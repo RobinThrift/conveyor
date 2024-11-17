@@ -1,0 +1,380 @@
+openapi: 3.0.0
+info:
+  title: Belt API
+  description: This is the Belt REST-ish API.
+  version: 0.1.0
+servers:
+- url: http://localhost:8080/api/v1
+  description: Local development server.
+
+paths:
+  /memos:
+    get:
+      parameters:
+      - name: page[size]
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 0
+          default: 10
+          x-go-type: uint64
+      - name: page[after]
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: filter[content]
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: filter[tag]
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: filter[created_at]
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: op[created_at]
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: ["=", "<="]
+      - name: filter[is_archived]
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+
+      operationId: ListMemos
+
+      responses:
+        "200":
+          description: The list of memos of the current account with pagination and filters applied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoList"
+
+    post:
+      operationId: CreateMemo
+
+      requestBody:
+        $ref: "#/components/requestBodies/CreateMemoRequest"
+      responses:
+        "201":
+          description: The memo was created succesfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memo"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tags:
+    get:
+      parameters:
+      - name: page[size]
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 0
+          default: 100
+          x-go-type: uint64
+      - name: page[after]
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: filter[prefix]
+        in: query
+        required: false
+        schema:
+          type: string
+
+      operationId: ListTags
+
+      responses:
+        "200":
+          description: The list of tags of the current account with pagination optionally constrained by the prefix filter.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagList"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /attachments:
+    get:
+      parameters:
+      - name: page[size]
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 0
+          default: 100
+          x-go-type: uint64
+      - name: page[after]
+        in: query
+        required: false
+        schema:
+          type: string
+
+      operationId: ListAttachments
+
+      responses:
+        "200":
+          description: A paginated list of attachments of the current account.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttachmentList"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+    post:
+      operationId: CreateAttachment
+
+      parameters:
+      - in: header
+        name: "X-Filename"
+        schema:
+          type: string
+        required: true
+
+      requestBody:
+        $ref: "#/components/requestBodies/CreateAttachmentRequest"
+      responses:
+        "201":
+          description: The atttachment was created succesfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Attachment"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+components:
+  schemas:
+    Memo:
+      type: object
+      properties:
+          id:
+            type: string
+          name:
+            type: string
+          content:
+            type: string
+          tags:
+            type: array
+            items:
+              type: string
+          isArchived:
+            type: boolean
+          createdBy:
+            type: string
+          createdAt:
+            type: string
+            format: date-time
+          updatedAt:
+            type: string
+            format: date-time
+      required:
+      - id
+      - name
+      - content
+      - tags
+      - isArchived
+      - createdBy
+      - createdAt
+      - updatedAt
+
+    MemoList:
+      type: object
+      properties:
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/Memo"
+          next:
+            type: string
+      required:
+      - items
+      - next
+
+
+    Tag:
+      type: object
+      properties:
+          tag:
+            type: string
+          count:
+            type: number
+      required:
+      - tag
+      - count
+
+    TagList:
+      type: object
+      properties:
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/Tag"
+          next:
+            type: string
+      required:
+      - items
+      - next
+
+    Attachment:
+      type: object
+      properties:
+          url:
+            type: string
+          filename:
+            type: string
+          contentType:
+            type: string
+          sizeBytes:
+            type: string
+          sha256:
+            type: string
+          createdBy:
+            type: string
+          createdAt:
+            type: string
+            format: date-time
+      required:
+      - url
+      - filename
+      - filepath
+      - contentType
+      - sizeBytes
+      - sha256
+      - createdBy
+      - createdAt
+
+    AttachmentList:
+      type: object
+      properties:
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/Attachment"
+          next:
+            type: string
+      required:
+      - items
+      - next
+
+    Error:
+      type: object
+      description: Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
+      properties:
+        code:
+          type: integer
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+      required:
+      - code
+      - type
+      - title
+      - detail
+
+
+  requestBodies:
+    CreateMemoRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+            required:
+            - content
+
+    CreateAttachmentRequest:
+      required: true
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary

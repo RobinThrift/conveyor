@@ -1,0 +1,103 @@
+version: "2"
+sql:
+- engine: "sqlite"
+  queries: "queries"
+  schema: "migrations"
+  gen:
+    go:
+      package: "sqlc"
+
+      out: "sqlc"
+      output_db_file_name: "sqlite_gen.go"
+      output_models_file_name: "models_gen.go"
+      output_querier_file_name: "querier_gen.go"
+      output_files_suffix: "_gen"
+      emit_interface: true
+      emit_methods_with_db_argument: true
+      omit_unused_structs: true
+
+      rename:
+        memos_ft: MemoFTS
+
+      overrides:
+      - column: sessions.expires_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: accounts.created_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: accounts.updated_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: local_auth_accounts.created_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: local_auth_accounts.updated_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: memos.id
+        go_type:
+          type: "MemoID"
+          import: "github.com/RobinThrift/belt/internal/domain"
+
+      - column: memos.content
+        go_type:
+          type: "[]byte"
+
+      - column: memos.tags
+        go_type:
+          type: "SQLiteStringSet"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: memos.created_by
+        go_type:
+          type: "AccountID"
+          import: "github.com/RobinThrift/belt/internal/auth"
+
+      - column: memos.created_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: memos.updated_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: memos_fts.content
+        go_type:
+          type: "[]byte"
+
+      - column: memos_fts.id
+        go_type:
+          type: "MemoID"
+          import: "github.com/RobinThrift/belt/internal/domain"
+
+      - column: memos_fts.is_archived
+        go_type:
+          type: "bool"
+
+      - column: memos_fts.created_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: memos_fts.updated_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: memos_fts.created_by
+        go_type:
+          type: "AccountID"
+          import: "github.com/RobinThrift/belt/internal/auth"
