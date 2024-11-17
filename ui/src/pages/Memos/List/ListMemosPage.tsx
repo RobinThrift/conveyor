@@ -10,7 +10,12 @@ import type { Tag } from "@/domain/Tag"
 import { useIsMobile } from "@/hooks/useIsMobile"
 import { Sliders } from "@phosphor-icons/react"
 import React, { startTransition, useCallback, useEffect, useState } from "react"
-import { type Filter, useListMemosPageState, useTagListStore } from "./state"
+import {
+    type Filter,
+    useListMemosPageState,
+    useMemoListStore,
+} from "./state/memos"
+import { useTagListStore } from "./state/tags"
 
 export interface ListMemosPageProps {
     filter: Filter
@@ -18,16 +23,19 @@ export interface ListMemosPageProps {
 
 export function ListMemosPage(props: ListMemosPageProps) {
     let state = useListMemosPageState({ filter: props.filter })
+    let memoList = useMemoListStore()
     let tagList = useTagListStore()
 
     let onClickTag = useCallback(
         (tag: Tag) => {
-            state.setFilter({
-                ...state.filter,
-                tag: tag,
+            memoList.setParams({
+                filter: {
+                    ...memoList.params.filter,
+                    tag: tag,
+                },
             })
         },
-        [state.setFilter, state.filter],
+        [memoList.params.filter, memoList.setParams],
     )
 
     let updateMemo = useCallback((memo: MemoT) => {
@@ -35,23 +43,30 @@ export function ListMemosPage(props: ListMemosPageProps) {
     }, [])
 
     let onEOLReached = useCallback(() => {
-        if (!state.memos.isLoading) {
-            state.memos.nextPage()
+        if (!memoList.isLoading) {
+            memoList.nextPage()
         }
-    }, [state.memos.isLoading, state.memos.nextPage])
+    }, [memoList.isLoading, memoList.nextPage])
+
+    let setFilter = useCallback(
+        (filter: Filter) => {
+            memoList.setParams({ filter })
+        },
+        [memoList.setParams],
+    )
 
     let memoCreated =
         state.creating.created &&
         !state.creating.inProgress &&
         !state.creating.error
 
-    useEffect(() => {
-        if (memoCreated) {
-            startTransition(() => {
-                state.memos.reset()
-            })
-        }
-    }, [state.memos.reset, memoCreated])
+    // useEffect(() => {
+    //     if (memoCreated) {
+    //         startTransition(() => {
+    //             state.memos.reset()
+    //         })
+    //     }
+    // }, [state.memos.reset, memoCreated])
 
     return (
         <div className="flex gap-4 justify-center">
@@ -65,7 +80,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                 </div>
 
                 <div className="gap-4 flex flex-col relative">
-                    {state.memos.memos.map((memo) => (
+                    {memoList.items.map((memo) => (
                         <Memo
                             key={memo.id}
                             memo={memo}
@@ -77,7 +92,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                         />
                     ))}
                     <EndOfListMarker onReached={onEOLReached} />
-                    {state.memos.isLoading && (
+                    {memoList.isLoading && (
                         <div className="flex justify-center items-center min-h-[200px]">
                             <Loader />
                         </div>
@@ -87,9 +102,9 @@ export function ListMemosPage(props: ListMemosPageProps) {
 
             <FiltersSidebar>
                 <Filters
-                    filters={state.filter}
+                    filters={memoList.params.filter}
                     tags={tagList}
-                    onChangeFilters={state.setFilter}
+                    onChangeFilters={setFilter}
                 />
             </FiltersSidebar>
         </div>

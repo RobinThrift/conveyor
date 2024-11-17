@@ -1,12 +1,9 @@
-import type { CreateMemoRequest } from "@/api/memos"
 import { list as listTags } from "@/api/tags"
-import type { Memo } from "@/domain/Memo"
 import type { Tag, TagList } from "@/domain/Tag"
-import { useMemoCreator, useMemoList } from "@/hooks/api/memos"
 import { $baseURL } from "@/hooks/useBaseURL"
 import { useStore } from "@nanostores/react"
 import { atom, batched, onMount, task } from "nanostores"
-import { startTransition, useCallback, useMemo, useState } from "react"
+import { useMemo } from "react"
 
 const $tagListStoreIsLoading = atom<boolean>(false)
 const $tagListStoreNext = atom<Tag | undefined>()
@@ -77,67 +74,4 @@ export function useTagListStore() {
         }),
         [store],
     )
-}
-
-export interface ListMemosPageState {
-    memos: {
-        memos: Memo[]
-        isLoading: boolean
-        error?: Error
-        nextPage: () => void
-        reset: () => void
-    }
-
-    creating: {
-        created?: Memo
-        inProgress: boolean
-        error?: Error
-    }
-
-    filter: Filter
-
-    setFilter: (f: Filter) => void
-
-    createMemo: (memo: CreateMemoRequest) => void
-}
-
-export interface Filter {
-    tag?: string
-    query?: string
-    exactDate?: Date
-    startDate?: Date
-}
-
-export function useListMemosPageState(init: {
-    filter: Filter
-}): ListMemosPageState {
-    let [filter, setFilter] = useState<Filter>(init.filter)
-    let memos = useMemoList({
-        pagination: {
-            pageSize: 10,
-        },
-        filter,
-    })
-
-    let memoCreator = useMemoCreator()
-
-    return {
-        memos: {
-            ...memos,
-            reset: useCallback(() => {
-                startTransition(() => {
-                    setFilter({})
-                    memos.reset(true)
-                })
-            }, [memos.reset]),
-        },
-        creating: {
-            created: memoCreator.created,
-            inProgress: memoCreator.isLoading,
-            error: memoCreator.error,
-        },
-        filter: filter,
-        setFilter,
-        createMemo: memoCreator.create,
-    }
 }

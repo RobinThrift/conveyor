@@ -10,5 +10,5 @@ export interface Memo {
 
 export interface MemoList {
     items: Memo[]
-    next: string
+    next?: Date
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -22,4 +23,8 @@ type Account struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+func (id AccountID) String() string {
+	return fmt.Sprint(int64(id))
 }

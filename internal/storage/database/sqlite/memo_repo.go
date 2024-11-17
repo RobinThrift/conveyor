@@ -18,8 +18,8 @@ import (
 type ListMemosQuery struct {
 	AccountID auth.AccountID
 
-	PageSize uint64
-	After    *domain.MemoID
+	PageSize  uint64
+	PageAfter *time.Time
 
 	Tag             *string
 	Search          *string
@@ -46,7 +46,6 @@ func (r *MemoRepo) GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo,
 
 	return &domain.Memo{
 		ID:         res.ID,
-		Name:       res.Name,
 		Content:    res.Content,
 		IsArchived: res.IsArchived,
 		CreatedBy:  res.CreatedBy,
@@ -57,11 +56,11 @@ func (r *MemoRepo) GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo,
 
 func (r *MemoRepo) ListMemos(ctx context.Context, query ListMemosQuery) (*domain.MemoList, error) {
 	params := sqlc.ListMemosParams{
-		Limit: int64(query.PageSize),
+		PageSize: int64(query.PageSize),
 	}
 
-	if query.After != nil {
-		params.After = int64(*query.After)
+	if query.PageAfter != nil {
+		params.PageAfter = types.NewSQLiteDatetime(*query.PageAfter).String()
 	}
 
 	if query.CreatedAt != nil {
@@ -104,13 +103,16 @@ func (r *MemoRepo) listMemos(ctx context.Context, params sqlc.ListMemosParams) (
 	for _, memo := range res {
 		list.Items = append(list.Items, &domain.Memo{
 			ID:         memo.ID,
-			Name:       memo.Name,
 			Content:    memo.Content,
 			IsArchived: memo.IsArchived,
 			CreatedBy:  memo.CreatedBy,
 			CreatedAt:  memo.CreatedAt.Time,
 			UpdatedAt:  memo.UpdatedAt.Time,
 		})
+	}
+
+	if len(res) != 0 {
+		list.Next = &res[len(res)-1].CreatedAt.Time
 	}
 
 	return list, nil
@@ -119,13 +121,13 @@ func (r *MemoRepo) listMemos(ctx context.Context, params sqlc.ListMemosParams) (
 
 func (r *MemoRepo) listMemosForTags(ctx context.Context, query ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
 	res, err := queries.ListMemosForTags(ctx, r.db.Conn(ctx), sqlc.ListMemosForTagsParams{
-		After:                params.After,
+		PageAfter:            params.PageAfter,
 		Tag:                  *query.Tag,
 		WithCreatedAt:        params.WithCreatedAt,
 		CreatedAt:            params.CreatedAt,
 		WithCreatedAtOrOlder: params.WithCreatedAtOrOlder,
 		CreatedAtOrOlder:     params.CreatedAtOrOlder,
-		Limit:                params.Limit,
+		PageSize:             params.PageSize,
 	})
 	if err != nil {
 		return nil, err
@@ -139,13 +141,16 @@ func (r *MemoRepo) listMemosForTags(ctx context.Context, query ListMemosQuery, p
 	for _, memo := range res {
 		list.Items = append(list.Items, &domain.Memo{
 			ID:         memo.ID,
-			Name:       memo.Name,
 			Content:    memo.Content,
 			IsArchived: memo.IsArchived,
 			CreatedBy:  memo.CreatedBy,
 			CreatedAt:  memo.CreatedAt.Time,
 			UpdatedAt:  memo.UpdatedAt.Time,
 		})
+	}
+
+	if len(res) != 0 {
+		list.Next = &res[len(res)-1].CreatedAt.Time
 	}
 
 	return list, nil
@@ -153,13 +158,13 @@ func (r *MemoRepo) listMemosForTags(ctx context.Context, query ListMemosQuery, p
 
 func (r *MemoRepo) listMemosWithSearch(ctx context.Context, query ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
 	res, err := queries.ListMemosWithSearch(ctx, r.db.Conn(ctx), sqlc.ListMemosWithSearchParams{
-		After:                params.After,
+		PageAfter:            params.PageAfter,
 		Search:               types.PrepareFTSQueryString(*query.Search),
 		WithCreatedAt:        params.WithCreatedAt,
 		CreatedAt:            params.CreatedAt,
 		WithCreatedAtOrOlder: params.WithCreatedAtOrOlder,
 		CreatedAtOrOlder:     params.CreatedAtOrOlder,
-		Limit:                params.Limit,
+		PageSize:             params.PageSize,
 	})
 	if err != nil {
 		return nil, err
@@ -173,13 +178,16 @@ func (r *MemoRepo) listMemosWithSearch(ctx context.Context, query ListMemosQuery
 	for _, memo := range res {
 		list.Items = append(list.Items, &domain.Memo{
 			ID:         memo.ID,
-			Name:       memo.Name,
 			Content:    memo.Content,
 			IsArchived: memo.IsArchived,
 			CreatedBy:  memo.CreatedBy,
 			CreatedAt:  memo.CreatedAt.Time,
 			UpdatedAt:  memo.UpdatedAt.Time,
 		})
+	}
+
+	if len(res) != 0 {
+		list.Next = &res[len(res)-1].CreatedAt.Time
 	}
 
 	return list, nil
@@ -187,14 +195,14 @@ func (r *MemoRepo) listMemosWithSearch(ctx context.Context, query ListMemosQuery
 
 func (r *MemoRepo) listMemosForTagsWithSearch(ctx context.Context, query ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
 	res, err := queries.ListMemosForTagsWithSearch(ctx, r.db.Conn(ctx), sqlc.ListMemosForTagsWithSearchParams{
-		After:                params.After,
+		PageAfter:            params.PageAfter,
 		Tag:                  *query.Tag,
 		Search:               types.PrepareFTSQueryString(*query.Search),
 		WithCreatedAt:        params.WithCreatedAt,
 		CreatedAt:            params.CreatedAt,
 		WithCreatedAtOrOlder: params.WithCreatedAtOrOlder,
 		CreatedAtOrOlder:     params.CreatedAtOrOlder,
-		Limit:                params.Limit,
+		PageSize:             params.PageSize,
 	})
 	if err != nil {
 		return nil, err
@@ -208,13 +216,16 @@ func (r *MemoRepo) listMemosForTagsWithSearch(ctx context.Context, query ListMem
 	for _, memo := range res {
 		list.Items = append(list.Items, &domain.Memo{
 			ID:         memo.ID,
-			Name:       memo.Name,
 			Content:    memo.Content,
 			IsArchived: memo.IsArchived,
 			CreatedBy:  memo.CreatedBy,
 			CreatedAt:  memo.CreatedAt.Time,
 			UpdatedAt:  memo.UpdatedAt.Time,
 		})
+	}
+
+	if len(res) != 0 {
+		list.Next = &res[len(res)-1].CreatedAt.Time
 	}
 
 	return list, nil
@@ -248,13 +259,16 @@ func (r *MemoRepo) ListArchivedMemos(ctx context.Context, query ListArchivedMemo
 	for _, memo := range res {
 		list.Items = append(list.Items, &domain.Memo{
 			ID:         memo.ID,
-			Name:       memo.Name,
 			Content:    memo.Content,
 			IsArchived: memo.IsArchived,
 			CreatedBy:  memo.CreatedBy,
 			CreatedAt:  memo.CreatedAt.Time,
 			UpdatedAt:  memo.UpdatedAt.Time,
 		})
+	}
+
+	if len(res) != 0 {
+		list.Next = &res[len(res)-1].CreatedAt.Time
 	}
 
 	return list, nil
@@ -288,7 +302,6 @@ func (r *MemoRepo) ListDeletedMemos(ctx context.Context, query ListDeletedMemosQ
 	for _, memo := range res {
 		list.Items = append(list.Items, &domain.Memo{
 			ID:         memo.ID,
-			Name:       memo.Name,
 			Content:    memo.Content,
 			IsArchived: memo.IsArchived,
 			CreatedBy:  memo.CreatedBy,
@@ -297,12 +310,14 @@ func (r *MemoRepo) ListDeletedMemos(ctx context.Context, query ListDeletedMemosQ
 		})
 	}
 
+	if len(res) != 0 {
+		list.Next = &res[len(res)-1].CreatedAt.Time
+	}
+
 	return list, nil
 }
-
-func (r *MemoRepo) CreateMemo(ctx context.Context, memo *domain.Memo) error {
-	err := queries.CreateMemo(ctx, r.db.Conn(ctx), sqlc.CreateMemoParams{
-		Name:      memo.Name,
+func (r *MemoRepo) CreateMemo(ctx context.Context, memo *domain.Memo) (domain.MemoID, error) {
+	id, err := queries.CreateMemo(ctx, r.db.Conn(ctx), sqlc.CreateMemoParams{
 		Content:   memo.Content,
 		CreatedBy: memo.CreatedBy,
 		CreatedAt: types.SQLiteDatetime{Time: memo.CreatedAt, Valid: true},
@@ -310,12 +325,12 @@ func (r *MemoRepo) CreateMemo(ctx context.Context, memo *domain.Memo) error {
 	if err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == 787 {
-			return fmt.Errorf("invalid account reference")
+			return domain.MemoID(-1), fmt.Errorf("invalid account reference")
 		}
-		return err
+		return domain.MemoID(-1), err
 	}
 
-	return nil
+	return id, nil
 }
 
 func (r *MemoRepo) UpdateMemoContent(ctx context.Context, memo *domain.Memo) error {

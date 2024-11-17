@@ -57,25 +57,31 @@ type Memo struct {
 	Id         string    `json:"id"`
 	IsArchived bool      `json:"isArchived"`
 	Name       string    `json:"name"`
-	Tags       []string  `json:"tags"`
 	UpdatedAt  time.Time `json:"updatedAt"`
 }
 
 // MemoList defines model for MemoList.
 type MemoList struct {
-	Items []Memo `json:"items"`
-	Next  string `json:"next"`
+	Items []Memo     `json:"items"`
+	Next  *time.Time `json:"next,omitempty"`
+}
+
+// Tag defines model for Tag.
+type Tag struct {
+	Count float32 `json:"count"`
+	Tag   string  `json:"tag"`
 }
 
 // TagList defines model for TagList.
 type TagList struct {
-	Items []string `json:"items"`
-	Next  string   `json:"next"`
+	Items []Tag  `json:"items"`
+	Next  string `json:"next"`
 }
 
 // CreateMemoRequest defines model for CreateMemoRequest.
 type CreateMemoRequest struct {
-	Content string `json:"content"`
+	Content   string     `json:"content"`
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
 }
 
 // ListAttachmentsParams defines parameters for ListAttachments.
@@ -92,7 +98,7 @@ type CreateAttachmentParams struct {
 // ListMemosParams defines parameters for ListMemos.
 type ListMemosParams struct {
 	PageSize         uint64                      `form:"page[size]" json:"page[size]"`
-	PageAfter        *string                     `form:"page[after],omitempty" json:"page[after],omitempty"`
+	PageAfter        *time.Time                  `form:"page[after],omitempty" json:"page[after],omitempty"`
 	FilterContent    *string                     `form:"filter[content],omitempty" json:"filter[content],omitempty"`
 	FilterTag        *string                     `form:"filter[tag],omitempty" json:"filter[tag],omitempty"`
 	FilterCreatedAt  *openapi_types.Date         `form:"filter[created_at],omitempty" json:"filter[created_at],omitempty"`
@@ -105,7 +111,8 @@ type ListMemosParamsOpCreatedAt string
 
 // CreateMemoJSONBody defines parameters for CreateMemo.
 type CreateMemoJSONBody struct {
-	Content string `json:"content"`
+	Content   string     `json:"content"`
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
 }
 
 // ListTagsParams defines parameters for ListTags.

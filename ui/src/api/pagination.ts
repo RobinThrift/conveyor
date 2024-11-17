@@ -1,4 +1,4 @@
-export interface Pagination<A extends string> {
+export interface Pagination<A> {
     pageSize: number
     after?: A
 }

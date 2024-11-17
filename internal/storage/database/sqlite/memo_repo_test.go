@@ -23,8 +23,7 @@ func Test_MemoRepo_Querying(t *testing.T) {
 
 	// Create new Memos
 	for i := 0; i < numMemos; i++ {
-		err := repo.CreateMemo(ctx, &domain.Memo{
-			Name:      fmt.Sprintf("Test Memo %d", i),
+		_, err := repo.CreateMemo(ctx, &domain.Memo{
 			Content:   []byte(fmt.Sprintf("# Test Memo %[1]d\n With some more content for memo %[1]d\n #tag-%[1]d #parent/tag-%[2]d", i, i+1)),
 			CreatedBy: auth.AccountID(1),
 			CreatedAt: now.Add(-time.Hour * time.Duration(i)),
@@ -32,20 +31,23 @@ func Test_MemoRepo_Querying(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	var lastMemoID *domain.MemoID
+	var lastMemoDate *time.Time
+	var lastMemoID = domain.MemoID(-1)
 	// List All Memos in batches of 25
 	for i := 0; i < numMemos; i += 25 {
 		q := ListMemosQuery{
 			AccountID: auth.AccountID(1),
 			PageSize:  25,
-			After:     lastMemoID,
+			PageAfter: lastMemoDate,
 		}
 
 		list, err := repo.ListMemos(ctx, q)
 		require.NoError(t, err, i)
 
-		require.Len(t, list.Items, 25, i)
-		lastMemoID = list.Next
+		require.Lenf(t, list.Items, 25, "i = %d", i)
+		require.NotEqualf(t, lastMemoID, list.Items[0].ID, "i = %d", i)
+		lastMemoID = list.Items[0].ID
+		lastMemoDate = list.Next
 	}
 
 	t.Run("With CreatedAt Date", func(t *testing.T) {
@@ -59,7 +61,6 @@ func Test_MemoRepo_Querying(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, list.Items, 13)
-		lastMemoID = list.Next
 	})
 
 	t.Run("With MinCreationDate", func(t *testing.T) {
@@ -74,7 +75,6 @@ func Test_MemoRepo_Querying(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, list.Items, numMemos-13)
-		lastMemoID = list.Next
 	})
 
 	t.Run("With Search Query", func(t *testing.T) {
@@ -90,7 +90,6 @@ func Test_MemoRepo_Querying(t *testing.T) {
 
 		fmt.Printf("list %s\n", list.Items[0].Content)
 		require.Len(t, list.Items, 111) // 10-19 + 100-199 inclusive
-		lastMemoID = list.Next
 	})
 
 	// t.Run("With Multiple Filters", func(t *testing.T) {
@@ -122,8 +121,7 @@ func Test_MemoRepo_CRUD(t *testing.T) {
 
 	// Create new Memos
 	for i := 0; i < numMemos; i++ {
-		err := repo.CreateMemo(ctx, &domain.Memo{
-			Name:      fmt.Sprintf("Test Memo %d", i),
+		_, err := repo.CreateMemo(ctx, &domain.Memo{
 			Content:   []byte(fmt.Sprintf("# Test Memo %d\n With some more content for memo %d", i, i)),
 			CreatedBy: auth.AccountID(1),
 			CreatedAt: now.Add(-time.Hour * time.Duration(i)),
@@ -227,8 +225,7 @@ func Test_MemoRepo_Create(t *testing.T) {
 	now := time.Date(2024, 03, 15, 12, 0, 0, 0, time.UTC)
 
 	// Create new Memos
-	err := repo.CreateMemo(ctx, &domain.Memo{
-		Name:      "Test Memo",
+	_, err := repo.CreateMemo(ctx, &domain.Memo{
 		Content:   []byte("# Test Memo\n With some more content"),
 		CreatedBy: auth.AccountID(1),
 		CreatedAt: now,
@@ -236,8 +233,7 @@ func Test_MemoRepo_Create(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("With Non-Existent Account ID", func(t *testing.T) {
-		err := repo.CreateMemo(ctx, &domain.Memo{
-			Name:      "",
+		_, err := repo.CreateMemo(ctx, &domain.Memo{
 			Content:   []byte(""),
 			CreatedBy: auth.AccountID(100),
 			CreatedAt: now,

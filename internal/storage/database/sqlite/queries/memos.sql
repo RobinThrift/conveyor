@@ -10,11 +10,11 @@ FROM memos
 WHERE
     is_archived = false
     AND is_deleted = false
-    AND id > CAST(@after as INTEGER)
+    AND CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
     AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
     AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
 ORDER BY created_at DESC
-LIMIT @limit;
+LIMIT @page_size;
 
 -- name: ListMemosForTags :many
 SELECT * FROM memos
@@ -22,12 +22,12 @@ JOIN memo_tags ON memo_id = memos.id
 WHERE
     is_archived = false
     AND is_deleted = false
-    AND id > CAST(@after as INTEGER)
+    AND CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
     AND memo_tags.tag = @tag
     AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
     AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
 ORDER BY created_at DESC
-LIMIT @limit;
+LIMIT @page_size;
 
 -- name: ListMemosWithSearch :many
 SELECT *
@@ -35,12 +35,12 @@ FROM memos_fts
 WHERE
     is_archived = false
     AND is_deleted = false
-    AND id > CAST(@after as INTEGER)
+    AND CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
     AND content MATCH CAST(@search as TEXT)
     AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
     AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
 ORDER BY created_at DESC, rank
-LIMIT @limit;
+LIMIT @page_size;
 
 -- name: ListMemosForTagsWithSearch :many
 SELECT * FROM memos_fts
@@ -48,13 +48,13 @@ JOIN memo_tags ON memo_id = memos.id
 WHERE
     is_archived = false
     AND is_deleted = false
-    AND id > CAST(@after as INTEGER)
+    AND CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
     AND memo_tags.tag = @tag
     AND content MATCH CAST(@search as TEXT)
     AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
     AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
 ORDER BY created_at DESC, rank
-LIMIT @limit;
+LIMIT @page_size;
 
 -- name: ListArchivedMemos :many
 SELECT *
@@ -75,13 +75,13 @@ WHERE
 ORDER BY created_at DESC
 LIMIT ?;
 
--- name: CreateMemo :exec
+-- name: CreateMemo :one
 INSERT INTO memos(
-    name,
     content,
     created_by,
     created_at
-) VALUES (?, ?, ?, ?);
+) VALUES (?, ?, ?)
+RETURNING id;
 
 -- name: UpdateMemoContent :execrows
 UPDATE memos SET

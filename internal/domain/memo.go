@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/RobinThrift/belt/internal/auth"
@@ -14,7 +15,6 @@ type MemoID int64
 
 type Memo struct {
 	ID         MemoID
-	Name       string
 	Content    []byte
 	IsArchived bool
 	CreatedBy  auth.AccountID
@@ -24,5 +24,9 @@ type Memo struct {
 
 type MemoList struct {
 	Items []*Memo
-	Next  *MemoID
+	Next  *time.Time
+}
+
+func (id MemoID) String() string {
+	return fmt.Sprint(int64(id))
 }

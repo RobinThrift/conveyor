@@ -28,7 +28,6 @@ const mockData: MockData = (() => {
     for (let i = 0; i < 100; i++) {
         memos.push({
             id: `10-${i}`,
-            name: `tenant_${i}`,
             content: `# Memo ${i}
 
 ${faker.lorem.lines({ min: 1, max: 10 })}
@@ -71,7 +70,7 @@ export const mockAPI: HttpHandler[] = [
 
         let memos: Memo[] = []
         let take = after === null
-        let next = ""
+        let next: Date | undefined = undefined
 
         for (let memo of mockData.memos) {
             take = take || memo.id === after
@@ -102,7 +101,7 @@ export const mockAPI: HttpHandler[] = [
             }
 
             if (memos.length >= pageSize) {
-                next = memo.id
+                next = memo.createdAt
                 break
             }
 
@@ -128,7 +127,6 @@ export const mockAPI: HttpHandler[] = [
             let now = new Date()
             let memo: Memo = {
                 id: mockData.memos.length.toString(),
-                name: body.content.split("\n")[0] || "",
                 content: body.content,
                 isArchived: false,
                 createdAt: now,

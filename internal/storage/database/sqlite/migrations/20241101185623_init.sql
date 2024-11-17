@@ -40,7 +40,6 @@ CREATE UNIQUE INDEX unique_auth_ref ON accounts(auth_ref);
 
 CREATE TABLE memos (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
-    name           TEXT NOT NULL,
 
     content TEXT NOT NULL,
 
@@ -111,14 +110,13 @@ CREATE TABLE memo_attachments (
 );
 
 
-CREATE VIRTUAL TABLE memos_fts USING fts5(id UNINDEXED, name UNINDEXED, content, is_archived UNINDEXED, is_deleted UNINDEXED, created_by UNINDEXED, created_at UNINDEXED, updated_at UNINDEXED, content='memos', content_rowid='id');
+CREATE VIRTUAL TABLE memos_fts USING fts5(id UNINDEXED, content, is_archived UNINDEXED, is_deleted UNINDEXED, created_by UNINDEXED, created_at UNINDEXED, updated_at UNINDEXED, content='memos', content_rowid='id');
 
 -- +goose StatementBegin
 CREATE TRIGGER memos_after_insert AFTER INSERT ON memos BEGIN
-    INSERT INTO memos_fts(rowid, id, name, content, is_archived, is_deleted, created_by, created_at, updated_at) VALUES (
+    INSERT INTO memos_fts(rowid, id, content, is_archived, is_deleted, created_by, created_at, updated_at) VALUES (
         new.id,
         new.id,
-        new.name,
         new.content,
         new.is_archived,
         new.is_deleted,
@@ -131,11 +129,10 @@ END;
 
 -- +goose StatementBegin
 CREATE TRIGGER memos_after_delete AFTER DELETE ON memos BEGIN
-    INSERT INTO memos_fts(memos_fts, rowid, id, name, content, is_archived, is_deleted, created_by, created_at, updated_at) VALUES (
+    INSERT INTO memos_fts(memos_fts, rowid, id, content, is_archived, is_deleted, created_by, created_at, updated_at) VALUES (
         'delete',
         old.id,
         old.id,
-        old.name,
         old.content,
         old.is_archived,
         old.is_deleted,
@@ -148,11 +145,10 @@ END;
 
 -- +goose StatementBegin
 CREATE TRIGGER memos_after_update AFTER UPDATE ON memos BEGIN
-    INSERT INTO memos_fts(memos_fts, rowid, id, name, content, is_archived, is_deleted, created_by, created_at, updated_at) VALUES (
+    INSERT INTO memos_fts(memos_fts, rowid, id, content, is_archived, is_deleted, created_by, created_at, updated_at) VALUES (
         'delete',
         old.id,
         old.id,
-        old.name,
         old.content,
         old.is_archived,
         old.is_deleted,
@@ -161,10 +157,9 @@ CREATE TRIGGER memos_after_update AFTER UPDATE ON memos BEGIN
         old.updated_at
     );
 
-    INSERT INTO memos_fts(rowid, id, name, content, is_archived, is_deleted, created_by, created_at, updated_at) VALUES (
+    INSERT INTO memos_fts(rowid, id, content, is_archived, is_deleted, created_by, created_at, updated_at) VALUES (
         new.id,
         new.id,
-        new.name,
         new.content,
         new.is_archived,
         new.is_deleted,

@@ -1,6 +1,6 @@
 import { type CreateMemoRequest, create, list } from "@/api/memos"
 import type { Pagination } from "@/api/pagination"
-import type { Memo, MemoID, MemoList } from "@/domain/Memo"
+import type { Memo, MemoList } from "@/domain/Memo"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCallback, useEffect, useState } from "react"
 import { useAPIRequest } from "./useAPIRequest"
@@ -15,7 +15,7 @@ export interface UseMemoList {
 }
 
 export function useMemoList(opts: {
-    pagination: Pagination<MemoID>
+    pagination: Pagination<Date>
     filter: {
         query?: string
         exactDate?: Date
@@ -25,8 +25,8 @@ export function useMemoList(opts: {
 }): UseMemoList {
     let baseURL = useBaseURL()
     let listMemos = useAPIRequest(list)
-    let [memos, setMemos] = useState<MemoList>({ items: [], next: "" })
-    let [pageAfter, setPageAfter] = useState<string | undefined>(
+    let [memos, setMemos] = useState<MemoList>({ items: [] })
+    let [pageAfter, setPageAfter] = useState<Date | undefined>(
         opts.pagination.after,
     )
 
@@ -58,7 +58,7 @@ export function useMemoList(opts: {
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: we want to reset if the dependency change
     useEffect(() => {
-        setMemos({ items: [], next: "" })
+        setMemos({ items: [] })
     }, [
         opts.filter.tag,
         opts.filter.query,

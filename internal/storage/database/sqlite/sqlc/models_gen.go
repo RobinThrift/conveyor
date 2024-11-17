@@ -45,7 +45,6 @@ type LocalAuthAccount struct {
 
 type Memo struct {
 	ID         domain.MemoID
-	Name       string
 	Content    []byte
 	IsArchived bool
 	IsDeleted  bool
@@ -56,7 +55,6 @@ type Memo struct {
 
 type MemoFTS struct {
 	ID         domain.MemoID
-	Name       string
 	Content    []byte
 	IsArchived bool
 	IsDeleted  string

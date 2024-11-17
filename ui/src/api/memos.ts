@@ -1,6 +1,7 @@
-import type { Memo, MemoID, MemoList } from "@/domain/Memo"
+import type { Memo, MemoList } from "@/domain/Memo"
 import { APIError } from "./APIError"
 import type { Pagination } from "./pagination"
+import { formatRFC3339 } from "date-fns"
 
 export async function list({
     pagination,
@@ -8,7 +9,7 @@ export async function list({
     filter,
     signal,
 }: {
-    pagination: Pagination<MemoID>
+    pagination: Pagination<Date>
     after?: string
     filter: {
         tag?: string
@@ -23,7 +24,10 @@ export async function list({
     url.searchParams.set("page[size]", `${pagination.pageSize}`)
 
     if (pagination.after) {
-        url.searchParams.set("page[after]", `${pagination.after}`)
+        url.searchParams.set(
+            "page[after]",
+            `${formatRFC3339(pagination.after)}`,
+        )
     }
 
     if (filter.tag) {
@@ -64,6 +68,8 @@ export async function list({
         createdAt: new Date(memo.createdAt),
         updatedAt: new Date(memo.updatedAt),
     }))
+
+    list.next = list.next && new Date(list.next)
 
     return list
 }

@@ -35,7 +35,7 @@ func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthControll
 	)
 
 	mux.Handle("/", csrfProtectionMiddleware(router.ensureLoggedIn(router.handlerFuncWithErr(func(w http.ResponseWriter, r *http.Request) error {
-		err := router.renderUI(w, r, ui.PageData{Title: "Admin"})
+		err := router.renderUI(w, r, ui.PageData{Title: "Belt"})
 		if err != nil {
 			router.renderErrorPage(w, r, err)
 		}

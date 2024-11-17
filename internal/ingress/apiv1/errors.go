@@ -7,43 +7,47 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"runtime/debug"
+
+	"github.com/RobinThrift/belt/internal/auth"
 )
 
 var errInvalidRequest = errors.New("invalid request")
+var errNotFound = errors.New("not found")
 
 func errorHandlerFunc(w http.ResponseWriter, r *http.Request, err error) {
-	slog.ErrorContext(r.Context(), err.Error(), slog.Any("error", err))
+	slog.ErrorContext(r.Context(), err.Error(), slog.Any("error", err), slog.String("path", r.URL.Path), slog.String("method", r.Method))
 
 	apiErr := Error{
 		Code:   http.StatusInternalServerError,
 		Detail: err.Error(),
 		Title:  http.StatusText(http.StatusInternalServerError),
-		Type:   "idm/api/v1/InternalServerError",
+		Type:   "belt/api/v1/InternalServerError",
 	}
 
-	// switch {
-	// case errors.Is(err, domain.ErrUnauthorized):
-	// 	apiErr = Error{
-	// 		Code:   http.StatusUnauthorized,
-	// 		Title:  http.StatusText(http.StatusUnauthorized),
-	// 		Detail: err.Error(),
-	// 		Type:   "idm/api/v1/Unauthorized",
-	// 	}
-	// case errors.Is(err, domain.ErrNotFound):
-	// 	apiErr = Error{
-	// 		Code:   http.StatusUnauthorized,
-	// 		Title:  http.StatusText(http.StatusUnauthorized),
-	// 		Detail: err.Error(),
-	// 		Type:   "idm/api/v1/NotFound",
-	// 	}
-	// case errors.Is(err, errInvalidRequest):
-	// 	apiErr = Error{
-	// 		Code:   http.StatusBadRequest,
-	// 		Title:  "InvalidRequest",
-	// 		Detail: err.Error(),
-	// 		Type:   "idm/api/v1/InvalidRequest",
-	// 	}
-	// }
+	switch {
+	case errors.Is(err, auth.ErrUnauthorized):
+		apiErr = Error{
+			Code:   http.StatusUnauthorized,
+			Title:  http.StatusText(http.StatusUnauthorized),
+			Detail: err.Error(),
+			Type:   "belt/api/v1/Unauthorized",
+		}
+	case errors.Is(err, errNotFound):
+		apiErr = Error{
+			Code:   http.StatusNotFound,
+			Title:  http.StatusText(http.StatusNotFound),
+			Detail: err.Error(),
+			Type:   "belt/api/v1/NotFound",
+		}
+	case errors.Is(err, errInvalidRequest):
+		apiErr = Error{
+			Code:   http.StatusBadRequest,
+			Title:  "InvalidRequest",
+			Detail: err.Error(),
+			Type:   "belt/api/v1/InvalidRequest",
+		}
+	}
 
 	w.WriteHeader(apiErr.Code)
 
@@ -67,7 +71,7 @@ func notFoundHandlerFunc(w http.ResponseWriter, r *http.Request) {
 		Code:   http.StatusNotFound,
 		Title:  http.StatusText(http.StatusNotFound),
 		Detail: r.URL.String(),
-		Type:   "idm/api/v1/NotFound",
+		Type:   "belt/api/v1/NotFound",
 	}
 
 	w.WriteHeader(apiErr.Code)
@@ -92,7 +96,7 @@ func methodNotAllowedHandlerFunc(w http.ResponseWriter, r *http.Request) {
 		Code:   http.StatusMethodNotAllowed,
 		Title:  http.StatusText(http.StatusMethodNotAllowed),
 		Detail: r.URL.String(),
-		Type:   "idm/api/v1/MethodNotAllowed",
+		Type:   "belt/api/v1/MethodNotAllowed",
 	}
 
 	w.WriteHeader(apiErr.Code)
@@ -120,13 +124,13 @@ func recoverer(next http.Handler) http.Handler {
 					panic(p)
 				}
 
-				slog.ErrorContext(ctx, "panic recovered", slog.Any("error", p))
+				slog.ErrorContext(ctx, "panic recovered", slog.Any("error", p), slog.String("stack", string(debug.Stack())))
 
 				apiErr := Error{
 					Code:   http.StatusInternalServerError,
 					Detail: fmt.Sprint(p),
 					Title:  http.StatusText(http.StatusInternalServerError),
-					Type:   "idm/api/v1/InternalServerError",
+					Type:   "belt/api/v1/InternalServerError",
 				}
 
 				w.WriteHeader(apiErr.Code)
@@ -147,4 +151,8 @@ func recoverer(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (e *Error) Error() string {
+	return fmt.Sprintf("%s (%d): %s %s", e.Type, e.Code, e.Title, e.Detail)
 }

@@ -18,7 +18,7 @@ type Querier interface {
 	CreateAccount(ctx context.Context, db DBTX, arg CreateAccountParams) error
 	CreateAttachment(ctx context.Context, db DBTX, arg CreateAttachmentParams) error
 	CreateLocalAuthAccount(ctx context.Context, db DBTX, arg CreateLocalAuthAccountParams) error
-	CreateMemo(ctx context.Context, db DBTX, arg CreateMemoParams) error
+	CreateMemo(ctx context.Context, db DBTX, arg CreateMemoParams) (domain.MemoID, error)
 	CreateMemoAttachmentLink(ctx context.Context, db DBTX, arg CreateMemoAttachmentLinkParams) error
 	CreateMemoTagConnection(ctx context.Context, db DBTX, arg CreateMemoTagConnectionParams) error
 	CreateSession(ctx context.Context, db DBTX, arg CreateSessionParams) error

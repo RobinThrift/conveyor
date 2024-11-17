@@ -24,6 +24,7 @@ paths:
         required: false
         schema:
           type: string
+          format: "date-time"
       - name: filter[content]
         in: query
         required: false
@@ -236,10 +237,6 @@ components:
             type: string
           content:
             type: string
-          tags:
-            type: array
-            items:
-              type: string
           isArchived:
             type: boolean
           createdBy:
@@ -254,7 +251,6 @@ components:
       - id
       - name
       - content
-      - tags
       - isArchived
       - createdBy
       - createdAt
@@ -269,9 +265,9 @@ components:
               $ref: "#/components/schemas/Memo"
           next:
             type: string
+            format: "date-time"
       required:
       - items
-      - next
 
 
     Tag:
@@ -368,6 +364,9 @@ components:
             properties:
               content:
                 type: string
+              createdAt:
+                type: string
+                format: date-time
             required:
             - content
 
