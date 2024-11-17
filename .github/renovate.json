@@ -1,0 +1,77 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+    "dependencyDashboard": true,
+
+    "commitMessagePrefix": "deps({{#if isGroup}}{{groupName}}{{else}}{{depName}}{{/if}}): ",
+    "commitMessageAction": "Upgrade",
+    "commitMessageLowerCase": "never",
+    "commitBodyTable": true,
+
+    "labels": ["dependencies"],
+    "prHourlyLimit": 50,
+    "prConcurrentLimit": 50,
+
+    "vulnerabilityAlerts": { "enabled": true },
+    "osvVulnerabilityAlerts": true,
+
+    "lockFileMaintenance": { "enabled": true },
+    "enabledManagers": ["gomod", "npm", "dockerfile", "github-actions", "custom.regex"],
+
+    "packageRules": [
+        { "matchDatasources": ["go"], "addLabels": ["go"] },
+
+        {
+            "groupName": "Go Open Telemetry Packages",
+            "matchDatasources": ["go"],
+            "matchPackageNames": ["/^go.opentelemetry.io/"]
+        },
+
+        { "matchManagers": ["npm"], "addLabels": ["javascript"] },
+
+        {
+            "groupName": "JavaScript React Packages",
+            "matchManagers": ["npm"],
+            "matchPackageNames": [
+                "/^react/",
+                "/^react-dom/",
+                "/^@types/react/",
+                "/^@types/react-dom/",
+                "/.*/react/"
+            ]
+        },
+
+        {
+            "groupName": "JavaScript Vite Packages",
+            "matchManagers": ["npm"],
+            "matchPackageNames": ["/^vite$/", "/^@vitejs/plugin-react$/", "/^vitest$/"]
+        },
+
+        {
+            "groupName": "JavaScript Storybook Packages",
+            "matchManagers": ["npm"],
+            "matchPackageNames": ["/^@storybook/", "/.*-storybook-/", "/^storybook$/"]
+        },
+
+        { "matchManagers": ["dockerfile"], "addLabels": ["docker"] },
+
+        { "matchManagers": ["github-actions"], "addLabels": ["github-actions"] },
+
+        {
+            "matchManagers": ["custom.regex"],
+            "addLabels": ["tools"],
+            "matchFileNames": ["**/TOOL_VERSIONS"]
+        }
+    ],
+
+    "customManagers": [
+        {
+            "customType": "regex",
+            "fileMatch": ["^.tools/TOOL_VERSIONS$"],
+            "matchStrings": [
+                "(?<depName>.+?): *(?<datasource>github-releases|go)://(?<packageName>.+?)@(?<currentValue>[\\d\\.]+)"
+            ],
+            "versioningTemplate": "semver"
+        }
+    ]
+}

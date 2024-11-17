@@ -1,0 +1,35 @@
+local_bin := absolute_path("./node_modules/.bin")
+
+serve *args="":
+    {{ local_bin }}/vite --mode development --strictPort --port 6155 {{ args }}
+
+build:
+    {{ local_bin }}/vite build --mode production
+
+watch mode="development": 
+    {{ local_bin }}/vite build --mode {{ mode }} --watch
+
+storybook *flags="":
+    -rm -rf .storybook/public/
+    {{ local_bin }}/msw init --save false .storybook/public/
+    {{ local_bin }}/storybook dev --no-open {{ flags }}
+
+fmt: install
+    {{ local_bin }}/biome format --write ./src
+
+lint: install
+    {{ local_bin }}/biome check --write ./src
+    {{ local_bin }}/tsc --noEmit
+
+typecheck: install
+    {{ local_bin }}/tsc --noEmit --incremental false
+
+typecheck-watch: install
+    {{ local_bin }}/tsc --noEmit --watch
+
+install:
+    if [ ! -d node_modules/.bin ] || [ package.json -nt package-lock.json ]; then npm i --no-audit --no-fund --install-links=false ; fi
+
+clean:
+	rm -rf build build node_modules
+

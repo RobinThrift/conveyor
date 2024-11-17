@@ -1,0 +1,45 @@
+{
+    "compilerOptions": {
+        "outDir": "frontend/build",
+
+        "jsx": "react",
+
+        "target": "ES2023",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+
+        "incremental": true,
+        "useDefineForClassFields": false,
+        "resolveJsonModule": true,
+        "allowJs": true,
+        "checkJs": false,
+        "maxNodeModuleJsDepth": 1,
+        "declaration": false,
+        "declarationMap": false,
+        "sourceMap": false,
+        "stripInternal": true,
+        "isolatedModules": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true,
+        "noFallthroughCasesInSwitch": true,
+        "allowUnusedLabels": false,
+        "allowUnreachableCode": false,
+
+        "lib": ["ESNext", "dom"],
+        "skipLibCheck": true,
+        "types": ["vite/client"],
+        "paths": {
+            "@/*": [ "./src/*" ]
+        }
+    },
+    "include": ["src/*.tsx", "src/**/*.tsx", "src/*.ts", "src/**/*.ts"],
+    "exclude": ["node_modules", "**/*.spec.ts"]
+}
+
+
