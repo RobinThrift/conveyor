@@ -1,0 +1,51 @@
+.content {
+    @apply prose max-w-none;
+    @apply prose-ul:my-0 prose-li:p-0 prose-li:my-0;
+
+    li > p {
+        @apply my-0;
+    }
+
+    h5 {
+        @apply font-bold mt-6;
+    }
+
+    :where(h5 + *):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+        margin-top: 0;
+    }
+
+    h6 {
+        @apply font-semibold underline mt-6;
+    }
+
+    :where(h6 + *):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+        margin-top: 0;
+    }
+
+    .table-wrapper {
+        @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6;
+        table {
+            margin: 0;
+        }
+    }
+
+    table {
+        @apply border-collapse;
+    }
+
+    thead {
+        @apply font-semibold bg-subtle-light;
+    }
+
+    td {
+        @apply p-2 border-x border-subtle;
+
+        &:first-child {
+            @apply border-l-0;
+        }
+
+        &:last-child {
+            @apply border-r-0;
+        }
+    }
+}

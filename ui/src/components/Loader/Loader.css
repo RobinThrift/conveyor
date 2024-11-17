@@ -1,0 +1,51 @@
+.loader {
+    --loader-size: 43px;
+    --loader-color: rgb(var(--color-primary));
+    --loader-speed: 1.3s;
+    --loader-dot-size: calc(var(--loader-size) * 0.24);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--loader-dot-size);
+    width: var(--loader-size);
+}
+
+.loader > div,
+.loader::before,
+.loader::after {
+    content: "";
+    display: block;
+    height: var(--loader-dot-size);
+    width: var(--loader-dot-size);
+    border-radius: 50%;
+    background-color: var(--loader-color);
+    transform: scale(0);
+    transition: background-color 0.3s ease;
+}
+
+.loader::before {
+    animation: pulse var(--loader-speed) ease-in-out
+        calc(var(--loader-speed) * -0.375) infinite;
+}
+
+.loader > div {
+    animation: pulse var(--loader-speed) ease-in-out
+        calc(var(--loader-speed) * -0.25) infinite both;
+}
+
+.loader::after {
+    animation: pulse var(--loader-speed) ease-in-out
+        calc(var(--loader-speed) * -0.125) infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1);
+    }
+}

@@ -1,0 +1,193 @@
+.btn {
+    @apply gap-2 rounded py-1 px-4;
+
+    background-color: rgb(var(--btn-bg));
+    color: rgb(var(--btn-color));
+    border: 1px solid rgb(var(--btn-border-color));
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    & > svg {
+        @apply size-4;
+    }
+
+    &:hover {
+        background-color: rgb(var(--btn-bg-hover));
+    }
+
+    &:focus,
+    &:focus-visible {
+        outline-style: solid;
+        outline-color: rgb(var(--btn-bg-active));
+        outline-width: 1px;
+    }
+
+    &:active {
+        background-color: rgb(var(--btn-bg-active));
+    }
+
+    &:disabled {
+        background-color: rgba(var(--btn-bg), 0.8);
+        color: rgba(var(--btn-color), 0.5);
+        border-color: rgba(var(--btn-border-color), 0.7);
+    }
+}
+
+.btn.primary {
+    --btn-bg: var(--btn-primary-bg);
+    --btn-color: var(--btn-primary-color);
+    --btn-border-color: var(--btn-primary-border-color);
+    --btn-bg-hover: var(--btn-primary-bg-hover);
+    --btn-bg-active: var(--btn-primary-bg-active);
+
+    &.plain {
+        --btn-bg-hover: var(--color-primary-light);
+        --btn-bg-active: var(--color-primary);
+        --btn-color: var(--color-primary-dark);
+
+        &:active {
+            --btn-color: var(--color-primary-contrast);
+        }
+    }
+}
+
+.btn.success {
+    --btn-bg: var(--btn-success-bg);
+    --btn-color: var(--btn-success-color);
+    --btn-border-color: var(--btn-success-border-color);
+    --btn-bg-hover: var(--btn-success-bg-hover);
+    --btn-bg-active: var(--btn-success-bg-active);
+
+    &.plain {
+        --btn-bg-hover: var(--color-success-light);
+        --btn-bg-active: var(--color-success);
+        --btn-color: var(--color-success-dark);
+
+        &:active {
+            --btn-color: var(--color-success-contrast);
+        }
+    }
+}
+
+.btn.danger {
+    --btn-bg: var(--btn-danger-bg);
+    --btn-color: var(--btn-danger-color);
+    --btn-border-color: var(--btn-danger-border-color);
+    --btn-bg-hover: var(--btn-danger-bg-hover);
+    --btn-bg-active: var(--btn-danger-bg-active);
+
+    &.plain {
+        --btn-bg-hover: var(--color-danger-light);
+        --btn-bg-active: var(--color-danger);
+        --btn-color: var(--color-danger-dark);
+
+        &:active {
+            --btn-color: var(--color-danger-contrast);
+        }
+    }
+}
+
+.btn.outline-btn {
+    background-color: transparent;
+    color: rgb(var(--btn-bg));
+    border: 1px solid rgb(var(--btn-border-color));
+
+    &:hover {
+        background-color: rgb(var(--btn-bg));
+        color: rgb(var(--btn-color));
+        border-color: rgb(var(--btn-border-color));
+    }
+
+    &:active {
+        background-color: rgb(var(--btn-bg-active));
+    }
+
+    &:disabled {
+        background-color: transparent !important;
+        color: rgba(var(--btn-border-color), 0.5);
+        border-color: rgb(var(--btn-border-color), 0.3);
+    }
+}
+
+.btn.plain {
+    --btn-bg-hover: var(--color-subtle);
+    --btn-color: var(--text-color);
+    --btn-bg-active: var(--color-subtle-dark);
+    background-color: transparent;
+    border-color: transparent;
+    color: inherit;
+
+    &:hover {
+        background-color: rgb(var(--btn-bg-hover));
+        color: rgb(var(--btn-color));
+    }
+
+    &:active {
+        background-color: rgb(var(--btn-bg-active));
+    }
+
+    &:disabled {
+        background-color: transparent !important;
+        color: inherit;
+        opacity: 0.5;
+    }
+}
+
+.btn.icon-only {
+    min-height: 2rem;
+}
+
+.btn.sm {
+    @apply gap-1 py-0.5 px-2 text-sm;
+
+    & > svg {
+        @apply size-3;
+    }
+
+    &.icon-only {
+        min-height: 1.5rem;
+    }
+}
+
+.btn.lg {
+    @apply text-lg font-semibold;
+
+    & > svg {
+        @apply size-6;
+    }
+
+    &.icon-only {
+        min-height: 2.2rem;
+    }
+}
+
+.btn.cover-text {
+    @apply pe-10;
+    position: relative;
+    transition: background-color 0.2s;
+
+    .btn-cover-text-icon {
+        @apply px-2 flex items-center justify-center;
+        position: absolute;
+        background-color: rgb(var(--btn-bg-active));
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 2rem;
+        transition: width 0.2s;
+    }
+
+    &:hover {
+        background-color: rgb(var(--btn-bg-active));
+
+        .btn-cover-text-icon {
+            width: 100%;
+        }
+
+        svg {
+            transform: scale(1.1);
+        }
+    }
+}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charSet="utf-8" />
+		<meta httpEquiv="X-UA-Compatible" content="ie=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
+		<meta name="base-url" {{ .BaseURL }} />
+		<meta name="csrf-token" {{ .CSRFToken }} />
+
+		<title>{{ .Title }}</title>
+
+		<link rel="stylesheet" href="{{ .AssetURL }}/index.css" />
+	</head>
+	<body>
+		<div id="__BELT_UI_ROOT__"></div>
+
+		<script type="belt_ui/data" id="__belt_ui_data__">{{ .UIData }}</script>
+		<script src="{{ .AssetURL }}/index.js" type="module"></script>
+	</body>
+</html>

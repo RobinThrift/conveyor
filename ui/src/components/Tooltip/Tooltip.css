@@ -1,0 +1,16 @@
+.tooltip {
+    @apply py-1 px-3;
+    @apply rounded-lg shadow-lg;
+    @apply bg-white border border-subtle-light;
+    @apply text-center text-sm text-text select-none;
+
+    min-width: var(--radix-tooltip-trigger-width);
+
+    &[data-state="delayed-open"][data-side="bottom"] {
+        @apply animate-in fade-in slide-in-from-top-1;
+    }
+
+    &[data-state="closed"][data-side="bottom"] {
+        @apply animate-out fade-out slide-out-to-top-1;
+    }
+}

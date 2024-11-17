@@ -1,0 +1,47 @@
+.editor {
+    @apply rounded-lg border border-subtle focus-within:border-primary p-3;
+    background-color: rgb(var(--surface-bg));
+
+    .cm-theme {
+        display: flex;
+
+        .cm-editor {
+            min-width: 100%;
+        }
+    }
+}
+
+.editor-buttons {
+    @apply sticky bottom-0 right-0 left-0 flex items-center justify-end gap-2 py-3;
+    pointer-events: none;
+
+    .btn {
+        pointer-events: all;
+    }
+}
+
+.cm-editor.cm-focused {
+    outline: none !important;
+    width: 100%;
+}
+
+.vim-enabled .cm-cursor {
+    width: 10px;
+    height: 15px;
+    background: rgb(var(--color-primary), 0.6) !important;
+    outline: 1px solid rgb(var(--color-primary), 0.6) !important;
+    border-left-color: transparent !important;
+}
+
+.cm-focused .cm-fat-cursor {
+    background: rgb(var(--color-primary)) !important;
+    outline: 1px solid rgb(var(--color-primary)) !important;
+}
+
+:not(.cm-focused) .cm-fat-cursor {
+    outline-color: rgb(var(--color-primary)) !important;
+}
+
+.cm-placeholder {
+    color: rgba(var(--color-subtle-extra-dark)) !important;
+}
