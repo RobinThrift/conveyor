@@ -1,9 +1,9 @@
-import { useMemo } from "react"
 import type { Pagination } from "@/api/pagination"
-import { atom, batched, onMount, task } from "nanostores"
+import { isEqual } from "@/helper"
 import { $baseURL } from "@/hooks/useBaseURL"
 import { useStore } from "@nanostores/react"
-import { isEqual } from "@/helper"
+import { atom, batched, onMount, task } from "nanostores"
+import { useMemo } from "react"
 
 export type QueryFunc<T, Params extends object, P> = (
     params: Params & { pagination: Pagination<P>; signal?: AbortSignal },
@@ -18,6 +18,8 @@ export function useQuery<T, Params extends object, P = string>(
     initParams: Params,
     opts?: UseQueryOptions,
 ) {
+    /* biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional, the init params and opts will change on every rerender
+    but as this is a store, it should not cause the store to be recreated. */
     let { $store, nextPage, setParams } = useMemo(
         () => createUseQuery(fn, initParams, opts),
         [fn],

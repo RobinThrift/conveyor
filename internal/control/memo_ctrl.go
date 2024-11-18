@@ -23,10 +23,20 @@ type MemoControlMemoRepo interface {
 	UpdateMemoContent(ctx context.Context, memo *domain.Memo) error
 	ArchiveMemo(ctx context.Context, id domain.MemoID) error
 	DeleteMemo(ctx context.Context, id domain.MemoID) error
+	ListTags(ctx context.Context, query sqlite.ListTagsQuery) (*domain.TagList, error)
 }
 
 func NewMemoControl(transactioner database.Transactioner, memoRepo MemoControlMemoRepo) *MemoControl {
 	return &MemoControl{transactioner: transactioner, memoRepo: memoRepo}
+}
+
+func (mc *MemoControl) GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo, error) {
+	account := auth.AccountFromCtx(ctx)
+	if account == nil {
+		return nil, auth.ErrUnauthorized
+	}
+
+	return mc.memoRepo.GetMemo(ctx, id)
 }
 
 type ListMemosQuery struct {
@@ -46,7 +56,6 @@ func (mc *MemoControl) ListMemos(ctx context.Context, query ListMemosQuery) (*do
 	}
 
 	return mc.memoRepo.ListMemos(ctx, sqlite.ListMemosQuery{
-		AccountID:       account.ID,
 		PageSize:        query.PageSize,
 		PageAfter:       query.PageAfter,
 		Tag:             query.Tag,
@@ -84,11 +93,60 @@ func (mc *MemoControl) CreateMemo(ctx context.Context, cmd CreateMemoCmd) (domai
 	return id, nil
 }
 
-func (mc *MemoControl) GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo, error) {
+type UpdateMemoCmd struct {
+	MemoID     domain.MemoID
+	IsArchived *bool
+	Content    []byte
+}
+
+func (mc *MemoControl) UpdateMemo(ctx context.Context, cmd UpdateMemoCmd) error {
+	account := auth.AccountFromCtx(ctx)
+	if account == nil {
+		return auth.ErrUnauthorized
+	}
+
+	memo, err := mc.memoRepo.GetMemo(ctx, cmd.MemoID)
+	if err != nil {
+		return err
+	}
+
+	if cmd.Content != nil {
+		memo.Content = cmd.Content
+
+		err = mc.memoRepo.UpdateMemoContent(ctx, memo)
+		if err != nil {
+			return fmt.Errorf("error updating memo %d: %v", cmd.MemoID, err)
+		}
+	}
+
+	if cmd.IsArchived != nil {
+		err = mc.memoRepo.ArchiveMemo(ctx, cmd.MemoID)
+		if err != nil {
+			return fmt.Errorf("error updating memo %d: %v", cmd.MemoID, err)
+		}
+	}
+
+	return nil
+}
+
+type ListTagsQuery struct {
+	PageSize  uint64
+	PageAfter *string
+
+	Tag             *string
+	Search          *string
+	CreatedAt       *time.Time
+	MinCreationDate *time.Time
+}
+
+func (mc *MemoControl) ListTags(ctx context.Context, query ListTagsQuery) (*domain.TagList, error) {
 	account := auth.AccountFromCtx(ctx)
 	if account == nil {
 		return nil, auth.ErrUnauthorized
 	}
 
-	return mc.memoRepo.GetMemo(ctx, id)
+	return mc.memoRepo.ListTags(ctx, sqlite.ListTagsQuery{
+		PageSize:  query.PageSize,
+		PageAfter: query.PageAfter,
+	})
 }

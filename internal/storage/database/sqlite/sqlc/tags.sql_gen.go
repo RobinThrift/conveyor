@@ -7,6 +7,7 @@ package sqlc
 
 import (
 	"context"
+	"strings"
 )
 
 const cleanupTagsWithNoCount = `-- name: CleanupTagsWithNoCount :exec
@@ -16,6 +17,49 @@ DELETE FROM tags WHERE count = 0
 func (q *Queries) CleanupTagsWithNoCount(ctx context.Context, db DBTX) error {
 	_, err := db.ExecContext(ctx, cleanupTagsWithNoCount)
 	return err
+}
+
+const cleanupeMemoTagConnection = `-- name: CleanupeMemoTagConnection :many
+DELETE FROM memo_tags WHERE memo_id = ?1 AND tag NOT IN (/*SLICE:tags*/?) RETURNING tag
+`
+
+type CleanupeMemoTagConnectionParams struct {
+	MemoID int64
+	Tags   []string
+}
+
+func (q *Queries) CleanupeMemoTagConnection(ctx context.Context, db DBTX, arg CleanupeMemoTagConnectionParams) ([]string, error) {
+	query := cleanupeMemoTagConnection
+	var queryParams []interface{}
+	queryParams = append(queryParams, arg.MemoID)
+	if len(arg.Tags) > 0 {
+		for _, v := range arg.Tags {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:tags*/?", strings.Repeat(",?", len(arg.Tags))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:tags*/?", "NULL", 1)
+	}
+	rows, err := db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var tag string
+		if err := rows.Scan(&tag); err != nil {
+			return nil, err
+		}
+		items = append(items, tag)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const createMemoTagConnection = `-- name: CreateMemoTagConnection :exec
@@ -39,8 +83,9 @@ func (q *Queries) CreateMemoTagConnection(ctx context.Context, db DBTX, arg Crea
 const createTag = `-- name: CreateTag :exec
 INSERT INTO tags(
     tag,
-    count
-) VALUES (?, ?)
+    count,
+	created_by
+) VALUES (?, ?, ?)
 ON CONFLICT (tag)
 DO UPDATE SET
     count       = count+1,
@@ -48,39 +93,41 @@ DO UPDATE SET
 `
 
 type CreateTagParams struct {
-	Tag   string
-	Count int64
+	Tag       string
+	Count     int64
+	CreatedBy int64
 }
 
 func (q *Queries) CreateTag(ctx context.Context, db DBTX, arg CreateTagParams) error {
-	_, err := db.ExecContext(ctx, createTag, arg.Tag, arg.Count)
+	_, err := db.ExecContext(ctx, createTag, arg.Tag, arg.Count, arg.CreatedBy)
 	return err
 }
 
-const deleteMemoTagConnection = `-- name: DeleteMemoTagConnection :exec
-DELETE FROM memo_tags WHERE memo_id = ? AND tag = ?
+const deleteMemoTagConnection = `-- name: DeleteMemoTagConnection :many
+DELETE FROM memo_tags WHERE memo_id = ? RETURNING tag
 `
 
-type DeleteMemoTagConnectionParams struct {
-	MemoID int64
-	Tag    string
-}
-
-func (q *Queries) DeleteMemoTagConnection(ctx context.Context, db DBTX, arg DeleteMemoTagConnectionParams) error {
-	_, err := db.ExecContext(ctx, deleteMemoTagConnection, arg.MemoID, arg.Tag)
-	return err
-}
-
-const deleteTag = `-- name: DeleteTag :exec
-UPDATE tags SET
-    count      = count-1,
-    updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
-WHERE tag IN (?)
-`
-
-func (q *Queries) DeleteTag(ctx context.Context, db DBTX, tag string) error {
-	_, err := db.ExecContext(ctx, deleteTag, tag)
-	return err
+func (q *Queries) DeleteMemoTagConnection(ctx context.Context, db DBTX, memoID int64) ([]string, error) {
+	rows, err := db.QueryContext(ctx, deleteMemoTagConnection, memoID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var tag string
+		if err := rows.Scan(&tag); err != nil {
+			return nil, err
+		}
+		items = append(items, tag)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listTags = `-- name: ListTags :many
@@ -92,12 +139,12 @@ LIMIT ?2
 `
 
 type ListTagsParams struct {
-	After string
-	Limit int64
+	PageAfter string
+	PageSize  int64
 }
 
 func (q *Queries) ListTags(ctx context.Context, db DBTX, arg ListTagsParams) ([]Tag, error) {
-	rows, err := db.QueryContext(ctx, listTags, arg.After, arg.Limit)
+	rows, err := db.QueryContext(ctx, listTags, arg.PageAfter, arg.PageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -124,4 +171,26 @@ func (q *Queries) ListTags(ctx context.Context, db DBTX, arg ListTagsParams) ([]
 		return nil, err
 	}
 	return items, nil
+}
+
+const reduceTagCount = `-- name: ReduceTagCount :exec
+UPDATE tags SET
+    count = count-1,
+    updated_at  = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
+WHERE tag IN (/*SLICE:tags*/?)
+`
+
+func (q *Queries) ReduceTagCount(ctx context.Context, db DBTX, tags []string) error {
+	query := reduceTagCount
+	var queryParams []interface{}
+	if len(tags) > 0 {
+		for _, v := range tags {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:tags*/?", strings.Repeat(",?", len(tags))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:tags*/?", "NULL", 1)
+	}
+	_, err := db.ExecContext(ctx, query, queryParams...)
+	return err
 }

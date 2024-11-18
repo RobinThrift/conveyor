@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/RobinThrift/belt/internal/auth"
@@ -14,18 +15,6 @@ import (
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
 	"github.com/mattn/go-sqlite3"
 )
-
-type ListMemosQuery struct {
-	AccountID auth.AccountID
-
-	PageSize  uint64
-	PageAfter *time.Time
-
-	Tag             *string
-	Search          *string
-	CreatedAt       *time.Time
-	MinCreationDate *time.Time
-}
 
 type MemoRepo struct {
 	db database.Database
@@ -52,6 +41,16 @@ func (r *MemoRepo) GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo,
 		CreatedAt:  res.CreatedAt.Time,
 		UpdatedAt:  res.UpdatedAt.Time,
 	}, nil
+}
+
+type ListMemosQuery struct {
+	PageSize  uint64
+	PageAfter *time.Time
+
+	Tag             *string
+	Search          *string
+	CreatedAt       *time.Time
+	MinCreationDate *time.Time
 }
 
 func (r *MemoRepo) ListMemos(ctx context.Context, query ListMemosQuery) (*domain.MemoList, error) {
@@ -116,7 +115,6 @@ func (r *MemoRepo) listMemos(ctx context.Context, params sqlc.ListMemosParams) (
 	}
 
 	return list, nil
-
 }
 
 func (r *MemoRepo) listMemosForTags(ctx context.Context, query ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
@@ -317,7 +315,15 @@ func (r *MemoRepo) ListDeletedMemos(ctx context.Context, query ListDeletedMemosQ
 	return list, nil
 }
 func (r *MemoRepo) CreateMemo(ctx context.Context, memo *domain.Memo) (domain.MemoID, error) {
-	id, err := queries.CreateMemo(ctx, r.db.Conn(ctx), sqlc.CreateMemoParams{
+	return database.InTransaction(ctx, r.db, func(ctx context.Context) (domain.MemoID, error) {
+		return r.createMemo(ctx, memo)
+	})
+}
+
+func (r *MemoRepo) createMemo(ctx context.Context, memo *domain.Memo) (domain.MemoID, error) {
+	db := r.db.Conn(ctx)
+
+	id, err := queries.CreateMemo(ctx, db, sqlc.CreateMemoParams{
 		Content:   memo.Content,
 		CreatedBy: memo.CreatedBy,
 		CreatedAt: types.SQLiteDatetime{Time: memo.CreatedAt, Valid: true},
@@ -330,11 +336,19 @@ func (r *MemoRepo) CreateMemo(ctx context.Context, memo *domain.Memo) (domain.Me
 		return domain.MemoID(-1), err
 	}
 
+	memo.ID = id
+	err = r.updateTags(ctx, db, memo, true)
+	if err != nil {
+		return domain.MemoID(-1), err
+	}
+
 	return id, nil
 }
 
 func (r *MemoRepo) UpdateMemoContent(ctx context.Context, memo *domain.Memo) error {
-	numRows, err := queries.UpdateMemoContent(ctx, r.db.Conn(ctx), sqlc.UpdateMemoContentParams{
+	db := r.db.Conn(ctx)
+
+	numRows, err := queries.UpdateMemoContent(ctx, db, sqlc.UpdateMemoContentParams{
 		Content: memo.Content,
 		ID:      memo.ID,
 	})
@@ -344,6 +358,11 @@ func (r *MemoRepo) UpdateMemoContent(ctx context.Context, memo *domain.Memo) err
 
 	if numRows == 0 {
 		return domain.ErrMemoNotFound
+	}
+
+	err = r.updateTags(ctx, db, memo, false)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -363,7 +382,34 @@ func (r *MemoRepo) ArchiveMemo(ctx context.Context, id domain.MemoID) error {
 }
 
 func (r *MemoRepo) DeleteMemo(ctx context.Context, id domain.MemoID) error {
-	err := queries.SoftDeleteMemo(ctx, r.db.Conn(ctx), id)
+	return r.db.InTransaction(ctx, func(ctx context.Context) error {
+		return r.deleteMemo(ctx, id)
+	})
+}
+
+func (r *MemoRepo) deleteMemo(ctx context.Context, id domain.MemoID) error {
+	db := r.db.Conn(ctx)
+
+	err := queries.SoftDeleteMemo(ctx, db, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = domain.ErrMemoNotFound
+		}
+
+		return fmt.Errorf("error marking Memo (%d) as deleted: %w", id, err)
+	}
+
+	tags, err := queries.DeleteMemoTagConnection(ctx, db, int64(id))
+	if err != nil {
+		return fmt.Errorf("error deleting Memo (%d) to Tag connections: %w", id, err)
+	}
+
+	err = queries.ReduceTagCount(ctx, db, tags)
+	if err != nil {
+		return fmt.Errorf("error deleting reducing tag count: %w", err)
+	}
+
+	err = r.cleanupTagsWithNoCount(ctx, db)
 	if err != nil {
 		return err
 	}
@@ -373,4 +419,128 @@ func (r *MemoRepo) DeleteMemo(ctx context.Context, id domain.MemoID) error {
 
 func (r *MemoRepo) CleanupDeletedMemos(ctx context.Context) (int64, error) {
 	return queries.CleanupDeletedMemos(ctx, r.db.Conn(ctx))
+}
+
+type ListTagsQuery struct {
+	PageSize  uint64
+	PageAfter *string
+}
+
+func (r *MemoRepo) ListTags(ctx context.Context, query ListTagsQuery) (*domain.TagList, error) {
+	params := sqlc.ListTagsParams{
+		PageSize: int64(query.PageSize),
+	}
+
+	if query.PageAfter != nil {
+		params.PageAfter = *query.PageAfter
+	}
+
+	res, err := queries.ListTags(ctx, r.db.Conn(ctx), params)
+	if err != nil {
+		return nil, err
+	}
+
+	list := &domain.TagList{
+		Items: make([]*domain.Tag, len(res)),
+		Next:  nil,
+	}
+
+	for i, tag := range res {
+		list.Items[i] = &domain.Tag{
+			Tag:       tag.Tag,
+			Count:     tag.Count,
+			UpdatedAt: tag.UpdatedAt.Time,
+		}
+	}
+
+	if len(res) != 0 {
+		next := fmt.Sprint(res[len(res)-1].ID)
+		list.Next = &next
+	}
+
+	return list, nil
+}
+
+func (r *MemoRepo) updateTags(ctx context.Context, db sqlc.DBTX, memo *domain.Memo, created bool) error {
+	tags := extractTags(memo.Content)
+
+	deletedTags, err := queries.CleanupeMemoTagConnection(ctx, db, sqlc.CleanupeMemoTagConnectionParams{MemoID: int64(memo.ID), Tags: tags})
+	if err != nil {
+		return err
+	}
+
+	err = queries.ReduceTagCount(ctx, db, deletedTags)
+	if err != nil {
+		return err
+	}
+
+	if created {
+		for _, tag := range tags {
+			err = queries.CreateTag(ctx, db, sqlc.CreateTagParams{Tag: tag, Count: 1, CreatedBy: int64(memo.CreatedBy)})
+			if err != nil {
+				return err
+			}
+
+			err = queries.CreateMemoTagConnection(ctx, db, sqlc.CreateMemoTagConnectionParams{
+				MemoID: int64(memo.ID),
+				Tag:    tag,
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	err = r.cleanupTagsWithNoCount(ctx, db)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *MemoRepo) cleanupTagsWithNoCount(ctx context.Context, db sqlc.DBTX) error {
+	err := queries.CleanupTagsWithNoCount(ctx, db)
+	if err != nil {
+		return fmt.Errorf("error cleaning up tags with 0 count: %w", err)
+	}
+
+	return nil
+}
+
+var tagPattern = regexp.MustCompile(`#([\w/\-_]+)`)
+var codeBlockPattern = regexp.MustCompile("```[\\w]*")
+
+func extractTags(content []byte) []string {
+	var tags []string //nolint: prealloc // false positive
+	nonCodeBlocks := codeBlockPattern.FindAllIndex(content, -1)
+
+	if len(nonCodeBlocks) == 0 {
+		foundTags := tagPattern.FindAllSubmatch(content, -1)
+		for _, tag := range foundTags {
+			tags = append(tags, string(tag[1]))
+		}
+
+		return tags
+	}
+
+	start := 0
+	end := 0
+	for i, f := range nonCodeBlocks {
+		if i%2 == 0 {
+			end = f[0]
+			foundTags := tagPattern.FindAllSubmatch(content[start:end], -1)
+			for _, tag := range foundTags {
+				tags = append(tags, string(tag[1]))
+			}
+			start = f[1]
+		}
+	}
+
+	foundTags := tagPattern.FindAllSubmatch(content[nonCodeBlocks[len(nonCodeBlocks)-1][1]:], -1)
+	for _, tag := range foundTags {
+		tags = append(tags, string(tag[1]))
+	}
+
+	return tags
 }

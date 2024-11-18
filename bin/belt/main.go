@@ -40,7 +40,7 @@ func run(ctx context.Context) error {
 
 	errs := make(chan error)
 
-	app := app.New(config)
+	app := app.New(config) //nolint: contextcheck // false positive
 	go func() {
 		errs <- app.Start(startCtx)
 	}()

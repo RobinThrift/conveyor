@@ -54,11 +54,6 @@ sql:
         go_type:
           type: "[]byte"
 
-      - column: memos.tags
-        go_type:
-          type: "SQLiteStringSet"
-          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
-
       - column: memos.created_by
         go_type:
           type: "AccountID"
@@ -101,3 +96,14 @@ sql:
         go_type:
           type: "AccountID"
           import: "github.com/RobinThrift/belt/internal/auth"
+
+      - column: tags.created_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: tags.updated_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+

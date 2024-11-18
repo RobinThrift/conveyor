@@ -11,8 +11,8 @@ export interface Filter {
     startDate?: Date
 }
 
-export function useMemoListStore() {
-    return useQuery<Memo, { filter: Filter }, Date>(listMemos, { filter: {} })
+export function useMemoListStore(init: { filter: Filter }) {
+    return useQuery<Memo, { filter: Filter }, Date>(listMemos, init)
 }
 
 export interface ListMemosPageState {

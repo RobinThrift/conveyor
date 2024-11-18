@@ -75,6 +75,6 @@ type Tag struct {
 	Tag       string
 	Count     int64
 	CreatedBy int64
-	CreatedAt string
-	UpdatedAt string
+	CreatedAt types.SQLiteDatetime
+	UpdatedAt types.SQLiteDatetime
 }

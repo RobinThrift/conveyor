@@ -3,11 +3,13 @@ package apiv1
 import (
 	"cmp"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/control"
+	"github.com/RobinThrift/belt/internal/domain"
 	"github.com/RobinThrift/belt/internal/server/session"
 )
 
@@ -108,9 +110,54 @@ func (r *router) CreateMemo(ctx context.Context, req CreateMemoRequestObject) (C
 	}, nil
 }
 
+// (PATCH /memos)
+func (r *router) UpdateMemo(ctx context.Context, req UpdateMemoRequestObject) (UpdateMemoResponseObject, error) {
+	cmd := control.UpdateMemoCmd{MemoID: domain.MemoID(req.Id)}
+
+	if req.Body.Content != nil {
+		cmd.Content = []byte(*req.Body.Content)
+	}
+
+	if req.Body.IsArchived != nil {
+		cmd.IsArchived = req.Body.IsArchived
+	}
+
+	err := r.memoCtrl.UpdateMemo(ctx, cmd)
+	if err != nil {
+		if errors.Is(err, domain.ErrMemoNotFound) {
+			return nil, fmt.Errorf("%w: %v", errNotFound, err)
+		}
+		return nil, err
+	}
+
+	return UpdateMemo204Response{}, nil
+}
+
 // (GET /tags)
 func (r *router) ListTags(ctx context.Context, req ListTagsRequestObject) (ListTagsResponseObject, error) {
-	panic("not implemented") // TODO: Implement
+	query := control.ListTagsQuery{
+		PageSize:  min(cmp.Or(req.Params.PageSize, 10), 50),
+		PageAfter: req.Params.PageAfter,
+	}
+
+	tags, err := r.memoCtrl.ListTags(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	apiTags := TagList{Items: make([]Tag, len(tags.Items))}
+	for i, tag := range tags.Items {
+		apiTags.Items[i] = Tag{
+			Count: float32(tag.Count),
+			Tag:   tag.Tag,
+		}
+	}
+
+	if tags.Next != nil {
+		apiTags.Next = tags.Next
+	}
+
+	return ListTags200JSONResponse(apiTags), nil
 }
 
 // (GET /attachments)
@@ -139,18 +186,3 @@ func (r *router) addAccountToContext(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
-
-// func paginationFromParams[T ~int64](pageAfter *string, pageSize uint64) (actualPageAfter *T, actualPageSize uint64, err error) {
-// 	actualPageSize = min(cmp.Or(pageSize, 10), 50)
-//
-// 	if pageAfter != nil {
-// 		id, err := strconv.ParseInt(*pageAfter, 10, 64)
-// 		if err != nil {
-// 			return actualPageAfter, actualPageSize, fmt.Errorf("%w: %v", errInvalidRequest, err)
-// 		}
-// 		asT := T(id)
-// 		actualPageAfter = &asT
-// 	}
-//
-// 	return actualPageAfter, actualPageSize, nil
-// }

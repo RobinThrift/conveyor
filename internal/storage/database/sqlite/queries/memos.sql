@@ -22,11 +22,11 @@ JOIN memo_tags ON memo_id = memos.id
 WHERE
     is_archived = false
     AND is_deleted = false
-    AND CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
+    AND CASE WHEN @page_after IS NOT NULL THEN memos.created_at < datetime(@page_after) ELSE true END
     AND memo_tags.tag = @tag
-    AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
-    AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
-ORDER BY created_at DESC
+    AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(memos.created_at) = date(@created_at) ELSE true END
+    AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(memos.created_at) <= date(@created_at_or_older) ELSE true END
+ORDER BY memos.created_at DESC
 LIMIT @page_size;
 
 -- name: ListMemosWithSearch :many
@@ -44,16 +44,16 @@ LIMIT @page_size;
 
 -- name: ListMemosForTagsWithSearch :many
 SELECT * FROM memos_fts
-JOIN memo_tags ON memo_id = memos.id
+JOIN memo_tags ON memo_id = memos_fts.id
 WHERE
     is_archived = false
     AND is_deleted = false
-    AND CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
+    AND CASE WHEN @page_after IS NOT NULL THEN memos_fts.created_at < datetime(@page_after) ELSE true END
     AND memo_tags.tag = @tag
     AND content MATCH CAST(@search as TEXT)
-    AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
-    AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
-ORDER BY created_at DESC, rank
+    AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(memos_fts.created_at) = date(@created_at) ELSE true END
+    AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(memos_fts.created_at) <= date(@created_at_or_older) ELSE true END
+ORDER BY memos_fts.created_at DESC, rank
 LIMIT @page_size;
 
 -- name: ListArchivedMemos :many

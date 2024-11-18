@@ -64,55 +64,55 @@ func errorHandlerFunc(w http.ResponseWriter, r *http.Request, err error) {
 	}
 }
 
-func notFoundHandlerFunc(w http.ResponseWriter, r *http.Request) {
-	slog.ErrorContext(r.Context(), "not found")
+// func notFoundHandlerFunc(w http.ResponseWriter, r *http.Request) {
+// 	slog.ErrorContext(r.Context(), "not found")
+//
+// 	apiErr := Error{
+// 		Code:   http.StatusNotFound,
+// 		Title:  http.StatusText(http.StatusNotFound),
+// 		Detail: r.URL.String(),
+// 		Type:   "belt/api/v1/NotFound",
+// 	}
+//
+// 	w.WriteHeader(apiErr.Code)
+//
+// 	b, err := json.Marshal(apiErr)
+// 	if err != nil {
+// 		slog.ErrorContext(r.Context(), "error while trying to marshal api error to json", slog.Any("error", err))
+// 		return
+// 	}
+//
+// 	_, err = w.Write(b)
+// 	if err != nil {
+// 		slog.ErrorContext(r.Context(), "error while writing http response", slog.Any("error", err))
+// 		return
+// 	}
+// }
 
-	apiErr := Error{
-		Code:   http.StatusNotFound,
-		Title:  http.StatusText(http.StatusNotFound),
-		Detail: r.URL.String(),
-		Type:   "belt/api/v1/NotFound",
-	}
-
-	w.WriteHeader(apiErr.Code)
-
-	b, err := json.Marshal(apiErr)
-	if err != nil {
-		slog.ErrorContext(r.Context(), "error while trying to marshal api error to json", slog.Any("error", err))
-		return
-	}
-
-	_, err = w.Write(b)
-	if err != nil {
-		slog.ErrorContext(r.Context(), "error while writing http response", slog.Any("error", err))
-		return
-	}
-}
-
-func methodNotAllowedHandlerFunc(w http.ResponseWriter, r *http.Request) {
-	slog.ErrorContext(r.Context(), "method not allowed")
-
-	apiErr := Error{
-		Code:   http.StatusMethodNotAllowed,
-		Title:  http.StatusText(http.StatusMethodNotAllowed),
-		Detail: r.URL.String(),
-		Type:   "belt/api/v1/MethodNotAllowed",
-	}
-
-	w.WriteHeader(apiErr.Code)
-
-	b, err := json.Marshal(apiErr)
-	if err != nil {
-		slog.ErrorContext(r.Context(), "error while trying to marshal api error to json", slog.Any("error", err))
-		return
-	}
-
-	_, err = w.Write(b)
-	if err != nil {
-		slog.ErrorContext(r.Context(), "error while writing http response", slog.Any("error", err))
-		return
-	}
-}
+// func methodNotAllowedHandlerFunc(w http.ResponseWriter, r *http.Request) {
+// 	slog.ErrorContext(r.Context(), "method not allowed")
+//
+// 	apiErr := Error{
+// 		Code:   http.StatusMethodNotAllowed,
+// 		Title:  http.StatusText(http.StatusMethodNotAllowed),
+// 		Detail: r.URL.String(),
+// 		Type:   "belt/api/v1/MethodNotAllowed",
+// 	}
+//
+// 	w.WriteHeader(apiErr.Code)
+//
+// 	b, err := json.Marshal(apiErr)
+// 	if err != nil {
+// 		slog.ErrorContext(r.Context(), "error while trying to marshal api error to json", slog.Any("error", err))
+// 		return
+// 	}
+//
+// 	_, err = w.Write(b)
+// 	if err != nil {
+// 		slog.ErrorContext(r.Context(), "error while writing http response", slog.Any("error", err))
+// 		return
+// 	}
+// }
 
 func recoverer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

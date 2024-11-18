@@ -36,9 +36,10 @@ test-report *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum"
     {{ local_bin }}/gotestsum --junitfile "tests.junit.xml" --junitfile-hide-empty-pkg --junitfile-project-name "RobinThrift/belt" --format {{ go_test_reporter }} --format-hide-empty-pkg -- {{ go_buildflags }} {{ flags }}
 
 # lint using staticcheck and golangci-lint
-lint: (_install-tool "staticcheck") (_install-tool "golangci-lint")
+lint: (_install-tool "staticcheck") (_install-tool "golangci-lint") (_install-tool "sqlc")
     {{ local_bin }}/staticcheck ./...
     {{ local_bin }}/golangci-lint run ./...
+    {{ local_bin }}/sqlc -f internal/storage/database/sqlite/sqlc.yaml vet
 
 lint-report: (_install-tool "staticcheck") (_install-tool "golangci-lint")
     {{ local_bin }}/golangci-lint run --timeout 5m --out-format=junit-xml ./... > lint.junit.xml

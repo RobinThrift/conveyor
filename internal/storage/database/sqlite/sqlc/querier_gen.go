@@ -14,6 +14,7 @@ type Querier interface {
 	ArchiveMemo(ctx context.Context, db DBTX, id domain.MemoID) (int64, error)
 	CleanupDeletedMemos(ctx context.Context, db DBTX) (int64, error)
 	CleanupTagsWithNoCount(ctx context.Context, db DBTX) error
+	CleanupeMemoTagConnection(ctx context.Context, db DBTX, arg CleanupeMemoTagConnectionParams) ([]string, error)
 	CountAccounts(ctx context.Context, db DBTX) (int64, error)
 	CreateAccount(ctx context.Context, db DBTX, arg CreateAccountParams) error
 	CreateAttachment(ctx context.Context, db DBTX, arg CreateAttachmentParams) error
@@ -26,9 +27,8 @@ type Querier interface {
 	DeleteExpired(ctx context.Context, db DBTX) error
 	DeleteMemoAttachmentLink(ctx context.Context, db DBTX, attachmentID int64) error
 	DeleteMemoAttachmentLinks(ctx context.Context, db DBTX, memoID int64) error
-	DeleteMemoTagConnection(ctx context.Context, db DBTX, arg DeleteMemoTagConnectionParams) error
+	DeleteMemoTagConnection(ctx context.Context, db DBTX, memoID int64) ([]string, error)
 	DeleteSession(ctx context.Context, db DBTX, token string) error
-	DeleteTag(ctx context.Context, db DBTX, tag string) error
 	GetAccount(ctx context.Context, db DBTX, id int64) (Account, error)
 	GetAccountByRef(ctx context.Context, db DBTX, authRef string) (Account, error)
 	GetAccountByUsername(ctx context.Context, db DBTX, username string) (Account, error)
@@ -43,6 +43,7 @@ type Querier interface {
 	ListMemosForTagsWithSearch(ctx context.Context, db DBTX, arg ListMemosForTagsWithSearchParams) ([]ListMemosForTagsWithSearchRow, error)
 	ListMemosWithSearch(ctx context.Context, db DBTX, arg ListMemosWithSearchParams) ([]MemoFTS, error)
 	ListTags(ctx context.Context, db DBTX, arg ListTagsParams) ([]Tag, error)
+	ReduceTagCount(ctx context.Context, db DBTX, tags []string) error
 	SoftDeleteMemo(ctx context.Context, db DBTX, id domain.MemoID) error
 	UpdateALocalAuthccount(ctx context.Context, db DBTX, arg UpdateALocalAuthccountParams) error
 	UpdateAccount(ctx context.Context, db DBTX, arg UpdateAccountParams) error

@@ -9,7 +9,7 @@ import type { Memo as MemoT } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
 import { useIsMobile } from "@/hooks/useIsMobile"
 import { Sliders } from "@phosphor-icons/react"
-import React, { startTransition, useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import {
     type Filter,
     useListMemosPageState,
@@ -22,8 +22,8 @@ export interface ListMemosPageProps {
 }
 
 export function ListMemosPage(props: ListMemosPageProps) {
-    let state = useListMemosPageState({ filter: props.filter })
-    let memoList = useMemoListStore()
+    let state = useListMemosPageState()
+    let memoList = useMemoListStore({ filter: props.filter })
     let tagList = useTagListStore()
 
     let onClickTag = useCallback(

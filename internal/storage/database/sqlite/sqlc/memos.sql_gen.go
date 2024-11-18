@@ -243,11 +243,11 @@ JOIN memo_tags ON memo_id = memos.id
 WHERE
     is_archived = false
     AND is_deleted = false
-    AND CASE WHEN ?1 IS NOT NULL THEN created_at < datetime(?1) ELSE true END
+    AND CASE WHEN ?1 IS NOT NULL THEN memos.created_at < datetime(?1) ELSE true END
     AND memo_tags.tag = ?2
-    AND CASE WHEN CAST(?3 as BOOLEAN) THEN date(created_at) = date(?4) ELSE true END
-    AND CASE WHEN CAST(?5 as BOOLEAN) THEN date(created_at) <= date(?6) ELSE true END
-ORDER BY created_at DESC
+    AND CASE WHEN CAST(?3 as BOOLEAN) THEN date(memos.created_at) = date(?4) ELSE true END
+    AND CASE WHEN CAST(?5 as BOOLEAN) THEN date(memos.created_at) <= date(?6) ELSE true END
+ORDER BY memos.created_at DESC
 LIMIT ?7
 `
 
@@ -320,16 +320,16 @@ func (q *Queries) ListMemosForTags(ctx context.Context, db DBTX, arg ListMemosFo
 
 const listMemosForTagsWithSearch = `-- name: ListMemosForTagsWithSearch :many
 SELECT memos_fts.id, content, is_archived, is_deleted, created_by, memos_fts.created_at, updated_at, memo_tags.id, memo_id, tag, memo_tags.created_at FROM memos_fts
-JOIN memo_tags ON memo_id = memos.id
+JOIN memo_tags ON memo_id = memos_fts.id
 WHERE
     is_archived = false
     AND is_deleted = false
-    AND CASE WHEN ?1 IS NOT NULL THEN created_at < datetime(?1) ELSE true END
+    AND CASE WHEN ?1 IS NOT NULL THEN memos_fts.created_at < datetime(?1) ELSE true END
     AND memo_tags.tag = ?2
     AND content MATCH CAST(?3 as TEXT)
-    AND CASE WHEN CAST(?4 as BOOLEAN) THEN date(created_at) = date(?5) ELSE true END
-    AND CASE WHEN CAST(?6 as BOOLEAN) THEN date(created_at) <= date(?7) ELSE true END
-ORDER BY created_at DESC, rank
+    AND CASE WHEN CAST(?4 as BOOLEAN) THEN date(memos_fts.created_at) = date(?5) ELSE true END
+    AND CASE WHEN CAST(?6 as BOOLEAN) THEN date(memos_fts.created_at) <= date(?7) ELSE true END
+ORDER BY memos_fts.created_at DESC, rank
 LIMIT ?8
 `
 

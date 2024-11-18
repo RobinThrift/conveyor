@@ -1,3 +1,4 @@
+//lint:file-ignore ST1005 Ignore because generated code
 //go:build go1.22
 
 // Package apiv1 provides primitives to interact with the openapi HTTP API.
@@ -74,14 +75,20 @@ type Tag struct {
 
 // TagList defines model for TagList.
 type TagList struct {
-	Items []Tag  `json:"items"`
-	Next  string `json:"next"`
+	Items []Tag   `json:"items"`
+	Next  *string `json:"next,omitempty"`
 }
 
 // CreateMemoRequest defines model for CreateMemoRequest.
 type CreateMemoRequest struct {
 	Content   string     `json:"content"`
 	CreatedAt *time.Time `json:"createdAt,omitempty"`
+}
+
+// UpdateMemoRequest defines model for UpdateMemoRequest.
+type UpdateMemoRequest struct {
+	Content    *string `json:"content,omitempty"`
+	IsArchived *bool   `json:"isArchived,omitempty"`
 }
 
 // ListAttachmentsParams defines parameters for ListAttachments.
@@ -115,6 +122,12 @@ type CreateMemoJSONBody struct {
 	CreatedAt *time.Time `json:"createdAt,omitempty"`
 }
 
+// UpdateMemoJSONBody defines parameters for UpdateMemo.
+type UpdateMemoJSONBody struct {
+	Content    *string `json:"content,omitempty"`
+	IsArchived *bool   `json:"isArchived,omitempty"`
+}
+
 // ListTagsParams defines parameters for ListTags.
 type ListTagsParams struct {
 	PageSize     uint64  `form:"page[size]" json:"page[size]"`
@@ -124,6 +137,9 @@ type ListTagsParams struct {
 
 // CreateMemoJSONRequestBody defines body for CreateMemo for application/json ContentType.
 type CreateMemoJSONRequestBody CreateMemoJSONBody
+
+// UpdateMemoJSONRequestBody defines body for UpdateMemo for application/json ContentType.
+type UpdateMemoJSONRequestBody UpdateMemoJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -139,6 +155,9 @@ type ServerInterface interface {
 
 	// (POST /memos)
 	CreateMemo(w http.ResponseWriter, r *http.Request)
+
+	// (PATCH /memos/{id})
+	UpdateMemo(w http.ResponseWriter, r *http.Request, id int64)
 
 	// (GET /tags)
 	ListTags(w http.ResponseWriter, r *http.Request, params ListTagsParams)
@@ -335,6 +354,31 @@ func (siw *ServerInterfaceWrapper) CreateMemo(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
+// UpdateMemo operation middleware
+func (siw *ServerInterfaceWrapper) UpdateMemo(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateMemo(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListTags operation middleware
 func (siw *ServerInterfaceWrapper) ListTags(w http.ResponseWriter, r *http.Request) {
 
@@ -509,6 +553,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("POST "+options.BaseURL+"/attachments", wrapper.CreateAttachment)
 	m.HandleFunc("GET "+options.BaseURL+"/memos", wrapper.ListMemos)
 	m.HandleFunc("POST "+options.BaseURL+"/memos", wrapper.CreateMemo)
+	m.HandleFunc("PATCH "+options.BaseURL+"/memos/{id}", wrapper.UpdateMemo)
 	m.HandleFunc("GET "+options.BaseURL+"/tags", wrapper.ListTags)
 
 	return m
@@ -673,6 +718,53 @@ func (response CreateMemodefaultJSONResponse) VisitCreateMemoResponse(w http.Res
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type UpdateMemoRequestObject struct {
+	Id   int64 `json:"id"`
+	Body *UpdateMemoJSONRequestBody
+}
+
+type UpdateMemoResponseObject interface {
+	VisitUpdateMemoResponse(w http.ResponseWriter) error
+}
+
+type UpdateMemo204Response struct {
+}
+
+func (response UpdateMemo204Response) VisitUpdateMemoResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type UpdateMemo400JSONResponse Error
+
+func (response UpdateMemo400JSONResponse) VisitUpdateMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateMemo401JSONResponse Error
+
+func (response UpdateMemo401JSONResponse) VisitUpdateMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateMemodefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response UpdateMemodefaultJSONResponse) VisitUpdateMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type ListTagsRequestObject struct {
 	Params ListTagsParams
 }
@@ -734,6 +826,9 @@ type StrictServerInterface interface {
 
 	// (POST /memos)
 	CreateMemo(ctx context.Context, request CreateMemoRequestObject) (CreateMemoResponseObject, error)
+
+	// (PATCH /memos/{id})
+	UpdateMemo(ctx context.Context, request UpdateMemoRequestObject) (UpdateMemoResponseObject, error)
 
 	// (GET /tags)
 	ListTags(ctx context.Context, request ListTagsRequestObject) (ListTagsResponseObject, error)
@@ -872,6 +967,39 @@ func (sh *strictHandler) CreateMemo(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(CreateMemoResponseObject); ok {
 		if err := validResponse.VisitCreateMemoResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateMemo operation middleware
+func (sh *strictHandler) UpdateMemo(w http.ResponseWriter, r *http.Request, id int64) {
+	var request UpdateMemoRequestObject
+
+	request.Id = id
+
+	var body UpdateMemoJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateMemo(ctx, request.(UpdateMemoRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateMemo")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateMemoResponseObject); ok {
+		if err := validResponse.VisitUpdateMemoResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
