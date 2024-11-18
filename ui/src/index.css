@@ -15,42 +15,42 @@
         --surface-bg: 245 245 245;
         --sidebar-bg: 232 231 230;
 
-        --color-primary-extra-light: 245, 237, 244;
-        --color-primary-light: 219, 192, 212;
-        --color-primary: 141, 97, 123;
-        --color-primary-dark: 126, 68, 96;
-        --color-primary-extra-dark: 75, 27, 45;
-        --color-primary-contrast: 255, 255, 255;
+        --color-primary-extra-light: 245 237 244;
+        --color-primary-light: 219 192 212;
+        --color-primary: 141 97 123;
+        --color-primary-dark: 126 68 96;
+        --color-primary-extra-dark: 75 27 45;
+        --color-primary-contrast: 255 255 255;
 
-        --color-success-extra-light: 231, 244, 239;
-        --color-success-light: 165, 207, 188;
-        --color-success: 74, 137, 92;
-        --color-success-dark: 51, 103, 61;
-        --color-success-extra-dark: 28, 63, 31;
-        --color-success-contrast: 255, 255, 255;
+        --color-success-extra-light: 231 244 239;
+        --color-success-light: 165 207 188;
+        --color-success: 74 137 92;
+        --color-success-dark: 51 103 61;
+        --color-success-extra-dark: 28 63 31;
+        --color-success-contrast: 255 255 255;
 
-        --color-danger-extra-light: 235, 210, 185;
-        --color-danger-light: 222, 178, 145;
-        --color-danger: 178, 48, 27;
-        --color-danger-dark: 133, 33, 17;
-        --color-danger-extra-dark: 107, 25, 12;
-        --color-danger-contrast: 255, 255, 255;
+        --color-danger-extra-light: 235 210 185;
+        --color-danger-light: 222 178 145;
+        --color-danger: 178 48 27;
+        --color-danger-dark: 133 33 17;
+        --color-danger-extra-dark: 107 25 12;
+        --color-danger-contrast: 255 255 255;
 
-        --color-subtle-extra-light: 250, 250, 250;
-        --color-subtle-light: 247, 247, 247;
-        --color-subtle: 232, 232, 232;
-        --color-subtle-dark: 174, 174, 174;
-        --color-subtle-extra-dark: 145, 145, 145;
-        --color-subtle-contrast: 3, 3, 3;
+        --color-subtle-extra-light: 250 250 250;
+        --color-subtle-light: 247 247 247;
+        --color-subtle: 232 232 232;
+        --color-subtle-dark: 174 174 174;
+        --color-subtle-extra-dark: 145 145 145;
+        --color-subtle-contrast: 3 3 3;
 
-        --dialog-bg: 255, 255, 255;
-        --modal-overlay-bg: 107, 114, 128;
+        --dialog-bg: 255 255 255;
+        --modal-overlay-bg: 107 114 128;
 
-        --btn-bg: 52, 52, 52;
-        --btn-bg-hover: 70, 70, 70;
-        --btn-bg-active: 32, 32, 32;
-        --btn-border-color: 53, 52, 52;
-        --btn-color: 255, 255, 255;
+        --btn-bg: 52 52 52;
+        --btn-bg-hover: 70 70 70;
+        --btn-bg-active: 32 32 32;
+        --btn-border-color: 53 52 52;
+        --btn-color: 255 255 255;
 
         --btn-primary-bg: var(--color-primary);
         --btn-primary-bg-hover: var(--color-primary-dark);
@@ -82,7 +82,7 @@
 
     body {
         color: rgb(var(--text-color));
-        background-color: rgb(242, 242, 242);
+        background-color: rgb(var(--body-bg));
     }
 }
 

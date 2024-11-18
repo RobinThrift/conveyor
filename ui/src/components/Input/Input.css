@@ -7,7 +7,7 @@
 }
 
 .input {
-    @apply appearance-none bg-subtle-light border border-subtle rounded ring ring-transparent text-subtle-contrast;
+    @apply appearance-none bg-surface border border-subtle rounded ring ring-transparent text-subtle-contrast;
     @apply hover:border-subtle-dark;
     @apply focus:ring-1 focus:outline-none focus:ring-primary-light;
     width: 100%;
