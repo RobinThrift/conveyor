@@ -28,8 +28,8 @@ func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthControll
 	csrfProtectionMiddleware := csrf.Protect(
 		config.CSRFSecret,
 		csrf.Secure(config.UseSecureCookies),
-		csrf.FieldName("idm.csrf.token"),
-		csrf.CookieName("idm_csrf_token"),
+		csrf.FieldName("belt.csrf.token"),
+		csrf.CookieName("belt_csrf_token"),
 		csrf.Path(config.BasePath),
 		csrf.ErrorHandler(http.HandlerFunc(router.csrfErrorHandler)),
 	)

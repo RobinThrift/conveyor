@@ -49,6 +49,6 @@ func (router *router) renderErrorPage(w http.ResponseWriter, r *http.Request, er
 }
 
 func (router *router) csrfErrorHandler(w http.ResponseWriter, r *http.Request) {
-	slog.ErrorContext(r.Context(), "csrf error: "+r.URL.String(), slog.String("method", r.Method), slog.Any("error", csrf.FailureReason(r)))
+	slog.ErrorContext(r.Context(), r.URL.String(), slog.String("method", r.Method), slog.Any("error", csrf.FailureReason(r)))
 	http.Redirect(w, r, r.URL.String(), http.StatusSeeOther)
 }

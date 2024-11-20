@@ -3,7 +3,6 @@ package control
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"github.com/RobinThrift/belt/internal/auth"
@@ -40,7 +39,6 @@ type GetAccountForCredentialsQuery struct {
 }
 
 func (ac *AuthController) GetAccountForCredentials(ctx context.Context, query GetAccountForCredentialsQuery) (*auth.Account, error) {
-	fmt.Printf("GetAccountForCredentials %#v\n", query)
 	localAccount, err := ac.localAuthRepo.Get(ctx, query.Username)
 	if err != nil {
 		if errors.Is(err, auth.ErrLocalAuthAccountNotFound) {

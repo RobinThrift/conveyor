@@ -38,8 +38,8 @@ export function LoginPage(props: LoginPageProps) {
                 >
                     <input
                         type="hidden"
-                        id="idm.csrf.token"
-                        name="idm.csrf.token"
+                        id="belt.csrf.token"
+                        name="belt.csrf.token"
                         defaultValue={csrfToken}
                     />
 

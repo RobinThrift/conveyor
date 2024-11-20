@@ -32,7 +32,7 @@ func (router *router) getLogin(w http.ResponseWriter, r *http.Request) error {
 func (router *router) postLogin(w http.ResponseWriter, r *http.Request) error {
 	redirectURL := router.getRedirectURL(r)
 
-	if validationErr := validateLoginForm(r.Form); len(validationErr) != 0 {
+	if validationErr := validateLoginForm(r.PostForm); len(validationErr) != 0 {
 		return router.renderUI(w, r, ui.PageData{
 			Title: "Login",
 			ServerData: ui.ServerData{

@@ -37,9 +37,10 @@ type Log struct {
 }
 
 type Database struct {
-	Path      string        `env:"PATH"`
-	EnableWAL bool          `env:"ENABLE_WAL"`
-	Timeout   time.Duration `env:"TIMEOUT"`
+	Path         string        `env:"PATH"`
+	EnableWAL    bool          `env:"ENABLE_WAL"`
+	Timeout      time.Duration `env:"TIMEOUT"`
+	DebugEnabled bool          `end:"DEBUG_ENABLED"`
 }
 
 type Argon2 struct {

@@ -33,8 +33,8 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
                 >
                     <input
                         type="hidden"
-                        id="idm.csrf.token"
-                        name="idm.csrf.token"
+                        id="belt.csrf.token"
+                        name="belt.csrf.token"
                         defaultValue={csrfToken}
                     />
 

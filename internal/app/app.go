@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"time"
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/control"
@@ -13,8 +12,8 @@ import (
 	uiIngress "github.com/RobinThrift/belt/internal/ingress/ui"
 	"github.com/RobinThrift/belt/internal/jobs"
 	"github.com/RobinThrift/belt/internal/server"
+	"github.com/RobinThrift/belt/internal/server/session"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite"
-	"github.com/alexedwards/scs/v2"
 )
 
 type App struct {
@@ -27,21 +26,13 @@ type App struct {
 
 func New(config Config) *App {
 	db := &sqlite.SQLite{
-		File:      config.Database.Path,
-		EnableWAL: config.Database.EnableWAL,
-		Timeout:   config.Database.Timeout,
+		File:         config.Database.Path,
+		EnableWAL:    config.Database.EnableWAL,
+		Timeout:      config.Database.Timeout,
+		DebugEnabled: config.Database.DebugEnabled,
 	}
 
-	sm := scs.New()                      //nolint:varnamelen
-	sm.Store = sqlite.NewSessionRepo(db) //nolint:contextcheck // false positive IMO
-	sm.Lifetime = 24 * time.Hour
-	sm.Cookie.HttpOnly = true
-	sm.Cookie.Persist = true
-	sm.Cookie.SameSite = http.SameSiteStrictMode
-	sm.ErrorFunc = func(w http.ResponseWriter, r *http.Request, err error) {
-		slog.ErrorContext(r.Context(), "session storage error", slog.Any("error", err))
-		w.WriteHeader(http.StatusInternalServerError)
-	}
+	sm := session.NewManager(db)
 
 	argon2Params := auth.Argon2Params{
 		KeyLen:  config.Argon2.KeyLen,

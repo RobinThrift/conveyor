@@ -2,9 +2,30 @@ package session
 
 import (
 	"context"
+	"log/slog"
+	"net/http"
+	"time"
 
+	"github.com/RobinThrift/belt/internal/storage/database"
+	"github.com/RobinThrift/belt/internal/storage/database/sqlite"
 	"github.com/alexedwards/scs/v2"
 )
+
+func NewManager(db database.Database) *scs.SessionManager {
+	sm := scs.New()                      //nolint:varnamelen
+	sm.Store = sqlite.NewSessionRepo(db) //nolint:contextcheck // false positive IMO
+	sm.Lifetime = 24 * time.Hour
+	sm.Cookie.Name = "belt_session"
+	sm.Cookie.HttpOnly = true
+	sm.Cookie.Persist = true
+	sm.Cookie.SameSite = http.SameSiteStrictMode
+	sm.ErrorFunc = func(w http.ResponseWriter, r *http.Request, err error) {
+		slog.ErrorContext(r.Context(), "session storage error", slog.Any("error", err))
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	return sm
+}
 
 type ctxSessMngrKeyType string
 

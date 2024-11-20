@@ -54,7 +54,7 @@ func (router *router) postChangePassord(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	if validationErr := validateChangePasswordForm(r.Form); len(validationErr) != 0 {
+	if validationErr := validateChangePasswordForm(r.PostForm); len(validationErr) != 0 {
 		return router.renderUI(w, r, ui.PageData{
 			Title: "Change Password",
 			ServerData: ui.ServerData{

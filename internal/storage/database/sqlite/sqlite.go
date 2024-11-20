@@ -14,9 +14,10 @@ import (
 )
 
 type SQLite struct {
-	File      string
-	Timeout   time.Duration
-	EnableWAL bool
+	File         string
+	Timeout      time.Duration
+	EnableWAL    bool
+	DebugEnabled bool
 	*sql.DB
 }
 
@@ -53,7 +54,15 @@ func (sq *SQLite) Close() error {
 func (sq *SQLite) Conn(ctx context.Context) database.Executor {
 	tx, ok := txFromCtx(ctx)
 	if !ok {
+		if sq.DebugEnabled {
+			return &debugExecutor{sq.DB}
+		}
+
 		return sq.DB
+	}
+
+	if sq.DebugEnabled {
+		return &debugExecutor{tx}
 	}
 
 	return tx
@@ -98,11 +107,34 @@ type ctxTxKeyType string
 
 const ctxTxKey = ctxTxKeyType("ctxTxKey")
 
-func txFromCtx(ctx context.Context) (*sql.Tx, bool) {
-	tx, ok := ctx.Value(ctxTxKey).(*sql.Tx)
+func txFromCtx(ctx context.Context) (database.Executor, bool) {
+	tx, ok := ctx.Value(ctxTxKey).(database.Executor)
 	return tx, ok
 }
 
-func ctxWithTx(parent context.Context, tx *sql.Tx) context.Context {
+func ctxWithTx(parent context.Context, tx database.Executor) context.Context {
 	return context.WithValue(parent, ctxTxKey, tx)
+}
+
+type debugExecutor struct {
+	exec database.Executor
+}
+
+func (d *debugExecutor) ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error) {
+	slog.DebugContext(ctx, "executing query", slog.String("query", query), slog.Any("args", args))
+	return d.exec.ExecContext(ctx, query, args...)
+}
+
+func (d *debugExecutor) PrepareContext(ctx context.Context, query string) (*sql.Stmt, error) {
+	return d.exec.PrepareContext(ctx, query)
+}
+
+func (d *debugExecutor) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
+	slog.DebugContext(ctx, "executing query", slog.String("query", query), slog.Any("args", args))
+	return d.exec.QueryContext(ctx, query, args...)
+}
+
+func (d *debugExecutor) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
+	slog.DebugContext(ctx, "executing query", slog.String("query", query), slog.Any("args", args))
+	return d.exec.QueryRowContext(ctx, query, args...)
 }
