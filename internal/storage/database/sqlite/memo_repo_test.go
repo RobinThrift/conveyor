@@ -208,7 +208,7 @@ func Test_MemoRepo_CRUD(t *testing.T) {
 
 		time.Sleep(time.Second) // ensure the updated_at field has changed as it only has second resolution
 
-		err = repo.ArchiveMemo(ctx, memo.ID)
+		err = repo.UpdateArchiveStatus(ctx, memo.ID, true)
 		require.NoError(t, err)
 
 		archived, err := repo.GetMemo(ctx, domain.MemoID(2))
@@ -216,10 +216,22 @@ func Test_MemoRepo_CRUD(t *testing.T) {
 
 		assert.True(t, archived.IsArchived)
 		assert.True(t, archived.UpdatedAt.After(memo.UpdatedAt))
+
+		err = repo.UpdateArchiveStatus(ctx, memo.ID, false)
+		require.NoError(t, err)
+
+		noLongerArchived, err := repo.GetMemo(ctx, domain.MemoID(2))
+		require.NoError(t, err)
+
+		assert.False(t, noLongerArchived.IsArchived)
+		assert.True(t, noLongerArchived.UpdatedAt.After(memo.UpdatedAt))
 	})
 
 	t.Run("ArchiveMemo/Not Found", func(t *testing.T) {
-		err := repo.ArchiveMemo(ctx, domain.MemoID(99))
+		err := repo.UpdateArchiveStatus(ctx, domain.MemoID(99), true)
+		require.ErrorIs(t, err, domain.ErrMemoNotFound)
+
+		err = repo.UpdateArchiveStatus(ctx, domain.MemoID(99), false)
 		require.ErrorIs(t, err, domain.ErrMemoNotFound)
 	})
 

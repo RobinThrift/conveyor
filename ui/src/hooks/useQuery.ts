@@ -20,8 +20,8 @@ export function useQuery<T, Params extends object, P = string>(
 ) {
     /* biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional, the init params and opts will change on every rerender
     but as this is a store, it should not cause the store to be recreated. */
-    let { $store, nextPage, setParams } = useMemo(
-        () => createUseQuery(fn, initParams, opts),
+    let { $store, nextPage, setParams, addItem } = useMemo(
+        () => createQueryStore(fn, initParams, opts),
         [fn],
     )
     let store = useStore($store)
@@ -30,12 +30,13 @@ export function useQuery<T, Params extends object, P = string>(
             ...store,
             nextPage,
             setParams,
+            addItem,
         }),
-        [store, nextPage, setParams],
+        [store, nextPage, setParams, addItem],
     )
 }
 
-function createUseQuery<T, Params extends object, P = string>(
+export function createQueryStore<T, Params extends object, P = string>(
     fn: QueryFunc<T, Params, P>,
     initParams: Params,
     opts?: UseQueryOptions,
@@ -46,6 +47,7 @@ function createUseQuery<T, Params extends object, P = string>(
     let $params = atom<Params>(initParams)
     let $items = atom<T[]>([])
     let $error = atom<Error | undefined>()
+    let $emptyResponse = atom<boolean>(false)
 
     let nextPage = () => {
         let pageCurrent = $pageCurrent.get()
@@ -53,7 +55,17 @@ function createUseQuery<T, Params extends object, P = string>(
         if (typeof pageNext !== "undefined" && pageNext === pageCurrent) {
             return
         }
+
+        if (
+            typeof pageNext === "undefined" &&
+            typeof pageNext === "undefined" &&
+            $emptyResponse.get()
+        ) {
+            return
+        }
+
         $isLoading.set(true)
+        $emptyResponse.set(false)
 
         task(async () => {
             let abortCtrl = new AbortController()
@@ -85,9 +97,11 @@ function createUseQuery<T, Params extends object, P = string>(
             $pageCurrent.set(pageNext)
 
             if (fetched.items.length === 0) {
+                $emptyResponse.set(true)
                 return
             }
 
+            $emptyResponse.set(false)
             $pageNext.set(fetched.next)
         })
     }
@@ -100,9 +114,10 @@ function createUseQuery<T, Params extends object, P = string>(
 
         $isLoading.set(true)
         $params.set(params)
+        $pageCurrent.set(undefined)
+        $pageNext.set(undefined)
         task(async () => {
             let abortCtrl = new AbortController()
-            let items = $items.get()
             let params = $params.get()
 
             let fetched: { items: T[]; next?: P }
@@ -125,10 +140,48 @@ function createUseQuery<T, Params extends object, P = string>(
             $isLoading.set(false)
             $error.set(undefined)
 
-            $items.set([...items, ...fetched.items])
-
+            $items.set(fetched.items)
             $pageNext.set(fetched.next)
         })
+    }
+
+    let addItem = (
+        item: T,
+        {
+            selectBy,
+            inPlace,
+            prepend,
+        }: {
+            selectBy?: (a: T) => boolean
+            inPlace?: boolean
+            prepend?: boolean
+        } = {},
+    ) => {
+        let index = -1
+        let items = [...$items.get()]
+        if (selectBy) {
+            index = items.findIndex(selectBy)
+        }
+
+        if (index === -1) {
+            if (prepend) {
+                $items.set([item, ...items])
+            } else {
+                $items.set([...items, item])
+            }
+            return
+        }
+
+        if (inPlace) {
+            items[index] = {
+                ...items[index],
+                ...item,
+            }
+        } else {
+            items[index] = item
+        }
+
+        $items.set(items)
     }
 
     let $store = batched(
@@ -151,7 +204,12 @@ function createUseQuery<T, Params extends object, P = string>(
 
     return {
         $store,
+        $items,
+        $params,
+        $isLoading,
+        $error,
         nextPage,
         setParams,
+        addItem,
     }
 }

@@ -26,3 +26,9 @@ export const Relative: Story = {
         relative: true,
     },
 }
+
+export const InvalidDateTime: Story = {
+    args: {
+        date: "123001235t8128" as any,
+    },
+}

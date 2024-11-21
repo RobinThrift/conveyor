@@ -7,7 +7,7 @@ import {
 import type { Extension } from "@codemirror/state"
 
 export function tagsAutoComplete(tags: Tag[] = []): Extension {
-    let completions: Completion[] = tags.map((tag) => ({ label: tag }))
+    let completions: Completion[] = tags.map((tag) => ({ label: tag.tag }))
 
     return autocompletion({
         override: [

@@ -10,17 +10,16 @@ INSERT INTO tags(
     tag,
     count,
 	created_by
-) VALUES (?, ?, ?)
+) VALUES (?, 1, ?)
 ON CONFLICT (tag)
 DO UPDATE SET
-    count       = count+1,
     updated_at  = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP);
 
--- name: ReduceTagCount :exec
+-- name: UpdateTagCount :exec
 UPDATE tags SET
-    count = count-1,
+    count = (SELECT COUNT(*) FROM memo_tags WHERE memo_tags.tag = tags.tag),
     updated_at  = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
-WHERE tag IN (sqlc.slice('tags'));
+WHERE tags.tag in (sqlc.slice('tags'));
 
 -- name: CleanupTagsWithNoCount :exec
 DELETE FROM tags WHERE count = 0;

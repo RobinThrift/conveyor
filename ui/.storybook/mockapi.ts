@@ -2,8 +2,14 @@ import { http, type HttpHandler, HttpResponse, delay } from "msw"
 import type { Memo, MemoList } from "../src/domain/Memo"
 import type { Attachment } from "../src/domain/Attachment"
 import type { Tag, TagList } from "../src/domain/Tag"
-import type { CreateMemoRequest } from "../src/api/memos"
-import { sub, isSameDay, roundToNearestMinutes, parseJSON } from "date-fns"
+import type { CreateMemoRequest, UpdateMemoRequest } from "../src/api/memos"
+import {
+    sub,
+    isSameDay,
+    roundToNearestMinutes,
+    parseJSON,
+    isEqual,
+} from "date-fns"
 import { faker } from "@faker-js/faker"
 
 interface MockData {
@@ -18,7 +24,10 @@ const mockData: MockData = (() => {
     let tags: Tag[] = []
 
     for (let i = 0; i < 100; i++) {
-        tags.push(`#${faker.word.noun()}/${faker.word.noun()}`)
+        tags.push({
+            tag: `#${faker.word.noun()}/${faker.word.noun()}`,
+            count: faker.number.int({ min: 1, max: 100 }),
+        })
     }
 
     tags.sort()
@@ -56,7 +65,8 @@ export const mockAPI: HttpHandler[] = [
             url.searchParams.get("page[size]") ?? "25",
             10,
         )
-        let after = url.searchParams.get("page[after]")
+        let pageAfterParam = url.searchParams.get("page[after]")
+        let pageAfter = pageAfterParam ? new Date(pageAfterParam) : null
         let filters = {
             content: url.searchParams.get("filter[content]"),
             tag: url.searchParams.get("filter[tag]"),
@@ -66,15 +76,16 @@ export const mockAPI: HttpHandler[] = [
                 url.searchParams.get("filter[is_archived]") ?? "false",
             ) as boolean,
         }
-        console.log("filters", filters)
 
         let memos: Memo[] = []
-        let take = after === null
+        let take = pageAfter === null
         let next: Date | undefined = undefined
 
         for (let memo of mockData.memos) {
-            take = take || memo.id === after
             if (!take) {
+                take =
+                    take ||
+                    (pageAfter ? isEqual(memo.createdAt, pageAfter) : false)
                 continue
             }
 
@@ -101,11 +112,14 @@ export const mockAPI: HttpHandler[] = [
             }
 
             if (memos.length >= pageSize) {
-                next = memo.createdAt
                 break
             }
 
             memos.push(memo)
+        }
+
+        if (memos.length !== 0) {
+            next = memos[memos.length - 1].createdAt
         }
 
         return HttpResponse.json(
@@ -139,6 +153,54 @@ export const mockAPI: HttpHandler[] = [
                 status: 201,
                 headers: { "content-type": "application/json; charset=utf-8" },
             })
+        },
+    ),
+
+    http.patch<{ memoID: string }, UpdateMemoRequest>(
+        "/api/v1/memos/:memoID",
+        async ({ request, params }) => {
+            await delay(500)
+
+            let body = await request.json()
+
+            let memoIndex = mockData.memos.findIndex(
+                (m) => m.id === params.memoID,
+            )
+            if (memoIndex === -1) {
+                return HttpResponse.json(
+                    {
+                        code: 404,
+                        type: "belt/api/v1/NotFound",
+                        title: "Not Found",
+                        detail: `Memo ${params.memoID} not Found`,
+                    },
+                    {
+                        status: 404,
+                        statusText: "Not Found",
+                        headers: {
+                            "content-type": "application/json; charset=utf-8",
+                        },
+                    },
+                )
+            }
+
+            let now = new Date()
+            let updated: Memo = {
+                ...mockData.memos[memoIndex],
+                updatedAt: now,
+            }
+
+            if (body.content) {
+                updated.content = body.content
+            }
+
+            if (typeof body.isArchived === "boolean") {
+                updated.isArchived = body.isArchived
+            }
+
+            mockData.memos[memoIndex] = updated
+
+            return new HttpResponse(null, { status: 204 })
         },
     ),
 

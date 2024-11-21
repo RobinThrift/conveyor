@@ -10,7 +10,11 @@ export function SearchBar(props: {
 }) {
     let onChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            props.onChange(e.target.value)
+            let value = e.target.value.trim()
+            if (value && !value.endsWith("*")) {
+                value += " *"
+            }
+            props.onChange(value)
         },
         [props.onChange],
     )

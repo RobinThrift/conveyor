@@ -13,21 +13,6 @@ import (
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
 )
 
-const archiveMemo = `-- name: ArchiveMemo :execrows
-UPDATE memos SET
-    is_archived = true,
-    updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
-WHERE id = ?
-`
-
-func (q *Queries) ArchiveMemo(ctx context.Context, db DBTX, id domain.MemoID) (int64, error) {
-	result, err := db.ExecContext(ctx, archiveMemo, id)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
-}
-
 const cleanupDeletedMemos = `-- name: CleanupDeletedMemos :execrows
 DELETE FROM memos WHERE is_deleted = true AND date(updated_at) < date('now','-30 days')
 `
@@ -465,16 +450,44 @@ func (q *Queries) ListMemosWithSearch(ctx context.Context, db DBTX, arg ListMemo
 	return items, nil
 }
 
-const softDeleteMemo = `-- name: SoftDeleteMemo :exec
+const setMemoDeletionStatus = `-- name: SetMemoDeletionStatus :execrows
 UPDATE memos SET
-    is_deleted = true,
+    is_deleted = ?,
     updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 WHERE id = ?
 `
 
-func (q *Queries) SoftDeleteMemo(ctx context.Context, db DBTX, id domain.MemoID) error {
-	_, err := db.ExecContext(ctx, softDeleteMemo, id)
-	return err
+type SetMemoDeletionStatusParams struct {
+	IsDeleted bool
+	ID        domain.MemoID
+}
+
+func (q *Queries) SetMemoDeletionStatus(ctx context.Context, db DBTX, arg SetMemoDeletionStatusParams) (int64, error) {
+	result, err := db.ExecContext(ctx, setMemoDeletionStatus, arg.IsDeleted, arg.ID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const seteMemoArchiveStatus = `-- name: SeteMemoArchiveStatus :execrows
+UPDATE memos SET
+    is_archived = ?,
+    updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
+WHERE id = ?
+`
+
+type SeteMemoArchiveStatusParams struct {
+	IsArchived bool
+	ID         domain.MemoID
+}
+
+func (q *Queries) SeteMemoArchiveStatus(ctx context.Context, db DBTX, arg SeteMemoArchiveStatusParams) (int64, error) {
+	result, err := db.ExecContext(ctx, seteMemoArchiveStatus, arg.IsArchived, arg.ID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const updateMemoContent = `-- name: UpdateMemoContent :execrows

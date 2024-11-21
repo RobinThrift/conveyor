@@ -10,7 +10,7 @@ const meta: Meta<typeof Filters> = {
     component: Filters,
 
     argTypes: {
-        onChangeFilters: { action: "onChangeFilters" },
+        onChangeFilter: { action: "onChangeFilters" },
     },
 }
 
@@ -23,16 +23,16 @@ export const Basic: Story = {
         filters: {},
         tags: {
             tags: [
-                "#tag-a",
-                "#tag-a/tag-a-0",
-                "#tag-a/tag-a-0/tag-a-0-a",
-                "#tag-a/tag-a-0/tag-a-0-b",
-                "#tag-a/tag-a-0/tag-a-0-b/tag-a-0-b-0",
-                "#tab-b/tag-b-0/tag-b-0-a",
-                "#tab-b/tag-b-0/tag-b-0-b",
-                "#tag-c",
-                "#tag-c/tag-c-0",
-                "#tag-c/tag-c-1/tag-c-1-a",
+                { tag: "tag-a", count: 1 },
+                { tag: "tag-a/tag-a-0", count: 1 },
+                { tag: "tag-a/tag-a-0/tag-a-0-a", count: 2 },
+                { tag: "tag-a/tag-a-0/tag-a-0-b", count: 1 },
+                { tag: "tag-a/tag-a-0/tag-a-0-b/tag-a-0-b-0", count: 5 },
+                { tag: "tab-b/tag-b-0/tag-b-0-a", count: 1 },
+                { tag: "tab-b/tag-b-0/tag-b-0-b", count: 10 },
+                { tag: "tag-c", count: 100 },
+                { tag: "tag-c/tag-c-0", count: 1 },
+                { tag: "tag-c/tag-c-1/tag-c-1-a", count: 1 },
             ],
             isLoading: false,
             nextPage: fn(),

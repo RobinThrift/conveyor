@@ -17,38 +17,38 @@ export interface FiltersProps {
     className?: string
     tags: { tags: Tag[]; isLoading: boolean; nextPage: () => void }
     filters: Filter
-    onChangeFilters: (f: Filter) => void
+    onChangeFilter: (f: Filter) => void
 }
 
 export function Filters(props: FiltersProps) {
     let onChangeSearch = useCallback(
         (query: string) => {
-            props.onChangeFilters({
+            props.onChangeFilter({
                 ...props.filters,
                 query,
             })
         },
-        [props.filters, props.onChangeFilters],
+        [props.filters, props.onChangeFilter],
     )
 
     let onSelectTag = useCallback(
         (selected?: string) => {
-            props.onChangeFilters({
+            props.onChangeFilter({
                 ...props.filters,
                 tag: selected,
             })
         },
-        [props.filters, props.onChangeFilters],
+        [props.filters, props.onChangeFilter],
     )
 
     let onSelectDate = useCallback(
         (date: Date | undefined) => {
-            props.onChangeFilters({
+            props.onChangeFilter({
                 ...props.filters,
                 exactDate: date,
             })
         },
-        [props.filters, props.onChangeFilters],
+        [props.filters, props.onChangeFilter],
     )
 
     return (

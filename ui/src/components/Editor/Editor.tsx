@@ -63,6 +63,7 @@ export function Editor(props: EditorProps) {
         [setContent],
     )
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: extra dependency so the editor can be cleared when used to create a new memo.
     let editor = useMemo(() => {
         if (!showEditor) {
             return (
@@ -100,7 +101,7 @@ export function Editor(props: EditorProps) {
         props.autoFocus,
         props.placeCursorAt,
         onChange,
-        content,
+        content(),
     ])
 
     return (

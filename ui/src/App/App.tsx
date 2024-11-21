@@ -1,7 +1,7 @@
 import { Sidebar } from "@/components/Sidebar"
 import { useStore } from "@nanostores/react"
 import { Archive, GearFine, Notepad, TrashSimple } from "@phosphor-icons/react"
-import React, { Suspense } from "react"
+import React, { Suspense, useCallback } from "react"
 import type { ServerData } from "./ServerData"
 import { $router } from "./router"
 
@@ -9,6 +9,7 @@ import { useT } from "@/i18n"
 import { ErrorPage } from "@/pages/Errors"
 import { ChangePasswordPage, LoginPage } from "@/pages/Login"
 import { ListMemosPage } from "@/pages/Memos/List"
+import { Filter, filterFromQuery, filterToQueryString } from "@/api/memos"
 
 export type AppProps = ServerData
 
@@ -17,6 +18,15 @@ export function App(props: AppProps) {
     let t = useT("app/navigation")
 
     let pageComp: React.ReactNode
+
+    let onChangeFilters = useCallback((filter: Filter) => {
+        console.log(
+            `${globalThis.location.pathname}?${filterToQueryString(filter)}`,
+        )
+        $router.open(
+            `${globalThis.location.pathname}?${filterToQueryString(filter)}`,
+        )
+    }, [])
 
     if (props.error) {
         return (
@@ -44,8 +54,12 @@ export function App(props: AppProps) {
 
         case "root":
         case "memos.list":
-            // @TODO: get filter from URL
-            pageComp = <ListMemosPage filter={{}} />
+            pageComp = (
+                <ListMemosPage
+                    filter={filterFromQuery(page.search)}
+                    onChangeFilters={onChangeFilters}
+                />
+            )
             break
     }
 

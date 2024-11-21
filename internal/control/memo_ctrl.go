@@ -21,8 +21,9 @@ type MemoControlMemoRepo interface {
 	ListMemos(ctx context.Context, query sqlite.ListMemosQuery) (*domain.MemoList, error)
 	CreateMemo(ctx context.Context, memo *domain.Memo) (domain.MemoID, error)
 	UpdateMemoContent(ctx context.Context, memo *domain.Memo) error
-	ArchiveMemo(ctx context.Context, id domain.MemoID) error
+	UpdateArchiveStatus(ctx context.Context, id domain.MemoID, isArchived bool) error
 	DeleteMemo(ctx context.Context, id domain.MemoID) error
+	UndeleteMemo(ctx context.Context, id domain.MemoID) error
 	ListTags(ctx context.Context, query sqlite.ListTagsQuery) (*domain.TagList, error)
 }
 
@@ -120,7 +121,7 @@ func (mc *MemoControl) UpdateMemo(ctx context.Context, cmd UpdateMemoCmd) error 
 	}
 
 	if cmd.IsArchived != nil {
-		err = mc.memoRepo.ArchiveMemo(ctx, cmd.MemoID)
+		err = mc.memoRepo.UpdateArchiveStatus(ctx, cmd.MemoID, *cmd.IsArchived)
 		if err != nil {
 			return fmt.Errorf("error updating memo %d: %v", cmd.MemoID, err)
 		}

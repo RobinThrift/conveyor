@@ -11,7 +11,6 @@ import (
 )
 
 type Querier interface {
-	ArchiveMemo(ctx context.Context, db DBTX, id domain.MemoID) (int64, error)
 	CleanupDeletedMemos(ctx context.Context, db DBTX) (int64, error)
 	CleanupTagsWithNoCount(ctx context.Context, db DBTX) error
 	CleanupeMemoTagConnection(ctx context.Context, db DBTX, arg CleanupeMemoTagConnectionParams) ([]string, error)
@@ -43,11 +42,12 @@ type Querier interface {
 	ListMemosForTagsWithSearch(ctx context.Context, db DBTX, arg ListMemosForTagsWithSearchParams) ([]ListMemosForTagsWithSearchRow, error)
 	ListMemosWithSearch(ctx context.Context, db DBTX, arg ListMemosWithSearchParams) ([]MemoFTS, error)
 	ListTags(ctx context.Context, db DBTX, arg ListTagsParams) ([]Tag, error)
-	ReduceTagCount(ctx context.Context, db DBTX, tags []string) error
-	SoftDeleteMemo(ctx context.Context, db DBTX, id domain.MemoID) error
+	SetMemoDeletionStatus(ctx context.Context, db DBTX, arg SetMemoDeletionStatusParams) (int64, error)
+	SeteMemoArchiveStatus(ctx context.Context, db DBTX, arg SeteMemoArchiveStatusParams) (int64, error)
 	UpdateALocalAuthccount(ctx context.Context, db DBTX, arg UpdateALocalAuthccountParams) error
 	UpdateAccount(ctx context.Context, db DBTX, arg UpdateAccountParams) error
 	UpdateMemoContent(ctx context.Context, db DBTX, arg UpdateMemoContentParams) (int64, error)
+	UpdateTagCount(ctx context.Context, db DBTX, tags []string) error
 }
 
 var _ Querier = (*Queries)(nil)

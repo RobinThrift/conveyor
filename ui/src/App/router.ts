@@ -1,4 +1,9 @@
-import { createRouter } from "@nanostores/router"
+import {
+    type InputPage,
+    type SearchParams,
+    createRouter,
+    getPagePath as getPagePathInternal,
+} from "@nanostores/router"
 
 let baseURL =
     globalThis.document
@@ -15,3 +20,10 @@ const routes = {
 }
 
 export const $router = createRouter(routes, { links: false })
+
+export function getPagePath<PageName extends keyof typeof routes>(
+    route: InputPage<typeof routes, PageName>,
+    search?: SearchParams,
+): string {
+    return getPagePathInternal($router, route, search)
+}

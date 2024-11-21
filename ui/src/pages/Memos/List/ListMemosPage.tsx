@@ -10,63 +10,65 @@ import type { Tag } from "@/domain/Tag"
 import { useIsMobile } from "@/hooks/useIsMobile"
 import { Sliders } from "@phosphor-icons/react"
 import React, { useCallback, useEffect, useState } from "react"
-import {
-    type Filter,
-    useListMemosPageState,
-    useMemoListStore,
-} from "./state/memos"
+import { type Filter, useListMemosPageState } from "./state/memos"
 import { useTagListStore } from "./state/tags"
 
 export interface ListMemosPageProps {
     filter: Filter
+    onChangeFilters?: (filter: Filter) => void
 }
 
 export function ListMemosPage(props: ListMemosPageProps) {
-    let state = useListMemosPageState()
-    let memoList = useMemoListStore({ filter: props.filter })
+    let {
+        memos,
+        isLoading,
+        filter,
+        nextPage,
+        setFilter,
+        createMemo,
+        updateMemo: updateMemoExec,
+        createMemoInProgress,
+    } = useListMemosPageState({ filter: props.filter })
     let tagList = useTagListStore()
 
     let onClickTag = useCallback(
-        (tag: Tag) => {
-            memoList.setParams({
-                filter: {
-                    ...memoList.params.filter,
-                    tag: tag,
-                },
+        (tag: string) => {
+            setFilter({
+                ...filter,
+                tag: tag,
             })
         },
-        [memoList.params.filter, memoList.setParams],
+        [filter, setFilter],
     )
 
-    let updateMemo = useCallback((memo: MemoT) => {
-        console.log("memo", memo)
-    }, [])
+    useEffect(() => {
+        setFilter(props.filter)
+    }, [props.filter])
 
     let onEOLReached = useCallback(() => {
-        if (!memoList.isLoading) {
-            memoList.nextPage()
+        if (!isLoading) {
+            nextPage()
         }
-    }, [memoList.isLoading, memoList.nextPage])
+    }, [isLoading, nextPage])
 
-    let setFilter = useCallback(
-        (filter: Filter) => {
-            memoList.setParams({ filter })
+    let updateMemo = useCallback(
+        (memo: MemoT) => {
+            updateMemoExec({ memo })
         },
-        [memoList.setParams],
+        [updateMemoExec],
     )
 
-    let memoCreated =
-        state.creating.created &&
-        !state.creating.inProgress &&
-        !state.creating.error
+    let onChangeFilters = useCallback(
+        (filter: Filter) => {
+            if (props.onChangeFilters) {
+                props.onChangeFilters(filter)
+                return
+            }
 
-    // useEffect(() => {
-    //     if (memoCreated) {
-    //         startTransition(() => {
-    //             state.memos.reset()
-    //         })
-    //     }
-    // }, [state.memos.reset, memoCreated])
+            setFilter(filter)
+        },
+        [props.onChangeFilters, setFilter],
+    )
 
     return (
         <div className="flex gap-4 justify-center">
@@ -74,13 +76,13 @@ export function ListMemosPage(props: ListMemosPageProps) {
                 <div className="container mx-auto">
                     <NewMemoEditor
                         tags={tagList.tags}
-                        createMemo={state.createMemo}
-                        memoCreated={memoCreated || false}
+                        createMemo={createMemo}
+                        inProgress={createMemoInProgress}
                     />
                 </div>
 
                 <div className="gap-4 flex flex-col relative">
-                    {memoList.items.map((memo) => (
+                    {memos.map((memo) => (
                         <Memo
                             key={memo.id}
                             memo={memo}
@@ -92,7 +94,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                         />
                     ))}
                     <EndOfListMarker onReached={onEOLReached} />
-                    {memoList.isLoading && (
+                    {isLoading && (
                         <div className="flex justify-center items-center min-h-[200px]">
                             <Loader />
                         </div>
@@ -102,9 +104,9 @@ export function ListMemosPage(props: ListMemosPageProps) {
 
             <FiltersSidebar>
                 <Filters
-                    filters={memoList.params.filter}
+                    filters={filter}
                     tags={tagList}
-                    onChangeFilters={setFilter}
+                    onChangeFilter={onChangeFilters}
                 />
             </FiltersSidebar>
         </div>
@@ -113,8 +115,8 @@ export function ListMemosPage(props: ListMemosPageProps) {
 
 function NewMemoEditor(props: {
     tags: Tag[]
-    createMemo: (memo: CreateMemoRequest) => void
-    memoCreated: boolean
+    createMemo: (req: { memo: CreateMemoRequest }) => void
+    inProgress: boolean
 }) {
     let createMemo = useCallback(
         (memo: CreateMemoRequest) => {
@@ -123,10 +125,11 @@ function NewMemoEditor(props: {
                 return
             }
 
-            props.createMemo(memo)
+            props.createMemo({ memo })
         },
         [props.createMemo],
     )
+
     let [newMemo, setNewMemo] = useState({
         id: Date.now().toString(),
         name: "",
@@ -137,7 +140,7 @@ function NewMemoEditor(props: {
     })
 
     useEffect(() => {
-        if (props.memoCreated) {
+        if (!props.inProgress) {
             setNewMemo({
                 id: Date.now().toString(),
                 name: "",
@@ -147,7 +150,7 @@ function NewMemoEditor(props: {
                 updatedAt: new Date(),
             })
         }
-    }, [props.memoCreated])
+    }, [props.inProgress])
 
     return (
         <Editor

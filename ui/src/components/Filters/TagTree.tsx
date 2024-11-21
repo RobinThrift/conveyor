@@ -1,3 +1,4 @@
+import type { Tag } from "@/domain/Tag"
 import { CaretRight, Hash } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React, { useCallback, useMemo } from "react"
@@ -9,7 +10,7 @@ import { EndOfListMarker } from "../EndOfListMarker"
 
 export interface TagTreeProps {
     className?: string
-    tags: string[]
+    tags: Tag[]
     selected?: string
     onSelect: (selected?: string) => void
     onEOLReached: () => void
@@ -28,17 +29,21 @@ export function TagTree({
         }
 
         tags.forEach((tag) => {
-            let segments = tag.replace("#", "").split("/")
+            let segments = tag.tag.replace("#", "").split("/")
             let id = ""
             segments.forEach((segment) => {
                 let parent = id
                 id = id === "" ? segment : `${id}/${segment}`
-                tree[id] = {
-                    id,
-                    name: segment,
-                    parent: parent || "root",
-                    children: [],
-                } satisfies INode
+                let metadata = { count: id === tag.tag ? tag.count : 0 }
+                if (!tree[id]) {
+                    tree[id] = {
+                        id,
+                        name: segment,
+                        parent: parent || "root",
+                        children: [],
+                        metadata,
+                    }
+                }
             })
         })
 
@@ -105,6 +110,9 @@ export function TagTree({
                                     type="button"
                                 >
                                     {element.name}
+                                    {element.metadata?.count
+                                        ? ` (${element.metadata.count})`
+                                        : null}
                                 </button>
 
                                 {element.children.length !== 0 && (

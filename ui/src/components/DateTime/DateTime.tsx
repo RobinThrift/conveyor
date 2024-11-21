@@ -22,24 +22,31 @@ export const DateTime = React.forwardRef<HTMLTimeElement, DateTimeProps>(
         let { time } = useFormat()
 
         let formatted = useMemo(() => {
-            if (!relative) {
-                return time(
-                    date,
-                    opts ?? { dateStyle: "long", timeStyle: "medium" },
-                )
-            }
+            try {
+                if (!relative) {
+                    return time(
+                        date,
+                        opts ?? { dateStyle: "long", timeStyle: "medium" },
+                    )
+                }
 
-            let now = new Date()
-            let diff = differenceInCalendarDays(date, now)
-            if (Math.abs(diff) <= 3) {
-                return t.datetime({
-                    date: formatDistance(date, now, { addSuffix: true }),
-                    time: time(date, { timeStyle: "short" }),
+                let now = new Date()
+                let diff = differenceInCalendarDays(date, now)
+                if (Math.abs(diff) <= 3) {
+                    return t.datetime({
+                        date: formatDistance(date, now, { addSuffix: true }),
+                        time: time(date, { timeStyle: "short" }),
+                    })
+                }
+
+                return time(date, { dateStyle: "long", timeStyle: "medium" })
+            } catch (err) {
+                return t.invalidTime({
+                    date: date?.toString(),
+                    error: (err as Error).message,
                 })
             }
-
-            return time(date, { dateStyle: "long", timeStyle: "medium" })
-        }, [date, time, opts, relative, t.datetime])
+        }, [date, time, opts, relative, t.datetime, t.invalidTime])
 
         return (
             <time

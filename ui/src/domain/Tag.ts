@@ -1,4 +1,7 @@
-export type Tag = string
+export interface Tag {
+    tag: string
+    count: number
+}
 
 export interface TagList {
     items: Tag[]

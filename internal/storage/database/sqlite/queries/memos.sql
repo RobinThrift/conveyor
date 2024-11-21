@@ -89,15 +89,15 @@ UPDATE memos SET
     updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 WHERE id = ?;
 
--- name: ArchiveMemo :execrows
+-- name: SeteMemoArchiveStatus :execrows
 UPDATE memos SET
-    is_archived = true,
+    is_archived = ?,
     updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 WHERE id = ?;
 
--- name: SoftDeleteMemo :exec
+-- name: SetMemoDeletionStatus :execrows
 UPDATE memos SET
-    is_deleted = true,
+    is_deleted = ?,
     updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 WHERE id = ?;
 

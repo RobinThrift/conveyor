@@ -30,7 +30,7 @@ interface MemoProps {
     className?: string
     memo: MemoT
     tags: Tag[]
-    onClickTag: (tag: Tag) => void
+    onClickTag: (tag: string) => void
     updateMemo: (memo: MemoT) => void
     doubleClickToEdit: boolean
 }
@@ -125,7 +125,7 @@ function MemoContent({
     onDoubleClick,
 }: {
     memo: MemoT
-    onClickTag: (tag: Tag) => void
+    onClickTag: (tag: string) => void
     activateEditingMode: () => void
     onDoubleClick?: (e: React.MouseEvent) => void
 }) {

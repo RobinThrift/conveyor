@@ -85,21 +85,19 @@ INSERT INTO tags(
     tag,
     count,
 	created_by
-) VALUES (?, ?, ?)
+) VALUES (?, 1, ?)
 ON CONFLICT (tag)
 DO UPDATE SET
-    count       = count+1,
     updated_at  = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 `
 
 type CreateTagParams struct {
 	Tag       string
-	Count     int64
 	CreatedBy int64
 }
 
 func (q *Queries) CreateTag(ctx context.Context, db DBTX, arg CreateTagParams) error {
-	_, err := db.ExecContext(ctx, createTag, arg.Tag, arg.Count, arg.CreatedBy)
+	_, err := db.ExecContext(ctx, createTag, arg.Tag, arg.CreatedBy)
 	return err
 }
 
@@ -173,15 +171,15 @@ func (q *Queries) ListTags(ctx context.Context, db DBTX, arg ListTagsParams) ([]
 	return items, nil
 }
 
-const reduceTagCount = `-- name: ReduceTagCount :exec
+const updateTagCount = `-- name: UpdateTagCount :exec
 UPDATE tags SET
-    count = count-1,
+    count = (SELECT COUNT(*) FROM memo_tags WHERE memo_tags.tag = tags.tag),
     updated_at  = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
-WHERE tag IN (/*SLICE:tags*/?)
+WHERE tags.tag in (/*SLICE:tags*/?)
 `
 
-func (q *Queries) ReduceTagCount(ctx context.Context, db DBTX, tags []string) error {
-	query := reduceTagCount
+func (q *Queries) UpdateTagCount(ctx context.Context, db DBTX, tags []string) error {
+	query := updateTagCount
 	var queryParams []interface{}
 	if len(tags) > 0 {
 		for _, v := range tags {

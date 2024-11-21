@@ -28,8 +28,8 @@
 .vim-enabled .cm-cursor {
     width: 10px;
     height: 15px;
-    background: rgb(var(--color-primary), 0.6) !important;
-    outline: 1px solid rgb(var(--color-primary), 0.6) !important;
+    background: rgb(var(--color-primary) / 0.6) !important;
+    outline: 1px solid rgb(var(--color-primary) / 0.6) !important;
     border-left-color: transparent !important;
 }
 
@@ -43,5 +43,5 @@
 }
 
 .cm-placeholder {
-    color: rgba(var(--color-subtle-extra-dark)) !important;
+    color: rgb(var(--color-subtle-extra-dark)) !important;
 }

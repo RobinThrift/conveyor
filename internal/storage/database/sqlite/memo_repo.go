@@ -337,7 +337,7 @@ func (r *MemoRepo) createMemo(ctx context.Context, memo *domain.Memo) (domain.Me
 	}
 
 	memo.ID = id
-	err = r.updateTags(ctx, db, memo, true)
+	err = r.updateTags(ctx, db, memo)
 	if err != nil {
 		return domain.MemoID(-1), err
 	}
@@ -360,7 +360,7 @@ func (r *MemoRepo) UpdateMemoContent(ctx context.Context, memo *domain.Memo) err
 		return domain.ErrMemoNotFound
 	}
 
-	err = r.updateTags(ctx, db, memo, false)
+	err = r.updateTags(ctx, db, memo)
 	if err != nil {
 		return err
 	}
@@ -368,8 +368,8 @@ func (r *MemoRepo) UpdateMemoContent(ctx context.Context, memo *domain.Memo) err
 	return nil
 }
 
-func (r *MemoRepo) ArchiveMemo(ctx context.Context, id domain.MemoID) error {
-	numRows, err := queries.ArchiveMemo(ctx, r.db.Conn(ctx), id)
+func (r *MemoRepo) UpdateArchiveStatus(ctx context.Context, id domain.MemoID, isArchived bool) error {
+	numRows, err := queries.SeteMemoArchiveStatus(ctx, r.db.Conn(ctx), sqlc.SeteMemoArchiveStatusParams{ID: id, IsArchived: isArchived})
 	if err != nil {
 		return err
 	}
@@ -387,10 +387,16 @@ func (r *MemoRepo) DeleteMemo(ctx context.Context, id domain.MemoID) error {
 	})
 }
 
+func (r *MemoRepo) UndeleteMemo(ctx context.Context, id domain.MemoID) error {
+	return r.db.InTransaction(ctx, func(ctx context.Context) error {
+		return r.undeleteMemo(ctx, id)
+	})
+}
+
 func (r *MemoRepo) deleteMemo(ctx context.Context, id domain.MemoID) error {
 	db := r.db.Conn(ctx)
 
-	err := queries.SoftDeleteMemo(ctx, db, id)
+	_, err := queries.SetMemoDeletionStatus(ctx, r.db.Conn(ctx), sqlc.SetMemoDeletionStatusParams{ID: id, IsDeleted: true})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = domain.ErrMemoNotFound
@@ -404,14 +410,43 @@ func (r *MemoRepo) deleteMemo(ctx context.Context, id domain.MemoID) error {
 		return fmt.Errorf("error deleting Memo (%d) to Tag connections: %w", id, err)
 	}
 
-	err = queries.ReduceTagCount(ctx, db, tags)
+	err = queries.UpdateTagCount(ctx, db, tags)
 	if err != nil {
-		return fmt.Errorf("error deleting reducing tag count: %w", err)
+		return fmt.Errorf("error updating tag count: %w", err)
 	}
 
 	err = r.cleanupTagsWithNoCount(ctx, db)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (r *MemoRepo) undeleteMemo(ctx context.Context, id domain.MemoID) error {
+	db := r.db.Conn(ctx)
+
+	numRows, err := queries.SetMemoDeletionStatus(ctx, r.db.Conn(ctx), sqlc.SetMemoDeletionStatusParams{ID: id, IsDeleted: false})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = domain.ErrMemoNotFound
+		}
+
+		return fmt.Errorf("error undeleting Memo (%d): %w", id, err)
+	}
+
+	if numRows == 0 {
+		return domain.ErrMemoNotFound
+	}
+
+	memo, err := r.GetMemo(ctx, id)
+	if err != nil {
+		return fmt.Errorf("error undeleting Memo (%d): %w", id, err)
+	}
+
+	err = r.updateTags(ctx, db, memo)
+	if err != nil {
+		return fmt.Errorf("error undeleting Memo (%d): %w", id, err)
 	}
 
 	return nil
@@ -461,7 +496,7 @@ func (r *MemoRepo) ListTags(ctx context.Context, query ListTagsQuery) (*domain.T
 	return list, nil
 }
 
-func (r *MemoRepo) updateTags(ctx context.Context, db sqlc.DBTX, memo *domain.Memo, created bool) error {
+func (r *MemoRepo) updateTags(ctx context.Context, db sqlc.DBTX, memo *domain.Memo) error {
 	tags := extractTags(memo.Content)
 
 	deletedTags, err := queries.CleanupeMemoTagConnection(ctx, db, sqlc.CleanupeMemoTagConnectionParams{MemoID: int64(memo.ID), Tags: tags})
@@ -469,26 +504,24 @@ func (r *MemoRepo) updateTags(ctx context.Context, db sqlc.DBTX, memo *domain.Me
 		return err
 	}
 
-	err = queries.ReduceTagCount(ctx, db, deletedTags)
-	if err != nil {
-		return err
+	for _, tag := range tags {
+		err = queries.CreateTag(ctx, db, sqlc.CreateTagParams{Tag: tag, CreatedBy: int64(memo.CreatedBy)})
+		if err != nil {
+			return err
+		}
+
+		err = queries.CreateMemoTagConnection(ctx, db, sqlc.CreateMemoTagConnectionParams{
+			MemoID: int64(memo.ID),
+			Tag:    tag,
+		})
+		if err != nil {
+			return err
+		}
 	}
 
-	if created {
-		for _, tag := range tags {
-			err = queries.CreateTag(ctx, db, sqlc.CreateTagParams{Tag: tag, Count: 1, CreatedBy: int64(memo.CreatedBy)})
-			if err != nil {
-				return err
-			}
-
-			err = queries.CreateMemoTagConnection(ctx, db, sqlc.CreateMemoTagConnectionParams{
-				MemoID: int64(memo.ID),
-				Tag:    tag,
-			})
-			if err != nil {
-				return err
-			}
-		}
+	err = queries.UpdateTagCount(ctx, db, append(deletedTags, tags...))
+	if err != nil {
+		return fmt.Errorf("error updating tag count: %w", err)
 	}
 
 	err = r.cleanupTagsWithNoCount(ctx, db)
