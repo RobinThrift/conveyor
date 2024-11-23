@@ -27,19 +27,19 @@ const (
 
 // Attachment defines model for Attachment.
 type Attachment struct {
-	ContentType string    `json:"contentType"`
-	CreatedAt   time.Time `json:"createdAt"`
-	CreatedBy   string    `json:"createdBy"`
-	Filename    string    `json:"filename"`
-	Sha256      string    `json:"sha256"`
-	SizeBytes   string    `json:"sizeBytes"`
-	Url         string    `json:"url"`
+	ContentType      string    `json:"contentType"`
+	CreatedAt        time.Time `json:"createdAt"`
+	CreatedBy        string    `json:"createdBy"`
+	OriginalFilename string    `json:"originalFilename"`
+	Sha256           string    `json:"sha256"`
+	SizeBytes        int64     `json:"sizeBytes"`
+	Url              string    `json:"url"`
 }
 
 // AttachmentList defines model for AttachmentList.
 type AttachmentList struct {
 	Items []Attachment `json:"items"`
-	Next  string       `json:"next"`
+	Next  *string      `json:"next,omitempty"`
 }
 
 // Error Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
@@ -99,7 +99,8 @@ type ListAttachmentsParams struct {
 
 // CreateAttachmentParams defines parameters for CreateAttachment.
 type CreateAttachmentParams struct {
-	XFilename string `json:"X-Filename"`
+	XFilename       string  `json:"X-Filename"`
+	ContentEncoding *string `json:"Content-Encoding,omitempty"`
 }
 
 // ListMemosParams defines parameters for ListMemos.
@@ -149,6 +150,9 @@ type ServerInterface interface {
 
 	// (POST /attachments)
 	CreateAttachment(w http.ResponseWriter, r *http.Request, params CreateAttachmentParams)
+
+	// (DELETE /attachments/{filename})
+	DeleteAttachment(w http.ResponseWriter, r *http.Request, filename string)
 
 	// (GET /memos)
 	ListMemos(w http.ResponseWriter, r *http.Request, params ListMemosParams)
@@ -247,8 +251,52 @@ func (siw *ServerInterfaceWrapper) CreateAttachment(w http.ResponseWriter, r *ht
 		return
 	}
 
+	// ------------- Optional header parameter "Content-Encoding" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Content-Encoding")]; found {
+		var ContentEncoding string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Content-Encoding", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "Content-Encoding", valueList[0], &ContentEncoding, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Content-Encoding", Err: err})
+			return
+		}
+
+		params.ContentEncoding = &ContentEncoding
+
+	}
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateAttachment(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteAttachment operation middleware
+func (siw *ServerInterfaceWrapper) DeleteAttachment(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "filename" -------------
+	var filename string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "filename", r.PathValue("filename"), &filename, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "filename", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteAttachment(w, r, filename)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -551,6 +599,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 
 	m.HandleFunc("GET "+options.BaseURL+"/attachments", wrapper.ListAttachments)
 	m.HandleFunc("POST "+options.BaseURL+"/attachments", wrapper.CreateAttachment)
+	m.HandleFunc("DELETE "+options.BaseURL+"/attachments/{filename}", wrapper.DeleteAttachment)
 	m.HandleFunc("GET "+options.BaseURL+"/memos", wrapper.ListMemos)
 	m.HandleFunc("POST "+options.BaseURL+"/memos", wrapper.CreateMemo)
 	m.HandleFunc("PATCH "+options.BaseURL+"/memos/{id}", wrapper.UpdateMemo)
@@ -648,6 +697,52 @@ type CreateAttachmentdefaultJSONResponse struct {
 }
 
 func (response CreateAttachmentdefaultJSONResponse) VisitCreateAttachmentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type DeleteAttachmentRequestObject struct {
+	Filename string `json:"filename"`
+}
+
+type DeleteAttachmentResponseObject interface {
+	VisitDeleteAttachmentResponse(w http.ResponseWriter) error
+}
+
+type DeleteAttachment204Response struct {
+}
+
+func (response DeleteAttachment204Response) VisitDeleteAttachmentResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteAttachment400JSONResponse Error
+
+func (response DeleteAttachment400JSONResponse) VisitDeleteAttachmentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteAttachment401JSONResponse Error
+
+func (response DeleteAttachment401JSONResponse) VisitDeleteAttachmentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteAttachmentdefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response DeleteAttachmentdefaultJSONResponse) VisitDeleteAttachmentResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -821,6 +916,9 @@ type StrictServerInterface interface {
 	// (POST /attachments)
 	CreateAttachment(ctx context.Context, request CreateAttachmentRequestObject) (CreateAttachmentResponseObject, error)
 
+	// (DELETE /attachments/{filename})
+	DeleteAttachment(ctx context.Context, request DeleteAttachmentRequestObject) (DeleteAttachmentResponseObject, error)
+
 	// (GET /memos)
 	ListMemos(ctx context.Context, request ListMemosRequestObject) (ListMemosResponseObject, error)
 
@@ -910,6 +1008,32 @@ func (sh *strictHandler) CreateAttachment(w http.ResponseWriter, r *http.Request
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(CreateAttachmentResponseObject); ok {
 		if err := validResponse.VisitCreateAttachmentResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteAttachment operation middleware
+func (sh *strictHandler) DeleteAttachment(w http.ResponseWriter, r *http.Request, filename string) {
+	var request DeleteAttachmentRequestObject
+
+	request.Filename = filename
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteAttachment(ctx, request.(DeleteAttachmentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteAttachment")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteAttachmentResponseObject); ok {
+		if err := validResponse.VisitDeleteAttachmentResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

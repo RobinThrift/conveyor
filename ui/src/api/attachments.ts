@@ -1,5 +1,4 @@
 import type { Attachment } from "@/domain/Attachment"
-import { supportsRequestStreams } from "@/helper/supportsRequestStreams"
 
 export async function uploadAttachment({
     filename,
@@ -19,9 +18,7 @@ export async function uploadAttachment({
 
     let body: ReadableStream | Blob = readable
 
-    if (!supportsRequestStreams) {
-        body = await streamToBlob(readable.getReader())
-    }
+    body = await streamToBlob(readable.getReader())
 
     let res = await fetch(url, {
         method: "POST",

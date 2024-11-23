@@ -47,7 +47,7 @@ func Test_MemoRepo_Querying(t *testing.T) {
 
 		require.Lenf(t, list.Items, 25, "i = %d", i)
 		require.NotEqualf(t, lastMemoID, list.Items[0].ID, "i = %d", i)
-		lastMemoID = list.Items[0].ID
+		lastMemoID = list.Items[len(list.Items)-1].ID
 		lastMemoDate = list.Next
 	}
 

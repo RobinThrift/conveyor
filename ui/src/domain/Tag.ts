@@ -5,5 +5,5 @@ export interface Tag {
 
 export interface TagList {
     items: Tag[]
-    next: Tag
+    next?: string
 }

@@ -233,6 +233,10 @@ paths:
         schema:
           type: string
         required: true
+      - in: header
+        name: "Content-Encoding"
+        schema:
+          type: string
 
       requestBody:
         $ref: "#/components/requestBodies/CreateAttachmentRequest"
@@ -261,6 +265,37 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /attachments/{filename}:
+    parameters:
+    - name: filename
+      in: path
+      required: true
+      schema:
+        type: string
+
+    delete:
+      operationId: DeleteAttachment
+      responses:
+        "204":
+          description: The attachment was deleted succesfully.
+          content: {}
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:
@@ -334,12 +369,13 @@ components:
       properties:
           url:
             type: string
-          filename:
+          originalFilename:
             type: string
           contentType:
             type: string
           sizeBytes:
-            type: string
+            type: number
+            x-go-type: int64
           sha256:
             type: string
           createdBy:
@@ -349,8 +385,7 @@ components:
             format: date-time
       required:
       - url
-      - filename
-      - filepath
+      - originalFilename
       - contentType
       - sizeBytes
       - sha256
@@ -368,7 +403,6 @@ components:
             type: string
       required:
       - items
-      - next
 
     Error:
       type: object

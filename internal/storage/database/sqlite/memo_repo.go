@@ -329,8 +329,7 @@ func (r *MemoRepo) createMemo(ctx context.Context, memo *domain.Memo) (domain.Me
 		CreatedAt: types.SQLiteDatetime{Time: memo.CreatedAt, Valid: true},
 	})
 	if err != nil {
-		var sqliteErr sqlite3.Error
-		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == 787 {
+		if errors.Is(err, sqlite3.ErrConstraintForeignKey) {
 			return domain.MemoID(-1), fmt.Errorf("invalid account reference")
 		}
 		return domain.MemoID(-1), err

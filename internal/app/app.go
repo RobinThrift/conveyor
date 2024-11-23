@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/control"
@@ -14,6 +15,7 @@ import (
 	"github.com/RobinThrift/belt/internal/server"
 	"github.com/RobinThrift/belt/internal/server/session"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite"
+	"github.com/RobinThrift/belt/internal/storage/filesystem"
 )
 
 type App struct {
@@ -45,12 +47,19 @@ func New(config Config) *App {
 	accountRepo := sqlite.NewAccountRepo(db)
 	localAuthRepo := sqlite.NewLocalAuthRepo(db)
 	memoRepo := sqlite.NewMemoRepo(db)
+	attachmentRepo := sqlite.NewAttachmentRepo(db)
+
+	fs := &filesystem.LocalFSAttachments{
+		AttachmentsDir: config.Attachments.Dir,
+		TmpDir:         os.TempDir(),
+	}
 
 	accountCtrl := control.NewAccountController(db, accountRepo)
 	authCtrl := control.NewAuthController(control.AuthConfig{
 		Argon2Params: argon2Params,
 	}, db, accountCtrl, localAuthRepo)
-	memoCtrl := control.NewMemoControl(db, memoRepo)
+	memoCtrl := control.NewMemoControl(db, memoRepo, attachmentRepo)
+	attachmentCtrl := control.NewAttachmentControl(fs, attachmentRepo)
 
 	mux := http.NewServeMux()
 
@@ -60,9 +69,10 @@ func New(config Config) *App {
 		CSRFSecret:       config.CSRFSecret,
 		UseSecureCookies: config.SecureCookies,
 		BasePath:         config.BasePath,
+		AttachmentsDir:   config.Attachments.Dir,
 	}, mux, authCtrl)
 
-	apiv1.New(config.BasePath, mux, memoCtrl)
+	apiv1.New(config.BasePath, mux, memoCtrl, attachmentCtrl)
 
 	return &App{
 		config: config,

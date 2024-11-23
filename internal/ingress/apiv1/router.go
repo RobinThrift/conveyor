@@ -2,6 +2,7 @@ package apiv1
 
 import (
 	"cmp"
+	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
@@ -14,11 +15,13 @@ import (
 )
 
 type router struct {
-	memoCtrl *control.MemoControl
+	baseURL        string
+	memoCtrl       *control.MemoControl
+	attachmentCtrl *control.AttachmentControl
 }
 
-func New(baseURL string, mux *http.ServeMux, memoCtrl *control.MemoControl) {
-	r := &router{memoCtrl: memoCtrl}
+func New(baseURL string, mux *http.ServeMux, memoCtrl *control.MemoControl, attachmentCtrl *control.AttachmentControl) {
+	r := &router{baseURL, memoCtrl, attachmentCtrl}
 
 	HandlerWithOptions(NewStrictHandlerWithOptions(r, nil, StrictHTTPServerOptions{
 		RequestErrorHandlerFunc:  errorHandlerFunc,
@@ -161,12 +164,78 @@ func (r *router) ListTags(ctx context.Context, req ListTagsRequestObject) (ListT
 }
 
 // (GET /attachments)
-func (router *router) ListAttachments(ctx context.Context, req ListAttachmentsRequestObject) (ListAttachmentsResponseObject, error) {
-	panic("not implemented") // TODO: Implement
+func (r *router) ListAttachments(ctx context.Context, req ListAttachmentsRequestObject) (ListAttachmentsResponseObject, error) {
+	query := control.ListAttachmentsQuery{
+		PageSize:  min(cmp.Or(req.Params.PageSize, 10), 50),
+		PageAfter: req.Params.PageAfter,
+	}
+
+	attachments, err := r.attachmentCtrl.ListAttachments(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	apiAttachments := AttachmentList{Items: make([]Attachment, len(attachments.Items))}
+	for i, a := range attachments.Items {
+		apiAttachments.Items[i] = Attachment{
+			Url:              r.baseURL + "attachments" + a.Filepath,
+			OriginalFilename: a.OriginalFilename,
+			ContentType:      a.ContentType,
+			Sha256:           fmt.Sprintf("%x", a.Sha256),
+			SizeBytes:        a.SizeBytes,
+			CreatedBy:        a.CreatedBy.String(),
+			CreatedAt:        a.CreatedAt,
+		}
+	}
+
+	if attachments.Next != nil {
+		apiAttachments.Next = attachments.Next
+	}
+
+	return ListAttachments200JSONResponse(apiAttachments), nil
 }
 
 // (POST /attachments)
-func (router *router) CreateAttachment(ctx context.Context, req CreateAttachmentRequestObject) (CreateAttachmentResponseObject, error) {
+func (r *router) CreateAttachment(ctx context.Context, req CreateAttachmentRequestObject) (CreateAttachmentResponseObject, error) {
+	content := req.Body
+	if req.Params.ContentEncoding != nil && *req.Params.ContentEncoding == "gzip" {
+		gr, err := gzip.NewReader(content)
+		if err != nil {
+			return nil, err
+		}
+		content = gr
+		defer gr.Close()
+	}
+
+	id, err := r.attachmentCtrl.CreateAttachment(ctx, control.CreateAttachmentCmd{
+		Filename: req.Params.XFilename,
+		Content:  content,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := r.attachmentCtrl.GetAttachment(ctx, id)
+	if err != nil {
+		if errors.Is(err, domain.ErrAttachmentNotFound) {
+			return nil, fmt.Errorf("%w: %v", errNotFound, err)
+		}
+		return nil, err
+	}
+
+	return CreateAttachment201JSONResponse{
+		Url:              r.baseURL + "attachments" + created.Filepath,
+		OriginalFilename: created.OriginalFilename,
+		ContentType:      created.ContentType,
+		Sha256:           fmt.Sprintf("%x", created.Sha256),
+		SizeBytes:        created.SizeBytes,
+		CreatedAt:        created.CreatedAt,
+		CreatedBy:        created.CreatedBy.String(),
+	}, nil
+}
+
+// (DELETE /attachments/{filename})
+func (r *router) DeleteAttachment(ctx context.Context, req DeleteAttachmentRequestObject) (DeleteAttachmentResponseObject, error) {
 	panic("not implemented") // TODO: Implement
 }
 

@@ -220,13 +220,13 @@ export const mockAPI: HttpHandler[] = [
         let next = ""
 
         for (let tag of mockData.tags) {
-            take = take || tag === after
+            take = take || tag.tag === after
             if (!take) {
                 continue
             }
 
             if (tags.length >= pageSize) {
-                next = tag
+                next = tag.tag
                 break
             }
 

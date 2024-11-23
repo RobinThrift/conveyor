@@ -149,7 +149,7 @@ export function filterFromQuery(query: FilterQuery): Filter {
     }
 
     let opCreatedAt = query["op[created_at]"]
-    if (opCreatedAt && opCreatedAt == "<=") {
+    if (opCreatedAt && opCreatedAt === "<=") {
         filter.startDate = parse(createdAt, "yyyy-MM-dd", new Date())
     } else {
         filter.exactDate = parse(createdAt, "yyyy-MM-dd", new Date())

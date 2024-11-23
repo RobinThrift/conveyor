@@ -20,6 +20,8 @@ type Config struct {
 	SecureCookies bool   `env:"SECURE_COOKIES"`
 	CSRFSecret    []byte `env:"CSRF_SECRET"`
 
+	Attachments Attachments `envPrefix:"ATTACHMENTS_"`
+
 	Database Database `envPrefix:"DATABASE_"`
 
 	Argon2 Argon2 `envPrefix:"ARGON2_"`
@@ -31,6 +33,10 @@ type Config struct {
 	Init Init `envPrefix:"INIT_"`
 }
 
+type Attachments struct {
+	Dir string `env:"DIR"`
+}
+
 type Log struct {
 	Format string `env:"FORMAT"`
 	Level  string `env:"LEVEL"`
@@ -40,7 +46,7 @@ type Database struct {
 	Path         string        `env:"PATH"`
 	EnableWAL    bool          `env:"ENABLE_WAL"`
 	Timeout      time.Duration `env:"TIMEOUT"`
-	DebugEnabled bool          `end:"DEBUG_ENABLED"`
+	DebugEnabled bool          `env:"DEBUG_ENABLED"`
 }
 
 type Argon2 struct {
@@ -61,6 +67,9 @@ var defaultConfig = Config{
 	BasePath:      "/",
 	SecureCookies: true,
 	CSRFSecret:    genCSRFSecret(),
+	Attachments: Attachments{
+		Dir: "attachments",
+	},
 	Database: Database{
 		Path:      "belt.db",
 		EnableWAL: true,

@@ -2,7 +2,6 @@ package apiv1_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/RobinThrift/belt/internal/ingress/apiv1"
@@ -14,7 +13,6 @@ func TestMemos(t *testing.T) {
 	t.Cleanup(cancel)
 
 	client := setup(ctx, t)
-	fmt.Printf("client %#v\n", client)
 
 	memos, err := get[apiv1.MemoList](ctx, client, "/api/v1/memos", "page[size]", "10")
 	require.NoError(t, err)

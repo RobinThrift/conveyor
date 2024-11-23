@@ -1,6 +1,7 @@
 package filesystem
 
 import (
+	"context"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -16,13 +17,13 @@ type LocalFSAttachments struct {
 	TmpDir         string
 }
 
-func (lfs *LocalFSAttachments) WriteAttachment(attachment *domain.Attachment, data io.Reader) (err error) {
+func (lfs *LocalFSAttachments) WriteAttachment(_ context.Context, attachment *domain.Attachment, data io.Reader) (err error) {
 	err = ensureDirExists(lfs.AttachmentsDir)
 	if err != nil {
 		return err
 	}
 
-	fhandle, err := os.CreateTemp(lfs.TmpDir, attachment.Filename)
+	fhandle, err := os.CreateTemp(lfs.TmpDir, attachment.OriginalFilename)
 	if err != nil {
 		return err
 	}
@@ -49,12 +50,12 @@ func (lfs *LocalFSAttachments) WriteAttachment(attachment *domain.Attachment, da
 
 	attachment.Sha256 = h.Sum(nil)
 
-	ext := path.Ext(attachment.Filename)
+	attachment.Filepath = ""
 	for _, b := range attachment.Sha256 {
 		attachment.Filepath = attachment.Filepath + "/" + fmt.Sprintf("%x", b)
 	}
 
-	attachment.Filepath += ext
+	attachment.Filepath = path.Join(attachment.Filepath, attachment.OriginalFilename)
 
 	finalFilePath := path.Join(lfs.AttachmentsDir, attachment.Filepath)
 
@@ -71,7 +72,7 @@ func (lfs *LocalFSAttachments) WriteAttachment(attachment *domain.Attachment, da
 	return nil
 }
 
-func (lfs *LocalFSAttachments) RemoveAttachment(attachment *domain.Attachment) error {
+func (lfs *LocalFSAttachments) RemoveAttachment(_ context.Context, attachment *domain.Attachment) error {
 	filepath := path.Join(lfs.AttachmentsDir, attachment.Filepath)
 
 	err := os.Remove(filepath)

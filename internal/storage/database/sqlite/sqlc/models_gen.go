@@ -21,14 +21,14 @@ type Account struct {
 }
 
 type Attachment struct {
-	ID          int64
-	Filename    string
-	Filepath    string
-	ContentType string
-	SizeBytes   int64
-	Sha256      []byte
-	CreatedBy   int64
-	CreatedAt   string
+	ID               domain.AttachmentID
+	Filepath         string
+	OriginalFilename string
+	ContentType      string
+	SizeBytes        int64
+	Sha256           []byte
+	CreatedBy        auth.AccountID
+	CreatedAt        types.SQLiteDatetime
 }
 
 type LocalAuthAccount struct {

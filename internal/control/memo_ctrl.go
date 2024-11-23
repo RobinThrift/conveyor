@@ -3,17 +3,20 @@ package control
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/domain"
 	"github.com/RobinThrift/belt/internal/storage/database"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite"
+	"github.com/RobinThrift/belt/internal/x/stringset"
 )
 
 type MemoControl struct {
-	transactioner database.Transactioner
-	memoRepo      MemoControlMemoRepo
+	transactioner  database.Transactioner
+	memoRepo       MemoControlMemoRepo
+	attachmentRepo MemoControlAttachmentRepo
 }
 
 type MemoControlMemoRepo interface {
@@ -27,8 +30,14 @@ type MemoControlMemoRepo interface {
 	ListTags(ctx context.Context, query sqlite.ListTagsQuery) (*domain.TagList, error)
 }
 
-func NewMemoControl(transactioner database.Transactioner, memoRepo MemoControlMemoRepo) *MemoControl {
-	return &MemoControl{transactioner: transactioner, memoRepo: memoRepo}
+type MemoControlAttachmentRepo interface {
+	CreateMemoAttachmentLink(ctx context.Context, memoID domain.MemoID, filepath string) error
+	DeleteMemoAttachmentLinks(ctx context.Context, memoID domain.MemoID, attachmentIDs []domain.AttachmentID) error
+	ListAttachmentsForMemo(ctx context.Context, memoID domain.MemoID) ([]*domain.Attachment, error)
+}
+
+func NewMemoControl(transactioner database.Transactioner, memoRepo MemoControlMemoRepo, attachmentRepo MemoControlAttachmentRepo) *MemoControl {
+	return &MemoControl{transactioner, memoRepo, attachmentRepo}
 }
 
 func (mc *MemoControl) GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo, error) {
@@ -91,6 +100,11 @@ func (mc *MemoControl) CreateMemo(ctx context.Context, cmd CreateMemoCmd) (domai
 		return domain.MemoID(-1), fmt.Errorf("%w: %v", domain.ErrCreateMemo, err)
 	}
 
+	err = mc.updateAttachments(ctx, id, cmd.Content)
+	if err != nil {
+		return domain.MemoID(-1), fmt.Errorf("%w: %v", domain.ErrCreateMemo, err)
+	}
+
 	return id, nil
 }
 
@@ -118,12 +132,51 @@ func (mc *MemoControl) UpdateMemo(ctx context.Context, cmd UpdateMemoCmd) error 
 		if err != nil {
 			return fmt.Errorf("error updating memo %d: %v", cmd.MemoID, err)
 		}
+
+		err = mc.updateAttachments(ctx, cmd.MemoID, cmd.Content)
+		if err != nil {
+			return fmt.Errorf("error updating memo %d: %v", cmd.MemoID, err)
+		}
 	}
 
 	if cmd.IsArchived != nil {
 		err = mc.memoRepo.UpdateArchiveStatus(ctx, cmd.MemoID, *cmd.IsArchived)
 		if err != nil {
 			return fmt.Errorf("error updating memo %d: %v", cmd.MemoID, err)
+		}
+	}
+
+	return nil
+}
+
+func (mc *MemoControl) updateAttachments(ctx context.Context, memoID domain.MemoID, content []byte) error {
+	attachmentURLs := stringset.New(extractAssetURLs(content)...)
+
+	existingAttachments, err := mc.attachmentRepo.ListAttachmentsForMemo(ctx, memoID)
+	if err != nil {
+		return fmt.Errorf("error getting attachments for memo: %w", err)
+	}
+
+	removed := make([]domain.AttachmentID, 0, len(attachmentURLs))
+	for _, attachment := range existingAttachments {
+		if !attachmentURLs.Has(attachment.Filepath) {
+			removed = append(removed, attachment.ID)
+		} else {
+			attachmentURLs.Del(attachment.Filepath)
+		}
+	}
+
+	if len(removed) != 0 {
+		err = mc.attachmentRepo.DeleteMemoAttachmentLinks(ctx, memoID, removed)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, url := range attachmentURLs.Values() {
+		err = mc.attachmentRepo.CreateMemoAttachmentLink(ctx, memoID, url)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -150,4 +203,17 @@ func (mc *MemoControl) ListTags(ctx context.Context, query ListTagsQuery) (*doma
 		PageSize:  query.PageSize,
 		PageAfter: query.PageAfter,
 	})
+}
+
+var attachmentsURLPattern = regexp.MustCompile(`\[.*\]\(.*/attachments/(([a-fA-F0-9]{2}/)+.+?)\)`)
+
+func extractAssetURLs(content []byte) []string {
+	matches := attachmentsURLPattern.FindAllSubmatch(content, -1)
+	assetURLs := make([]string, 0, len(matches))
+
+	for _, match := range matches {
+		assetURLs = append(assetURLs, "/"+string(match[1]))
+	}
+
+	return assetURLs
 }

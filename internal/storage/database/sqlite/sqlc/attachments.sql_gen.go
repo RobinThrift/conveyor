@@ -7,35 +7,56 @@ package sqlc
 
 import (
 	"context"
+	"strings"
+
+	"github.com/RobinThrift/belt/internal/auth"
+	"github.com/RobinThrift/belt/internal/domain"
 )
 
-const createAttachment = `-- name: CreateAttachment :exec
+const countAttachments = `-- name: CountAttachments :one
+SELECT COUNT(*) FROM attachments
+`
+
+func (q *Queries) CountAttachments(ctx context.Context, db DBTX) (int64, error) {
+	row := db.QueryRowContext(ctx, countAttachments)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const createAttachment = `-- name: CreateAttachment :one
 INSERT INTO attachments(
-    filename,
+    filepath,
+    original_filename,
     content_type,
     size_bytes,
     sha256,
     created_by
-) VALUES (?, ?, ?, ?, ?)
+) VALUES (?, ?, ?, ?, ?, ?)
+RETURNING id
 `
 
 type CreateAttachmentParams struct {
-	Filename    string
-	ContentType string
-	SizeBytes   int64
-	Sha256      []byte
-	CreatedBy   int64
+	Filepath         string
+	OriginalFilename string
+	ContentType      string
+	SizeBytes        int64
+	Sha256           []byte
+	CreatedBy        auth.AccountID
 }
 
-func (q *Queries) CreateAttachment(ctx context.Context, db DBTX, arg CreateAttachmentParams) error {
-	_, err := db.ExecContext(ctx, createAttachment,
-		arg.Filename,
+func (q *Queries) CreateAttachment(ctx context.Context, db DBTX, arg CreateAttachmentParams) (domain.AttachmentID, error) {
+	row := db.QueryRowContext(ctx, createAttachment,
+		arg.Filepath,
+		arg.OriginalFilename,
 		arg.ContentType,
 		arg.SizeBytes,
 		arg.Sha256,
 		arg.CreatedBy,
 	)
-	return err
+	var id domain.AttachmentID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const createMemoAttachmentLink = `-- name: CreateMemoAttachmentLink :exec
@@ -55,41 +76,126 @@ func (q *Queries) CreateMemoAttachmentLink(ctx context.Context, db DBTX, arg Cre
 	return err
 }
 
-const deleteMemoAttachmentLink = `-- name: DeleteMemoAttachmentLink :exec
-DELETE FROM memo_attachments WHERE attachment_id = ?
-`
-
-func (q *Queries) DeleteMemoAttachmentLink(ctx context.Context, db DBTX, attachmentID int64) error {
-	_, err := db.ExecContext(ctx, deleteMemoAttachmentLink, attachmentID)
-	return err
-}
-
-const deleteMemoAttachmentLinks = `-- name: DeleteMemoAttachmentLinks :exec
+const deleteAllMemoAttachmentLinks = `-- name: DeleteAllMemoAttachmentLinks :exec
 DELETE FROM memo_attachments WHERE memo_id = ?
 `
 
-func (q *Queries) DeleteMemoAttachmentLinks(ctx context.Context, db DBTX, memoID int64) error {
-	_, err := db.ExecContext(ctx, deleteMemoAttachmentLinks, memoID)
+func (q *Queries) DeleteAllMemoAttachmentLinks(ctx context.Context, db DBTX, memoID int64) error {
+	_, err := db.ExecContext(ctx, deleteAllMemoAttachmentLinks, memoID)
 	return err
+}
+
+const deleteAttachments = `-- name: DeleteAttachments :execrows
+DELETE FROM attachments WHERE id IN (/*SLICE:ids*/?)
+`
+
+func (q *Queries) DeleteAttachments(ctx context.Context, db DBTX, ids []domain.AttachmentID) (int64, error) {
+	query := deleteAttachments
+	var queryParams []interface{}
+	if len(ids) > 0 {
+		for _, v := range ids {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:ids*/?", strings.Repeat(",?", len(ids))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:ids*/?", "NULL", 1)
+	}
+	result, err := db.ExecContext(ctx, query, queryParams...)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const deleteMemoAttachmentLinks = `-- name: DeleteMemoAttachmentLinks :exec
+DELETE FROM memo_attachments WHERE memo_id = ? AND attachment_id IN (/*SLICE:attachment_ids*/?)
+`
+
+type DeleteMemoAttachmentLinksParams struct {
+	MemoID        int64
+	AttachmentIds []int64
+}
+
+func (q *Queries) DeleteMemoAttachmentLinks(ctx context.Context, db DBTX, arg DeleteMemoAttachmentLinksParams) error {
+	query := deleteMemoAttachmentLinks
+	var queryParams []interface{}
+	queryParams = append(queryParams, arg.MemoID)
+	if len(arg.AttachmentIds) > 0 {
+		for _, v := range arg.AttachmentIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:attachment_ids*/?", strings.Repeat(",?", len(arg.AttachmentIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:attachment_ids*/?", "NULL", 1)
+	}
+	_, err := db.ExecContext(ctx, query, queryParams...)
+	return err
+}
+
+const getAttachment = `-- name: GetAttachment :one
+SELECT
+    attachments.id, attachments.filepath, attachments.original_filename, attachments.content_type, attachments.size_bytes, attachments.sha256, attachments.created_by, attachments.created_at
+FROM attachments
+WHERE id = ?
+LIMIT 1
+`
+
+func (q *Queries) GetAttachment(ctx context.Context, db DBTX, id domain.AttachmentID) (Attachment, error) {
+	row := db.QueryRowContext(ctx, getAttachment, id)
+	var i Attachment
+	err := row.Scan(
+		&i.ID,
+		&i.Filepath,
+		&i.OriginalFilename,
+		&i.ContentType,
+		&i.SizeBytes,
+		&i.Sha256,
+		&i.CreatedBy,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getAttachmentByFilepath = `-- name: GetAttachmentByFilepath :one
+SELECT
+    attachments.id, attachments.filepath, attachments.original_filename, attachments.content_type, attachments.size_bytes, attachments.sha256, attachments.created_by, attachments.created_at
+FROM attachments
+WHERE filepath = ?
+LIMIT 1
+`
+
+func (q *Queries) GetAttachmentByFilepath(ctx context.Context, db DBTX, filepath string) (Attachment, error) {
+	row := db.QueryRowContext(ctx, getAttachmentByFilepath, filepath)
+	var i Attachment
+	err := row.Scan(
+		&i.ID,
+		&i.Filepath,
+		&i.OriginalFilename,
+		&i.ContentType,
+		&i.SizeBytes,
+		&i.Sha256,
+		&i.CreatedBy,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const listAttachments = `-- name: ListAttachments :many
 SELECT
-    attachments.id, attachments.filename, attachments.filepath, attachments.content_type, attachments.size_bytes, attachments.sha256, attachments.created_by, attachments.created_at
+    attachments.id, attachments.filepath, attachments.original_filename, attachments.content_type, attachments.size_bytes, attachments.sha256, attachments.created_by, attachments.created_at
 FROM attachments
-WHERE created_by = ? AND filename > ?
-ORDER BY filename
-LIMIT ?
+WHERE original_filename > ?1
+ORDER BY original_filename
+LIMIT ?2
 `
 
 type ListAttachmentsParams struct {
-	CreatedBy int64
-	Filename  string
-	Limit     int64
+	PageAfter string
+	PageSize  int64
 }
 
 func (q *Queries) ListAttachments(ctx context.Context, db DBTX, arg ListAttachmentsParams) ([]Attachment, error) {
-	rows, err := db.QueryContext(ctx, listAttachments, arg.CreatedBy, arg.Filename, arg.Limit)
+	rows, err := db.QueryContext(ctx, listAttachments, arg.PageAfter, arg.PageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +205,88 @@ func (q *Queries) ListAttachments(ctx context.Context, db DBTX, arg ListAttachme
 		var i Attachment
 		if err := rows.Scan(
 			&i.ID,
-			&i.Filename,
 			&i.Filepath,
+			&i.OriginalFilename,
+			&i.ContentType,
+			&i.SizeBytes,
+			&i.Sha256,
+			&i.CreatedBy,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAttachmentsForMemo = `-- name: ListAttachmentsForMemo :many
+SELECT attachments.id, attachments.filepath, attachments.original_filename, attachments.content_type, attachments.size_bytes, attachments.sha256, attachments.created_by, attachments.created_at
+FROM attachments
+JOIN memo_attachments ON memo_attachments.attachment_id = attachments.id
+WHERE memo_attachments.memo_id = ?
+`
+
+func (q *Queries) ListAttachmentsForMemo(ctx context.Context, db DBTX, memoID int64) ([]Attachment, error) {
+	rows, err := db.QueryContext(ctx, listAttachmentsForMemo, memoID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Attachment
+	for rows.Next() {
+		var i Attachment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Filepath,
+			&i.OriginalFilename,
+			&i.ContentType,
+			&i.SizeBytes,
+			&i.Sha256,
+			&i.CreatedBy,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUnusedAttachments = `-- name: ListUnusedAttachments :many
+;
+
+SELECT attachments.id, attachments.filepath, attachments.original_filename, attachments.content_type, attachments.size_bytes, attachments.sha256, attachments.created_by, attachments.created_at
+FROM attachments
+LEFT JOIN memo_attachments ON attachments.id = memo_attachments.attachment_id
+WHERE memo_attachments.id IS NULL
+`
+
+func (q *Queries) ListUnusedAttachments(ctx context.Context, db DBTX) ([]Attachment, error) {
+	rows, err := db.QueryContext(ctx, listUnusedAttachments)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Attachment
+	for rows.Next() {
+		var i Attachment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Filepath,
+			&i.OriginalFilename,
 			&i.ContentType,
 			&i.SizeBytes,
 			&i.Sha256,

@@ -5,11 +5,11 @@ import React, { Suspense, useCallback } from "react"
 import type { ServerData } from "./ServerData"
 import { $router } from "./router"
 
+import { type Filter, filterFromQuery, filterToQueryString } from "@/api/memos"
 import { useT } from "@/i18n"
 import { ErrorPage } from "@/pages/Errors"
 import { ChangePasswordPage, LoginPage } from "@/pages/Login"
 import { ListMemosPage } from "@/pages/Memos/List"
-import { Filter, filterFromQuery, filterToQueryString } from "@/api/memos"
 
 export type AppProps = ServerData
 

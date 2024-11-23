@@ -6,6 +6,7 @@ import (
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/control"
+	"github.com/RobinThrift/belt/internal/server"
 	"github.com/RobinThrift/belt/internal/server/session"
 	"github.com/RobinThrift/belt/ui"
 	"github.com/gorilla/csrf"
@@ -20,6 +21,7 @@ type Config struct {
 	CSRFSecret       []byte
 	UseSecureCookies bool
 	BasePath         string
+	AttachmentsDir   string
 }
 
 func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthController) {
@@ -42,7 +44,16 @@ func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthControll
 		return nil
 	}))))
 
-	mux.Handle("/assets/", ui.Assets(config.BasePath+"assets/"))
+	mux.Handle("/assets/", server.CompressWithGzipMiddleware(ui.Assets(config.BasePath+"assets/")))
+	mux.Handle(
+		config.BasePath+"attachments/",
+		server.CompressWithGzipMiddleware(
+			http.StripPrefix(
+				config.BasePath+"attachments/",
+				http.FileServer(http.Dir(config.AttachmentsDir)),
+			),
+		),
+	)
 
 	mux.Handle("GET /login", csrfProtectionMiddleware(router.handlerFuncWithErr((router.getLogin))))
 	mux.Handle("POST /login", csrfProtectionMiddleware(router.handlerFuncWithErr(router.postLogin)))

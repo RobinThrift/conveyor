@@ -43,7 +43,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
 
     useEffect(() => {
         setFilter(props.filter)
-    }, [props.filter])
+    }, [setFilter, props.filter])
 
     let onEOLReached = useCallback(() => {
         if (!isLoading) {

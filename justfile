@@ -20,6 +20,7 @@ run: (_install-tool "watchexec")
         BELT_SECURE_COOKIES="false" \
         BELT_DATABASE_PATH="./test/manual/belt.db" \
         BELT_DATABASE_DEBUG_ENABLED="true" \
+        BELT_ATTACHMENTS_DIR="./test/manual/attachments" \
         BELT_INIT_USERNAME="user" \
         BELT_INIT_PASSWORD="password" \
         {{ local_bin }}/watchexec -r -e go -- go run -trimpath -tags sqlite_fts5,sqlite_omit_load_extension,dev ./bin/belt

@@ -6,8 +6,8 @@ import { atom, batched, onMount, task } from "nanostores"
 import { useMemo } from "react"
 
 const $tagListStoreIsLoading = atom<boolean>(false)
-const $tagListStoreNext = atom<Tag | undefined>()
-const $tagListStoreCurrent = atom<Tag | undefined>()
+const $tagListStoreNext = atom<string | undefined>()
+const $tagListStoreCurrent = atom<string | undefined>()
 const $tagListStoreTags = atom<Tag[]>([])
 const $tagListStoreError = atom<Error | undefined>()
 

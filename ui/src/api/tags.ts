@@ -1,4 +1,4 @@
-import type { Tag, TagList } from "@/domain/Tag"
+import type { TagList } from "@/domain/Tag"
 import type { Pagination } from "./pagination"
 
 export async function list({
@@ -6,7 +6,7 @@ export async function list({
     baseURL = "",
     signal,
 }: {
-    pagination: Pagination<Tag>
+    pagination: Pagination<string>
     after?: string
     baseURL?: string
     signal?: AbortSignal

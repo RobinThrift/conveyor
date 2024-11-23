@@ -86,17 +86,18 @@ CREATE UNIQUE INDEX unique_memo_tag_connection ON memo_tags(memo_id, tag);
 CREATE TABLE attachments (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    filename     TEXT NOT NULL,
-    filepath     TEXT NOT NULL,
-    content_type TEXT NOT NULL,
-    size_bytes   INT  NOT NULL,
-    sha256       BLOB NOT NULL,
+    filepath          TEXT NOT NULL,
+    original_filename TEXT NOT NULL,
+    content_type      TEXT NOT NULL,
+    size_bytes        INT  NOT NULL,
+    sha256            BLOB NOT NULL,
 
     created_by INTEGER NOT NULL,
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)),
 
     FOREIGN KEY(created_by) REFERENCES accounts(id)
 );
+CREATE UNIQUE INDEX attachment_filepath ON attachments(filepath);
 
 CREATE TABLE memo_attachments (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -177,6 +178,7 @@ DROP TRIGGER memos_after_insert;
 DROP TABLE memos_fts;
 
 DROP TABLE memo_attachments;
+DROP INDEX attachment_filepath;
 DROP TABLE attachments;
 
 DROP INDEX unique_memo_tag_connection;

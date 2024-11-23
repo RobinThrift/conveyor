@@ -26,6 +26,8 @@ func setup(ctx context.Context, t *testing.T) *client {
 		t.Fatal(err)
 	}
 
+	config.Attachments.Dir = t.TempDir()
+
 	config.Log.Level = "debug"
 	config.Log.Format = "console"
 
@@ -105,7 +107,7 @@ type client struct {
 	baseURL *url.URL
 }
 
-func get[P any](ctx context.Context, client *client, path string, queryPairs ...any) (*P, error) {
+func getRaw(ctx context.Context, client *client, path string, queryPairs ...any) ([]byte, error) {
 	url := client.baseURL.JoinPath(path)
 	query := url.Query()
 	for i := 0; i < len(queryPairs); i += 2 {
@@ -133,10 +135,19 @@ func get[P any](ctx context.Context, client *client, path string, queryPairs ...
 		return nil, fmt.Errorf("error reading body for GET reqquest %s: %w", url.String(), err)
 	}
 
+	return body, nil
+}
+
+func get[P any](ctx context.Context, client *client, path string, queryPairs ...any) (*P, error) {
+	body, err := getRaw(ctx, client, path, queryPairs...)
+	if err != nil {
+		return nil, err
+	}
+
 	var payload P
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
-		return nil, fmt.Errorf("error unmarshalling body for GET reqquest %s: %s\n%w", url.String(), body, err)
+		return nil, fmt.Errorf("error unmarshalling body for GET reqquest %s: %s\n%w", path, body, err)
 	}
 
 	return &payload, nil
@@ -243,6 +254,42 @@ func get[P any](ctx context.Context, client *client, path string, queryPairs ...
 // 	return nil
 // }
 
+func postRaw[B io.Reader, P any](ctx context.Context, client *client, path string, data B, headerPairs ...string) (*P, error) {
+	url := client.baseURL.JoinPath(path)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url.String(), data)
+	if err != nil {
+		return nil, fmt.Errorf("error constructing POST request for %s: %w", url, err)
+	}
+
+	for i := 0; i < len(headerPairs); i += 2 {
+		req.Header.Add(fmt.Sprint(headerPairs[i]), fmt.Sprint(headerPairs[i+1]))
+	}
+
+	res, err := client.c.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error executing POST request %s: %w", url, err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode >= 400 {
+		return nil, fmt.Errorf("POST request to %s returned with error status: %w", url, unmarshalAPIError(res))
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading body for POST reqquest %s: %w", url, err)
+	}
+
+	var payload P
+	err = json.Unmarshal(body, &payload)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling body for GET reqquest %s: %s\n%w", url, body, err)
+	}
+
+	return &payload, nil
+}
+
 func unmarshalAPIError(res *http.Response) error {
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -269,10 +316,6 @@ func initialLogin(ctx context.Context, client *client, username string, password
 		return fmt.Errorf("error logging in: error executing initial request: %w", err)
 	}
 	client.c.Jar.SetCookies(client.baseURL, res.Cookies())
-
-	// fmt.Printf("client.baseURL %v\n", client.baseURL.String())
-	// fmt.Printf("res.Cookies() %v\n", res.Cookies())
-	// fmt.Printf("cookies %v\n", client.c.Jar.Cookies(client.baseURL))
 
 	token, err := extractCSRFToken(res)
 	if err != nil {
