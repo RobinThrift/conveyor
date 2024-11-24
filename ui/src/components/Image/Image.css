@@ -1,0 +1,7 @@
+.image-zoom [data-rmiz-btn-unzoom] {
+    @apply flex items-center justify-center text-primary-dark rounded-lg bg-subtle text-xl;
+}
+
+.image-zoom [data-rmiz-modal-overlay="visible"] {
+    @apply bg-black/50 backdrop-blur;
+}

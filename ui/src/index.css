@@ -7,6 +7,7 @@
 @import "./components/Loader/Loader.css" layer(components);
 @import "./components/Select/Select.css" layer(components);
 @import "./components/Tooltip/Tooltip.css" layer(components);
+@import "./components/Image/Image.css" layer(components);
 
 @layer base {
     :root {

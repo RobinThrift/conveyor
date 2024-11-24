@@ -63,7 +63,7 @@ This text will be \`monospaced\`... hopefully. ~~Scratch this.~~
 ###### Heading 6
 This is a [link](${faker.internet.url()}), an auto link (http://example.com) and an image will follow:
 
-![image caption](${faker.image.url({ height: 200, width: 200 })})
+![image caption](${faker.image.url({ height: 1500, width: 1800 })})
 
 ***
 

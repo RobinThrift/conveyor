@@ -39,6 +39,7 @@ import type {
 } from "mdast"
 import { Code } from "./Code"
 import { autoTagLinks, mdastAutoTagLinks } from "./tagExtension"
+import { Image as ImageComp } from "@/components/Image"
 
 export interface MarkdownProps {
     children: string
@@ -311,10 +312,13 @@ function imageToJSX(ctx: Context, node: Image): ReactNode {
     let id = `${ctx.id}-${idFromText(node.title || node.alt || node.url)}`
 
     return (
-        <figure key={nodeKey(node)} id={id}>
-            <img src={node.url} alt={node.alt ?? undefined} loading="lazy" />
-            <figcaption>{node.title || node.alt}</figcaption>
-        </figure>
+        <ImageComp
+            key={nodeKey(node)}
+            id={id}
+            src={node.url}
+            alt={node.alt ?? node.url}
+            caption={node.title ?? undefined}
+        />
     )
 }
 
