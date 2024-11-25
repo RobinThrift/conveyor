@@ -1,5 +1,6 @@
 import React, { type Key, type ReactNode, useMemo } from "react"
 
+import { Image as ImageComp } from "@/components/Image"
 import { ArrowUDownLeft } from "@phosphor-icons/react"
 import clsx from "clsx"
 import type {
@@ -30,7 +31,6 @@ import type {
     TableRow,
 } from "mdast"
 import { Code } from "./Code"
-import { Image as ImageComp } from "@/components/Image"
 import { useMarkdownWorker } from "./useMarkdownWorker"
 
 export interface MarkdownProps {

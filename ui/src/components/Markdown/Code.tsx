@@ -1,3 +1,4 @@
+import { useIdleCallback } from "@/hooks/useIdleCallback"
 import { useOnVisible } from "@/hooks/useLoadOnVisible"
 import { usePromise } from "@/hooks/usePromise"
 import { LanguageDescription } from "@codemirror/language"
@@ -57,7 +58,7 @@ export function Highlight({
         return def.language.parser
     }, [lang])
 
-    let highlighted = useMemo(() => {
+    let highlighted = useIdleCallback(() => {
         if (!parser.resolved || !parser.result) {
             return code
         }
@@ -93,7 +94,7 @@ export function Highlight({
         console.error(parser.error)
     }
 
-    return <code>{highlighted}</code>
+    return <code>{highlighted || code}</code>
 }
 
 let tagFixes: Record<string, string> = {
