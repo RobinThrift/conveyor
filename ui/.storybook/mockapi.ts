@@ -41,7 +41,7 @@ const mockData: MockData = (() => {
 
 ${faker.lorem.lines({ min: 1, max: 10 })}
 
-${faker.helpers.arrayElement(tags)}`,
+${faker.helpers.arrayElement(tags).tag}`,
             isArchived: i > 90,
             createdAt: sub(now, { hours: i * 2 }),
             updatedAt: sub(now, { hours: i }),

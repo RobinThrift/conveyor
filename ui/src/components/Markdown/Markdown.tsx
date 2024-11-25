@@ -1,12 +1,3 @@
-import { fromMarkdown } from "mdast-util-from-markdown"
-import { gfmAutolinkLiteralFromMarkdown } from "mdast-util-gfm-autolink-literal"
-import { gfmFootnoteFromMarkdown } from "mdast-util-gfm-footnote"
-import { gfmStrikethroughFromMarkdown } from "mdast-util-gfm-strikethrough"
-import { gfmTableFromMarkdown } from "mdast-util-gfm-table"
-import { gfmAutolinkLiteral } from "micromark-extension-gfm-autolink-literal"
-import { gfmFootnote } from "micromark-extension-gfm-footnote"
-import { gfmStrikethrough } from "micromark-extension-gfm-strikethrough"
-import { gfmTable } from "micromark-extension-gfm-table"
 import React, { type Key, type ReactNode, useMemo } from "react"
 
 import { ArrowUDownLeft } from "@phosphor-icons/react"
@@ -31,6 +22,7 @@ import type {
     Node,
     Paragraph,
     PhrasingContent,
+    Root,
     RootContent,
     Strong,
     Table,
@@ -38,8 +30,8 @@ import type {
     TableRow,
 } from "mdast"
 import { Code } from "./Code"
-import { autoTagLinks, mdastAutoTagLinks } from "./tagExtension"
 import { Image as ImageComp } from "@/components/Image"
+import { useMarkdownWorker } from "./useMarkdownWorker"
 
 export interface MarkdownProps {
     children: string
@@ -49,37 +41,24 @@ export interface MarkdownProps {
 }
 
 export function Markdown(props: MarkdownProps) {
-    let parsed = useMemo(() => {
-        let ctx: Context = {
-            id: props.id,
-            footnotes: [],
-            onClickTag: props.onClickTag,
-        }
+    let ast = useMarkdownWorker(props.children)
 
-        return parseMarkdown(ctx, props.children)
-    }, [props.children, props.id, props.onClickTag])
+    let parsed = useMemo(() => {
+        if (ast) {
+            let ctx: Context = {
+                id: props.id,
+                footnotes: [],
+                onClickTag: props.onClickTag,
+            }
+
+            return astToJSX(ctx, ast)
+        }
+    }, [ast, props.id, props.onClickTag])
 
     return <div className={clsx("content", props.className)}>{parsed}</div>
 }
 
-function parseMarkdown(ctx: Context, raw: string): ReactNode[] {
-    let ast = fromMarkdown(raw, {
-        extensions: [
-            gfmAutolinkLiteral(),
-            gfmFootnote(),
-            gfmStrikethrough(),
-            gfmTable(),
-            autoTagLinks(),
-        ],
-        mdastExtensions: [
-            gfmAutolinkLiteralFromMarkdown(),
-            gfmFootnoteFromMarkdown(),
-            gfmStrikethroughFromMarkdown(),
-            gfmTableFromMarkdown(),
-            mdastAutoTagLinks(),
-        ],
-    })
-
+function astToJSX(ctx: Context, ast: Root): ReactNode[] {
     let nodes: ReactNode[] = [
         ast.children.map((node) => astNodeToJSX(ctx, node)),
     ]

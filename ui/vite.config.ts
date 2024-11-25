@@ -14,6 +14,12 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         resolve: {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
+                "decode-named-character-reference": path.resolve(
+                    __dirname,
+                    "node_modules",
+                    "decode-named-character-reference",
+                    "index.js",
+                ),
             },
         },
 
