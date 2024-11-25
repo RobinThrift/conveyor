@@ -103,6 +103,34 @@ paths:
         type: number
         x-go-type: int64
 
+    get:
+      operationId: GetMemo
+
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memo"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
     patch:
       operationId: UpdateMemo
 

@@ -10,6 +10,32 @@ export interface Filter {
     startDate?: Date
 }
 
+export async function get({
+    id,
+    baseURL = "",
+    signal,
+}: {
+    id: string
+    baseURL?: string
+    signal?: AbortSignal
+}): Promise<Memo> {
+    let url = new URL(`${baseURL}/api/v1/memos/${id}`, globalThis.location.href)
+
+    let res = await fetch(url, { signal })
+
+    if (!res.ok || res.status !== 200) {
+        throw new Error(`error fetching memo: ${res.status} ${res.statusText}`)
+    }
+
+    let memo = (await res.json()) as Memo
+
+    return {
+        ...memo,
+        createdAt: new Date(memo.createdAt),
+        updatedAt: new Date(memo.updatedAt),
+    }
+}
+
 export async function list({
     pagination,
     baseURL = "",
@@ -17,7 +43,6 @@ export async function list({
     signal,
 }: {
     pagination: Pagination<Date>
-    after?: string
     filter: Filter
     baseURL?: string
     signal?: AbortSignal

@@ -6,27 +6,28 @@ import type { ServerData } from "./ServerData"
 import { $router } from "./router"
 
 import { type Filter, filterFromQuery, filterToQueryString } from "@/api/memos"
+import { useBaseURL } from "@/hooks/useBaseURL"
 import { useT } from "@/i18n"
 import { ErrorPage } from "@/pages/Errors"
 import { ChangePasswordPage, LoginPage } from "@/pages/Login"
 import { ListMemosPage } from "@/pages/Memos/List"
+import { SingleMemoPage } from "@/pages/Memos/Single"
 
 export type AppProps = ServerData
 
 export function App(props: AppProps) {
+    let baseURL = useBaseURL()
     let page = useStore($router)
     let t = useT("app/navigation")
 
     let pageComp: React.ReactNode
 
-    let onChangeFilters = useCallback((filter: Filter) => {
-        console.log(
-            `${globalThis.location.pathname}?${filterToQueryString(filter)}`,
-        )
-        $router.open(
-            `${globalThis.location.pathname}?${filterToQueryString(filter)}`,
-        )
-    }, [])
+    let onChangeFilters = useCallback(
+        (filter: Filter) => {
+            $router.open(`${baseURL}/memos?${filterToQueryString(filter)}`)
+        },
+        [baseURL],
+    )
 
     if (props.error) {
         return (
@@ -57,6 +58,14 @@ export function App(props: AppProps) {
             pageComp = (
                 <ListMemosPage
                     filter={filterFromQuery(page.search)}
+                    onChangeFilters={onChangeFilters}
+                />
+            )
+            break
+        case "memos.single":
+            pageComp = (
+                <SingleMemoPage
+                    memoID={page.params.id}
                     onChangeFilters={onChangeFilters}
                 />
             )

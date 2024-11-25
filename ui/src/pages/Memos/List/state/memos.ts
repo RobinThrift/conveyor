@@ -5,7 +5,7 @@ import {
 } from "@/api/memos"
 import type { Memo } from "@/domain/Memo"
 import { createMutatorStore } from "@/hooks/useMutator"
-import { createQueryStore } from "@/hooks/useQuery"
+import { createPaginatedQueryStore } from "@/hooks/usePaginatedQuery"
 import { useStore } from "@nanostores/react"
 import { onMount } from "nanostores"
 import { useEffect, useMemo } from "react"
@@ -30,7 +30,7 @@ export function useListMemosPageState(init: { filter: Filter }) {
         /* biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional, the init will change on every rerender
     but as this is a store, it should not be recreated. */
     } = useMemo(() => {
-        let $memos = createQueryStore<Memo, { filter: Filter }, Date>(
+        let $memos = createPaginatedQueryStore<Memo, { filter: Filter }, Date>(
             listMemos,
             init,
         )

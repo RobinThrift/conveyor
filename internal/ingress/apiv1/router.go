@@ -34,6 +34,27 @@ func New(baseURL string, mux *http.ServeMux, memoCtrl *control.MemoControl, atta
 	})
 }
 
+// (GET /memos/{id})
+func (r *router) GetMemo(ctx context.Context, req GetMemoRequestObject) (GetMemoResponseObject, error) {
+	memo, err := r.memoCtrl.GetMemo(ctx, domain.MemoID(req.Id))
+	if err != nil {
+		if errors.Is(err, domain.ErrMemoNotFound) {
+			return nil, fmt.Errorf("%w: %v", errNotFound, err)
+		}
+
+		return nil, err
+	}
+
+	return GetMemo200JSONResponse{
+		Id:         memo.ID.String(),
+		Content:    string(memo.Content),
+		IsArchived: memo.IsArchived,
+		CreatedAt:  memo.CreatedAt,
+		CreatedBy:  memo.CreatedBy.String(),
+		UpdatedAt:  memo.UpdatedAt,
+	}, nil
+}
+
 // (GET /memos)
 func (r *router) ListMemos(ctx context.Context, req ListMemosRequestObject) (ListMemosResponseObject, error) {
 	query := control.ListMemosQuery{

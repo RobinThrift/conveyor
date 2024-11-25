@@ -160,6 +160,9 @@ type ServerInterface interface {
 	// (POST /memos)
 	CreateMemo(w http.ResponseWriter, r *http.Request)
 
+	// (GET /memos/{id})
+	GetMemo(w http.ResponseWriter, r *http.Request, id int64)
+
 	// (PATCH /memos/{id})
 	UpdateMemo(w http.ResponseWriter, r *http.Request, id int64)
 
@@ -402,6 +405,31 @@ func (siw *ServerInterfaceWrapper) CreateMemo(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
+// GetMemo operation middleware
+func (siw *ServerInterfaceWrapper) GetMemo(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetMemo(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // UpdateMemo operation middleware
 func (siw *ServerInterfaceWrapper) UpdateMemo(w http.ResponseWriter, r *http.Request) {
 
@@ -602,6 +630,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("DELETE "+options.BaseURL+"/attachments/{filename}", wrapper.DeleteAttachment)
 	m.HandleFunc("GET "+options.BaseURL+"/memos", wrapper.ListMemos)
 	m.HandleFunc("POST "+options.BaseURL+"/memos", wrapper.CreateMemo)
+	m.HandleFunc("GET "+options.BaseURL+"/memos/{id}", wrapper.GetMemo)
 	m.HandleFunc("PATCH "+options.BaseURL+"/memos/{id}", wrapper.UpdateMemo)
 	m.HandleFunc("GET "+options.BaseURL+"/tags", wrapper.ListTags)
 
@@ -813,6 +842,53 @@ func (response CreateMemodefaultJSONResponse) VisitCreateMemoResponse(w http.Res
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type GetMemoRequestObject struct {
+	Id int64 `json:"id"`
+}
+
+type GetMemoResponseObject interface {
+	VisitGetMemoResponse(w http.ResponseWriter) error
+}
+
+type GetMemo200JSONResponse Memo
+
+func (response GetMemo200JSONResponse) VisitGetMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetMemo400JSONResponse Error
+
+func (response GetMemo400JSONResponse) VisitGetMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetMemo401JSONResponse Error
+
+func (response GetMemo401JSONResponse) VisitGetMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetMemodefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response GetMemodefaultJSONResponse) VisitGetMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type UpdateMemoRequestObject struct {
 	Id   int64 `json:"id"`
 	Body *UpdateMemoJSONRequestBody
@@ -924,6 +1000,9 @@ type StrictServerInterface interface {
 
 	// (POST /memos)
 	CreateMemo(ctx context.Context, request CreateMemoRequestObject) (CreateMemoResponseObject, error)
+
+	// (GET /memos/{id})
+	GetMemo(ctx context.Context, request GetMemoRequestObject) (GetMemoResponseObject, error)
 
 	// (PATCH /memos/{id})
 	UpdateMemo(ctx context.Context, request UpdateMemoRequestObject) (UpdateMemoResponseObject, error)
@@ -1091,6 +1170,32 @@ func (sh *strictHandler) CreateMemo(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(CreateMemoResponseObject); ok {
 		if err := validResponse.VisitCreateMemoResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetMemo operation middleware
+func (sh *strictHandler) GetMemo(w http.ResponseWriter, r *http.Request, id int64) {
+	var request GetMemoRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetMemo(ctx, request.(GetMemoRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetMemo")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetMemoResponseObject); ok {
+		if err := validResponse.VisitGetMemoResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

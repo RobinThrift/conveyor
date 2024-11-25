@@ -56,6 +56,36 @@ ${faker.helpers.arrayElement(tags).tag}`,
 })()
 
 export const mockAPI: HttpHandler[] = [
+    http.get<{ memoID: string }, UpdateMemoRequest>(
+        "/api/v1/memos/:memoID",
+        async ({ params }) => {
+            await delay(500)
+
+            let memo = mockData.memos.find((m) => m.id === params.memoID)
+            if (!memo) {
+                return HttpResponse.json(
+                    {
+                        code: 404,
+                        type: "belt/api/v1/NotFound",
+                        title: "Not Found",
+                        detail: `Memo ${params.memoID} not Found`,
+                    },
+                    {
+                        status: 404,
+                        statusText: "Not Found",
+                        headers: {
+                            "content-type": "application/json; charset=utf-8",
+                        },
+                    },
+                )
+            }
+
+            return HttpResponse.json(memo, {
+                headers: { "content-type": "application/json; charset=utf-8" },
+            })
+        },
+    ),
+
     http.get("/api/v1/memos", async ({ request }) => {
         await delay(500)
 

@@ -1,9 +1,4 @@
-import {
-    type InputPage,
-    type SearchParams,
-    createRouter,
-    getPagePath as getPagePathInternal,
-} from "@nanostores/router"
+import { createRouter } from "@nanostores/router"
 
 let baseURL =
     globalThis.document
@@ -11,19 +6,13 @@ let baseURL =
         ?.getAttribute("content")
         ?.replace(/\/$/, "") ?? ""
 
-const routes = {
-    login: `${baseURL}/login`,
-    "login.change_password": `${baseURL}/auth/change_password`,
-    root: `${baseURL}/`,
-    "memos.list": `${baseURL}/memos`,
-    "memos.single": `${baseURL}/memos/:id`,
-}
-
-export const $router = createRouter(routes, { links: false })
-
-export function getPagePath<PageName extends keyof typeof routes>(
-    route: InputPage<typeof routes, PageName>,
-    search?: SearchParams,
-): string {
-    return getPagePathInternal($router, route, search)
-}
+export const $router = createRouter(
+    {
+        login: `${baseURL}/login`,
+        "login.change_password": `${baseURL}/auth/change_password`,
+        root: `${baseURL}/`,
+        "memos.list": `${baseURL}/memos`,
+        "memos.single": `${baseURL}/memos/:id`,
+    },
+    { links: false },
+)
