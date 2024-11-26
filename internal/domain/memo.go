@@ -30,3 +30,16 @@ type MemoList struct {
 func (id MemoID) String() string {
 	return fmt.Sprint(int64(id))
 }
+
+type ListMemosQuery struct {
+	PageSize  uint64
+	PageAfter *time.Time
+
+	Tag             *string
+	Search          *string
+	CreatedAt       *time.Time
+	MinCreationDate *time.Time
+
+	IsArchived *bool
+	IsDeleted  *bool
+}

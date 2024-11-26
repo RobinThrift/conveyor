@@ -8,11 +8,11 @@ LIMIT 1;
 SELECT *
 FROM memos
 WHERE
-    is_archived = false
-    AND is_deleted = false
-    AND CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
-    AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
-    AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
+    CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
+    AND CASE WHEN CAST(@with_created_at AS BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
+    AND CASE WHEN CAST(@with_created_at_or_older AS BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
+    AND CASE WHEN CAST(@with_is_archived AS BOOLEAN) THEN is_archived = CAST(@is_archived AS BOOLEAN) ELSE is_archived = false END
+    AND CASE WHEN CAST(@with_is_deleted AS BOOLEAN) THEN is_deleted = CAST(@is_deleted AS BOOLEAN) ELSE is_deleted = false END
 ORDER BY created_at DESC
 LIMIT @page_size;
 
@@ -20,12 +20,12 @@ LIMIT @page_size;
 SELECT * FROM memos
 JOIN memo_tags ON memo_id = memos.id
 WHERE
-    is_archived = false
-    AND is_deleted = false
-    AND CASE WHEN @page_after IS NOT NULL THEN memos.created_at < datetime(@page_after) ELSE true END
+    CASE WHEN @page_after IS NOT NULL THEN memos.created_at < datetime(@page_after) ELSE true END
     AND memo_tags.tag = @tag
-    AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(memos.created_at) = date(@created_at) ELSE true END
-    AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(memos.created_at) <= date(@created_at_or_older) ELSE true END
+    AND CASE WHEN CAST(@with_created_at AS BOOLEAN) THEN date(memos.created_at) = date(@created_at) ELSE true END
+    AND CASE WHEN CAST(@with_created_at_or_older AS BOOLEAN) THEN date(memos.created_at) <= date(@created_at_or_older) ELSE true END
+    AND CASE WHEN CAST(@with_is_archived AS BOOLEAN) THEN is_archived = CAST(@is_archived AS BOOLEAN) ELSE is_archived = false END
+    AND CASE WHEN CAST(@with_is_deleted AS BOOLEAN) THEN is_deleted = CAST(@is_deleted AS BOOLEAN) ELSE is_deleted = false END
 ORDER BY memos.created_at DESC
 LIMIT @page_size;
 
@@ -33,12 +33,12 @@ LIMIT @page_size;
 SELECT *
 FROM memos_fts
 WHERE
-    is_archived = false
-    AND is_deleted = false
-    AND CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
+    CASE WHEN @page_after IS NOT NULL THEN created_at < datetime(@page_after) ELSE true END
     AND content MATCH CAST(@search as TEXT)
     AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(created_at) = date(@created_at) ELSE true END
     AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(created_at) <= date(@created_at_or_older) ELSE true END
+    AND CASE WHEN CAST(@with_is_archived AS BOOLEAN) THEN is_archived = CAST(@is_archived AS BOOLEAN) ELSE is_archived = false END
+    AND CASE WHEN CAST(@with_is_deleted AS BOOLEAN) THEN is_deleted = CAST(@is_deleted AS BOOLEAN) ELSE is_deleted = false END
 ORDER BY created_at DESC, rank
 LIMIT @page_size;
 
@@ -46,34 +46,15 @@ LIMIT @page_size;
 SELECT * FROM memos_fts
 JOIN memo_tags ON memo_id = memos_fts.id
 WHERE
-    is_archived = false
-    AND is_deleted = false
-    AND CASE WHEN @page_after IS NOT NULL THEN memos_fts.created_at < datetime(@page_after) ELSE true END
+    CASE WHEN @page_after IS NOT NULL THEN memos_fts.created_at < datetime(@page_after) ELSE true END
     AND memo_tags.tag = @tag
     AND content MATCH CAST(@search as TEXT)
     AND CASE WHEN CAST(@with_created_at as BOOLEAN) THEN date(memos_fts.created_at) = date(@created_at) ELSE true END
     AND CASE WHEN CAST(@with_created_at_or_older as BOOLEAN) THEN date(memos_fts.created_at) <= date(@created_at_or_older) ELSE true END
+    AND CASE WHEN CAST(@with_is_archived AS BOOLEAN) THEN is_archived = CAST(@is_archived AS BOOLEAN) ELSE is_archived = false END
+    AND CASE WHEN CAST(@with_is_deleted AS BOOLEAN) THEN is_deleted = CAST(@is_deleted AS BOOLEAN) ELSE is_deleted = false END
 ORDER BY memos_fts.created_at DESC, rank
 LIMIT @page_size;
-
--- name: ListArchivedMemos :many
-SELECT *
-FROM memos
-WHERE
-    is_archived = true
-    AND is_deleted = false
-    AND id > ?
-ORDER BY created_at DESC
-LIMIT ?;
-
--- name: ListDeletedMemos :many
-SELECT *
-FROM memos
-WHERE
-    is_deleted = true
-    AND id > ?
-ORDER BY created_at DESC
-LIMIT ?;
 
 -- name: CreateMemo :one
 INSERT INTO memos(
@@ -98,6 +79,7 @@ WHERE id = ?;
 -- name: SetMemoDeletionStatus :execrows
 UPDATE memos SET
     is_deleted = ?,
+    is_archived = false,
     updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 WHERE id = ?;
 

@@ -23,3 +23,31 @@ export const List: Story = {
         </div>
     ),
 }
+
+export const Archive: Story = {
+    args: {
+        filter: {
+            isArchived: true,
+        },
+    },
+
+    render: (args) => (
+        <div className="container mx-auto">
+            <ListMemosPage {...args} />
+        </div>
+    ),
+}
+
+export const Bin: Story = {
+    args: {
+        filter: {
+            isDeleted: true,
+        },
+    },
+
+    render: (args) => (
+        <div className="container mx-auto">
+            <ListMemosPage {...args} />
+        </div>
+    ),
+}

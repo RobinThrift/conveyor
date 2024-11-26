@@ -12,3 +12,12 @@ export interface MemoList {
     items: Memo[]
     next?: Date
 }
+
+export interface ListMemosQuery {
+    tag?: string
+    query?: string
+    exactDate?: Date
+    startDate?: Date
+    isArchived?: boolean
+    isDeleted?: boolean
+}

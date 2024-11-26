@@ -15,46 +15,61 @@ import (
 func Test_MemoRepo_Querying(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	repo := setupMemoRepo(ctx, t)
-
 	numMemos := 500
 	now := time.Date(2024, 03, 15, 12, 0, 0, 0, time.UTC)
 
-	// Create new Memos
-	for i := 0; i < numMemos; i++ {
-		_, err := repo.CreateMemo(ctx, &domain.Memo{
-			Content:   []byte(fmt.Sprintf("# Test Memo %[1]d\n With some more content for memo %[1]d\n #tag-%[1]d #parent/tag-%[2]d #mod-two-is-%d", i, i+1, i%2)),
-			CreatedBy: auth.AccountID(1),
-			CreatedAt: now.Add(-time.Hour * time.Duration(i)),
-		})
-		require.NoError(t, err)
+	createMemos := func(ctx context.Context, t *testing.T, repo *MemoRepo) {
+		for i := 0; i < numMemos; i++ {
+			_, err := repo.CreateMemo(ctx, &domain.Memo{
+				Content:   []byte(fmt.Sprintf("# Test Memo %[1]d\n With some more content for memo %[1]d\n #tag-%[1]d #parent/tag-%[2]d #mod-two-is-%d", i, i+1, i%2)),
+				CreatedBy: auth.AccountID(1),
+				CreatedAt: now.Add(-time.Hour * time.Duration(i)),
+			})
+			require.NoError(t, err)
+		}
 	}
 
-	var lastMemoDate *time.Time
-	var lastMemoID = domain.MemoID(-1)
-	// List All Memos in batches of 25
-	for i := 0; i < numMemos; i += 25 {
-		q := ListMemosQuery{
-			PageSize:  25,
-			PageAfter: lastMemoDate,
+	t.Run("List All Memos Paginated", func(t *testing.T) {
+		t.Parallel()
+
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
+		var lastMemoDate *time.Time
+		var lastMemoID = domain.MemoID(-1)
+		total := 0
+		for i := 0; i < numMemos; i += 25 {
+			q := domain.ListMemosQuery{
+				PageSize:  25,
+				PageAfter: lastMemoDate,
+			}
+
+			list, err := repo.ListMemos(ctx, q)
+			require.NoError(t, err, i)
+
+			require.Lenf(t, list.Items, 25, "i = %d", i)
+			require.NotEqualf(t, lastMemoID, list.Items[0].ID, "i = %d", i)
+			lastMemoID = list.Items[len(list.Items)-1].ID
+			lastMemoDate = list.Next
+			total += len(list.Items)
 		}
 
-		list, err := repo.ListMemos(ctx, q)
-		require.NoError(t, err, i)
-
-		require.Lenf(t, list.Items, 25, "i = %d", i)
-		require.NotEqualf(t, lastMemoID, list.Items[0].ID, "i = %d", i)
-		lastMemoID = list.Items[len(list.Items)-1].ID
-		lastMemoDate = list.Next
-	}
+		assert.Equal(t, numMemos, total)
+	})
 
 	t.Run("Filter by CreatedAt Date", func(t *testing.T) {
 		t.Parallel()
 
-		q := ListMemosQuery{
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
+		q := domain.ListMemosQuery{
 			PageSize:  25,
 			CreatedAt: &now,
 		}
@@ -68,8 +83,14 @@ func Test_MemoRepo_Querying(t *testing.T) {
 	t.Run("Filter by MinCreationDate", func(t *testing.T) {
 		t.Parallel()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
 		minCreationDate := now.Add(time.Hour * -24)
-		q := ListMemosQuery{
+		q := domain.ListMemosQuery{
 			PageSize:        uint64(numMemos),
 			MinCreationDate: &minCreationDate,
 		}
@@ -83,8 +104,14 @@ func Test_MemoRepo_Querying(t *testing.T) {
 	t.Run("Filter By Tag", func(t *testing.T) {
 		t.Parallel()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
 		tag := "mod-two-is-1"
-		q := ListMemosQuery{
+		q := domain.ListMemosQuery{
 			PageSize: uint64(numMemos),
 			Tag:      &tag,
 		}
@@ -98,8 +125,14 @@ func Test_MemoRepo_Querying(t *testing.T) {
 	t.Run("Filter with Full Text Search Query", func(t *testing.T) {
 		t.Parallel()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
 		search := `# Test Memo 1*` //nolint:goconst // in test code
-		q := ListMemosQuery{
+		q := domain.ListMemosQuery{
 			PageSize: uint64(numMemos),
 			Search:   &search,
 		}
@@ -113,9 +146,15 @@ func Test_MemoRepo_Querying(t *testing.T) {
 	t.Run("Filter by Multiple", func(t *testing.T) {
 		t.Parallel()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
 		minCreationDate := now.Add(time.Hour * -24)
 		search := "# Test Memo 1*"
-		q := ListMemosQuery{
+		q := domain.ListMemosQuery{
 			PageSize:        uint64(numMemos),
 			Search:          &search,
 			MinCreationDate: &minCreationDate,
@@ -130,9 +169,15 @@ func Test_MemoRepo_Querying(t *testing.T) {
 	t.Run("Filter by Tag with Full Text Search Query", func(t *testing.T) {
 		t.Parallel()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
 		tag := "mod-two-is-1"
 		search := `# Test Memo 1*`
-		q := ListMemosQuery{
+		q := domain.ListMemosQuery{
 			PageSize: uint64(numMemos),
 			Tag:      &tag,
 			Search:   &search,
@@ -142,6 +187,88 @@ func Test_MemoRepo_Querying(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, list.Items, 56) // roundUp(111/2): 111 as explained above, div by 2 because modulus 2 is 1 for half the Memos
+	})
+
+	t.Run("List All Archived Memos Paginated", func(t *testing.T) {
+		t.Parallel()
+
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
+		for i := numMemos / 2; i < numMemos; i++ {
+			err := repo.UpdateArchiveStatus(ctx, domain.MemoID(i), true)
+			require.NoError(t, err, i)
+		}
+
+		total := 0
+		isArchived := true
+		var lastMemoDate *time.Time
+		var lastMemoID = domain.MemoID(-1)
+		for i := 0; i < numMemos/2; i += 25 {
+			q := domain.ListMemosQuery{
+				PageSize:   25,
+				PageAfter:  lastMemoDate,
+				IsArchived: &isArchived,
+			}
+
+			list, err := repo.ListMemos(ctx, q)
+			require.NoError(t, err, i)
+
+			require.Lenf(t, list.Items, 25, "i = %d", i)
+			require.NotEqualf(t, lastMemoID, list.Items[0].ID, "i = %d", i)
+			lastMemoID = list.Items[len(list.Items)-1].ID
+			lastMemoDate = list.Next
+			total += len(list.Items)
+			for _, memo := range list.Items {
+				assert.Truef(t, memo.IsArchived, "memo.ID = %d", memo.ID)
+			}
+		}
+
+		assert.Equal(t, numMemos/2, total)
+	})
+
+	t.Run("List All Deleted Memos Paginated", func(t *testing.T) {
+		t.Parallel()
+
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+
+		repo := setupMemoRepo(ctx, t)
+		createMemos(ctx, t, repo)
+
+		for i := numMemos / 2; i < numMemos; i++ {
+			err := repo.DeleteMemo(ctx, domain.MemoID(i))
+			require.NoError(t, err, i)
+		}
+
+		total := 0
+		isDeleted := true
+		var lastMemoDate *time.Time
+		var lastMemoID = domain.MemoID(-1)
+		for i := 0; i < numMemos/2; i += 25 {
+			q := domain.ListMemosQuery{
+				PageSize:  25,
+				PageAfter: lastMemoDate,
+				IsDeleted: &isDeleted,
+			}
+
+			list, err := repo.ListMemos(ctx, q)
+			require.NoError(t, err, i)
+
+			require.Lenf(t, list.Items, 25, "i = %d", i)
+			require.NotEqualf(t, lastMemoID, list.Items[0].ID, "i = %d", i)
+			lastMemoID = list.Items[len(list.Items)-1].ID
+			lastMemoDate = list.Next
+			total += len(list.Items)
+			for _, memo := range list.Items {
+				assert.Falsef(t, memo.IsArchived, "memo.ID = %d", memo.ID)
+			}
+		}
+
+		assert.Equal(t, numMemos/2, total)
 	})
 }
 

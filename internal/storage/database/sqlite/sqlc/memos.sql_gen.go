@@ -69,110 +69,17 @@ func (q *Queries) GetMemo(ctx context.Context, db DBTX, id domain.MemoID) (Memo,
 	return i, err
 }
 
-const listArchivedMemos = `-- name: ListArchivedMemos :many
-SELECT id, content, is_archived, is_deleted, created_by, created_at, updated_at
-FROM memos
-WHERE
-    is_archived = true
-    AND is_deleted = false
-    AND id > ?
-ORDER BY created_at DESC
-LIMIT ?
-`
-
-type ListArchivedMemosParams struct {
-	ID    domain.MemoID
-	Limit int64
-}
-
-func (q *Queries) ListArchivedMemos(ctx context.Context, db DBTX, arg ListArchivedMemosParams) ([]Memo, error) {
-	rows, err := db.QueryContext(ctx, listArchivedMemos, arg.ID, arg.Limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Memo
-	for rows.Next() {
-		var i Memo
-		if err := rows.Scan(
-			&i.ID,
-			&i.Content,
-			&i.IsArchived,
-			&i.IsDeleted,
-			&i.CreatedBy,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listDeletedMemos = `-- name: ListDeletedMemos :many
-SELECT id, content, is_archived, is_deleted, created_by, created_at, updated_at
-FROM memos
-WHERE
-    is_deleted = true
-    AND id > ?
-ORDER BY created_at DESC
-LIMIT ?
-`
-
-type ListDeletedMemosParams struct {
-	ID    domain.MemoID
-	Limit int64
-}
-
-func (q *Queries) ListDeletedMemos(ctx context.Context, db DBTX, arg ListDeletedMemosParams) ([]Memo, error) {
-	rows, err := db.QueryContext(ctx, listDeletedMemos, arg.ID, arg.Limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Memo
-	for rows.Next() {
-		var i Memo
-		if err := rows.Scan(
-			&i.ID,
-			&i.Content,
-			&i.IsArchived,
-			&i.IsDeleted,
-			&i.CreatedBy,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const listMemos = `-- name: ListMemos :many
 SELECT id, content, is_archived, is_deleted, created_by, created_at, updated_at
 FROM memos
 WHERE
-    is_archived = false
-    AND is_deleted = false
-    AND CASE WHEN ?1 IS NOT NULL THEN created_at < datetime(?1) ELSE true END
-    AND CASE WHEN CAST(?2 as BOOLEAN) THEN date(created_at) = date(?3) ELSE true END
-    AND CASE WHEN CAST(?4 as BOOLEAN) THEN date(created_at) <= date(?5) ELSE true END
+    CASE WHEN ?1 IS NOT NULL THEN created_at < datetime(?1) ELSE true END
+    AND CASE WHEN CAST(?2 AS BOOLEAN) THEN date(created_at) = date(?3) ELSE true END
+    AND CASE WHEN CAST(?4 AS BOOLEAN) THEN date(created_at) <= date(?5) ELSE true END
+    AND CASE WHEN CAST(?6 AS BOOLEAN) THEN is_archived = CAST(?7 AS BOOLEAN) ELSE is_archived = false END
+    AND CASE WHEN CAST(?8 AS BOOLEAN) THEN is_deleted = CAST(?9 AS BOOLEAN) ELSE is_deleted = false END
 ORDER BY created_at DESC
-LIMIT ?6
+LIMIT ?10
 `
 
 type ListMemosParams struct {
@@ -181,6 +88,10 @@ type ListMemosParams struct {
 	CreatedAt            interface{}
 	WithCreatedAtOrOlder bool
 	CreatedAtOrOlder     interface{}
+	WithIsArchived       bool
+	IsArchived           bool
+	WithIsDeleted        bool
+	IsDeleted            bool
 	PageSize             int64
 }
 
@@ -191,6 +102,10 @@ func (q *Queries) ListMemos(ctx context.Context, db DBTX, arg ListMemosParams) (
 		arg.CreatedAt,
 		arg.WithCreatedAtOrOlder,
 		arg.CreatedAtOrOlder,
+		arg.WithIsArchived,
+		arg.IsArchived,
+		arg.WithIsDeleted,
+		arg.IsDeleted,
 		arg.PageSize,
 	)
 	if err != nil {
@@ -226,14 +141,14 @@ const listMemosForTags = `-- name: ListMemosForTags :many
 SELECT memos.id, content, is_archived, is_deleted, created_by, memos.created_at, updated_at, memo_tags.id, memo_id, tag, memo_tags.created_at FROM memos
 JOIN memo_tags ON memo_id = memos.id
 WHERE
-    is_archived = false
-    AND is_deleted = false
-    AND CASE WHEN ?1 IS NOT NULL THEN memos.created_at < datetime(?1) ELSE true END
+    CASE WHEN ?1 IS NOT NULL THEN memos.created_at < datetime(?1) ELSE true END
     AND memo_tags.tag = ?2
-    AND CASE WHEN CAST(?3 as BOOLEAN) THEN date(memos.created_at) = date(?4) ELSE true END
-    AND CASE WHEN CAST(?5 as BOOLEAN) THEN date(memos.created_at) <= date(?6) ELSE true END
+    AND CASE WHEN CAST(?3 AS BOOLEAN) THEN date(memos.created_at) = date(?4) ELSE true END
+    AND CASE WHEN CAST(?5 AS BOOLEAN) THEN date(memos.created_at) <= date(?6) ELSE true END
+    AND CASE WHEN CAST(?7 AS BOOLEAN) THEN is_archived = CAST(?8 AS BOOLEAN) ELSE is_archived = false END
+    AND CASE WHEN CAST(?9 AS BOOLEAN) THEN is_deleted = CAST(?10 AS BOOLEAN) ELSE is_deleted = false END
 ORDER BY memos.created_at DESC
-LIMIT ?7
+LIMIT ?11
 `
 
 type ListMemosForTagsParams struct {
@@ -243,6 +158,10 @@ type ListMemosForTagsParams struct {
 	CreatedAt            interface{}
 	WithCreatedAtOrOlder bool
 	CreatedAtOrOlder     interface{}
+	WithIsArchived       bool
+	IsArchived           bool
+	WithIsDeleted        bool
+	IsDeleted            bool
 	PageSize             int64
 }
 
@@ -268,6 +187,10 @@ func (q *Queries) ListMemosForTags(ctx context.Context, db DBTX, arg ListMemosFo
 		arg.CreatedAt,
 		arg.WithCreatedAtOrOlder,
 		arg.CreatedAtOrOlder,
+		arg.WithIsArchived,
+		arg.IsArchived,
+		arg.WithIsDeleted,
+		arg.IsDeleted,
 		arg.PageSize,
 	)
 	if err != nil {
@@ -307,15 +230,15 @@ const listMemosForTagsWithSearch = `-- name: ListMemosForTagsWithSearch :many
 SELECT memos_fts.id, content, is_archived, is_deleted, created_by, memos_fts.created_at, updated_at, memo_tags.id, memo_id, tag, memo_tags.created_at FROM memos_fts
 JOIN memo_tags ON memo_id = memos_fts.id
 WHERE
-    is_archived = false
-    AND is_deleted = false
-    AND CASE WHEN ?1 IS NOT NULL THEN memos_fts.created_at < datetime(?1) ELSE true END
+    CASE WHEN ?1 IS NOT NULL THEN memos_fts.created_at < datetime(?1) ELSE true END
     AND memo_tags.tag = ?2
     AND content MATCH CAST(?3 as TEXT)
     AND CASE WHEN CAST(?4 as BOOLEAN) THEN date(memos_fts.created_at) = date(?5) ELSE true END
     AND CASE WHEN CAST(?6 as BOOLEAN) THEN date(memos_fts.created_at) <= date(?7) ELSE true END
+    AND CASE WHEN CAST(?8 AS BOOLEAN) THEN is_archived = CAST(?9 AS BOOLEAN) ELSE is_archived = false END
+    AND CASE WHEN CAST(?10 AS BOOLEAN) THEN is_deleted = CAST(?11 AS BOOLEAN) ELSE is_deleted = false END
 ORDER BY memos_fts.created_at DESC, rank
-LIMIT ?8
+LIMIT ?12
 `
 
 type ListMemosForTagsWithSearchParams struct {
@@ -326,6 +249,10 @@ type ListMemosForTagsWithSearchParams struct {
 	CreatedAt            interface{}
 	WithCreatedAtOrOlder bool
 	CreatedAtOrOlder     interface{}
+	WithIsArchived       bool
+	IsArchived           bool
+	WithIsDeleted        bool
+	IsDeleted            bool
 	PageSize             int64
 }
 
@@ -352,6 +279,10 @@ func (q *Queries) ListMemosForTagsWithSearch(ctx context.Context, db DBTX, arg L
 		arg.CreatedAt,
 		arg.WithCreatedAtOrOlder,
 		arg.CreatedAtOrOlder,
+		arg.WithIsArchived,
+		arg.IsArchived,
+		arg.WithIsDeleted,
+		arg.IsDeleted,
 		arg.PageSize,
 	)
 	if err != nil {
@@ -391,14 +322,14 @@ const listMemosWithSearch = `-- name: ListMemosWithSearch :many
 SELECT id, content, is_archived, is_deleted, created_by, created_at, updated_at
 FROM memos_fts
 WHERE
-    is_archived = false
-    AND is_deleted = false
-    AND CASE WHEN ?1 IS NOT NULL THEN created_at < datetime(?1) ELSE true END
+    CASE WHEN ?1 IS NOT NULL THEN created_at < datetime(?1) ELSE true END
     AND content MATCH CAST(?2 as TEXT)
     AND CASE WHEN CAST(?3 as BOOLEAN) THEN date(created_at) = date(?4) ELSE true END
     AND CASE WHEN CAST(?5 as BOOLEAN) THEN date(created_at) <= date(?6) ELSE true END
+    AND CASE WHEN CAST(?7 AS BOOLEAN) THEN is_archived = CAST(?8 AS BOOLEAN) ELSE is_archived = false END
+    AND CASE WHEN CAST(?9 AS BOOLEAN) THEN is_deleted = CAST(?10 AS BOOLEAN) ELSE is_deleted = false END
 ORDER BY created_at DESC, rank
-LIMIT ?7
+LIMIT ?11
 `
 
 type ListMemosWithSearchParams struct {
@@ -408,6 +339,10 @@ type ListMemosWithSearchParams struct {
 	CreatedAt            interface{}
 	WithCreatedAtOrOlder bool
 	CreatedAtOrOlder     interface{}
+	WithIsArchived       bool
+	IsArchived           bool
+	WithIsDeleted        bool
+	IsDeleted            bool
 	PageSize             int64
 }
 
@@ -419,6 +354,10 @@ func (q *Queries) ListMemosWithSearch(ctx context.Context, db DBTX, arg ListMemo
 		arg.CreatedAt,
 		arg.WithCreatedAtOrOlder,
 		arg.CreatedAtOrOlder,
+		arg.WithIsArchived,
+		arg.IsArchived,
+		arg.WithIsDeleted,
+		arg.IsDeleted,
 		arg.PageSize,
 	)
 	if err != nil {
@@ -453,6 +392,7 @@ func (q *Queries) ListMemosWithSearch(ctx context.Context, db DBTX, arg ListMemo
 const setMemoDeletionStatus = `-- name: SetMemoDeletionStatus :execrows
 UPDATE memos SET
     is_deleted = ?,
+    is_archived = false,
     updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 WHERE id = ?
 `

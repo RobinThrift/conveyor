@@ -112,6 +112,7 @@ type ListMemosParams struct {
 	FilterCreatedAt  *openapi_types.Date         `form:"filter[created_at],omitempty" json:"filter[created_at],omitempty"`
 	OpCreatedAt      *ListMemosParamsOpCreatedAt `form:"op[created_at],omitempty" json:"op[created_at],omitempty"`
 	FilterIsArchived *bool                       `form:"filter[is_archived],omitempty" json:"filter[is_archived],omitempty"`
+	FilterIsDeleted  *bool                       `form:"filter[is_deleted],omitempty" json:"filter[is_deleted],omitempty"`
 }
 
 // ListMemosParamsOpCreatedAt defines parameters for ListMemos.
@@ -377,6 +378,14 @@ func (siw *ServerInterfaceWrapper) ListMemos(w http.ResponseWriter, r *http.Requ
 	err = runtime.BindQueryParameter("form", true, false, "filter[is_archived]", r.URL.Query(), &params.FilterIsArchived)
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "filter[is_archived]", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "filter[is_deleted]" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "filter[is_deleted]", r.URL.Query(), &params.FilterIsDeleted)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "filter[is_deleted]", Err: err})
 		return
 	}
 

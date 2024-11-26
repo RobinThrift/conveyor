@@ -62,6 +62,28 @@ export function App(props: AppProps) {
                 />
             )
             break
+        case "memos.archive":
+            pageComp = (
+                <ListMemosPage
+                    filter={{
+                        ...filterFromQuery(page.search),
+                        isArchived: true,
+                    }}
+                    onChangeFilters={onChangeFilters}
+                />
+            )
+            break
+        case "memos.bin":
+            pageComp = (
+                <ListMemosPage
+                    filter={{
+                        ...filterFromQuery(page.search),
+                        isDeleted: true,
+                    }}
+                    onChangeFilters={onChangeFilters}
+                />
+            )
+            break
         case "memos.single":
             pageComp = (
                 <SingleMemoPage
@@ -100,17 +122,15 @@ export function App(props: AppProps) {
                     },
                     {
                         label: t.Archive,
-                        url: "/archive",
+                        url: "/memos/archive",
                         icon: <Archive weight="duotone" />,
-                        // isActive: page?.route === "memos.archive"
-                        isActive: false,
+                        isActive: page?.route === "memos.archive",
                     },
                     {
                         label: t.Bin,
-                        url: "/bin",
+                        url: "/memos/bin",
                         icon: <TrashSimple weight="duotone" />,
-                        // isActive: page?.route === "memos.bin"
-                        isActive: false,
+                        isActive: page?.route === "memos.bin",
                     },
                     {
                         label: t.Settings,

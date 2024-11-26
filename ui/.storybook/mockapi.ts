@@ -14,6 +14,7 @@ import { faker } from "@faker-js/faker"
 
 interface MockData {
     memos: Memo[]
+    deletedMemos: Memo[]
     tags: Tag[]
     attachments: (Attachment & { data: Blob })[]
 }
@@ -33,23 +34,31 @@ const mockData: MockData = (() => {
     tags.sort()
 
     let memos: Memo[] = []
+    let deletedMemos: Memo[] = []
 
-    for (let i = 0; i < 100; i++) {
-        memos.push({
+    for (let i = 0; i < 120; i++) {
+        let memo = {
             id: `10-${i}`,
             content: `# Memo ${i}
 
 ${faker.lorem.lines({ min: 1, max: 10 })}
 
 ${faker.helpers.arrayElement(tags).tag}`,
-            isArchived: i > 90,
+            isArchived: i > 90 && i < 100,
             createdAt: sub(now, { hours: i * 2 }),
             updatedAt: sub(now, { hours: i }),
-        })
+        }
+
+        if (i > 100) {
+            deletedMemos.push(memo)
+        } else {
+            memos.push(memo)
+        }
     }
 
     return {
         memos,
+        deletedMemos,
         tags,
         attachments: [],
     }
@@ -105,13 +114,18 @@ export const mockAPI: HttpHandler[] = [
             isArchived: JSON.parse(
                 url.searchParams.get("filter[is_archived]") ?? "false",
             ) as boolean,
+            isDeleted: JSON.parse(
+                url.searchParams.get("filter[is_deleted]") ?? "false",
+            ) as boolean,
         }
 
         let memos: Memo[] = []
         let take = pageAfter === null
         let next: Date | undefined = undefined
 
-        for (let memo of mockData.memos) {
+        let all = filters.isDeleted ? mockData.deletedMemos : mockData.memos
+
+        for (let memo of all) {
             if (!take) {
                 take =
                     take ||

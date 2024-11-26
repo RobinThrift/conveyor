@@ -1,3 +1,4 @@
+import type { ListMemosQuery } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
 import clsx from "clsx"
 import React, { useCallback } from "react"
@@ -6,12 +7,7 @@ import { Calendar } from "./Calendar"
 import { SearchBar } from "./SearchBar"
 import { TagTree } from "./TagTree"
 
-export interface Filter {
-    tag?: string
-    query?: string
-    exactDate?: Date
-    startDate?: Date
-}
+export type Filter = ListMemosQuery
 
 export interface FiltersProps {
     className?: string

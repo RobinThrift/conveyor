@@ -21,7 +21,7 @@ type MemoControl struct {
 
 type MemoControlMemoRepo interface {
 	GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo, error)
-	ListMemos(ctx context.Context, query sqlite.ListMemosQuery) (*domain.MemoList, error)
+	ListMemos(ctx context.Context, query domain.ListMemosQuery) (*domain.MemoList, error)
 	CreateMemo(ctx context.Context, memo *domain.Memo) (domain.MemoID, error)
 	UpdateMemoContent(ctx context.Context, memo *domain.Memo) error
 	UpdateArchiveStatus(ctx context.Context, id domain.MemoID, isArchived bool) error
@@ -49,15 +49,7 @@ func (mc *MemoControl) GetMemo(ctx context.Context, id domain.MemoID) (*domain.M
 	return mc.memoRepo.GetMemo(ctx, id)
 }
 
-type ListMemosQuery struct {
-	PageSize  uint64
-	PageAfter *time.Time
-
-	Tag             *string
-	Search          *string
-	CreatedAt       *time.Time
-	MinCreationDate *time.Time
-}
+type ListMemosQuery domain.ListMemosQuery
 
 func (mc *MemoControl) ListMemos(ctx context.Context, query ListMemosQuery) (*domain.MemoList, error) {
 	account := auth.AccountFromCtx(ctx)
@@ -65,14 +57,7 @@ func (mc *MemoControl) ListMemos(ctx context.Context, query ListMemosQuery) (*do
 		return nil, auth.ErrUnauthorized
 	}
 
-	return mc.memoRepo.ListMemos(ctx, sqlite.ListMemosQuery{
-		PageSize:        query.PageSize,
-		PageAfter:       query.PageAfter,
-		Tag:             query.Tag,
-		Search:          query.Search,
-		CreatedAt:       query.CreatedAt,
-		MinCreationDate: query.MinCreationDate,
-	})
+	return mc.memoRepo.ListMemos(ctx, domain.ListMemosQuery(query))
 }
 
 type CreateMemoCmd struct {

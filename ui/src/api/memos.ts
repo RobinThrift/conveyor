@@ -1,14 +1,9 @@
-import type { Memo, MemoID, MemoList } from "@/domain/Memo"
+import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
 import { format, formatRFC3339, parse } from "date-fns"
 import { APIError } from "./APIError"
 import type { Pagination } from "./pagination"
 
-export interface Filter {
-    tag?: string
-    query?: string
-    exactDate?: Date
-    startDate?: Date
-}
+export type Filter = ListMemosQuery
 
 export async function get({
     id,
@@ -155,14 +150,16 @@ export async function update({
     return res.json()
 }
 
-export interface FilterQuery {
+export interface FilterQueryParams {
     "filter[tag]"?: string
     "filter[content]"?: string
     "filter[created_at]"?: string
     "op[created_at]"?: string
+    "filter[is_deleted]"?: string
+    "filter[is_archived]"?: string
 }
 
-export function filterFromQuery(query: FilterQuery): Filter {
+export function filterFromQuery(query: FilterQueryParams): Filter {
     let filter: Filter = {
         tag: query["filter[tag]"],
         query: query["filter[content]"],
@@ -226,5 +223,14 @@ function filterToSearchParams(
             format(filter.startDate, "yyyy-MM-dd"),
         )
         searchParams.set("op[created_at]", "<=")
+    }
+
+    if (filter.isArchived) {
+        searchParams.set("filter[is_archived]", "true")
+    }
+
+    if (filter.isDeleted) {
+        searchParams.delete("filter[is_archived]")
+        searchParams.set("filter[is_deleted]", "true")
     }
 }

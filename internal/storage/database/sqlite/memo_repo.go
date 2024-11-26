@@ -6,9 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"time"
 
-	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/domain"
 	"github.com/RobinThrift/belt/internal/storage/database"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/sqlc"
@@ -43,17 +41,7 @@ func (r *MemoRepo) GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo,
 	}, nil
 }
 
-type ListMemosQuery struct {
-	PageSize  uint64
-	PageAfter *time.Time
-
-	Tag             *string
-	Search          *string
-	CreatedAt       *time.Time
-	MinCreationDate *time.Time
-}
-
-func (r *MemoRepo) ListMemos(ctx context.Context, query ListMemosQuery) (*domain.MemoList, error) {
+func (r *MemoRepo) ListMemos(ctx context.Context, query domain.ListMemosQuery) (*domain.MemoList, error) {
 	params := sqlc.ListMemosParams{
 		PageSize: int64(query.PageSize),
 	}
@@ -71,6 +59,17 @@ func (r *MemoRepo) ListMemos(ctx context.Context, query ListMemosQuery) (*domain
 		params.WithCreatedAt = false
 		params.WithCreatedAtOrOlder = true
 		params.CreatedAtOrOlder = types.NewSQLiteDatetime(*query.MinCreationDate).String()
+	}
+
+	if query.IsArchived != nil {
+		params.WithIsArchived = true
+		params.IsArchived = true
+	}
+
+	if query.IsDeleted != nil {
+		params.WithIsArchived = false
+		params.WithIsDeleted = true
+		params.IsDeleted = true
 	}
 
 	if query.Search != nil && query.Tag != nil {
@@ -117,7 +116,7 @@ func (r *MemoRepo) listMemos(ctx context.Context, params sqlc.ListMemosParams) (
 	return list, nil
 }
 
-func (r *MemoRepo) listMemosForTags(ctx context.Context, query ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
+func (r *MemoRepo) listMemosForTags(ctx context.Context, query domain.ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
 	res, err := queries.ListMemosForTags(ctx, r.db.Conn(ctx), sqlc.ListMemosForTagsParams{
 		PageAfter:            params.PageAfter,
 		Tag:                  *query.Tag,
@@ -154,7 +153,7 @@ func (r *MemoRepo) listMemosForTags(ctx context.Context, query ListMemosQuery, p
 	return list, nil
 }
 
-func (r *MemoRepo) listMemosWithSearch(ctx context.Context, query ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
+func (r *MemoRepo) listMemosWithSearch(ctx context.Context, query domain.ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
 	res, err := queries.ListMemosWithSearch(ctx, r.db.Conn(ctx), sqlc.ListMemosWithSearchParams{
 		PageAfter:            params.PageAfter,
 		Search:               types.PrepareFTSQueryString(*query.Search),
@@ -191,7 +190,7 @@ func (r *MemoRepo) listMemosWithSearch(ctx context.Context, query ListMemosQuery
 	return list, nil
 }
 
-func (r *MemoRepo) listMemosForTagsWithSearch(ctx context.Context, query ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
+func (r *MemoRepo) listMemosForTagsWithSearch(ctx context.Context, query domain.ListMemosQuery, params sqlc.ListMemosParams) (*domain.MemoList, error) {
 	res, err := queries.ListMemosForTagsWithSearch(ctx, r.db.Conn(ctx), sqlc.ListMemosForTagsWithSearchParams{
 		PageAfter:            params.PageAfter,
 		Tag:                  *query.Tag,
@@ -229,91 +228,6 @@ func (r *MemoRepo) listMemosForTagsWithSearch(ctx context.Context, query ListMem
 	return list, nil
 }
 
-type ListArchivedMemosQuery struct {
-	AccountID auth.AccountID
-	PageSize  uint64
-	After     *domain.MemoID
-}
-
-func (r *MemoRepo) ListArchivedMemos(ctx context.Context, query ListArchivedMemosQuery) (*domain.MemoList, error) {
-	params := sqlc.ListArchivedMemosParams{
-		Limit: int64(query.PageSize),
-	}
-
-	if query.After != nil {
-		params.ID = *query.After
-	}
-
-	res, err := queries.ListArchivedMemos(ctx, r.db.Conn(ctx), params)
-	if err != nil {
-		return nil, err
-	}
-
-	list := &domain.MemoList{
-		Items: make([]*domain.Memo, 0, len(res)),
-		Next:  nil,
-	}
-
-	for _, memo := range res {
-		list.Items = append(list.Items, &domain.Memo{
-			ID:         memo.ID,
-			Content:    memo.Content,
-			IsArchived: memo.IsArchived,
-			CreatedBy:  memo.CreatedBy,
-			CreatedAt:  memo.CreatedAt.Time,
-			UpdatedAt:  memo.UpdatedAt.Time,
-		})
-	}
-
-	if len(res) != 0 {
-		list.Next = &res[len(res)-1].CreatedAt.Time
-	}
-
-	return list, nil
-}
-
-type ListDeletedMemosQuery struct {
-	AccountID auth.AccountID
-	PageSize  uint64
-	After     *domain.MemoID
-}
-
-func (r *MemoRepo) ListDeletedMemos(ctx context.Context, query ListDeletedMemosQuery) (*domain.MemoList, error) {
-	params := sqlc.ListDeletedMemosParams{
-		Limit: int64(query.PageSize),
-	}
-
-	if query.After != nil {
-		params.ID = *query.After
-	}
-
-	res, err := queries.ListDeletedMemos(ctx, r.db.Conn(ctx), params)
-	if err != nil {
-		return nil, err
-	}
-
-	list := &domain.MemoList{
-		Items: make([]*domain.Memo, 0, len(res)),
-		Next:  nil,
-	}
-
-	for _, memo := range res {
-		list.Items = append(list.Items, &domain.Memo{
-			ID:         memo.ID,
-			Content:    memo.Content,
-			IsArchived: memo.IsArchived,
-			CreatedBy:  memo.CreatedBy,
-			CreatedAt:  memo.CreatedAt.Time,
-			UpdatedAt:  memo.UpdatedAt.Time,
-		})
-	}
-
-	if len(res) != 0 {
-		list.Next = &res[len(res)-1].CreatedAt.Time
-	}
-
-	return list, nil
-}
 func (r *MemoRepo) CreateMemo(ctx context.Context, memo *domain.Memo) (domain.MemoID, error) {
 	return database.InTransaction(ctx, r.db, func(ctx context.Context) (domain.MemoID, error) {
 		return r.createMemo(ctx, memo)

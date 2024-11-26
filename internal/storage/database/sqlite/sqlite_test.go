@@ -10,7 +10,7 @@ func newTestDB(ctx context.Context, t *testing.T) *SQLite {
 	t.Helper()
 
 	db := &SQLite{
-		File:    t.TempDir() + "/" + t.Name() + ".db",
+		File:    ":memory:",
 		Timeout: time.Second,
 	}
 

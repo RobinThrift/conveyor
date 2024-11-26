@@ -58,10 +58,12 @@ func (r *router) GetMemo(ctx context.Context, req GetMemoRequestObject) (GetMemo
 // (GET /memos)
 func (r *router) ListMemos(ctx context.Context, req ListMemosRequestObject) (ListMemosResponseObject, error) {
 	query := control.ListMemosQuery{
-		PageSize:  min(cmp.Or(req.Params.PageSize, 10), 50),
-		PageAfter: req.Params.PageAfter,
-		Tag:       req.Params.FilterTag,
-		Search:    req.Params.FilterContent,
+		PageSize:   min(cmp.Or(req.Params.PageSize, 10), 50),
+		PageAfter:  req.Params.PageAfter,
+		Tag:        req.Params.FilterTag,
+		Search:     req.Params.FilterContent,
+		IsArchived: req.Params.FilterIsArchived,
+		IsDeleted:  req.Params.FilterIsDeleted,
 	}
 
 	if req.Params.FilterCreatedAt != nil {

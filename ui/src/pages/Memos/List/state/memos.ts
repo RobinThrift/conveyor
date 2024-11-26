@@ -3,19 +3,14 @@ import {
     update as apiUpdateMemo,
     list as listMemos,
 } from "@/api/memos"
-import type { Memo } from "@/domain/Memo"
+import type { ListMemosQuery, Memo } from "@/domain/Memo"
 import { createMutatorStore } from "@/hooks/useMutator"
 import { createPaginatedQueryStore } from "@/hooks/usePaginatedQuery"
 import { useStore } from "@nanostores/react"
 import { onMount } from "nanostores"
 import { useEffect, useMemo } from "react"
 
-export interface Filter {
-    tag?: string
-    query?: string
-    exactDate?: Date
-    startDate?: Date
-}
+export type Filter = ListMemosQuery
 
 export function useListMemosPageState(init: { filter: Filter }) {
     let {
