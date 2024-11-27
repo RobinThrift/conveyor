@@ -82,6 +82,10 @@ sql:
         go_type:
           type: "bool"
 
+      - column: memos_fts.is_deleted
+        go_type:
+          type: "bool"
+
       - column: memos_fts.created_at
         go_type:
           type: "SQLiteDatetime"

@@ -111,6 +111,7 @@ export interface UpdateMemoRequest {
     id: MemoID
     content?: string
     isArchived?: boolean
+    isDeleted?: boolean
 }
 
 export async function update({
@@ -121,7 +122,7 @@ export async function update({
     memo: UpdateMemoRequest
     baseURL?: string
     signal?: AbortSignal
-}): Promise<Memo> {
+}): Promise<void> {
     let url = new URL(
         `${baseURL}/api/v1/memos/${memo.id}`,
         globalThis.location.href,
@@ -133,6 +134,7 @@ export async function update({
         body: JSON.stringify({
             content: memo.content,
             isArchived: memo.isArchived,
+            isDeleted: memo.isDeleted,
         }),
     })
 
@@ -146,8 +148,6 @@ export async function update({
         let err = await APIError.fromHTTPResponse(res)
         throw err.withPrefix("error creating memo")
     }
-
-    return res.json()
 }
 
 export interface FilterQueryParams {

@@ -73,6 +73,7 @@ WHERE id = ?;
 -- name: SeteMemoArchiveStatus :execrows
 UPDATE memos SET
     is_archived = ?,
+    is_deleted = false,
     updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 WHERE id = ?;
 

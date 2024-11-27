@@ -49,6 +49,7 @@ func (r *router) GetMemo(ctx context.Context, req GetMemoRequestObject) (GetMemo
 		Id:         memo.ID.String(),
 		Content:    string(memo.Content),
 		IsArchived: memo.IsArchived,
+		IsDeleted:  memo.IsDeleted,
 		CreatedAt:  memo.CreatedAt,
 		CreatedBy:  memo.CreatedBy.String(),
 		UpdatedAt:  memo.UpdatedAt,
@@ -93,6 +94,7 @@ func (r *router) ListMemos(ctx context.Context, req ListMemosRequestObject) (Lis
 			Id:         memo.ID.String(),
 			Content:    string(memo.Content),
 			IsArchived: memo.IsArchived,
+			IsDeleted:  memo.IsDeleted,
 			CreatedAt:  memo.CreatedAt,
 			CreatedBy:  memo.CreatedBy.String(),
 			UpdatedAt:  memo.UpdatedAt,
@@ -130,6 +132,7 @@ func (r *router) CreateMemo(ctx context.Context, req CreateMemoRequestObject) (C
 		Id:         memo.ID.String(),
 		Content:    string(memo.Content),
 		IsArchived: memo.IsArchived,
+		IsDeleted:  memo.IsDeleted,
 		CreatedAt:  memo.CreatedAt,
 		CreatedBy:  memo.CreatedBy.String(),
 		UpdatedAt:  memo.UpdatedAt,
@@ -145,7 +148,14 @@ func (r *router) UpdateMemo(ctx context.Context, req UpdateMemoRequestObject) (U
 	}
 
 	if req.Body.IsArchived != nil {
+		cmd.Content = nil
 		cmd.IsArchived = req.Body.IsArchived
+	}
+
+	if req.Body.IsDeleted != nil {
+		cmd.Content = nil
+		cmd.IsArchived = nil
+		cmd.IsDeleted = req.Body.IsDeleted
 	}
 
 	err := r.memoCtrl.UpdateMemo(ctx, cmd)
@@ -157,6 +167,22 @@ func (r *router) UpdateMemo(ctx context.Context, req UpdateMemoRequestObject) (U
 	}
 
 	return UpdateMemo204Response{}, nil
+}
+
+// (DELETE /memos/{id})
+func (r *router) DeleteMemo(ctx context.Context, req DeleteMemoRequestObject) (DeleteMemoResponseObject, error) {
+	isDeleted := true
+	cmd := control.UpdateMemoCmd{MemoID: domain.MemoID(req.Id), IsDeleted: &isDeleted}
+
+	err := r.memoCtrl.UpdateMemo(ctx, cmd)
+	if err != nil {
+		if errors.Is(err, domain.ErrMemoNotFound) {
+			return nil, fmt.Errorf("%w: %v", errNotFound, err)
+		}
+		return nil, err
+	}
+
+	return DeleteMemo204Response{}, nil
 }
 
 // (GET /tags)

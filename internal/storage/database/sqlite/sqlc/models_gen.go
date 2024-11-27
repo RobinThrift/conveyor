@@ -57,7 +57,7 @@ type MemoFTS struct {
 	ID         domain.MemoID
 	Content    []byte
 	IsArchived bool
-	IsDeleted  string
+	IsDeleted  bool
 	CreatedBy  auth.AccountID
 	CreatedAt  types.SQLiteDatetime
 	UpdatedAt  types.SQLiteDatetime

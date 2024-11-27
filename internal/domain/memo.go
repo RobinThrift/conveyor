@@ -17,6 +17,7 @@ type Memo struct {
 	ID         MemoID
 	Content    []byte
 	IsArchived bool
+	IsDeleted  bool
 	CreatedBy  auth.AccountID
 	CreatedAt  time.Time
 	UpdatedAt  time.Time

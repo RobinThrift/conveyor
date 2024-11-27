@@ -64,7 +64,6 @@ export class MarkdownWorker {
     }
 
     public terminate() {
-        console.log("terminate")
         this._worker.terminate()
     }
 

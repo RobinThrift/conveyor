@@ -20,7 +20,7 @@ export function usePaginatedQuery<T, Params extends object, P = string>(
 ) {
     /* biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional, the init params and opts will change on every rerender
     but as this is a store, it should not cause the store to be recreated. */
-    let { $store, nextPage, setParams, addItem } = useMemo(
+    let { $store, nextPage, setParams } = useMemo(
         () => createPaginatedQueryStore(fn, initParams, opts),
         [fn],
     )
@@ -30,9 +30,8 @@ export function usePaginatedQuery<T, Params extends object, P = string>(
             ...store,
             nextPage,
             setParams,
-            addItem,
         }),
-        [store, nextPage, setParams, addItem],
+        [store, nextPage, setParams],
     )
 }
 
@@ -145,45 +144,6 @@ export function createPaginatedQueryStore<T, Params extends object, P = string>(
         })
     }
 
-    let addItem = (
-        item: T,
-        {
-            selectBy,
-            inPlace,
-            prepend,
-        }: {
-            selectBy?: (a: T) => boolean
-            inPlace?: boolean
-            prepend?: boolean
-        } = {},
-    ) => {
-        let index = -1
-        let items = [...$items.get()]
-        if (selectBy) {
-            index = items.findIndex(selectBy)
-        }
-
-        if (index === -1) {
-            if (prepend) {
-                $items.set([item, ...items])
-            } else {
-                $items.set([...items, item])
-            }
-            return
-        }
-
-        if (inPlace) {
-            items[index] = {
-                ...items[index],
-                ...item,
-            }
-        } else {
-            items[index] = item
-        }
-
-        $items.set(items)
-    }
-
     let $store = batched(
         [$items, $params, $isLoading, $error],
         (items, params, isLoading, error) => {
@@ -210,6 +170,5 @@ export function createPaginatedQueryStore<T, Params extends object, P = string>(
         $error,
         nextPage,
         setParams,
-        addItem,
     }
 }

@@ -96,6 +96,7 @@ func (mc *MemoControl) CreateMemo(ctx context.Context, cmd CreateMemoCmd) (domai
 type UpdateMemoCmd struct {
 	MemoID     domain.MemoID
 	IsArchived *bool
+	IsDeleted  *bool
 	Content    []byte
 }
 
@@ -128,6 +129,18 @@ func (mc *MemoControl) UpdateMemo(ctx context.Context, cmd UpdateMemoCmd) error 
 		err = mc.memoRepo.UpdateArchiveStatus(ctx, cmd.MemoID, *cmd.IsArchived)
 		if err != nil {
 			return fmt.Errorf("error updating memo %d: %v", cmd.MemoID, err)
+		}
+	}
+
+	if cmd.IsDeleted != nil && *cmd.IsDeleted {
+		err = mc.memoRepo.DeleteMemo(ctx, cmd.MemoID)
+		if err != nil {
+			return fmt.Errorf("error deleting memo %d: %v", cmd.MemoID, err)
+		}
+	} else if cmd.IsDeleted != nil && !*cmd.IsDeleted {
+		err = mc.memoRepo.UndeleteMemo(ctx, cmd.MemoID)
+		if err != nil {
+			return fmt.Errorf("error restoring memo %d: %v", cmd.MemoID, err)
 		}
 	}
 

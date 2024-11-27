@@ -6,7 +6,6 @@ import type { ServerData } from "./ServerData"
 import { $router } from "./router"
 
 import { type Filter, filterFromQuery, filterToQueryString } from "@/api/memos"
-import { useBaseURL } from "@/hooks/useBaseURL"
 import { useT } from "@/i18n"
 import { ErrorPage } from "@/pages/Errors"
 import { ChangePasswordPage, LoginPage } from "@/pages/Login"
@@ -16,18 +15,16 @@ import { SingleMemoPage } from "@/pages/Memos/Single"
 export type AppProps = ServerData
 
 export function App(props: AppProps) {
-    let baseURL = useBaseURL()
     let page = useStore($router)
     let t = useT("app/navigation")
 
     let pageComp: React.ReactNode
 
-    let onChangeFilters = useCallback(
-        (filter: Filter) => {
-            $router.open(`${baseURL}/memos?${filterToQueryString(filter)}`)
-        },
-        [baseURL],
-    )
+    let onChangeFilters = useCallback((filter: Filter) => {
+        $router.open(
+            `${globalThis.location.pathname}?${filterToQueryString(filter)}`,
+        )
+    }, [])
 
     if (props.error) {
         return (
@@ -69,6 +66,7 @@ export function App(props: AppProps) {
                         ...filterFromQuery(page.search),
                         isArchived: true,
                     }}
+                    showEditor={false}
                     onChangeFilters={onChangeFilters}
                 />
             )
@@ -80,6 +78,7 @@ export function App(props: AppProps) {
                         ...filterFromQuery(page.search),
                         isDeleted: true,
                     }}
+                    showEditor={false}
                     onChangeFilters={onChangeFilters}
                 />
             )

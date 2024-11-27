@@ -21,6 +21,7 @@ export const Basic: Story = {
             id: "new",
             content: "",
             isArchived: false,
+            isDeleted: false,
             createdAt: new Date(),
             updatedAt: new Date(),
         },

@@ -83,7 +83,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Memo"
         "400":
-          description: Bad request
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -119,7 +119,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Memo"
         "400":
-          description: Bad request
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -144,10 +144,41 @@ paths:
         $ref: "#/components/requestBodies/UpdateMemoRequest"
       responses:
         "204":
-          description: The memo was updated succesfully.
+          description: The memo was updated successfully.
           content: {}
         "400":
-          description: Bad request
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      operationId: DeleteMemo
+
+      responses:
+        "204":
+          description: The memo was deleted successfully.
+          content: {}
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -196,7 +227,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/TagList"
         "400":
-          description: Bad request
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -240,7 +271,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/AttachmentList"
         "400":
-          description: Bad request
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -282,7 +313,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Attachment"
         "400":
-          description: Bad request
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -314,7 +345,7 @@ paths:
           description: The attachment was deleted succesfully.
           content: {}
         "400":
-          description: Bad request
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -344,6 +375,8 @@ components:
             type: string
           isArchived:
             type: boolean
+          isDeleted:
+            type: boolean
           createdBy:
             type: string
           createdAt:
@@ -357,6 +390,7 @@ components:
       - name
       - content
       - isArchived
+      - isDeleted
       - createdBy
       - createdAt
       - updatedAt
@@ -484,6 +518,8 @@ components:
                 type: string
                 x-go-skip-optional-pointer: true
               isArchived:
+                type: boolean
+              isDeleted:
                 type: boolean
 
     CreateAttachmentRequest:

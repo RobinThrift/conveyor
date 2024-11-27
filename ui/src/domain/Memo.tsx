@@ -4,6 +4,7 @@ export interface Memo {
     id: MemoID
     content: string
     isArchived: boolean
+    isDeleted: boolean
     createdAt: Date
     updatedAt: Date
 }

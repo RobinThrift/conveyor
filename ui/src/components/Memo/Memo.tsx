@@ -1,3 +1,4 @@
+import type { UpdateMemoRequest } from "@/api/memos"
 import { Tooltip } from "@/components//Tooltip"
 import { Button } from "@/components/Button"
 import { DateTime } from "@/components/DateTime"
@@ -26,12 +27,14 @@ import React, {
     useState,
 } from "react"
 
+export type PartialMemoUpdate = UpdateMemoRequest
+
 interface MemoProps {
     className?: string
     memo: MemoT
     tags: Tag[]
     onClickTag: (tag: string) => void
-    updateMemo: (memo: MemoT) => void
+    updateMemo: (memo: PartialMemoUpdate) => void
     doubleClickToEdit: boolean
 }
 
@@ -47,13 +50,23 @@ export function Memo(props: MemoProps) {
         [],
     )
 
-    let updateMemo = useCallback(
+    let updateMemoContent = useCallback(
         (memo: MemoT) => {
             startTransition(() => {
                 setDoubleClickPos(undefined)
                 setIsEditing(false)
                 setMemo(memo)
             })
+            props.updateMemo({
+                id: memo.id,
+                content: memo.content,
+            })
+        },
+        [props.updateMemo],
+    )
+
+    let updateMemo = useCallback(
+        (memo: PartialMemoUpdate) => {
             props.updateMemo(memo)
         },
         [props.updateMemo],
@@ -93,7 +106,7 @@ export function Memo(props: MemoProps) {
         <ChangeMemoEditor
             tags={props.tags}
             memo={memo}
-            updateMemo={updateMemo}
+            updateMemo={updateMemoContent}
             onCancel={onCancelEditting}
             placeCursorAt={doubleClickPos}
         />
@@ -103,6 +116,7 @@ export function Memo(props: MemoProps) {
             onClickTag={props.onClickTag}
             activateEditingMode={activateEditingMode}
             onDoubleClick={onDoubleClick}
+            updateMemo={updateMemo}
         />
     )
 
@@ -122,11 +136,13 @@ function MemoContent({
     memo,
     onClickTag,
     activateEditingMode,
+    updateMemo,
     onDoubleClick,
 }: {
     memo: MemoT
     onClickTag: (tag: string) => void
     activateEditingMode: () => void
+    updateMemo: (memo: PartialMemoUpdate) => void
     onDoubleClick?: (e: React.MouseEvent) => void
 }) {
     let ref = useRef(null)
@@ -149,6 +165,7 @@ function MemoContent({
             <MemoHeader
                 memo={memo}
                 activateEditingMode={activateEditingMode}
+                updateMemo={updateMemo}
                 ref={ref}
             />
 
@@ -161,7 +178,12 @@ const MemoHeader = React.forwardRef(function MemoHeader(
     {
         memo,
         activateEditingMode,
-    }: { memo: MemoT; activateEditingMode: () => void },
+        updateMemo,
+    }: {
+        memo: MemoT
+        activateEditingMode: () => void
+        updateMemo: (memo: PartialMemoUpdate) => void
+    },
     forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
     let t = useT("components/Memo/DateTime")
@@ -201,6 +223,7 @@ const MemoHeader = React.forwardRef(function MemoHeader(
             <MemoActions
                 memo={memo}
                 activateEditingMode={activateEditingMode}
+                updateMemo={updateMemo}
             />
         </div>
     )
@@ -209,7 +232,12 @@ const MemoHeader = React.forwardRef(function MemoHeader(
 function MemoActions({
     memo,
     activateEditingMode,
-}: { memo: MemoT; activateEditingMode: () => void }) {
+    updateMemo,
+}: {
+    memo: MemoT
+    activateEditingMode: () => void
+    updateMemo: (memo: PartialMemoUpdate) => void
+}) {
     let t = useT("components/Memo/Actions")
 
     return (
@@ -235,15 +263,23 @@ function MemoActions({
                 plain={true}
                 items={[
                     {
-                        label: t.Archive,
+                        label: memo.isArchived ? t.Unarchive : t.Archive,
                         icon: <Archive />,
-                        action: () => console.log(t.Archive),
+                        action: () =>
+                            updateMemo({
+                                id: memo.id,
+                                isArchived: !memo.isArchived,
+                            }),
                     },
                     {
-                        label: t.Delete,
+                        label: memo.isDeleted ? t.Restore : t.Delete,
                         icon: <TrashSimple />,
                         destructive: true,
-                        action: () => console.log(t.Delete),
+                        action: () =>
+                            updateMemo({
+                                id: memo.id,
+                                isDeleted: !memo.isDeleted,
+                            }),
                     },
                 ]}
             />

@@ -3,9 +3,8 @@ import { Editor } from "@/components/Editor"
 import { EndOfListMarker } from "@/components/EndOfListMarker"
 import { Filters } from "@/components/Filters"
 import { Loader } from "@/components/Loader"
-import { Memo } from "@/components/Memo"
+import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/Sheet"
-import type { Memo as MemoT } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
 import { useIsMobile } from "@/hooks/useIsMobile"
 import { Sliders } from "@phosphor-icons/react"
@@ -15,10 +14,12 @@ import { useTagListStore } from "./state/tags"
 
 export interface ListMemosPageProps {
     filter: Filter
+    showEditor?: boolean
     onChangeFilters?: (filter: Filter) => void
 }
 
 export function ListMemosPage(props: ListMemosPageProps) {
+    let showEditor = props.showEditor ?? true
     let {
         memos,
         isLoading,
@@ -26,9 +27,8 @@ export function ListMemosPage(props: ListMemosPageProps) {
         nextPage,
         setFilter,
         createMemo,
-        updateMemo: updateMemoExec,
-        createMemoInProgress,
-    } = useListMemosPageState({ filter: props.filter })
+        updateMemo,
+    } = useListMemosPageState({ filter: props.filter, pageSize: 20 })
     let tagList = useTagListStore()
 
     let onClickTag = useCallback(
@@ -51,11 +51,11 @@ export function ListMemosPage(props: ListMemosPageProps) {
         }
     }, [isLoading, nextPage])
 
-    let updateMemo = useCallback(
-        (memo: MemoT) => {
-            updateMemoExec({ memo })
+    let updateMemoContentCallback = useCallback(
+        (update: PartialMemoUpdate) => {
+            updateMemo(update, !("content" in update))
         },
-        [updateMemoExec],
+        [updateMemo],
     )
 
     let onChangeFilters = useCallback(
@@ -73,13 +73,15 @@ export function ListMemosPage(props: ListMemosPageProps) {
     return (
         <div className="flex gap-4 justify-center">
             <div className="flex-1 max-w-4xl gap-4 flex flex-col">
-                <div className="container mx-auto">
-                    <NewMemoEditor
-                        tags={tagList.tags}
-                        createMemo={createMemo}
-                        inProgress={createMemoInProgress}
-                    />
-                </div>
+                {showEditor && (
+                    <div className="container mx-auto">
+                        <NewMemoEditor
+                            tags={tagList.tags}
+                            createMemo={createMemo}
+                            inProgress={isLoading}
+                        />
+                    </div>
+                )}
 
                 <div className="gap-4 flex flex-col relative">
                     {memos.map((memo) => (
@@ -88,7 +90,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                             memo={memo}
                             tags={tagList.tags}
                             onClickTag={onClickTag}
-                            updateMemo={updateMemo}
+                            updateMemo={updateMemoContentCallback}
                             className="animate-in slide-in-from-bottom fade-in"
                             doubleClickToEdit={true}
                         />
@@ -115,7 +117,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
 
 function NewMemoEditor(props: {
     tags: Tag[]
-    createMemo: (req: { memo: CreateMemoRequest }) => void
+    createMemo: (memo: CreateMemoRequest) => void
     inProgress: boolean
 }) {
     let createMemo = useCallback(
@@ -125,7 +127,7 @@ function NewMemoEditor(props: {
                 return
             }
 
-            props.createMemo({ memo })
+            props.createMemo(memo)
         },
         [props.createMemo],
     )
@@ -135,6 +137,7 @@ function NewMemoEditor(props: {
         name: "",
         content: "",
         isArchived: false,
+        isDeleted: false,
         createdAt: new Date(),
         updatedAt: new Date(),
     })
@@ -146,6 +149,7 @@ function NewMemoEditor(props: {
                 name: "",
                 content: "",
                 isArchived: false,
+                isDeleted: false,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             })

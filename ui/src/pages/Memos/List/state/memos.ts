@@ -1,91 +1,233 @@
 import {
-    create as apiCreateMemo,
-    update as apiUpdateMemo,
+    type CreateMemoRequest,
+    type UpdateMemoRequest,
+    create as createMemo,
     list as listMemos,
+    update as updateMemo,
 } from "@/api/memos"
-import type { ListMemosQuery, Memo } from "@/domain/Memo"
-import { createMutatorStore } from "@/hooks/useMutator"
-import { createPaginatedQueryStore } from "@/hooks/usePaginatedQuery"
+import type { ListMemosQuery, Memo, MemoList } from "@/domain/Memo"
+import { isEqual } from "@/helper"
+import { $baseURL } from "@/hooks/useBaseURL"
 import { useStore } from "@nanostores/react"
-import { onMount } from "nanostores"
+import { atom, batched, onMount, task } from "nanostores"
 import { useEffect, useMemo } from "react"
 
 export type Filter = ListMemosQuery
 
-export function useListMemosPageState(init: { filter: Filter }) {
-    let {
-        $memos,
-        setFilter,
-        nextPage,
-        $creator,
-        createMemo,
-        $updator,
-        updateMemo,
-        cleanup,
-        /* biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional, the init will change on every rerender
-    but as this is a store, it should not be recreated. */
-    } = useMemo(() => {
-        let $memos = createPaginatedQueryStore<Memo, { filter: Filter }, Date>(
-            listMemos,
-            init,
-        )
-        let $creator = createMutatorStore(apiCreateMemo)
-        let $updator = createMutatorStore(apiUpdateMemo)
+export type MemoUpdate = UpdateMemoRequest
 
-        let setFilter = (filter: Filter) => {
-            $memos.setParams({ filter })
-        }
+export interface UseListMemosPageStateInit {
+    filter: Filter
+    pageSize: number
+}
 
-        let cleanup = onMount($memos.$store, () => {
-            return $creator.$store.subscribe((creator) => {
-                if (creator.lastResult) {
-                    $memos.addItem(creator.lastResult, {
-                        prepend: true,
-                    })
-                }
-            })
-        })
+export function useListMemosPageState(init: UseListMemosPageStateInit) {
+    /* biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional, the init params and opts will change on every rerender
+    but as this is a store, it should not cause the store to be recreated. */
+    let { $store, nextPage, setFilter, createMemo, updateMemo } = useMemo(
+        () => createListMemosPageStore(init),
+        [],
+    )
+    let store = useStore($store)
 
-        return {
-            $memos,
-            setFilter,
-            nextPage: $memos.nextPage,
-            createMemo: $creator.exec,
-            $creator,
-            updateMemo: $updator.exec,
-            $updator,
-            cleanup,
-        }
-    }, [])
-
-    let memos = useStore($memos.$store)
-    let createMemoInProgress = useStore($creator.$inProgress)
-    let updateMemoInProgress = useStore($updator.$inProgress)
-
-    useEffect(() => cleanup, [cleanup])
+    useEffect(() => {
+        setFilter(init.filter)
+    }, [setFilter, init.filter])
 
     return useMemo(
         () => ({
-            memos: memos.items,
-            isLoading: memos.isLoading,
-            filter: memos.params.filter,
-            setFilter,
+            ...store,
             nextPage,
+            setFilter,
             createMemo,
-            createMemoInProgress,
             updateMemo,
-            updateMemoInProgress,
         }),
-        [
-            memos.items,
-            memos.isLoading,
-            memos.params.filter,
-            setFilter,
-            nextPage,
-            createMemo,
-            createMemoInProgress,
-            updateMemo,
-            updateMemoInProgress,
-        ],
+        [store, nextPage, setFilter, createMemo, updateMemo],
     )
+}
+
+export function createListMemosPageStore(init: UseListMemosPageStateInit) {
+    let $isLoading = atom<boolean>(false)
+    let $pagination = atom<{
+        current?: Date
+        next?: Date
+        eol: boolean
+    }>({ current: undefined, next: undefined, eol: false })
+    let $filter = atom<Filter>(init.filter)
+    let $memos = atom<Memo[]>([])
+    let $error = atom<Error | undefined>()
+
+    let fetchPage = (page: Date | undefined, pageSize: number) => {
+        let abortCtrl = new AbortController()
+        let filter = $filter.get()
+
+        return listMemos({
+            filter: { ...filter },
+            pagination: {
+                after: page,
+                pageSize,
+            },
+            baseURL: $baseURL.get(),
+            signal: abortCtrl.signal,
+        })
+    }
+
+    let nextPage = () => {
+        if ($isLoading.get()) {
+            return
+        }
+
+        let pagination = $pagination.get()
+        if (pagination.eol) {
+            return
+        }
+
+        $isLoading.set(true)
+
+        task(async () => {
+            let memos = $memos.get()
+
+            let fetched: MemoList
+            try {
+                fetched = await fetchPage(pagination.next, init.pageSize)
+            } catch (err) {
+                $isLoading.set(false)
+                $error.set(err as Error)
+                return
+            }
+
+            $isLoading.set(false)
+            $error.set(undefined)
+
+            $memos.set([...memos, ...fetched.items])
+
+            if (fetched.items.length === 0) {
+                $pagination.set({
+                    eol: true,
+                    current: pagination.current,
+                    next: pagination.next,
+                })
+            } else {
+                $pagination.set({
+                    eol: false,
+                    current: pagination.next,
+                    next: fetched.next,
+                })
+            }
+        })
+    }
+
+    let setFilter = (params: Filter, force?: boolean) => {
+        let currentParmas = $filter.get()
+        if (isEqual(params, currentParmas) && !force) {
+            return
+        }
+
+        $filter.set(params)
+        $pagination.set({ current: undefined, next: undefined, eol: false })
+        $memos.set([])
+
+        nextPage()
+    }
+
+    let create = (memo: CreateMemoRequest) => {
+        if ($isLoading.get()) {
+            return
+        }
+
+        $isLoading.set(true)
+
+        task(async () => {
+            let abortCtrl = new AbortController()
+
+            let created: Memo
+            try {
+                created = await createMemo({
+                    memo,
+                    baseURL: $baseURL.get(),
+                    signal: abortCtrl.signal,
+                })
+            } catch (err) {
+                $isLoading.set(true)
+                $error.set(err as Error)
+                return
+            }
+
+            $memos.set([created, ...$memos.get()])
+            $isLoading.set(true)
+            $error.set(undefined)
+        })
+    }
+
+    let update = (memo: MemoUpdate, removeItem: boolean) => {
+        if ($isLoading.get()) {
+            return
+        }
+
+        $isLoading.set(true)
+
+        task(async () => {
+            let abortCtrl = new AbortController()
+
+            try {
+                await updateMemo({
+                    memo,
+                    baseURL: $baseURL.get(),
+                    signal: abortCtrl.signal,
+                })
+            } catch (err) {
+                $isLoading.set(false)
+                $error.set(err as Error)
+                return
+            }
+
+            $isLoading.set(false)
+            $error.set(undefined)
+
+            let items = [...$memos.get()]
+            let index = items.findIndex((m) => m.id === memo.id)
+
+            if (index === -1) {
+                return
+            }
+
+            if (removeItem) {
+                items.splice(index, 1)
+            } else {
+                if (index !== -1) {
+                    items[index] = {
+                        ...items[index],
+                        updatedAt: new Date(),
+                        ...memo,
+                    }
+                }
+            }
+
+            $memos.set(items)
+        })
+    }
+
+    let $store = batched(
+        [$memos, $filter, $isLoading, $error],
+        (memos, filter, isLoading, error) => {
+            return {
+                memos,
+                isLoading,
+                filter,
+                error,
+            }
+        },
+    )
+
+    onMount($store, () => {
+        nextPage()
+    })
+
+    return {
+        $store,
+        nextPage,
+        setFilter,
+        createMemo: create,
+        updateMemo: update,
+    }
 }

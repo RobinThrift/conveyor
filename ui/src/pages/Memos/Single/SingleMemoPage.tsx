@@ -1,7 +1,6 @@
 import type { Filter } from "@/api/memos"
 import { Loader } from "@/components/Loader"
-import { Memo } from "@/components/Memo"
-import type { Memo as MemoT } from "@/domain/Memo"
+import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import type { Tag } from "@/domain/Tag"
 import React, { useCallback } from "react"
 import { useSingleMemoPageState } from "./state"
@@ -29,7 +28,7 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
     )
 
     let updateMemoCallback = useCallback(
-        (memo: MemoT) => {
+        (memo: PartialMemoUpdate) => {
             updateMemo({ memo })
         },
         [updateMemo],

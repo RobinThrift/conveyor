@@ -260,7 +260,7 @@ type ListMemosForTagsWithSearchRow struct {
 	ID          domain.MemoID
 	Content     []byte
 	IsArchived  bool
-	IsDeleted   string
+	IsDeleted   bool
 	CreatedBy   auth.AccountID
 	CreatedAt   types.SQLiteDatetime
 	UpdatedAt   types.SQLiteDatetime
@@ -413,6 +413,7 @@ func (q *Queries) SetMemoDeletionStatus(ctx context.Context, db DBTX, arg SetMem
 const seteMemoArchiveStatus = `-- name: SeteMemoArchiveStatus :execrows
 UPDATE memos SET
     is_archived = ?,
+    is_deleted = false,
     updated_at = strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)
 WHERE id = ?
 `

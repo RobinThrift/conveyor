@@ -9,6 +9,9 @@ import "@/index.css"
 const meta: Meta<typeof Memo> = {
     title: "Components/Memo",
     component: Memo,
+    argTypes: {
+        updateMemo: { action: "updateMemo" },
+    },
 }
 
 export default meta
@@ -16,9 +19,6 @@ type Story = StoryObj<typeof Memo>
 
 export const Basic: Story = {
     name: "Memo",
-    argTypes: {
-        updateMemo: { action: "updateMemo" },
-    },
     args: {
         doubleClickToEdit: true,
         memo: {
@@ -95,6 +95,7 @@ function parseMarkdown(raw: string): React.ReactNode | React.ReactNode[] {
 
 `,
             isArchived: false,
+            isDeleted: false,
             createdAt: new Date(),
             updatedAt: new Date(),
         },

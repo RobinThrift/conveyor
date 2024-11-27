@@ -3,18 +3,11 @@ import type { Memo, MemoList } from "../src/domain/Memo"
 import type { Attachment } from "../src/domain/Attachment"
 import type { Tag, TagList } from "../src/domain/Tag"
 import type { CreateMemoRequest, UpdateMemoRequest } from "../src/api/memos"
-import {
-    sub,
-    isSameDay,
-    roundToNearestMinutes,
-    parseJSON,
-    isEqual,
-} from "date-fns"
+import { sub, isSameDay, roundToNearestMinutes, isEqual, parse } from "date-fns"
 import { faker } from "@faker-js/faker"
 
 interface MockData {
     memos: Memo[]
-    deletedMemos: Memo[]
     tags: Tag[]
     attachments: (Attachment & { data: Blob })[]
 }
@@ -34,7 +27,6 @@ const mockData: MockData = (() => {
     tags.sort()
 
     let memos: Memo[] = []
-    let deletedMemos: Memo[] = []
 
     for (let i = 0; i < 120; i++) {
         let memo = {
@@ -45,20 +37,16 @@ ${faker.lorem.lines({ min: 1, max: 10 })}
 
 ${faker.helpers.arrayElement(tags).tag}`,
             isArchived: i > 90 && i < 100,
+            isDeleted: i > 100,
             createdAt: sub(now, { hours: i * 2 }),
             updatedAt: sub(now, { hours: i }),
         }
 
-        if (i > 100) {
-            deletedMemos.push(memo)
-        } else {
-            memos.push(memo)
-        }
+        memos.push(memo)
     }
 
     return {
         memos,
-        deletedMemos,
         tags,
         attachments: [],
     }
@@ -123,9 +111,7 @@ export const mockAPI: HttpHandler[] = [
         let take = pageAfter === null
         let next: Date | undefined = undefined
 
-        let all = filters.isDeleted ? mockData.deletedMemos : mockData.memos
-
-        for (let memo of all) {
+        for (let memo of mockData.memos) {
             if (!take) {
                 take =
                     take ||
@@ -134,6 +120,10 @@ export const mockAPI: HttpHandler[] = [
             }
 
             if (memo.isArchived !== filters.isArchived) {
+                continue
+            }
+
+            if (memo.isDeleted !== filters.isDeleted) {
                 continue
             }
 
@@ -146,7 +136,10 @@ export const mockAPI: HttpHandler[] = [
 
             if (
                 filters.createdAt &&
-                !isSameDay(memo.createdAt, parseJSON(filters.createdAt))
+                !isSameDay(
+                    memo.createdAt,
+                    parse(filters.createdAt, "yyyy-MM-dd", new Date()),
+                )
             ) {
                 continue
             }
@@ -187,6 +180,7 @@ export const mockAPI: HttpHandler[] = [
                 id: mockData.memos.length.toString(),
                 content: body.content,
                 isArchived: false,
+                isDeleted: false,
                 createdAt: now,
                 updatedAt: now,
             }

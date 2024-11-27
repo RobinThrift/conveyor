@@ -18,6 +18,8 @@ export const translations = {
     "components/Memo/Actions": {
         Archive: "Archive",
         Delete: "Delete",
+        Unarchive: "Unarchive",
+        Restore: "Restore",
     } satisfies Translations,
 
     "components/Memo/DateTime": {

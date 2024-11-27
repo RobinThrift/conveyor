@@ -57,6 +57,7 @@ type Memo struct {
 	CreatedBy  string    `json:"createdBy"`
 	Id         string    `json:"id"`
 	IsArchived bool      `json:"isArchived"`
+	IsDeleted  bool      `json:"isDeleted"`
 	Name       string    `json:"name"`
 	UpdatedAt  time.Time `json:"updatedAt"`
 }
@@ -89,6 +90,7 @@ type CreateMemoRequest struct {
 type UpdateMemoRequest struct {
 	Content    *string `json:"content,omitempty"`
 	IsArchived *bool   `json:"isArchived,omitempty"`
+	IsDeleted  *bool   `json:"isDeleted,omitempty"`
 }
 
 // ListAttachmentsParams defines parameters for ListAttachments.
@@ -128,6 +130,7 @@ type CreateMemoJSONBody struct {
 type UpdateMemoJSONBody struct {
 	Content    *string `json:"content,omitempty"`
 	IsArchived *bool   `json:"isArchived,omitempty"`
+	IsDeleted  *bool   `json:"isDeleted,omitempty"`
 }
 
 // ListTagsParams defines parameters for ListTags.
@@ -160,6 +163,9 @@ type ServerInterface interface {
 
 	// (POST /memos)
 	CreateMemo(w http.ResponseWriter, r *http.Request)
+
+	// (DELETE /memos/{id})
+	DeleteMemo(w http.ResponseWriter, r *http.Request, id int64)
 
 	// (GET /memos/{id})
 	GetMemo(w http.ResponseWriter, r *http.Request, id int64)
@@ -414,6 +420,31 @@ func (siw *ServerInterfaceWrapper) CreateMemo(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
+// DeleteMemo operation middleware
+func (siw *ServerInterfaceWrapper) DeleteMemo(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteMemo(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetMemo operation middleware
 func (siw *ServerInterfaceWrapper) GetMemo(w http.ResponseWriter, r *http.Request) {
 
@@ -639,6 +670,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("DELETE "+options.BaseURL+"/attachments/{filename}", wrapper.DeleteAttachment)
 	m.HandleFunc("GET "+options.BaseURL+"/memos", wrapper.ListMemos)
 	m.HandleFunc("POST "+options.BaseURL+"/memos", wrapper.CreateMemo)
+	m.HandleFunc("DELETE "+options.BaseURL+"/memos/{id}", wrapper.DeleteMemo)
 	m.HandleFunc("GET "+options.BaseURL+"/memos/{id}", wrapper.GetMemo)
 	m.HandleFunc("PATCH "+options.BaseURL+"/memos/{id}", wrapper.UpdateMemo)
 	m.HandleFunc("GET "+options.BaseURL+"/tags", wrapper.ListTags)
@@ -851,6 +883,52 @@ func (response CreateMemodefaultJSONResponse) VisitCreateMemoResponse(w http.Res
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type DeleteMemoRequestObject struct {
+	Id int64 `json:"id"`
+}
+
+type DeleteMemoResponseObject interface {
+	VisitDeleteMemoResponse(w http.ResponseWriter) error
+}
+
+type DeleteMemo204Response struct {
+}
+
+func (response DeleteMemo204Response) VisitDeleteMemoResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteMemo400JSONResponse Error
+
+func (response DeleteMemo400JSONResponse) VisitDeleteMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteMemo401JSONResponse Error
+
+func (response DeleteMemo401JSONResponse) VisitDeleteMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteMemodefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response DeleteMemodefaultJSONResponse) VisitDeleteMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type GetMemoRequestObject struct {
 	Id int64 `json:"id"`
 }
@@ -933,6 +1011,15 @@ func (response UpdateMemo401JSONResponse) VisitUpdateMemoResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type UpdateMemo404JSONResponse Error
+
+func (response UpdateMemo404JSONResponse) VisitUpdateMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type UpdateMemodefaultJSONResponse struct {
 	Body       Error
 	StatusCode int
@@ -1009,6 +1096,9 @@ type StrictServerInterface interface {
 
 	// (POST /memos)
 	CreateMemo(ctx context.Context, request CreateMemoRequestObject) (CreateMemoResponseObject, error)
+
+	// (DELETE /memos/{id})
+	DeleteMemo(ctx context.Context, request DeleteMemoRequestObject) (DeleteMemoResponseObject, error)
 
 	// (GET /memos/{id})
 	GetMemo(ctx context.Context, request GetMemoRequestObject) (GetMemoResponseObject, error)
@@ -1179,6 +1269,32 @@ func (sh *strictHandler) CreateMemo(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(CreateMemoResponseObject); ok {
 		if err := validResponse.VisitCreateMemoResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteMemo operation middleware
+func (sh *strictHandler) DeleteMemo(w http.ResponseWriter, r *http.Request, id int64) {
+	var request DeleteMemoRequestObject
+
+	request.Id = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteMemo(ctx, request.(DeleteMemoRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteMemo")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteMemoResponseObject); ok {
+		if err := validResponse.VisitDeleteMemoResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
