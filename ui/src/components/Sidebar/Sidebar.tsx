@@ -5,7 +5,7 @@ import { List, SignOut } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React, { useMemo } from "react"
 import { Sheet, SheetContent, SheetTrigger } from "../Sheet"
-import { ThemeSwitcher } from "../ThemeSwitcher"
+import { ModeSwitcher, ThemeSwitcher } from "../ThemeSwitcher"
 
 export interface SidebarProps {
     className?: string
@@ -68,7 +68,10 @@ export function Sidebar(props: SidebarProps) {
             </nav>
 
             <div className="px-4 py-4 w-full flex flex-col gap-y-4">
-                <ThemeSwitcher />
+                <div className="space-y-2">
+                    <ThemeSwitcher />
+                    <ModeSwitcher />
+                </div>
 
                 <Link
                     href="/logout"

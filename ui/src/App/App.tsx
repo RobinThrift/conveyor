@@ -2,19 +2,38 @@ import { Sidebar } from "@/components/Sidebar"
 import { useStore } from "@nanostores/react"
 import { Archive, GearFine, Notepad, TrashSimple } from "@phosphor-icons/react"
 import React, { Suspense, useCallback } from "react"
-import type { ServerData } from "./ServerData"
 import { $router } from "./router"
 
 import { type Filter, filterFromQuery, filterToQueryString } from "@/api/memos"
+import { useBaseURL } from "@/hooks/useBaseURL"
 import { useT } from "@/i18n"
 import { ErrorPage } from "@/pages/Errors"
-import { ChangePasswordPage, LoginPage } from "@/pages/Login"
+import {
+    ChangePasswordPage,
+    type ChangePasswordPageProps,
+    LoginPage,
+    type LoginPageProps,
+} from "@/pages/Login"
 import { ListMemosPage } from "@/pages/Memos/List"
 import { SingleMemoPage } from "@/pages/Memos/Single"
+import { SettingsPage } from "@/pages/Settings"
 
-export type AppProps = ServerData
+export interface AppProps {
+    /* Specific component props that need data from the server, e.g. based on the request or errors. */
+    components: {
+        LoginPage: LoginPageProps
+        LoginChangePasswordPage: ChangePasswordPageProps
+    }
+
+    error?: {
+        code: number
+        title: string
+        detail: string
+    }
+}
 
 export function App(props: AppProps) {
+    let baseURL = useBaseURL()
     let page = useStore($router)
     let t = useT("app/navigation")
 
@@ -25,6 +44,13 @@ export function App(props: AppProps) {
             `${globalThis.location.pathname}?${filterToQueryString(filter)}`,
         )
     }, [])
+
+    let onChangeSettingsTab = useCallback(
+        (tab: string) => {
+            $router.open(`${baseURL}/settings/${tab}`)
+        },
+        [baseURL],
+    )
 
     if (props.error) {
         return (
@@ -91,6 +117,14 @@ export function App(props: AppProps) {
                 />
             )
             break
+        case "settings":
+            pageComp = (
+                <SettingsPage
+                    tab={page.params.tab}
+                    onChangeTab={onChangeSettingsTab}
+                />
+            )
+            break
     }
 
     if (!pageComp) {
@@ -133,10 +167,9 @@ export function App(props: AppProps) {
                     },
                     {
                         label: t.Settings,
-                        url: "/settings",
+                        url: "/settings/interface",
                         icon: <GearFine weight="duotone" />,
-                        // isActive: page?.route === "settings"
-                        isActive: false,
+                        isActive: page?.route === "settings",
                     },
                 ]}
             />

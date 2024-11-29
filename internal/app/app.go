@@ -34,7 +34,7 @@ func New(config Config) *App {
 		DebugEnabled: config.Database.DebugEnabled,
 	}
 
-	sm := session.NewManager(db)
+	sessionManager := session.NewManager(db)
 
 	argon2Params := auth.Argon2Params{
 		KeyLen:  config.Argon2.KeyLen,
@@ -48,6 +48,7 @@ func New(config Config) *App {
 	localAuthRepo := sqlite.NewLocalAuthRepo(db)
 	memoRepo := sqlite.NewMemoRepo(db)
 	attachmentRepo := sqlite.NewAttachmentRepo(db)
+	settingsRepo := sqlite.NewSettingsRepo(db)
 
 	fs := &filesystem.LocalFSAttachments{
 		AttachmentsDir: config.Attachments.Dir,
@@ -60,19 +61,20 @@ func New(config Config) *App {
 	}, db, accountCtrl, localAuthRepo)
 	memoCtrl := control.NewMemoControl(db, memoRepo, attachmentRepo)
 	attachmentCtrl := control.NewAttachmentControl(fs, attachmentRepo)
+	settingsCtrl := control.NewSettingsControl(settingsRepo)
 
 	mux := http.NewServeMux()
 
-	srv := server.New(server.Config{Addr: config.Addr, UseSecureCookies: config.SecureCookies}, mux, sm)
+	srv := server.New(server.Config{Addr: config.Addr, UseSecureCookies: config.SecureCookies}, mux, sessionManager)
 
 	uiIngress.NewRouter(uiIngress.Config{
 		CSRFSecret:       config.CSRFSecret,
 		UseSecureCookies: config.SecureCookies,
 		BasePath:         config.BasePath,
 		AttachmentsDir:   config.Attachments.Dir,
-	}, mux, authCtrl)
+	}, mux, authCtrl, settingsCtrl, accountCtrl)
 
-	apiv1.New(config.BasePath, mux, memoCtrl, attachmentCtrl)
+	apiv1.New(config.BasePath, mux, memoCtrl, attachmentCtrl, settingsCtrl)
 
 	return &App{
 		config: config,

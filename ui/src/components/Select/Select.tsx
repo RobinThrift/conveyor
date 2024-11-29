@@ -9,7 +9,9 @@ export interface SelectProps<T extends string = string> {
     name: string
     value?: T
     placeholder?: string
-    children: React.ReactElement<SelectOptionProps>[]
+    children:
+        | React.ReactElement<SelectOptionProps>
+        | React.ReactElement<SelectOptionProps>[]
     onChange: (value: T) => void
 }
 

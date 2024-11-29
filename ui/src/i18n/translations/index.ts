@@ -4,7 +4,7 @@ import type { translations } from "./en"
 export const translationFiles = import.meta.glob<
     boolean,
     string,
-    ComponentsJSON
+    { default: ComponentsJSON }
 >("../../../translations/*.json")
 
 export { translations as fallback } from "./en"

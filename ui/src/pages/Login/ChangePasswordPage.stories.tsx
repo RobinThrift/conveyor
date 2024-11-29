@@ -20,9 +20,10 @@ export const ChangePasswordForm: Story = {}
 export const WithError: Story = {
     args: {
         validationErrors: {
-            current_password: "Current Password is incorrect",
-            new_password: "New Password don't match",
-            form: "General Error",
+            current_password: "CurrentPasswordIncorrect",
+            new_password: "NewPasswordIsOldPassword",
+            repeat_new_password: "NewPasswordsDoNotMatch",
+            form: "General form error",
         },
     },
 }

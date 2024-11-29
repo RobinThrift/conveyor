@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+
+	"github.com/RobinThrift/belt/internal/domain"
 )
 
 //go:embed src/html/error.tmpl.html
@@ -22,7 +24,52 @@ type PageData struct {
 	ServerData ServerData
 }
 
+type Account struct {
+	Username    string `json:"username,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
+}
+
+type Settings struct {
+	Locale   LocaleSettings   `json:"locale,omitempty"`
+	Theme    ThemeSettings    `json:"theme,omitempty"`
+	Controls ControlsSettings `json:"controls,omitempty"`
+}
+
+type LocaleSettings struct {
+	Language string `json:"language,omitempty"`
+	Region   string `json:"region,omitempty"`
+}
+
+type ThemeSettings struct {
+	ColourScheme string `json:"colourScheme,omitempty"`
+	Mode         string `json:"mode,omitempty"`
+}
+
+type ControlsSettings struct {
+	Vim               bool `json:"vim,omitempty"`
+	DoubleClickToEdit bool `json:"doubleClickToEdit,omitempty"`
+}
+
+func NewSettings(s *domain.Settings) *Settings {
+	return &Settings{
+		Locale: LocaleSettings{
+			Language: s.Locale.Language,
+			Region:   s.Locale.Region,
+		},
+		Theme: ThemeSettings{
+			ColourScheme: s.Theme.ColourScheme,
+			Mode:         s.Theme.Mode,
+		},
+		Controls: ControlsSettings{
+			Vim:               s.Controls.Vim,
+			DoubleClickToEdit: s.Controls.DoubleClickToEdit,
+		},
+	}
+}
+
 type ServerData struct {
+	Account    *Account             `json:"account,omitempty"`
+	Settings   *Settings            `json:"settings,omitempty"`
 	Components ServerDataComponents `json:"components,omitempty"`
 	Error      *UIError             `json:"error,omitempty"`
 }
@@ -30,6 +77,7 @@ type ServerData struct {
 type ServerDataComponents struct {
 	LoginPage               LoginPage               `json:"LoginPage,omitempty"`
 	LoginChangePasswordPage LoginChangePasswordPage `json:"LoginChangePasswordPage,omitempty"`
+	SettingsPage            SettingsPage            `json:"SettingsPage,omitempty"`
 }
 
 type UIError struct {
@@ -76,5 +124,9 @@ type LoginPage struct {
 
 type LoginChangePasswordPage struct {
 	RedirectURL      string            `json:"redirectURL,omitempty"`
+	ValidationErrors map[string]string `json:"validationErrors,omitempty"`
+}
+
+type SettingsPage struct {
 	ValidationErrors map[string]string `json:"validationErrors,omitempty"`
 }

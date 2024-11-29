@@ -68,6 +68,16 @@ type MemoList struct {
 	Next  *time.Time `json:"next,omitempty"`
 }
 
+// Settings defines model for Settings.
+type Settings struct {
+	ControlsDoubleClickToEdit bool   `json:"controls.doubleClickToEdit"`
+	ControlsVim               bool   `json:"controls.vim"`
+	LocaleLanguage            string `json:"locale.language"`
+	LocaleRegion              string `json:"locale.region"`
+	ThemeColourScheme         string `json:"theme.colourScheme"`
+	ThemeMode                 string `json:"theme.mode"`
+}
+
 // Tag defines model for Tag.
 type Tag struct {
 	Count float32 `json:"count"`
@@ -80,6 +90,18 @@ type TagList struct {
 	Next  *string `json:"next,omitempty"`
 }
 
+// ErrorBadRequest Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
+type ErrorBadRequest = Error
+
+// ErrorNotFound Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
+type ErrorNotFound = Error
+
+// ErrorOther Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
+type ErrorOther = Error
+
+// ErrorUnauthorized Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
+type ErrorUnauthorized = Error
+
 // CreateMemoRequest defines model for CreateMemoRequest.
 type CreateMemoRequest struct {
 	Content   string     `json:"content"`
@@ -91,6 +113,16 @@ type UpdateMemoRequest struct {
 	Content    *string `json:"content,omitempty"`
 	IsArchived *bool   `json:"isArchived,omitempty"`
 	IsDeleted  *bool   `json:"isDeleted,omitempty"`
+}
+
+// UpdateSettingsRequest defines model for UpdateSettingsRequest.
+type UpdateSettingsRequest struct {
+	ControlsDoubleClickToEdit *bool   `json:"controls.doubleClickToEdit,omitempty"`
+	ControlsVim               *bool   `json:"controls.vim,omitempty"`
+	LocaleLanguage            *string `json:"locale.language,omitempty"`
+	LocaleRegion              *string `json:"locale.region,omitempty"`
+	ThemeColourScheme         *string `json:"theme.colourScheme,omitempty"`
+	ThemeMode                 *string `json:"theme.mode,omitempty"`
 }
 
 // ListAttachmentsParams defines parameters for ListAttachments.
@@ -133,6 +165,16 @@ type UpdateMemoJSONBody struct {
 	IsDeleted  *bool   `json:"isDeleted,omitempty"`
 }
 
+// UpdateSettingsJSONBody defines parameters for UpdateSettings.
+type UpdateSettingsJSONBody struct {
+	ControlsDoubleClickToEdit *bool   `json:"controls.doubleClickToEdit,omitempty"`
+	ControlsVim               *bool   `json:"controls.vim,omitempty"`
+	LocaleLanguage            *string `json:"locale.language,omitempty"`
+	LocaleRegion              *string `json:"locale.region,omitempty"`
+	ThemeColourScheme         *string `json:"theme.colourScheme,omitempty"`
+	ThemeMode                 *string `json:"theme.mode,omitempty"`
+}
+
 // ListTagsParams defines parameters for ListTags.
 type ListTagsParams struct {
 	PageSize     uint64  `form:"page[size]" json:"page[size]"`
@@ -145,6 +187,9 @@ type CreateMemoJSONRequestBody CreateMemoJSONBody
 
 // UpdateMemoJSONRequestBody defines body for UpdateMemo for application/json ContentType.
 type UpdateMemoJSONRequestBody UpdateMemoJSONBody
+
+// UpdateSettingsJSONRequestBody defines body for UpdateSettings for application/json ContentType.
+type UpdateSettingsJSONRequestBody UpdateSettingsJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -172,6 +217,12 @@ type ServerInterface interface {
 
 	// (PATCH /memos/{id})
 	UpdateMemo(w http.ResponseWriter, r *http.Request, id int64)
+
+	// (GET /settings)
+	GetSettings(w http.ResponseWriter, r *http.Request)
+
+	// (PATCH /settings)
+	UpdateSettings(w http.ResponseWriter, r *http.Request)
 
 	// (GET /tags)
 	ListTags(w http.ResponseWriter, r *http.Request, params ListTagsParams)
@@ -495,6 +546,34 @@ func (siw *ServerInterfaceWrapper) UpdateMemo(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
+// GetSettings operation middleware
+func (siw *ServerInterfaceWrapper) GetSettings(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSettings(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateSettings operation middleware
+func (siw *ServerInterfaceWrapper) UpdateSettings(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateSettings(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListTags operation middleware
 func (siw *ServerInterfaceWrapper) ListTags(w http.ResponseWriter, r *http.Request) {
 
@@ -673,10 +752,20 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("DELETE "+options.BaseURL+"/memos/{id}", wrapper.DeleteMemo)
 	m.HandleFunc("GET "+options.BaseURL+"/memos/{id}", wrapper.GetMemo)
 	m.HandleFunc("PATCH "+options.BaseURL+"/memos/{id}", wrapper.UpdateMemo)
+	m.HandleFunc("GET "+options.BaseURL+"/settings", wrapper.GetSettings)
+	m.HandleFunc("PATCH "+options.BaseURL+"/settings", wrapper.UpdateSettings)
 	m.HandleFunc("GET "+options.BaseURL+"/tags", wrapper.ListTags)
 
 	return m
 }
+
+type ErrorBadRequestJSONResponse Error
+
+type ErrorNotFoundJSONResponse Error
+
+type ErrorOtherJSONResponse Error
+
+type ErrorUnauthorizedJSONResponse Error
 
 type ListAttachmentsRequestObject struct {
 	Params ListAttachmentsParams
@@ -1032,6 +1121,116 @@ func (response UpdateMemodefaultJSONResponse) VisitUpdateMemoResponse(w http.Res
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type GetSettingsRequestObject struct {
+}
+
+type GetSettingsResponseObject interface {
+	VisitGetSettingsResponse(w http.ResponseWriter) error
+}
+
+type GetSettings200JSONResponse Settings
+
+func (response GetSettings200JSONResponse) VisitGetSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetSettings400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response GetSettings400JSONResponse) VisitGetSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetSettings401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response GetSettings401JSONResponse) VisitGetSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetSettings404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response GetSettings404JSONResponse) VisitGetSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetSettingsdefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response GetSettingsdefaultJSONResponse) VisitGetSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type UpdateSettingsRequestObject struct {
+	Body *UpdateSettingsJSONRequestBody
+}
+
+type UpdateSettingsResponseObject interface {
+	VisitUpdateSettingsResponse(w http.ResponseWriter) error
+}
+
+type UpdateSettings204Response struct {
+}
+
+func (response UpdateSettings204Response) VisitUpdateSettingsResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type UpdateSettings400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response UpdateSettings400JSONResponse) VisitUpdateSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateSettings401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response UpdateSettings401JSONResponse) VisitUpdateSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateSettings404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response UpdateSettings404JSONResponse) VisitUpdateSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateSettingsdefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response UpdateSettingsdefaultJSONResponse) VisitUpdateSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type ListTagsRequestObject struct {
 	Params ListTagsParams
 }
@@ -1105,6 +1304,12 @@ type StrictServerInterface interface {
 
 	// (PATCH /memos/{id})
 	UpdateMemo(ctx context.Context, request UpdateMemoRequestObject) (UpdateMemoResponseObject, error)
+
+	// (GET /settings)
+	GetSettings(ctx context.Context, request GetSettingsRequestObject) (GetSettingsResponseObject, error)
+
+	// (PATCH /settings)
+	UpdateSettings(ctx context.Context, request UpdateSettingsRequestObject) (UpdateSettingsResponseObject, error)
 
 	// (GET /tags)
 	ListTags(ctx context.Context, request ListTagsRequestObject) (ListTagsResponseObject, error)
@@ -1354,6 +1559,61 @@ func (sh *strictHandler) UpdateMemo(w http.ResponseWriter, r *http.Request, id i
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(UpdateMemoResponseObject); ok {
 		if err := validResponse.VisitUpdateMemoResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetSettings operation middleware
+func (sh *strictHandler) GetSettings(w http.ResponseWriter, r *http.Request) {
+	var request GetSettingsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetSettings(ctx, request.(GetSettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetSettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetSettingsResponseObject); ok {
+		if err := validResponse.VisitGetSettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateSettings operation middleware
+func (sh *strictHandler) UpdateSettings(w http.ResponseWriter, r *http.Request) {
+	var request UpdateSettingsRequestObject
+
+	var body UpdateSettingsJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateSettings(ctx, request.(UpdateSettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateSettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateSettingsResponseObject); ok {
+		if err := validResponse.VisitUpdateSettingsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

@@ -2,6 +2,7 @@ import type { Filter } from "@/api/memos"
 import { Loader } from "@/components/Loader"
 import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import type { Tag } from "@/domain/Tag"
+import { useSetting } from "@/storage/settings"
 import React, { useCallback } from "react"
 import { useSingleMemoPageState } from "./state"
 
@@ -11,6 +12,10 @@ export interface SingleMemoPageProps {
 }
 
 export function SingleMemoPage(props: SingleMemoPageProps) {
+    let [doubleClickToEdit] = useSetting<boolean, "controls.doubleClickToEdit">(
+        "controls.doubleClickToEdit",
+    )
+
     let { memo, isLoading, updateMemo, error } = useSingleMemoPageState(
         props.memoID,
     )
@@ -37,7 +42,7 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
     let tags: Tag[] = []
 
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-4xl">
             {isLoading && (
                 <div className="flex justify-center items-center min-h-[200px]">
                     <Loader />
@@ -52,7 +57,7 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
                     onClickTag={onClickTag}
                     updateMemo={updateMemoCallback}
                     className="animate-in slide-in-from-bottom fade-in"
-                    doubleClickToEdit={true}
+                    doubleClickToEdit={doubleClickToEdit}
                 />
             )}
         </div>

@@ -15,6 +15,7 @@ export const $router = createRouter(
         "memos.archive": `${baseURL}/memos/archive`,
         "memos.bin": `${baseURL}/memos/bin`,
         "memos.single": `${baseURL}/memos/:id`,
+        settings: `${baseURL}/settings/:tab/:subsection?`,
     },
     { links: false },
 )

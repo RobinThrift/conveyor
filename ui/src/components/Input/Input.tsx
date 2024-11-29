@@ -27,10 +27,12 @@ export interface InputProps {
 
     serverInvalid?: boolean
     message?: string
+    messages?: Record<string, string | ((data: { name: string }) => string)>
 
     value?: any
     onKeyUp?: (e: React.KeyboardEvent<HTMLInputElement>) => void
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+    defaultValue?: string
 }
 
 export function Input(props: InputProps) {
@@ -80,18 +82,35 @@ export function Input(props: InputProps) {
                         onKeyUp={props.onKeyUp}
                         onChange={props.onChange}
                         value={props.value}
+                        defaultValue={props.defaultValue}
                     />
                 </Form.Control>
             </div>
 
-            {props.serverInvalid && props.message && (
+            {props.messages && (
+                <Form.Message
+                    className={clsx(
+                        "mt-2 field-message",
+                        props.messageClassName,
+                    )}
+                    match="valueMissing"
+                >
+                    {translate("Invalid/Empty", props.messages, {
+                        name: props.label ?? props.name,
+                    })}
+                </Form.Message>
+            )}
+
+            {props.message && (
                 <Form.Message
                     className={clsx(
                         "mt-2 field-message",
                         props.messageClassName,
                     )}
                 >
-                    {props.message}
+                    {translate(props.message, props.messages, {
+                        name: props.label ?? props.name,
+                    })}
                 </Form.Message>
             )}
 
@@ -104,4 +123,21 @@ export function Input(props: InputProps) {
             )}
         </Form.Field>
     )
+}
+
+function translate(
+    key: string,
+    messages: InputProps["messages"],
+    data: { name: string },
+): string {
+    let message = messages?.[key]
+    if (!message) {
+        return key
+    }
+
+    if (typeof message === "function") {
+        return message(data)
+    }
+
+    return message
 }

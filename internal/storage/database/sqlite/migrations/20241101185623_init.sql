@@ -110,6 +110,19 @@ CREATE TABLE memo_attachments (
     FOREIGN KEY(attachment_id) REFERENCES attachments(id)
 );
 
+CREATE TABLE settings (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id INTEGER NOT NULL,
+    key        TEXT NOT NULL,
+    value      BLOB NOT NULL,
+
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)),
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)),
+
+    FOREIGN KEY(account_id) REFERENCES accounts(id)
+);
+CREATE UNIQUE INDEX settings_key_account_idx ON settings(account_id, key);
+
 
 CREATE VIRTUAL TABLE memos_fts USING fts5(id UNINDEXED, content, is_archived UNINDEXED, is_deleted UNINDEXED, created_by UNINDEXED, created_at UNINDEXED, updated_at UNINDEXED, content='memos', content_rowid='id');
 
@@ -188,6 +201,9 @@ DROP TABLE tags;
 
 DROP INDEX memos_created_at;
 DROP TABLE memos;
+
+DROP INDEX settings_key_account_idx;
+DROP TABLE settings;
 
 DROP INDEX unique_usernames;
 DROP INDEX unique_auth_ref;

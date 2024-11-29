@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: Belt API
   description: This is the Belt REST-ish API.
@@ -362,6 +362,43 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /settings:
+    get:
+      operationId: GetSettings
+
+      responses:
+        "200":
+          description: A map of all settings and their values.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+    patch:
+      operationId: UpdateSettings
+
+      requestBody:
+        $ref: "#/components/requestBodies/UpdateSettingsRequest"
+      responses:
+        "204":
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
 components:
   schemas:
     Memo:
@@ -472,6 +509,29 @@ components:
       required:
       - items
 
+    Settings:
+      type: object
+      properties:
+        locale.language:
+          type: string
+        locale.region:
+          type: string
+        theme.colourScheme:
+          type: string
+        theme.mode:
+          type: string
+        controls.vim:
+          type: boolean
+        controls.doubleClickToEdit:
+          type: boolean
+      required:
+      - "locale.language"
+      - "locale.region"
+      - "theme.colourScheme"
+      - "theme.mode"
+      - "controls.vim"
+      - "controls.doubleClickToEdit"
+
     Error:
       type: object
       description: Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
@@ -529,3 +589,49 @@ components:
           schema:
             type: string
             format: binary
+
+    UpdateSettingsRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              locale.language:
+                type: string
+              locale.region:
+                type: string
+              theme.colourScheme:
+                type: string
+              theme.mode:
+                type: string
+              controls.vim:
+                type: boolean
+              controls.doubleClickToEdit:
+                type: boolean
+
+  responses:
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ErrorOther:
+      description: Other errors
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

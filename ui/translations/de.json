@@ -1,0 +1,125 @@
+{
+    "app/navigation": {
+        "Memos": "Memos",
+        "Archive": "Archiv",
+        "Bin": "Müll",
+        "Settings": "Einstellungen"
+    },
+
+    "components/Sidebar": {
+        "Logout": "Ausloggen",
+        "GreetingMorning": "Moin,",
+        "GreetingAfternoon": "Guten Tag,",
+        "GreetingEvening": "Abend,"
+    },
+
+    "components/Memo/Actions": {
+        "Archive": "Archivieren",
+        "Delete": "Löschen",
+        "Unarchive": "Unarchivieren",
+        "Restore": "Wiederherstellen"
+    },
+
+    "components/Memo/DateTime": {
+        "CreatedAt": "Erstellt am",
+        "UpdatedAt": "Verändert am"
+    },
+
+    "components/Editor": {
+        "Cancel": "Abbrechen",
+        "Save": "Speichern"
+    },
+
+    "components/DateTime": {
+        "datetime": "{date} um {time}",
+        "invalidTime": "Ungültiges Datum \"{date}\": {error}"
+    },
+
+    "components/ThemeSwitcher": {
+        "ColoursDefault": "Standard Farben",
+        "Auto": "Auto",
+        "Light": "Hell",
+        "Dark": "Dunkel",
+        "SelectColourSchemeAriaLabel": "Farbschemawahl",
+        "SelectModeAriaLabel": "Auswahl des Hell- oder Dunkelmodus"
+    },
+
+    "components/Filters/Calendar": {
+        "Today": "Heute"
+    },
+
+    "pages/Errors/NotFound": {
+        "Title": "Nicht gefunden",
+        "Detail": "Die Seite kann nicht gefunden werden"
+    },
+
+    "pages/Errors/Unauthorized": {
+        "Title": "Nicht Authorisiert",
+        "Detail": "Du hast auf diese Seite keinen Zugriff"
+    },
+
+    "pages/LoginChangePassword": {
+        "Invalid/Empty": "{name} darf nicht leer sein",
+        "CurrentPasswordIncorrect": "Incorrect password",
+        "EmptyCurrentPassword": "Bitte gib Dein aktuelles Passwort ein",
+        "EmptyNewPassword": "Bitte gib ein neues Passwort ein",
+        "EmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
+        "NewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
+        "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein",
+        "Title": "Passwort ändern",
+        "CurrentPasswordLabel": "Aktulles Passwort",
+        "NewPasswordLabel": "Neues Passwort",
+        "RepeatNewPasswordLabel": "Neues Passwort wiederholen"
+    },
+
+    "pages/Settings/Tabs": {
+        "Interface": "Benutzeroberfläche",
+        "Locale": "Sprache & Region",
+        "Account": "Konto",
+        "System": "System"
+    },
+
+    "pages/Settings/InterfaceSettingsTab": {
+        "Title": "Einstellungen der Benutzeroberfläche",
+        "Description": "Passe das Aussehen und Verhalten der Benutzeroberfläche an.",
+        "SectionTheme": "Farben und Modus",
+        "LabelColourScheme": "Farbschema",
+        "LabelModeOverride": "Hell/Dunkl-Modus erzwingen",
+        "SectionControls": "Controls",
+        "LabelEnableVimKeybindings": "Aktiviere Vim keybindings",
+        "LabelEnableDoubleClickToEdit": "Doppelklick auf Memos aktiviert den Editor"
+    },
+
+    "pages/Settings/LocaleSettingsTab": {
+        "Title": "Sprache & Region",
+        "Description": "Setze die Sprache- und Regionseinstellunge",
+        "LabelSelectLanguage": "Sprache",
+        "LabelSelectRegion": "Region"
+    },
+
+    "pages/Settings/AccountSettingsTab": {
+        "Title": "Konto",
+        "Description": "Verwalte dein Konto.",
+
+        "DisplayNameLabel": "Anzeigename",
+        "UpdateDisplayNameButton": "Speichern",
+        "EmptyDisplayName": "Anzeigename darf nicht leer sein",
+
+        "ChangePasswordTitle": "Password Ändern",
+        "ChangePasswordButton": "Ändern",
+        "Invalid/Empty": "{name} darf nicht leer sein",
+        "CurrentPasswordIncorrect": "Incorrect password",
+        "EmptyCurrentPassword": "Bitte gib Dein aktuelles Passwort ein",
+        "EmptyNewPassword": "Bitte gib ein neues Passwort ein",
+        "EmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
+        "NewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
+        "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein",
+        "CurrentPasswordLabel": "Aktulles Passwort",
+        "NewPasswordLabel": "Neues Passwort",
+        "RepeatNewPasswordLabel": "Neues Passwort wiederholen"
+    },
+
+    "pages/Settings/SystemSettingsTab": {
+        "Title": "System"
+    }
+}

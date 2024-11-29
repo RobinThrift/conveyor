@@ -32,3 +32,17 @@
 .field-message {
     @apply block px-3 py-2 border border-danger-dark bg-danger/40 text-danger-dark rounded;
 }
+
+.checkbox-field {
+    @apply flex items-center gap-2;
+
+    label {
+        @apply cursor-pointer;
+    }
+}
+
+.checkbox {
+    @apply flex size-7 appearance-none items-center justify-center rounded bg-surface border-2 border-subtle outline-none;
+    @apply hover:border-primary;
+    @apply focus:outline-primary focus:outline-offset-0;
+}

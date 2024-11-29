@@ -18,10 +18,11 @@ type router struct {
 	baseURL        string
 	memoCtrl       *control.MemoControl
 	attachmentCtrl *control.AttachmentControl
+	settingsCtrl   *control.SettingsControl
 }
 
-func New(baseURL string, mux *http.ServeMux, memoCtrl *control.MemoControl, attachmentCtrl *control.AttachmentControl) {
-	r := &router{baseURL, memoCtrl, attachmentCtrl}
+func New(baseURL string, mux *http.ServeMux, memoCtrl *control.MemoControl, attachmentCtrl *control.AttachmentControl, settingsCtrl *control.SettingsControl) {
+	r := &router{baseURL, memoCtrl, attachmentCtrl, settingsCtrl}
 
 	HandlerWithOptions(NewStrictHandlerWithOptions(r, nil, StrictHTTPServerOptions{
 		RequestErrorHandlerFunc:  errorHandlerFunc,
@@ -286,6 +287,42 @@ func (r *router) CreateAttachment(ctx context.Context, req CreateAttachmentReque
 // (DELETE /attachments/{filename})
 func (r *router) DeleteAttachment(ctx context.Context, req DeleteAttachmentRequestObject) (DeleteAttachmentResponseObject, error) {
 	panic("not implemented") // TODO: Implement
+}
+
+// (GET /settings)
+func (r *router) GetSettings(ctx context.Context, req GetSettingsRequestObject) (GetSettingsResponseObject, error) {
+	settings, err := r.settingsCtrl.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return GetSettings200JSONResponse{
+		LocaleLanguage:            settings.Locale.Language,
+		LocaleRegion:              settings.Locale.Region,
+		ThemeColourScheme:         settings.Theme.ColourScheme,
+		ThemeMode:                 settings.Theme.Mode,
+		ControlsVim:               settings.Controls.Vim,
+		ControlsDoubleClickToEdit: settings.Controls.DoubleClickToEdit,
+	}, nil
+}
+
+// (PATCH /settings)
+func (r *router) UpdateSettings(ctx context.Context, req UpdateSettingsRequestObject) (UpdateSettingsResponseObject, error) {
+	cmd := control.SetSettingsCmd{
+		LocaleLanguage:            req.Body.LocaleLanguage,
+		LocaleRegion:              req.Body.LocaleRegion,
+		ThemeColourScheme:         req.Body.ThemeColourScheme,
+		ThemeMode:                 req.Body.ThemeMode,
+		ControlsVim:               req.Body.ControlsVim,
+		ControlsDoubleClickToEdit: req.Body.ControlsDoubleClickToEdit,
+	}
+
+	err := r.settingsCtrl.Set(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return UpdateSettings204Response{}, nil
 }
 
 func (r *router) addAccountToContext(next http.Handler) http.Handler {

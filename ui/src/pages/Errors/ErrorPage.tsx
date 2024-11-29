@@ -1,14 +1,28 @@
+import { useT } from "@/i18n"
 import React from "react"
 
-export interface ErrorPageProps {
-    className?: string
-
-    code: number
+export type OtherError = {
     title: string
     detail: string
 }
 
+export type TranslatedError = {
+    t: string
+}
+
+export type ErrorPageProps = {
+    className?: string
+    code: number
+} & (OtherError | TranslatedError)
+
 export function ErrorPage(props: ErrorPageProps) {
+    let t = useT(`pages/Errors/${(props as TranslatedError).t}` as any) as {
+        Title: string
+        Detail: string
+    }
+    let title = "title" in props ? props.title : t.Title
+    let detail = "detail" in props ? props.detail : t.Detail
+
     return (
         <div className="grid h-screen place-content-center px-4">
             <div className="text-center">
@@ -17,10 +31,10 @@ export function ErrorPage(props: ErrorPageProps) {
                 </h1>
 
                 <p className="text-2xl font-bold tracking-tight sm:text-4xl">
-                    {props.title}
+                    {title}
                 </p>
 
-                <p className="mt-4 text-subtle-extra-dark">{props.detail}</p>
+                <p className="mt-4 text-subtle-extra-dark">{detail}</p>
             </div>
         </div>
     )

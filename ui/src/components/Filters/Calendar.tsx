@@ -1,5 +1,5 @@
 import { Button } from "@/components/Button"
-import { useLocale, useT } from "@/i18n"
+import { useDateFnsLocale, useT } from "@/i18n"
 import { CaretDown, CaretLeft, CaretRight } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React, { startTransition, useCallback, useEffect, useState } from "react"
@@ -12,7 +12,7 @@ export interface CalendarProps {
 }
 
 export function Calendar({ className, ...props }: CalendarProps) {
-    let locale = useLocale()
+    let locale = useDateFnsLocale()
     let t = useT("components/Filters/Calendar")
     let [selected, setSelected] = useState<Date | undefined>(
         props.selected ?? new Date(),

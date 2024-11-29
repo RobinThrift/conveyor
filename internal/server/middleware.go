@@ -69,34 +69,43 @@ func setRequestIDMiddleware(next http.Handler) http.Handler {
 }
 
 // logRequestsMiddleware logs all incoming requests and will also add the logger to the context of next handler in the chain.
-func logRequestsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logFields := []any{slog.String("method", r.Method)}
-
-		wrapped := &statusResponseWriter{w, 200}
-
-		start := time.Now()
-		defer func() {
-			logFields = append(
-				logFields,
-				slog.Int("status", wrapped.statusCode),
-				slog.Float64("response_time_ms", float64(time.Since(start))/float64(time.Millisecond)),
-			)
-
-			var log = slog.InfoContext
-
-			if p := recover(); p != nil {
-				logFields = append(logFields, slog.Any("error", p))
-				log = slog.ErrorContext
-			} else if wrapped.statusCode >= 400 {
-				log = slog.ErrorContext
+func logRequestsMiddleware(skipFor []string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			for _, s := range skipFor {
+				if strings.HasPrefix(r.URL.Path, s) {
+					next.ServeHTTP(w, r)
+					return
+				}
 			}
 
-			log(r.Context(), r.URL.String(), logFields...)
-		}()
+			logFields := []any{slog.String("method", r.Method)}
 
-		next.ServeHTTP(wrapped, r)
-	})
+			wrapped := &statusResponseWriter{w, 200}
+
+			start := time.Now()
+			defer func() {
+				logFields = append(
+					logFields,
+					slog.Int("status", wrapped.statusCode),
+					slog.Float64("response_time_ms", float64(time.Since(start))/float64(time.Millisecond)),
+				)
+
+				var log = slog.InfoContext
+
+				if p := recover(); p != nil {
+					logFields = append(logFields, slog.Any("error", p))
+					log = slog.ErrorContext
+				} else if wrapped.statusCode >= 400 {
+					log = slog.ErrorContext
+				}
+
+				log(r.Context(), r.URL.String(), logFields...)
+			}()
+
+			next.ServeHTTP(wrapped, r)
+		})
+	}
 }
 
 type statusResponseWriter struct {
@@ -144,7 +153,7 @@ func (w gzipResponseWriter) Write(b []byte) (int, error) {
 
 func CompressWithGzipMiddleware(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") || r.Header.Get("upgrade") != "" {
 			next.ServeHTTP(w, r)
 			return
 		}

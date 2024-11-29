@@ -1,6 +1,7 @@
 import { Input } from "@/components/Input"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
+import { useT } from "@/i18n"
 import { Password } from "@phosphor-icons/react"
 import * as Form from "@radix-ui/react-form"
 import React from "react"
@@ -11,19 +12,21 @@ export interface ChangePasswordPageProps {
         form?: string
         current_password?: string
         new_password?: string
+        repeat_new_password?: string
     }
 }
 
 export function ChangePasswordPage(props: ChangePasswordPageProps) {
     let csrfToken = useCSRFToken()
     let baseURL = useBaseURL()
+    let t = useT("pages/LoginChangePassword")
 
     return (
         <div className="h-screen w-screen flex items-center justify-stretch md:justify-center bg-body bg-[radial-gradient(#d2d5da_1px,transparent_1px)] [background-size:16px_16px] lg:[mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)]">
             <div className="flex items-center justify-center flex-col w-full md:w-[400px]">
                 <div className="flex flex-col items-center justify-center">
                     <h3 className="text-xl mt-8 mb-3 font-semibold text-primary-extra-dark">
-                        Change Password
+                        {t.Title}
                     </h3>
                 </div>
                 <Form.Root
@@ -49,7 +52,7 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
                         <Input
                             type="password"
                             name="current_password"
-                            ariaLabel="Current Password"
+                            ariaLabel={t.CurrentPasswordLabel}
                             icon={<Password />}
                             serverInvalid={
                                 !!props.validationErrors?.current_password
@@ -58,7 +61,7 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
                             iconClassName="z-20"
                             messageClassName="mt-0"
                             autoComplete="current_password"
-                            placeholder="Current Password"
+                            placeholder={t.CurrentPasswordLabel}
                             required
                             autoFocus
                         />
@@ -66,7 +69,7 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
                         <Input
                             name="new_password"
                             type="password"
-                            ariaLabel="New Password"
+                            ariaLabel={t.NewPasswordLabel}
                             icon={<Password />}
                             serverInvalid={
                                 !!props.validationErrors?.new_password
@@ -74,21 +77,21 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
                             inputClassName="rounded-t-none !border-b-transparent hover:border-b-subtle-dark focus:border-b-subtle-dark focus:z-10 relative"
                             iconClassName="z-20"
                             autoComplete="new_password"
-                            placeholder="New Password"
+                            placeholder={t.NewPasswordLabel}
                             required
                         />
 
                         <Input
                             name="repeat_new_password"
                             type="password"
-                            ariaLabel="Repeat New Password"
+                            ariaLabel={t.RepeatNewPasswordLabel}
                             icon={<Password />}
                             serverInvalid={
-                                !!props.validationErrors?.new_password
+                                !!props.validationErrors?.repeat_new_password
                             }
                             inputClassName="rounded-t-none hover:border-b-subtle-dark focus:border-b-subtle-dark"
                             autoComplete="repeat_new_password"
-                            placeholder="Repeat New Password"
+                            placeholder={t.RepeatNewPasswordLabel}
                             required
                         />
 
@@ -105,7 +108,7 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
                                 key={v}
                                 className="mt-5 field-message animate-in slide-in-from-bottom fade-in-50 duration-300"
                             >
-                                {v}
+                                {t[v as keyof typeof t] ?? v}
                             </div>
                         ))}
                 </Form.Root>

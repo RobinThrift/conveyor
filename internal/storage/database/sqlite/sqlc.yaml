@@ -125,3 +125,8 @@ sql:
         go_type:
           type: "SQLiteDatetime"
           import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: settings.value
+        go_type:
+          type: "SQLiteJSON"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"

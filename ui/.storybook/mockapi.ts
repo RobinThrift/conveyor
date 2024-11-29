@@ -5,6 +5,7 @@ import type { Tag, TagList } from "../src/domain/Tag"
 import type { CreateMemoRequest, UpdateMemoRequest } from "../src/api/memos"
 import { sub, isSameDay, roundToNearestMinutes, isEqual, parse } from "date-fns"
 import { faker } from "@faker-js/faker"
+import type { UpdateSettingsRequest } from "../src/storage/remote/api/settings"
 
 interface MockData {
     memos: Memo[]
@@ -345,6 +346,18 @@ export const mockAPI: HttpHandler[] = [
             return new HttpResponse(attachment.data, {
                 headers: { "content-type": attachment.contentType },
             })
+        },
+    ),
+
+    http.patch<never, UpdateSettingsRequest>(
+        "/api/v1/settings",
+        async ({ request }) => {
+            await delay(500)
+            let body = await request.json()
+            Object.entries(body).forEach(([key, value]) => {
+                localStorage.setItem(`belt.settings.${key}`, value.toString())
+            })
+            return new HttpResponse(null, { status: 204 })
         },
     ),
 ]

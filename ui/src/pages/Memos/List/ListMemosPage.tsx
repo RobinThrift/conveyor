@@ -7,6 +7,7 @@ import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/Sheet"
 import type { Tag } from "@/domain/Tag"
 import { useIsMobile } from "@/hooks/useIsMobile"
+import { useSetting } from "@/storage/settings"
 import { Sliders } from "@phosphor-icons/react"
 import React, { useCallback, useEffect, useState } from "react"
 import { type Filter, useListMemosPageState } from "./state/memos"
@@ -19,6 +20,9 @@ export interface ListMemosPageProps {
 }
 
 export function ListMemosPage(props: ListMemosPageProps) {
+    let [doubleClickToEdit] = useSetting<boolean, "controls.doubleClickToEdit">(
+        "controls.doubleClickToEdit",
+    )
     let showEditor = props.showEditor ?? true
     let {
         memos,
@@ -92,7 +96,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                             onClickTag={onClickTag}
                             updateMemo={updateMemoContentCallback}
                             className="animate-in slide-in-from-bottom fade-in"
-                            doubleClickToEdit={true}
+                            doubleClickToEdit={doubleClickToEdit}
                         />
                     ))}
                     <EndOfListMarker onReached={onEOLReached} />

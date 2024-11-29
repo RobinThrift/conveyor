@@ -1,7 +1,7 @@
+import * as Form from "@/components/Form"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
 import { Belt, Password, User } from "@phosphor-icons/react"
-import * as Form from "@radix-ui/react-form"
 import React from "react"
 
 export interface LoginPageProps {

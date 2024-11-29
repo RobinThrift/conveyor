@@ -6,6 +6,7 @@ import (
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/control"
+	"github.com/RobinThrift/belt/internal/domain"
 	"github.com/RobinThrift/belt/internal/server"
 	"github.com/RobinThrift/belt/internal/server/session"
 	"github.com/RobinThrift/belt/ui"
@@ -13,8 +14,10 @@ import (
 )
 
 type router struct {
-	authCtrl *control.AuthController
-	config   Config
+	authCtrl     *control.AuthController
+	settingsCtrl *control.SettingsControl
+	accountCtrl  *control.AccountControl
+	config       Config
 }
 
 type Config struct {
@@ -24,8 +27,8 @@ type Config struct {
 	AttachmentsDir   string
 }
 
-func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthController) {
-	router := &router{authCtrl: authCtrl, config: config}
+func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthController, settingsCtrl *control.SettingsControl, accountCtrl *control.AccountControl) {
+	router := &router{authCtrl, settingsCtrl, accountCtrl, config}
 
 	csrfProtectionMiddleware := csrf.Protect(
 		config.CSRFSecret,
@@ -59,7 +62,10 @@ func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthControll
 	mux.Handle("POST /login", csrfProtectionMiddleware(router.handlerFuncWithErr(router.postLogin)))
 
 	mux.Handle("GET /auth/change_password", csrfProtectionMiddleware(router.handlerFuncWithErr((router.getChangePassword))))
-	mux.Handle("POST /auth/change_password", csrfProtectionMiddleware(router.handlerFuncWithErr(router.postChangePassord)))
+	mux.Handle("POST /auth/change_password", csrfProtectionMiddleware(router.handlerFuncWithErr(router.postChangePassword)))
+
+	mux.Handle("POST /settings/account/update_info", csrfProtectionMiddleware(router.ensureLoggedIn(router.handlerFuncWithErr(router.postAccountUpdateInfo))))
+	mux.Handle("POST /settings/account/change_password", csrfProtectionMiddleware(router.ensureLoggedIn(router.handlerFuncWithErr(router.postAccountChangePassword))))
 
 	mux.Handle("GET /logout", router.handlerFuncWithErr(router.getLogout))
 }
@@ -76,6 +82,21 @@ func (router *router) renderUI(w http.ResponseWriter, r *http.Request, data ui.P
 	data.BaseURL = router.config.BasePath
 	data.AssetURL = joinPath(router.config.BasePath, "/assets")
 	data.CSRFToken = csrf.Token(r)
+	data.ServerData.Settings = ui.NewSettings(&domain.DefaultSettings)
+
+	if account := auth.AccountFromCtx(r.Context()); account != nil {
+		data.ServerData.Account = &ui.Account{
+			Username:    account.Username,
+			DisplayName: account.DisplayName,
+		}
+
+		settings, err := router.settingsCtrl.Get(r.Context())
+		if err != nil {
+			return err
+		}
+
+		data.ServerData.Settings = ui.NewSettings(settings)
+	}
 
 	err := ui.Render(w, data)
 	if err != nil {
@@ -87,11 +108,12 @@ func (router *router) renderUI(w http.ResponseWriter, r *http.Request, data ui.P
 
 func (router *router) ensureLoggedIn(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, ok := session.Get[*auth.Account](r.Context(), "account")
+		account, ok := session.Get[*auth.Account](r.Context(), "account")
 		if !ok {
 			router.redirectTo(w, r, "login")
 			return
 		}
-		next.ServeHTTP(w, r)
+		ctx := auth.CtxWithAccount(r.Context(), account)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

@@ -38,6 +38,7 @@ type Querier interface {
 	GetLocalAuthAccountByUsername(ctx context.Context, db DBTX, username string) (LocalAuthAccount, error)
 	GetMemo(ctx context.Context, db DBTX, id domain.MemoID) (Memo, error)
 	GetSession(ctx context.Context, db DBTX, token string) (Session, error)
+	GetSettings(ctx context.Context, db DBTX, accountID int64) (Setting, error)
 	ListAttachments(ctx context.Context, db DBTX, arg ListAttachmentsParams) ([]Attachment, error)
 	ListAttachmentsForMemo(ctx context.Context, db DBTX, memoID int64) ([]Attachment, error)
 	ListMemos(ctx context.Context, db DBTX, arg ListMemosParams) ([]Memo, error)
@@ -52,6 +53,7 @@ type Querier interface {
 	UpdateAccount(ctx context.Context, db DBTX, arg UpdateAccountParams) error
 	UpdateMemoContent(ctx context.Context, db DBTX, arg UpdateMemoContentParams) (int64, error)
 	UpdateTagCount(ctx context.Context, db DBTX, tags []string) error
+	UpsertSetting(ctx context.Context, db DBTX, arg UpsertSettingParams) error
 }
 
 var _ Querier = (*Queries)(nil)

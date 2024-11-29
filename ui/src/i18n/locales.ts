@@ -1,11 +1,16 @@
 import { browser, localeFrom } from "@nanostores/i18n"
-import { persistentAtom } from "@nanostores/persistent"
+import { computed } from "nanostores"
+import { $lang, supportedLanguages } from "./langauges"
+import type { supportedRegions } from "./regions"
+import { $region } from "./regions"
 
-export const supportedLocales = ["en-gb"]
+export type Locale =
+    `${(typeof supportedLanguages)[number]}-${(typeof supportedRegions)[number]}`
 
-export const localeSettings = persistentAtom<string | undefined>("belt.locale")
-
-export const locale = localeFrom(
-    localeSettings,
-    browser({ available: supportedLocales, fallback: "en-gb" }),
+export const $locale = localeFrom(
+    computed(
+        [$lang, $region],
+        (lang = "en", region = "gb") => `${lang}-${region}`,
+    ),
+    browser({ available: supportedLanguages, fallback: "en-gb" }),
 )

@@ -1,21 +1,18 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { App, type AppProps } from "./App"
+import { App } from "./App"
 import "@/index.css"
+import { accountStore } from "@/storage/account"
+import { settingsStore } from "@/storage/settings"
+import { serverData } from "./App/ServerData"
 
-document.documentElement.classList.toggle(
-    "dark",
-    window.matchMedia("(prefers-color-scheme: dark)").matches,
-)
+settingsStore.init(serverData.settings)
 
-let globalData: AppProps = JSON.parse(
-    // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
-    document.getElementById("__belt_ui_data__")!.innerHTML,
-)
+accountStore.set(serverData.account)
 
 // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
 ReactDOM.createRoot(document.getElementById("__BELT_UI_ROOT__")!).render(
     <React.StrictMode>
-        <App {...globalData} />
+        <App {...serverData} />
     </React.StrictMode>,
 )

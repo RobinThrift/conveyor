@@ -3,10 +3,10 @@ import clsx from "clsx"
 import React, { useCallback } from "react"
 import { $router } from "../App/router"
 
-export function Link({
-    external = false,
-    ...props
-}: React.AnchorHTMLAttributes<any> & { href: string; external?: boolean }) {
+export const Link = React.forwardRef<
+    HTMLAnchorElement,
+    React.AnchorHTMLAttributes<any> & { href: string; external?: boolean }
+>(function Link({ external = false, ...props }, forwardedRef) {
     let baseURL = useBaseURL()
     let href = external ? baseURL + props.href : props.href
 
@@ -19,9 +19,14 @@ export function Link({
     )
 
     return (
-        <a {...props} href={href} onClick={!external ? onClick : undefined} />
+        <a
+            ref={forwardedRef}
+            {...props}
+            href={href}
+            onClick={!external ? onClick : undefined}
+        />
     )
-}
+})
 
 export interface LinkButtonProps extends React.AnchorHTMLAttributes<any> {
     iconLeft?: React.ReactNode

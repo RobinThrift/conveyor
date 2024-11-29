@@ -18,8 +18,8 @@ func New(c Config, mux *http.ServeMux, sm *scs.SessionManager) *http.Server {
 	mux.Handle("/health", http.HandlerFunc(healthEndpointHandler))
 	mux.Handle("/metrics", promhttp.Handler())
 
-	handler := sessionMiddleware(sm, []string{"/static"})(mux)
-	handler = logRequestsMiddleware(handler)
+	handler := sessionMiddleware(sm, []string{"/assets"})(mux)
+	handler = logRequestsMiddleware([]string{"/assets"})(handler)
 	handler = traceRequestMiddleware()(handler)
 	handler = setRequestIDMiddleware(handler)
 

@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "frontend/build",
+        "outDir": "build",
 
         "jsx": "react",
 

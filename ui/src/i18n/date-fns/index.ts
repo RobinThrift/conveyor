@@ -2,30 +2,31 @@ import { usePromise } from "@/hooks/usePromise"
 import { useStore } from "@nanostores/react"
 import { enGB as fallback } from "date-fns/locale"
 import type { Locale } from "date-fns/locale"
-import { locale } from "../locales"
-import { supportedLocales } from "../locales"
+import { $region, supportedRegions } from "../regions"
 
 const loadedLocales = new Map<string, Promise<Locale>>()
 
-const dateFnsLocales = import.meta.glob<boolean, string, { default: Locale }>(
-    "./*-*.ts",
-)
+const dateFnsLocales = import.meta.glob<
+    boolean,
+    (typeof supportedRegions)[number],
+    { default: Locale }
+>("./*.ts")
 
 export function useLocale(): Locale | undefined {
-    let code = useStore(locale)
+    let region = useStore($region) ?? "gb"
 
     let p = usePromise(() => {
-        if (!supportedLocales.includes(code)) {
+        if (!supportedRegions.includes(region)) {
             return Promise.resolve(fallback)
         }
 
-        let loaded = loadedLocales.get(code)
+        let loaded = loadedLocales.get(region)
         if (loaded) {
             return loaded
         }
 
-        let l = dateFnsLocales[`./${code}.ts`]().then((m) => m.default)
-        loadedLocales.set(code, l)
+        let l = dateFnsLocales[`./${region}.ts`]().then((m) => m.default)
+        loadedLocales.set(region, l)
         return l
     }, [])
 

@@ -1,4 +1,4 @@
-import { useFormat, useT } from "@/i18n"
+import { useDateFnsLocale, useFormat, useT } from "@/i18n"
 import { differenceInCalendarDays, formatDistance } from "date-fns"
 import React, { useMemo } from "react"
 
@@ -19,6 +19,7 @@ export interface DateTimeProps
 export const DateTime = React.forwardRef<HTMLTimeElement, DateTimeProps>(
     function DateTime({ relative, date, opts, ...intrinsics }, forwardedRef) {
         let t = useT("components/DateTime")
+        let locale = useDateFnsLocale()
         let { time } = useFormat()
 
         let formatted = useMemo(() => {
@@ -34,7 +35,10 @@ export const DateTime = React.forwardRef<HTMLTimeElement, DateTimeProps>(
                 let diff = differenceInCalendarDays(date, now)
                 if (Math.abs(diff) <= 3) {
                     return t.datetime({
-                        date: formatDistance(date, now, { addSuffix: true }),
+                        date: formatDistance(date, now, {
+                            addSuffix: true,
+                            locale,
+                        }),
                         time: time(date, { timeStyle: "short" }),
                     })
                 }
@@ -46,7 +50,7 @@ export const DateTime = React.forwardRef<HTMLTimeElement, DateTimeProps>(
                     error: (err as Error).message,
                 })
             }
-        }, [date, time, opts, relative, t.datetime, t.invalidTime])
+        }, [date, time, locale, opts, relative, t.datetime, t.invalidTime])
 
         return (
             <time

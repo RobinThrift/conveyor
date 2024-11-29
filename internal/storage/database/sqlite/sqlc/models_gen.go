@@ -70,6 +70,15 @@ type Session struct {
 	ExpiresAt types.SQLiteDatetime
 }
 
+type Setting struct {
+	ID        int64
+	AccountID int64
+	Key       string
+	Value     types.SQLiteJSON
+	CreatedAt string
+	UpdatedAt string
+}
+
 type Tag struct {
 	ID        int64
 	Tag       string

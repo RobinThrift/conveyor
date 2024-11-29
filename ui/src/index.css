@@ -8,6 +8,7 @@
 @import "./components/Select/Select.css" layer(components);
 @import "./components/Tooltip/Tooltip.css" layer(components);
 @import "./components/Image/Image.css" layer(components);
+@import "./pages/Settings/SettingsPage.css" layer(components);
 
 @layer base {
     :root {

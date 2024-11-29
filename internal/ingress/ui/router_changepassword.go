@@ -37,7 +37,7 @@ func (router *router) getChangePassword(w http.ResponseWriter, r *http.Request) 
 }
 
 // [POST] /login/change_password
-func (router *router) postChangePassord(w http.ResponseWriter, r *http.Request) error {
+func (router *router) postChangePassword(w http.ResponseWriter, r *http.Request) error {
 	redirectURL := router.getRedirectURL(r)
 
 	account, ok := session.Get[*auth.Account](r.Context(), accountForChangingPassword)
@@ -87,7 +87,7 @@ func (router *router) postChangePassord(w http.ResponseWriter, r *http.Request) 
 					Components: ui.ServerDataComponents{
 						LoginChangePasswordPage: ui.LoginChangePasswordPage{
 							RedirectURL:      redirectURL,
-							ValidationErrors: map[string]string{"form": err.Error()},
+							ValidationErrors: map[string]string{"current_password": "CurrentPasswordIncorrect"},
 						},
 					},
 				},
@@ -117,19 +117,23 @@ func validateChangePasswordForm(form url.Values) map[string]string {
 	repeateNewPassword := form.Get("repeat_new_password")
 
 	if currentPassword == "" {
-		return map[string]string{"current_password": "please enter current password"}
+		return map[string]string{"current_password": "EmptyCurrentPassword"}
 	}
 
 	if newPassword == "" {
-		return map[string]string{"new_password": "please enter a new password"}
+		return map[string]string{"new_password": "EmptyNewPassword"}
+	}
+
+	if repeateNewPassword == "" {
+		return map[string]string{"new_password": "EmptyRepeateNewPassword"}
 	}
 
 	if newPassword != repeateNewPassword {
-		return map[string]string{"repeat_new_password": "new passwords don't match"}
+		return map[string]string{"repeat_new_password": "NewPasswordsDoNotMatch"}
 	}
 
 	if newPassword == currentPassword {
-		return map[string]string{"new_password": "new passwords can't be old password"}
+		return map[string]string{"new_password": "NewPasswordIsOldPassword"}
 	}
 
 	return nil

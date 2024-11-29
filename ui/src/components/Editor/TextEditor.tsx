@@ -1,9 +1,11 @@
 import type { Tag } from "@/domain/Tag"
 import * as eventbus from "@/eventbus"
 import { useAttachmentUploader } from "@/hooks/api/attachments"
+import { settingsStore } from "@/storage/settings"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import { languages } from "@codemirror/language-data"
 import { SearchCursor } from "@codemirror/search"
+import { useStore } from "@nanostores/react"
 import { Vim, getCM, vim } from "@replit/codemirror-vim"
 import { hyperLink } from "@uiw/codemirror-extensions-hyper-link"
 import { quietlight } from "@uiw/codemirror-theme-quietlight"
@@ -47,15 +49,19 @@ export interface TextEditorProps {
 export function TextEditor(props: TextEditorProps) {
     useAttachmentUploader()
 
+    let enableVimKeybindings = useStore(settingsStore.$values, {
+        keys: ["controls", "controls.vim"],
+    }).controls.vim
+
     let extensions: Extension[] = useMemo(() => {
         return [
             fileDropHandler(),
-            vim(),
+            enableVimKeybindings ? vim() : [],
             markdown({ base: markdownLanguage, codeLanguages: languages }),
             hyperLink,
             tagsAutoComplete(props.tags),
         ]
-    }, [props.tags])
+    }, [props.tags, enableVimKeybindings])
 
     useEffect(() => {
         return eventbus.on(`vim:write:${props.id}`, props.onSave)

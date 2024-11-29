@@ -15,16 +15,14 @@ type Story = StoryObj<typeof ErrorPage>
 export const NotFound: Story = {
     args: {
         code: 404,
-        title: "Not Found",
-        detail: "The requested page was not found.",
+        t: "NotFound",
     },
 }
 
 export const Unauthorized: Story = {
     args: {
         code: 401,
-        title: "Unauthorized",
-        detail: "You are not authorized to see this page.",
+        t: "Unauthorized",
     },
 }
 
