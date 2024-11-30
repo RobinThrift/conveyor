@@ -111,6 +111,15 @@ func run(ctx context.Context, args []string) error {
 				Arch: map[string]string{"arm64": "aarch64", "amd64": "x86_64"},
 				Test: []string{"--version"},
 			},
+
+			{
+				Name: "vacuum",
+				Src: recipes.Source{
+					Type:        recipes.SourceTypeGoInstall,
+					URLTemplate: "github.com/daveshanley/vacuum",
+				},
+				Test: []string{"version"},
+			},
 		},
 	}
 

@@ -12,3 +12,5 @@ goose: go://github.com/pressly/goose@3.22.1
 # Changelog
 git-cliff: github-releases://orhun/git-cliff@2.6.1
 
+# Other Linters
+vacuum: go://github.com/daveshanley/vacuum@0.14.3

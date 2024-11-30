@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
   title: Belt API
   description: This is the Belt REST-ish API.
@@ -7,6 +7,12 @@ servers:
 - url: http://localhost:8080/api/v1
   description: Local development server.
 
+tags:
+- name: Memos
+- name: Tags
+- name: Settings
+- name: Attachments
+
 paths:
   /memos:
     get:
@@ -14,53 +20,70 @@ paths:
       - name: page[size]
         in: query
         required: true
+        description: Number of Memos returned per page.
         schema:
           type: integer
           minimum: 0
-          default: 10
+          default: 25
+          example: 25
           x-go-type: uint64
       - name: page[after]
         in: query
         required: false
+        description: Marker from which to start the requested page of Memos from.
         schema:
           type: string
           format: "date-time"
+          example: "2024-11-28T00:20:00+01:00"
       - name: filter[content]
         in: query
         required: false
+        description: Full text search Memo content.
         schema:
           type: string
+          example: "FTS copabilties with wild*cards"
       - name: filter[tag]
         in: query
         required: false
+        description: Filter Memos by Tag.
         schema:
           type: string
+          example: "go"
       - name: filter[created_at]
         in: query
         required: false
+        description: Filter Memos by creation date (not time)
         schema:
           type: string
           format: date
+          example: "2024-03-05"
       - name: op[created_at]
         in: query
         required: false
+        description: Used in conjuction with the `filter[created_at]` parameter to specify the operand to use to compare the creation date.
         schema:
           type: string
           enum: ["=", "<="]
+          example: "="
       - name: filter[is_archived]
         in: query
         required: false
+        description: Filter by the archival status of the Memo.
         schema:
           type: boolean
           default: false
       - name: filter[is_deleted]
         in: query
         required: false
+        description: Filter Memos by the deletion status.
         schema:
           type: boolean
           default: false
 
       operationId: ListMemos
+      tags: [Memos]
+      summary: List Memos paginated and filtered
+      description: Retrieve a paginated list of Memos, optionally contstrained by the provided filters.
 
       responses:
         "200":
@@ -69,9 +92,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MemoList"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
 
     post:
       operationId: CreateMemo
+      tags: [Memos]
+      summary: Create a new Memo
+      description: Create a new Memo with content and an optional `createdAt` date, useful for importing.
 
       requestBody:
         $ref: "#/components/requestBodies/CreateMemoRequest"
@@ -83,62 +117,53 @@ paths:
               schema:
                 $ref: "#/components/schemas/Memo"
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorBadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorOther"
 
   /memos/{id}:
     parameters:
     - name: id
       in: path
       required: true
+      description: Memo ID
       schema:
         type: number
+        example: 987654
         x-go-type: int64
 
     get:
       operationId: GetMemo
+      tags: [Memos]
+      summary: Get a Memo
+      description: Retrieve a single Memo and it's content.
 
       responses:
         "200":
+          description: The requested Memo
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Memo"
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorBadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorOther"
 
 
     patch:
       operationId: UpdateMemo
+      tags: [Memos]
+      summary: Update Memo
+      description: Update a Memo's content, archival or deletion status.
 
       requestBody:
         $ref: "#/components/requestBodies/UpdateMemoRequest"
@@ -147,53 +172,32 @@ paths:
           description: The memo was updated successfully.
           content: {}
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorBadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorUnauthorized"
         "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorNotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorOther"
 
     delete:
       operationId: DeleteMemo
+      tags: [Memos]
+      summary: Delete Memo
+      description: Delete the Memo with the provided ID. This operation is idempotent, so calls no non-existing Memos will not fail.
 
       responses:
         "204":
           description: The memo was deleted successfully.
           content: {}
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorBadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorOther"
 
   /tags:
     get:
@@ -201,23 +205,32 @@ paths:
       - name: page[size]
         in: query
         required: true
+        description: Number of Tags returned per page.
         schema:
           type: integer
           minimum: 0
           default: 100
+          example: 110
           x-go-type: uint64
       - name: page[after]
         in: query
         required: false
+        description: Marker from which to start the requested page of Tags from.
         schema:
           type: string
+          example: tag-a
       - name: filter[prefix]
         in: query
         required: false
+        description: Prefix filter.
         schema:
           type: string
+          example: tag-a
 
       operationId: ListTags
+      tags: [Tags]
+      summary: List Tags
+      description: Retrieve a paginated list of Tags, optionally constrained by a prefix filter.
 
       responses:
         "200":
@@ -227,22 +240,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/TagList"
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorBadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorOther"
 
   /attachments:
     get:
@@ -250,18 +254,25 @@ paths:
       - name: page[size]
         in: query
         required: true
+        description: Number of Attachments returned per page.
         schema:
           type: integer
           minimum: 0
           default: 100
+          example: 50
           x-go-type: uint64
       - name: page[after]
+        description: Marker from which to start the requested page of Attachments from.
         in: query
         required: false
         schema:
           type: string
+          example: "a/b/c/doc.pdf"
 
       operationId: ListAttachments
+      tags: [Attachments]
+      summary: List Attachments paginated
+      description: Retrieve a paginated list of Attachments.
 
       responses:
         "200":
@@ -271,37 +282,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/AttachmentList"
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorBadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
+          $ref: "#/components/responses/ErrorOther"
 
     post:
       operationId: CreateAttachment
+      tags: [Attachments]
+      summary: Upload an attachment
+      description: Upload a Memo Attachment's raw data and provide a filename.
 
       parameters:
       - in: header
         name: "X-Filename"
+        description: Filename associated with the attachment.
         schema:
           type: string
+          example: image.png
         required: true
       - in: header
         name: "Content-Encoding"
+        description: Encoding of the uploaded data.
         schema:
           type: string
+          example: gzip
 
       requestBody:
         $ref: "#/components/requestBodies/CreateAttachmentRequest"
@@ -313,58 +321,49 @@ paths:
               schema:
                 $ref: "#/components/schemas/Attachment"
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorBadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorOther"
 
   /attachments/{filename}:
     parameters:
     - name: filename
       in: path
       required: true
+      description: Filepath of the attachment
       schema:
         type: string
+        example: a/b/c/image.png
 
     delete:
       operationId: DeleteAttachment
+      tags: [Attachments]
+      summary: Delete an attachment
+      description: Delete an attachment, regardless of wheither it's stil being used.
+
       responses:
         "204":
           description: The attachment was deleted succesfully.
           content: {}
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorBadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+          $ref: "#/components/responses/ErrorOther"
 
   /settings:
     get:
       operationId: GetSettings
+      tags: [Settings]
+      summary: Get account's settings
+      description: Retrieve all of the current account's settings.
 
       responses:
         "200":
@@ -384,11 +383,15 @@ paths:
 
     patch:
       operationId: UpdateSettings
+      tags: [Settings]
+      summary: Update account's settings
+      description: Update some or all of the current account's settings.
 
       requestBody:
         $ref: "#/components/requestBodies/UpdateSettingsRequest"
       responses:
         "204":
+          description: The settings were updated successfully.
           content: {}
         "400":
           $ref: "#/components/responses/ErrorBadRequest"
@@ -402,92 +405,160 @@ paths:
 components:
   schemas:
     Memo:
+      description: Memos contain Markdown content that you want to keep for later.
       type: object
       properties:
           id:
             type: string
-          name:
-            type: string
+            example: "123456"
           content:
             type: string
+            example: |-
+              # Title
+              Content of the Memo
+              #tag-a #tag-b
           isArchived:
             type: boolean
+            example: false
           isDeleted:
             type: boolean
+            example: false
           createdBy:
             type: string
+            example: "65541"
           createdAt:
             type: string
             format: date-time
+            example: "2024-11-29T13:22:00.000Z"
           updatedAt:
             type: string
             format: date-time
+            example: "2024-11-29T13:22:00.000Z"
       required:
       - id
-      - name
       - content
       - isArchived
       - isDeleted
       - createdBy
       - createdAt
       - updatedAt
+      example:
+        id: "123456"
+        content: |-
+            # Title
+            Content of the Memo
+            #tag-a #tag-b
+        isArchived: false
+        isDeleted: false
+        createdBy: "65541"
+        createdAt: "2024-11-29T13:22:00.000Z"
+        updatedAt: "2024-11-29T13:22:00.000Z"
 
     MemoList:
       type: object
+      description: A paginated list of Memos. The `next` property should be used to fetch the next page.
       properties:
           items:
             type: array
             items:
               $ref: "#/components/schemas/Memo"
+            example:
+              - id: "123545"
+                content: |-
+                  # Title
+                  Content of the Memo
+                  #tag-a #tag-b
+                isArchived: false
+                isDeleted: false
+                createdBy:  "65541"
+                createdAt: "2024-11-29T13:22:00.000Z"
+                updatedAt: "2024-11-29T13:22:00.000Z"
           next:
             type: string
             format: "date-time"
+            example: "2024-11-29T13:22:00.000Z"
       required:
       - items
-
+      example:
+        items:
+          - content: |-
+              # Title
+              Content of the Memo
+              #tag-a #tag-b
+            id: "123545"
+            isArchived: false
+            isDeleted: false
+            createdBy:  "65541"
+            createdAt: "2024-11-29T13:22:00.000Z"
+            updatedAt: "2024-11-29T13:22:00.000Z"
+        next: "2024-11-29T13:22:00.000Z"
 
     Tag:
       type: object
+      description: A single Tag that can be associated with many Memos.
       properties:
           tag:
             type: string
+            example: tag-a
           count:
             type: number
+            example: 10
       required:
       - tag
       - count
+      example:
+        tag: tag-a
+        count: 10
 
     TagList:
       type: object
+      description: A paginated list of Tags.
       properties:
           items:
             type: array
             items:
               $ref: "#/components/schemas/Tag"
+            example:
+            - tag: tag-a
+              count: 10
           next:
             type: string
+            example: "a/b/c/d/image.png"
       required:
       - items
+      example:
+        items:
+        - tag: tag-a
+          count: 10
+        next: "a/b/c/d/image.png"
 
     Attachment:
       type: object
+      description: A file that can be referenced by a Memo.
       properties:
           url:
             type: string
+            example: "/a/b/c/d/image.png"
           originalFilename:
             type: string
+            example: "image.png"
           contentType:
             type: string
+            example: "image/png"
           sizeBytes:
             type: number
+            example: 50
             x-go-type: int64
           sha256:
             type: string
+            example: a989d98398
           createdBy:
             type: string
+            example: "12345"
           createdAt:
             type: string
             format: date-time
+            example: "2024-11-29T13:22:00.000Z"
       required:
       - url
       - originalFilename
@@ -496,34 +567,69 @@ components:
       - sha256
       - createdBy
       - createdAt
+      example:
+        url: /a/b/c/d/image.png
+        originalFilename: image.png
+        contentType: image/png
+        sha256: a989d98398
+        sizeBytes: 50
+        createdBy: "12345"
+        createdAt: "2024-11-29T13:22:00.000Z"
 
     AttachmentList:
       type: object
+      description: A paginated list of Attachments.
       properties:
           items:
             type: array
             items:
               $ref: "#/components/schemas/Attachment"
+            example:
+            - url: /a/b/c/d/image.png
+              originalFilename: image.png
+              contentType: image/png
+              sha256: a989d98398
+              sizeBytes: 50
+              createdBy: "12345"
+              createdAt: "2024-11-29T13:22:00.000Z"
           next:
             type: string
+            example: "a/b/c/doc.pdf"
       required:
       - items
+      example:
+        items:
+        - url: /a/b/c/d/image.png
+          originalFilename: image.png
+          contentType: image/png
+          sha256: a989d98398
+          sizeBytes: 50
+          createdBy: "12345"
+          createdAt: "2024-11-29T13:22:00.000Z"
+        next: "a/b/c/doc.pdf"
 
     Settings:
       type: object
+      description: Account specific application settings.
       properties:
         locale.language:
           type: string
+          example: "en"
         locale.region:
           type: string
+          example: "gb"
         theme.colourScheme:
           type: string
+          example: "default"
         theme.mode:
           type: string
+          example: "auto"
         controls.vim:
           type: boolean
+          example: true
         controls.doubleClickToEdit:
           type: boolean
+          example: true
       required:
       - "locale.language"
       - "locale.region"
@@ -531,6 +637,13 @@ components:
       - "theme.mode"
       - "controls.vim"
       - "controls.doubleClickToEdit"
+      example:
+        controls.doubleClickToEdit: true
+        controls.vim: true
+        locale.language: en
+        locale.region: gb
+        theme.colourScheme: default
+        theme.mode: auto
 
     Error:
       type: object
@@ -538,21 +651,30 @@ components:
       properties:
         code:
           type: integer
+          example: 500
         type:
           type: string
+          example: "belt/api/v1/InternalServerError"
         title:
           type: string
+          example: "InternalServerError"
         detail:
           type: string
+          example: "unknown error"
       required:
       - code
       - type
       - title
       - detail
-
+      example:
+        code: 500
+        detail: unknown error
+        title: InternalServerError
+        type: belt/api/v1/InternalServerError
 
   requestBodies:
     CreateMemoRequest:
+      description: Create a new Memo with the content provided. If the `createdAt` property is not set, the current date/time will be used.
       required: true
       content:
         application/json:
@@ -561,13 +683,22 @@ components:
             properties:
               content:
                 type: string
+                example: |-
+                  # Title
+                  Content of the Memo
+                  #tag-a #tag-b
               createdAt:
                 type: string
                 format: date-time
+                example: "2024-11-29T13:32:25Z"
             required:
             - content
+            example:
+              content: Slg
+              createdAt: "2024-11-29T13:32:25Z"
 
     UpdateMemoRequest:
+      description: Update Memo content, archival or deletion status.
       required: true
       content:
         application/json:
@@ -576,22 +707,28 @@ components:
             properties:
               content:
                 type: string
+                example: "Updated content"
                 x-go-skip-optional-pointer: true
               isArchived:
                 type: boolean
               isDeleted:
                 type: boolean
+            example:
+              content: "Updated content"
 
     CreateAttachmentRequest:
       required: true
+      description: The attachment's raw data.
       content:
         application/octet-stream:
           schema:
             type: string
             format: binary
+            example: "0x5"
 
     UpdateSettingsRequest:
       required: true
+      description: Update individual settings value.
       content:
         application/json:
           schema:
@@ -599,16 +736,27 @@ components:
             properties:
               locale.language:
                 type: string
+                example: "de"
               locale.region:
                 type: string
+                example: "de"
               theme.colourScheme:
                 type: string
+                example: "default"
               theme.mode:
                 type: string
+                example: "dark"
               controls.vim:
                 type: boolean
               controls.doubleClickToEdit:
                 type: boolean
+            example:
+              controls.doubleClickToEdit: true
+              controls.vim: true
+              locale.language: de
+              locale.region: de
+              theme.colourScheme: default
+              theme.mode: dark
 
   responses:
     ErrorBadRequest:
@@ -617,18 +765,33 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
+          example:
+            code: 400
+            detail: Invalid request body
+            title: Bad Request
+            type: belt/api/v1/BadRequest
     ErrorUnauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
+          example:
+            code: 401
+            detail: You lack the required permissions to perform this action
+            title: Unauthorized
+            type: belt/api/v1/Unauthorized
     ErrorNotFound:
       description: Not Found
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
+          example:
+            code: 404
+            detail: The requested page could not be found
+            title: Not Found
+            type: belt/api/v1/NotFound
     ErrorOther:
       description: Other errors
       content:

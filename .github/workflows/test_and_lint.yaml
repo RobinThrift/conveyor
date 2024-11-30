@@ -34,6 +34,7 @@ jobs:
         check_name: "Lint Results"
         files: |
           lint.junit.xml
+          apiv1.junit.xml
 
   Test:
     runs-on: ubuntu-latest

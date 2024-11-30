@@ -14,4 +14,8 @@ export const APIDocs: Story = {
     args: {
         url: "/src/api/apiv1.openapi3.yaml",
     },
+
+    parameters: {
+        layout: "fullscreen",
+    },
 }

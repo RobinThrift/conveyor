@@ -25,7 +25,7 @@ const (
 	LessThanEqual ListMemosParamsOpCreatedAt = "<="
 )
 
-// Attachment defines model for Attachment.
+// Attachment A file that can be referenced by a Memo.
 type Attachment struct {
 	ContentType      string    `json:"contentType"`
 	CreatedAt        time.Time `json:"createdAt"`
@@ -36,7 +36,7 @@ type Attachment struct {
 	Url              string    `json:"url"`
 }
 
-// AttachmentList defines model for AttachmentList.
+// AttachmentList A paginated list of Attachments.
 type AttachmentList struct {
 	Items []Attachment `json:"items"`
 	Next  *string      `json:"next,omitempty"`
@@ -50,7 +50,7 @@ type Error struct {
 	Type   string `json:"type"`
 }
 
-// Memo defines model for Memo.
+// Memo Memos contain Markdown content that you want to keep for later.
 type Memo struct {
 	Content    string    `json:"content"`
 	CreatedAt  time.Time `json:"createdAt"`
@@ -58,17 +58,16 @@ type Memo struct {
 	Id         string    `json:"id"`
 	IsArchived bool      `json:"isArchived"`
 	IsDeleted  bool      `json:"isDeleted"`
-	Name       string    `json:"name"`
 	UpdatedAt  time.Time `json:"updatedAt"`
 }
 
-// MemoList defines model for MemoList.
+// MemoList A paginated list of Memos. The `next` property should be used to fetch the next page.
 type MemoList struct {
 	Items []Memo     `json:"items"`
 	Next  *time.Time `json:"next,omitempty"`
 }
 
-// Settings defines model for Settings.
+// Settings Account specific application settings.
 type Settings struct {
 	ControlsDoubleClickToEdit bool   `json:"controls.doubleClickToEdit"`
 	ControlsVim               bool   `json:"controls.vim"`
@@ -78,13 +77,13 @@ type Settings struct {
 	ThemeMode                 string `json:"theme.mode"`
 }
 
-// Tag defines model for Tag.
+// Tag A single Tag that can be associated with many Memos.
 type Tag struct {
 	Count float32 `json:"count"`
 	Tag   string  `json:"tag"`
 }
 
-// TagList defines model for TagList.
+// TagList A paginated list of Tags.
 type TagList struct {
 	Items []Tag   `json:"items"`
 	Next  *string `json:"next,omitempty"`
@@ -127,26 +126,47 @@ type UpdateSettingsRequest struct {
 
 // ListAttachmentsParams defines parameters for ListAttachments.
 type ListAttachmentsParams struct {
-	PageSize  uint64  `form:"page[size]" json:"page[size]"`
+	// PageSize Number of Attachments returned per page.
+	PageSize uint64 `form:"page[size]" json:"page[size]"`
+
+	// PageAfter Marker from which to start the requested page of Attachments from.
 	PageAfter *string `form:"page[after],omitempty" json:"page[after],omitempty"`
 }
 
 // CreateAttachmentParams defines parameters for CreateAttachment.
 type CreateAttachmentParams struct {
-	XFilename       string  `json:"X-Filename"`
+	// XFilename Filename associated with the attachment.
+	XFilename string `json:"X-Filename"`
+
+	// ContentEncoding Encoding of the uploaded data.
 	ContentEncoding *string `json:"Content-Encoding,omitempty"`
 }
 
 // ListMemosParams defines parameters for ListMemos.
 type ListMemosParams struct {
-	PageSize         uint64                      `form:"page[size]" json:"page[size]"`
-	PageAfter        *time.Time                  `form:"page[after],omitempty" json:"page[after],omitempty"`
-	FilterContent    *string                     `form:"filter[content],omitempty" json:"filter[content],omitempty"`
-	FilterTag        *string                     `form:"filter[tag],omitempty" json:"filter[tag],omitempty"`
-	FilterCreatedAt  *openapi_types.Date         `form:"filter[created_at],omitempty" json:"filter[created_at],omitempty"`
-	OpCreatedAt      *ListMemosParamsOpCreatedAt `form:"op[created_at],omitempty" json:"op[created_at],omitempty"`
-	FilterIsArchived *bool                       `form:"filter[is_archived],omitempty" json:"filter[is_archived],omitempty"`
-	FilterIsDeleted  *bool                       `form:"filter[is_deleted],omitempty" json:"filter[is_deleted],omitempty"`
+	// PageSize Number of Memos returned per page.
+	PageSize uint64 `form:"page[size]" json:"page[size]"`
+
+	// PageAfter Marker from which to start the requested page of Memos from.
+	PageAfter *time.Time `form:"page[after],omitempty" json:"page[after],omitempty"`
+
+	// FilterContent Full text search Memo content.
+	FilterContent *string `form:"filter[content],omitempty" json:"filter[content],omitempty"`
+
+	// FilterTag Filter Memos by Tag.
+	FilterTag *string `form:"filter[tag],omitempty" json:"filter[tag],omitempty"`
+
+	// FilterCreatedAt Filter Memos by creation date (not time)
+	FilterCreatedAt *openapi_types.Date `form:"filter[created_at],omitempty" json:"filter[created_at],omitempty"`
+
+	// OpCreatedAt Used in conjuction with the `filter[created_at]` parameter to specify the operand to use to compare the creation date.
+	OpCreatedAt *ListMemosParamsOpCreatedAt `form:"op[created_at],omitempty" json:"op[created_at],omitempty"`
+
+	// FilterIsArchived Filter by the archival status of the Memo.
+	FilterIsArchived *bool `form:"filter[is_archived],omitempty" json:"filter[is_archived],omitempty"`
+
+	// FilterIsDeleted Filter Memos by the deletion status.
+	FilterIsDeleted *bool `form:"filter[is_deleted],omitempty" json:"filter[is_deleted],omitempty"`
 }
 
 // ListMemosParamsOpCreatedAt defines parameters for ListMemos.
@@ -177,8 +197,13 @@ type UpdateSettingsJSONBody struct {
 
 // ListTagsParams defines parameters for ListTags.
 type ListTagsParams struct {
-	PageSize     uint64  `form:"page[size]" json:"page[size]"`
-	PageAfter    *string `form:"page[after],omitempty" json:"page[after],omitempty"`
+	// PageSize Number of Tags returned per page.
+	PageSize uint64 `form:"page[size]" json:"page[size]"`
+
+	// PageAfter Marker from which to start the requested page of Tags from.
+	PageAfter *string `form:"page[after],omitempty" json:"page[after],omitempty"`
+
+	// FilterPrefix Prefix filter.
 	FilterPrefix *string `form:"filter[prefix],omitempty" json:"filter[prefix],omitempty"`
 }
 
@@ -193,37 +218,37 @@ type UpdateSettingsJSONRequestBody UpdateSettingsJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-
+	// List Attachments paginated
 	// (GET /attachments)
 	ListAttachments(w http.ResponseWriter, r *http.Request, params ListAttachmentsParams)
-
+	// Upload an attachment
 	// (POST /attachments)
 	CreateAttachment(w http.ResponseWriter, r *http.Request, params CreateAttachmentParams)
-
+	// Delete an attachment
 	// (DELETE /attachments/{filename})
 	DeleteAttachment(w http.ResponseWriter, r *http.Request, filename string)
-
+	// List Memos paginated and filtered
 	// (GET /memos)
 	ListMemos(w http.ResponseWriter, r *http.Request, params ListMemosParams)
-
+	// Create a new Memo
 	// (POST /memos)
 	CreateMemo(w http.ResponseWriter, r *http.Request)
-
+	// Delete Memo
 	// (DELETE /memos/{id})
 	DeleteMemo(w http.ResponseWriter, r *http.Request, id int64)
-
+	// Get a Memo
 	// (GET /memos/{id})
 	GetMemo(w http.ResponseWriter, r *http.Request, id int64)
-
+	// Update Memo
 	// (PATCH /memos/{id})
 	UpdateMemo(w http.ResponseWriter, r *http.Request, id int64)
-
+	// Get account's settings
 	// (GET /settings)
 	GetSettings(w http.ResponseWriter, r *http.Request)
-
+	// Update account's settings
 	// (PATCH /settings)
 	UpdateSettings(w http.ResponseWriter, r *http.Request)
-
+	// List Tags
 	// (GET /tags)
 	ListTags(w http.ResponseWriter, r *http.Request, params ListTagsParams)
 }
@@ -784,7 +809,7 @@ func (response ListAttachments200JSONResponse) VisitListAttachmentsResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListAttachments400JSONResponse Error
+type ListAttachments400JSONResponse struct{ ErrorBadRequestJSONResponse }
 
 func (response ListAttachments400JSONResponse) VisitListAttachmentsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -793,11 +818,20 @@ func (response ListAttachments400JSONResponse) VisitListAttachmentsResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListAttachments401JSONResponse Error
+type ListAttachments401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
 
 func (response ListAttachments401JSONResponse) VisitListAttachmentsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAttachments404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response ListAttachments404JSONResponse) VisitListAttachmentsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -832,7 +866,7 @@ func (response CreateAttachment201JSONResponse) VisitCreateAttachmentResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateAttachment400JSONResponse Error
+type CreateAttachment400JSONResponse struct{ ErrorBadRequestJSONResponse }
 
 func (response CreateAttachment400JSONResponse) VisitCreateAttachmentResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -841,11 +875,20 @@ func (response CreateAttachment400JSONResponse) VisitCreateAttachmentResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateAttachment401JSONResponse Error
+type CreateAttachment401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
 
 func (response CreateAttachment401JSONResponse) VisitCreateAttachmentResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateAttachment404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response CreateAttachment404JSONResponse) VisitCreateAttachmentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -878,7 +921,7 @@ func (response DeleteAttachment204Response) VisitDeleteAttachmentResponse(w http
 	return nil
 }
 
-type DeleteAttachment400JSONResponse Error
+type DeleteAttachment400JSONResponse struct{ ErrorBadRequestJSONResponse }
 
 func (response DeleteAttachment400JSONResponse) VisitDeleteAttachmentResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -887,11 +930,20 @@ func (response DeleteAttachment400JSONResponse) VisitDeleteAttachmentResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteAttachment401JSONResponse Error
+type DeleteAttachment401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
 
 func (response DeleteAttachment401JSONResponse) VisitDeleteAttachmentResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteAttachment404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response DeleteAttachment404JSONResponse) VisitDeleteAttachmentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -925,6 +977,45 @@ func (response ListMemos200JSONResponse) VisitListMemosResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
+type ListMemos400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response ListMemos400JSONResponse) VisitListMemosResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListMemos401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response ListMemos401JSONResponse) VisitListMemosResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListMemos404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response ListMemos404JSONResponse) VisitListMemosResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListMemosdefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response ListMemosdefaultJSONResponse) VisitListMemosResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type CreateMemoRequestObject struct {
 	Body *CreateMemoJSONRequestBody
 }
@@ -942,7 +1033,7 @@ func (response CreateMemo201JSONResponse) VisitCreateMemoResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateMemo400JSONResponse Error
+type CreateMemo400JSONResponse struct{ ErrorBadRequestJSONResponse }
 
 func (response CreateMemo400JSONResponse) VisitCreateMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -951,11 +1042,20 @@ func (response CreateMemo400JSONResponse) VisitCreateMemoResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateMemo401JSONResponse Error
+type CreateMemo401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
 
 func (response CreateMemo401JSONResponse) VisitCreateMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateMemo404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response CreateMemo404JSONResponse) VisitCreateMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -988,7 +1088,7 @@ func (response DeleteMemo204Response) VisitDeleteMemoResponse(w http.ResponseWri
 	return nil
 }
 
-type DeleteMemo400JSONResponse Error
+type DeleteMemo400JSONResponse struct{ ErrorBadRequestJSONResponse }
 
 func (response DeleteMemo400JSONResponse) VisitDeleteMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -997,11 +1097,20 @@ func (response DeleteMemo400JSONResponse) VisitDeleteMemoResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteMemo401JSONResponse Error
+type DeleteMemo401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
 
 func (response DeleteMemo401JSONResponse) VisitDeleteMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteMemo404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response DeleteMemo404JSONResponse) VisitDeleteMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -1035,7 +1144,7 @@ func (response GetMemo200JSONResponse) VisitGetMemoResponse(w http.ResponseWrite
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetMemo400JSONResponse Error
+type GetMemo400JSONResponse struct{ ErrorBadRequestJSONResponse }
 
 func (response GetMemo400JSONResponse) VisitGetMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -1044,11 +1153,20 @@ func (response GetMemo400JSONResponse) VisitGetMemoResponse(w http.ResponseWrite
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetMemo401JSONResponse Error
+type GetMemo401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
 
 func (response GetMemo401JSONResponse) VisitGetMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetMemo404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response GetMemo404JSONResponse) VisitGetMemoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -1082,7 +1200,7 @@ func (response UpdateMemo204Response) VisitUpdateMemoResponse(w http.ResponseWri
 	return nil
 }
 
-type UpdateMemo400JSONResponse Error
+type UpdateMemo400JSONResponse struct{ ErrorBadRequestJSONResponse }
 
 func (response UpdateMemo400JSONResponse) VisitUpdateMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -1091,7 +1209,7 @@ func (response UpdateMemo400JSONResponse) VisitUpdateMemoResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateMemo401JSONResponse Error
+type UpdateMemo401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
 
 func (response UpdateMemo401JSONResponse) VisitUpdateMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -1100,7 +1218,7 @@ func (response UpdateMemo401JSONResponse) VisitUpdateMemoResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateMemo404JSONResponse Error
+type UpdateMemo404JSONResponse struct{ ErrorNotFoundJSONResponse }
 
 func (response UpdateMemo404JSONResponse) VisitUpdateMemoResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -1248,7 +1366,7 @@ func (response ListTags200JSONResponse) VisitListTagsResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListTags400JSONResponse Error
+type ListTags400JSONResponse struct{ ErrorBadRequestJSONResponse }
 
 func (response ListTags400JSONResponse) VisitListTagsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -1257,11 +1375,20 @@ func (response ListTags400JSONResponse) VisitListTagsResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListTags401JSONResponse Error
+type ListTags401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
 
 func (response ListTags401JSONResponse) VisitListTagsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListTags404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response ListTags404JSONResponse) VisitListTagsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -1280,37 +1407,37 @@ func (response ListTagsdefaultJSONResponse) VisitListTagsResponse(w http.Respons
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-
+	// List Attachments paginated
 	// (GET /attachments)
 	ListAttachments(ctx context.Context, request ListAttachmentsRequestObject) (ListAttachmentsResponseObject, error)
-
+	// Upload an attachment
 	// (POST /attachments)
 	CreateAttachment(ctx context.Context, request CreateAttachmentRequestObject) (CreateAttachmentResponseObject, error)
-
+	// Delete an attachment
 	// (DELETE /attachments/{filename})
 	DeleteAttachment(ctx context.Context, request DeleteAttachmentRequestObject) (DeleteAttachmentResponseObject, error)
-
+	// List Memos paginated and filtered
 	// (GET /memos)
 	ListMemos(ctx context.Context, request ListMemosRequestObject) (ListMemosResponseObject, error)
-
+	// Create a new Memo
 	// (POST /memos)
 	CreateMemo(ctx context.Context, request CreateMemoRequestObject) (CreateMemoResponseObject, error)
-
+	// Delete Memo
 	// (DELETE /memos/{id})
 	DeleteMemo(ctx context.Context, request DeleteMemoRequestObject) (DeleteMemoResponseObject, error)
-
+	// Get a Memo
 	// (GET /memos/{id})
 	GetMemo(ctx context.Context, request GetMemoRequestObject) (GetMemoResponseObject, error)
-
+	// Update Memo
 	// (PATCH /memos/{id})
 	UpdateMemo(ctx context.Context, request UpdateMemoRequestObject) (UpdateMemoResponseObject, error)
-
+	// Get account's settings
 	// (GET /settings)
 	GetSettings(ctx context.Context, request GetSettingsRequestObject) (GetSettingsResponseObject, error)
-
+	// Update account's settings
 	// (PATCH /settings)
 	UpdateSettings(ctx context.Context, request UpdateSettingsRequestObject) (UpdateSettingsResponseObject, error)
-
+	// List Tags
 	// (GET /tags)
 	ListTags(ctx context.Context, request ListTagsRequestObject) (ListTagsResponseObject, error)
 }
