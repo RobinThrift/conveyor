@@ -24,7 +24,8 @@ type Config struct {
 
 	Database Database `envPrefix:"DATABASE_"`
 
-	Argon2 Argon2 `envPrefix:"ARGON2_"`
+	Argon2         Argon2 `envPrefix:"ARGON2_"`
+	APITokenLength uint   `env:"API_TOKEN_LENGTH"`
 
 	Log Log `envPrefix:"LOG_"`
 
@@ -81,6 +82,7 @@ var defaultConfig = Config{
 		Threads: 2,
 		Time:    1,
 	},
+	APITokenLength: 32,
 	Log: Log{
 		Format: "json",
 		Level:  "info",

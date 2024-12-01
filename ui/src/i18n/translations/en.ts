@@ -1,4 +1,4 @@
-import { type Components, params } from "@nanostores/i18n"
+import { type Components, count, params } from "@nanostores/i18n"
 
 const sharedErrorTranslations: Components = {
     Input: {
@@ -125,5 +125,37 @@ export const translations = {
 
     "pages/Settings/SystemSettingsTab": {
         Title: "System",
+        SectionAPITokensTitle: "API Tokens",
+        SectionAPITokensDescription: "Create and revoke API Access Tokens.",
+    },
+
+    "pages/Settings/SystemSettingsTab/New": {
+        Title: "Create API Token",
+        FieldNameLabel: "Name",
+        FieldExpiresInLabel: "Expires In",
+        FieldExpiresInValueDays: count({
+            one: "{count} day",
+            many: "{count} days",
+        }),
+        FieldExpiresInValueMonths: count({
+            one: "{count} month",
+            many: "{count} months",
+        }),
+        ButtonLabel: "Create",
+    },
+
+    "pages/Settings/SystemSettingsTab/LastCreated": {
+        Title: "Created API Token",
+        Notice: "Please note this token. IT WILL NOT BE SHOWN AGAIN!",
+    },
+
+    "pages/Settings/SystemSettingsTab/List": {
+        Title: "API Tokens",
+        ColumName: "Name",
+        ColumExpires: "Expires",
+        ColumnCreated: "Created",
+        DeleteButton: "Delete",
+        PrevPage: "Previous Page",
+        NextPage: "Next Page",
     },
 } satisfies Components

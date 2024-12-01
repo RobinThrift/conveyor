@@ -12,7 +12,7 @@ import (
 	"github.com/RobinThrift/belt/internal/auth"
 )
 
-var errInvalidRequest = errors.New("invalid request")
+var errBadRequest = errors.New("invalid request")
 var errNotFound = errors.New("not found")
 
 func errorHandlerFunc(w http.ResponseWriter, r *http.Request, err error) {
@@ -40,13 +40,17 @@ func errorHandlerFunc(w http.ResponseWriter, r *http.Request, err error) {
 			Detail: err.Error(),
 			Type:   "belt/api/v1/NotFound",
 		}
-	case errors.Is(err, errInvalidRequest):
+	case errors.Is(err, errBadRequest):
 		apiErr = Error{
 			Code:   http.StatusBadRequest,
-			Title:  "InvalidRequest",
+			Title:  "BadRequest",
 			Detail: err.Error(),
-			Type:   "belt/api/v1/InvalidRequest",
+			Type:   "belt/api/v1/BadRequest",
 		}
+	}
+
+	if asAPIErr, ok := err.(*Error); ok {
+		apiErr = *asAPIErr
 	}
 
 	w.WriteHeader(apiErr.Code)

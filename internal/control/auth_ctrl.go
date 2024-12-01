@@ -3,6 +3,7 @@ package control
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/RobinThrift/belt/internal/auth"
@@ -16,6 +17,7 @@ type AuthController struct {
 	config        AuthConfig
 	transactioner database.Transactioner
 	accountCtrl   *AccountControl
+	tokenCtrl     *APITokenController
 	localAuthRepo AuthControllerLocalAuthRepo
 }
 
@@ -26,11 +28,12 @@ type AuthControllerLocalAuthRepo interface {
 }
 
 type AuthConfig struct {
-	Argon2Params auth.Argon2Params
+	Argon2Params   auth.Argon2Params
+	APITokenLength uint
 }
 
-func NewAuthController(config AuthConfig, transactioner database.Transactioner, accountCtrl *AccountControl, localAuthRepo AuthControllerLocalAuthRepo) *AuthController {
-	return &AuthController{config: config, transactioner: transactioner, accountCtrl: accountCtrl, localAuthRepo: localAuthRepo}
+func NewAuthController(config AuthConfig, transactioner database.Transactioner, accountCtrl *AccountControl, tokenCtrl *APITokenController, localAuthRepo AuthControllerLocalAuthRepo) *AuthController {
+	return &AuthController{config, transactioner, accountCtrl, tokenCtrl, localAuthRepo}
 }
 
 type GetAccountForCredentialsQuery struct {
@@ -69,6 +72,20 @@ func (ac *AuthController) GetAccountForCredentials(ctx context.Context, query Ge
 	}
 
 	account.RequiresPasswordChange = localAccount.RequiresPasswordChange
+
+	return account, nil
+}
+
+func (ac *AuthController) GetAccountForAPIToken(ctx context.Context, plaintextToken auth.APITokenValue) (*auth.Account, error) {
+	token, err := ac.tokenCtrl.GetAPIToken(ctx, plaintextToken)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrInvalidCredentials, err)
+	}
+
+	account, err := ac.accountCtrl.Get(ctx, token.AccountID)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrInvalidCredentials, err)
+	}
 
 	return account, nil
 }
@@ -167,7 +184,7 @@ func (ac *AuthController) ChangeAccountPassword(ctx context.Context, cmd ChangeA
 }
 
 type ResetPasswordCmd struct {
-	AccountID       int64
+	AccountID       auth.AccountID
 	PlaintextPasswd auth.PlaintextPassword
 }
 

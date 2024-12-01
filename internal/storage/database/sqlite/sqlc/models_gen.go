@@ -11,13 +11,22 @@ import (
 )
 
 type Account struct {
-	ID          int64
+	ID          auth.AccountID
 	Username    string
 	DisplayName string
 	IsAdmin     bool
 	AuthRef     string
 	CreatedAt   types.SQLiteDatetime
 	UpdatedAt   types.SQLiteDatetime
+}
+
+type ApiToken struct {
+	ID        int64
+	AccountID auth.AccountID
+	Name      string
+	Value     []byte
+	CreatedAt types.SQLiteDatetime
+	ExpiresAt types.SQLiteDatetime
 }
 
 type Attachment struct {

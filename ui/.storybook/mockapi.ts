@@ -1,15 +1,26 @@
 import { http, type HttpHandler, HttpResponse, delay } from "msw"
+import type { APIToken, APITokenList } from "../src/domain/APIToken"
 import type { Memo, MemoList } from "../src/domain/Memo"
 import type { Attachment } from "../src/domain/Attachment"
 import type { Tag, TagList } from "../src/domain/Tag"
 import type { CreateMemoRequest, UpdateMemoRequest } from "../src/api/memos"
-import { sub, isSameDay, roundToNearestMinutes, isEqual, parse } from "date-fns"
+import {
+    sub,
+    isSameDay,
+    roundToNearestMinutes,
+    isEqual,
+    parse,
+    parseJSON,
+    add,
+} from "date-fns"
 import { faker } from "@faker-js/faker"
 import type { UpdateSettingsRequest } from "../src/storage/remote/api/settings"
+import type { CreateAPITokenRequest } from "../src/storage/remote/api/apitokens"
 
 interface MockData {
     memos: Memo[]
     tags: Tag[]
+    apitokens: APIToken[]
     attachments: (Attachment & { data: Blob })[]
 }
 
@@ -46,9 +57,20 @@ ${faker.helpers.arrayElement(tags).tag}`,
         memos.push(memo)
     }
 
+    let apitokens: APIToken[] = []
+
+    for (let i = 0; i < 100; i++) {
+        apitokens.push({
+            name: `Token_${i}`,
+            createdAt: sub(now, { hours: i * 2 }),
+            expiresAt: sub(add(now, { hours: 5 }), { days: i }),
+        })
+    }
+
     return {
         memos,
         tags,
+        apitokens,
         attachments: [],
     }
 })()
@@ -331,6 +353,106 @@ export const mockAPI: HttpHandler[] = [
         })
     }),
 
+    http.patch<never, UpdateSettingsRequest>(
+        "/api/v1/settings",
+        async ({ request }) => {
+            await delay(500)
+            let body = await request.json()
+            Object.entries(body).forEach(([key, value]) => {
+                localStorage.setItem(`belt.settings.${key}`, value.toString())
+            })
+            return new HttpResponse(null, { status: 204 })
+        },
+    ),
+
+    http.get("/api/v1/apitokens", async ({ request }) => {
+        await delay(500)
+
+        let url = new URL(request.url)
+
+        let pageSize = Number.parseInt(
+            url.searchParams.get("page[size]") ?? "100",
+            10,
+        )
+        let after = url.searchParams.get("page[after]")
+
+        let apitokens: APIToken[] = []
+        let take = after === null
+        let next = ""
+
+        for (let token of mockData.apitokens) {
+            take = take || token.name === after
+            if (!take) {
+                continue
+            }
+
+            if (apitokens.length >= pageSize) {
+                next = token.name
+                break
+            }
+
+            apitokens.push(token)
+        }
+
+        return HttpResponse.json(
+            {
+                items: apitokens,
+                next,
+            } satisfies APITokenList,
+            { headers: { "content-type": "application/json; charset=utf-8" } },
+        )
+    }),
+
+    http.post<never, CreateAPITokenRequest>(
+        "/api/v1/apitokens",
+        async ({ request }) => {
+            await delay(500)
+
+            let body = await request.json()
+
+            let now = new Date()
+            let token: APIToken = {
+                name: body.name,
+                createdAt: now,
+                expiresAt: parseJSON(body.expiresAt as any),
+            }
+
+            mockData.apitokens = [token, ...mockData.apitokens]
+
+            return HttpResponse.json(
+                { token: body.name },
+                {
+                    status: 201,
+                    headers: {
+                        "content-type": "application/json; charset=utf-8",
+                    },
+                },
+            )
+        },
+    ),
+
+    http.delete<{ name: string }>(
+        "/api/v1/apitokens/:name",
+        async ({ params }) => {
+            await delay(500)
+
+            let index = mockData.apitokens.findIndex(
+                (a) => a.name === params.name,
+            )
+            if (index === -1) {
+                return new HttpResponse(null, {
+                    status: 204,
+                })
+            }
+
+            mockData.apitokens.splice(index, 1)
+
+            return new HttpResponse(null, {
+                status: 204,
+            })
+        },
+    ),
+
     http.get<{ filename: string }>(
         "/attachments/:filename",
         async ({ params }) => {
@@ -346,18 +468,6 @@ export const mockAPI: HttpHandler[] = [
             return new HttpResponse(attachment.data, {
                 headers: { "content-type": attachment.contentType },
             })
-        },
-    ),
-
-    http.patch<never, UpdateSettingsRequest>(
-        "/api/v1/settings",
-        async ({ request }) => {
-            await delay(500)
-            let body = await request.json()
-            Object.entries(body).forEach(([key, value]) => {
-                localStorage.setItem(`belt.settings.${key}`, value.toString())
-            })
-            return new HttpResponse(null, { status: 204 })
         },
     ),
 ]

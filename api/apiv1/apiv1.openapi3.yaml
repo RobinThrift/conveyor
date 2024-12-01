@@ -1,17 +1,22 @@
-openapi: 3.0.0
+openapi: 3.0.4
 info:
   title: Belt API
   description: This is the Belt REST-ish API.
   version: 0.1.0
 servers:
-- url: http://localhost:8080/api/v1
+- url: http://localhost:8081/api/v1
   description: Local development server.
+
+security:
+  - cookieAuth: []
+  - tokenBearerAuth: []
 
 tags:
 - name: Memos
 - name: Tags
-- name: Settings
 - name: Attachments
+- name: Settings
+- name: APITokens
 
 paths:
   /memos:
@@ -402,7 +407,121 @@ paths:
         default:
           $ref: "#/components/responses/ErrorOther"
 
+  /apitokens:
+    get:
+      parameters:
+      - name: page[size]
+        in: query
+        required: true
+        description: Number of API Tokens returned per page.
+        schema:
+          type: integer
+          minimum: 0
+          default: 25
+          example: 25
+          x-go-type: uint64
+      - name: page[after]
+        in: query
+        required: false
+        description: Marker from which to start the requested page of API Tokens from.
+        schema:
+          type: string
+          example: "123456"
+
+      operationId: ListAPITokens
+      tags: [APITokens]
+      summary: List API Tokens paginated
+      description: Retrieve a paginated list of API Tokens.
+
+      responses:
+        "200":
+          description: The pagianted list of API Tokens for the current account.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/APITokenList"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+    post:
+      operationId: CreateAPIToken
+      tags: [APITokens]
+      summary: Create a new API Token
+      description: Create a new named API Token with the specified expiration date.
+
+      requestBody:
+        $ref: "#/components/requestBodies/CreateAPITokenRequest"
+      responses:
+        "201":
+          description: The API Token was created succesfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "123215$abekjwe2kj123"
+                required:
+                - token
+                example:
+                    token: "123215$abekjwe2kj123"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+  /apitokens/{name}:
+    parameters:
+    - name: name
+      in: path
+      required: true
+      description: API Token name
+      schema:
+        type: string
+        example: "test-api-token"
+
+    delete:
+      operationId: DeleteAPIToken
+      tags: [APITokens]
+      summary: Delete API Token
+      description: Delete the API Token with the provided name. Subsequent requests with this token will fail. This operation is idempotent, so calls no non-existing Memos will not fail.
+
+      responses:
+        "204":
+          description: The API Token was deleted successfully.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
 components:
+  securitySchemes:
+    cookieAuth:
+      description: Session based authentication primarily used by the UI
+      type: apiKey
+      in: cookie
+      name: belt_session
+    tokenBearerAuth:
+      description: API Token sent as a bearer token in the header. When accessing Belt via the API this is the recommended way to pass along the API Token.
+      type: http
+      scheme: bearer
+
   schemas:
     Memo:
       description: Memos contain Markdown content that you want to keep for later.
@@ -645,6 +764,54 @@ components:
         theme.colourScheme: default
         theme.mode: auto
 
+    APIToken:
+      type: object
+      description: Auth token used to access the API.
+      properties:
+          name:
+            type: string
+            example: "test-api-token"
+          createdAt:
+            type: string
+            format: date-time
+            example: "2024-11-29T13:22:00.000Z"
+          expiresAt:
+            type: string
+            format: date-time
+            example: "2024-11-29T13:22:00.000Z"
+      required:
+      - name
+      - createdAt
+      - expiresAt
+      example:
+        name: test-api-token
+        createdAt: "2024-11-29T13:22:00.000Z"
+        expiresAt: "2024-11-29T13:22:00.000Z"
+
+    APITokenList:
+      type: object
+      description: A paginated list of API Tokens.
+      properties:
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/APIToken"
+            example:
+            - name: test-api-token
+              createdAt: "2024-11-29T13:22:00.000Z"
+              expiresAt: "2024-11-29T13:22:00.000Z"
+          next:
+            type: string
+            example: "100"
+      required:
+      - items
+      example:
+        items:
+        - name: test-api-token
+          createdAt: "2024-11-29T13:22:00.000Z"
+          expiresAt: "2024-11-29T13:22:00.000Z"
+        next: "100"
+
     Error:
       type: object
       description: Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
@@ -757,6 +924,28 @@ components:
               locale.region: de
               theme.colourScheme: default
               theme.mode: dark
+
+    CreateAPITokenRequest:
+      description: Create a new named API Token.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "test-api-token"
+              expiresAt:
+                type: string
+                format: date-time
+                example: "2024-11-29T13:32:25Z"
+            required:
+            - name
+            - expiresAt
+            example:
+              name: "test-api-token"
+              expiresAt: "2024-11-29T13:32:25Z"
 
   responses:
     ErrorBadRequest:

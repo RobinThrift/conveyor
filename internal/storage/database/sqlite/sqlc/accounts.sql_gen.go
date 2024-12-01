@@ -8,6 +8,7 @@ package sqlc
 import (
 	"context"
 
+	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
 )
 
@@ -56,7 +57,7 @@ WHERE id = ?
 LIMIT 1
 `
 
-func (q *Queries) GetAccount(ctx context.Context, db DBTX, id int64) (Account, error) {
+func (q *Queries) GetAccount(ctx context.Context, db DBTX, id auth.AccountID) (Account, error) {
 	row := db.QueryRowContext(ctx, getAccount, id)
 	var i Account
 	err := row.Scan(
@@ -127,7 +128,7 @@ WHERE id = ?
 type UpdateAccountParams struct {
 	DisplayName string
 	UpdatedAt   types.SQLiteDatetime
-	ID          int64
+	ID          auth.AccountID
 }
 
 func (q *Queries) UpdateAccount(ctx context.Context, db DBTX, arg UpdateAccountParams) error {

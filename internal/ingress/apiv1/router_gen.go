@@ -1,4 +1,5 @@
 //lint:file-ignore ST1005 Ignore because generated code
+//lint:file-ignore SA1029 Ignore because generated code
 //go:build go1.22
 
 // Package apiv1 provides primitives to interact with the openapi HTTP API.
@@ -19,11 +20,29 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+const (
+	CookieAuthScopes      = "cookieAuth.Scopes"
+	TokenBearerAuthScopes = "tokenBearerAuth.Scopes"
+)
+
 // Defines values for ListMemosParamsOpCreatedAt.
 const (
 	Equal         ListMemosParamsOpCreatedAt = "="
 	LessThanEqual ListMemosParamsOpCreatedAt = "<="
 )
+
+// APIToken Auth token used to access the API.
+type APIToken struct {
+	CreatedAt time.Time `json:"createdAt"`
+	ExpiresAt time.Time `json:"expiresAt"`
+	Name      string    `json:"name"`
+}
+
+// APITokenList A paginated list of API Tokens.
+type APITokenList struct {
+	Items []APIToken `json:"items"`
+	Next  *string    `json:"next,omitempty"`
+}
 
 // Attachment A file that can be referenced by a Memo.
 type Attachment struct {
@@ -101,6 +120,12 @@ type ErrorOther = Error
 // ErrorUnauthorized Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
 type ErrorUnauthorized = Error
 
+// CreateAPITokenRequest defines model for CreateAPITokenRequest.
+type CreateAPITokenRequest struct {
+	ExpiresAt time.Time `json:"expiresAt"`
+	Name      string    `json:"name"`
+}
+
 // CreateMemoRequest defines model for CreateMemoRequest.
 type CreateMemoRequest struct {
 	Content   string     `json:"content"`
@@ -122,6 +147,21 @@ type UpdateSettingsRequest struct {
 	LocaleRegion              *string `json:"locale.region,omitempty"`
 	ThemeColourScheme         *string `json:"theme.colourScheme,omitempty"`
 	ThemeMode                 *string `json:"theme.mode,omitempty"`
+}
+
+// ListAPITokensParams defines parameters for ListAPITokens.
+type ListAPITokensParams struct {
+	// PageSize Number of API Tokens returned per page.
+	PageSize uint64 `form:"page[size]" json:"page[size]"`
+
+	// PageAfter Marker from which to start the requested page of API Tokens from.
+	PageAfter *string `form:"page[after],omitempty" json:"page[after],omitempty"`
+}
+
+// CreateAPITokenJSONBody defines parameters for CreateAPIToken.
+type CreateAPITokenJSONBody struct {
+	ExpiresAt time.Time `json:"expiresAt"`
+	Name      string    `json:"name"`
 }
 
 // ListAttachmentsParams defines parameters for ListAttachments.
@@ -207,6 +247,9 @@ type ListTagsParams struct {
 	FilterPrefix *string `form:"filter[prefix],omitempty" json:"filter[prefix],omitempty"`
 }
 
+// CreateAPITokenJSONRequestBody defines body for CreateAPIToken for application/json ContentType.
+type CreateAPITokenJSONRequestBody CreateAPITokenJSONBody
+
 // CreateMemoJSONRequestBody defines body for CreateMemo for application/json ContentType.
 type CreateMemoJSONRequestBody CreateMemoJSONBody
 
@@ -218,6 +261,15 @@ type UpdateSettingsJSONRequestBody UpdateSettingsJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// List API Tokens paginated
+	// (GET /apitokens)
+	ListAPITokens(w http.ResponseWriter, r *http.Request, params ListAPITokensParams)
+	// Create a new API Token
+	// (POST /apitokens)
+	CreateAPIToken(w http.ResponseWriter, r *http.Request)
+	// Delete API Token
+	// (DELETE /apitokens/{name})
+	DeleteAPIToken(w http.ResponseWriter, r *http.Request, name string)
 	// List Attachments paginated
 	// (GET /attachments)
 	ListAttachments(w http.ResponseWriter, r *http.Request, params ListAttachmentsParams)
@@ -262,10 +314,123 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
+// ListAPITokens operation middleware
+func (siw *ServerInterfaceWrapper) ListAPITokens(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListAPITokensParams
+
+	// ------------- Required query parameter "page[size]" -------------
+
+	if paramValue := r.URL.Query().Get("page[size]"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "page[size]"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "page[size]", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page[size]", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "page[after]" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page[after]", r.URL.Query(), &params.PageAfter)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page[after]", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAPITokens(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateAPIToken operation middleware
+func (siw *ServerInterfaceWrapper) CreateAPIToken(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateAPIToken(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteAPIToken operation middleware
+func (siw *ServerInterfaceWrapper) DeleteAPIToken(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", r.PathValue("name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteAPIToken(w, r, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListAttachments operation middleware
 func (siw *ServerInterfaceWrapper) ListAttachments(w http.ResponseWriter, r *http.Request) {
 
 	var err error
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListAttachmentsParams
@@ -308,6 +473,14 @@ func (siw *ServerInterfaceWrapper) ListAttachments(w http.ResponseWriter, r *htt
 func (siw *ServerInterfaceWrapper) CreateAttachment(w http.ResponseWriter, r *http.Request) {
 
 	var err error
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params CreateAttachmentParams
@@ -381,6 +554,14 @@ func (siw *ServerInterfaceWrapper) DeleteAttachment(w http.ResponseWriter, r *ht
 		return
 	}
 
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteAttachment(w, r, filename)
 	}))
@@ -396,6 +577,14 @@ func (siw *ServerInterfaceWrapper) DeleteAttachment(w http.ResponseWriter, r *ht
 func (siw *ServerInterfaceWrapper) ListMemos(w http.ResponseWriter, r *http.Request) {
 
 	var err error
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListMemosParams
@@ -485,6 +674,14 @@ func (siw *ServerInterfaceWrapper) ListMemos(w http.ResponseWriter, r *http.Requ
 // CreateMemo operation middleware
 func (siw *ServerInterfaceWrapper) CreateMemo(w http.ResponseWriter, r *http.Request) {
 
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateMemo(w, r)
 	}))
@@ -509,6 +706,14 @@ func (siw *ServerInterfaceWrapper) DeleteMemo(w http.ResponseWriter, r *http.Req
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
 		return
 	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteMemo(w, r, id)
@@ -535,6 +740,14 @@ func (siw *ServerInterfaceWrapper) GetMemo(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetMemo(w, r, id)
 	}))
@@ -560,6 +773,14 @@ func (siw *ServerInterfaceWrapper) UpdateMemo(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateMemo(w, r, id)
 	}))
@@ -574,6 +795,14 @@ func (siw *ServerInterfaceWrapper) UpdateMemo(w http.ResponseWriter, r *http.Req
 // GetSettings operation middleware
 func (siw *ServerInterfaceWrapper) GetSettings(w http.ResponseWriter, r *http.Request) {
 
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetSettings(w, r)
 	}))
@@ -587,6 +816,14 @@ func (siw *ServerInterfaceWrapper) GetSettings(w http.ResponseWriter, r *http.Re
 
 // UpdateSettings operation middleware
 func (siw *ServerInterfaceWrapper) UpdateSettings(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateSettings(w, r)
@@ -603,6 +840,14 @@ func (siw *ServerInterfaceWrapper) UpdateSettings(w http.ResponseWriter, r *http
 func (siw *ServerInterfaceWrapper) ListTags(w http.ResponseWriter, r *http.Request) {
 
 	var err error
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, CookieAuthScopes, []string{})
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListTagsParams
@@ -769,6 +1014,9 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	m.HandleFunc("GET "+options.BaseURL+"/apitokens", wrapper.ListAPITokens)
+	m.HandleFunc("POST "+options.BaseURL+"/apitokens", wrapper.CreateAPIToken)
+	m.HandleFunc("DELETE "+options.BaseURL+"/apitokens/{name}", wrapper.DeleteAPIToken)
 	m.HandleFunc("GET "+options.BaseURL+"/attachments", wrapper.ListAttachments)
 	m.HandleFunc("POST "+options.BaseURL+"/attachments", wrapper.CreateAttachment)
 	m.HandleFunc("DELETE "+options.BaseURL+"/attachments/{filename}", wrapper.DeleteAttachment)
@@ -791,6 +1039,175 @@ type ErrorNotFoundJSONResponse Error
 type ErrorOtherJSONResponse Error
 
 type ErrorUnauthorizedJSONResponse Error
+
+type ListAPITokensRequestObject struct {
+	Params ListAPITokensParams
+}
+
+type ListAPITokensResponseObject interface {
+	VisitListAPITokensResponse(w http.ResponseWriter) error
+}
+
+type ListAPITokens200JSONResponse APITokenList
+
+func (response ListAPITokens200JSONResponse) VisitListAPITokensResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAPITokens400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response ListAPITokens400JSONResponse) VisitListAPITokensResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAPITokens401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response ListAPITokens401JSONResponse) VisitListAPITokensResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAPITokens404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response ListAPITokens404JSONResponse) VisitListAPITokensResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAPITokensdefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response ListAPITokensdefaultJSONResponse) VisitListAPITokensResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type CreateAPITokenRequestObject struct {
+	Body *CreateAPITokenJSONRequestBody
+}
+
+type CreateAPITokenResponseObject interface {
+	VisitCreateAPITokenResponse(w http.ResponseWriter) error
+}
+
+type CreateAPIToken201JSONResponse struct {
+	Token string `json:"token"`
+}
+
+func (response CreateAPIToken201JSONResponse) VisitCreateAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateAPIToken400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response CreateAPIToken400JSONResponse) VisitCreateAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateAPIToken401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response CreateAPIToken401JSONResponse) VisitCreateAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateAPIToken404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response CreateAPIToken404JSONResponse) VisitCreateAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateAPITokendefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response CreateAPITokendefaultJSONResponse) VisitCreateAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type DeleteAPITokenRequestObject struct {
+	Name string `json:"name"`
+}
+
+type DeleteAPITokenResponseObject interface {
+	VisitDeleteAPITokenResponse(w http.ResponseWriter) error
+}
+
+type DeleteAPIToken204Response struct {
+}
+
+func (response DeleteAPIToken204Response) VisitDeleteAPITokenResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteAPIToken400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response DeleteAPIToken400JSONResponse) VisitDeleteAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteAPIToken401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response DeleteAPIToken401JSONResponse) VisitDeleteAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteAPIToken404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response DeleteAPIToken404JSONResponse) VisitDeleteAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteAPITokendefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response DeleteAPITokendefaultJSONResponse) VisitDeleteAPITokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
 
 type ListAttachmentsRequestObject struct {
 	Params ListAttachmentsParams
@@ -1407,6 +1824,15 @@ func (response ListTagsdefaultJSONResponse) VisitListTagsResponse(w http.Respons
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// List API Tokens paginated
+	// (GET /apitokens)
+	ListAPITokens(ctx context.Context, request ListAPITokensRequestObject) (ListAPITokensResponseObject, error)
+	// Create a new API Token
+	// (POST /apitokens)
+	CreateAPIToken(ctx context.Context, request CreateAPITokenRequestObject) (CreateAPITokenResponseObject, error)
+	// Delete API Token
+	// (DELETE /apitokens/{name})
+	DeleteAPIToken(ctx context.Context, request DeleteAPITokenRequestObject) (DeleteAPITokenResponseObject, error)
 	// List Attachments paginated
 	// (GET /attachments)
 	ListAttachments(ctx context.Context, request ListAttachmentsRequestObject) (ListAttachmentsResponseObject, error)
@@ -1469,6 +1895,89 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ListAPITokens operation middleware
+func (sh *strictHandler) ListAPITokens(w http.ResponseWriter, r *http.Request, params ListAPITokensParams) {
+	var request ListAPITokensRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListAPITokens(ctx, request.(ListAPITokensRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAPITokens")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAPITokensResponseObject); ok {
+		if err := validResponse.VisitListAPITokensResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateAPIToken operation middleware
+func (sh *strictHandler) CreateAPIToken(w http.ResponseWriter, r *http.Request) {
+	var request CreateAPITokenRequestObject
+
+	var body CreateAPITokenJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateAPIToken(ctx, request.(CreateAPITokenRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateAPIToken")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateAPITokenResponseObject); ok {
+		if err := validResponse.VisitCreateAPITokenResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteAPIToken operation middleware
+func (sh *strictHandler) DeleteAPIToken(w http.ResponseWriter, r *http.Request, name string) {
+	var request DeleteAPITokenRequestObject
+
+	request.Name = name
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteAPIToken(ctx, request.(DeleteAPITokenRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteAPIToken")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteAPITokenResponseObject); ok {
+		if err := validResponse.VisitDeleteAPITokenResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ListAttachments operation middleware

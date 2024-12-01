@@ -49,16 +49,21 @@ func New(config Config) *App {
 	memoRepo := sqlite.NewMemoRepo(db)
 	attachmentRepo := sqlite.NewAttachmentRepo(db)
 	settingsRepo := sqlite.NewSettingsRepo(db)
+	apiTokenRepo := sqlite.NewAPITokenRepo(db)
 
 	fs := &filesystem.LocalFSAttachments{
 		AttachmentsDir: config.Attachments.Dir,
 		TmpDir:         os.TempDir(),
 	}
 
+	authConfig := control.AuthConfig{
+		Argon2Params:   argon2Params,
+		APITokenLength: config.APITokenLength,
+	}
+
 	accountCtrl := control.NewAccountController(db, accountRepo)
-	authCtrl := control.NewAuthController(control.AuthConfig{
-		Argon2Params: argon2Params,
-	}, db, accountCtrl, localAuthRepo)
+	apiTokenCtrl := control.NewAPITokenController(authConfig, apiTokenRepo)
+	authCtrl := control.NewAuthController(authConfig, db, accountCtrl, apiTokenCtrl, localAuthRepo)
 	memoCtrl := control.NewMemoControl(db, memoRepo, attachmentRepo)
 	attachmentCtrl := control.NewAttachmentControl(fs, attachmentRepo)
 	settingsCtrl := control.NewSettingsControl(settingsRepo)
@@ -74,7 +79,7 @@ func New(config Config) *App {
 		AttachmentsDir:   config.Attachments.Dir,
 	}, mux, authCtrl, settingsCtrl, accountCtrl)
 
-	apiv1.New(config.BasePath, mux, memoCtrl, attachmentCtrl, settingsCtrl)
+	apiv1.New(config.BasePath, mux, memoCtrl, attachmentCtrl, settingsCtrl, apiTokenCtrl, authCtrl)
 
 	return &App{
 		config: config,

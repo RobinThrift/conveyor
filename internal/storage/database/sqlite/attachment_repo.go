@@ -194,7 +194,7 @@ func (r *AttachmentRepo) DeleteAttachments(ctx context.Context, ids []domain.Att
 	_, err := queries.DeleteAttachments(ctx, r.db.Conn(ctx), ids)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.ErrAttachmentNotFound
+			return nil
 		}
 		return err
 	}

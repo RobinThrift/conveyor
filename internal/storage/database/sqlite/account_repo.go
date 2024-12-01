@@ -34,7 +34,7 @@ func (r *AccountRepo) CountAccounts(ctx context.Context) (int64, error) {
 	return count, nil
 }
 
-func (r *AccountRepo) Get(ctx context.Context, id int64) (*auth.Account, error) {
+func (r *AccountRepo) Get(ctx context.Context, id auth.AccountID) (*auth.Account, error) {
 	account, err := queries.GetAccount(ctx, r.db.Conn(ctx), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -45,7 +45,7 @@ func (r *AccountRepo) Get(ctx context.Context, id int64) (*auth.Account, error) 
 	}
 
 	return &auth.Account{
-		ID:          auth.AccountID(account.ID),
+		ID:          account.ID,
 		Username:    account.Username,
 		DisplayName: account.DisplayName,
 		IsAdmin:     account.IsAdmin,
@@ -66,7 +66,7 @@ func (r *AccountRepo) GetByUsername(ctx context.Context, username string) (*auth
 	}
 
 	return &auth.Account{
-		ID:          auth.AccountID(account.ID),
+		ID:          account.ID,
 		Username:    account.Username,
 		DisplayName: account.DisplayName,
 		IsAdmin:     account.IsAdmin,
@@ -87,7 +87,7 @@ func (r *AccountRepo) GetByRef(ctx context.Context, ref string) (*auth.Account, 
 	}
 
 	return &auth.Account{
-		ID:          auth.AccountID(account.ID),
+		ID:          account.ID,
 		Username:    account.Username,
 		DisplayName: account.DisplayName,
 		IsAdmin:     account.IsAdmin,
@@ -108,7 +108,7 @@ func (r *AccountRepo) Create(ctx context.Context, toCreate *auth.Account) error 
 
 func (r *AccountRepo) Update(ctx context.Context, toUpdate *auth.Account) error {
 	return queries.UpdateAccount(ctx, r.db.Conn(ctx), sqlc.UpdateAccountParams{
-		ID:          int64(toUpdate.ID),
+		ID:          toUpdate.ID,
 		DisplayName: toUpdate.DisplayName,
 		UpdatedAt:   types.NewSQLiteDatetime(time.Now().UTC()),
 	})

@@ -7,6 +7,7 @@ package sqlc
 import (
 	"context"
 
+	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/domain"
 )
 
@@ -16,6 +17,7 @@ type Querier interface {
 	CleanupeMemoTagConnection(ctx context.Context, db DBTX, arg CleanupeMemoTagConnectionParams) ([]string, error)
 	CountAccounts(ctx context.Context, db DBTX) (int64, error)
 	CountAttachments(ctx context.Context, db DBTX) (int64, error)
+	CreateAPIToken(ctx context.Context, db DBTX, arg CreateAPITokenParams) error
 	CreateAccount(ctx context.Context, db DBTX, arg CreateAccountParams) error
 	CreateAttachment(ctx context.Context, db DBTX, arg CreateAttachmentParams) (domain.AttachmentID, error)
 	CreateLocalAuthAccount(ctx context.Context, db DBTX, arg CreateLocalAuthAccountParams) error
@@ -24,13 +26,15 @@ type Querier interface {
 	CreateMemoTagConnection(ctx context.Context, db DBTX, arg CreateMemoTagConnectionParams) error
 	CreateSession(ctx context.Context, db DBTX, arg CreateSessionParams) error
 	CreateTag(ctx context.Context, db DBTX, arg CreateTagParams) error
+	DeleteAPIToken(ctx context.Context, db DBTX, arg DeleteAPITokenParams) error
 	DeleteAllMemoAttachmentLinks(ctx context.Context, db DBTX, memoID int64) error
 	DeleteAttachments(ctx context.Context, db DBTX, ids []domain.AttachmentID) (int64, error)
 	DeleteExpired(ctx context.Context, db DBTX) error
 	DeleteMemoAttachmentLinks(ctx context.Context, db DBTX, arg DeleteMemoAttachmentLinksParams) error
 	DeleteMemoTagConnection(ctx context.Context, db DBTX, memoID int64) ([]string, error)
 	DeleteSession(ctx context.Context, db DBTX, token string) error
-	GetAccount(ctx context.Context, db DBTX, id int64) (Account, error)
+	GetAPIToken(ctx context.Context, db DBTX, value []byte) (ApiToken, error)
+	GetAccount(ctx context.Context, db DBTX, id auth.AccountID) (Account, error)
 	GetAccountByRef(ctx context.Context, db DBTX, authRef string) (Account, error)
 	GetAccountByUsername(ctx context.Context, db DBTX, username string) (Account, error)
 	GetAttachment(ctx context.Context, db DBTX, id domain.AttachmentID) (Attachment, error)
@@ -39,6 +43,7 @@ type Querier interface {
 	GetMemo(ctx context.Context, db DBTX, id domain.MemoID) (Memo, error)
 	GetSession(ctx context.Context, db DBTX, token string) (Session, error)
 	GetSettings(ctx context.Context, db DBTX, accountID int64) (Setting, error)
+	ListAPITokens(ctx context.Context, db DBTX, arg ListAPITokensParams) ([]ApiToken, error)
 	ListAttachments(ctx context.Context, db DBTX, arg ListAttachmentsParams) ([]Attachment, error)
 	ListAttachmentsForMemo(ctx context.Context, db DBTX, memoID int64) ([]Attachment, error)
 	ListMemos(ctx context.Context, db DBTX, arg ListMemosParams) ([]Memo, error)

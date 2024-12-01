@@ -37,6 +37,20 @@ CREATE TABLE accounts (
 CREATE UNIQUE INDEX unique_usernames ON accounts(username);
 CREATE UNIQUE INDEX unique_auth_ref ON accounts(auth_ref);
 
+CREATE TABLE api_tokens (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id      INTEGER NOT NULL,
+
+    name            TEXT NOT NULL,
+    value           BLOB NOT NULL,
+
+    created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)),
+    expires_at      TEXT NOT NULL,
+
+    FOREIGN KEY(account_id) REFERENCES accounts(id)
+);
+CREATE UNIQUE INDEX unique_api_token ON api_tokens(value);
+CREATE UNIQUE INDEX unique_api_token_name ON api_tokens(account_id, name);
 
 CREATE TABLE memos (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -204,6 +218,10 @@ DROP TABLE memos;
 
 DROP INDEX settings_key_account_idx;
 DROP TABLE settings;
+
+DROP INDEX unique_api_token;
+DROP INDEX unique_api_token_name;
+DROP TABLE api_tokens;
 
 DROP INDEX unique_usernames;
 DROP INDEX unique_auth_ref;

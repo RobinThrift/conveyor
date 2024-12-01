@@ -26,6 +26,10 @@
     h3 {
         @apply font-semibold text-xl mb-4;
     }
+
+    h4 {
+        @apply font-semibold text-lg mb-2;
+    }
 }
 
 .settings-tab-section {
@@ -38,5 +42,54 @@
             @apply text-sm font-semibold;
             @apply col-start-1 col-span-3 row-start-1;
         }
+    }
+}
+
+.settings-tab-section {
+    .table-wrapper {
+        @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6;
+        table {
+            margin: 0;
+        }
+    }
+
+    table {
+        @apply border-collapse w-full;
+    }
+
+    thead {
+        @apply font-semibold bg-subtle-light;
+    }
+
+    th {
+        @apply p-2 border-l border-b border-t-0 border-subtle text-left;
+
+        &:first-child {
+            @apply border-l-0;
+        }
+
+        &:last-child {
+            @apply border-r-0;
+        }
+    }
+
+    td {
+        @apply p-2 border-l border-subtle;
+
+        &:first-child {
+            @apply border-l-0;
+        }
+
+        &:last-child {
+            @apply border-r-0;
+        }
+    }
+
+    .api-tokens-list th:last-child {
+        border-left-width: 0;
+    }
+
+    .api-tokens-list td:last-child {
+        border-left-width: 0;
     }
 }

@@ -16,7 +16,7 @@ type AccountControlAccountRepo interface {
 	CountAccounts(ctx context.Context) (int64, error)
 	Create(ctx context.Context, account *auth.Account) error
 	Update(ctx context.Context, account *auth.Account) error
-	Get(ctx context.Context, id int64) (*auth.Account, error)
+	Get(ctx context.Context, id auth.AccountID) (*auth.Account, error)
 	GetByUsername(ctx context.Context, username string) (*auth.Account, error)
 	GetByRef(ctx context.Context, ref string) (*auth.Account, error)
 }
@@ -25,7 +25,7 @@ func NewAccountController(transactioner database.Transactioner, repo AccountCont
 	return &AccountControl{transactioner: transactioner, repo: repo}
 }
 
-func (ac *AccountControl) Get(ctx context.Context, id int64) (*auth.Account, error) {
+func (ac *AccountControl) Get(ctx context.Context, id auth.AccountID) (*auth.Account, error) {
 	account, err := ac.repo.Get(ctx, id)
 	if err != nil {
 		return nil, err

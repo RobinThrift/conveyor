@@ -25,6 +25,11 @@ sql:
           type: "SQLiteDatetime"
           import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
 
+      - column: accounts.id
+        go_type:
+          type: "AccountID"
+          import: "github.com/RobinThrift/belt/internal/auth"
+
       - column: accounts.created_at
         go_type:
           type: "SQLiteDatetime"
@@ -41,6 +46,21 @@ sql:
           import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
 
       - column: local_auth_accounts.updated_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: api_tokens.account_id
+        go_type:
+          type: "AccountID"
+          import: "github.com/RobinThrift/belt/internal/auth"
+
+      - column: api_tokens.created_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
+
+      - column: api_tokens.expires_at
         go_type:
           type: "SQLiteDatetime"
           import: "github.com/RobinThrift/belt/internal/storage/database/sqlite/types"

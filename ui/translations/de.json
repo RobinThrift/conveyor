@@ -120,6 +120,38 @@
     },
 
     "pages/Settings/SystemSettingsTab": {
-        "Title": "System"
+        "Title": "System",
+        "SectionAPITokensTitle": "API Tokens",
+        "SectionAPITokensDescription": "Erstelle und lösche API Tokens."
+    },
+
+    "pages/Settings/SystemSettingsTab/New": {
+        "Title": "Neuen API Token erstellen",
+        "FieldNameLabel": "Name",
+        "FieldExpiresInLabel": "Gültigkeit",
+        "FieldExpiresInValueDays": {
+            "one": "{count} Tag",
+            "many": "{count} Tage"
+        },
+        "FieldExpiresInValueMonths": {
+            "one": "{count} Monat",
+            "many": "{count} Monate"
+        },
+        "ButtonLabel": "Neuen Token Erstellen"
+    },
+
+    "pages/Settings/SystemSettingsTab/LastCreated": {
+        "Title": "Neuer API Token",
+        "Notice": "Bitte notieren den Token. DIESER WERT WIRD NIE WIEDER ANGEZEIGT!"
+    },
+
+    "pages/Settings/SystemSettingsTab/List": {
+        "Title": "API Tokens",
+        "ColumName": "Name",
+        "ColumExpires": "Gültig bis",
+        "ColumnCreated": "Erstellt",
+        "DeleteButton": "Löschen",
+        "PrevPage": "Vorherige Seite",
+        "NextPage": "Nächste Seite"
     }
 }

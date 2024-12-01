@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/control"
@@ -19,10 +21,16 @@ type router struct {
 	memoCtrl       *control.MemoControl
 	attachmentCtrl *control.AttachmentControl
 	settingsCtrl   *control.SettingsControl
+	tokenCtrl      *control.APITokenController
+	accountFetcher AccountFetcher
 }
 
-func New(baseURL string, mux *http.ServeMux, memoCtrl *control.MemoControl, attachmentCtrl *control.AttachmentControl, settingsCtrl *control.SettingsControl) {
-	r := &router{baseURL, memoCtrl, attachmentCtrl, settingsCtrl}
+type AccountFetcher interface {
+	GetAccountForAPIToken(ctx context.Context, value auth.APITokenValue) (*auth.Account, error)
+}
+
+func New(baseURL string, mux *http.ServeMux, memoCtrl *control.MemoControl, attachmentCtrl *control.AttachmentControl, settingsCtrl *control.SettingsControl, tokenCtrl *control.APITokenController, accountFetcher AccountFetcher) {
+	r := &router{baseURL, memoCtrl, attachmentCtrl, settingsCtrl, tokenCtrl, accountFetcher}
 
 	HandlerWithOptions(NewStrictHandlerWithOptions(r, nil, StrictHTTPServerOptions{
 		RequestErrorHandlerFunc:  errorHandlerFunc,
@@ -31,7 +39,7 @@ func New(baseURL string, mux *http.ServeMux, memoCtrl *control.MemoControl, atta
 		BaseRouter:       mux,
 		BaseURL:          baseURL + "api/v1",
 		ErrorHandlerFunc: errorHandlerFunc,
-		Middlewares:      []MiddlewareFunc{recoverer, r.addAccountToContext},
+		Middlewares:      []MiddlewareFunc{recoverer, r.checkAuth},
 	})
 }
 
@@ -80,7 +88,7 @@ func (r *router) ListMemos(ctx context.Context, req ListMemosRequestObject) (Lis
 		case "<=":
 			query.MinCreationDate = &req.Params.FilterCreatedAt.Time
 		default:
-			return nil, fmt.Errorf("%w: unknown operation '%s' for filter[created_at]", errInvalidRequest, createdAtOp)
+			return nil, fmt.Errorf("%w: unknown operation '%s' for filter[created_at]", errBadRequest, createdAtOp)
 		}
 	}
 
@@ -325,14 +333,90 @@ func (r *router) UpdateSettings(ctx context.Context, req UpdateSettingsRequestOb
 	return UpdateSettings204Response{}, nil
 }
 
-func (r *router) addAccountToContext(next http.Handler) http.Handler {
+// List API Tokens paginated
+// (GET /apitokens)
+func (r *router) ListAPITokens(ctx context.Context, req ListAPITokensRequestObject) (ListAPITokensResponseObject, error) {
+	var pageAfter *int64
+	if req.Params.PageAfter != nil {
+		p, err := strconv.ParseInt(*req.Params.PageAfter, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("%w: invalid pageAfter", errBadRequest)
+		}
+		pageAfter = &p
+	}
+
+	query := control.ListAPITokenQuery{
+		PageSize:  req.Params.PageSize,
+		PageAfter: pageAfter,
+	}
+
+	tokens, err := r.tokenCtrl.ListAPITokens(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	apiTokens := APITokenList{Items: make([]APIToken, len(tokens.Items))}
+	for i, token := range tokens.Items {
+		apiTokens.Items[i] = APIToken{
+			Name:      token.Name,
+			CreatedAt: token.CreatedAt,
+			ExpiresAt: token.ExpiresAt,
+		}
+	}
+
+	if tokens.Next != nil {
+		next := fmt.Sprint(*tokens.Next)
+		apiTokens.Next = &next
+	}
+
+	return ListAPITokens200JSONResponse(apiTokens), nil
+}
+
+// Create a new API Token
+// (POST /apitokens)
+func (r *router) CreateAPIToken(ctx context.Context, req CreateAPITokenRequestObject) (CreateAPITokenResponseObject, error) {
+	value, err := r.tokenCtrl.CreateAPIToken(ctx, &auth.APIToken{
+		Name:      req.Body.Name,
+		ExpiresAt: req.Body.ExpiresAt,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return CreateAPIToken201JSONResponse{Token: value}, nil
+}
+
+// Delete API Token
+// (DELETE /apitokens/{name})
+func (r *router) DeleteAPIToken(ctx context.Context, req DeleteAPITokenRequestObject) (DeleteAPITokenResponseObject, error) {
+	err := r.tokenCtrl.DeleteAPIToken(ctx, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return DeleteAPIToken204Response{}, nil
+}
+
+func (router *router) checkAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		account, ok := session.Get[*auth.Account](r.Context(), "account")
-		if !ok {
+		var account *auth.Account
+		var err error
+		if token, ok := apiTokenFromHeader(r.Header); ok {
+			account, err = router.accountFetcher.GetAccountForAPIToken(r.Context(), token)
+		} else {
+			account, _ = session.Get[*auth.Account](r.Context(), "account")
+		}
+
+		if account == nil || errors.Is(err, auth.ErrUnauthorized) {
+			errorHandlerFunc(w, r, auth.ErrUnauthorized)
+			return
+		}
+
+		if err != nil {
 			errorHandlerFunc(w, r, &Error{
-				Code:  http.StatusUnauthorized,
-				Title: http.StatusText(http.StatusUnauthorized),
-				Type:  "belt/api/v1/Unauthorized",
+				Code:  http.StatusInternalServerError,
+				Title: http.StatusText(http.StatusInternalServerError),
+				Type:  "belt/api/v1/InternalServerError",
 			})
 			return
 		}
@@ -340,4 +424,15 @@ func (r *router) addAccountToContext(next http.Handler) http.Handler {
 		ctx := auth.CtxWithAccount(r.Context(), account)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+const authHeader = "Authorization"
+
+func apiTokenFromHeader(header http.Header) (auth.APITokenValue, bool) {
+	token := header.Get(authHeader)
+	if token == "" || token == "Bearer" {
+		return nil, false
+	}
+
+	return auth.APITokenValue(strings.TrimPrefix(token, "Bearer ")), true
 }

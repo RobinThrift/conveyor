@@ -1,6 +1,7 @@
 package apiv1_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -153,44 +154,6 @@ func get[P any](ctx context.Context, client *client, path string, queryPairs ...
 	return &payload, nil
 }
 
-// func post[B, P any](ctx context.Context, client *client, path string, data B) (*P, error) {
-// url :=client.baseURL.JoinPath(path)
-// 	url := client.baseURL + path
-//
-// 	encoded, err := json.Marshal(data)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error marshalling body for POST reqquest %s: %w", url, err)
-// 	}
-//
-// 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(encoded))
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error constructing POST request for %s: %w", url, err)
-// 	}
-//
-// 	res, err := client.c.Do(req)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error executing POST request %s: %w", url, err)
-// 	}
-// 	defer res.Body.Close()
-//
-// 	if res.StatusCode >= 400 {
-// 		return nil, fmt.Errorf("POST request to %s returned with error status: %w", url, unmarshalAPIError(res))
-// 	}
-//
-// 	body, err := io.ReadAll(res.Body)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error reading body for POST reqquest %s: %w", url, err)
-// 	}
-//
-// 	var payload P
-// 	err = json.Unmarshal(body, &payload)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error unmarshalling body for GET reqquest %s: %s\n%w", url, body, err)
-// 	}
-//
-// 	return &payload, nil
-// }
-//
 // func patch[B, P any](ctx context.Context, client *client, path string, data B) (*P, error) {
 // url :=client.baseURL.JoinPath(path)
 // 	url := client.baseURL + path
@@ -232,27 +195,26 @@ func get[P any](ctx context.Context, client *client, path string, queryPairs ...
 //
 // 	return &payload, nil
 // }
-//
-// func del(ctx context.Context, client *client, path string) error {
-// url :=client.baseURL.JoinPath(path)
-// 	url := client.baseURL + path
-// 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
-// 	if err != nil {
-// 		return fmt.Errorf("error constructing request for %s: %w", url, err)
-// 	}
-//
-// 	res, err := client.c.Do(req)
-// 	if err != nil {
-// 		return fmt.Errorf("error executing DELETE request %s: %w", url, err)
-// 	}
-// 	defer res.Body.Close()
-//
-// 	if res.StatusCode >= 400 {
-// 		return fmt.Errorf("DELETE request to %s returned with error status: %w", url, unmarshalAPIError(res))
-// 	}
-//
-// 	return nil
-// }
+
+func del(ctx context.Context, client *client, path string) error {
+	url := client.baseURL.JoinPath(path)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url.String(), nil)
+	if err != nil {
+		return fmt.Errorf("error constructing request for %s: %w", url.String(), err)
+	}
+
+	res, err := client.c.Do(req)
+	if err != nil {
+		return fmt.Errorf("error executing DELETE request %s: %w", url.String(), err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode >= 400 {
+		return fmt.Errorf("DELETE request to %s returned with error status: %w", url.String(), unmarshalAPIError(res))
+	}
+
+	return nil
+}
 
 func postRaw[B io.Reader, P any](ctx context.Context, client *client, path string, data B, headerPairs ...string) (*P, error) {
 	url := client.baseURL.JoinPath(path)
@@ -288,6 +250,15 @@ func postRaw[B io.Reader, P any](ctx context.Context, client *client, path strin
 	}
 
 	return &payload, nil
+}
+
+func post[B, P any](ctx context.Context, client *client, path string, data B, headerPairs ...string) (*P, error) {
+	encoded, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("error marshalling body for POST reqquest %s: %w", path, err)
+	}
+
+	return postRaw[io.Reader, P](ctx, client, path, bytes.NewReader(encoded), headerPairs...)
 }
 
 func unmarshalAPIError(res *http.Response) error {
