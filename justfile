@@ -43,22 +43,27 @@ build:
     go build -ldflags="{{go_ldflags}}" {{ go_buildflags }} -o build/belt ./bin/belt
 
 test *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
+    @mkdir -p ui/build && touch ./ui/build/index.js
     {{ local_bin }}/gotestsum --format {{ go_test_reporter }} --format-hide-empty-pkg -- {{ go_buildflags }} {{ flags }}
 
 test-watch *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
+    @mkdir -p ui/build && touch ./ui/build/index.js
     {{ local_bin }}/gotestsum --format {{ go_test_reporter }} --format-hide-empty-pkg --watch -- {{ go_buildflags }} {{ flags }}
 
 test-report *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
+    @mkdir -p ui/build && touch ./ui/build/index.js
     {{ local_bin }}/gotestsum --junitfile "tests.junit.xml" --junitfile-hide-empty-pkg --junitfile-project-name "RobinThrift/belt" --format {{ go_test_reporter }} --format-hide-empty-pkg -- {{ go_buildflags }} {{ flags }}
 
 # lint using staticcheck and golangci-lint
 lint: (_install-tool "staticcheck") (_install-tool "golangci-lint") (_install-tool "sqlc") (_install-tool "vacuum")
+    @mkdir -p ui/build && touch ./ui/build/index.js
     {{ local_bin }}/staticcheck ./...
     {{ local_bin }}/golangci-lint run ./...
     {{ local_bin }}/sqlc -f internal/storage/database/sqlite/sqlc.yaml vet
     {{ local_bin }}/vacuum lint --ruleset .scripts/vacuum.yaml --details --fail-severity warn --no-banner --all-results ./api/apiv1/apiv1.openapi3.yaml
 
 lint-report: (_install-tool "staticcheck") (_install-tool "golangci-lint")
+    @mkdir -p ui/build && touch ./ui/build/index.js
     {{ local_bin }}/golangci-lint run --timeout 5m --out-format=junit-xml ./... > lint.junit.xml
     {{ local_bin }}/vacuum report --ruleset .scripts/vacuum.yaml --no-style --junit ./api/apiv1/apiv1.openapi3.yaml -o > apiv1.junit.xml
 
