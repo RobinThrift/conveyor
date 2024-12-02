@@ -10,15 +10,15 @@ build-oci-image:
         --platform="{{ oci_platforms }}" \
         {{ docker_extra_args }} \
         -f ./deployment/Dockerfile \
-        -t {{ oci_repo }}:{{ version }} .
+        -t {{ oci_repo }}:{{ replace_regex(version, "^v", "") }} .
 
 run-oci-image:
-    -docker rmi {{ oci_repo }}:{{ version }}
+    -docker rmi {{ oci_repo }}:{{ replace_regex(version, "^v", "") }}
 
     docker build \
         --build-arg="VERSION={{ version }}" \
         -f ./deployment/Dockerfile \
-        -t {{ oci_repo }}:{{ version }} .
+        -t {{ oci_repo }}:{{ replace_regex(version, "^v", "") }} .
 
     docker run --rm \
         -e BELT_LOG_LEVEL="debug" -e BELT_LOG_FORMAT="console" \
@@ -28,4 +28,4 @@ run-oci-image:
         -e BELT_INIT_USERNAME="user" \
         -e BELT_INIT_PASSWORD="password" \
         -p 8081:8081 \
-        {{ oci_repo }}:{{ version }}
+        {{ oci_repo }}:{{ replace_regex(version, "^v", "") }}
