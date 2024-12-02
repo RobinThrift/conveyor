@@ -73,6 +73,10 @@ export function TextEditor(props: TextEditorProps) {
 
     let onCreateEditor = useCallback(
         (view: EditorView) => {
+            if (!enableVimKeybindings) {
+                return
+            }
+
             Vim.handleEx(getCM(view), "startinsert")
             view.dispatch({
                 effects: [StateEffect.appendConfig.of(EditorView.lineWrapping)],
@@ -108,7 +112,7 @@ export function TextEditor(props: TextEditorProps) {
                 })
             }
         },
-        [props.placeCursorAt],
+        [props.placeCursorAt, enableVimKeybindings],
     )
 
     return (
