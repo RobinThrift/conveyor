@@ -154,7 +154,7 @@ export function createListMemosPageStore(init: UseListMemosPageStateInit) {
             }
 
             $memos.set([created, ...$memos.get()])
-            $isLoading.set(true)
+            $isLoading.set(false)
             $error.set(undefined)
         })
     }
