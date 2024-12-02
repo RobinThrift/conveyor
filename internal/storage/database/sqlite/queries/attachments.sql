@@ -32,6 +32,8 @@ INSERT INTO attachments(
     sha256,
     created_by
 ) VALUES (?, ?, ?, ?, ?, ?)
+ON CONFLICT (filepath) DO UPDATE
+    SET filepath = filepath
 RETURNING id;
 
 -- name: DeleteAttachments :execrows

@@ -99,6 +99,58 @@ func Test_AttachmentRepo_CRUD(t *testing.T) {
 	})
 }
 
+func Test_AttachmentRepo_IgnoreDuplicate(t *testing.T) {
+	t.Parallel()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	repo := setupAttachmentRepo(ctx, t)
+
+	numAttachments := 10
+	now := time.Date(2024, 03, 15, 12, 0, 0, 0, time.UTC)
+
+	// Create new Attachments
+	for i := 0; i < numAttachments; i++ {
+		filename := fmt.Sprintf("file-%d.txt", i)
+		hash := sha256.New().Sum([]byte(filename))
+		_, err := repo.CreateAttachment(ctx, &domain.Attachment{
+			OriginalFilename: filename,
+			Filepath:         "a/b/c/" + filename,
+			ContentType:      "plain/text",
+			SizeBytes:        int64(len(filename)),
+			Sha256:           hash,
+			CreatedBy:        auth.AccountID(1),
+			CreatedAt:        now.Add(-time.Hour * time.Duration(i)),
+		})
+		require.NoError(t, err)
+	}
+
+	count, err := repo.CountAttachments(ctx)
+	require.NoError(t, err)
+	require.Equal(t, int64(numAttachments), count)
+
+	// Create new Attachments
+	for i := 0; i < numAttachments; i++ {
+		filename := fmt.Sprintf("file-%d.txt", i)
+		hash := sha256.New().Sum([]byte(filename))
+		_, err := repo.CreateAttachment(ctx, &domain.Attachment{
+			OriginalFilename: filename,
+			Filepath:         "a/b/c/" + filename,
+			ContentType:      "plain/text",
+			SizeBytes:        int64(len(filename)),
+			Sha256:           hash,
+			CreatedBy:        auth.AccountID(1),
+			CreatedAt:        now.Add(-time.Hour * time.Duration(i)),
+		})
+		require.NoError(t, err)
+	}
+
+	count, err = repo.CountAttachments(ctx)
+	require.NoError(t, err)
+	require.Equal(t, int64(numAttachments), count)
+}
+
 func Test_AttachmentRepo_CleanupUnused(t *testing.T) {
 	t.Parallel()
 
