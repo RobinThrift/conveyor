@@ -39,8 +39,11 @@ export function useSetting<T, K extends Keys>(
 export function useThemeMode() {
     let [mode] = useSetting("theme.mode")
 
-    if (mode === "auto") {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches
+    if (
+        mode === "auto" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+        return "dark"
     }
 
     return mode
