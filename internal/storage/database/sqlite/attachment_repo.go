@@ -9,7 +9,7 @@ import (
 	"github.com/RobinThrift/belt/internal/domain"
 	"github.com/RobinThrift/belt/internal/storage/database"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/sqlc"
-	"github.com/mattn/go-sqlite3"
+	"modernc.org/sqlite"
 )
 
 type AttachmentRepo struct {
@@ -120,7 +120,8 @@ func (r *AttachmentRepo) CreateAttachment(ctx context.Context, attachment *domai
 		CreatedBy:        attachment.CreatedBy,
 	})
 	if err != nil {
-		if errors.Is(err, sqlite3.ErrConstraintForeignKey) {
+		var sqlErr *sqlite.Error
+		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {
 			return domain.AttachmentID(-1), fmt.Errorf("invalid account reference")
 		}
 		return domain.AttachmentID(-1), err
@@ -164,7 +165,8 @@ func (r *AttachmentRepo) CreateMemoAttachmentLink(ctx context.Context, memoID do
 		AttachmentID: int64(attachment.ID),
 	})
 	if err != nil {
-		if errors.Is(err, sqlite3.ErrConstraintForeignKey) {
+		var sqlErr *sqlite.Error
+		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {
 			return domain.ErrMemoNotFound
 		}
 		return err

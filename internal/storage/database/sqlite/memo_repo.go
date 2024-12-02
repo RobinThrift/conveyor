@@ -11,7 +11,7 @@ import (
 	"github.com/RobinThrift/belt/internal/storage/database"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/sqlc"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
-	"github.com/mattn/go-sqlite3"
+	"modernc.org/sqlite"
 )
 
 type MemoRepo struct {
@@ -248,7 +248,8 @@ func (r *MemoRepo) createMemo(ctx context.Context, memo *domain.Memo) (domain.Me
 		CreatedAt: types.SQLiteDatetime{Time: memo.CreatedAt, Valid: true},
 	})
 	if err != nil {
-		if errors.Is(err, sqlite3.ErrConstraintForeignKey) {
+		var sqlErr *sqlite.Error
+		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {
 			return domain.MemoID(-1), fmt.Errorf("invalid account reference")
 		}
 		return domain.MemoID(-1), err

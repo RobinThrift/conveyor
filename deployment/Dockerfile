@@ -1,5 +1,3 @@
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.4.0 AS xx
-
 FROM --platform=$BUILDPLATFORM node:23-alpine3.19 AS frontend
 
 RUN apk update && apk upgrade && apk add --no-cache curl && \
@@ -20,31 +18,20 @@ RUN just build
 
 FROM --platform=$BUILDPLATFORM golang:1.23.3-alpine3.19 AS builder
 
-COPY --from=xx / /
-
-RUN apk update && apk upgrade && apk add --no-cache curl gcc musl-dev &&  \
+RUN apk update && apk upgrade && apk add --no-cache curl &&  \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
     just --version
 
-
-ARG TARGETPLATFORM
-RUN xx-apk add musl-dev gcc
-
 COPY . /belt
 COPY --from=frontend /belt/ui/build /belt/ui/build
-
 WORKDIR /belt
 
-ARG VERSION
-RUN xx-go --wrap
+ARG VERSION TARGETOS TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=1 \
-    GO_LDFLAGS="-linkmode=external -extldflags=-static -s -w" \
-    GO_TAGS="linux,sqlite_omit_load_extension,sqlite_foreign_keys,sqlite_fts5" \
-    VERSION=$VERSION \
-    just build && \
-    xx-verify --static /belt/build/belt
+    GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 \
+    GO_LDFLAGS="-s -w" GO_BUILD_FLAGS="-trimpath" VERSION=$VERSION \
+    just build
 
 # Create a nonroot user to copy
 RUN echo "nobody:*:65534:65534:nobody:/_nonexistent:/bin/false" > /etc/passwd.nonroot

@@ -2,8 +2,7 @@ local_bin  := absolute_path("./.bin")
 version    := env_var_or_default("VERSION", "dev")
 
 go_ldflags := env_var_or_default("GO_LDFLAGS", "") + " -X 'github.com/RobinThrift/belt/internal.Version=" + version + "'"
-go_tags := env_var_or_default("GO_TAGS", "sqlite_omit_load_extension,sqlite_foreign_keys,sqlite_fts5")
-go_buildflags := env_var_or_default("GO_BUILD_FLAGS", "-trimpath") + " -tags " + go_tags
+go_buildflags := env_var_or_default("GO_BUILD_FLAGS", "-trimpath")
 go_test_reporter := env("GO_TEST_REPORTER", "pkgname-and-test-fails")
 go_lint_reporter := env("GO_LINT_REPORTER", "colored-line-number")
 
@@ -25,7 +24,7 @@ run: (_install-tool "watchexec")
         BELT_ATTACHMENTS_DIR="./test/manual/attachments" \
         BELT_INIT_USERNAME="user" \
         BELT_INIT_PASSWORD="password" \
-        {{ local_bin }}/watchexec -r -e go -- go run -trimpath -tags {{ go_tags }},dev ./bin/belt
+        {{ local_bin }}/watchexec -r -e go -- go run -trimpath -tags dev ./bin/belt
 
 run-prod:
     cd ui && just install build

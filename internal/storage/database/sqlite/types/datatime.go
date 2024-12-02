@@ -9,7 +9,7 @@ import (
 )
 
 // SQLiteDatetime offers interoperability between SQLite's lack of Datetime types and go's time.Time.
-// Inspired from github.com/mattn/go-sqlite3.
+// Inspired by github.com/mattn/go-sqlite3.
 type SQLiteDatetime struct {
 	Time  time.Time
 	Valid bool

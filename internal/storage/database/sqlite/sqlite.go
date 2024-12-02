@@ -10,7 +10,7 @@ import (
 	"github.com/RobinThrift/belt/internal/storage/database"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/sqlc"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 type SQLite struct {
@@ -28,12 +28,12 @@ func (sq *SQLite) Open() error {
 
 	journalMode := ""
 	if sq.EnableWAL {
-		journalMode = "&_journal_mode=wal"
+		journalMode = "&_pragma=journal_mode(wal)"
 	}
 
-	connStr := fmt.Sprintf("%s?mode=rwc&cache=shared&_busy_timeout=%d&_foreign_keys=1&_txlock=immediate%s", sq.File, sq.Timeout.Milliseconds(), journalMode)
+	connStr := fmt.Sprintf("%s?_pragma=busy_timeout(%d)&_pragma=foreign_keys(1)&_txlock=immediate&_time_format=sqlite%s", sq.File, sq.Timeout.Milliseconds(), journalMode)
 
-	db, err := sql.Open("sqlite3", connStr)
+	db, err := sql.Open("sqlite", connStr)
 	if err != nil {
 		return err
 	}

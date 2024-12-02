@@ -10,7 +10,7 @@ import (
 	"github.com/RobinThrift/belt/internal/storage/database"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/sqlc"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
-	"github.com/mattn/go-sqlite3"
+	"modernc.org/sqlite"
 )
 
 type APITokenRepo struct {
@@ -87,7 +87,8 @@ func (r *APITokenRepo) CreateAPIToken(ctx context.Context, token *auth.APIToken)
 	})
 
 	if err != nil {
-		if errors.Is(err, sqlite3.ErrConstraintForeignKey) {
+		var sqlErr *sqlite.Error
+		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {
 			return fmt.Errorf("invalid account reference")
 		}
 
