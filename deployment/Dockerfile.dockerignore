@@ -13,4 +13,3 @@ CHANGELOG
 README.md
 
 **/node_modules
-**/package-lock.json # due to bug https://github.com/npm/cli/issues/4828

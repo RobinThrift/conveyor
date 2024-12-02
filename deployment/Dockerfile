@@ -7,6 +7,7 @@ RUN apk update && apk upgrade && apk add --no-cache curl && \
     just --version
 
 COPY ./ui/package.json /belt/ui/package.json
+COPY ./ui/package-lock.json /belt/ui/package-lock.json
 COPY ./ui/justfile /belt/ui/justfile
 
 WORKDIR /belt/ui
