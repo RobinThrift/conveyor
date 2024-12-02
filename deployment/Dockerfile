@@ -1,20 +1,30 @@
-FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.4.0 AS xx
 
-FROM --platform=$BUILDPLATFORM node:20-alpine3.18 as frontend
+FROM --platform=$BUILDPLATFORM node:23-alpine3.19 AS frontend
 
-RUN apk update && apk upgrade && apk add --no-cache just curl
+RUN apk update && apk upgrade && apk add --no-cache curl && \
+    curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
+    just --version
 
-COPY . /belt
+COPY ./ui/package.json /belt/ui/package.json
+COPY ./ui/justfile /belt/ui/justfile
 
-WORKDIR /belt
+WORKDIR /belt/ui
 
-RUN just build-js build-js build-styles build-icons _fonts
+RUN just install
 
-FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.18 as builder
+COPY ./ui /belt/ui
+
+RUN just build
+
+FROM --platform=$BUILDPLATFORM golang:1.23.3-alpine3.19 AS builder
 
 COPY --from=xx / /
 
-RUN apk update && apk upgrade && apk add --no-cache just clang lld
+RUN apk update && apk upgrade && apk add --no-cache curl &&  \
+    curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
+    just --version
+
 
 ARG TARGETPLATFORM
 RUN xx-apk add musl-dev gcc
@@ -28,10 +38,12 @@ ARG VERSION
 RUN xx-go --wrap
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=1 GO_LDFLGAS="-linkmode=external -extldflags=-static -s -w" GO_BUILD_FLAGS="-trimpath" GO_TAGS="linux,sqlite_omit_load_extension,sqlite_foreign_keys,sqlite_fts5" \
-	VERSION=$VERSION \
-    just _build-go && \
-	xx-verify --static /belt/build/belt
+    CGO_ENABLED=1 \
+    GO_LDFLAGS="-linkmode=external -extldflags=-static -s -w" \
+    GO_TAGS="linux,sqlite_omit_load_extension,sqlite_foreign_keys,sqlite_fts5" \
+    VERSION=$VERSION \
+    just build && \
+    xx-verify --static /belt/build/belt
 
 # Create a nonroot user to copy
 RUN echo "nobody:*:65534:65534:nobody:/_nonexistent:/bin/false" > /etc/passwd.nonroot
@@ -49,8 +61,8 @@ COPY --from=builder /etc/passwd.nonroot /etc/passwd
 COPY --from=builder --chown=nobody:nobody /run/belt /run
 COPY --from=builder --chown=nobody:nobody /tmp/belt /tmp
 
-ENV STUFF_DATABASE_PATH="/run/belt.db"
-ENV STUFF_FILE_DIR="/run/files"
+ENV BELT_DATABASE_PATH="/run/belt.db"
+ENV BELT_ATTACHMENTS_DIR="/run/files"
 
 USER nobody
 

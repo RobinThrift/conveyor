@@ -3,7 +3,7 @@ local_bin := absolute_path("./node_modules/.bin")
 serve *args="":
     {{ local_bin }}/vite --mode development --strictPort --port 6155 {{ args }}
 
-build:
+build: install
     {{ local_bin }}/vite build --mode production
 
 watch mode="development": 

@@ -2,12 +2,13 @@ local_bin  := absolute_path("./.bin")
 version    := env_var_or_default("VERSION", "dev")
 
 go_ldflags := env_var_or_default("GO_LDFLAGS", "") + " -X 'github.com/RobinThrift/belt/internal.Version=" + version + "'"
-go_tags := env_var_or_default("GO_TAGS", "sqlite_fts5,sqlite_omit_load_extension")
+go_tags := env_var_or_default("GO_TAGS", "sqlite_omit_load_extension,sqlite_foreign_keys,sqlite_fts5")
 go_buildflags := env_var_or_default("GO_BUILD_FLAGS", "-trimpath") + " -tags " + go_tags
 go_test_reporter := env("GO_TEST_REPORTER", "pkgname-and-test-fails")
 
 import ".scripts/database.justfile"
 import ".scripts/api.justfile"
+import ".scripts/oci.justfile"
 
 _default:
     @just --list
@@ -23,7 +24,20 @@ run: (_install-tool "watchexec")
         BELT_ATTACHMENTS_DIR="./test/manual/attachments" \
         BELT_INIT_USERNAME="user" \
         BELT_INIT_PASSWORD="password" \
-        {{ local_bin }}/watchexec -r -e go -- go run -trimpath -tags sqlite_fts5,sqlite_omit_load_extension,dev ./bin/belt
+        {{ local_bin }}/watchexec -r -e go -- go run -trimpath -tags {{ go_tags }},dev ./bin/belt
+
+run-prod:
+    cd ui && just install build
+    just build
+    @BELT_LOG_LEVEL="debug" BELT_LOG_FORMAT="console" \
+        BELT_ADDR="localhost:8081" \
+        BELT_SECURE_COOKIES="false" \
+        BELT_DATABASE_PATH="./test/manual/belt.db" \
+        BELT_DATABASE_DEBUG_ENABLED="true" \
+        BELT_ATTACHMENTS_DIR="./test/manual/attachments" \
+        BELT_INIT_USERNAME="user" \
+        BELT_INIT_PASSWORD="password" \
+        ./build/belt
 
 build:
     go build -ldflags="{{go_ldflags}}" {{ go_buildflags }} -o build/belt ./bin/belt
