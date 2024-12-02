@@ -22,7 +22,7 @@ FROM --platform=$BUILDPLATFORM golang:1.23.3-alpine3.19 AS builder
 
 COPY --from=xx / /
 
-RUN apk update && apk upgrade && apk add --no-cache curl &&  \
+RUN apk update && apk upgrade && apk add --no-cache curl gcc musl-dev &&  \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
     just --version
 
