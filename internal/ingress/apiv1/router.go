@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -266,7 +267,7 @@ func (r *router) CreateAttachment(ctx context.Context, req CreateAttachmentReque
 	}
 
 	id, err := r.attachmentCtrl.CreateAttachment(ctx, control.CreateAttachmentCmd{
-		Filename: req.Params.XFilename,
+		Filename: url.QueryEscape(req.Params.XFilename),
 		Content:  content,
 	})
 	if err != nil {
