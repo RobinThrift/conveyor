@@ -15,7 +15,7 @@ export interface ParseInput {
     type: "parse"
     id: string
     params: {
-        markdown: ArrayBuffer
+        markdown: Uint8Array | ArrayBuffer
     }
 }
 
@@ -30,7 +30,7 @@ export interface WorkerOutputError {
 export interface WorkerOutputResult {
     type: "result"
     id: string
-    data: ArrayBuffer
+    data: Uint8Array | ArrayBuffer
 }
 
 globalThis.onmessage = (evt: MessageEvent<WorkerInput>) => {
@@ -53,7 +53,7 @@ globalThis.onmessage = (evt: MessageEvent<WorkerInput>) => {
 
 const encoder = new TextEncoder()
 
-function parseMarkdown(content: ArrayBuffer, id: string) {
+function parseMarkdown(content: Uint8Array | ArrayBuffer, id: string) {
     let ast = fromMarkdown(new Uint8Array(content), "utf-8", {
         extensions: [
             gfmAutolinkLiteral(),

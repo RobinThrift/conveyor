@@ -37,7 +37,7 @@ jobs:
       env:
         BIOME_REPORTER: "github"
       run: |
-        cd ui &&
+        cd ui && \
         just lint
 
   Test:
