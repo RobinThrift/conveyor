@@ -50,7 +50,7 @@ COPY --from=builder --chown=nobody:nobody /run/belt /run
 COPY --from=builder --chown=nobody:nobody /tmp/belt /tmp
 
 ENV BELT_DATABASE_PATH="/run/belt.db"
-ENV BELT_ATTACHMENTS_DIR="/run/files"
+ENV BELT_ATTACHMENTS_DIR="/run/attachments"
 
 USER nobody
 
