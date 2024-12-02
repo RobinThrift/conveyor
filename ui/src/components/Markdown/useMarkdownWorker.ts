@@ -5,10 +5,13 @@ import { MarkdownWorker } from "./parser.worker"
 let sharedWorker: MarkdownWorker | undefined
 let activeCount = 0
 
+let terminationTimeout: ReturnType<typeof setTimeout> | undefined = undefined
+
 export function useMarkdownWorker(markdown: string) {
     let [result, setResult] = useState<Root | undefined>(undefined)
 
     useEffect(() => {
+        clearTimeout(terminationTimeout)
         activeCount++
 
         if (!sharedWorker) {
@@ -28,9 +31,11 @@ export function useMarkdownWorker(markdown: string) {
         return () => {
             activeCount--
             if (activeCount <= 0) {
-                activeCount = 0
-                sharedWorker?.terminate()
-                sharedWorker = undefined
+                terminationTimeout = setTimeout(() => {
+                    activeCount = 0
+                    sharedWorker?.terminate()
+                    sharedWorker = undefined
+                }, 5000)
             }
         }
     }, [markdown])
