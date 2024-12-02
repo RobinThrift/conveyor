@@ -43,11 +43,6 @@ func (lfs *LocalFSAttachments) WriteAttachment(_ context.Context, attachment *do
 		return err
 	}
 
-	err = fhandle.Close()
-	if err != nil {
-		return err
-	}
-
 	attachment.Sha256 = h.Sum(nil)
 
 	attachment.Filepath = ""
@@ -65,6 +60,10 @@ func (lfs *LocalFSAttachments) WriteAttachment(_ context.Context, attachment *do
 	}
 
 	err = os.Rename(fhandle.Name(), finalFilePath)
+	if err != nil {
+		err = copyFile(fhandle, finalFilePath)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -129,4 +128,21 @@ func isEmptyDir(dir string) (bool, error) {
 	}
 
 	return len(entries) == 0, nil
+}
+
+func copyFile(fhandle *os.File, targetPath string) error {
+	src, err := os.Open(fhandle.Name())
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	target, err := os.OpenFile(targetPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(target, src)
+
+	return errors.Join(err, target.Close())
 }
