@@ -1,6 +1,7 @@
 import { Link } from "@/components/Link"
 import { useBreakpoint } from "@/hooks/useBreakPoint"
 import { useT } from "@/i18n"
+import { useAccount } from "@/storage/account"
 import { List, SignOut } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React, { useMemo } from "react"
@@ -10,7 +11,6 @@ import { ModeSwitcher, ThemeSwitcher } from "../ThemeSwitcher"
 export interface SidebarProps {
     className?: string
     items: SidebarItem[]
-    username: string
 }
 
 export interface SidebarItem {
@@ -23,27 +23,10 @@ export interface SidebarItem {
 export function Sidebar(props: SidebarProps) {
     let useCollapsibleSidebar = useBreakpoint(1630)
     let t = useT("components/Sidebar")
-    let greeting = useMemo(() => {
-        let now = new Date()
-        if (now.getHours() < 12) {
-            return t.GreetingMorning
-        }
-
-        if (now.getHours() < 18) {
-            return t.GreetingAfternoon
-        }
-
-        return t.GreetingEvening
-    }, [t.GreetingMorning, t.GreetingEvening, t.GreetingAfternoon])
 
     let content = (
         <div className="sidebar">
-            <div className="px-6 py-4 mb-4 overflow-hidden">
-                <span className="block -mb-2 font-semibold">{greeting}</span>
-                <span className="text-primary text-2xl font-bold">
-                    {props.username}
-                </span>
-            </div>
+            <Greeting />
 
             <nav className="flex w-full grow">
                 <ul className="w-full h-fit p-4 pt-0 space-y-1">
@@ -110,5 +93,31 @@ export function Sidebar(props: SidebarProps) {
                 {content}
             </div>
         </aside>
+    )
+}
+
+function Greeting() {
+    let t = useT("components/Sidebar")
+    let account = useAccount()
+    let greeting = useMemo(() => {
+        let now = new Date()
+        if (now.getHours() < 12) {
+            return t.GreetingMorning
+        }
+
+        if (now.getHours() < 18) {
+            return t.GreetingAfternoon
+        }
+
+        return t.GreetingEvening
+    }, [t.GreetingMorning, t.GreetingEvening, t.GreetingAfternoon])
+
+    return (
+        <div className="px-6 py-4 mb-4 overflow-hidden">
+            <span className="block -mb-2 font-semibold">{greeting}</span>
+            <span className="text-primary text-2xl font-bold">
+                {account.displayName}
+            </span>
+        </div>
     )
 }

@@ -143,7 +143,6 @@ export function App(props: AppProps) {
         <div className="flex gap-4 justify-start flex-col">
             <Sidebar
                 className="sm:w-[250px] w-[80%] h-screen fixed"
-                username="User"
                 items={[
                     {
                         label: t.Memos,

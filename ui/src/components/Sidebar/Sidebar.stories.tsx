@@ -4,7 +4,6 @@ import React from "react"
 import { Sidebar } from "./Sidebar"
 
 import "@/index.css"
-import { faker } from "@faker-js/faker"
 
 const meta: Meta<typeof Sidebar> = {
     title: "Components/Sidebar",
@@ -22,7 +21,6 @@ export const Basic: Story = {
 
     args: {
         className: "w-[250px] h-screen fixed",
-        username: faker.person.firstName(),
         items: [
             {
                 label: "Memos",
