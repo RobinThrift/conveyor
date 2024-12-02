@@ -1,7 +1,7 @@
 import type { Tag } from "@/domain/Tag"
 import * as eventbus from "@/eventbus"
 import { useAttachmentUploader } from "@/hooks/api/attachments"
-import { settingsStore } from "@/storage/settings"
+import { settingsStore, useThemeMode } from "@/storage/settings"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import { languages } from "@codemirror/language-data"
 import { SearchCursor } from "@codemirror/search"
@@ -9,6 +9,7 @@ import { useStore } from "@nanostores/react"
 import { Vim, getCM, vim } from "@replit/codemirror-vim"
 import { hyperLink } from "@uiw/codemirror-extensions-hyper-link"
 import { quietlight } from "@uiw/codemirror-theme-quietlight"
+import { tokyoNightInit } from "@uiw/codemirror-theme-tokyo-night"
 import CodeMirror, {
     StateEffect,
     EditorView,
@@ -47,6 +48,17 @@ export interface TextEditorProps {
 }
 
 export function TextEditor(props: TextEditorProps) {
+    let themeMode = useThemeMode()
+    let theme = useMemo(
+        () =>
+            themeMode === "dark"
+                ? tokyoNightInit({
+                      settings: { background: "rgb(var(--surface-bg))" },
+                  })
+                : quietlight,
+        [themeMode],
+    )
+
     useAttachmentUploader()
 
     let enableVimKeybindings = useStore(settingsStore.$values, {
@@ -123,7 +135,7 @@ export function TextEditor(props: TextEditorProps) {
             value={props.content}
             extensions={[extensions]}
             onChange={props.onChange}
-            theme={quietlight}
+            theme={theme}
             autoFocus={props.autoFocus}
             placeholder={props.placeholder}
             onCreateEditor={onCreateEditor}

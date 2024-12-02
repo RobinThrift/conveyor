@@ -1,6 +1,7 @@
 .select-list {
     @apply p-1 overflow-auto rounded-md bg-white shadow-lg;
     @apply ring-1 ring-black ring-opacity-5;
+    @apply dark:bg-sidebar dark:border dark:border-subtle-extra-dark;
 
     min-width: var(--radix-select-trigger-width);
     max-height: var(--radix-select-content-available-height);
@@ -51,7 +52,7 @@
         @apply bg-primary text-white;
     }
 
-    &.checkbox {
+    &.checkbox-item {
         @apply pl-6;
     }
 }

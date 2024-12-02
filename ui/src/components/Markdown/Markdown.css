@@ -1,6 +1,7 @@
 .content {
     @apply prose max-w-none;
     @apply prose-ul:my-0 prose-li:p-0 prose-li:my-0;
+    @apply dark:prose-invert;
 
     li > p {
         @apply my-0;
@@ -24,6 +25,7 @@
 
     .table-wrapper {
         @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6;
+        @apply border-subtle-extra-dark;
         table {
             margin: 0;
         }
@@ -35,10 +37,12 @@
 
     thead {
         @apply font-semibold bg-subtle-light;
+        @apply dark:bg-subtle-extra-dark;
     }
 
     td {
         @apply p-2 border-x border-subtle;
+        @apply border-subtle-extra-dark;
 
         &:first-child {
             @apply border-l-0;

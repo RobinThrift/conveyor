@@ -29,9 +29,9 @@
     }
 
     &:disabled {
-        background-color: rgba(var(--btn-bg), 0.8);
-        color: rgba(var(--btn-color), 0.5);
-        border-color: rgba(var(--btn-border-color), 0.7);
+        background-color: rgba(var(--btn-bg) / 0.8);
+        color: rgba(var(--btn-color) / 0.5);
+        border-color: rgba(var(--btn-border-color) / 0.7);
     }
 }
 
@@ -106,8 +106,17 @@
 
     &:disabled {
         background-color: transparent !important;
-        color: rgba(var(--btn-border-color), 0.5);
-        border-color: rgb(var(--btn-border-color), 0.3);
+        color: rgba(var(--btn-border-color) / 0.5);
+        border-color: rgb(var(--btn-border-color) / 0.3);
+    }
+}
+
+.dark .btn.regular.outline-btn {
+    --btn-border-color: var(--text-color);
+    --btn-bg: var(--text-color);
+
+    &:hover {
+        --btn-bg: var(--btn-regular-bg);
     }
 }
 

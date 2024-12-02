@@ -8,6 +8,7 @@
 @import "./components/Select/Select.css" layer(components);
 @import "./components/Tooltip/Tooltip.css" layer(components);
 @import "./components/Image/Image.css" layer(components);
+@import "./components/Sidebar/Sidebar.css" layer(components);
 @import "./pages/Settings/SettingsPage.css" layer(components);
 
 @layer base {
@@ -54,6 +55,12 @@
         --btn-border-color: 53 52 52;
         --btn-color: 255 255 255;
 
+        --btn-regular-bg: 52 52 52;
+        --btn-regular-bg-hover: 70 70 70;
+        --btn-regular-bg-active: 32 32 32;
+        --btn-regular-border-color: 53 52 52;
+        --btn-regular-color: 255 255 255;
+
         --btn-primary-bg: var(--color-primary);
         --btn-primary-bg-hover: var(--color-primary-dark);
         --btn-primary-bg-active: var(--color-primary-extra-dark);
@@ -74,7 +81,71 @@
     }
 
     :root.dark {
-        --modal-overlay-bg: 30 41 59;
+        --text-color: 255 255 255;
+        --body-bg: 26 31 42;
+        --surface-bg: 41 46 58;
+        --sidebar-bg: 26 31 42;
+
+        --color-primary-extra-light: 171 206 222;
+        --color-primary-light: 127 175 201;
+        --color-primary: 57 117 163;
+        --color-primary-dark: 9 65 122;
+        --color-primary-extra-dark: 7 56 110;
+        --color-primary-contrast: 235 244 247;
+
+        --color-success-extra-light: 231 244 239;
+        --color-success-light: 165 207 188;
+        --color-success: 74 137 92;
+        --color-success-dark: 51 103 61;
+        --color-success-extra-dark: 28 63 31;
+        --color-success-contrast: 255 255 255;
+
+        --color-danger-extra-light: 235 210 185;
+        --color-danger-light: 222 178 145;
+        --color-danger: 178 48 27;
+        --color-danger-dark: 133 33 17;
+        --color-danger-extra-dark: 107 25 12;
+        --color-danger-contrast: 255 255 255;
+
+        --color-subtle-extra-light: 177 177 177;
+        --color-subtle-light: 150 150 150;
+        --color-subtle: 131 131 131;
+        --color-subtle-dark: 112 112 112;
+        --color-subtle-extra-dark: 93 93 93;
+        --color-subtle-contrast: 250 250 250;
+
+        --dialog-bg: 255 255 255;
+        --modal-overlay-bg: 107 114 128;
+
+        --btn-bg: 52 52 52;
+        --btn-bg-hover: 70 70 70;
+        --btn-bg-active: 32 32 32;
+        --btn-border-color: 53 52 52;
+        --btn-color: 255 255 255;
+
+        --btn-regular-bg: 52 52 52;
+        --btn-regular-bg-hover: 70 70 70;
+        --btn-regular-bg-active: 32 32 32;
+        --btn-regular-border-color: 53 52 52;
+        --btn-regular-color: 255 255 255;
+
+        --btn-primary-bg: var(--color-primary);
+        --btn-primary-bg-hover: var(--color-primary-dark);
+        --btn-primary-bg-active: var(--color-primary-extra-dark);
+        --btn-primary-border-color: var(--color-primary-dark);
+        --btn-primary-color: var(--color-primary-contrast);
+
+        --btn-success-bg: var(--color-success);
+        --btn-success-bg-hover: var(--color-success-dark);
+        --btn-success-bg-active: var(--color-success-extra-dark);
+        --btn-success-border-color: var(--color-success-dark);
+        --btn-success-color: var(--color-primary-contrast);
+
+        --btn-danger-bg: var(--color-danger);
+        --btn-danger-bg-hover: var(--color-danger-dark);
+        --btn-danger-bg-active: var(--color-danger-extra-dark);
+        --btn-danger-border-color: var(--color-danger-dark);
+        --btn-danger-color: var(--color-danger-contrast);
     }
 }
 

@@ -89,7 +89,7 @@ export const Option = React.forwardRef<HTMLDivElement, SelectOptionProps>(
             <RadixSelect.SelectItem
                 className={clsx("select-item", {
                     nocheckbox: !props.useCheckbox,
-                    checkbox: props.useCheckbox,
+                    "checkbox-item": props.useCheckbox,
                 })}
                 value={props.value}
                 disabled={props.disabled}

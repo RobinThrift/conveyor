@@ -35,3 +35,13 @@ export function useSetting<T, K extends Keys>(
         settingsStore.set,
     ]
 }
+
+export function useThemeMode() {
+    let [mode] = useSetting("theme.mode")
+
+    if (mode === "auto") {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+    }
+
+    return mode
+}

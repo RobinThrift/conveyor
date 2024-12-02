@@ -1,6 +1,7 @@
 .settings-tab-list {
     @apply rounded-lg border border-subtle bg-surface px-2 py-1;
     @apply grid gap-2 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4;
+    @apply border-subtle-extra-dark;
 }
 
 .settings-tab-list-item {
@@ -9,10 +10,15 @@
 
     &:hover {
         @apply bg-subtle text-primary-dark;
+        @apply dark:bg-subtle-extra-light dark:text-primary-extra-dark;
     }
 
     &[data-state="active"] {
         @apply bg-primary text-primary-contrast;
+        @apply dark:bg-primary-dark;
+        &:hover {
+            @apply text-primary-contrast;
+        }
     }
 }
 
@@ -34,6 +40,7 @@
 
 .settings-tab-section {
     @apply rounded-lg border border-subtle bg-surface p-4 flex-1 space-y-2;
+    @apply border-subtle-extra-dark;
 
     .checkbox-field {
         @apply flex flex-row-reverse justify-between;
@@ -48,6 +55,8 @@
 .settings-tab-section {
     .table-wrapper {
         @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6;
+        @apply border-subtle-extra-dark;
+
         table {
             margin: 0;
         }
@@ -59,10 +68,12 @@
 
     thead {
         @apply font-semibold bg-subtle-light;
+        @apply dark:bg-subtle-extra-dark;
     }
 
     th {
         @apply p-2 border-l border-b border-t-0 border-subtle text-left;
+        @apply border-subtle-extra-dark;
 
         &:first-child {
             @apply border-l-0;
@@ -75,6 +86,7 @@
 
     td {
         @apply p-2 border-l border-subtle;
+        @apply border-subtle-extra-dark;
 
         &:first-child {
             @apply border-l-0;

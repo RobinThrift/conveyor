@@ -1,5 +1,6 @@
 .editor {
     @apply rounded-lg border border-subtle focus-within:border-primary p-3;
+    @apply dark:border-subtle-extra-dark;
     background-color: rgb(var(--surface-bg));
 
     .cm-theme {

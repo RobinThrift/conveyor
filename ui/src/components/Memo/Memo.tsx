@@ -124,6 +124,7 @@ export function Memo(props: MemoProps) {
         <article
             className={clsx(
                 "rounded-lg border border-subtle bg-surface p-4 relative group",
+                "dark:border-subtle-extra-dark",
                 props.className,
             )}
         >

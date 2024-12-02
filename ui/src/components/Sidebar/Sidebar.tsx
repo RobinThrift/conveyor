@@ -37,7 +37,7 @@ export function Sidebar(props: SidebarProps) {
     }, [t.GreetingMorning, t.GreetingEvening, t.GreetingAfternoon])
 
     let content = (
-        <div className="h-full flex flex-col bg-sidebar">
+        <div className="sidebar">
             <div className="px-6 py-4 mb-4 overflow-hidden">
                 <span className="block -mb-2 font-semibold">{greeting}</span>
                 <span className="text-primary text-2xl font-bold">
@@ -51,13 +51,9 @@ export function Sidebar(props: SidebarProps) {
                         <li key={item.url}>
                             <Link
                                 href={item.url}
-                                className={clsx(
-                                    "flex items-center gap-4 cursor-pointer w-full rounded p-2 hover:text-primary font-semibold transition hover:bg-body",
-                                    {
-                                        "bg-body text-primary border-l-2 border-l-primary":
-                                            item.isActive,
-                                    },
-                                )}
+                                className={clsx("sidebar-menu-item", {
+                                    active: item.isActive,
+                                })}
                             >
                                 {item.icon}
                                 {item.label}
