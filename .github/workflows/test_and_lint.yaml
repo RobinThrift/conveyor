@@ -24,22 +24,17 @@ jobs:
     - uses: RobinThrift/action-setup-just@v1
 
     - name: "Lint Go"
+      env:
+        GO_LINT_REPORTER: "github-actions"
       run: |
-        just lint-report
+        just lint
 
     - name: "Lint JS"
+      env:
+        BIOME_REPORTER: "github"
       run: |
         cd ui &&
         just lint
-
-    - name: Publish Lint Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        check_name: "Lint Results"
-        files: |
-          lint.junit.xml
-          apiv1.junit.xml
 
   Test:
     runs-on: ubuntu-latest
@@ -54,8 +49,9 @@ jobs:
     - name: "Test"
       env:
         GO_TEST_REPORTER: "github-actions"
+        EXPORT_REPORT: "true"
       run: |
-        just test-report
+        just test
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
@@ -63,4 +59,4 @@ jobs:
       with:
         check_name: "Test Results"
         files: |
-          tests.junit.xml
+          *.junit.xml

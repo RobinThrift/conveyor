@@ -5,6 +5,7 @@ go_ldflags := env_var_or_default("GO_LDFLAGS", "") + " -X 'github.com/RobinThrif
 go_tags := env_var_or_default("GO_TAGS", "sqlite_omit_load_extension,sqlite_foreign_keys,sqlite_fts5")
 go_buildflags := env_var_or_default("GO_BUILD_FLAGS", "-trimpath") + " -tags " + go_tags
 go_test_reporter := env("GO_TEST_REPORTER", "pkgname-and-test-fails")
+go_lint_reporter := env("GO_LINT_REPORTER", "colored-line-number")
 
 import ".scripts/database.justfile"
 import ".scripts/api.justfile"
@@ -42,30 +43,26 @@ run-prod:
 build:
     go build -ldflags="{{go_ldflags}}" {{ go_buildflags }} -o build/belt ./bin/belt
 
+export_report := env_var_or_default("EXPORT_REPORT", "false")
 test *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
     @mkdir -p ui/build && touch ./ui/build/index.js
-    {{ local_bin }}/gotestsum --format {{ go_test_reporter }} --format-hide-empty-pkg -- {{ go_buildflags }} {{ flags }}
+    {{ local_bin }}/gotestsum \
+        {{ if export_report == "true" { "--junitfile 'tests.junit.xml' --junitfile-project-name 'RobinThrift/belt' --junitfile-hide-empty-pkg" } else { "" } }} \
+        --format {{ go_test_reporter }} \
+        --format-hide-empty-pkg \
+        -- {{ go_buildflags }} {{ flags }}
 
 test-watch *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
     @mkdir -p ui/build && touch ./ui/build/index.js
     {{ local_bin }}/gotestsum --format {{ go_test_reporter }} --format-hide-empty-pkg --watch -- {{ go_buildflags }} {{ flags }}
 
-test-report *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
-    @mkdir -p ui/build && touch ./ui/build/index.js
-    {{ local_bin }}/gotestsum --junitfile "tests.junit.xml" --junitfile-hide-empty-pkg --junitfile-project-name "RobinThrift/belt" --format {{ go_test_reporter }} --format-hide-empty-pkg -- {{ go_buildflags }} {{ flags }}
-
 # lint using staticcheck and golangci-lint
 lint: (_install-tool "staticcheck") (_install-tool "golangci-lint") (_install-tool "sqlc") (_install-tool "vacuum")
     @mkdir -p ui/build && touch ./ui/build/index.js
     {{ local_bin }}/staticcheck ./...
-    {{ local_bin }}/golangci-lint run ./...
+    {{ local_bin }}/golangci-lint run --out-format={{ go_lint_reporter }} ./...
     {{ local_bin }}/sqlc -f internal/storage/database/sqlite/sqlc.yaml vet
     {{ local_bin }}/vacuum lint --ruleset .scripts/vacuum.yaml --details --fail-severity warn --no-banner --all-results ./api/apiv1/apiv1.openapi3.yaml
-
-lint-report: (_install-tool "staticcheck") (_install-tool "golangci-lint")
-    @mkdir -p ui/build && touch ./ui/build/index.js
-    {{ local_bin }}/golangci-lint run --timeout 5m --out-format=junit-xml ./... > lint.junit.xml
-    {{ local_bin }}/vacuum report --ruleset .scripts/vacuum.yaml --no-style --junit ./api/apiv1/apiv1.openapi3.yaml -o > apiv1.junit.xml
 
 fmt:
     @go fmt ./...
