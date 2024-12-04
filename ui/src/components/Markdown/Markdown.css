@@ -53,7 +53,7 @@
         }
     }
 
-    code {
+    :where(code):not(pre > code) {
         @apply bg-sidebar;
     }
 
