@@ -2,6 +2,7 @@ import type { APIToken } from "@/domain/APIToken"
 import { $baseURL } from "@/hooks/useBaseURL"
 import { atom, batched, computed, onMount, task } from "nanostores"
 import * as api from "./api/apitokens"
+import { randomID } from "@/helper"
 
 const $tokens = atom<APIToken[]>([])
 const $pages = atom<(string | undefined)[]>([])
@@ -11,7 +12,7 @@ const $hasNextPage = atom<boolean>(false)
 const $isLoading = atom<boolean>(true)
 const $error = atom<Error | undefined>()
 const $lastCreatedValue = atom<string | undefined>()
-const $forceReload = atom<string>(crypto.randomUUID())
+const $forceReload = atom<string>(randomID())
 
 const pageSize = 10
 
@@ -137,7 +138,7 @@ let create = (token: api.CreateAPITokenRequest) => {
 
         $isLoading.set(false)
         $lastCreatedValue.set(created.token)
-        $forceReload.set(crypto.randomUUID())
+        $forceReload.set(randomID())
     })
 }
 
@@ -165,7 +166,7 @@ let del = (name: string) => {
 
         $isLoading.set(false)
         $error.set(undefined)
-        $forceReload.set(crypto.randomUUID())
+        $forceReload.set(randomID())
     })
 }
 

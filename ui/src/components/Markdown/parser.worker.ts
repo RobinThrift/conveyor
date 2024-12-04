@@ -5,6 +5,7 @@ import type {
     WorkerOutputError,
     WorkerOutputResult,
 } from "./parser.worker.internal"
+import { randomID } from "@/helper"
 
 export class MarkdownWorker {
     private _worker: Worker
@@ -68,7 +69,7 @@ export class MarkdownWorker {
     }
 
     public parse(markdown: string): Promise<Root> {
-        let id = globalThis.crypto.randomUUID()
+        let id = randomID()
 
         let result = new Promise<Root>((resolve, reject) => {
             this._requests.set(id, { resolve, reject })

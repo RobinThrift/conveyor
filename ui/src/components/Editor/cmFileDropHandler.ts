@@ -1,4 +1,5 @@
 import * as eventbus from "@/eventbus"
+import { randomID } from "@/helper"
 import { SearchCursor } from "@codemirror/search"
 import {
     type Extension,
@@ -153,7 +154,7 @@ const fileDropHandlerExt = ViewPlugin.fromClass(
             let insertStrings = [""]
 
             Array.from(e.dataTransfer.files).forEach((file) => {
-                let localID = `${file.name}_${globalThis.crypto.randomUUID()}`
+                let localID = `${file.name}_${randomID()}`
                 this.dropPositions.set(localID, pos)
                 eventbus.emit("attachments:upload:start", {
                     localID,
