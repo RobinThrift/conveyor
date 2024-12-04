@@ -76,7 +76,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
 
     return (
         <div className="flex gap-4 justify-center">
-            <div className="flex-1 max-w-4xl gap-4 flex flex-col">
+            <div className="flex-1 max-w-4xl w-full gap-4 flex flex-col">
                 {showEditor && (
                     <div className="container mx-auto">
                         <NewMemoEditor
@@ -185,7 +185,11 @@ function FiltersSidebar(props: React.PropsWithChildren) {
                     </SheetTrigger>
                 </div>
 
-                <SheetContent title="Filters" side="right">
+                <SheetContent
+                    title="Filters"
+                    titleClassName="sr-only"
+                    side="right"
+                >
                     <div className="bg-body p-3 h-full overflow-auto relative">
                         {props.children}
                     </div>
