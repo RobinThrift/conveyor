@@ -9,6 +9,7 @@ export function Sheet(props: SheetProps) {
 
 export interface SheetContentProps {
     className?: string
+    titleClassName?: string
     children: React.ReactNode | React.ReactNode[]
     title: string
     side?: "left" | "right"
@@ -21,7 +22,9 @@ export function SheetContent({
 }: SheetContentProps) {
     return (
         <Dialog.Portal>
-            <Dialog.DialogTitle>{props.title}</Dialog.DialogTitle>
+            <Dialog.DialogTitle className={props.titleClassName}>
+                {props.title}
+            </Dialog.DialogTitle>
             <SheetOverlay />
             <Dialog.DialogContent
                 {...props}
