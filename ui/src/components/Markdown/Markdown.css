@@ -3,6 +3,9 @@
     @apply prose-ul:my-0 prose-li:p-0 prose-li:my-0;
     @apply dark:prose-invert;
 
+	text-wrap: pretty;
+	overflow-wrap: break-word;
+
     li > p {
         @apply my-0;
     }
