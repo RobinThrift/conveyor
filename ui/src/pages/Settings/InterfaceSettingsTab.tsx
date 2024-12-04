@@ -1,16 +1,23 @@
 import { Checkbox } from "@/components/Input/Checkbox"
 import { ModeSwitcher, ThemeSwitcher } from "@/components/ThemeSwitcher"
 import { useT } from "@/i18n"
-import { settingsStore } from "@/storage/settings"
+import { settingsStore, useSetting } from "@/storage/settings"
 import { useStore } from "@nanostores/react"
 import React, { useCallback } from "react"
+import { Select } from "@/components/Select"
+import { useBaseURL } from "@/hooks/useBaseURL"
 
 export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
     function InterfaceSettingsTab(_, forwardedRef) {
         let t = useT("pages/Settings/InterfaceSettingsTab")
+
+        let baseURL = useBaseURL()
+
         let controls = useStore(settingsStore.$values, {
             keys: ["controls", "controls.vim", "controls.doubleClickToEdit"],
         }).controls
+
+        let [icon, setIcon] = useSetting<string, "theme.icon">("theme.icon")
 
         let onChangeControlVim = useCallback((v: boolean | "indeterminate") => {
             settingsStore.set("controls.vim", v)
@@ -51,6 +58,42 @@ export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
                             {t.LabelModeOverride}
                         </label>
                         <ModeSwitcher className="col-span-5" />
+                    </div>
+
+                    <div className="md:grid grid-cols-6 space-y-1">
+                        <label
+                            htmlFor="mode"
+                            className="flex items-center mt-4 sm:mt-0 font-semibold text-sm"
+                        >
+                            {t.LabelModeOverride}
+                        </label>
+                        <Select
+                            className="col-span-5"
+                            name="icon"
+                            ariaLabel={t.LabelIcon}
+                            onChange={setIcon}
+                            value={icon}
+                        >
+                            <Select.Option value="default">
+                                <div className="icon-select-option">
+                                    <img
+                                        src={`${baseURL}/assets/icons/default/pwa-192x192.png`}
+                                        alt="default"
+                                    />
+                                    <span>(Default)</span>
+                                </div>
+                            </Select.Option>
+
+                            <Select.Option value="fat-b">
+                                <div className="icon-select-option">
+                                    <img
+                                        src={`${baseURL}/assets/icons/fat-b/pwa-192x192.png`}
+                                        alt="fat-b"
+                                    />
+                                    <span>(Fat B)</span>
+                                </div>
+                            </Select.Option>
+                        </Select>
                     </div>
                 </div>
 

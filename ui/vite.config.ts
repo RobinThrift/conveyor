@@ -6,6 +6,8 @@ export default defineConfig(async (config): Promise<UserConfig> => {
     return {
         base: "/assets/",
 
+        publicDir: "build/",
+
         define: {
             "process.env.LOG_LEVEL": JSON.stringify("error"),
             "process.env.NODE_ENV": JSON.stringify(config.mode),
@@ -24,15 +26,6 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         },
 
         plugins: [react()],
-
-        server: {
-            proxy: {
-                "/api": {
-                    target: "http://localhost:6150",
-                    changeOrigin: true,
-                },
-            },
-        },
 
         build: {
             outDir: "build",

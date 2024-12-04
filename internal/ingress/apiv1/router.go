@@ -310,6 +310,7 @@ func (r *router) GetSettings(ctx context.Context, req GetSettingsRequestObject) 
 		LocaleRegion:              settings.Locale.Region,
 		ThemeColourScheme:         settings.Theme.ColourScheme,
 		ThemeMode:                 settings.Theme.Mode,
+		ThemeIcon:                 settings.Theme.Icon,
 		ControlsVim:               settings.Controls.Vim,
 		ControlsDoubleClickToEdit: settings.Controls.DoubleClickToEdit,
 	}, nil
@@ -322,6 +323,7 @@ func (r *router) UpdateSettings(ctx context.Context, req UpdateSettingsRequestOb
 		LocaleRegion:              req.Body.LocaleRegion,
 		ThemeColourScheme:         req.Body.ThemeColourScheme,
 		ThemeMode:                 req.Body.ThemeMode,
+		ThemeIcon:                 req.Body.ThemeIcon,
 		ControlsVim:               req.Body.ControlsVim,
 		ControlsDoubleClickToEdit: req.Body.ControlsDoubleClickToEdit,
 	}

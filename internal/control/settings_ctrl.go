@@ -52,6 +52,7 @@ type SetSettingsCmd struct {
 	LocaleRegion              *string
 	ThemeColourScheme         *string
 	ThemeMode                 *string
+	ThemeIcon                 *string
 	ControlsVim               *bool
 	ControlsDoubleClickToEdit *bool
 }
@@ -80,6 +81,10 @@ func (sc *SettingsControl) Set(ctx context.Context, cmd SetSettingsCmd) error {
 
 	if cmd.ThemeColourScheme != nil {
 		settings.Theme.ColourScheme = *cmd.ThemeColourScheme
+	}
+
+	if cmd.ThemeIcon != nil {
+		settings.Theme.Icon = *cmd.ThemeIcon
 	}
 
 	if cmd.ThemeMode != nil {

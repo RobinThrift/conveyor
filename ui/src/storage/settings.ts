@@ -6,9 +6,7 @@ export * from "./remote/settings"
 
 type Keys = StoreKeys<typeof settingsStore.$values>
 
-export function useSetting<T, K extends Keys>(
-    key: K,
-): [T, typeof settingsStore.set] {
+export function useSetting<T, K extends Keys>(key: K): [T, (v: T) => void] {
     let parts = useMemo(() => key.split("."), [key])
     let keys = useMemo(() => {
         let paths = [] as Keys[]
@@ -32,7 +30,9 @@ export function useSetting<T, K extends Keys>(
 
             return value as T
         }, [store, parts]),
-        settingsStore.set,
+        (v: T) => {
+            settingsStore.set(key, v)
+        },
     ]
 }
 

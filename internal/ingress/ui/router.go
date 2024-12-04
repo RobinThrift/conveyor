@@ -1,7 +1,10 @@
 package ui
 
 import (
+	"cmp"
+	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/RobinThrift/belt/internal/auth"
@@ -47,6 +50,8 @@ func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthControll
 		return nil
 	}))))
 
+	mux.Handle(config.BasePath+"assets/manifest.json", server.CompressWithGzipMiddleware(http.HandlerFunc(router.serveManifestJSON)))
+
 	mux.Handle("/assets/", server.CompressWithGzipMiddleware(ui.Assets(config.BasePath+"assets/")))
 	mux.Handle(
 		config.BasePath+"attachments/",
@@ -81,6 +86,7 @@ func (router *router) handlerFuncWithErr(h func(w http.ResponseWriter, r *http.R
 func (router *router) renderUI(w http.ResponseWriter, r *http.Request, data ui.PageData) error {
 	data.BaseURL = router.config.BasePath
 	data.AssetURL = joinPath(router.config.BasePath, "/assets")
+	data.Icon = "default"
 	data.CSRFToken = csrf.Token(r)
 	data.ServerData.Settings = ui.NewSettings(&domain.DefaultSettings)
 
@@ -96,6 +102,8 @@ func (router *router) renderUI(w http.ResponseWriter, r *http.Request, data ui.P
 		}
 
 		data.ServerData.Settings = ui.NewSettings(settings)
+
+		data.Icon = cmp.Or(settings.Theme.Icon, data.Icon)
 	}
 
 	err := ui.Render(w, data)
@@ -104,6 +112,62 @@ func (router *router) renderUI(w http.ResponseWriter, r *http.Request, data ui.P
 	}
 
 	return nil
+}
+
+func (router *router) serveManifestJSON(w http.ResponseWriter, r *http.Request) {
+	icon := "default"
+
+	if account := auth.AccountFromCtx(r.Context()); account != nil {
+		settings, err := router.settingsCtrl.Get(r.Context())
+		if err != nil {
+			slog.ErrorContext(r.Context(), "error getting user settings", slog.Any("error", err))
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		icon = cmp.Or(settings.Theme.Icon, icon)
+	}
+
+	manifestJSON := &manifest{
+		Name:            "Belt",
+		ShortName:       "Belt",
+		StartURL:        router.config.BasePath,
+		BackgroundColor: "transparent",
+		ThemeColor:      "transparent",
+		Display:         "standalone",
+		Icons: []manifestIcon{
+			{
+				Src:   router.config.BasePath + "icons/" + icon + "/pwa-64x64.png",
+				Sizes: "64x64",
+				Type:  "image/png",
+			},
+			{
+				Src:   router.config.BasePath + "icons/" + icon + "/pwa-192x192.png",
+				Sizes: "192x192",
+				Type:  "image/png",
+			},
+			{
+				Src:   router.config.BasePath + "icons/" + icon + "/pwa-512x512.png",
+				Sizes: "512x512",
+				Type:  "image/png",
+			},
+			{
+				Src:     router.config.BasePath + "icons/" + icon + "/maskable-icon-512x512.png",
+				Sizes:   "512x512",
+				Type:    "image/png",
+				Purpose: "maskable",
+			},
+		},
+	}
+
+	body, err := json.Marshal(manifestJSON)
+	if err != nil {
+		slog.ErrorContext(r.Context(), "error marshalling manifest to json", slog.Any("error", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/manifest+json")
+	_, _ = w.Write(body)
 }
 
 func (router *router) ensureLoggedIn(next http.Handler) http.Handler {
@@ -116,4 +180,21 @@ func (router *router) ensureLoggedIn(next http.Handler) http.Handler {
 		ctx := auth.CtxWithAccount(r.Context(), account)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+type manifest struct {
+	Name            string         `json:"name"`
+	ShortName       string         `json:"short_name"`
+	StartURL        string         `json:"start_url"`
+	BackgroundColor string         `json:"background_color"`
+	ThemeColor      string         `json:"theme_color"`
+	Display         string         `json:"display"`
+	Icons           []manifestIcon `json:"icons"`
+}
+
+type manifestIcon struct {
+	Src     string `json:"src"`
+	Sizes   string `json:"sizes"`
+	Type    string `json:"type"`
+	Purpose string `json:"purpose,omitempty"`
 }

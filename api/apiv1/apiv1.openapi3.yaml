@@ -743,6 +743,9 @@ components:
         theme.mode:
           type: string
           example: "auto"
+        theme.icon:
+          type: string
+          example: "default"
         controls.vim:
           type: boolean
           example: true
@@ -754,6 +757,7 @@ components:
       - "locale.region"
       - "theme.colourScheme"
       - "theme.mode"
+      - "theme.icon"
       - "controls.vim"
       - "controls.doubleClickToEdit"
       example:
@@ -763,6 +767,7 @@ components:
         locale.region: gb
         theme.colourScheme: default
         theme.mode: auto
+        theme.icon: default
 
     APIToken:
       type: object
@@ -913,6 +918,9 @@ components:
               theme.mode:
                 type: string
                 example: "dark"
+              theme.icon:
+                type: string
+                example: "default"
               controls.vim:
                 type: boolean
               controls.doubleClickToEdit:
@@ -924,6 +932,7 @@ components:
               locale.region: de
               theme.colourScheme: default
               theme.mode: dark
+              theme.icon: default
 
     CreateAPITokenRequest:
       description: Create a new named API Token.

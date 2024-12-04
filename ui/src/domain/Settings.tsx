@@ -8,6 +8,7 @@ export type Settings = {
     theme: {
         colourScheme: "default"
         mode: "auto" | "light" | "dark"
+        icon: string
     }
     controls: {
         vim: boolean

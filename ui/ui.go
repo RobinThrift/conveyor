@@ -19,6 +19,7 @@ type PageData struct {
 	Title     string
 	BaseURL   string
 	AssetURL  string
+	Icon      string
 	CSRFToken string
 
 	ServerData ServerData
@@ -43,6 +44,7 @@ type LocaleSettings struct {
 type ThemeSettings struct {
 	ColourScheme string `json:"colourScheme,omitempty"`
 	Mode         string `json:"mode,omitempty"`
+	Icon         string `json:"icon,omitempty"`
 }
 
 type ControlsSettings struct {
@@ -59,6 +61,7 @@ func NewSettings(s *domain.Settings) *Settings {
 		Theme: ThemeSettings{
 			ColourScheme: s.Theme.ColourScheme,
 			Mode:         s.Theme.Mode,
+			Icon:         s.Theme.Icon,
 		},
 		Controls: ControlsSettings{
 			Vim:               s.Controls.Vim,
@@ -91,6 +94,7 @@ func Render(w http.ResponseWriter, data PageData) error {
 		UIData    template.HTML
 		CSRFToken template.HTMLAttr
 		AssetURL  string
+		Icon      string
 		BaseURL   template.HTMLAttr
 		Title     string
 	}
@@ -102,6 +106,7 @@ func Render(w http.ResponseWriter, data PageData) error {
 
 	tmpldata.Title = data.Title
 	tmpldata.AssetURL = data.AssetURL
+	tmpldata.Icon = data.Icon
 	tmpldata.BaseURL = template.HTMLAttr(`content="` + data.BaseURL + `"`)
 	tmpldata.CSRFToken = template.HTMLAttr(`content="` + data.CSRFToken + `"`)
 	tmpldata.UIData = template.HTML(encoded)

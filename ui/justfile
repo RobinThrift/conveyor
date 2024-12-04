@@ -2,11 +2,12 @@ biome_reporter := if env_var_or_default("BIOME_REPORTER", "") != "" { "--reporte
 
 local_bin := absolute_path("./node_modules/.bin")
 
-serve *args="":
+serve *args="": _generate-icons
     {{ local_bin }}/vite --mode development --strictPort --port 6155 {{ args }}
 
 build: install
     {{ local_bin }}/vite build --mode production
+    just _generate-icons
 
 watch mode="development": 
     {{ local_bin }}/vite build --mode {{ mode }} --watch
@@ -28,6 +29,13 @@ typecheck: install
 
 typecheck-watch: install
     {{ local_bin }}/tsc --noEmit --watch
+
+_generate-icons:
+    -mkidr build
+    - rm -rf build/icons
+    cp -r public/icons build/icons
+    for icon in ./build/icons/*/icon.svg; do {{ local_bin }}/pwa-assets-generator --preset minimal-2023 "$icon"; done
+    
 
 install:
     if [ ! -d node_modules/.bin ] || [ package.json -nt package-lock.json ]; then npm ci --no-audit --no-fund --install-links=false ; fi

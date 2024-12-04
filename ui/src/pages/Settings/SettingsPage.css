@@ -105,3 +105,11 @@
         border-left-width: 0;
     }
 }
+
+.icon-select-option {
+	@apply flex gap-2 items-center;
+
+	img {
+		@apply size-6;
+	}
+}

@@ -19,6 +19,7 @@ type settingsJSON struct {
 	LocaleRegion              string `json:"locale.region,omitempty"`
 	ThemeColourScheme         string `json:"theme.colourScheme,omitempty"`
 	ThemeMode                 string `json:"theme.mode,omitempty"`
+	ThemeIcon                 string `json:"theme.icon,omitempty"`
 	ControlsVim               bool   `json:"controls.vim,omitempty"`
 	ControlsDoubleClickToEdit bool   `json:"controls.DoubleClickToEdit,omitempty"`
 }
@@ -54,6 +55,7 @@ func (r *SettingsRepo) Get(ctx context.Context, accountID auth.AccountID) (*doma
 
 	settings.Theme.ColourScheme = cmp.Or(value.ThemeColourScheme, settings.Theme.ColourScheme)
 	settings.Theme.Mode = cmp.Or(value.ThemeMode, settings.Theme.Mode)
+	settings.Theme.Icon = cmp.Or(value.ThemeIcon, settings.Theme.Icon)
 
 	settings.Controls.Vim = cmp.Or(value.ControlsVim, settings.Controls.Vim)
 	settings.Controls.DoubleClickToEdit = cmp.Or(value.ControlsDoubleClickToEdit, settings.Controls.DoubleClickToEdit)
@@ -70,6 +72,7 @@ func (r *SettingsRepo) Set(ctx context.Context, accountID auth.AccountID, settin
 			LocaleRegion:              settings.Locale.Region,
 			ThemeColourScheme:         settings.Theme.ColourScheme,
 			ThemeMode:                 settings.Theme.Mode,
+			ThemeIcon:                 settings.Theme.Icon,
 			ControlsVim:               settings.Controls.Vim,
 			ControlsDoubleClickToEdit: settings.Controls.DoubleClickToEdit,
 		}),

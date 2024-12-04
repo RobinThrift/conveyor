@@ -93,6 +93,7 @@ type Settings struct {
 	LocaleLanguage            string `json:"locale.language"`
 	LocaleRegion              string `json:"locale.region"`
 	ThemeColourScheme         string `json:"theme.colourScheme"`
+	ThemeIcon                 string `json:"theme.icon"`
 	ThemeMode                 string `json:"theme.mode"`
 }
 
@@ -146,6 +147,7 @@ type UpdateSettingsRequest struct {
 	LocaleLanguage            *string `json:"locale.language,omitempty"`
 	LocaleRegion              *string `json:"locale.region,omitempty"`
 	ThemeColourScheme         *string `json:"theme.colourScheme,omitempty"`
+	ThemeIcon                 *string `json:"theme.icon,omitempty"`
 	ThemeMode                 *string `json:"theme.mode,omitempty"`
 }
 
@@ -232,6 +234,7 @@ type UpdateSettingsJSONBody struct {
 	LocaleLanguage            *string `json:"locale.language,omitempty"`
 	LocaleRegion              *string `json:"locale.region,omitempty"`
 	ThemeColourScheme         *string `json:"theme.colourScheme,omitempty"`
+	ThemeIcon                 *string `json:"theme.icon,omitempty"`
 	ThemeMode                 *string `json:"theme.mode,omitempty"`
 }
 

@@ -14,6 +14,7 @@ type LocaleSettings struct {
 type ThemeSettings struct {
 	ColourScheme string
 	Mode         string
+	Icon         string
 }
 
 type ControlsSettings struct {
@@ -29,6 +30,7 @@ var DefaultSettings = Settings{
 	Theme: ThemeSettings{
 		ColourScheme: "default",
 		Mode:         "auto",
+		Icon:         "default",
 	},
 	Controls: ControlsSettings{
 		Vim:               false,

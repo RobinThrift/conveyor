@@ -1,7 +1,8 @@
 import * as Form from "@/components/Form"
+import { Logo } from "@/components/Logo"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
-import { Belt, Password, User } from "@phosphor-icons/react"
+import { Password, User } from "@phosphor-icons/react"
 import React from "react"
 
 export interface LoginPageProps {
@@ -19,14 +20,7 @@ export function LoginPage(props: LoginPageProps) {
         <div className="h-screen w-screen flex items-center justify-stretch md:justify-center bg-body bg-[radial-gradient(#d2d5da_1px,transparent_1px)] [background-size:16px_16px] lg:[mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)]">
             <div className="flex items-center justify-center flex-col w-full md:w-[400px]">
                 <div className="flex flex-col items-center justify-center">
-                    <Belt
-                        className="text-primary animate-in slide-in-from-bottom fade-in-50 duration-300"
-                        size={40}
-                        weight="duotone"
-                    />
-                    <h1 className="text-primary text-3xl text-center font-semibold -mt-2 animate-in slide-in-from-bottom fade-in-50 duration-300">
-                        Belt
-                    </h1>
+                    <Logo className="w-full" />
                     <h3 className="text-xl mt-8 mb-3 font-semibold text-primary-extra-dark animate-in slide-in-from-bottom fade-in-50 duration-300">
                         Sign In
                     </h3>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-36,-134)">
+        <g id="Artboard2" transform="matrix(1.0535,0,0,2.22609,-1.92593,-164.296)">
+            <rect x="36" y="134" width="243" height="115" style="fill:none;"/>
+            <g transform="matrix(24.6664,0,0,11.6734,-6882.96,-2310.28)">
+                <path d="M283.831,218.396L283.831,217.064L286.033,217.064C286.427,217.064 286.734,216.945 286.954,216.706C287.174,216.467 287.284,216.182 287.284,215.852C287.284,215.63 287.235,215.427 287.136,215.242C287.037,215.057 286.894,214.91 286.707,214.802C286.52,214.694 286.295,214.64 286.033,214.64L283.831,214.64L283.831,213.326L285.853,213.326C286.187,213.326 286.456,213.241 286.66,213.071C286.864,212.901 286.966,212.647 286.966,212.309C286.966,211.971 286.864,211.717 286.66,211.547C286.456,211.377 286.187,211.292 285.853,211.292L283.831,211.292L283.831,209.96L286.048,209.96C286.604,209.96 287.072,210.063 287.451,210.268C287.83,210.473 288.115,210.741 288.307,211.072C288.499,211.403 288.595,211.764 288.595,212.156C288.595,212.638 288.45,213.053 288.159,213.401C287.868,213.749 287.441,214.008 286.879,214.178L286.954,213.647C287.576,213.823 288.058,214.113 288.4,214.517C288.742,214.921 288.913,215.407 288.913,215.975C288.913,216.423 288.803,216.83 288.582,217.195C288.361,217.56 288.04,217.851 287.62,218.069C287.2,218.287 286.691,218.396 286.093,218.396L283.831,218.396ZM282.634,218.396L282.634,209.96L284.257,209.96L284.257,218.396L282.634,218.396Z" style="fill:url(#_Radial1);fill-rule:nonzero;"/>
+            </g>
+        </g>
+    </g>
+    <defs>
+        <radialGradient id="_Radial1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(31.4584,0,0,8.802,271.105,216.959)"><stop offset="0" style="stop-color:rgb(96,165,250);stop-opacity:1"/><stop offset="0.41" style="stop-color:rgb(167,139,250);stop-opacity:1"/><stop offset="0.69" style="stop-color:rgb(148,146,250);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(96,165,250);stop-opacity:1"/></radialGradient>
+    </defs>
+</svg>

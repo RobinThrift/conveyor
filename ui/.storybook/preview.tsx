@@ -29,6 +29,7 @@ let serverData: ServerData = {
                 localStorage.getItem("belt.settings.theme.language") ??
                 "default",
             mode: localStorage.getItem("belt.settings.theme.mode") ?? "auto",
+            icon: localStorage.getItem("belt.settings.theme.icon") ?? "default",
         },
         controls: {
             vim: JSON.parse(
@@ -45,7 +46,7 @@ let serverData: ServerData = {
     components: {
         LoginPage: {},
         LoginChangePasswordPage: {},
-        SettingsPage: {},
+        SettingsPage: { validationErrors: {} },
     },
 }
 
