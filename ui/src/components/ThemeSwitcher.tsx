@@ -1,6 +1,6 @@
 import { Select } from "@/components/Select"
 import { useT } from "@/i18n"
-import { settingsStore, useSetting } from "@/storage/settings"
+import { useSetting } from "@/storage/settings"
 import { Moon, Sun, SunHorizon } from "@phosphor-icons/react"
 import React, { useCallback, useEffect } from "react"
 
@@ -10,10 +10,13 @@ export function ThemeSwitcher({
     className?: string
 }) {
     let t = useT("components/ThemeSwitcher")
-    let [colourScheme] = useSetting("theme.colourScheme")
-    let onChange = useCallback((v: string) => {
-        settingsStore.set("theme.colourScheme", v)
-    }, [])
+    let [colourScheme, setColourScheme] = useSetting("theme.colourScheme")
+    let onChange = useCallback(
+        (v: string) => {
+            setColourScheme(v)
+        },
+        [setColourScheme],
+    )
 
     return (
         <Select
@@ -34,26 +37,16 @@ export function ModeSwitcher({
     className?: string
 }) {
     let t = useT("components/ThemeSwitcher")
-    let [mode] = useSetting("theme.mode")
-    let onChange = useCallback((v: string) => {
-        settingsStore.set("theme.mode", v)
-    }, [])
+    let [mode, setMode] = useSetting("theme.mode")
+    let onChange = useCallback(
+        (v: string) => {
+            setMode(v)
+        },
+        [setMode],
+    )
 
     useEffect(() => {
-        switch (mode) {
-            case "auto":
-                document.documentElement.classList.toggle(
-                    "dark",
-                    window.matchMedia("(prefers-color-scheme: dark)").matches,
-                )
-                break
-            case "light":
-                document.documentElement.classList.remove("dark")
-                break
-            case "dark":
-                document.documentElement.classList.add("dark")
-                break
-        }
+        setModeOnDocument(mode as any)
     }, [mode])
 
     return (
@@ -86,4 +79,29 @@ export function ModeSwitcher({
             </Select.Option>
         </Select>
     )
+}
+
+function setModeOnDocument(mode: "auto" | "light" | "dark") {
+    switch (mode) {
+        case "auto":
+            document.documentElement.classList.toggle(
+                "dark",
+                window.matchMedia("(prefers-color-scheme: dark)").matches,
+            )
+            break
+        case "light":
+            document.documentElement.classList.remove("dark")
+            break
+        case "dark":
+            document.documentElement.classList.add("dark")
+            break
+    }
+
+    let bgColour = getComputedStyle(document.documentElement).getPropertyValue(
+        "--body-bg",
+    )
+
+    document
+        .querySelector("meta[name=theme-color]")
+        ?.setAttribute("content", `rgb(${bgColour})`)
 }
