@@ -1,8 +1,8 @@
 :root.rosepine {
-    --text-color: #575279;
-    --body-bg: #faf4ed;
-    --surface-bg: #fffaf3;
-    --sidebar-bg: #f2e9e1;
+    --text-color: 87 82 121;
+    --body-bg: 250 244 237;
+    --surface-bg: 255 250 243;
+    --sidebar-bg: 242 233 225;
 
     --color-primary-extra-light: 147 193 204;
     --color-primary-light: 88 149 168;
