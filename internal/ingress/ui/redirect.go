@@ -8,6 +8,10 @@ import (
 )
 
 func (router *router) redirectTo(w http.ResponseWriter, r *http.Request, segments ...string) {
+	if len(segments) == 0 {
+		http.Redirect(w, r, router.config.BasePath, http.StatusSeeOther)
+	}
+
 	if strings.HasPrefix(segments[0], "http") {
 		http.Redirect(w, r, segments[0], http.StatusSeeOther)
 		return
