@@ -1,10 +1,12 @@
+import { $router } from "@/App/router"
 import { Link } from "@/components/Link"
 import { useBreakpoint } from "@/hooks/useBreakPoint"
 import { useT } from "@/i18n"
 import { useAccount } from "@/storage/account"
+import { useStore } from "@nanostores/react"
 import { List, SignOut } from "@phosphor-icons/react"
 import clsx from "clsx"
-import React, { useMemo } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Sheet, SheetContent, SheetTrigger } from "../Sheet"
 import { ModeSwitcher, ThemeSwitcher } from "../ThemeSwitcher"
 
@@ -69,22 +71,7 @@ export function Sidebar(props: SidebarProps) {
     )
 
     if (useCollapsibleSidebar) {
-        return (
-            <Sheet>
-                <header>
-                    <SheetTrigger asChild>
-                        <button
-                            type="button"
-                            className="px-4 pt-4 cursor-pointer"
-                        >
-                            <List size={20} />
-                        </button>
-                    </SheetTrigger>
-                </header>
-
-                <SheetContent title="Menu">{content}</SheetContent>
-            </Sheet>
-        )
+        return <Collapsible>{content}</Collapsible>
     }
 
     return (
@@ -93,6 +80,36 @@ export function Sidebar(props: SidebarProps) {
                 {content}
             </div>
         </aside>
+    )
+}
+
+function Collapsible({ children }: React.PropsWithChildren) {
+    let [isOpen, setIsOpen] = useState(false)
+    let page = useStore($router)
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional, we want the sidebar to close whenever the route changes
+    useEffect(() => {
+        setIsOpen(false)
+    }, [page?.route])
+
+    return (
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <header>
+                <SheetTrigger asChild>
+                    <button type="button" className="px-4 pt-4 cursor-pointer">
+                        <List size={20} />
+                    </button>
+                </SheetTrigger>
+            </header>
+
+            <SheetContent
+                title="Menu"
+                titleClassName="sr-only"
+                description="Main Navigation"
+            >
+                {children}
+            </SheetContent>
+        </Sheet>
     )
 }
 
