@@ -74,6 +74,7 @@ func (mc *MemoControl) CreateMemo(ctx context.Context, cmd CreateMemoCmd) (domai
 	memo := &domain.Memo{
 		CreatedBy: account.ID,
 		Content:   cmd.Content,
+		CreatedAt: time.Now(),
 	}
 
 	if cmd.CreatedAt != nil {

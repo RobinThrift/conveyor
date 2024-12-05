@@ -216,7 +216,7 @@ func del(ctx context.Context, client *client, path string) error {
 	return nil
 }
 
-func postRaw[B io.Reader, P any](ctx context.Context, client *client, path string, data B, headerPairs ...string) (*P, error) {
+func postRaw[D io.Reader, R any](ctx context.Context, client *client, path string, data D, headerPairs ...string) (*R, error) {
 	url := client.baseURL.JoinPath(path)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url.String(), data)
@@ -243,7 +243,7 @@ func postRaw[B io.Reader, P any](ctx context.Context, client *client, path strin
 		return nil, fmt.Errorf("error reading body for POST reqquest %s: %w", url, err)
 	}
 
-	var payload P
+	var payload R
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling body for GET reqquest %s: %s\n%w", url, body, err)
@@ -252,13 +252,13 @@ func postRaw[B io.Reader, P any](ctx context.Context, client *client, path strin
 	return &payload, nil
 }
 
-func post[B, P any](ctx context.Context, client *client, path string, data B, headerPairs ...string) (*P, error) {
+func post[D, R any](ctx context.Context, client *client, path string, data D, headerPairs ...string) (*R, error) {
 	encoded, err := json.Marshal(data)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling body for POST reqquest %s: %w", path, err)
 	}
 
-	return postRaw[io.Reader, P](ctx, client, path, bytes.NewReader(encoded), headerPairs...)
+	return postRaw[io.Reader, R](ctx, client, path, bytes.NewReader(encoded), headerPairs...)
 }
 
 func unmarshalAPIError(res *http.Response) error {
