@@ -31,8 +31,8 @@ typecheck-watch: install
     {{ local_bin }}/tsc --noEmit --watch
 
 _generate-icons:
-    -mkidr build
-    - rm -rf build/icons
+    -mkdir build
+    -rm -rf build/icons
     cp -r public/icons build/icons
     for icon in ./build/icons/*/icon.svg; do {{ local_bin }}/pwa-assets-generator --preset minimal-2023 "$icon"; done
     
