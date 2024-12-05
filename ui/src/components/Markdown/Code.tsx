@@ -1,13 +1,11 @@
 import { useIdleCallback } from "@/hooks/useIdleCallback"
 import { useOnVisible } from "@/hooks/useLoadOnVisible"
 import { usePromise } from "@/hooks/usePromise"
+import { useTheme } from "@/storage/settings"
+import { themes } from "@/themes"
 import { LanguageDescription } from "@codemirror/language"
 import { languages } from "@codemirror/language-data"
 import { classHighlighter, highlightCode } from "@lezer/highlight"
-import {
-    defaultSettingsTokyoNight,
-    tokyoNightStyle,
-} from "@uiw/codemirror-theme-tokyo-night"
 import React, { useMemo, useRef } from "react"
 
 export function Code({
@@ -17,6 +15,9 @@ export function Code({
 }: { children: string; lang?: string; meta?: string }) {
     let ref = useRef(null)
     let isVisible = useOnVisible(ref, { ratio: 0 })
+
+    let [colourScheme, mode] = useTheme()
+    let theme = useMemo(() => themes[colourScheme][mode], [colourScheme, mode])
 
     let highlighted: React.ReactNode | undefined = useMemo(() => {
         if (isVisible) {
@@ -30,8 +31,8 @@ export function Code({
         <pre
             ref={ref}
             style={{
-                backgroundColor: defaultSettingsTokyoNight.background,
-                color: defaultSettingsTokyoNight.foreground,
+                backgroundColor: theme.background,
+                color: theme.foreground,
             }}
         >
             {highlighted}
@@ -95,41 +96,4 @@ export function Highlight({
     }
 
     return <code>{highlighted || code}</code>
-}
-
-let tagFixes: Record<string, string> = {
-    "special(variableName)": "variableName",
-    "special(string)": "string",
-    "function(variableName)": "variableName",
-    "standard(name)": "name",
-    "constant(name)": "constant",
-    "definition(name)": "definition",
-}
-
-let style = tokyoNightStyle
-    .map((styles) => {
-        let selector = ""
-        if (Array.isArray(styles.tag)) {
-            selector = styles.tag
-                .map((t) => `.tok-${tagFixes[t.toString()] ?? t}`)
-                .join(", ")
-        } else {
-            selector = `.tok-${tagFixes[styles.tag.toString()] ?? styles.tag}`
-        }
-        return `${selector} {
-    color: ${styles.color || "inherit"};
-    font-weight: ${styles.fontWeight || "inherit"};
-    font-style: ${styles.fontStyle || "inherit"};
-    text-decoration: ${styles.fontStyle || "none"};
-}`
-    })
-    .join("\n")
-
-let styleEl = document.querySelector("#syntax-highlighting")
-if (styleEl) {
-    styleEl.textContent = style
-} else {
-    styleEl = document.createElement("style")
-    styleEl.textContent = style
-    document.head.appendChild(styleEl)
 }

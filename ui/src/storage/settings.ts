@@ -1,3 +1,4 @@
+import type { themes } from "@/themes"
 import { type StoreKeys, useStore } from "@nanostores/react"
 import { useMemo } from "react"
 import { settingsStore } from "./remote/settings"
@@ -6,7 +7,9 @@ export * from "./remote/settings"
 
 type Keys = StoreKeys<typeof settingsStore.$values>
 
-export function useSetting<T, K extends Keys>(key: K): [T, (v: T) => void] {
+export function useSetting<T, K extends Keys = Keys>(
+    key: K,
+): [T, (v: T) => void] {
     let parts = useMemo(() => key.split("."), [key])
     let keys = useMemo(() => {
         let paths = [] as Keys[]
@@ -36,15 +39,22 @@ export function useSetting<T, K extends Keys>(key: K): [T, (v: T) => void] {
     ]
 }
 
-export function useThemeMode() {
-    let [mode] = useSetting("theme.mode")
+export function useTheme<T extends keyof typeof themes>(): [
+    T,
+    "light" | "dark",
+] {
+    let [mode] = useSetting<"light" | "dark" | "auto">("theme.mode")
+    let [colourScheme] = useSetting<T>("theme.colourScheme")
 
-    if (
-        mode === "auto" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-    ) {
-        return "dark"
-    }
+    return useMemo(() => {
+        let resolvedMode = mode
+        if (
+            mode === "auto" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+        ) {
+            resolvedMode = "dark"
+        }
 
-    return mode
+        return [colourScheme, resolvedMode as "light" | "dark"]
+    }, [colourScheme, mode])
 }

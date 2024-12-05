@@ -37,6 +37,7 @@
 
     "components/ThemeSwitcher": {
         "ColoursDefault": "Standard Farben",
+        "RosePine": "Rosé Pine",
         "Auto": "Auto",
         "Light": "Hell",
         "Dark": "Dunkel",

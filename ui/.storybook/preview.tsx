@@ -1,6 +1,6 @@
 import type { Preview } from "@storybook/react"
 import { initialize, mswLoader } from "msw-storybook-addon"
-import React from "react"
+import React, { useEffect } from "react"
 import { mockAPI } from "./mockapi"
 import type { ServerData } from "../src/App/ServerData"
 import { settingsStore } from "../src/storage/settings"
@@ -26,7 +26,7 @@ let serverData: ServerData = {
 
         theme: {
             colourScheme:
-                localStorage.getItem("belt.settings.theme.language") ??
+                localStorage.getItem("belt.settings.theme.colourScheme") ??
                 "default",
             mode: localStorage.getItem("belt.settings.theme.mode") ?? "auto",
             icon: localStorage.getItem("belt.settings.theme.icon") ?? "default",
@@ -61,14 +61,33 @@ const preview: Preview = {
     loaders: [mswLoader],
 
     decorators: [
-        (Story, { globals: { theme } }) => {
-            document.documentElement.classList.toggle(
-                "dark",
-                theme === "dark" ||
-                    (theme === "auto" &&
-                        window.matchMedia("(prefers-color-scheme: dark)")
-                            .matches),
-            )
+        (Story, { globals: { themeMode, themeColours } }) => {
+            useEffect(() => {
+                let current =
+                    document.documentElement.dataset.colourScheme ?? ""
+                if (current) {
+                    document.documentElement.classList.remove(current)
+                }
+
+                document.documentElement.classList.add(themeColours)
+                document.documentElement.dataset.colourScheme = themeColours
+
+                localStorage.setItem(
+                    "belt.settings.theme.colourScheme",
+                    themeColours,
+                )
+            }, [themeColours])
+
+            useEffect(() => {
+                document.documentElement.classList.toggle(
+                    "dark",
+                    themeMode === "dark" ||
+                        (themeMode === "auto" &&
+                            window.matchMedia("(prefers-color-scheme: dark)")
+                                .matches),
+                )
+                localStorage.setItem("belt.settings.theme.mode", themeMode)
+            }, [themeMode])
 
             if (!document.getElementById("__belt_ui_data__")) {
                 settingsStore.init(serverData.settings)
@@ -86,12 +105,28 @@ const preview: Preview = {
     ],
 
     globalTypes: {
-        theme: {
-            description: "Theme",
-            defaultValue: "auto",
+        themeColours: {
+            description: "Colour Scheme",
+            defaultValue:
+                localStorage.getItem("belt.settings.theme.colourScheme") ??
+                "default",
+            toolbar: {
+                title: "Default",
+                icon: "contrast",
+                items: [
+                    { value: "default", title: "Default" },
+                    { value: "rosepine", title: "Rosé Pine" },
+                ],
+                dynamicTitle: true,
+            },
+        },
+        themeMode: {
+            description: "Mode",
+            defaultValue:
+                localStorage.getItem("belt.settings.theme.mode") ?? "auto",
             toolbar: {
                 title: "Auto",
-                icon: "switchalt",
+                icon: "lightning",
                 items: [
                     { value: "auto", title: "Auto" },
                     { value: "dark", title: "Dark" },

@@ -1,8 +1,8 @@
 import type { APIToken } from "@/domain/APIToken"
+import { randomID } from "@/helper"
 import { $baseURL } from "@/hooks/useBaseURL"
 import { atom, batched, computed, onMount, task } from "nanostores"
 import * as api from "./api/apitokens"
-import { randomID } from "@/helper"
 
 const $tokens = atom<APIToken[]>([])
 const $pages = atom<(string | undefined)[]>([])

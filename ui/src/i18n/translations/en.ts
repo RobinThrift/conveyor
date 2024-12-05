@@ -53,6 +53,7 @@ export const translations = {
 
     "components/ThemeSwitcher": {
         ColoursDefault: "Default Colours",
+        RosePine: "Rosé Pine",
         Auto: "Auto",
         Light: "Light",
         Dark: "Dark",

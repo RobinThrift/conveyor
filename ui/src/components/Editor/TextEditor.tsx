@@ -1,15 +1,14 @@
 import type { Tag } from "@/domain/Tag"
 import * as eventbus from "@/eventbus"
 import { useAttachmentUploader } from "@/hooks/api/attachments"
-import { settingsStore, useThemeMode } from "@/storage/settings"
+import { settingsStore, useTheme } from "@/storage/settings"
+import { themes } from "@/themes"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import { languages } from "@codemirror/language-data"
 import { SearchCursor } from "@codemirror/search"
 import { useStore } from "@nanostores/react"
 import { Vim, getCM, vim } from "@replit/codemirror-vim"
 import { hyperLink } from "@uiw/codemirror-extensions-hyper-link"
-import { quietlight } from "@uiw/codemirror-theme-quietlight"
-import { tokyoNightInit } from "@uiw/codemirror-theme-tokyo-night"
 import CodeMirror, {
     StateEffect,
     EditorView,
@@ -48,16 +47,8 @@ export interface TextEditorProps {
 }
 
 export function TextEditor(props: TextEditorProps) {
-    let themeMode = useThemeMode()
-    let theme = useMemo(
-        () =>
-            themeMode === "dark"
-                ? tokyoNightInit({
-                      settings: { background: "rgb(var(--surface-bg))" },
-                  })
-                : quietlight,
-        [themeMode],
-    )
+    let [colourScheme, mode] = useTheme()
+    let theme = useMemo(() => themes[colourScheme][mode], [colourScheme, mode])
 
     useAttachmentUploader()
 
@@ -135,7 +126,7 @@ export function TextEditor(props: TextEditorProps) {
             value={props.content}
             extensions={[extensions]}
             onChange={props.onChange}
-            theme={theme}
+            theme={theme.cm}
             autoFocus={props.autoFocus}
             placeholder={props.placeholder}
             onCreateEditor={onCreateEditor}

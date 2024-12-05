@@ -1,0 +1,165 @@
+.tok-keyword {
+    color: var(--code-keyword);
+}
+
+.tok-name {
+    color: var(--code-name);
+}
+
+.tok-deleted {
+    color: var(--code-deleted);
+}
+
+.tok-character {
+    color: var(--code-character);
+}
+
+.tok-macroName {
+    color: var(--code-macroName, var(--code-name));
+}
+
+.tok-propertyName {
+    color: var(--code-propertyName);
+}
+
+.tok-processingInstruction {
+    color: var(--code-processingInstruction);
+}
+
+.tok-string {
+    color: var(--code-string);
+}
+
+.tok-inserted {
+    color: var(--code-inserted);
+}
+
+.tok-variableName {
+    color: var(--code-variableName, var(--code-name));
+}
+
+.tok-labelName {
+    color: var(--code-labelName);
+}
+
+.tok-color {
+    color: var(--code-color);
+}
+
+.tok-constant {
+    color: var(--code-constant);
+}
+
+.tok-definition {
+    color: var(--code-definition, var(--code-name));
+}
+
+.tok-separator {
+    color: var(--code-separator);
+}
+
+.tok-className {
+    color: var(--code-className);
+}
+
+.tok-number {
+    color: var(--code-number);
+}
+
+.tok-changed {
+    color: var(--code-changed);
+}
+
+.tok-annotation {
+    color: var(--code-annotation);
+}
+
+.tok-modifier {
+    color: var(--code-modifier);
+}
+
+.tok-self,
+.tok-namespace {
+    color: var(--code-self, var(--code-constant));
+}
+
+.tok-namespace {
+    color: var(--code-namespace);
+}
+
+.tok-typeName {
+    color: var(--code-typeName, var(--code-name));
+}
+
+.tok-operator {
+    color: var(--code-operator, var(--code-keyword));
+}
+
+.tok-operatorKeyword {
+    color: var(
+        --code-operatorKeyword,
+        var(--code-operator, var(--code-keyword))
+    );
+}
+
+.tok-url {
+    color: var(--code-url);
+}
+
+.tok-escape {
+    color: var(--code-escape);
+}
+
+.tok-regexp {
+    color: var(--code-regexp, var(--code-keyword));
+}
+
+.tok-link {
+    color: var(--code-link, var(--code-url));
+    color: inherit;
+    font-weight: inherit;
+    font-style: inherit;
+    text-decoration: none;
+}
+
+.tok-meta {
+    color: var(--code-meta, var(--code-comment));
+}
+
+.tok-comment {
+    color: var(--code-comment);
+}
+
+.tok-tagName {
+    color: var(--code-tagName, var(--code-keyword));
+}
+
+.tok-strong {
+    font-weight: bold;
+}
+
+.tok-emphasis {
+    font-style: italic;
+    text-decoration: italic;
+}
+
+.tok-heading {
+    color: var(--code-heading);
+    font-weight: bold;
+}
+
+.tok-atom {
+    color: var(--code-atom);
+}
+
+.tok-bool {
+    color: var(--code-bool);
+}
+
+.tok-invalid {
+    color: var(--code-invalid);
+}
+
+.tok-strikethrough {
+    text-decoration: line-through;
+}

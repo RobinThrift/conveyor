@@ -13,6 +13,7 @@ const $values = deepMap<Settings>({
     theme: {
         colourScheme: "default",
         mode: "auto",
+        icon: "default",
     },
     controls: {
         vim: true,

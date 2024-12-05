@@ -107,9 +107,9 @@
 }
 
 .icon-select-option {
-	@apply flex gap-2 items-center;
+    @apply flex gap-2 items-center;
 
-	img {
-		@apply size-6;
-	}
+    img {
+        @apply size-6;
+    }
 }

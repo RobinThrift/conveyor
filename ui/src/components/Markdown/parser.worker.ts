@@ -1,3 +1,4 @@
+import { randomID } from "@/helper"
 import type { Root } from "mdast"
 import type {
     WorkerInput,
@@ -5,7 +6,6 @@ import type {
     WorkerOutputError,
     WorkerOutputResult,
 } from "./parser.worker.internal"
-import { randomID } from "@/helper"
 
 export class MarkdownWorker {
     private _worker: Worker

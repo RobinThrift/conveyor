@@ -3,6 +3,7 @@ export interface UpdateSettingsRequest {
     "locale.region": string
     "theme.colourScheme": string
     "theme.mode": string
+    "theme.icon": string
     "controls.vim": boolean
     "controls.doubleClickToEdit"?: boolean
 }

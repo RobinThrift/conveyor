@@ -2,7 +2,7 @@ import { Select } from "@/components/Select"
 import { useT } from "@/i18n"
 import { useSetting } from "@/storage/settings"
 import { Moon, Sun, SunHorizon } from "@phosphor-icons/react"
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 
 export function ThemeSwitcher({
     className,
@@ -10,13 +10,18 @@ export function ThemeSwitcher({
     className?: string
 }) {
     let t = useT("components/ThemeSwitcher")
-    let [colourScheme, setColourScheme] = useSetting("theme.colourScheme")
+    let [colourScheme, setColourScheme] =
+        useSetting<string>("theme.colourScheme")
     let onChange = useCallback(
         (v: string) => {
             setColourScheme(v)
         },
         [setColourScheme],
     )
+
+    useMemo(() => {
+        setColourSchemeOnDocument(colourScheme)
+    }, [colourScheme])
 
     return (
         <Select
@@ -27,6 +32,7 @@ export function ThemeSwitcher({
             value={colourScheme as string}
         >
             <Select.Option value="default">{t.ColoursDefault}</Select.Option>
+            <Select.Option value="rosepine">{t.RosePine}</Select.Option>
         </Select>
     )
 }
@@ -104,4 +110,14 @@ function setModeOnDocument(mode: "auto" | "light" | "dark") {
     document
         .querySelector("meta[name=theme-color]")
         ?.setAttribute("content", `rgb(${bgColour})`)
+}
+
+function setColourSchemeOnDocument(colourScheme: "default" | string) {
+    let current = document.documentElement.dataset.colourScheme ?? ""
+    if (current) {
+        document.documentElement.classList.remove(current)
+    }
+
+    document.documentElement.classList.add(colourScheme)
+    document.documentElement.dataset.colourScheme = colourScheme
 }

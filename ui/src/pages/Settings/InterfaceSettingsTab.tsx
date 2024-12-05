@@ -1,11 +1,11 @@
 import { Checkbox } from "@/components/Input/Checkbox"
+import { Select } from "@/components/Select"
 import { ModeSwitcher, ThemeSwitcher } from "@/components/ThemeSwitcher"
+import { useBaseURL } from "@/hooks/useBaseURL"
 import { useT } from "@/i18n"
 import { settingsStore, useSetting } from "@/storage/settings"
 import { useStore } from "@nanostores/react"
 import React, { useCallback } from "react"
-import { Select } from "@/components/Select"
-import { useBaseURL } from "@/hooks/useBaseURL"
 
 export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
     function InterfaceSettingsTab(_, forwardedRef) {
