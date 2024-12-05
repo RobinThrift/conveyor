@@ -136,22 +136,22 @@ func (router *router) serveManifestJSON(w http.ResponseWriter, r *http.Request) 
 		Display:         "standalone",
 		Icons: []manifestIcon{
 			{
-				Src:   router.config.BasePath + "icons/" + icon + "/pwa-64x64.png",
+				Src:   router.config.BasePath + "assets/icons/" + icon + "/pwa-64x64.png",
 				Sizes: "64x64",
 				Type:  "image/png",
 			},
 			{
-				Src:   router.config.BasePath + "icons/" + icon + "/pwa-192x192.png",
+				Src:   router.config.BasePath + "assets/icons/" + icon + "/pwa-192x192.png",
 				Sizes: "192x192",
 				Type:  "image/png",
 			},
 			{
-				Src:   router.config.BasePath + "icons/" + icon + "/pwa-512x512.png",
+				Src:   router.config.BasePath + "assets/icons/" + icon + "/pwa-512x512.png",
 				Sizes: "512x512",
 				Type:  "image/png",
 			},
 			{
-				Src:     router.config.BasePath + "icons/" + icon + "/maskable-icon-512x512.png",
+				Src:     router.config.BasePath + "assets/icons/" + icon + "/maskable-icon-512x512.png",
 				Sizes:   "512x512",
 				Type:    "image/png",
 				Purpose: "maskable",
