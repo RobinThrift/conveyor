@@ -1,5 +1,10 @@
 import path from "node:path"
-import { defineConfig, type UserConfig } from "vite"
+import {
+    defineConfig,
+    type UserConfig,
+    searchForWorkspaceRoot,
+    Plugin,
+} from "vite"
 import react from "@vitejs/plugin-react"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
@@ -7,6 +12,8 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         base: "/assets/",
 
         publicDir: "build/",
+
+        logLevel: "info",
 
         define: {
             "process.env.LOG_LEVEL": JSON.stringify("error"),
@@ -26,6 +33,19 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         },
 
         plugins: [react()],
+
+        server: {
+            proxy: {
+                "^/assets/icons/.*": {
+                    target: "http://localhost:6155",
+                    rewrite: (path) =>
+                        path.replace(
+                            /^\/assets\/icons/,
+                            `/assets/@fs/${searchForWorkspaceRoot(process.cwd())}/build/icons`,
+                        ),
+                },
+            },
+        },
 
         build: {
             outDir: "build",
