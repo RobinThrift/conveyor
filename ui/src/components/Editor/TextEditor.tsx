@@ -2,7 +2,6 @@ import type { Tag } from "@/domain/Tag"
 import * as eventbus from "@/eventbus"
 import { useAttachmentUploader } from "@/hooks/api/attachments"
 import { settingsStore, useTheme } from "@/storage/settings"
-import { themes } from "@/themes"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import { languages } from "@codemirror/language-data"
 import { SearchCursor } from "@codemirror/search"
@@ -47,8 +46,7 @@ export interface TextEditorProps {
 }
 
 export function TextEditor(props: TextEditorProps) {
-    let [colourScheme, mode] = useTheme()
-    let theme = useMemo(() => themes[colourScheme][mode], [colourScheme, mode])
+    let { colours } = useTheme()
 
     useAttachmentUploader()
 
@@ -126,7 +124,7 @@ export function TextEditor(props: TextEditorProps) {
             value={props.content}
             extensions={[extensions]}
             onChange={props.onChange}
-            theme={theme.cm}
+            theme={colours.cm}
             autoFocus={props.autoFocus}
             placeholder={props.placeholder}
             onCreateEditor={onCreateEditor}

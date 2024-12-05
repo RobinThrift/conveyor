@@ -2,7 +2,6 @@ import { useIdleCallback } from "@/hooks/useIdleCallback"
 import { useOnVisible } from "@/hooks/useLoadOnVisible"
 import { usePromise } from "@/hooks/usePromise"
 import { useTheme } from "@/storage/settings"
-import { themes } from "@/themes"
 import { LanguageDescription } from "@codemirror/language"
 import { languages } from "@codemirror/language-data"
 import { classHighlighter, highlightCode } from "@lezer/highlight"
@@ -16,8 +15,7 @@ export function Code({
     let ref = useRef(null)
     let isVisible = useOnVisible(ref, { ratio: 0 })
 
-    let [colourScheme, mode] = useTheme()
-    let theme = useMemo(() => themes[colourScheme][mode], [colourScheme, mode])
+    let { colours } = useTheme()
 
     let highlighted: React.ReactNode | undefined = useMemo(() => {
         if (isVisible) {
@@ -31,8 +29,8 @@ export function Code({
         <pre
             ref={ref}
             style={{
-                backgroundColor: theme.background,
-                color: theme.foreground,
+                backgroundColor: colours.background,
+                color: colours.foreground,
             }}
         >
             {highlighted}
