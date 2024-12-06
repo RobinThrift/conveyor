@@ -1,4 +1,4 @@
-package jobs
+package app
 
 import (
 	"context"
@@ -10,26 +10,26 @@ import (
 	"github.com/RobinThrift/belt/internal/storage/database"
 )
 
-type InitSetupJobConfig struct {
+type initSetupConfig struct {
 	InitUsername string
 	InitPassword auth.PlaintextPassword
 	Argon2params auth.Argon2Params
 }
 
-type InitSetupJob struct {
-	config   InitSetupJobConfig
+type initSetup struct {
+	config   initSetupConfig
 	tx       database.Transactioner
 	accCtrl  *control.AccountControl
 	authCtrl *control.AuthController
 }
 
-func NewInitSetupJob(config InitSetupJobConfig, tx database.Transactioner, accCtrl *control.AccountControl, authCtrl *control.AuthController) *InitSetupJob {
-	return &InitSetupJob{config, tx, accCtrl, authCtrl}
+func newInitSetup(config initSetupConfig, tx database.Transactioner, accCtrl *control.AccountControl, authCtrl *control.AuthController) *initSetup {
+	return &initSetup{config, tx, accCtrl, authCtrl}
 }
 
-func (isj *InitSetupJob) Exec(ctx context.Context) error {
+func (isj *initSetup) exec(ctx context.Context) error {
 	return isj.tx.InTransaction(ctx, func(ctx context.Context) error {
-		err := isj.exec(ctx)
+		err := isj.run(ctx)
 		if err != nil {
 			return fmt.Errorf("error executing initial setup job: %w", err)
 		}
@@ -38,7 +38,7 @@ func (isj *InitSetupJob) Exec(ctx context.Context) error {
 	})
 }
 
-func (isj *InitSetupJob) exec(ctx context.Context) error {
+func (isj *initSetup) run(ctx context.Context) error {
 	skipInitSetup, err := isj.skipInitSetup(ctx)
 	if err != nil {
 		return fmt.Errorf("error checking if initial setup should be skipped: %w", err)
@@ -67,7 +67,7 @@ func (isj *InitSetupJob) exec(ctx context.Context) error {
 	return nil
 }
 
-func (isj *InitSetupJob) skipInitSetup(ctx context.Context) (bool, error) {
+func (isj *initSetup) skipInitSetup(ctx context.Context) (bool, error) {
 	count, err := isj.accCtrl.CountAccounts(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error listing accounts: %w", err)

@@ -9,6 +9,8 @@ import (
 )
 
 func TestRequestFromContext(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 
 	ctx = RequestIDWithCtx(ctx, "test")
@@ -23,6 +25,8 @@ func TestRequestFromContext(t *testing.T) {
 }
 
 func TestHTTPHeader(t *testing.T) {
+	t.Parallel()
+
 	req, err := http.NewRequest(http.MethodGet, "http://example.com", nil)
 	assert.NoError(t, err)
 

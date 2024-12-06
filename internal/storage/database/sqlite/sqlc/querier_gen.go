@@ -9,6 +9,7 @@ import (
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/domain"
+	"github.com/RobinThrift/belt/internal/storage/database/sqlite/types"
 )
 
 type Querier interface {
@@ -20,6 +21,7 @@ type Querier interface {
 	CreateAPIToken(ctx context.Context, db DBTX, arg CreateAPITokenParams) error
 	CreateAccount(ctx context.Context, db DBTX, arg CreateAccountParams) error
 	CreateAttachment(ctx context.Context, db DBTX, arg CreateAttachmentParams) (domain.AttachmentID, error)
+	CreateJob(ctx context.Context, db DBTX, arg CreateJobParams) error
 	CreateLocalAuthAccount(ctx context.Context, db DBTX, arg CreateLocalAuthAccountParams) error
 	CreateMemo(ctx context.Context, db DBTX, arg CreateMemoParams) (domain.MemoID, error)
 	CreateMemoAttachmentLink(ctx context.Context, db DBTX, arg CreateMemoAttachmentLinkParams) error
@@ -41,6 +43,7 @@ type Querier interface {
 	GetAttachmentByFilepath(ctx context.Context, db DBTX, filepath string) (Attachment, error)
 	GetLocalAuthAccountByUsername(ctx context.Context, db DBTX, username string) (LocalAuthAccount, error)
 	GetMemo(ctx context.Context, db DBTX, id domain.MemoID) (Memo, error)
+	GetNextWakeUpTime(ctx context.Context, db DBTX) (types.SQLiteDatetime, error)
 	GetSession(ctx context.Context, db DBTX, token string) (Session, error)
 	GetSettings(ctx context.Context, db DBTX, accountID int64) (Setting, error)
 	ListAPITokens(ctx context.Context, db DBTX, arg ListAPITokensParams) ([]ApiToken, error)
@@ -50,12 +53,14 @@ type Querier interface {
 	ListMemosForTags(ctx context.Context, db DBTX, arg ListMemosForTagsParams) ([]ListMemosForTagsRow, error)
 	ListMemosForTagsWithSearch(ctx context.Context, db DBTX, arg ListMemosForTagsWithSearchParams) ([]ListMemosForTagsWithSearchRow, error)
 	ListMemosWithSearch(ctx context.Context, db DBTX, arg ListMemosWithSearchParams) ([]MemoFTS, error)
+	ListNextJobs(ctx context.Context, db DBTX, scheduledFor string) ([]Job, error)
 	ListTags(ctx context.Context, db DBTX, arg ListTagsParams) ([]Tag, error)
 	ListUnusedAttachments(ctx context.Context, db DBTX) ([]Attachment, error)
 	SetMemoDeletionStatus(ctx context.Context, db DBTX, arg SetMemoDeletionStatusParams) (int64, error)
 	SeteMemoArchiveStatus(ctx context.Context, db DBTX, arg SeteMemoArchiveStatusParams) (int64, error)
 	UpdateALocalAuthccount(ctx context.Context, db DBTX, arg UpdateALocalAuthccountParams) error
 	UpdateAccount(ctx context.Context, db DBTX, arg UpdateAccountParams) error
+	UpdateJob(ctx context.Context, db DBTX, arg UpdateJobParams) error
 	UpdateMemoContent(ctx context.Context, db DBTX, arg UpdateMemoContentParams) (int64, error)
 	UpdateTagCount(ctx context.Context, db DBTX, tags []string) error
 	UpsertSetting(ctx context.Context, db DBTX, arg UpsertSettingParams) error

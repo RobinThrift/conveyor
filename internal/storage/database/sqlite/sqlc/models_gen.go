@@ -40,6 +40,18 @@ type Attachment struct {
 	CreatedAt        types.SQLiteDatetime
 }
 
+type Job struct {
+	ID           int64
+	State        interface{}
+	Kind         string
+	Data         types.SQLiteJSON
+	Result       types.SQLiteJSON
+	ScheduledFor types.SQLiteDatetime
+	CreatedAt    types.SQLiteDatetime
+	FinishedAt   types.SQLiteDatetime
+	CreatedBy    auth.AccountID
+}
+
 type LocalAuthAccount struct {
 	ID                     int64
 	Username               string

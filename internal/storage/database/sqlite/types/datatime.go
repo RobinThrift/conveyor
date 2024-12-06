@@ -29,6 +29,10 @@ func (sdt SQLiteDatetime) String() string {
 }
 
 func (sdt *SQLiteDatetime) Scan(src any) error {
+	if src == nil {
+		return nil
+	}
+
 	str, ok := src.(string)
 	if !ok {
 		return fmt.Errorf("invalid input type for converting to time %T", src)

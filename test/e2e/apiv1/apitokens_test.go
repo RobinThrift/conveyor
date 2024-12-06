@@ -13,6 +13,8 @@ import (
 )
 
 func TestAPITokens_CRUD(t *testing.T) {
+	t.Parallel()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -59,6 +61,8 @@ func TestAPITokens_CRUD(t *testing.T) {
 }
 
 func TestAPITokens_Usage(t *testing.T) {
+	t.Parallel()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 

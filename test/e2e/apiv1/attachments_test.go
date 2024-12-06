@@ -12,6 +12,8 @@ import (
 )
 
 func TestAttachments(t *testing.T) {
+	t.Parallel()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -32,6 +34,8 @@ func TestAttachments(t *testing.T) {
 }
 
 func TestAttachment_WithSpacesInFileName(t *testing.T) {
+	t.Parallel()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 

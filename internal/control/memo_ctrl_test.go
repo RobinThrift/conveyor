@@ -94,7 +94,7 @@ func Test_extractAssetURLs(t *testing.T) {
 }
 
 func setupMemoControl(ctx context.Context, t *testing.T, plugins ...plugins.Plugin) *MemoControl {
-	db := testhelper.NewTestSQLite(ctx, t)
+	db := testhelper.NewInMemTestSQLite(ctx, t)
 
 	accountRepo := sqlite.NewAccountRepo(db)
 	memoRepo := sqlite.NewMemoRepo(db)

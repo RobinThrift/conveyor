@@ -6,12 +6,15 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/control"
 	"github.com/RobinThrift/belt/internal/ingress/apiv1"
 	uiIngress "github.com/RobinThrift/belt/internal/ingress/ui"
 	"github.com/RobinThrift/belt/internal/jobs"
+	"github.com/RobinThrift/belt/internal/plugins"
+	"github.com/RobinThrift/belt/internal/plugins/memos/opengraph"
 	"github.com/RobinThrift/belt/internal/server"
 	"github.com/RobinThrift/belt/internal/server/session"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite"
@@ -23,7 +26,8 @@ type App struct {
 	srv    *http.Server
 	db     *sqlite.SQLite
 
-	jobs []jobs.Job
+	initSetup *initSetup
+	jobs      *jobs.System
 }
 
 func New(config Config) *App {
@@ -50,6 +54,7 @@ func New(config Config) *App {
 	attachmentRepo := sqlite.NewAttachmentRepo(db)
 	settingsRepo := sqlite.NewSettingsRepo(db)
 	apiTokenRepo := sqlite.NewAPITokenRepo(db)
+	jobRepo := sqlite.NewJobRepo(db)
 
 	fs := &filesystem.LocalFSAttachments{
 		AttachmentsDir: config.Attachments.Dir,
@@ -89,13 +94,13 @@ func New(config Config) *App {
 		config: config,
 		srv:    srv,
 		db:     db,
-		jobs: []jobs.Job{
-			jobs.NewInitSetupJob(jobs.InitSetupJobConfig{
-				InitUsername: config.Init.Username,
-				InitPassword: auth.PlaintextPassword(config.Init.Password),
-				Argon2params: argon2Params,
-			}, db, accountCtrl, authCtrl),
-		}}
+		initSetup: newInitSetup(initSetupConfig{
+			InitUsername: config.Init.Username,
+			InitPassword: auth.PlaintextPassword(config.Init.Password),
+			Argon2params: argon2Params,
+		}, db, accountCtrl, authCtrl),
+		jobs: jobSystem,
+	}
 }
 
 func (a *App) Start(ctx context.Context) error {
@@ -109,11 +114,9 @@ func (a *App) Start(ctx context.Context) error {
 		return err
 	}
 
-	for _, job := range a.jobs {
-		err = job.Exec(ctx)
-		if err != nil {
-			return err
-		}
+	err = a.initSetup.exec(ctx)
+	if err != nil {
+		return err
 	}
 
 	slog.InfoContext(ctx, fmt.Sprintf("starting server on %v", a.config.Addr))
