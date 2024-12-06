@@ -268,6 +268,35 @@ spec:
     ),
 }
 
+export const Directives: Story = {
+    name: "Directives",
+    argTypes: {
+        onClickTag: { action: "onClickTag" },
+    },
+    args: {
+        id: "storybook",
+        children: `
+# Directives
+
+::open-graph-link[https://github.com/RobinThrift/belt/]{title="GitHub - RobinThrift/belt" description="Contribute to RobinThrift/belt development by creating an account on GitHub." img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/belt"  alt="Contribute to RobinThrift/belt development by creating an account on GitHub."}
+
+#tag-a #tab-b
+
+:::details{className="text-primary" summary="Collapsible"}
+${faker.lorem.paragraph()}
+:::
+
+
+::foo[directive]{attrs="value"}
+`,
+    },
+    render: (args) => (
+        <div className="container mx-auto">
+            <Markdown {...args} />
+        </div>
+    ),
+}
+
 export const StressTest: Story = {
     render: (args) => {
         let allArgs = useMemo(() => {
@@ -363,5 +392,14 @@ function parseMarkdown(raw: string): React.ReactNode | React.ReactNode[] {
 | Cell A1      | Cell B1        | Cell C1       |
 | Cell A2      | Cell B2        | Cell C2       |
 | Cell A3      | Cell B3        | Cell C3       |
+
+## Directives
+
+::open-graph-link[https://github.com/RobinThrift/belt/]{img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/belt" title="GitHub - RobinThrift/belt" description="Contribute to RobinThrift/belt development by creating an account on GitHub."}
+
+:::details{className="text-primary" summary="Collapsible"}
+${faker.lorem.paragraph()}
+:::
+
 `
 }

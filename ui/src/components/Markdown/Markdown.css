@@ -72,3 +72,19 @@
         content: "";
     }
 }
+
+.open-graph-preview {
+    @apply overflow-hidden rounded-lg flex flex-col bg-subtle-extra-dark text-subtle-contrast my-2 lg:max-w-[40%];
+    width: 100%;
+
+    h5 {
+        margin: 0;
+    }
+
+    caption {
+        @apply p-2;
+        display: block;
+        text-align: start;
+        width: 100%;
+    }
+}

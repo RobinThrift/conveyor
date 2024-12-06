@@ -1,8 +1,10 @@
+import { directiveFromMarkdown } from "mdast-util-directive"
 import { fromMarkdown } from "mdast-util-from-markdown"
 import { gfmAutolinkLiteralFromMarkdown } from "mdast-util-gfm-autolink-literal"
 import { gfmFootnoteFromMarkdown } from "mdast-util-gfm-footnote"
 import { gfmStrikethroughFromMarkdown } from "mdast-util-gfm-strikethrough"
 import { gfmTableFromMarkdown } from "mdast-util-gfm-table"
+import { directive } from "micromark-extension-directive"
 import { gfmAutolinkLiteral } from "micromark-extension-gfm-autolink-literal"
 import { gfmFootnote } from "micromark-extension-gfm-footnote"
 import { gfmStrikethrough } from "micromark-extension-gfm-strikethrough"
@@ -60,6 +62,7 @@ function parseMarkdown(content: Uint8Array | ArrayBuffer, id: string) {
             gfmFootnote(),
             gfmStrikethrough(),
             gfmTable(),
+            directive(),
             autoTagLinks(),
         ],
         mdastExtensions: [
@@ -67,6 +70,7 @@ function parseMarkdown(content: Uint8Array | ArrayBuffer, id: string) {
             gfmFootnoteFromMarkdown(),
             gfmStrikethroughFromMarkdown(),
             gfmTableFromMarkdown(),
+            directiveFromMarkdown(),
             mdastAutoTagLinks(),
         ],
     })

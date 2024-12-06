@@ -1,0 +1,25 @@
+.alert {
+    @apply p-3 border-2 rounded-lg my-2 flex gap-2 items-start;
+
+    & > svg {
+        @apply size-8;
+        min-width: 28px;
+    }
+
+    .content {
+        @apply mt-0.5;
+        color: inherit;
+    }
+
+    &.info {
+        @apply border-primary-dark bg-primary-extra-light text-primary-extra-dark;
+    }
+
+    &.success {
+        @apply border-success-dark bg-success-light text-success-extra-dark;
+    }
+
+    &.danger {
+        @apply border-danger-dark bg-danger-light text-danger-extra-dark;
+    }
+}

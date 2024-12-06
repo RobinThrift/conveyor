@@ -93,6 +93,15 @@ function parseMarkdown(raw: string): React.ReactNode | React.ReactNode[] {
 | Cell A2      | Cell B2        | Cell C2       |
 | Cell A3      | Cell B3        | Cell C3       |
 
+## Directives
+
+::open-graph-link[https://github.com/RobinThrift/belt/]{img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/belt" title="GitHub - RobinThrift/belt" description="Contribute to RobinThrift/belt development by creating an account on GitHub."}
+
+:::details{className="text-primary" summary="Collapsible"}
+${faker.lorem.paragraph()}
+:::
+
+
 `,
             isArchived: false,
             isDeleted: false,

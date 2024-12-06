@@ -1,5 +1,6 @@
 import React, { type Key, type ReactNode, useMemo } from "react"
 
+import { Alert } from "@/components/Alert"
 import { Image as ImageComp } from "@/components/Image"
 import { ArrowUDownLeft } from "@phosphor-icons/react"
 import clsx from "clsx"
@@ -30,7 +31,9 @@ import type {
     TableCell,
     TableRow,
 } from "mdast"
+import type { ContainerDirective, LeafDirective } from "mdast-util-directive"
 import { Code } from "./Code"
+import { directives } from "./directives"
 import { useMarkdownWorker } from "./useMarkdownWorker"
 
 export interface MarkdownProps {
@@ -121,10 +124,20 @@ function astNodeToJSX(ctx: Context, node: RootContent): ReactNode {
             return footnoteReferenceToJSX(ctx, node)
         case "footnoteDefinition":
             return footnoteDefinitionToJSX(ctx, node)
+        case "containerDirective":
+            return directiveToJSX(ctx, node)
+        case "leafDirective":
+            return directiveToJSX(ctx, node)
         case "break":
             return <br key={nodeKey(node)} />
         case "thematicBreak":
             return <hr key={nodeKey(node)} />
+        case "html":
+            return (
+                <Alert variant="danger" key={nodeKey(node)}>
+                    HTML ist not supported
+                </Alert>
+            )
     }
 
     throw new Error(`unknown node type ${node.type}`)
@@ -399,6 +412,32 @@ function footnoteReferenceToJSX(
                 {node.label}
             </a>
         </sup>
+    )
+}
+
+function directiveToJSX(
+    ctx: Context,
+    node: ContainerDirective | LeafDirective,
+): ReactNode {
+    let Directive = directives[node.name as keyof typeof directives]
+    if (!Directive) {
+        return (
+            <Alert
+                variant="danger"
+                key={nodeKey(node)}
+            >{`Unknown directive "${node.name}"`}</Alert>
+        )
+    }
+
+    let children = node.children.map((c) => astNodeToJSX(ctx, c))
+    if (node.type === "leafDirective") {
+        children = [extractText(node.children).join("")]
+    }
+
+    return (
+        <Directive {...(node.attributes ?? {})} key={nodeKey(node)}>
+            {children}
+        </Directive>
     )
 }
 
