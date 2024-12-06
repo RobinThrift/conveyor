@@ -23,7 +23,7 @@ export interface SidebarItem {
 }
 
 export function Sidebar(props: SidebarProps) {
-    let useCollapsibleSidebar = useBreakpoint(1630)
+    let useCollapsibleSidebar = useBreakpoint(1641)
     let t = useT("components/Sidebar")
 
     let content = (
