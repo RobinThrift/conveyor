@@ -31,7 +31,11 @@ import type {
     TableCell,
     TableRow,
 } from "mdast"
-import type { ContainerDirective, LeafDirective } from "mdast-util-directive"
+import type {
+    ContainerDirective,
+    LeafDirective,
+    TextDirective,
+} from "mdast-util-directive"
 import { Code } from "./Code"
 import { directives } from "./directives"
 import { useMarkdownWorker } from "./useMarkdownWorker"
@@ -127,6 +131,8 @@ function astNodeToJSX(ctx: Context, node: RootContent): ReactNode {
         case "containerDirective":
             return directiveToJSX(ctx, node)
         case "leafDirective":
+            return directiveToJSX(ctx, node)
+        case "textDirective":
             return directiveToJSX(ctx, node)
         case "break":
             return <br key={nodeKey(node)} />
@@ -417,7 +423,7 @@ function footnoteReferenceToJSX(
 
 function directiveToJSX(
     ctx: Context,
-    node: ContainerDirective | LeafDirective,
+    node: ContainerDirective | LeafDirective | TextDirective,
 ): ReactNode {
     let Directive = directives[node.name as keyof typeof directives]
     if (!Directive) {
