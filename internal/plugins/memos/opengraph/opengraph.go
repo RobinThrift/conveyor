@@ -220,7 +220,7 @@ func newOGInfoFromHTMl(body io.Reader) (*oginfo, error) {
 				if bytes.Equal(key, []byte("property")) {
 					property = string(val)
 				} else if bytes.Equal(key, []byte("content")) {
-					content = string(val)
+					content = strings.ReplaceAll(string(val), `"`, "'")
 				}
 				if !more {
 					break
