@@ -237,7 +237,7 @@ func (r *router) ListAttachments(ctx context.Context, req ListAttachmentsRequest
 	apiAttachments := AttachmentList{Items: make([]Attachment, len(attachments.Items))}
 	for i, a := range attachments.Items {
 		apiAttachments.Items[i] = Attachment{
-			Url:              r.baseURL + "attachments" + a.Filepath,
+			Url:              a.URL(r.baseURL),
 			OriginalFilename: a.OriginalFilename,
 			ContentType:      a.ContentType,
 			Sha256:           fmt.Sprintf("%x", a.Sha256),
@@ -283,7 +283,7 @@ func (r *router) CreateAttachment(ctx context.Context, req CreateAttachmentReque
 	}
 
 	return CreateAttachment201JSONResponse{
-		Url:              r.baseURL + "attachments" + created.Filepath,
+		Url:              created.URL(r.baseURL),
 		OriginalFilename: created.OriginalFilename,
 		ContentType:      created.ContentType,
 		Sha256:           fmt.Sprintf("%x", created.Sha256),

@@ -27,3 +27,7 @@ type AttachmentList struct {
 	Items []*Attachment
 	Next  *string
 }
+
+func (a *Attachment) URL(baseURL string) string {
+	return baseURL + "attachments" + a.Filepath
+}

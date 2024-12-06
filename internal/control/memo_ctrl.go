@@ -3,11 +3,13 @@ package control
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"regexp"
 	"time"
 
 	"github.com/RobinThrift/belt/internal/auth"
 	"github.com/RobinThrift/belt/internal/domain"
+	"github.com/RobinThrift/belt/internal/plugins"
 	"github.com/RobinThrift/belt/internal/storage/database"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite"
 	"github.com/RobinThrift/belt/internal/x/stringset"
@@ -17,6 +19,7 @@ type MemoControl struct {
 	transactioner  database.Transactioner
 	memoRepo       MemoControlMemoRepo
 	attachmentRepo MemoControlAttachmentRepo
+	plugins        []plugins.Plugin
 }
 
 type MemoControlMemoRepo interface {
@@ -36,8 +39,8 @@ type MemoControlAttachmentRepo interface {
 	ListAttachmentsForMemo(ctx context.Context, memoID domain.MemoID) ([]*domain.Attachment, error)
 }
 
-func NewMemoControl(transactioner database.Transactioner, memoRepo MemoControlMemoRepo, attachmentRepo MemoControlAttachmentRepo) *MemoControl {
-	return &MemoControl{transactioner, memoRepo, attachmentRepo}
+func NewMemoControl(transactioner database.Transactioner, memoRepo MemoControlMemoRepo, attachmentRepo MemoControlAttachmentRepo, plugins []plugins.Plugin) *MemoControl {
+	return &MemoControl{transactioner, memoRepo, attachmentRepo, plugins}
 }
 
 func (mc *MemoControl) GetMemo(ctx context.Context, id domain.MemoID) (*domain.Memo, error) {
@@ -66,6 +69,12 @@ type CreateMemoCmd struct {
 }
 
 func (mc *MemoControl) CreateMemo(ctx context.Context, cmd CreateMemoCmd) (domain.MemoID, error) {
+	return database.InTransaction(ctx, mc.transactioner, func(ctx context.Context) (domain.MemoID, error) {
+		return mc.createMemo(ctx, cmd)
+	})
+}
+
+func (mc *MemoControl) createMemo(ctx context.Context, cmd CreateMemoCmd) (domain.MemoID, error) {
 	account := auth.AccountFromCtx(ctx)
 	if account == nil {
 		return domain.MemoID(-1), auth.ErrUnauthorized
@@ -81,6 +90,8 @@ func (mc *MemoControl) CreateMemo(ctx context.Context, cmd CreateMemoCmd) (domai
 		memo.CreatedAt = cmd.CreatedAt.UTC()
 	}
 
+	memo.Content = mc.runMemoContentPlugins(ctx, memo.Content)
+
 	id, err := mc.memoRepo.CreateMemo(ctx, memo)
 	if err != nil {
 		return domain.MemoID(-1), fmt.Errorf("%w: %v", domain.ErrCreateMemo, err)
@@ -90,6 +101,9 @@ func (mc *MemoControl) CreateMemo(ctx context.Context, cmd CreateMemoCmd) (domai
 	if err != nil {
 		return domain.MemoID(-1), fmt.Errorf("%w: %v", domain.ErrCreateMemo, err)
 	}
+
+	memo.ID = id
+	mc.runMemoSavedlugins(ctx, memo)
 
 	return id, nil
 }
@@ -102,6 +116,12 @@ type UpdateMemoCmd struct {
 }
 
 func (mc *MemoControl) UpdateMemo(ctx context.Context, cmd UpdateMemoCmd) error {
+	return mc.transactioner.InTransaction(ctx, func(ctx context.Context) error {
+		return mc.updateMemo(ctx, cmd)
+	})
+}
+
+func (mc *MemoControl) updateMemo(ctx context.Context, cmd UpdateMemoCmd) error {
 	account := auth.AccountFromCtx(ctx)
 	if account == nil {
 		return auth.ErrUnauthorized
@@ -113,7 +133,7 @@ func (mc *MemoControl) UpdateMemo(ctx context.Context, cmd UpdateMemoCmd) error 
 	}
 
 	if cmd.Content != nil {
-		memo.Content = cmd.Content
+		memo.Content = mc.runMemoContentPlugins(ctx, cmd.Content)
 
 		err = mc.memoRepo.UpdateMemoContent(ctx, memo)
 		if err != nil {
@@ -144,6 +164,8 @@ func (mc *MemoControl) UpdateMemo(ctx context.Context, cmd UpdateMemoCmd) error 
 			return fmt.Errorf("error restoring memo %d: %v", cmd.MemoID, err)
 		}
 	}
+
+	mc.runMemoSavedlugins(ctx, memo)
 
 	return nil
 }
@@ -180,6 +202,35 @@ func (mc *MemoControl) updateAttachments(ctx context.Context, memoID domain.Memo
 	}
 
 	return nil
+}
+
+func (mc *MemoControl) runMemoContentPlugins(ctx context.Context, content []byte) []byte {
+	var err error
+	for _, p := range mc.plugins {
+		mcp, ok := p.(plugins.MemoContentPlugin)
+		if !ok {
+			continue
+		}
+		content, err = mcp.MemoContentPlugin(ctx, content)
+		if err != nil {
+			slog.ErrorContext(ctx, "error running plugin "+p.Name()+" (MemoContentPlugin)", slog.Any("error", err))
+		}
+	}
+
+	return content
+}
+
+func (mc *MemoControl) runMemoSavedlugins(ctx context.Context, memo *domain.Memo) {
+	for _, p := range mc.plugins {
+		mcp, ok := p.(plugins.MemoSavedPlugin)
+		if !ok {
+			continue
+		}
+		err := mcp.MemoSavedPlugin(ctx, memo)
+		if err != nil {
+			slog.ErrorContext(ctx, "error running plugin "+p.Name()+" (MemoSavedPlugin)", slog.Any("error", err))
+		}
+	}
 }
 
 type ListTagsQuery struct {

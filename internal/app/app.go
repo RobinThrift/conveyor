@@ -64,9 +64,13 @@ func New(config Config) *App {
 	accountCtrl := control.NewAccountController(db, accountRepo)
 	apiTokenCtrl := control.NewAPITokenController(authConfig, apiTokenRepo)
 	authCtrl := control.NewAuthController(authConfig, db, accountCtrl, apiTokenCtrl, localAuthRepo)
-	memoCtrl := control.NewMemoControl(db, memoRepo, attachmentRepo)
 	attachmentCtrl := control.NewAttachmentControl(fs, attachmentRepo)
+	memoCtrl := control.NewMemoControl(db, memoRepo, attachmentRepo, []plugins.Plugin{
+		opengraph.NewOpenGraphPlugin(config.BasePath, attachmentCtrl),
+	})
 	settingsCtrl := control.NewSettingsControl(settingsRepo)
+
+	jobSystem := jobs.NewSystem(db, jobRepo, accountCtrl, time.Now, jobFuncs)
 
 	mux := http.NewServeMux()
 
