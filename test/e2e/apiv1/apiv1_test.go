@@ -32,7 +32,7 @@ func setup(ctx context.Context, t *testing.T) *client {
 	config.Log.Level = "debug"
 	config.Log.Format = "console"
 
-	config.Database.Path = ":memory:"
+	config.Database.Path = t.TempDir() + "/" + strings.ReplaceAll(t.Name(), "/", "__") + ".db"
 	config.Database.DebugEnabled = true
 
 	config.SecureCookies = false
