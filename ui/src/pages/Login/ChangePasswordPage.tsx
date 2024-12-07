@@ -1,3 +1,4 @@
+import { BuildInfo } from "@/components/BuildInfo"
 import { Input } from "@/components/Input"
 import { ModeSwitcher } from "@/components/ThemeSwitcher"
 import { useBaseURL } from "@/hooks/useBaseURL"
@@ -120,7 +121,8 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
                     </Form.Root>
                 </div>
             </div>
-            <footer className="p-2 flex justify-end absolute bottom-0 left-0 right-0">
+            <footer className="login-footer">
+                <BuildInfo />
                 <ModeSwitcher className="max-w-sm" />
             </footer>
         </div>

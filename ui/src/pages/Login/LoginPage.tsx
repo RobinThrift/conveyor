@@ -1,3 +1,4 @@
+import { BuildInfo } from "@/components/BuildInfo"
 import * as Form from "@/components/Form"
 import { Logo } from "@/components/Logo"
 import { ModeSwitcher } from "@/components/ThemeSwitcher"
@@ -107,7 +108,8 @@ export function LoginPage(props: LoginPageProps) {
                     </Form.Root>
                 </div>
             </div>
-            <footer className="p-2 flex justify-end absolute bottom-0 left-0 right-0">
+            <footer className="login-footer">
+                <BuildInfo />
                 <ModeSwitcher className="max-w-sm" />
             </footer>
         </div>

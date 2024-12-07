@@ -19,3 +19,7 @@
 .login-window {
     @apply flex items-center justify-center flex-col w-full phone:w-[400px];
 }
+
+.login-footer {
+    @apply p-2 flex justify-between items-center absolute bottom-0 left-0 right-0;
+}

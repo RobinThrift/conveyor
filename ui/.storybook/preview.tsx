@@ -48,6 +48,14 @@ let serverData: ServerData = {
         LoginChangePasswordPage: {},
         SettingsPage: { validationErrors: {} },
     },
+
+    buildInfo: {
+        version: "vDEV",
+        commitHash: "b23121",
+        commitDate: "2024-12-07T17:26:43Z",
+        projectLink: "https://github.com/RobinThrift/belt",
+        goVersion: "1.23.4",
+    },
 }
 
 const preview: Preview = {

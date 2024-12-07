@@ -5,6 +5,7 @@ import React, { Suspense, useCallback } from "react"
 import { $router } from "./router"
 
 import { type Filter, filterFromQuery, filterToQueryString } from "@/api/memos"
+import { BuildInfo } from "@/components/BuildInfo"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useT } from "@/i18n"
 import { ErrorPage } from "@/pages/Errors"
@@ -174,6 +175,9 @@ export function App(props: AppProps) {
             />
             <main className="flex-1 p-4 pt-12 md:ps-0 md:pt-4 overflow-x-hidden overflow-y-auto h-screen">
                 <Suspense>{pageComp}</Suspense>
+                <footer className="p-2 flex justify-end items-center">
+                    <BuildInfo />
+                </footer>
             </main>
         </div>
     )

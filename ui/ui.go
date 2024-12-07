@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/RobinThrift/belt/internal/domain"
+	"github.com/RobinThrift/belt/internal/version"
 )
 
 //go:embed src/html/error.tmpl.html
@@ -75,6 +76,15 @@ type ServerData struct {
 	Settings   *Settings            `json:"settings,omitempty"`
 	Components ServerDataComponents `json:"components,omitempty"`
 	Error      *UIError             `json:"error,omitempty"`
+	BuildInfo  BuildInfo            `json:"buildInfo"`
+}
+
+type BuildInfo struct {
+	Version     string `json:"version"`
+	CommitHash  string `json:"commitHash"`
+	CommitDate  string `json:"commitDate"`
+	GoVersion   string `json:"goVersion"`
+	ProjectLink string `json:"projectLink"`
 }
 
 type ServerDataComponents struct {
@@ -89,6 +99,8 @@ type UIError struct {
 	Detail string
 }
 
+var buildInfo = version.GetBuildInfo()
+
 func Render(w http.ResponseWriter, data PageData) error {
 	var tmpldata struct {
 		UIData    template.HTML
@@ -98,6 +110,12 @@ func Render(w http.ResponseWriter, data PageData) error {
 		BaseURL   template.HTMLAttr
 		Title     string
 	}
+
+	data.ServerData.BuildInfo.Version = buildInfo.Version
+	data.ServerData.BuildInfo.CommitHash = buildInfo.Hash
+	data.ServerData.BuildInfo.CommitDate = buildInfo.Date
+	data.ServerData.BuildInfo.GoVersion = buildInfo.GoVersion
+	data.ServerData.BuildInfo.ProjectLink = "http://github.com/RobinThrift/belt"
 
 	encoded, err := json.Marshal(data.ServerData)
 	if err != nil {
