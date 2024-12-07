@@ -8,11 +8,7 @@ import { SearchCursor } from "@codemirror/search"
 import { useStore } from "@nanostores/react"
 import { Vim, getCM, vim } from "@replit/codemirror-vim"
 import { hyperLink } from "@uiw/codemirror-extensions-hyper-link"
-import CodeMirror, {
-    StateEffect,
-    EditorView,
-    type Extension,
-} from "@uiw/react-codemirror"
+import CodeMirror, { EditorView, type Extension } from "@uiw/react-codemirror"
 import React, { useCallback, useEffect, useMemo } from "react"
 import { fileDropHandler } from "./cmFileDropHandler"
 import { tagsAutoComplete } from "./tagsAutoComplete"
@@ -32,6 +28,15 @@ Vim.defineEx("quit", "q", (cm: { cm6: EditorView }) => {
 Vim.defineEx("cquit", "cq", (cm: { cm6: EditorView }) => {
     eventbus.emit(`vim:quit:${cm.cm6.dom.parentElement?.id ?? "global"}`)
 })
+
+Vim.map("A", "g$i")
+Vim.map("I", "g0i")
+
+Vim.map("j", "gj")
+Vim.map("j", "gj", "visual")
+
+Vim.map("k", "gk")
+Vim.map("k", "gk", "visual")
 
 export interface TextEditorProps {
     id: string
@@ -61,6 +66,7 @@ export function TextEditor(props: TextEditorProps) {
             markdown({ base: markdownLanguage, codeLanguages: languages }),
             hyperLink,
             tagsAutoComplete(props.tags),
+            EditorView.lineWrapping,
         ]
     }, [props.tags, enableVimKeybindings])
 
@@ -74,14 +80,9 @@ export function TextEditor(props: TextEditorProps) {
 
     let onCreateEditor = useCallback(
         (view: EditorView) => {
-            if (!enableVimKeybindings) {
-                return
+            if (enableVimKeybindings) {
+                Vim.handleEx(getCM(view), "startinsert")
             }
-
-            Vim.handleEx(getCM(view), "startinsert")
-            view.dispatch({
-                effects: [StateEffect.appendConfig.of(EditorView.lineWrapping)],
-            })
 
             if (!props.placeCursorAt) {
                 return
