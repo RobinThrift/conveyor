@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"regexp"
 
 	"github.com/RobinThrift/belt/internal/domain"
 	"github.com/RobinThrift/belt/internal/storage/database"
@@ -416,7 +415,7 @@ func (r *MemoRepo) ListTags(ctx context.Context, query ListTagsQuery) (*domain.T
 }
 
 func (r *MemoRepo) updateTags(ctx context.Context, db sqlc.DBTX, memo *domain.Memo) error {
-	tags := extractTags(memo.Content)
+	tags := domain.ExtractTags(memo.Content)
 
 	deletedTags, err := queries.CleanupeMemoTagConnection(ctx, db, sqlc.CleanupeMemoTagConnectionParams{MemoID: int64(memo.ID), Tags: tags})
 	if err != nil {
@@ -458,41 +457,4 @@ func (r *MemoRepo) cleanupTagsWithNoCount(ctx context.Context, db sqlc.DBTX) err
 	}
 
 	return nil
-}
-
-var tagPattern = regexp.MustCompile(`#([\w/\-_]+)`)
-var codeBlockPattern = regexp.MustCompile("```[\\w]*")
-
-func extractTags(content []byte) []string {
-	var tags []string //nolint: prealloc // false positive
-	nonCodeBlocks := codeBlockPattern.FindAllIndex(content, -1)
-
-	if len(nonCodeBlocks) == 0 {
-		foundTags := tagPattern.FindAllSubmatch(content, -1)
-		for _, tag := range foundTags {
-			tags = append(tags, string(tag[1]))
-		}
-
-		return tags
-	}
-
-	start := 0
-	end := 0
-	for i, f := range nonCodeBlocks {
-		if i%2 == 0 {
-			end = f[0]
-			foundTags := tagPattern.FindAllSubmatch(content[start:end], -1)
-			for _, tag := range foundTags {
-				tags = append(tags, string(tag[1]))
-			}
-			start = f[1]
-		}
-	}
-
-	foundTags := tagPattern.FindAllSubmatch(content[nonCodeBlocks[len(nonCodeBlocks)-1][1]:], -1)
-	for _, tag := range foundTags {
-		tags = append(tags, string(tag[1]))
-	}
-
-	return tags
 }
