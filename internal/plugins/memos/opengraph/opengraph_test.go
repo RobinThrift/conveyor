@@ -62,9 +62,19 @@ func TestOpenGraphPlugin(t *testing.T) {
 		},
 
 		{
-			name:     "Multiple Links",
-			input:    "\n \n" + url + "/RobinThrift/belt\n\t\t" + url + "/RobinThrift/stuff",
-			expected: "\n \n" + url + "/RobinThrift/belt\n\t\t" + url + "/RobinThrift/stuff",
+			name:     "Fist line is not Link",
+			input:    "\n# Heading 1\n" + url + "/RobinThrift/belt",
+			expected: "\n# Heading 1\n" + url + "/RobinThrift/belt",
+		},
+
+		{
+			name: "Multiple Lines Valid",
+			input: url + `/RobinThrift/belt
+This is a short description of the link #and #some #tags
+and another link: ` + url + "/RobinThrift/stuff",
+			expected: `::open-graph-link[https://github.com/RobinThrift/belt]{title="GitHub - RobinThrift/belt" description="Contribute to RobinThrift/belt development by creating an account on GitHub." img="/attachments/e3/b0/c4/42/98/fc/1c/14/9a/fb/f4/c8/99/6f/b9/24/27/ae/41/e4/64/9b/93/4c/a4/95/99/1b/78/52/b8/55/belt.png" alt="Contribute to RobinThrift/belt development by creating an account on GitHub."}
+This is a short description of the link #and #some #tags
+and another link: ` + url + "/RobinThrift/stuff",
 		},
 
 		{

@@ -1,7 +1,6 @@
 package opengraph
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"errors"
@@ -21,7 +20,7 @@ import (
 )
 
 // OpenGraphPlugin fetched Open Graph Protocol (https://ogp.me/) information if the Memo content starts with a plain URL with not spaces
-// and NOT other text, including tags. Subsequent lines may only contain tags.
+// and NO other text, including tags.
 // Leading and trailing Whitespace will be stripped.
 type OpenGraphPlugin struct {
 	baseURL        string
@@ -55,10 +54,6 @@ func (p *OpenGraphPlugin) MemoContentPlugin(ctx context.Context, content []byte)
 
 	u, err := url.Parse(string(link))
 	if err != nil {
-		return content, nil
-	}
-
-	if shouldSkip(orignalContent[end:]) {
 		return content, nil
 	}
 
@@ -153,10 +148,19 @@ type oginfo struct {
 }
 
 func (i *oginfo) String() string {
+	siteName := i.siteName
+	if siteName != "" {
+		if strings.Contains(i.title, i.siteName) {
+			siteName = ""
+		} else {
+			siteName += " - "
+		}
+	}
+
 	return fmt.Sprintf(
-		`::open-graph-link[%s]{title="%s - %s" description="%s" img="%s" alt="%s"}`,
+		`::open-graph-link[%s]{title="%s%s" description="%s" img="%s" alt="%s"}`,
 		i.url,
-		i.siteName,
+		siteName,
 		i.title,
 		i.description,
 		i.image,
@@ -192,6 +196,7 @@ func newOGInfoFromHTMl(body io.Reader) (*oginfo, error) {
 	info := oginfo{}
 
 	tokenizer := html.NewTokenizer(body)
+	inTitle := false
 
 	for {
 		tt := tokenizer.Next()
@@ -212,51 +217,55 @@ func newOGInfoFromHTMl(body io.Reader) (*oginfo, error) {
 			break
 		}
 
-		if (tt == html.SelfClosingTagToken || tt == html.StartTagToken) && bytes.Equal(tagName, []byte("meta")) {
-			var property string
-			var content string
-			key, val, more := tokenizer.TagAttr()
-			for {
-				if bytes.Equal(key, []byte("property")) {
-					property = string(val)
-				} else if bytes.Equal(key, []byte("content")) {
-					content = strings.ReplaceAll(string(val), `"`, "'")
-				}
-				if !more {
-					break
-				}
-				key, val, more = tokenizer.TagAttr()
-			}
+		if (tt == html.SelfClosingTagToken || tt == html.StartTagToken) && bytes.Equal(tagName, []byte("title")) {
+			inTitle = true
+		}
 
-			switch property {
-			case "og:url":
-				info.url = content
-			case "og:site_name":
-				info.siteName = content
-			case "og:title":
-				info.title = content
-			case "og:description":
-				info.description = content
-			case "og:image":
-				info.image = content
-			case "og:image:alt":
-				info.imageAlt = content
-			}
+		if tt == html.TextToken && inTitle && info.title == "" {
+			info.title = string(tokenizer.Text())
+			inTitle = false
+			continue
+		}
+
+		if (tt == html.SelfClosingTagToken || tt == html.StartTagToken) && bytes.Equal(tagName, []byte("meta")) {
+			extractMetaTag(tokenizer, &info)
 		}
 	}
 
 	return &info, nil
 }
 
-func shouldSkip(content []byte) bool {
-	scanner := bufio.NewScanner(bytes.NewReader(content))
-	scanner.Split(bufio.ScanWords)
-
-	for scanner.Scan() {
-		if scanner.Bytes()[0] != '#' {
-			return true
+func extractMetaTag(tokenizer *html.Tokenizer, info *oginfo) {
+	var property string
+	var content string
+	key, val, more := tokenizer.TagAttr()
+	for {
+		if bytes.Equal(key, []byte("property")) {
+			property = string(val)
+		} else if bytes.Equal(key, []byte("content")) {
+			content = strings.ReplaceAll(string(val), `"`, "'")
 		}
+		if !more {
+			break
+		}
+		key, val, more = tokenizer.TagAttr()
 	}
 
-	return false
+	fmt.Printf("=====> property %#v\n", property)
+	fmt.Printf("=====> content %#v\n", content)
+	switch property {
+	case "og:url":
+		info.url = content
+	case "og:site_name":
+		info.siteName = content
+	case "og:title":
+		info.title = content
+	case "og:description":
+		info.description = content
+	case "og:image":
+		info.image = content
+	case "og:image:alt":
+		info.imageAlt = content
+	}
+
 }
