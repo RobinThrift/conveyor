@@ -56,6 +56,59 @@ const preview: Preview = {
         msw: {
             handlers: mockAPI,
         },
+
+        viewport: {
+            viewports: {
+                phone: {
+                    name: "Phone",
+                    styles: {
+                        height: "852px",
+                        width: "393px",
+                    },
+                    type: "mobile",
+                },
+                xs: {
+                    name: "Small Window",
+                    styles: {
+                        width: "768px",
+                        height: "900px",
+                    },
+                    type: "desktop",
+                },
+                tablet: {
+                    name: "Tablet",
+                    styles: {
+                        height: "1024px",
+                        width: "768px",
+                    },
+                    type: "desktop",
+                },
+                sm: {
+                    name: "Small",
+                    styles: {
+                        width: "1440px",
+                        height: "900px",
+                    },
+                    type: "desktop",
+                },
+                md: {
+                    name: "Medium",
+                    styles: {
+                        width: "1680px",
+                        height: "1050px",
+                    },
+                    type: "desktop",
+                },
+                lg: {
+                    name: "Large",
+                    styles: {
+                        width: "2100px",
+                        height: "1280px",
+                    },
+                    type: "desktop",
+                },
+            },
+        },
     },
 
     loaders: [mswLoader],
