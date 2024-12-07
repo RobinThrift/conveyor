@@ -41,7 +41,8 @@ const tagListStoreNextPage = () =>
             tags = await listTags({
                 pagination: {
                     after: next,
-                    pageSize: 20,
+                    // @TODO: use real pagination
+                    pageSize: 1000,
                 },
                 baseURL: $baseURL.get(),
                 signal: abortCtrl.signal,
