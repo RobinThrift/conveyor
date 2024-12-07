@@ -68,7 +68,7 @@ export function Calendar({ className, ...props }: CalendarProps) {
             classNames={{
                 months: "flex flex-wrap gap-2 relative w-full",
                 nav: "flex align-center absolute top-0 right-0 h-6",
-                month_caption: "flex h-6 lg:px-3",
+                month_caption: "flex h-6 md:px-3",
                 dropdowns: "inline-flex align-center gap-1 relative",
                 dropdown_root: "inline-flex align-center relative group",
                 months_dropdown:
@@ -76,7 +76,7 @@ export function Calendar({ className, ...props }: CalendarProps) {
                 caption:
                     "items-center inline-flex nowrap relative z-10 border-0",
                 caption_label:
-                    "flex items-center -ml-1 xl:-ml-3 mr-1 p-1 xl:p-2 rounded group-hover:bg-subtle text-sm sm:text-base",
+                    "flex items-center -ml-1 lg:-ml-3 mr-1 p-1 lg:p-2 rounded group-hover:bg-subtle text-sm sm:text-base",
                 years_dropdown:
                     "appearance-none border-0 absolute inset-0 opacity-0 w-full z-20",
                 month: "w-full",

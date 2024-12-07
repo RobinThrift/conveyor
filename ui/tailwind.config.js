@@ -6,6 +6,15 @@ export default {
     darkMode: "class",
     content: [".src/html/*.html", "./src/**/*.{ts,tsx}"],
     theme: {
+        screens: {
+            phone: "390px",
+            xs: "768px",
+            tablet: "1024px",
+            sm: "1440px",
+            md: "1680px",
+            lg: "2100px",
+        },
+
         extend: {
             colors: {
                 primary: {

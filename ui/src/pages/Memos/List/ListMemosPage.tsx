@@ -75,19 +75,17 @@ export function ListMemosPage(props: ListMemosPageProps) {
     )
 
     return (
-        <div className="flex gap-4 justify-center">
-            <div className="flex-1 max-w-4xl w-full gap-4 flex flex-col">
+        <div className="flex gap-4 justify-center w-full">
+            <div className="flex-1 flex flex-col gap-4 w-full max-w-3xl sm:max-w-4xl mx-auto lg:mx-1">
                 {showEditor && (
-                    <div className="container mx-auto">
-                        <NewMemoEditor
-                            tags={tagList.tags}
-                            createMemo={createMemo}
-                            inProgress={isLoading}
-                        />
-                    </div>
+                    <NewMemoEditor
+                        tags={tagList.tags}
+                        createMemo={createMemo}
+                        inProgress={isLoading}
+                    />
                 )}
 
-                <div className="gap-4 flex flex-col relative">
+                <div className="flex flex-col gap-4 relative">
                     {memos.map((memo) => (
                         <Memo
                             key={memo.id}
@@ -113,6 +111,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                     filters={filter}
                     tags={tagList}
                     onChangeFilter={onChangeFilters}
+                    className="sm:max-w-[300px] sm:pe-4 md:pe-8 lg:max-w-none lg:w-[300px] lg:pe-0"
                 />
             </FiltersSidebar>
         </div>

@@ -74,7 +74,9 @@
 }
 
 .open-graph-preview {
-    @apply overflow-hidden rounded-lg flex flex-col bg-subtle-extra-dark text-subtle-contrast my-2 lg:max-w-[40%];
+    @apply overflow-hidden rounded-lg flex flex-col border hover:border-subtle-extra-dark bg-subtle text-subtle-contrast;
+    @apply my-2 sm:max-w-[50%] sm:float-left sm:clear-left sm:mr-2 sm:mt-0;
+    @apply dark:bg-subtle-extra-dark;
     width: 100%;
 
     h5 {

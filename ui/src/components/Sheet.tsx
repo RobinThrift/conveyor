@@ -37,7 +37,7 @@ export function SheetContent({
                 {...props}
                 className={clsx(
                     "fixed z-50 gap-4 bg-background shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-                    "h-full w-3/4 xl:w-1/3 sm:max-w-xs",
+                    "h-full w-3/4 xs:w-1/3",
                     {
                         "inset-y-0 left-0 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left":
                             side === "left",

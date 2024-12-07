@@ -1,6 +1,6 @@
 .settings-tab-list {
     @apply rounded-lg border border-subtle bg-surface px-2 py-1;
-    @apply grid gap-2 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4;
+    @apply grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
     @apply border-subtle-extra-dark;
 }
 

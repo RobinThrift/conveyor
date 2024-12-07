@@ -140,9 +140,9 @@ export function App(props: AppProps) {
     }
 
     return (
-        <div className="flex gap-4 justify-start flex-col">
+        <div className="flex gap-4 justify-start">
             <Sidebar
-                className="sm:w-[250px] w-[80%] h-screen fixed"
+                className="max-w-[250px] w-[80%] h-screen"
                 items={[
                     {
                         label: t.Memos,
@@ -172,7 +172,7 @@ export function App(props: AppProps) {
                     },
                 ]}
             />
-            <main className="flex-1 p-4 pt-0 2xl:pt-4 overflow-hiddden">
+            <main className="flex-1 p-4 pt-12 md:ps-0 md:pt-4 overflow-x-hidden overflow-y-auto h-screen">
                 <Suspense>{pageComp}</Suspense>
             </main>
         </div>

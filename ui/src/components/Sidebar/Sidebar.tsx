@@ -23,7 +23,7 @@ export interface SidebarItem {
 }
 
 export function Sidebar(props: SidebarProps) {
-    let useCollapsibleSidebar = useBreakpoint(1641)
+    let useCollapsibleSidebar = useBreakpoint(1440)
     let t = useT("components/Sidebar")
 
     let content = (
@@ -94,7 +94,7 @@ function Collapsible({ children }: React.PropsWithChildren) {
 
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <header>
+            <header className="fixed">
                 <SheetTrigger asChild>
                     <button type="button" className="px-4 pt-4 cursor-pointer">
                         <List size={20} />
