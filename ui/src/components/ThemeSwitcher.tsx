@@ -43,16 +43,16 @@ export function ModeSwitcher({
     className?: string
 }) {
     let t = useT("components/ThemeSwitcher")
-    let [mode, setMode] = useSetting("theme.mode")
+    let [mode, setMode] = useSetting<"light" | "auto" | "dark">("theme.mode")
     let onChange = useCallback(
         (v: string) => {
-            setMode(v)
+            setMode(v as "light" | "auto" | "dark")
         },
         [setMode],
     )
 
     useEffect(() => {
-        setModeOnDocument(mode as any)
+        setModeOnDocument(mode)
     }, [mode])
 
     return (
@@ -87,7 +87,7 @@ export function ModeSwitcher({
     )
 }
 
-function setModeOnDocument(mode: "auto" | "light" | "dark") {
+function setModeOnDocument(mode: "auto" | "light" | "dark" = "auto") {
     switch (mode) {
         case "auto":
             document.documentElement.classList.toggle(

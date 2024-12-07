@@ -32,7 +32,7 @@
 }
 
 .field-message {
-    @apply block px-3 py-2 border border-danger-dark bg-danger/40 text-danger-dark rounded;
+    @apply block px-3 py-2 border border-danger-dark bg-danger text-danger-contrast rounded;
 }
 
 .checkbox-field {

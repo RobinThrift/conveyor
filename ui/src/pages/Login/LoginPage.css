@@ -1,0 +1,21 @@
+.login-bg {
+    @apply h-screen w-screen flex items-center justify-stretch phone:justify-center;
+    background-color: rgb(--var(--body-bg));
+    background-image: radial-gradient(
+        rgb(var(--color-subtle-dark)) 1px,
+        transparent 1px
+    );
+    background-size: 16px 16px;
+
+    @media (min-width: 1024px) {
+        mask-image: radial-gradient(
+            ellipse 50% 50% at 50% 50%,
+            #000 60%,
+            transparent 100%
+        );
+    }
+}
+
+.login-window {
+    @apply flex items-center justify-center flex-col w-full phone:w-[400px];
+}
