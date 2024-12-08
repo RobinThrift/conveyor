@@ -6,6 +6,7 @@ import {
     Plugin,
 } from "vite"
 import react from "@vitejs/plugin-react"
+import { VitePWA } from "vite-plugin-pwa"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
     return {
@@ -32,7 +33,18 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             },
         },
 
-        plugins: [react()],
+        plugins: [
+            react(),
+            VitePWA({
+                strategies: "generateSW",
+                registerType: "prompt",
+                manifest: false,
+                workbox: {
+                    globPatterns: ["**/*.{js,css.svg}"],
+                    navigateFallback: null,
+                },
+            }),
+        ],
 
         server: {
             proxy: {
