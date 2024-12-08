@@ -1,0 +1,38 @@
+.memos-list-page {
+    @apply flex gap-4 justify-center w-full;
+}
+
+.memos-list {
+    @apply flex-1 flex flex-col gap-4 w-full max-w-3xl mx-auto;
+
+    @apply tablet:max-w-6xl;
+    @media (min-width: 1024px) {
+        /* tablet */
+        padding-right: 240px;
+    }
+
+    @apply lg:mx-1;
+    @media (min-width: 2100px) {
+        /* lg */
+        max-width: 80rem;
+        padding-right: 0px;
+    }
+}
+
+.filters-sidebar {
+    @apply tablet:pe-4 tablet:fixed tablet:right-0 tablet:h-screen overscroll-none;
+    @media (min-width: 1024px) {
+        /* tablet */
+        max-width: 300px;
+    }
+
+    @apply md:pe-8;
+
+    @apply lg:pe-4;
+    @media (min-width: 2100px) {
+        /* lg */
+        position: relative;
+        width: 300px;
+        max-width: none;
+    }
+}

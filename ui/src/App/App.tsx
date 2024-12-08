@@ -173,9 +173,9 @@ export function App(props: AppProps) {
                     },
                 ]}
             />
-            <main className="flex-1 p-4 pt-12 md:ps-0 md:pt-4 overflow-x-hidden overflow-y-auto h-screen">
+            <main className="flex-1 p-4 pt-12 md:ps-0 sm:pt-4 overflow-x-hidden overflow-y-auto h-screen">
                 <Suspense>{pageComp}</Suspense>
-                <footer className="p-2 flex justify-end items-center">
+                <footer className="p-2 flex justify-start items-center">
                     <BuildInfo />
                 </footer>
             </main>

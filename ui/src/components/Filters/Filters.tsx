@@ -1,6 +1,5 @@
 import type { ListMemosQuery } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
-import clsx from "clsx"
 import React, { useCallback } from "react"
 import { Loader } from "../Loader"
 import { Calendar } from "./Calendar"
@@ -48,26 +47,29 @@ export function Filters(props: FiltersProps) {
     )
 
     return (
-        <div className={clsx("space-y-4", props.className)}>
-            <SearchBar onChange={onChangeSearch} />
+        <div className={props.className}>
+            <div className="space-y-4 flex flex-col lg:fixed tablet:h-full tablet:pb-8 tablet:overflow-y-auto">
+                <SearchBar onChange={onChangeSearch} />
 
-            <Calendar
-                onSelect={onSelectDate}
-                selected={props.filters.exactDate}
-            />
+                <Calendar
+                    onSelect={onSelectDate}
+                    selected={props.filters.exactDate}
+                />
 
-            <TagTree
-                tags={props.tags.tags}
-                onSelect={onSelectTag}
-                selected={props.filters.tag}
-                onEOLReached={props.tags.nextPage}
-            />
+                <TagTree
+                    tags={props.tags.tags}
+                    onSelect={onSelectTag}
+                    selected={props.filters.tag}
+                    onEOLReached={props.tags.nextPage}
+                    className="sm:overflow-auto flex-1 pb-2 overscroll-contain"
+                />
 
-            {props.tags.isLoading && (
-                <div className="flex justify-center items-center min-h-[100px]">
-                    <Loader />
-                </div>
-            )}
+                {props.tags.isLoading && (
+                    <div className="flex justify-center items-center min-h-[100px]">
+                        <Loader />
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

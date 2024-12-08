@@ -17,6 +17,7 @@
 @import "./components/Alert/Alert.css" layer(components);
 @import "./pages/Settings/SettingsPage.css" layer(components);
 @import "./pages/Login/LoginPage.css" layer(components);
+@import "./pages/Memos/List/ListMemosPage.css" layer(components);
 
 @layer base {
     body {

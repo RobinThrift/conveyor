@@ -8,6 +8,7 @@
     background-size: 16px 16px;
 
     @media (min-width: 1024px) {
+        /* tablet */
         mask-image: radial-gradient(
             ellipse 50% 50% at 50% 50%,
             #000 60%,

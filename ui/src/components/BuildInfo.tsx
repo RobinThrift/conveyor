@@ -4,7 +4,12 @@ import React from "react"
 
 export function BuildInfo({ className }: { className?: string }) {
     return (
-        <div className={clsx("text-sm text-subtle", className)}>
+        <div
+            className={clsx(
+                "text-sm text-subtle-dark dark:text-subtle",
+                className,
+            )}
+        >
             {serverData.buildInfo.version}@
             <a
                 href={serverData.buildInfo.projectLink}
