@@ -8,6 +8,7 @@ import {
 import type { ListMemosQuery, Memo, MemoList } from "@/domain/Memo"
 import { isEqual } from "@/helper"
 import { $baseURL } from "@/hooks/useBaseURL"
+import { add as addNotification } from "@/notifications/store"
 import { useStore } from "@nanostores/react"
 import { atom, batched, onMount, task } from "nanostores"
 import { useEffect, useMemo } from "react"
@@ -156,6 +157,12 @@ export function createListMemosPageStore(init: UseListMemosPageStateInit) {
             $memos.set([created, ...$memos.get()])
             $isLoading.set(false)
             $error.set(undefined)
+
+            addNotification({
+                type: "info",
+                title: "New Memo created",
+                durationMs: 1000,
+            })
         })
     }
 
@@ -204,6 +211,12 @@ export function createListMemosPageStore(init: UseListMemosPageStateInit) {
             }
 
             $memos.set(items)
+
+            addNotification({
+                type: "info",
+                title: "Memo Updated",
+                durationMs: 1000,
+            })
         })
     }
 
@@ -221,6 +234,19 @@ export function createListMemosPageStore(init: UseListMemosPageStateInit) {
 
     onMount($store, () => {
         nextPage()
+
+        return $error.subscribe((err) => {
+            if (!err) {
+                return
+            }
+
+            let [title, message] = err.message.split(/:\n/, 2)
+            addNotification({
+                type: "error",
+                title,
+                message,
+            })
+        })
     })
 
     return {

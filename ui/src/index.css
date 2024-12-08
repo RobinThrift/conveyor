@@ -15,6 +15,7 @@
 @import "./components/Image/Image.css" layer(components);
 @import "./components/Sidebar/Sidebar.css" layer(components);
 @import "./components/Alert/Alert.css" layer(components);
+@import "./components/Notifications/Notifications.css" layer(components);
 @import "./pages/Settings/SettingsPage.css" layer(components);
 @import "./pages/Login/LoginPage.css" layer(components);
 @import "./pages/Memos/List/ListMemosPage.css" layer(components);

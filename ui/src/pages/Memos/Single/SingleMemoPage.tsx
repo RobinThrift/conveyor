@@ -16,14 +16,7 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
         "controls.doubleClickToEdit",
     )
 
-    let { memo, isLoading, updateMemo, error } = useSingleMemoPageState(
-        props.memoID,
-    )
-
-    if (error) {
-        // @TODO: proper error handling
-        console.error(error)
-    }
+    let { memo, isLoading, updateMemo } = useSingleMemoPageState(props.memoID)
 
     let onClickTag = useCallback(
         (tag: string) => {

@@ -1,6 +1,7 @@
 import { useIdleCallback } from "@/hooks/useIdleCallback"
 import { useOnVisible } from "@/hooks/useLoadOnVisible"
 import { usePromise } from "@/hooks/usePromise"
+import { add as addNotification } from "@/notifications/store"
 import { useTheme } from "@/storage/settings"
 import { LanguageDescription } from "@codemirror/language"
 import { languages } from "@codemirror/language-data"
@@ -90,7 +91,12 @@ export function Highlight({
     }, [parser, code])
 
     if (parser.resolved && parser.error) {
-        console.error(parser.error)
+        let [title, message] = parser.error.message.split(/:\n/, 2)
+        addNotification({
+            type: "error",
+            title,
+            message,
+        })
     }
 
     return <code>{highlighted || code}</code>

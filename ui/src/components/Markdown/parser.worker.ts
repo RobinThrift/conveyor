@@ -1,4 +1,5 @@
 import { randomID } from "@/helper"
+import { add as addNotification } from "@/notifications/store"
 import type { Root } from "mdast"
 import type {
     WorkerInput,
@@ -25,9 +26,14 @@ export class MarkdownWorker {
             },
         )
 
-        // @TODO: proper error handling
-        this._worker.onmessageerror = (evt) => console.error(evt)
-
+        this._worker.onmessageerror = (evt) => {
+            let [title, message] = evt.data.error.message.split(/:\n/, 2)
+            addNotification({
+                type: "error",
+                title,
+                message,
+            })
+        }
         this._worker.onmessage = (evt: MessageEvent<WorkerOutput>) => {
             switch (evt.data.type) {
                 case "result":

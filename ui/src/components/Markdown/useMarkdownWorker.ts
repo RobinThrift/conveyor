@@ -1,3 +1,4 @@
+import { add as addNotification } from "@/notifications/store"
 import type { Root } from "mdast"
 import { useEffect, useState } from "react"
 import { MarkdownWorker } from "./parser.worker"
@@ -24,8 +25,12 @@ export function useMarkdownWorker(markdown: string) {
                 setResult(ast)
             })
             .catch((err) => {
-                // @TODO: proper error handling
-                console.error(err)
+                let [title, message] = err.message.split(/:\n/, 2)
+                addNotification({
+                    type: "error",
+                    title,
+                    message,
+                })
             })
 
         return () => {

@@ -6,6 +6,7 @@ import { $router } from "./router"
 
 import { type Filter, filterFromQuery, filterToQueryString } from "@/api/memos"
 import { BuildInfo } from "@/components/BuildInfo"
+import { Notifications } from "@/components/Notifications"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useT } from "@/i18n"
 import { ErrorPage } from "@/pages/Errors"
@@ -179,6 +180,8 @@ export function App(props: AppProps) {
                     <BuildInfo />
                 </footer>
             </main>
+
+            <Notifications />
         </div>
     )
 }

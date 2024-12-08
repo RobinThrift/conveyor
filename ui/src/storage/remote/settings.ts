@@ -1,5 +1,6 @@
 import type { Settings } from "@/domain/Settings"
 import { $baseURL } from "@/hooks/useBaseURL"
+import { add as addNotification } from "@/notifications/store"
 import type { StoreKeys } from "@nanostores/react"
 import { atom, deepMap, task } from "nanostores"
 import { type UpdateSettingsRequest, update } from "./api/settings"
@@ -24,8 +25,18 @@ const $values = deepMap<Settings>({
 const $isLoading = atom<boolean>(false)
 const $error = atom<Error | undefined>()
 
-// @TODO: Add proper error handling
-$error.subscribe((err) => (err ? console.error(err) : undefined))
+$error.subscribe((err) => {
+    if (!err) {
+        return
+    }
+
+    let [title, message] = err.message.split(/:\n/, 2)
+    addNotification({
+        type: "error",
+        title,
+        message,
+    })
+})
 
 async function set<K extends StoreKeys<typeof $values>>(
     path: K,
