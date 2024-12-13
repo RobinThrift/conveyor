@@ -1,7 +1,7 @@
 import { useBaseURL } from "@/hooks/useBaseURL"
+import { useGoto } from "@/state/router"
 import clsx from "clsx"
 import React, { useCallback } from "react"
-import { $router } from "../App/router"
 
 export const Link = React.forwardRef<
     HTMLAnchorElement,
@@ -9,13 +9,14 @@ export const Link = React.forwardRef<
 >(function Link({ external = false, ...props }, forwardedRef) {
     let baseURL = useBaseURL()
     let href = external ? baseURL + props.href : props.href
+    let goto = useGoto()
 
     let onClick = useCallback(
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault()
-            $router.open(new URL(href, globalThis.location.href).pathname)
+            goto(new URL(href, globalThis.location.href).pathname)
         },
-        [href],
+        [href, goto],
     )
 
     return (
@@ -49,12 +50,13 @@ export function LinkButton({
 }: LinkButtonProps) {
     let baseURL = useBaseURL()
     let href = external ? baseURL + props.href : props.href
+    let goto = useGoto()
 
     let onClick = useCallback(() => {
         if (!external) {
-            $router.open(new URL(href, globalThis.location.href).pathname)
+            goto(new URL(href, globalThis.location.href).pathname)
         }
-    }, [href, external])
+    }, [href, external, goto])
 
     let { outline, plain, children, ...aProps } = props
 

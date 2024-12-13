@@ -1,5 +1,5 @@
+import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
-import type { Pagination } from "./pagination"
 
 export async function list({
     pagination,

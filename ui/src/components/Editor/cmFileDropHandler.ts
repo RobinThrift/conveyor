@@ -104,8 +104,8 @@ const fileDropHandlerExt = ViewPlugin.fromClass(
             this.unsub = eventbus.on("attachments:upload:done", (evt) => {
                 let cursor = new SearchCursor(
                     this.view.state.doc,
-                    `(uploading: ${evt.localID})`,
-                    this.dropPositions.get(evt.localID),
+                    `(uploading: ${evt.taskID})`,
+                    this.dropPositions.get(evt.taskID),
                 )
 
                 let found = cursor.next().value
@@ -157,7 +157,7 @@ const fileDropHandlerExt = ViewPlugin.fromClass(
                 let localID = `${file.name}_${randomID()}`
                 this.dropPositions.set(localID, pos)
                 eventbus.emit("attachments:upload:start", {
-                    localID,
+                    taskID: localID,
                     filename: file.name,
                     data: file.stream(),
                 })

@@ -14,8 +14,8 @@ import {
     add,
 } from "date-fns"
 import { faker } from "@faker-js/faker"
-import type { UpdateSettingsRequest } from "../src/storage/remote/api/settings"
-import type { CreateAPITokenRequest } from "../src/storage/remote/api/apitokens"
+import type { UpdateSettingsRequest } from "../src/storage/remote/apiv1/settings"
+import type { CreateAPITokenRequest } from "../src/storage/remote/apiv1/apitokens"
 
 interface MockData {
     memos: Memo[]
@@ -31,8 +31,8 @@ const mockData: MockData = (() => {
 
     for (let i = 0; i < 100; i++) {
         tags.push({
-            tag: `#${faker.word.noun()}/${faker.word.noun()}`,
-            count: faker.number.int({ min: 1, max: 100 }),
+            tag: `${faker.word.noun()}/${faker.word.noun()}`,
+            count: 0,
         })
     }
 
@@ -41,13 +41,23 @@ const mockData: MockData = (() => {
     let memos: Memo[] = []
 
     for (let i = 0; i < 120; i++) {
+        let memoTags = [
+            faker.helpers.arrayElement(tags).tag,
+            faker.helpers.arrayElement(tags).tag,
+        ]
+        tags.forEach((t) => {
+            if (memoTags.includes(t.tag)) {
+                t.count++
+            }
+        })
+
         let memo = {
             id: `10-${i}`,
             content: `# Memo ${i}
 
 ${faker.lorem.lines({ min: 1, max: 10 })}
 
-${faker.helpers.arrayElement(tags).tag}`,
+#${memoTags.join(" #")}`,
             isArchived: i > 90 && i < 100,
             isDeleted: i > 100,
             createdAt: sub(now, { hours: i * 2 }),

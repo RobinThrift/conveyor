@@ -3,13 +3,15 @@ import { initialize, mswLoader } from "msw-storybook-addon"
 import React, { useEffect } from "react"
 import { mockAPI } from "./mockapi"
 import type { ServerData } from "../src/App/ServerData"
-import { settingsStore } from "../src/storage/settings"
-import { accountStore } from "../src/storage/account"
+import { Theme } from "../src/components/Theme"
+import { configureRootStore } from "../src/state"
 
 // Initialize MSW
 initialize({
     onUnhandledRequest: "bypass",
 })
+
+var _mockRootStore: ReturnType<typeof configureRootStore> | undefined
 
 let serverData: ServerData = {
     account: {
@@ -122,17 +124,8 @@ const preview: Preview = {
     loaders: [mswLoader],
 
     decorators: [
-        (Story, { globals: { themeMode, themeColours } }) => {
+        (Story, { globals: { themeMode, themeColours, serverData } }) => {
             useEffect(() => {
-                let current =
-                    document.documentElement.dataset.colourScheme ?? ""
-                if (current) {
-                    document.documentElement.classList.remove(current)
-                }
-
-                document.documentElement.classList.add(themeColours)
-                document.documentElement.dataset.colourScheme = themeColours
-
                 localStorage.setItem(
                     "belt.settings.theme.colourScheme",
                     themeColours,
@@ -140,20 +133,10 @@ const preview: Preview = {
             }, [themeColours])
 
             useEffect(() => {
-                document.documentElement.classList.toggle(
-                    "dark",
-                    themeMode === "dark" ||
-                        (themeMode === "auto" &&
-                            window.matchMedia("(prefers-color-scheme: dark)")
-                                .matches),
-                )
                 localStorage.setItem("belt.settings.theme.mode", themeMode)
             }, [themeMode])
 
             if (!document.getElementById("__belt_ui_data__")) {
-                settingsStore.init(serverData.settings)
-                accountStore.set(serverData.account)
-
                 let uiElement = document.createElement("script")
                 uiElement.type = "belt_ui/data"
                 uiElement.id = "__belt_ui_data__"
@@ -161,9 +144,29 @@ const preview: Preview = {
                 document.body.prepend(uiElement)
             }
 
-            return <Story />
+            return (
+                <Theme colourScheme={themeColours} mode={themeMode}>
+                    <Story />
+                </Theme>
+            )
         },
     ],
+
+    initialGlobals: {
+        serverData,
+        configureMockRootStore: () => {
+            if (_mockRootStore) {
+                return _mockRootStore
+            }
+
+            _mockRootStore = configureRootStore({
+                baseURL: location.pathname,
+                router: { href: location.href },
+                ...serverData,
+            })
+            return _mockRootStore
+        },
+    },
 
     globalTypes: {
         themeColours: {

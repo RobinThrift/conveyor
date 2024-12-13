@@ -1,10 +1,9 @@
 import { Checkbox } from "@/components/Input/Checkbox"
 import { Select } from "@/components/Select"
-import { ModeSwitcher, ThemeSwitcher } from "@/components/ThemeSwitcher"
+import { SelectColourScheme, SelectMode } from "@/components/ThemeSwitcher"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useT } from "@/i18n"
-import { settingsStore, useSetting } from "@/storage/settings"
-import { useStore } from "@nanostores/react"
+import { useSetting } from "@/state/settings"
 import React, { useCallback } from "react"
 
 export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
@@ -13,21 +12,22 @@ export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
 
         let baseURL = useBaseURL()
 
-        let controls = useStore(settingsStore.$values, {
-            keys: ["controls", "controls.vim", "controls.doubleClickToEdit"],
-        }).controls
+        let [controls, setControls] = useSetting("controls")
 
-        let [icon, setIcon] = useSetting<string, "theme.icon">("theme.icon")
+        let [icon, setIcon] = useSetting("theme.icon")
 
-        let onChangeControlVim = useCallback((v: boolean | "indeterminate") => {
-            settingsStore.set("controls.vim", v)
-        }, [])
+        let onChangeControlVim = useCallback(
+            (v: boolean | "indeterminate") => {
+                setControls({ ...controls, vim: v as boolean })
+            },
+            [controls, setControls],
+        )
 
         let onChangeControlDoubleClickToEdit = useCallback(
             (v: boolean | "indeterminate") => {
-                settingsStore.set("controls.doubleClickToEdit", v)
+                setControls({ ...controls, doubleClickToEdit: v as boolean })
             },
-            [],
+            [controls, setControls],
         )
 
         return (
@@ -47,7 +47,7 @@ export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
                         >
                             {t.LabelColourScheme}
                         </label>
-                        <ThemeSwitcher className="col-span-5" />
+                        <SelectColourScheme className="col-span-5" />
                     </div>
 
                     <div className="md:grid grid-cols-6 space-y-1">
@@ -57,7 +57,7 @@ export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
                         >
                             {t.LabelModeOverride}
                         </label>
-                        <ModeSwitcher className="col-span-5" />
+                        <SelectMode className="col-span-5" />
                     </div>
 
                     <div className="md:grid grid-cols-6 space-y-1">

@@ -4,7 +4,7 @@ import { Input } from "@/components/Input"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
 import { useT } from "@/i18n"
-import { useAccount } from "@/storage/account"
+import { useAccountDisplayName } from "@/state/account"
 import React from "react"
 import type { SettingsPageProps } from "./SettingsPage"
 
@@ -12,7 +12,7 @@ export const AccountSettingsTab = React.forwardRef<
     HTMLDivElement,
     Pick<SettingsPageProps, "validationErrors">
 >(function AccountSettingsTab({ validationErrors }, forwardedRef) {
-    let account = useAccount()
+    let displayName = useAccountDisplayName()
     let csrfToken = useCSRFToken()
     let baseURL = useBaseURL()
 
@@ -39,7 +39,7 @@ export const AccountSettingsTab = React.forwardRef<
                 <Input
                     name="display_name"
                     label={t.DisplayNameLabel}
-                    defaultValue={account.displayName as string}
+                    defaultValue={displayName}
                     required
                     serverInvalid={!!validationErrors?.display_name}
                     message={validationErrors?.display_name}

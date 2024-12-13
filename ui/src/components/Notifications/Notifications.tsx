@@ -1,9 +1,7 @@
 import { Button } from "@/components/Button"
 import { useT } from "@/i18n"
-import {
-    type Notification as NotificationT,
-    useNotificationStore,
-} from "@/notifications"
+import type { Notification as NotificationT } from "@/notifications"
+import { useNotifications } from "@/state/notifications"
 import { Info, Warning, X } from "@phosphor-icons/react"
 import * as Toast from "@radix-ui/react-toast"
 import clsx from "clsx"
@@ -16,7 +14,7 @@ export interface NotificationsProps {
 
 export function Notifications(props: NotificationsProps) {
     let t = useT("components/Notifications")
-    let { notifications, remove } = useNotificationStore()
+    let { notifications, remove } = useNotifications()
     let durationMs = props.durationMs || 10000
 
     let toasts = useMemo(

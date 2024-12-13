@@ -1,4 +1,4 @@
-import { add as addNotification } from "@/notifications/store"
+import { useNotificationDispatcher } from "@/state/notifications"
 import type { Root } from "mdast"
 import { useEffect, useState } from "react"
 import { MarkdownWorker } from "./parser.worker"
@@ -10,6 +10,7 @@ let terminationTimeout: ReturnType<typeof setTimeout> | undefined = undefined
 
 export function useMarkdownWorker(markdown: string) {
     let [result, setResult] = useState<Root | undefined>(undefined)
+    let addNotification = useNotificationDispatcher()
 
     useEffect(() => {
         clearTimeout(terminationTimeout)
@@ -43,7 +44,7 @@ export function useMarkdownWorker(markdown: string) {
                 }, 5000)
             }
         }
-    }, [markdown])
+    }, [markdown, addNotification])
 
     return result
 }

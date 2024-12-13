@@ -20,13 +20,15 @@ export interface ServerData {
         detail: string
     }
 
-    buildInfo: {
-        version: string
-        commitHash: string
-        commitDate: string
-        projectLink: string
-        goVersion: string
-    }
+    buildInfo: BuildInfo
+}
+
+export interface BuildInfo {
+    version: string
+    commitHash: string
+    commitDate: string
+    projectLink: string
+    goVersion: string
 }
 
 let _serverData: ServerData = undefined as any

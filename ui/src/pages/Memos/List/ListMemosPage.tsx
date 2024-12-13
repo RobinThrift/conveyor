@@ -1,4 +1,3 @@
-import type { CreateMemoRequest } from "@/api/memos"
 import { Editor } from "@/components/Editor"
 import { EndOfListMarker } from "@/components/EndOfListMarker"
 import { Filters } from "@/components/Filters"
@@ -7,11 +6,14 @@ import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/Sheet"
 import type { Tag } from "@/domain/Tag"
 import { useIsMobile } from "@/hooks/useIsMobile"
-import { useSetting } from "@/storage/settings"
+import { useSetting } from "@/state/settings"
 import { Sliders } from "@phosphor-icons/react"
-import React, { useCallback, useEffect, useState } from "react"
-import { type Filter, useListMemosPageState } from "./state/memos"
-import { useTagListStore } from "./state/tags"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import {
+    type CreateMemoRequest,
+    type Filter,
+    useListMemosPageState,
+} from "./state"
 
 export interface ListMemosPageProps {
     filter: Filter
@@ -20,46 +22,43 @@ export interface ListMemosPageProps {
 }
 
 export function ListMemosPage(props: ListMemosPageProps) {
-    let [doubleClickToEdit] = useSetting<boolean, "controls.doubleClickToEdit">(
-        "controls.doubleClickToEdit",
-    )
+    let [doubleClickToEdit] = useSetting("controls.doubleClickToEdit")
     let showEditor = props.showEditor ?? true
     let {
-        memos,
-        isLoading,
-        filter,
-        nextPage,
-        setFilter,
-        createMemo,
-        updateMemo,
-    } = useListMemosPageState({ filter: props.filter, pageSize: 20 })
-    let tagList = useTagListStore()
+        state: { memos, isLoading, filter, tags, isLoadingTags },
+        actions,
+    } = useListMemosPageState()
+
+    useEffect(() => {
+        if (Object.keys(props.filter).length) {
+            actions.setFilter(props.filter)
+        } else {
+            actions.loadPage()
+        }
+        actions.loadTags()
+    }, [actions.setFilter, actions.loadPage, actions.loadTags, props.filter])
 
     let onClickTag = useCallback(
         (tag: string) => {
-            setFilter({
+            actions.setFilter({
                 ...filter,
                 tag: tag,
             })
         },
-        [filter, setFilter],
+        [filter, actions.setFilter],
     )
-
-    useEffect(() => {
-        setFilter(props.filter)
-    }, [setFilter, props.filter])
 
     let onEOLReached = useCallback(() => {
         if (!isLoading) {
-            nextPage()
+            actions.loadNextPage()
         }
-    }, [isLoading, nextPage])
+    }, [isLoading, actions.loadNextPage])
 
     let updateMemoContentCallback = useCallback(
         (update: PartialMemoUpdate) => {
-            updateMemo(update, !("content" in update))
+            actions.updateMemo(update, !("content" in update))
         },
-        [updateMemo],
+        [actions.updateMemo],
     )
 
     let onChangeFilters = useCallback(
@@ -69,9 +68,35 @@ export function ListMemosPage(props: ListMemosPageProps) {
                 return
             }
 
-            setFilter(filter)
+            actions.setFilter(filter)
         },
-        [props.onChangeFilters, setFilter],
+        [props.onChangeFilters, actions.setFilter],
+    )
+
+    let memoComponents = useMemo(
+        () =>
+            memos.map((memo) => (
+                <Memo
+                    key={memo.id}
+                    memo={memo}
+                    tags={tags}
+                    actions={{
+                        edit: !filter.isArchived && !filter.isDeleted,
+                    }}
+                    onClickTag={onClickTag}
+                    updateMemo={updateMemoContentCallback}
+                    doubleClickToEdit={doubleClickToEdit}
+                    className="animate-in slide-in-from-bottom fade-in"
+                />
+            )),
+        [
+            memos,
+            filter,
+            tags,
+            onClickTag,
+            updateMemoContentCallback,
+            doubleClickToEdit,
+        ],
     )
 
     return (
@@ -79,25 +104,16 @@ export function ListMemosPage(props: ListMemosPageProps) {
             <div className="memos-list">
                 {showEditor && (
                     <NewMemoEditor
-                        tags={tagList.tags}
-                        createMemo={createMemo}
+                        tags={tags}
+                        createMemo={actions.createMemo}
                         inProgress={isLoading}
                     />
                 )}
 
                 <div className="flex flex-col gap-4 relative">
-                    {memos.map((memo) => (
-                        <Memo
-                            key={memo.id}
-                            memo={memo}
-                            tags={tagList.tags}
-                            onClickTag={onClickTag}
-                            updateMemo={updateMemoContentCallback}
-                            className="animate-in slide-in-from-bottom fade-in"
-                            doubleClickToEdit={doubleClickToEdit}
-                        />
-                    ))}
-                    <EndOfListMarker onReached={onEOLReached} />
+                    {memoComponents}
+                    {!isLoading && <EndOfListMarker onReached={onEOLReached} />}
+
                     {isLoading && (
                         <div className="flex justify-center items-center min-h-[200px]">
                             <Loader />
@@ -109,7 +125,11 @@ export function ListMemosPage(props: ListMemosPageProps) {
             <FiltersSidebar>
                 <Filters
                     filters={filter}
-                    tags={tagList}
+                    tags={{
+                        tags,
+                        isLoading: isLoadingTags,
+                        nextPage: actions.loadNextTagsPage,
+                    }}
                     onChangeFilter={onChangeFilters}
                     className="filters-sidebar"
                 />

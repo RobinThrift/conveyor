@@ -1,4 +1,3 @@
-import type { UpdateMemoRequest } from "@/api/memos"
 import { Tooltip } from "@/components//Tooltip"
 import { Button } from "@/components/Button"
 import { DateTime } from "@/components/DateTime"
@@ -10,6 +9,7 @@ import type { Memo as MemoT } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
 import { useOnVisible } from "@/hooks/useLoadOnVisible"
 import { useT } from "@/i18n"
+import type { UpdateMemoRequest } from "@/state/memos"
 import {
     Archive,
     ArrowSquareOut,
@@ -29,17 +29,43 @@ import React, {
 
 export type PartialMemoUpdate = UpdateMemoRequest
 
+export interface MemoActions {
+    edit: boolean
+    link: boolean
+    archive: boolean
+    delete: boolean
+}
+
+const defaultActions: MemoActions = {
+    edit: true,
+    link: true,
+    archive: true,
+    delete: true,
+}
+
 interface MemoProps {
     className?: string
     memo: MemoT
     tags: Tag[]
+    actions?: Partial<MemoActions>
+    doubleClickToEdit: boolean
     onClickTag: (tag: string) => void
     updateMemo: (memo: PartialMemoUpdate) => void
-    doubleClickToEdit: boolean
 }
 
 export function Memo(props: MemoProps) {
     let [memo, setMemo] = useState(props.memo)
+    let [actions, setActions] = useState({
+        ...defaultActions,
+        ...(props.actions ?? {}),
+    })
+
+    useEffect(() => {
+        setActions({
+            ...defaultActions,
+            ...(props.actions ?? {}),
+        })
+    }, [props.actions])
 
     let [isEditing, setIsEditing] = useState(false)
     let [doubleClickPos, setDoubleClickPos] = useState<
@@ -84,6 +110,10 @@ export function Memo(props: MemoProps) {
     }, [props.memo])
 
     let onDoubleClick = useMemo(() => {
+        if (!actions.edit) {
+            return
+        }
+
         if (props.doubleClickToEdit) {
             return (e: React.MouseEvent) => {
                 startTransition(() => {
@@ -100,7 +130,7 @@ export function Memo(props: MemoProps) {
                 })
             }
         }
-    }, [props.doubleClickToEdit])
+    }, [props.doubleClickToEdit, actions.edit])
 
     let children = isEditing ? (
         <ChangeMemoEditor
@@ -113,6 +143,7 @@ export function Memo(props: MemoProps) {
     ) : (
         <MemoContent
             memo={memo}
+            actions={actions}
             onClickTag={props.onClickTag}
             activateEditingMode={activateEditingMode}
             onDoubleClick={onDoubleClick}
@@ -135,12 +166,14 @@ export function Memo(props: MemoProps) {
 
 function MemoContent({
     memo,
+    actions,
     onClickTag,
     activateEditingMode,
     updateMemo,
     onDoubleClick,
 }: {
     memo: MemoT
+    actions: MemoActions
     onClickTag: (tag: string) => void
     activateEditingMode: () => void
     updateMemo: (memo: PartialMemoUpdate) => void
@@ -165,6 +198,7 @@ function MemoContent({
         <>
             <MemoHeader
                 memo={memo}
+                actions={actions}
                 activateEditingMode={activateEditingMode}
                 updateMemo={updateMemo}
                 ref={ref}
@@ -178,10 +212,12 @@ function MemoContent({
 const MemoHeader = React.forwardRef(function MemoHeader(
     {
         memo,
+        actions,
         activateEditingMode,
         updateMemo,
     }: {
         memo: MemoT
+        actions: MemoActions
         activateEditingMode: () => void
         updateMemo: (memo: PartialMemoUpdate) => void
     },
@@ -221,8 +257,9 @@ const MemoHeader = React.forwardRef(function MemoHeader(
                 />
             </Tooltip>
 
-            <MemoActions
+            <MemoActionBar
                 memo={memo}
+                actions={actions}
                 activateEditingMode={activateEditingMode}
                 updateMemo={updateMemo}
             />
@@ -230,12 +267,14 @@ const MemoHeader = React.forwardRef(function MemoHeader(
     )
 })
 
-function MemoActions({
+function MemoActionBar({
     memo,
+    actions,
     activateEditingMode,
     updateMemo,
 }: {
     memo: MemoT
+    actions: MemoActions
     activateEditingMode: () => void
     updateMemo: (memo: PartialMemoUpdate) => void
 }) {
@@ -243,47 +282,53 @@ function MemoActions({
 
     return (
         <div className="flex justify-end flex-1">
-            <Button
-                iconLeft={<Pencil />}
-                plain={true}
-                size="sm"
-                onClick={activateEditingMode}
-            />
+            {actions.edit && (
+                <Button
+                    iconLeft={<Pencil />}
+                    plain={true}
+                    size="sm"
+                    onClick={activateEditingMode}
+                />
+            )}
 
-            <LinkButton
-                href={`/memos/${memo.id}`}
-                iconLeft={<ArrowSquareOut />}
-                plain={true}
-                size="sm"
-            />
+            {actions.link && (
+                <LinkButton
+                    href={`/memos/${memo.id}`}
+                    iconLeft={<ArrowSquareOut />}
+                    plain={true}
+                    size="sm"
+                />
+            )}
 
-            <DropdownMenu
-                ariaLabel="More memo actions"
-                iconRight={<DotsThreeVertical weight="bold" />}
-                size="sm"
-                plain={true}
-                items={[
-                    {
-                        label: memo.isArchived ? t.Unarchive : t.Archive,
-                        icon: <Archive />,
-                        action: () =>
-                            updateMemo({
-                                id: memo.id,
-                                isArchived: !memo.isArchived,
-                            }),
-                    },
-                    {
-                        label: memo.isDeleted ? t.Restore : t.Delete,
-                        icon: <TrashSimple />,
-                        destructive: true,
-                        action: () =>
-                            updateMemo({
-                                id: memo.id,
-                                isDeleted: !memo.isDeleted,
-                            }),
-                    },
-                ]}
-            />
+            {(actions.delete || actions.archive) && (
+                <DropdownMenu
+                    ariaLabel="More memo actions"
+                    iconRight={<DotsThreeVertical weight="bold" />}
+                    size="sm"
+                    plain={true}
+                    items={[
+                        {
+                            label: memo.isArchived ? t.Unarchive : t.Archive,
+                            icon: <Archive />,
+                            action: () =>
+                                updateMemo({
+                                    id: memo.id,
+                                    isArchived: !memo.isArchived,
+                                }),
+                        },
+                        {
+                            label: memo.isDeleted ? t.Restore : t.Delete,
+                            icon: <TrashSimple />,
+                            destructive: true,
+                            action: () =>
+                                updateMemo({
+                                    id: memo.id,
+                                    isDeleted: !memo.isDeleted,
+                                }),
+                        },
+                    ]}
+                />
+            )}
         </div>
     )
 }

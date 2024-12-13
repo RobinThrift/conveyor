@@ -1,13 +1,9 @@
-import { useStore } from "@nanostores/react"
-import { atom } from "nanostores"
-
-export const $baseURL = atom(
+export const baseURL =
     globalThis.document
         ?.querySelector("meta[name=base-url]")
         ?.getAttribute("content")
-        ?.replace(/\/$/, "") ?? "",
-)
+        ?.replace(/\/$/, "") ?? ""
 
 export function useBaseURL(): string {
-    return useStore($baseURL)
+    return baseURL
 }

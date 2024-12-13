@@ -1,3 +1,4 @@
+import { Provider } from "@/state"
 import type { Meta, StoryObj } from "@storybook/react"
 import { fn } from "@storybook/test"
 import React from "react"
@@ -12,6 +13,12 @@ const meta: Meta<typeof Filters> = {
     argTypes: {
         onChangeFilter: { action: "onChangeFilters" },
     },
+
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

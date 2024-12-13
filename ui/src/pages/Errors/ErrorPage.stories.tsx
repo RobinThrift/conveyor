@@ -1,4 +1,6 @@
+import { Provider } from "@/state"
 import type { Meta, StoryObj } from "@storybook/react"
+import React from "react"
 import { ErrorPage } from "./ErrorPage"
 
 import "@/index.css"
@@ -6,6 +8,12 @@ import "@/index.css"
 const meta: Meta<typeof ErrorPage> = {
     title: "Pages/Error",
     component: ErrorPage,
+
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

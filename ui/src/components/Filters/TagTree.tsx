@@ -43,6 +43,8 @@ export function TagTree({
                         children: [],
                         metadata,
                     }
+                } else {
+                    tree[id].metadata = metadata
                 }
             })
         })
@@ -106,7 +108,11 @@ export function TagTree({
                                 <Hash className="text-subtle-dark" />
                                 <button
                                     className="flex-1 appearance-none text-left"
-                                    onClick={onClick}
+                                    onClick={
+                                        element.metadata?.count
+                                            ? onClick
+                                            : handleExpand
+                                    }
                                     type="button"
                                 >
                                     {element.name}

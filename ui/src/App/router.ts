@@ -1,21 +1,18 @@
-import { createRouter } from "@nanostores/router"
+import { useSetPage } from "@/state/router"
+import React, { useEffect } from "react"
 
-let baseURL =
-    globalThis.document
-        ?.querySelector("meta[name=base-url]")
-        ?.getAttribute("content")
-        ?.replace(/\/$/, "") ?? ""
+export function Router(props: React.PropsWithChildren) {
+    let setPage = useSetPage()
 
-export const $router = createRouter(
-    {
-        login: `${baseURL}/login`,
-        "login.change_password": `${baseURL}/auth/change_password`,
-        root: `${baseURL}/`,
-        "memos.list": `${baseURL}/memos`,
-        "memos.archive": `${baseURL}/memos/archive`,
-        "memos.bin": `${baseURL}/memos/bin`,
-        "memos.single": `${baseURL}/memos/:id`,
-        settings: `${baseURL}/settings/:tab/:subsection?`,
-    },
-    { links: false },
-)
+    useEffect(() => {
+        let onPopState = () => {
+            setPage(location.href)
+        }
+
+        window.addEventListener("popstate", onPopState)
+
+        return () => window.removeEventListener("popstate", onPopState)
+    }, [setPage])
+
+    return props.children
+}

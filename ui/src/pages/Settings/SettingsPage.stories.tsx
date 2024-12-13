@@ -1,4 +1,6 @@
+import { Provider } from "@/state"
 import type { Meta, StoryObj } from "@storybook/react"
+import React from "react"
 import { SettingsPage } from "./SettingsPage"
 
 import "@/index.css"
@@ -9,6 +11,12 @@ const meta: Meta<typeof SettingsPage> = {
     args: {
         tab: "interface",
     },
+
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

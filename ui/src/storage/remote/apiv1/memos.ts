@@ -1,7 +1,7 @@
 import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
+import type { Pagination } from "@/domain/Pagination"
 import { format, formatRFC3339, parse } from "date-fns"
 import { APIError } from "./APIError"
-import type { Pagination } from "./pagination"
 
 export type Filter = ListMemosQuery
 

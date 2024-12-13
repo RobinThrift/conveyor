@@ -1,8 +1,8 @@
 import { useIdleCallback } from "@/hooks/useIdleCallback"
 import { useOnVisible } from "@/hooks/useLoadOnVisible"
 import { usePromise } from "@/hooks/usePromise"
-import { add as addNotification } from "@/notifications/store"
-import { useTheme } from "@/storage/settings"
+import { useNotificationDispatcher } from "@/state/notifications"
+import { useTheme } from "@/state/settings"
 import { LanguageDescription } from "@codemirror/language"
 import { languages } from "@codemirror/language-data"
 import { classHighlighter, highlightCode } from "@lezer/highlight"
@@ -43,6 +43,7 @@ export function Highlight({
     code,
     lang,
 }: { code: string; lang?: string; meta?: string }) {
+    let addNotification = useNotificationDispatcher()
     let parser = usePromise(async () => {
         if (!lang) {
             return

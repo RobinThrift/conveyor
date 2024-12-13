@@ -6,7 +6,7 @@ export type Settings = {
         region: (typeof supportedRegions)[number]
     }
     theme: {
-        colourScheme: "default"
+        colourScheme: "default" | "rosepine"
         mode: "auto" | "light" | "dark"
         icon: string
     }

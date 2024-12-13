@@ -1,6 +1,6 @@
-import { APIError } from "@/api/APIError"
-import type { Pagination } from "@/api/pagination"
 import type { APITokenList } from "@/domain/APIToken"
+import type { Pagination } from "@/domain/Pagination"
+import { APIError } from "./APIError"
 
 export async function list({
     pagination,

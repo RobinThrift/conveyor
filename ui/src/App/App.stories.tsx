@@ -1,21 +1,22 @@
+import { Provider } from "@/state"
 import type { Meta, StoryObj } from "@storybook/react"
-import React, { useEffect } from "react"
+import React from "react"
 import { App, type AppProps } from "./App"
-import { $router } from "./router"
 
 import "@/index.css"
 
-export interface AppStoryArgs extends AppProps {
-    url: string
-}
-
-const meta: Meta<AppStoryArgs> = {
+const meta: Meta<AppProps> = {
     title: "Belt/App",
     component: App,
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta
-type Story = StoryObj<AppStoryArgs>
+type Story = StoryObj<AppProps>
 
 export const Full: Story = {
     name: "App",
@@ -24,14 +25,10 @@ export const Full: Story = {
     },
 
     args: {
-        url: "/",
-    },
-
-    render: (args) => {
-        useEffect(() => {
-            $router.open(args.url)
-        }, [args.url])
-
-        return <App {...args} />
+        components: {
+            LoginPage: { redirectURL: "" },
+            LoginChangePasswordPage: { redirectURL: "" },
+            SettingsPage: { validationErrors: {} },
+        },
     },
 }

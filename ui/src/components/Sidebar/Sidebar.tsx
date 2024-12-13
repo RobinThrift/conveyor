@@ -1,14 +1,13 @@
-import { $router } from "@/App/router"
 import { Link } from "@/components/Link"
 import { useBreakpoint } from "@/hooks/useBreakPoint"
 import { useT } from "@/i18n"
-import { useAccount } from "@/storage/account"
-import { useStore } from "@nanostores/react"
+import { useAccountDisplayName } from "@/state/account"
+import { useCurrentPage } from "@/state/router"
 import { List, SignOut } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React, { useEffect, useMemo, useState } from "react"
 import { Sheet, SheetContent, SheetTrigger } from "../Sheet"
-import { ModeSwitcher, ThemeSwitcher } from "../ThemeSwitcher"
+import { SelectColourScheme, SelectMode } from "../ThemeSwitcher"
 
 export interface SidebarProps {
     className?: string
@@ -50,8 +49,8 @@ export function Sidebar(props: SidebarProps) {
 
             <div className="px-4 py-4 w-full flex flex-col gap-y-4">
                 <div className="space-y-2">
-                    <ThemeSwitcher />
-                    <ModeSwitcher />
+                    <SelectColourScheme />
+                    <SelectMode />
                 </div>
 
                 <Link
@@ -85,7 +84,7 @@ export function Sidebar(props: SidebarProps) {
 
 function Collapsible({ children }: React.PropsWithChildren) {
     let [isOpen, setIsOpen] = useState(false)
-    let page = useStore($router)
+    let page = useCurrentPage()
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional, we want the sidebar to close whenever the route changes
     useEffect(() => {
@@ -115,7 +114,7 @@ function Collapsible({ children }: React.PropsWithChildren) {
 
 function Greeting() {
     let t = useT("components/Sidebar")
-    let account = useAccount()
+    let displayName = useAccountDisplayName()
     let greeting = useMemo(() => {
         let now = new Date()
         if (now.getHours() < 12) {
@@ -133,7 +132,7 @@ function Greeting() {
         <div className="px-6 py-4 mb-4 overflow-hidden">
             <span className="block -mb-2 font-semibold">{greeting}</span>
             <span className="text-primary text-2xl font-bold">
-                {account.displayName}
+                {displayName}
             </span>
         </div>
     )

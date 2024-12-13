@@ -1,6 +1,6 @@
 import { BuildInfo } from "@/components/BuildInfo"
 import { Input } from "@/components/Input"
-import { ModeSwitcher } from "@/components/ThemeSwitcher"
+import { SelectMode } from "@/components/ThemeSwitcher"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
 import { useT } from "@/i18n"
@@ -123,7 +123,7 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
             </div>
             <footer className="login-footer">
                 <BuildInfo />
-                <ModeSwitcher className="max-w-sm" />
+                <SelectMode className="max-w-sm" />
             </footer>
         </div>
     )

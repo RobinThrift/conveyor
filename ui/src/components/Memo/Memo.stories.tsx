@@ -1,4 +1,5 @@
 import type { Tag } from "@/domain/Tag"
+import { Provider } from "@/state"
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
@@ -12,6 +13,11 @@ const meta: Meta<typeof Memo> = {
     argTypes: {
         updateMemo: { action: "updateMemo" },
     },
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

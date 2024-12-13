@@ -1,8 +1,10 @@
-import { serverData } from "@/App/ServerData"
+import { useBuildInfo } from "@/state/buildInfo"
 import clsx from "clsx"
 import React from "react"
 
 export function BuildInfo({ className }: { className?: string }) {
+    let buildInfo = useBuildInfo()
+
     return (
         <div
             className={clsx(
@@ -10,16 +12,15 @@ export function BuildInfo({ className }: { className?: string }) {
                 className,
             )}
         >
-            {serverData.buildInfo.version}@
+            {buildInfo.version}@
             <a
-                href={serverData.buildInfo.projectLink}
+                href={buildInfo.projectLink}
                 className="hover:text-primary"
                 target="_github"
             >
-                {serverData.buildInfo.commitHash.substring(0, 7)}
+                {buildInfo.commitHash.substring(0, 7)}
             </a>{" "}
-            ({serverData.buildInfo.goVersion}; {serverData.buildInfo.commitDate}
-            )
+            ({buildInfo.goVersion}; {buildInfo.commitDate})
         </div>
     )
 }

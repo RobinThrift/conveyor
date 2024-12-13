@@ -1,7 +1,7 @@
 import { BuildInfo } from "@/components/BuildInfo"
 import * as Form from "@/components/Form"
 import { Logo } from "@/components/Logo"
-import { ModeSwitcher } from "@/components/ThemeSwitcher"
+import { SelectMode } from "@/components/ThemeSwitcher"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
 import { Password, User } from "@phosphor-icons/react"
@@ -110,7 +110,7 @@ export function LoginPage(props: LoginPageProps) {
             </div>
             <footer className="login-footer">
                 <BuildInfo />
-                <ModeSwitcher className="max-w-sm" />
+                <SelectMode className="max-w-sm" />
             </footer>
         </div>
     )

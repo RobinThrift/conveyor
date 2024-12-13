@@ -1,5 +1,5 @@
+import * as eventbus from "@/eventbus"
 import { randomID } from "@/helper"
-import { add as addNotification } from "@/notifications/store"
 import type { Root } from "mdast"
 import type {
     WorkerInput,
@@ -28,7 +28,7 @@ export class MarkdownWorker {
 
         this._worker.onmessageerror = (evt) => {
             let [title, message] = evt.data.error.message.split(/:\n/, 2)
-            addNotification({
+            eventbus.emit("notifications:add", {
                 type: "error",
                 title,
                 message,

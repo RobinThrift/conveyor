@@ -43,5 +43,5 @@ install:
     @echo "Biome:" $({{ local_bin }}/biome --version)
 
 clean:
-	rm -rf build build node_modules
+    rm -rf build build node_modules
 

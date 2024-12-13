@@ -1,3 +1,5 @@
+export * from "./getset"
+
 const isPrimitive = (value: any) => value !== Object(value)
 
 const isPlainObject = (value: any) =>

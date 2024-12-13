@@ -1,3 +1,4 @@
+import { Provider } from "@/state"
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react"
 import React, { useMemo } from "react"
@@ -8,6 +9,11 @@ import "@/index.css"
 const meta: Meta<typeof Markdown> = {
     title: "Components/Markdown",
     component: Markdown,
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

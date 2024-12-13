@@ -1,3 +1,4 @@
+import { Alert } from "@/components/Alert"
 import { Button } from "@/components/Button"
 import { DateTime } from "@/components/DateTime"
 import * as Form from "@/components/Form"
@@ -10,13 +11,13 @@ import { useStateGetter } from "@/hooks/useStateGetter"
 import { useT } from "@/i18n"
 import { CaretLeft, CaretRight } from "@phosphor-icons/react"
 import { add } from "date-fns"
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect } from "react"
 import { useSystemSettingsTabState } from "./state"
 
 export const SystemSettingsTab = React.forwardRef<HTMLDivElement>(
     function SystemSettingsTab(_, forwardedRef) {
         let t = useT("pages/Settings/SystemSettingsTab")
-        let state = useSystemSettingsTabState()
+        let { state, actions } = useSystemSettingsTabState()
 
         return (
             <div ref={forwardedRef} className="settings-tab">
@@ -24,49 +25,81 @@ export const SystemSettingsTab = React.forwardRef<HTMLDivElement>(
                     <h2>{t.Title}</h2>
                 </div>
 
-                <div className="settings-tab-section">
-                    <h2>{t.SectionAPITokensTitle}</h2>
-                    <small>{t.SectionAPITokensDescription}</small>
-
-                    {state.error && (
-                        <div className="mt-5 field-message animate-in slide-in-from-bottom fade-in-50 duration-300">
-                            {state.error.message}
-                        </div>
-                    )}
-
-                    <div className="relative">
-                        {state.isLoading && (
-                            <div className="absolute inset-0 flex justify-center items-center bg-surface/50 rounded-lg">
-                                <Loader />
-                            </div>
-                        )}
-
-                        {state.lastCreatedValue && (
-                            <LastCreatedAPIToken
-                                value={state.lastCreatedValue}
-                            />
-                        )}
-
-                        <CreateNewAPIToken create={state.create} />
-
-                        <APITokensList
-                            tokens={state.tokens}
-                            hasPreviousPage={state.hasPreviousPage}
-                            hasNextPage={state.hasNextPage}
-                            prevPage={state.loadPrevPage}
-                            nextPage={state.loadNextPage}
-                            onDelete={state.del}
-                        />
-                    </div>
-                </div>
+                <APITokensSections
+                    isLoading={state.isLoading}
+                    apiTokens={state.apiTokens}
+                    hasPreviousPage={state.hasPrevPage}
+                    hasNextPage={state.hasNextPage}
+                    lastCreatedValue={state.lastCreatedValue}
+                    error={state.error}
+                    loadPage={actions.loadPage}
+                    loadPrevPage={actions.loadPrevPage}
+                    loadNextPage={actions.loadNextPage}
+                    createAPIToken={actions.create}
+                    deleteAPIToken={actions.del}
+                />
             </div>
         )
     },
 )
 
+function APITokensSections(props: {
+    isLoading: boolean
+    apiTokens: APIToken[]
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+    lastCreatedValue?: string
+    error?: Error
+    loadPage: () => void
+    loadNextPage: () => void
+    loadPrevPage: () => void
+    createAPIToken: (token: { name: string; expiresAt: Date }) => void
+    deleteAPIToken: (name: string) => void
+}) {
+    let t = useT("pages/Settings/SystemSettingsTab")
+
+    useEffect(() => {
+        props.loadPage()
+    }, [props.loadPage])
+
+    return (
+        <div className="settings-tab-section">
+            <h2>{t.SectionAPITokensTitle}</h2>
+            <small>{t.SectionAPITokensDescription}</small>
+
+            {props.error && (
+                <Alert variant="danger">{props.error.message}</Alert>
+            )}
+
+            <div className="relative">
+                {props.isLoading && (
+                    <div className="absolute inset-0 flex justify-center items-center top-4 bg-surface/50 rounded-lg">
+                        <Loader />
+                    </div>
+                )}
+
+                {props.lastCreatedValue && (
+                    <LastCreatedAPIToken value={props.lastCreatedValue} />
+                )}
+
+                <CreateNewAPIToken onSubmit={props.createAPIToken} />
+
+                <APITokensList
+                    tokens={props.apiTokens}
+                    hasPreviousPage={props.hasPreviousPage}
+                    hasNextPage={props.hasNextPage}
+                    prevPage={props.loadPrevPage}
+                    nextPage={props.loadNextPage}
+                    onDelete={props.deleteAPIToken}
+                />
+            </div>
+        </div>
+    )
+}
+
 function CreateNewAPIToken({
-    create,
-}: { create: (token: { name: string; expiresAt: Date }) => void }) {
+    onSubmit: create,
+}: { onSubmit: (token: { name: string; expiresAt: Date }) => void }) {
     let t = useT("pages/Settings/SystemSettingsTab/New")
 
     let [name, setName] = useStateGetter("")

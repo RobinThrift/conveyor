@@ -1,4 +1,5 @@
 import type { Tag } from "@/domain/Tag"
+import { Provider } from "@/state"
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
@@ -9,6 +10,11 @@ import "@/index.css"
 const meta: Meta<typeof Editor> = {
     title: "Components/Editor",
     component: Editor,
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

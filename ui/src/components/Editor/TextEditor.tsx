@@ -1,11 +1,10 @@
 import type { Tag } from "@/domain/Tag"
 import * as eventbus from "@/eventbus"
-import { useAttachmentUploader } from "@/hooks/api/attachments"
-import { settingsStore, useTheme } from "@/storage/settings"
+import { useAttachmentUploader } from "@/state/attachments"
+import { useSetting, useTheme } from "@/state/settings"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import { languages } from "@codemirror/language-data"
 import { SearchCursor } from "@codemirror/search"
-import { useStore } from "@nanostores/react"
 import { Vim, getCM, vim } from "@replit/codemirror-vim"
 import { hyperLink } from "@uiw/codemirror-extensions-hyper-link"
 import CodeMirror, { EditorView, type Extension } from "@uiw/react-codemirror"
@@ -55,9 +54,7 @@ export function TextEditor(props: TextEditorProps) {
 
     useAttachmentUploader()
 
-    let enableVimKeybindings = useStore(settingsStore.$values, {
-        keys: ["controls", "controls.vim"],
-    }).controls.vim
+    let [enableVimKeybindings] = useSetting("controls.vim")
 
     let extensions: Extension[] = useMemo(() => {
         return [

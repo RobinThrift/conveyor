@@ -1,33 +1,33 @@
 import { Select } from "@/components/Select"
 import {
-    $lang,
-    $region,
+    type Language,
+    type Region,
     supportedLanguages,
     supportedRegions,
     useT,
 } from "@/i18n"
-import { useStore } from "@nanostores/react"
+import { useSetting } from "@/state/settings"
 import React, { useCallback, useMemo } from "react"
 
 export const LocaleSettingsTab = React.forwardRef<HTMLDivElement>(
     function LocaleSettingsTab(_, forwardedRef) {
         let t = useT("pages/Settings/LocaleSettingsTab")
 
-        let lang = useStore($lang) || "en"
-        let region = useStore($region) || "gb"
+        let [lang, setLang] = useSetting("locale.language")
+        let [region, setRegion] = useSetting("locale.region")
 
         let onChangeLanguage = useCallback(
-            (v: (typeof supportedLanguages)[number]) => {
-                $lang.set(v)
+            (v: Language) => {
+                setLang(v)
             },
-            [],
+            [setLang],
         )
 
         let onChangeRegion = useCallback(
-            (v: (typeof supportedRegions)[number]) => {
-                $region.set(v)
+            (v: Region) => {
+                setRegion(v)
             },
-            [],
+            [setRegion],
         )
 
         let languages = useMemo(

@@ -1,5 +1,6 @@
 import { Button } from "@/components/Button"
-import { useNotificationDispatcher } from "@/notifications"
+import { Provider } from "@/state"
+import { useNotificationDispatcher } from "@/state/notifications"
 import { faker } from "@faker-js/faker"
 import { Info, Warning, X } from "@phosphor-icons/react"
 import type { Meta, StoryObj } from "@storybook/react"
@@ -9,6 +10,11 @@ import { Notifications } from "./Notifications"
 const meta: Meta<typeof Notifications> = {
     title: "Components/Notifications",
     component: Notifications,
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

@@ -4,10 +4,17 @@ import React from "react"
 import { Sidebar } from "./Sidebar"
 
 import "@/index.css"
+import { Provider } from "@/state"
 
 const meta: Meta<typeof Sidebar> = {
     title: "Components/Sidebar",
     component: Sidebar,
+
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

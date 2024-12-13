@@ -1,7 +1,6 @@
-import { formatter } from "@nanostores/i18n"
-import { useStore } from "@nanostores/react"
-import { computed } from "nanostores"
-import { $region, type supportedRegions } from "./regions"
+import { useRegion } from "@/state/i18n"
+import { useMemo } from "react"
+import type { supportedRegions } from "./regions"
 
 const regionFixed: Partial<Record<(typeof supportedRegions)[number], string>> =
     {
@@ -9,13 +8,25 @@ const regionFixed: Partial<Record<(typeof supportedRegions)[number], string>> =
         us: "en-us",
     }
 
-let $regionWithDefault = computed(
-    $region,
-    (region = "gb") => regionFixed[region] ?? region,
-)
-
-export const $format = formatter($regionWithDefault)
-
 export function useFormat() {
-    return useStore($format)
+    let region = useRegion()
+    let code = regionFixed[region] || "en-gb"
+    return useMemo(
+        () => ({
+            number(num: number, opts?: Intl.NumberFormatOptions) {
+                return new Intl.NumberFormat(code, opts).format(num)
+            },
+            relativeTime(
+                num: number,
+                unit: Intl.RelativeTimeFormatUnit,
+                opts?: Intl.RelativeTimeFormatOptions,
+            ) {
+                return new Intl.RelativeTimeFormat(code, opts).format(num, unit)
+            },
+            time(date?: Date | number, opts?: Intl.DateTimeFormatOptions) {
+                return new Intl.DateTimeFormat(code, opts).format(date)
+            },
+        }),
+        [code],
+    )
 }

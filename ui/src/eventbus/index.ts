@@ -1,20 +1,22 @@
 import type { Attachment } from "@/domain/Attachment"
+import type { Notification } from "@/notifications"
 import { createNanoEvents } from "nanoevents"
 
 export interface Events {
+    "notifications:add": (evt: Notification) => void
     [key: `vim:write:${string}`]: () => void
     [key: `vim:quit:${string}`]: () => void
     "attachments:upload:start": (evt: {
-        localID: string
+        taskID: string
         filename: string
         data: ReadableStream<Uint8Array>
     }) => void
     "attachments:upload:done": (evt: {
-        localID: string
+        taskID: string
         attachment?: Attachment
     }) => void
     "attachments:upload:error": (evt: {
-        localID: string
+        taskID: string
         error: Error
     }) => void
 }

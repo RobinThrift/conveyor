@@ -1,3 +1,4 @@
+import { Provider } from "@/state"
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
@@ -16,6 +17,11 @@ const meta: Meta<typeof Tooltip> = {
         },
         layout: "centered",
     },
+    decorators: (Story, { globals: { configureMockRootStore } }) => (
+        <Provider store={configureMockRootStore()}>
+            <Story />
+        </Provider>
+    ),
 }
 
 export default meta

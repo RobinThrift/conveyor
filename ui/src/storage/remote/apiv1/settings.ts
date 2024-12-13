@@ -1,10 +1,10 @@
 export interface UpdateSettingsRequest {
-    "locale.language": string
-    "locale.region": string
-    "theme.colourScheme": string
-    "theme.mode": string
-    "theme.icon": string
-    "controls.vim": boolean
+    "locale.language"?: string
+    "locale.region"?: string
+    "theme.colourScheme"?: string
+    "theme.mode"?: string
+    "theme.icon"?: string
+    "controls.vim"?: boolean
     "controls.doubleClickToEdit"?: boolean
 }
 

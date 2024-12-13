@@ -1,9 +1,9 @@
-import type { Filter } from "@/api/memos"
 import { Loader } from "@/components/Loader"
 import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import type { Tag } from "@/domain/Tag"
-import { useSetting } from "@/storage/settings"
-import React, { useCallback } from "react"
+import type { Filter } from "@/state/memolist"
+import { useSetting } from "@/state/settings"
+import React, { useCallback, useEffect } from "react"
 import { useSingleMemoPageState } from "./state"
 
 export interface SingleMemoPageProps {
@@ -12,11 +12,15 @@ export interface SingleMemoPageProps {
 }
 
 export function SingleMemoPage(props: SingleMemoPageProps) {
-    let [doubleClickToEdit] = useSetting<boolean, "controls.doubleClickToEdit">(
-        "controls.doubleClickToEdit",
-    )
+    let [doubleClickToEdit] = useSetting("controls.doubleClickToEdit")
 
-    let { memo, isLoading, updateMemo } = useSingleMemoPageState(props.memoID)
+    let { state, actions } = useSingleMemoPageState(props.memoID)
+
+    useEffect(() => {
+        if (!state?.memo) {
+            actions.load()
+        }
+    }, [state?.memo, actions.load])
 
     let onClickTag = useCallback(
         (tag: string) => {
@@ -27,29 +31,32 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
 
     let updateMemoCallback = useCallback(
         (memo: PartialMemoUpdate) => {
-            updateMemo({ memo })
+            actions.update(memo)
         },
-        [updateMemo],
+        [actions.update],
     )
 
     let tags: Tag[] = []
 
     return (
         <div className="container mx-auto max-w-4xl">
-            {isLoading && (
+            {(!state || state?.isLoading) && (
                 <div className="flex justify-center items-center min-h-[200px]">
                     <Loader />
                 </div>
             )}
 
-            {memo && (
+            {state?.memo && (
                 <Memo
-                    key={memo.id}
-                    memo={memo}
+                    memo={state?.memo}
                     tags={tags}
+                    actions={{
+                        link: false,
+                        edit: !state.memo.isArchived && !state.memo.isDeleted,
+                    }}
+                    className="animate-in slide-in-from-bottom fade-in"
                     onClickTag={onClickTag}
                     updateMemo={updateMemoCallback}
-                    className="animate-in slide-in-from-bottom fade-in"
                     doubleClickToEdit={doubleClickToEdit}
                 />
             )}

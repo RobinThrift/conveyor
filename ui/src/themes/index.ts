@@ -1,3 +1,4 @@
+import type { Settings } from "@/domain/Settings"
 import type { Extension } from "@codemirror/state"
 import * as d from "./default"
 import * as rosepine from "./rosepine"
@@ -13,7 +14,7 @@ export type Theme = {
     dark: ThemeMode
 }
 
-export const themes: Record<string, Theme> = {
+export const themes: Record<Settings["theme"]["colourScheme"], Theme> = {
     default: d,
     rosepine,
 }

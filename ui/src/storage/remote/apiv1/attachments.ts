@@ -3,7 +3,7 @@ import type { Attachment } from "@/domain/Attachment"
 export async function uploadAttachment({
     filename,
     data,
-    baseURL,
+    baseURL = "",
     signal,
 }: {
     filename: string

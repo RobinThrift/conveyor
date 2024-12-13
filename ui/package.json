@@ -42,9 +42,6 @@
         "@codemirror/state": "^6.4.1",
         "@lezer/highlight": "^1.2.1",
         "@nanostores/i18n": "^0.12.2",
-        "@nanostores/persistent": "^0.10.2",
-        "@nanostores/react": "^0.8.0",
-        "@nanostores/router": "^0.16.1",
         "@phosphor-icons/react": "^2.1.7",
         "@radix-ui/react-checkbox": "^1.1.2",
         "@radix-ui/react-dialog": "^1.1.2",
@@ -54,6 +51,7 @@
         "@radix-ui/react-tabs": "^1.1.1",
         "@radix-ui/react-toast": "^1.2.2",
         "@radix-ui/react-tooltip": "^1.1.4",
+        "@reduxjs/toolkit": "^2.4.0",
         "@replit/codemirror-vim": "^6.2.1",
         "@scalar/api-reference-react": "^0.3.139",
         "@tailwindcss/typography": "^0.5.15",
@@ -77,12 +75,13 @@
         "micromark-extension-gfm-table": "^2.1.0",
         "micromark-util-symbol": "^2.0.0",
         "nanoevents": "^9.1.0",
-        "nanostores": "^0.11.3",
         "react": "^18.3.1",
         "react-accessible-treeview": "^2.9.1",
         "react-day-picker": "^9.2.1",
         "react-dom": "^18.3.1",
         "react-medium-image-zoom": "^5.2.11",
+        "react-redux": "^9.1.2",
+        "redux": "^5.0.1",
         "tailwindcss-animate": "^1.0.7"
     }
 }
