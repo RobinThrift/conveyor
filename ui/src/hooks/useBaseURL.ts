@@ -1,9 +1,13 @@
-export const baseURL =
-    globalThis.document
-        ?.querySelector("meta[name=base-url]")
-        ?.getAttribute("content")
-        ?.replace(/\/$/, "") ?? ""
+import { slice as router } from "@/state/router"
+import { useSelector } from "react-redux"
 
 export function useBaseURL(): string {
-    return baseURL
+    return (
+        useSelector(router.selectors.baseURL) ??
+        globalThis.document
+            ?.querySelector("meta[name=base-url]")
+            ?.getAttribute("content")
+            ?.replace(/\/$/, "") ??
+        ""
+    )
 }

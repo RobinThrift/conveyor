@@ -1,9 +1,9 @@
 .tooltip {
     @apply py-1 px-3;
     @apply rounded-lg shadow-lg;
-    @apply bg-white border border-subtle-light;
+    @apply bg-surface border border-subtle-light;
     @apply text-center text-sm text-text select-none;
-    @apply dark:bg-sidebar dark:border dark:border-subtle-extra-dark;
+    @apply dark:border dark:border-subtle-extra-dark;
 
     min-width: var(--radix-tooltip-trigger-width);
 

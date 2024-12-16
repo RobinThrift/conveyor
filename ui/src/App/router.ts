@@ -5,8 +5,14 @@ export function Router(props: React.PropsWithChildren) {
     let setPage = useSetPage()
 
     useEffect(() => {
-        let onPopState = () => {
-            setPage(location.href)
+        let onPopState = (e: PopStateEvent) => {
+            if (!e.hasUAVisualTransition && "startViewTransition" in document) {
+                document.startViewTransition(() => {
+                    setPage(location.href)
+                })
+            } else {
+                setPage(location.href)
+            }
         }
 
         window.addEventListener("popstate", onPopState)

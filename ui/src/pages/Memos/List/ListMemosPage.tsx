@@ -87,6 +87,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                     updateMemo={updateMemoContentCallback}
                     doubleClickToEdit={doubleClickToEdit}
                     className="animate-in slide-in-from-bottom fade-in"
+                    viewTransitionName={`memo-${memo.id}`}
                 />
             )),
         [
@@ -100,7 +101,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
     )
 
     return (
-        <div className="memos-list-page">
+        <div className="memos-list-page pt-12 tablet:pt-0">
             <div className="memos-list">
                 {showEditor && (
                     <NewMemoEditor
@@ -196,9 +197,12 @@ function FiltersSidebar(props: React.PropsWithChildren) {
     if (isMobile) {
         return (
             <Sheet>
-                <div className="absolute right-0 top-0 z-40">
+                <div className="absolute right-2 top-2 z-40">
                     <SheetTrigger asChild>
-                        <button type="button" className="p-4">
+                        <button
+                            type="button"
+                            className="p-2 bg-navigation-bg text-navigation-fg rounded-full"
+                        >
                             <Sliders />
                         </button>
                     </SheetTrigger>

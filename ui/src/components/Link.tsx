@@ -5,8 +5,12 @@ import React, { useCallback } from "react"
 
 export const Link = React.forwardRef<
     HTMLAnchorElement,
-    React.AnchorHTMLAttributes<any> & { href: string; external?: boolean }
->(function Link({ external = false, ...props }, forwardedRef) {
+    React.AnchorHTMLAttributes<any> & {
+        href: string
+        external?: boolean
+        viewTransition?: boolean
+    }
+>(function Link({ external = false, viewTransition, ...props }, forwardedRef) {
     let baseURL = useBaseURL()
     let href = external ? baseURL + props.href : props.href
     let goto = useGoto()
@@ -14,9 +18,11 @@ export const Link = React.forwardRef<
     let onClick = useCallback(
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault()
-            goto(new URL(href, globalThis.location.href).pathname)
+            goto(new URL(href, globalThis.location.href).pathname, {
+                viewTransition,
+            })
         },
-        [href, goto],
+        [href, goto, viewTransition],
     )
 
     return (
@@ -38,6 +44,7 @@ export interface LinkButtonProps extends React.AnchorHTMLAttributes<any> {
     plain?: boolean
     external?: boolean
     href: string
+    viewTransition?: boolean
 }
 
 export function LinkButton({
@@ -46,6 +53,7 @@ export function LinkButton({
     size = "md",
     variant = "regular",
     external = false,
+    viewTransition,
     ...props
 }: LinkButtonProps) {
     let baseURL = useBaseURL()
@@ -54,9 +62,11 @@ export function LinkButton({
 
     let onClick = useCallback(() => {
         if (!external) {
-            goto(new URL(href, globalThis.location.href).pathname)
+            goto(new URL(href, globalThis.location.href).pathname, {
+                viewTransition,
+            })
         }
-    }, [href, external, goto])
+    }, [href, external, goto, viewTransition])
 
     let { outline, plain, children, ...aProps } = props
 

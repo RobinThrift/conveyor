@@ -12,14 +12,14 @@
     }
 
     &.info {
-        @apply border-primary-dark bg-primary-extra-light text-primary-extra-dark;
+        @apply border-primary-dark bg-primary-extra-light;
     }
 
     &.success {
-        @apply border-success-dark bg-success-light text-success-extra-dark;
+        @apply border-success-dark bg-success-light text-success-contrast;
     }
 
     &.danger {
-        @apply border-danger-dark bg-danger-light text-danger-extra-dark;
+        @apply border-danger-dark bg-danger-light text-danger-contrast;
     }
 }

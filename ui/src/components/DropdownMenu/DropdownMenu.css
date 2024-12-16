@@ -1,7 +1,8 @@
 .dropdown-menu-list {
-    @apply p-1 overflow-auto rounded-md bg-white shadow-lg;
+    @apply p-1 overflow-auto rounded-md bg-surface shadow-lg;
     @apply ring-1 ring-black ring-opacity-5;
-    @apply dark:bg-sidebar dark:border dark:border-subtle-extra-dark;
+    @apply dark:border dark:border-subtle-extra-dark;
+    z-index: 9999;
 
     min-width: var(--radix-dropdown-menu-trigger-width);
 

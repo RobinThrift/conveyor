@@ -24,17 +24,15 @@ export function ErrorPage(props: ErrorPageProps) {
     let detail = "detail" in props ? props.detail : t.Detail
 
     return (
-        <div className="grid h-screen place-content-center px-4">
-            <div className="text-center">
-                <h1 className="text-9xl font-black text-primary">
-                    {props.code}
-                </h1>
+        <div className="error-page grid h-screen place-content-center px-4">
+            <h1 className="text-9xl font-black text-primary">{props.code}</h1>
 
+            <div className="message">
                 <p className="text-2xl font-bold tracking-tight sm:text-4xl">
                     {title}
                 </p>
 
-                <p className="mt-4 text-subtle-extra-dark">{detail}</p>
+                <p className="text-subtle-extra-light">{detail}</p>
             </div>
         </div>
     )

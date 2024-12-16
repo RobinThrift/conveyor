@@ -90,7 +90,10 @@ export const slice = createSlice({
             state,
             {
                 payload: { path },
-            }: PayloadAction<{ path: string; replace?: boolean }>,
+            }: PayloadAction<{
+                path: string
+                replace?: boolean
+            }>,
         ) => {
             let [page, cacheKey] = matchRoute(
                 state.routes,
@@ -112,6 +115,7 @@ export const slice = createSlice({
     },
     selectors: {
         currentPage: (state) => state.page,
+        baseURL: (state) => state.baseURL,
     },
 })
 
@@ -128,10 +132,12 @@ export const registerEffects = (startListening: StartListening) => {
                 return
             }
 
+            let fullPath = state.baseURL + path
+
             if (replace) {
-                history.replaceState(null, "", path)
+                history.replaceState(null, "", fullPath)
             } else {
-                history.pushState(null, "", path)
+                history.pushState(null, "", fullPath)
             }
         },
     })
@@ -144,8 +150,21 @@ export function useCurrentPage() {
 export function useGoto() {
     let dispatch = useDispatch()
     return useCallback(
-        (path: string, replace?: boolean) =>
-            dispatch(slice.actions.goto({ path, replace })),
+        (
+            path: string,
+            {
+                replace,
+                viewTransition,
+            }: { replace?: boolean; viewTransition?: boolean } = {},
+        ) => {
+            if (viewTransition && "startViewTransition" in document) {
+                document.startViewTransition(() => {
+                    dispatch(slice.actions.goto({ path, replace }))
+                })
+            } else {
+                dispatch(slice.actions.goto({ path, replace }))
+            }
+        },
         [dispatch],
     )
 }

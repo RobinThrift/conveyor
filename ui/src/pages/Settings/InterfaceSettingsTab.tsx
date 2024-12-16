@@ -8,7 +8,7 @@ import React, { useCallback } from "react"
 
 export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
     function InterfaceSettingsTab(_, forwardedRef) {
-        let t = useT("pages/Settings/InterfaceSettingsTab")
+        let t = useT("pages/Settings/InterfaceSettings")
 
         let baseURL = useBaseURL()
 
@@ -31,13 +31,8 @@ export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
         )
 
         return (
-            <div ref={forwardedRef} className="settings-tab">
-                <div className="settings-tab-section">
-                    <h2>{t.Title}</h2>
-                    <small>{t.Description}</small>
-                </div>
-
-                <div className="settings-tab-section">
+            <div ref={forwardedRef} className="settings-section-content">
+                <div className="settings-sub-section">
                     <h3>{t.SectionTheme}</h3>
 
                     <div className="sm:mb-0 md:grid grid-cols-6 space-y-1">
@@ -97,24 +92,22 @@ export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
                     </div>
                 </div>
 
-                <div className="settings-tab-section">
+                <div className="settings-sub-section">
                     <h3>{t.SectionControls}</h3>
 
-                    <div className="md:w-1/2">
-                        <div className="space-y-2">
-                            <Checkbox
-                                label={t.LabelEnableVimKeybindings}
-                                name="controls.vim"
-                                value={controls.vim}
-                                onChange={onChangeControlVim}
-                            />
-                            <Checkbox
-                                label={t.LabelEnableDoubleClickToEdit}
-                                name="controls.doubleClickEdit"
-                                value={controls.doubleClickToEdit}
-                                onChange={onChangeControlDoubleClickToEdit}
-                            />
-                        </div>
+                    <div className="grid xs:grid-cols-2 gap-2 tablet:gap-4">
+                        <Checkbox
+                            label={t.LabelEnableVimKeybindings}
+                            name="controls.vim"
+                            value={controls.vim}
+                            onChange={onChangeControlVim}
+                        />
+                        <Checkbox
+                            label={t.LabelEnableDoubleClickToEdit}
+                            name="controls.doubleClickEdit"
+                            value={controls.doubleClickToEdit}
+                            onChange={onChangeControlDoubleClickToEdit}
+                        />
                     </div>
                 </div>
             </div>

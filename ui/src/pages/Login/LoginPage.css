@@ -1,24 +1,38 @@
-.login-bg {
-    @apply h-screen w-screen flex items-center justify-stretch phone:justify-center;
-    background-color: rgb(--var(--body-bg));
-    background-image: radial-gradient(
-        rgb(var(--color-subtle-dark)) 1px,
-        transparent 1px
-    );
-    background-size: 16px 16px;
+.login-header {
+    @apply flex items-center py-2 fixed right-4 left-4 top-0 border-b border-b-body-contrast;
 
-    @media (min-width: 1024px) {
-        /* tablet */
-        mask-image: radial-gradient(
-            ellipse 50% 50% at 50% 50%,
-            #000 60%,
-            transparent 100%
-        );
+    .logo {
+        @apply font-extrabold text-xl flex-1 flex items-start;
+    }
+
+    .mode-select {
+        @apply max-w-fit sm:max-w-sm;
     }
 }
 
 .login-window {
-    @apply flex items-center justify-center flex-col w-full phone:w-[400px];
+    @apply flex flex-col mt-28 w-full max-w-[500px] container mx-auto rounded-lg bg-body-contrast text-body shadow-lg;
+    @apply animate-in fade-in-50 duration-100;
+
+    h1 {
+        @apply p-4 text-7xl font-extralight mb-4;
+    }
+
+    .input-field {
+        @apply flex gap-2 items-center bg-body rounded p-2 text-body-contrast;
+
+        &[data-invalid="true"] {
+            @apply border border-danger;
+        }
+
+        input {
+            @apply bg-transparent border-none flex-1 focus:outline-none;
+        }
+
+        label {
+            @apply sr-only;
+        }
+    }
 }
 
 .login-footer {

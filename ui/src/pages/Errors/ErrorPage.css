@@ -1,0 +1,39 @@
+.error-page {
+    --step-1: clamp(12.5rem, 10.5699rem + 10.2941vw, 23.4375rem);
+    --step-2: clamp(25rem, 24.2417rem + 4.0441vw, 29.2969rem);
+    --step-3: clamp(36.6211rem, 52.361rem + -12.5919vw, 50rem);
+    --step-4: clamp(45.7764rem, 109.5689rem + -51.034vw, 100rem);
+    --step-5: clamp(57.2205rem, 225.1964rem + -134.3807vw, 200rem);
+
+    h1 {
+        @apply font-black text-transparent absolute -bottom-[5vw] -left-[5vw];
+        @apply animate-in slide-in-from-bottom fade-in duration-300 ease-out;
+
+        -webkit-text-stroke: 4px rgb(var(--color-primary));
+
+        @media (min-width: 768px) {
+            font-size: var(--step-1);
+        }
+
+        @media (min-width: 1024px) {
+            font-size: var(--step-2);
+        }
+
+        @media (min-width: 1440px) {
+            font-size: var(--step-3);
+        }
+
+        @media (min-width: 1680px) {
+            font-size: var(--step-4);
+        }
+
+        @media (min-width: 2100px) {
+            font-size: var(--step-5);
+        }
+    }
+
+    .message {
+        @apply text-center relative z-10 p-8 rounded-lg bg-body-contrast text-body space-y-2 shadow-lg;
+        @apply animate-in fade-in-50 duration-100;
+    }
+}

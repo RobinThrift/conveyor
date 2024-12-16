@@ -1,10 +1,12 @@
 import { Button } from "@/components/Button"
 import * as Form from "@/components/Form"
 import { Input } from "@/components/Input"
+import { Link } from "@/components/Link"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
 import { useT } from "@/i18n"
 import { useAccountDisplayName } from "@/state/account"
+import { SignOut } from "@phosphor-icons/react"
 import React from "react"
 import type { SettingsPageProps } from "./SettingsPage"
 
@@ -16,17 +18,12 @@ export const AccountSettingsTab = React.forwardRef<
     let csrfToken = useCSRFToken()
     let baseURL = useBaseURL()
 
-    let t = useT("pages/Settings/AccountSettingsTab")
+    let t = useT("pages/Settings/AccountSettings")
 
     return (
-        <div ref={forwardedRef} className="settings-tab">
-            <div className="settings-tab-section">
-                <h2>{t.Title}</h2>
-                <small>{t.Description}</small>
-            </div>
-
+        <div ref={forwardedRef} className="settings-section-content">
             <Form.Root
-                className="settings-tab-section"
+                className="settings-sub-section"
                 action={`${baseURL}/settings/account/update_info`}
                 method="post"
             >
@@ -49,15 +46,15 @@ export const AccountSettingsTab = React.forwardRef<
                     inputWrapperClassName="col-span-4"
                 />
 
-                <div className="flex justify-end items-center">
-                    <Button size="sm" variant="primary" type="submit">
+                <div className="flex justify-end items-center mt-2">
+                    <Button size="sm" type="submit">
                         {t.UpdateDisplayNameButton}
                     </Button>
                 </div>
             </Form.Root>
 
             <Form.Root
-                className="settings-tab-section"
+                className="settings-sub-section"
                 action={`${baseURL}/settings/account/change_password`}
                 method="post"
             >
@@ -117,12 +114,25 @@ export const AccountSettingsTab = React.forwardRef<
                     messageClassName="col-span-6"
                 />
 
-                <div className="flex justify-end items-center">
-                    <Button size="sm" variant="primary" type="submit">
+                <div className="flex justify-end items-center mt-2">
+                    <Button size="sm" type="submit">
                         {t.ChangePasswordButton}
                     </Button>
                 </div>
             </Form.Root>
+
+            <div className="settings-sub-section">
+                <h2>{t.Logout}</h2>
+
+                <Link href="/logout" external className="btn">
+                    <SignOut
+                        weight="fill"
+                        size={20}
+                        className="rotate-180 mt-0.5"
+                    />
+                    {t.Logout}
+                </Link>
+            </div>
         </div>
     )
 })

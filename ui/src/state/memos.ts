@@ -87,15 +87,6 @@ export const registerEffects = (startListening: StartListening) => {
             }
 
             dispatch(slice.actions.setMemo(memo))
-            dispatch(
-                notifications.actions.add({
-                    notification: {
-                        type: "info",
-                        title: "New Memo created",
-                        durationMs: 1000,
-                    },
-                }),
-            )
         },
     })
 

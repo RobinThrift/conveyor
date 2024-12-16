@@ -16,15 +16,10 @@ import { useSystemSettingsTabState } from "./state"
 
 export const SystemSettingsTab = React.forwardRef<HTMLDivElement>(
     function SystemSettingsTab(_, forwardedRef) {
-        let t = useT("pages/Settings/SystemSettingsTab")
         let { state, actions } = useSystemSettingsTabState()
 
         return (
-            <div ref={forwardedRef} className="settings-tab">
-                <div className="settings-tab-section">
-                    <h2>{t.Title}</h2>
-                </div>
-
+            <div ref={forwardedRef} className="settings-section-content">
                 <APITokensSections
                     isLoading={state.isLoading}
                     apiTokens={state.apiTokens}
@@ -56,26 +51,20 @@ function APITokensSections(props: {
     createAPIToken: (token: { name: string; expiresAt: Date }) => void
     deleteAPIToken: (name: string) => void
 }) {
-    let t = useT("pages/Settings/SystemSettingsTab")
+    let t = useT("pages/Settings/SystemSettings")
 
     useEffect(() => {
         props.loadPage()
     }, [props.loadPage])
 
     return (
-        <div className="settings-tab-section">
-            <h2>{t.SectionAPITokensTitle}</h2>
+        <div className="settings-sub-section">
+            <h3>{t.SectionAPITokensTitle}</h3>
             <small>{t.SectionAPITokensDescription}</small>
 
-            {props.error && (
-                <Alert variant="danger">{props.error.message}</Alert>
-            )}
-
-            <div className="relative">
-                {props.isLoading && (
-                    <div className="absolute inset-0 flex justify-center items-center top-4 bg-surface/50 rounded-lg">
-                        <Loader />
-                    </div>
+            <div className="settings-sub-section relative mt-4">
+                {props.error && (
+                    <Alert variant="danger">{props.error.message}</Alert>
                 )}
 
                 {props.lastCreatedValue && (
@@ -83,6 +72,20 @@ function APITokensSections(props: {
                 )}
 
                 <CreateNewAPIToken onSubmit={props.createAPIToken} />
+
+                {props.isLoading && (
+                    <div className="absolute inset-0 flex justify-center items-center top-0 bg-body-contrast/80 rounded-lg z-20">
+                        <Loader />
+                    </div>
+                )}
+            </div>
+
+            <div className="settings-sub-section relative mt-4">
+                {props.isLoading && (
+                    <div className="absolute inset-0 flex justify-center items-center top-4 bg-body-contrast/80 rounded-lg">
+                        <Loader />
+                    </div>
+                )}
 
                 <APITokensList
                     tokens={props.apiTokens}
@@ -100,7 +103,7 @@ function APITokensSections(props: {
 function CreateNewAPIToken({
     onSubmit: create,
 }: { onSubmit: (token: { name: string; expiresAt: Date }) => void }) {
-    let t = useT("pages/Settings/SystemSettingsTab/New")
+    let t = useT("pages/Settings/SystemSettings/New")
 
     let [name, setName] = useStateGetter("")
     let [expiresIn, setExpiresIn] = useStateGetter<
@@ -147,8 +150,8 @@ function CreateNewAPIToken({
     )
 
     return (
-        <Form.Root className="p-4 mb-4" onSubmit={onSubmit}>
-            <h3>{t.Title}</h3>
+        <Form.Root onSubmit={onSubmit}>
+            <h4>{t.Title}</h4>
             <div className="space-y-2">
                 <Input
                     name="api_token_name"
@@ -200,7 +203,7 @@ function CreateNewAPIToken({
 }
 
 function LastCreatedAPIToken({ value }: { value: string }) {
-    let t = useT("pages/Settings/SystemSettingsTab/LastCreated")
+    let t = useT("pages/Settings/SystemSettings/LastCreated")
 
     let onFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
         e.currentTarget.select()
@@ -235,10 +238,10 @@ function APITokensList({
     prevPage: () => void
     onDelete: (name: string) => void
 }) {
-    let t = useT("pages/Settings/SystemSettingsTab/List")
+    let t = useT("pages/Settings/SystemSettings/List")
 
     return (
-        <div className="p-4 api-tokens-list">
+        <div className="api-tokens-list">
             <div className="table-wrapper">
                 <table>
                     <thead>

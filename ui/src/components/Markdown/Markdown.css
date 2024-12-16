@@ -2,6 +2,17 @@
     @apply prose max-w-none;
     @apply prose-ul:my-0 prose-li:p-0 prose-li:my-0;
     @apply dark:prose-invert;
+    @apply text-text;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: "Bodoni Moda Variable", serif;
+        @apply mb-0;
+    }
 
     text-wrap: pretty;
     overflow-wrap: break-word;

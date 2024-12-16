@@ -45,7 +45,7 @@
     &.plain {
         --btn-bg-hover: var(--color-primary-light);
         --btn-bg-active: var(--color-primary);
-        --btn-color: var(--color-primary-dark);
+        --btn-color: var(--color-primary-contrast);
 
         &:active {
             --btn-color: var(--color-primary-contrast);
@@ -63,7 +63,7 @@
     &.plain {
         --btn-bg-hover: var(--color-success-light);
         --btn-bg-active: var(--color-success);
-        --btn-color: var(--color-success-dark);
+        --btn-color: var(--color-success-contrast);
 
         &:active {
             --btn-color: var(--color-success-contrast);
@@ -81,7 +81,7 @@
     &.plain {
         --btn-bg-hover: var(--color-danger-light);
         --btn-bg-active: var(--color-danger);
-        --btn-color: var(--color-danger-dark);
+        --btn-color: var(--color-danger-contrast);
 
         &:active {
             --btn-color: var(--color-danger-contrast);

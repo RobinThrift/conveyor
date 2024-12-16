@@ -1,58 +1,94 @@
-.settings-tab-list {
-    @apply rounded-lg border border-subtle bg-surface px-2 py-1;
-    @apply grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
-    @apply border-subtle-extra-dark;
-}
+.settings-page {
+    @apply container mx-auto max-w-4xl;
 
-.settings-tab-list-item {
-    @apply rounded flex items-center justify-center gap-2 p-1 py-2;
-    width: 100%;
-
-    &:hover {
-        @apply bg-subtle text-primary-dark;
-        @apply dark:bg-subtle-extra-light dark:text-primary-extra-dark;
-    }
-
-    &[data-state="active"] {
-        @apply bg-primary text-primary-contrast;
-        @apply dark:bg-primary-dark;
-        &:hover {
-            @apply text-primary-contrast;
-        }
+    h1 {
+        @apply text-4xl mb-4 px-2;
+        font-family: "Bodoni Moda Variable", serif;
     }
 }
 
-.settings-tab {
-    @apply space-y-2 mt-4;
+.settings-section {
+    @apply rounded-lg shadow-lg overflow-hidden relative z-10;
+    @apply pb-4 -mb-8;
+
+    &:last-child {
+        @apply mb-0 pb-4;
+    }
+
+    &[data-state="open"] .settings-heading h2 {
+        @apply font-semibold;
+    }
+}
+
+.settings-heading {
+    @apply w-full text-left p-4 -outline-offset-4 outline-primary relative;
+
+    &:focus-visible {
+        outline-style: solid;
+        outline-width: 2px;
+    }
 
     h2 {
-        @apply font-semibold text-2xl;
+        @apply text-xl;
+    }
+
+    .icon {
+        @apply absolute right-4 top-4 size-12 opacity-30;
+    }
+}
+
+.settings-section-content {
+    @apply p-4 pb-8;
+
+    .checkbox-field {
+        @apply flex flex-row-reverse justify-between items-center p-2 gap-2 rounded-lg shadow-lg h-fit;
+        @apply bg-surface text-text;
+
+        label {
+            @apply flex-1;
+        }
+
+        &:hover {
+            @apply shadow-xl;
+        }
+
+        .checkbox {
+            @apply rounded-full;
+        }
+    }
+
+    h2,
+    h3,
+    h4 {
+        @apply font-semibold mb-2;
+    }
+
+    h2 {
+        @apply text-xl;
     }
 
     h3 {
-        @apply font-semibold text-xl mb-4;
+        @apply text-lg;
     }
 
-    h4 {
-        @apply font-semibold text-lg mb-2;
-    }
-}
-
-.settings-tab-section {
-    @apply rounded-lg border border-subtle bg-surface p-4 flex-1 space-y-2;
-    @apply border-subtle-extra-dark;
-
-    .checkbox-field {
-        @apply flex flex-row-reverse justify-between;
-
-        label {
-            @apply text-sm font-semibold;
-            @apply col-start-1 col-span-3 row-start-1;
-        }
+    h3:has(+ small) {
+        @apply mb-0;
     }
 }
 
-.settings-tab-section {
+.settings-sub-section {
+    @apply mt-8 pb-8 border-b border-b-current;
+
+    &:first-child {
+        @apply mt-0 pb-4;
+    }
+
+    &:last-child {
+        @apply border-none;
+    }
+}
+
+.settings-section {
     .table-wrapper {
         @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6;
         @apply border-subtle-extra-dark;

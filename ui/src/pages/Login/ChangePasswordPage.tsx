@@ -1,5 +1,4 @@
 import { BuildInfo } from "@/components/BuildInfo"
-import { Input } from "@/components/Input"
 import { SelectMode } from "@/components/ThemeSwitcher"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
@@ -22,104 +21,134 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
     let csrfToken = useCSRFToken()
     let baseURL = useBaseURL()
     let t = useT("pages/LoginChangePassword")
+    console.log("t", t)
 
     return (
-        <div>
-            <div className="login-bg">
-                <div className="login-window">
-                    <div className="flex flex-col items-center justify-center">
-                        <h3 className="text-2xl mt-8 mb-3 font-semibold text-primary-extra-dark dark:text-text">
-                            {t.Title}
-                        </h3>
-                    </div>
-                    <Form.Root
-                        action={`${baseURL}/auth/change_password`}
-                        method="post"
-                        className="w-full"
-                    >
-                        <input
-                            type="hidden"
-                            id="belt.csrf.token"
-                            name="belt.csrf.token"
-                            defaultValue={csrfToken}
-                        />
+        <div className="h-screen px-2 sm:px-4">
+            <header className="login-header">
+                <div className="logo">Belt</div>
+                <SelectMode className="mode-select" />
+            </header>
+            <div className="login-window">
+                <h1 className="!text-6xl">{t.Title}</h1>
 
-                        <input
-                            type="hidden"
-                            id="redirect_url"
-                            name="redirect_url"
-                            defaultValue={props.redirectURL}
-                        />
+                <Form.Root
+                    action={`${baseURL}/auth/change_password`}
+                    method="post"
+                    className="p-4"
+                >
+                    <input
+                        type="hidden"
+                        id="belt.csrf.token"
+                        name="belt.csrf.token"
+                        defaultValue={csrfToken}
+                    />
 
-                        <div className="flex flex-col px-3 py-2 w-full">
-                            <Input
-                                type="password"
-                                name="current_password"
-                                ariaLabel={t.CurrentPasswordLabel}
-                                icon={<Password />}
-                                serverInvalid={
-                                    !!props.validationErrors?.current_password
-                                }
-                                inputClassName="rounded-b-none !border-b-transparent hover:border-b-subtle-dark focus:border-b-subtle-dark focus:z-10 relative"
-                                iconClassName="z-20"
-                                messageClassName="mt-0"
-                                autoComplete="current_password"
-                                placeholder={t.CurrentPasswordLabel}
-                                required
-                                autoFocus
-                            />
+                    <input
+                        type="hidden"
+                        id="redirect_url"
+                        name="redirect_url"
+                        defaultValue={props.redirectURL}
+                    />
 
-                            <Input
-                                name="new_password"
-                                type="password"
-                                ariaLabel={t.NewPasswordLabel}
-                                icon={<Password />}
-                                serverInvalid={
-                                    !!props.validationErrors?.new_password
-                                }
-                                inputClassName="rounded-t-none !border-b-transparent hover:border-b-subtle-dark focus:border-b-subtle-dark focus:z-10 relative"
-                                iconClassName="z-20"
-                                autoComplete="new_password"
-                                placeholder={t.NewPasswordLabel}
-                                required
-                            />
+                    <div className="space-y-2">
+                        <Form.Field
+                            name="current_password"
+                            aria-label={t.CurrentPasswordLabel}
+                            className="input-field"
+                            serverInvalid={
+                                !!props.validationErrors?.current_password
+                            }
+                        >
+                            <Form.Label htmlFor="current_password">
+                                {t.CurrentPasswordLabel}
+                            </Form.Label>
 
-                            <Input
-                                name="repeat_new_password"
-                                type="password"
-                                ariaLabel={t.RepeatNewPasswordLabel}
-                                icon={<Password />}
-                                serverInvalid={
-                                    !!props.validationErrors
-                                        ?.repeat_new_password
-                                }
-                                inputClassName="rounded-t-none hover:border-b-subtle-dark focus:border-b-subtle-dark"
-                                autoComplete="repeat_new_password"
-                                placeholder={t.RepeatNewPasswordLabel}
-                                required
-                            />
+                            <Password weight="bold" size={24} />
 
-                            <Form.Submit asChild>
-                                <button
-                                    className="btn primary mt-5"
-                                    type="submit"
-                                >
-                                    Change Password
-                                </button>
-                            </Form.Submit>
-                        </div>
+                            <Form.Control asChild>
+                                <input
+                                    type="password"
+                                    name="current_password"
+                                    id="current_password"
+                                    autoComplete="current_password"
+                                    placeholder={t.CurrentPasswordLabel}
+                                    required
+                                />
+                            </Form.Control>
+                        </Form.Field>
+
+                        <Form.Field
+                            name="new_password"
+                            aria-label={t.NewPasswordLabel}
+                            className="input-field"
+                            serverInvalid={
+                                !!props.validationErrors?.new_password
+                            }
+                        >
+                            <Form.Label htmlFor="new_password">
+                                {t.NewPasswordLabel}
+                            </Form.Label>
+
+                            <Password weight="bold" size={24} />
+
+                            <Form.Control asChild>
+                                <input
+                                    type="password"
+                                    name="new_password"
+                                    id="new_password"
+                                    autoComplete="new_password"
+                                    placeholder={t.NewPasswordLabel}
+                                    required
+                                />
+                            </Form.Control>
+                        </Form.Field>
+
+                        <Form.Field
+                            name="repeate_new_password"
+                            aria-label={t.RepeatNewPasswordLabel}
+                            className="input-field"
+                            serverInvalid={
+                                !!props.validationErrors?.repeat_new_password
+                            }
+                        >
+                            <Form.Label htmlFor="repeate_new_password">
+                                {t.RepeatNewPasswordLabel}
+                            </Form.Label>
+
+                            <Password weight="bold" size={24} />
+
+                            <Form.Control asChild>
+                                <input
+                                    type="password"
+                                    name="repeate_new_password"
+                                    id="repeate_new_password"
+                                    autoComplete="repeate_new_password"
+                                    placeholder={t.RepeatNewPasswordLabel}
+                                    required
+                                />
+                            </Form.Control>
+                        </Form.Field>
 
                         {props.validationErrors &&
                             Object.values(props.validationErrors).map((v) => (
-                                <div
-                                    key={v}
-                                    className="mt-5 field-message animate-in slide-in-from-bottom fade-in-50 duration-300"
-                                >
+                                <div key={v} className="mt-5 field-message">
                                     {t[v as keyof typeof t] ?? v}
                                 </div>
                             ))}
-                    </Form.Root>
-                </div>
+
+                        <div className="flex items-center justify-end mt-4">
+                            <Form.Submit asChild>
+                                <button
+                                    className="btn primary lg w-full"
+                                    type="submit"
+                                >
+                                    {t.ChangePasswordButton}
+                                </button>
+                            </Form.Submit>
+                        </div>
+                    </div>
+                </Form.Root>
             </div>
             <footer className="login-footer">
                 <BuildInfo />

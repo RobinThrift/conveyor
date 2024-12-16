@@ -1,6 +1,6 @@
 import { useT } from "@/i18n"
 import { Globe, Palette, User, Wrench } from "@phosphor-icons/react"
-import * as Tabs from "@radix-ui/react-tabs"
+import * as Accordion from "@radix-ui/react-accordion"
 import React from "react"
 import { AccountSettingsTab } from "./AccountSettingsTab"
 import { InterfaceSettingsTab } from "./InterfaceSettingsTab"
@@ -19,50 +19,95 @@ export interface SettingsPageProps {
 }
 
 export function SettingsPage(props: SettingsPageProps) {
-    let t = useT("pages/Settings/Tabs")
+    let t = useT("pages/Settings")
+    let tInterface = useT("pages/Settings/InterfaceSettings")
+    let tLocale = useT("pages/Settings/LocaleSettings")
+    let tAccount = useT("pages/Settings/AccountSettings")
+    let tSystem = useT("pages/Settings/SystemSettings")
 
     return (
-        <Tabs.Root
-            className="container mx-auto max-w-4xl flex flex-col gap-2 justify-center"
-            defaultValue={props.tab}
-            onValueChange={props.onChangeTab}
-        >
-            <Tabs.List className="settings-tab-list">
-                <Tabs.Trigger
+        <div className="settings-page">
+            <h1>{t.Title}</h1>
+
+            <Accordion.Root
+                className="flex flex-col gap-2 justify-center"
+                type="single"
+                defaultValue={props.tab}
+                onValueChange={props.onChangeTab}
+            >
+                <Accordion.Item
                     value="interface"
-                    className="settings-tab-list-item"
+                    className="settings-section bg-primary text-primary-contrast"
                 >
-                    <Palette /> {t.Interface}
-                </Tabs.Trigger>
-                <Tabs.Trigger value="locale" className="settings-tab-list-item">
-                    <Globe /> {t.Locale}
-                </Tabs.Trigger>
-                <Tabs.Trigger
+                    <Accordion.Trigger
+                        value="interface"
+                        className="settings-heading outline-primary-extra-dark"
+                    >
+                        <h2>{tInterface.Title}</h2>
+                        <small>{tInterface.Description}</small>
+                        <Palette weight="fill" className="icon" />
+                    </Accordion.Trigger>
+
+                    <Accordion.Content asChild>
+                        <InterfaceSettingsTab />
+                    </Accordion.Content>
+                </Accordion.Item>
+
+                <Accordion.Item
+                    value="locale"
+                    className="settings-section bg-success text-success-contrast"
+                >
+                    <Accordion.Trigger
+                        value="locale"
+                        className="settings-heading"
+                    >
+                        <h2>{tLocale.Title}</h2>
+                        <small>{tLocale.Description}</small>
+                        <Globe weight="fill" className="icon" />
+                    </Accordion.Trigger>
+
+                    <Accordion.Content asChild>
+                        <LocaleSettingsTab />
+                    </Accordion.Content>
+                </Accordion.Item>
+
+                <Accordion.Item
                     value="account"
-                    className="settings-tab-list-item"
+                    className="settings-section bg-danger text-danger-contrast"
                 >
-                    <User /> {t.Account}
-                </Tabs.Trigger>
-                <Tabs.Trigger value="system" className="settings-tab-list-item">
-                    <Wrench /> {t.System}
-                </Tabs.Trigger>
-            </Tabs.List>
+                    <Accordion.Trigger
+                        value="account"
+                        className="settings-heading"
+                    >
+                        <h2>{tAccount.Title}</h2>
+                        <small>{tAccount.Description}</small>
+                        <User weight="fill" className="icon" />
+                    </Accordion.Trigger>
 
-            <Tabs.Content value="interface" asChild>
-                <InterfaceSettingsTab />
-            </Tabs.Content>
+                    <Accordion.Content asChild>
+                        <AccountSettingsTab
+                            validationErrors={props.validationErrors}
+                        />
+                    </Accordion.Content>
+                </Accordion.Item>
 
-            <Tabs.Content value="locale" asChild>
-                <LocaleSettingsTab />
-            </Tabs.Content>
+                <Accordion.Item
+                    value="system"
+                    className="settings-section bg-subtle text-subtle-contrast"
+                >
+                    <Accordion.Trigger
+                        value="system"
+                        className="settings-heading"
+                    >
+                        <h2>{tSystem.Title}</h2>
+                        <Wrench weight="fill" className="icon" />
+                    </Accordion.Trigger>
 
-            <Tabs.Content value="account" asChild>
-                <AccountSettingsTab validationErrors={props.validationErrors} />
-            </Tabs.Content>
-
-            <Tabs.Content value="system" asChild>
-                <SystemSettingsTab />
-            </Tabs.Content>
-        </Tabs.Root>
+                    <Accordion.Content asChild>
+                        <SystemSettingsTab />
+                    </Accordion.Content>
+                </Accordion.Item>
+            </Accordion.Root>
+        </div>
     )
 }

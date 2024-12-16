@@ -36,7 +36,7 @@ export function SheetContent({
             <Dialog.DialogContent
                 {...props}
                 className={clsx(
-                    "fixed z-50 gap-4 bg-background shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+                    "fixed z-[1001] gap-4 bg-background shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
                     "h-full w-3/4 xs:w-1/3",
                     {
                         "inset-y-0 left-0 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left":
@@ -61,17 +61,18 @@ export function SheetTrigger(props: SheetTriggerProps) {
     return <Dialog.DialogTrigger {...props} />
 }
 
-const SheetOverlay = React.forwardRef<
+export const SheetOverlay = React.forwardRef<
     React.ElementRef<typeof Dialog.Overlay>,
     React.ComponentPropsWithoutRef<typeof Dialog.Overlay>
 >(function SheetOverlay({ className, ...props }, ref) {
     return (
         <Dialog.Overlay
             className={clsx(
-                "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+                "fixed inset-0 z-[1000] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
                 className,
             )}
             {...props}
+            style={{ viewTransitionName: "overlay" }}
             ref={ref}
         />
     )

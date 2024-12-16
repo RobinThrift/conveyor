@@ -51,6 +51,7 @@ interface MemoProps {
     doubleClickToEdit: boolean
     onClickTag: (tag: string) => void
     updateMemo: (memo: PartialMemoUpdate) => void
+    viewTransitionName?: string
 }
 
 export function Memo(props: MemoProps) {
@@ -153,11 +154,10 @@ export function Memo(props: MemoProps) {
 
     return (
         <article
-            className={clsx(
-                "rounded-lg border border-subtle bg-surface p-4 relative group",
-                "dark:border-subtle-extra-dark",
-                props.className,
-            )}
+            className={clsx("memo", props.className)}
+            style={{
+                viewTransitionName: props.viewTransitionName,
+            }}
         >
             {children}
         </article>
@@ -297,6 +297,7 @@ function MemoActionBar({
                     iconLeft={<ArrowSquareOut />}
                     plain={true}
                     size="sm"
+                    viewTransition
                 />
             )}
 

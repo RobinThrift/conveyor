@@ -4,7 +4,11 @@ import animate from "tailwindcss-animate"
 /** @type {import('tailwindcss').Config} */
 export default {
     darkMode: "class",
-    content: [".src/html/*.html", "./src/**/*.{ts,tsx}"],
+    content: [
+        ".src/html/*.html",
+        "./src/**/*.{ts,tsx}",
+        "./src/**/*.stories.tsx",
+    ],
     theme: {
         screens: {
             phone: "390px",
@@ -79,9 +83,32 @@ export default {
 
                 text: "rgba(var(--text-color) / <alpha-value>)",
                 body: "rgba(var(--body-bg) / <alpha-value>)",
+                "body-contrast":
+                    "rgba(var(--body-bg-contrast) / <alpha-value>)",
                 surface: "rgba(var(--surface-bg) / <alpha-value>)",
                 sidebar: "rgba(var(--sidebar-bg) / <alpha-value>)",
+
+                navigation: {
+                    bg: "rgba(var(--navigation-bg) / <alpha-value>)",
+                    fg: "rgba(var(--navigation-fg) / <alpha-value>)",
+                },
             },
+
+            typography: () => ({
+                DEFAULT: {
+                    css: {
+                        color: "rgb(var(--text-color))",
+                        h1: { color: "rgb(var(--text-color))" },
+                        h2: { color: "rgb(var(--text-color))" },
+                        h3: { color: "rgb(var(--text-color))" },
+                        h4: { color: "rgb(var(--text-color))" },
+                        h5: { color: "rgb(var(--text-color))" },
+                        h6: { color: "rgb(var(--text-color))" },
+                        blockquote: { color: "rgb(var(--text-color))" },
+                        a: { color: "rgb(var(--color-primary))" },
+                    },
+                },
+            }),
         },
     },
     plugins: [typography, animate],

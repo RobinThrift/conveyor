@@ -11,7 +11,7 @@ import React, { useCallback, useMemo } from "react"
 
 export const LocaleSettingsTab = React.forwardRef<HTMLDivElement>(
     function LocaleSettingsTab(_, forwardedRef) {
-        let t = useT("pages/Settings/LocaleSettingsTab")
+        let t = useT("pages/Settings/LocaleSettings")
 
         let [lang, setLang] = useSetting("locale.language")
         let [region, setRegion] = useSetting("locale.region")
@@ -55,13 +55,8 @@ export const LocaleSettingsTab = React.forwardRef<HTMLDivElement>(
         )
 
         return (
-            <div ref={forwardedRef} className="settings-tab">
-                <div className="settings-tab-section">
-                    <h2>{t.Title}</h2>
-                    <small>{t.Description}</small>
-                </div>
-
-                <div className="settings-tab-section">
+            <div ref={forwardedRef} className="settings-section-content">
+                <div className="settings-sub-section">
                     <div className="sm:mb-0 md:grid grid-cols-6 space-y-1">
                         <label
                             htmlFor="language"

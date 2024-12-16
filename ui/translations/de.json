@@ -1,16 +1,9 @@
 {
-    "app/navigation": {
+    "components/Navigation": {
         "Memos": "Memos",
         "Archive": "Archiv",
         "Bin": "Müll",
         "Settings": "Einstellungen"
-    },
-
-    "components/Sidebar": {
-        "Logout": "Ausloggen",
-        "GreetingMorning": "Moin,",
-        "GreetingAfternoon": "Guten Tag,",
-        "GreetingEvening": "Abend,"
     },
 
     "components/Memo/Actions": {
@@ -64,28 +57,34 @@
         "Detail": "Du hast auf diese Seite keinen Zugriff"
     },
 
+    "pages/Login": {
+        "Title": "Login",
+        "UsernameLabel": "Benutername",
+        "PasswordLabel": "Passwort",
+        "LoginButton": "Anmelden",
+        "Invalid/Empty": "{name} darf nicht leer sein"
+    },
+
     "pages/LoginChangePassword": {
+        "Title": "Passwort ändern",
+        "CurrentPasswordLabel": "Aktulles Passwort",
+        "NewPasswordLabel": "Neues Passwort",
+        "RepeatNewPasswordLabel": "Neues Passwort wiederholen",
+        "ChangePasswordButton": "Passwort ändern",
         "Invalid/Empty": "{name} darf nicht leer sein",
         "CurrentPasswordIncorrect": "Incorrect password",
         "EmptyCurrentPassword": "Bitte gib Dein aktuelles Passwort ein",
         "EmptyNewPassword": "Bitte gib ein neues Passwort ein",
         "EmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
         "NewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
-        "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein",
-        "Title": "Passwort ändern",
-        "CurrentPasswordLabel": "Aktulles Passwort",
-        "NewPasswordLabel": "Neues Passwort",
-        "RepeatNewPasswordLabel": "Neues Passwort wiederholen"
+        "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein"
     },
 
-    "pages/Settings/Tabs": {
-        "Interface": "Benutzeroberfläche",
-        "Locale": "Sprache & Region",
-        "Account": "Konto",
-        "System": "System"
+    "pages/Settings": {
+        "Title": "Settings"
     },
 
-    "pages/Settings/InterfaceSettingsTab": {
+    "pages/Settings/InterfaceSettings": {
         "Title": "Einstellungen der Benutzeroberfläche",
         "Description": "Passe das Aussehen und Verhalten der Benutzeroberfläche an.",
         "SectionTheme": "Farben und Modus",
@@ -97,20 +96,21 @@
         "LabelEnableDoubleClickToEdit": "Doppelklick auf Memos aktiviert den Editor"
     },
 
-    "pages/Settings/LocaleSettingsTab": {
+    "pages/Settings/LocaleSettings": {
         "Title": "Sprache & Region",
         "Description": "Setze die Sprache- und Regionseinstellunge",
         "LabelSelectLanguage": "Sprache",
         "LabelSelectRegion": "Region"
     },
 
-    "pages/Settings/AccountSettingsTab": {
+    "pages/Settings/AccountSettings": {
         "Title": "Konto",
         "Description": "Verwalte dein Konto.",
 
         "DisplayNameLabel": "Anzeigename",
         "UpdateDisplayNameButton": "Speichern",
         "EmptyDisplayName": "Anzeigename darf nicht leer sein",
+        "Logout": "Ausloggen",
 
         "ChangePasswordTitle": "Password Ändern",
         "ChangePasswordButton": "Ändern",
@@ -126,13 +126,13 @@
         "RepeatNewPasswordLabel": "Neues Passwort wiederholen"
     },
 
-    "pages/Settings/SystemSettingsTab": {
+    "pages/Settings/SystemSettings": {
         "Title": "System",
         "SectionAPITokensTitle": "API Tokens",
         "SectionAPITokensDescription": "Erstelle und lösche API Tokens."
     },
 
-    "pages/Settings/SystemSettingsTab/New": {
+    "pages/Settings/SystemSettings/New": {
         "Title": "Neuen API Token erstellen",
         "FieldNameLabel": "Name",
         "FieldExpiresInLabel": "Gültigkeit",
@@ -147,12 +147,12 @@
         "ButtonLabel": "Neuen Token Erstellen"
     },
 
-    "pages/Settings/SystemSettingsTab/LastCreated": {
+    "pages/Settings/SystemSettings/LastCreated": {
         "Title": "Neuer API Token",
         "Notice": "Bitte notieren den Token. DIESER WERT WIRD NIE WIEDER ANGEZEIGT!"
     },
 
-    "pages/Settings/SystemSettingsTab/List": {
+    "pages/Settings/SystemSettings/List": {
         "Title": "API Tokens",
         "ColumName": "Name",
         "ColumExpires": "Gültig bis",

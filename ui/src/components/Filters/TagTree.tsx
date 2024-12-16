@@ -102,10 +102,18 @@ export function TagTree({
                             <div
                                 className={clsx(
                                     "flex gap-1 items-center cursor-pointer rounded hover:bg-subtle ps-1 pe-2",
-                                    { "!bg-primary-light": isSelected },
+                                    {
+                                        "!bg-primary-light !text-primary-contrast":
+                                            isSelected,
+                                    },
                                 )}
                             >
-                                <Hash className="text-subtle-dark" />
+                                <Hash
+                                    className={clsx({
+                                        "text-subtle-dark": !isSelected,
+                                        "text-primary-contrast": isSelected,
+                                    })}
+                                />
                                 <button
                                     className="flex-1 appearance-none text-left"
                                     onClick={

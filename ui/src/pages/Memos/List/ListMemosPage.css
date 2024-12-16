@@ -6,10 +6,6 @@
     @apply flex-1 flex flex-col gap-4 w-full max-w-3xl mx-auto;
 
     @apply tablet:max-w-6xl;
-    @media (min-width: 1024px) {
-        /* tablet */
-        padding-right: 240px;
-    }
 
     @apply lg:mx-1;
     @media (min-width: 2100px) {
@@ -20,19 +16,62 @@
 }
 
 .filters-sidebar {
-    @apply tablet:pe-4 tablet:fixed tablet:right-0 tablet:h-screen overscroll-none;
+    @apply tablet:pe-4 overscroll-none;
+
+    @apply tablet:static tablet:right-0;
     @media (min-width: 1024px) {
         /* tablet */
         max-width: 300px;
+        height: auto;
     }
 
-    @apply md:pe-8;
+    @apply md:pe-4;
+
+    @media (min-width: 1650px) {
+        position: fixed;
+        height: calc(100vh - 5rem);
+    }
 
     @apply lg:pe-4;
     @media (min-width: 2100px) {
         /* lg */
-        position: relative;
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
         width: 300px;
         max-width: none;
+        height: calc(100vh - 1.5rem);
+    }
+
+    view-transition-name: filters-sidebar;
+}
+
+::view-transition-group(filters-sidebar),
+::view-transition-old(filters-sidebar),
+::view-transition-new(filters-sidebar) {
+    animation-name: none;
+}
+
+::view-transition-old(filters-sidebar) {
+    display: none;
+}
+
+/* Entry transition */
+::view-transition-new(filters-sidebar):only-child {
+    @apply animate-in slide-in-from-right-1/2 fade-in;
+}
+
+/* Exit transition */
+::view-transition-old(filters-sidebar):only-child {
+    @apply animate-out slide-out-to-right-full fade-out;
+    display: block;
+}
+
+@media (prefers-reduced-motion) {
+    ::view-transition-group(filters-sidebar),
+    ::view-transition-old(filters-sidebar),
+    ::view-transition-new(filters-sidebar) {
+        animation: none !important;
     }
 }

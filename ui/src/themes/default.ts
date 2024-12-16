@@ -1,6 +1,6 @@
 import {
     defaultSettingsQuietlight,
-    quietlight,
+    quietlightInit,
 } from "@uiw/codemirror-theme-quietlight"
 import {
     defaultSettingsTokyoNight,
@@ -10,7 +10,9 @@ import {
 export const light = {
     foreground: defaultSettingsQuietlight.foreground,
     background: defaultSettingsQuietlight.background,
-    cm: quietlight,
+    cm: quietlightInit({
+        settings: { background: "rgb(var(--surface-bg))" },
+    }),
 }
 
 export const dark = {

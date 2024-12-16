@@ -48,7 +48,7 @@ export function Filters(props: FiltersProps) {
 
     return (
         <div className={props.className}>
-            <div className="space-y-4 flex flex-col lg:fixed tablet:h-full tablet:pb-8 tablet:overflow-y-auto">
+            <div className="space-y-4 flex flex-col tablet:h-full tablet:pb-4 w-full">
                 <SearchBar onChange={onChangeSearch} />
 
                 <Calendar

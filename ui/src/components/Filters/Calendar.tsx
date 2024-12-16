@@ -87,7 +87,7 @@ export function Calendar({ className, ...props }: CalendarProps) {
                 day: "text-center cursor-pointer rounded hover:bg-subtle",
                 day_outside: "text-subtle",
                 day_selected: "bg-primary",
-                today: "bg-primary-light",
+                today: "bg-primary-extra-light",
                 selected:
                     "!bg-primary-dark !text-primary-contrast !hover:bg-primary-dark",
                 outside: "text-subtle-dark",

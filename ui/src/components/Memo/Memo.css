@@ -1,0 +1,4 @@
+.memo {
+    @apply rounded-lg border border-subtle bg-surface p-4;
+    @apply dark:border-subtle-extra-dark;
+}

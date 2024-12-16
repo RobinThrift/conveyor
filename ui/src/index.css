@@ -1,5 +1,7 @@
 @import "./tailwind.css";
 
+@import "@fontsource-variable/bodoni-moda";
+
 @import "./themes/default.css" layer(base);
 @import "./themes/rosepine.css" layer(base);
 
@@ -13,12 +15,14 @@
 @import "./components/Select/Select.css" layer(components);
 @import "./components/Tooltip/Tooltip.css" layer(components);
 @import "./components/Image/Image.css" layer(components);
-@import "./components/Sidebar/Sidebar.css" layer(components);
+@import "./components/Navigation/Navigation.css" layer(components);
 @import "./components/Alert/Alert.css" layer(components);
 @import "./components/Notifications/Notifications.css" layer(components);
+@import "./components/Memo/Memo.css" layer(components);
 @import "./pages/Settings/SettingsPage.css" layer(components);
 @import "./pages/Login/LoginPage.css" layer(components);
 @import "./pages/Memos/List/ListMemosPage.css" layer(components);
+@import "./pages/Errors/ErrorPage.css" layer(components);
 
 @layer base {
     body {
@@ -54,4 +58,8 @@
 
 .tree-leaf-list-item:only-of-type .tree-node::before {
     display: none;
+}
+
+:root {
+    view-transition-name: none;
 }

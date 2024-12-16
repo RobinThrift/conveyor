@@ -31,7 +31,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
         >
             <RadixSelect.Trigger
                 className={clsx(
-                    "input flex items-center gap-2 justify-between px-2 py-1 text-sm",
+                    "input flex items-center gap-2 justify-between px-2 py-1 text-sm bg-surface",
                     props.className,
                 )}
                 aria-label={props.ariaLabel}

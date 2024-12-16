@@ -4,7 +4,7 @@ const sharedErrorTranslations: Components = {
     Input: {
         "Invalid/Empty": params("{name} must not be empty"),
     },
-    ChangePassword: {
+    "ChangePassword/Errors": {
         CurrentPasswordIncorrect: "Incorrect password",
         EmptyCurrentPassword: "Please enter current password",
         EmptyNewPassword: "Please enter a new password",
@@ -15,18 +15,11 @@ const sharedErrorTranslations: Components = {
 }
 
 export const translations = {
-    "app/navigation": {
+    "components/Navigation": {
         Memos: "Memos",
         Archive: "Archive",
         Bin: "Bin",
         Settings: "Settings",
-    },
-
-    "components/Sidebar": {
-        Logout: "Logout",
-        GreetingMorning: "Good Morning,",
-        GreetingAfternoon: "Good Afternoon,",
-        GreetingEvening: "Good Evening,",
     },
 
     "components/Memo/Actions": {
@@ -80,6 +73,14 @@ export const translations = {
         Detail: "You are not authorized to see this page",
     },
 
+    "pages/Login": {
+        ...sharedErrorTranslations.Input,
+        Title: "Login",
+        UsernameLabel: "Username",
+        PasswordLabel: "Password",
+        LoginButton: "Login",
+    },
+
     "pages/LoginChangePassword": {
         ...sharedErrorTranslations.Input,
         ...sharedErrorTranslations["ChangePassword/Errors"],
@@ -87,17 +88,15 @@ export const translations = {
         CurrentPasswordLabel: "Current Password",
         NewPasswordLabel: "New Password",
         RepeatNewPasswordLabel: "Repeat New Password",
+        ChangePasswordButton: "Change Password",
     },
 
-    "pages/Settings/Tabs": {
-        Interface: "Interface",
-        Locale: "Language & Locale",
-        Account: "Account",
-        System: "System",
+    "pages/Settings": {
+        Title: "Settings",
     },
 
-    "pages/Settings/InterfaceSettingsTab": {
-        Title: "Interface Settings",
+    "pages/Settings/InterfaceSettings": {
+        Title: "Interface",
         Description: "Control how the user interface looks and behaves.",
         SectionTheme: "Theme",
         LabelColourScheme: "Colour Scheme",
@@ -108,14 +107,14 @@ export const translations = {
         LabelEnableDoubleClickToEdit: "Enable double click to edit memos",
     },
 
-    "pages/Settings/LocaleSettingsTab": {
+    "pages/Settings/LocaleSettings": {
         Title: "Language & Locale",
         Description: "Set your preferred language and locale.",
         LabelSelectLanguage: "Language",
         LabelSelectRegion: "Region",
     },
 
-    "pages/Settings/AccountSettingsTab": {
+    "pages/Settings/AccountSettings": {
         ...sharedErrorTranslations.Input,
         ...sharedErrorTranslations["ChangePassword/Errors"],
         Title: "Account",
@@ -128,15 +127,16 @@ export const translations = {
         RepeatNewPasswordLabel: "Repeat New Password",
         ChangePasswordButton: "Change",
         EmptyDisplayName: "Display Name must not be empty",
+        Logout: "Logout",
     },
 
-    "pages/Settings/SystemSettingsTab": {
+    "pages/Settings/SystemSettings": {
         Title: "System",
         SectionAPITokensTitle: "API Tokens",
         SectionAPITokensDescription: "Create and revoke API Access Tokens.",
     },
 
-    "pages/Settings/SystemSettingsTab/New": {
+    "pages/Settings/SystemSettings/New": {
         Title: "Create API Token",
         FieldNameLabel: "Name",
         FieldExpiresInLabel: "Expires In",
@@ -151,12 +151,12 @@ export const translations = {
         ButtonLabel: "Create",
     },
 
-    "pages/Settings/SystemSettingsTab/LastCreated": {
+    "pages/Settings/SystemSettings/LastCreated": {
         Title: "Created API Token",
         Notice: "Please note this token. IT WILL NOT BE SHOWN AGAIN!",
     },
 
-    "pages/Settings/SystemSettingsTab/List": {
+    "pages/Settings/SystemSettings/List": {
         Title: "API Tokens",
         ColumName: "Name",
         ColumExpires: "Expires",

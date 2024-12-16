@@ -39,10 +39,17 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
     let tags: Tag[] = []
 
     return (
-        <div className="container mx-auto max-w-4xl">
+        <div
+            className="container mx-auto max-w-[80rem]"
+            style={{
+                viewTransitionName: `memo-${props.memoID}`,
+            }}
+        >
             {(!state || state?.isLoading) && (
-                <div className="flex justify-center items-center min-h-[200px]">
-                    <Loader />
+                <div className="memo animate-in slide-in-from-bottom fade-in">
+                    <div className="flex justify-center items-center min-h-[200px]">
+                        <Loader />
+                    </div>
                 </div>
             )}
 
@@ -54,10 +61,10 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
                         link: false,
                         edit: !state.memo.isArchived && !state.memo.isDeleted,
                     }}
-                    className="animate-in slide-in-from-bottom fade-in"
                     onClickTag={onClickTag}
                     updateMemo={updateMemoCallback}
                     doubleClickToEdit={doubleClickToEdit}
+                    className="min-h-[200px]"
                 />
             )}
         </div>

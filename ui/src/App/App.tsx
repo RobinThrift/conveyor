@@ -1,5 +1,4 @@
-import { Sidebar } from "@/components/Sidebar"
-import { Archive, GearFine, Notepad, TrashSimple } from "@phosphor-icons/react"
+import { Navigation } from "@/components/Navigation"
 import React, { Suspense, useCallback } from "react"
 import { Router } from "./router"
 
@@ -7,7 +6,6 @@ import { BuildInfo } from "@/components/BuildInfo"
 import { Notifications } from "@/components/Notifications"
 import { Theme } from "@/components/Theme"
 import { useBaseURL } from "@/hooks/useBaseURL"
-import { useT } from "@/i18n"
 import { ErrorPage } from "@/pages/Errors"
 import { ChangePasswordPage, LoginPage } from "@/pages/Login"
 import { ListMemosPage } from "@/pages/Memos/List"
@@ -45,7 +43,6 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
     let goto = useGoto()
 
     let baseURL = useBaseURL()
-    let t = useT("app/navigation")
     let { colourScheme, mode } = useTheme()
 
     let pageComp: React.ReactNode
@@ -61,7 +58,7 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
 
     let onChangeSettingsTab = useCallback(
         (tab: string) => {
-            goto(`${baseURL}/settings/${tab}`)
+            goto(`${baseURL}/settings/${tab}`, { viewTransition: true })
         },
         [baseURL, goto],
     )
@@ -166,41 +163,13 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
 
     return (
         <Theme colourScheme={colourScheme} mode={mode}>
-            <div className="flex gap-4 justify-start">
-                <Sidebar
-                    className="max-w-[250px] w-[80%] h-screen"
-                    items={[
-                        {
-                            label: t.Memos,
-                            url: "/memos",
-                            icon: <Notepad weight="duotone" />,
-                            isActive:
-                                page?.route === "memos.list" ||
-                                page?.route === "root",
-                        },
-                        {
-                            label: t.Archive,
-                            url: "/memos/archive",
-                            icon: <Archive weight="duotone" />,
-                            isActive: page?.route === "memos.archive",
-                        },
-                        {
-                            label: t.Bin,
-                            url: "/memos/bin",
-                            icon: <TrashSimple weight="duotone" />,
-                            isActive: page?.route === "memos.bin",
-                        },
-                        {
-                            label: t.Settings,
-                            url: "/settings/interface",
-                            icon: <GearFine weight="duotone" />,
-                            isActive: page?.route === "settings",
-                        },
-                    ]}
+            <div className="flex flex-col justify-start">
+                <Navigation
+                    active={page?.route === "root" ? "memos.list" : page?.route}
                 />
-                <main className="flex-1 p-4 pt-12 md:ps-0 sm:pt-4 overflow-x-hidden overflow-y-auto h-screen">
+                <main className="flex-1 px-2 tablet:px-4 pb-32 pt-2 tablet:pb-4 tablet:pt-20 lg:pt-16 overflow-x-hidden overflow-y-auto max-h-screen">
                     <Suspense>{pageComp}</Suspense>
-                    <footer className="p-2 flex justify-start items-center">
+                    <footer className="px-2 py-4 flex justify-center items-center">
                         <BuildInfo />
                     </footer>
                 </main>
