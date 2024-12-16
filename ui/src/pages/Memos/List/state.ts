@@ -1,3 +1,4 @@
+import type { Memo } from "@/domain/Memo"
 import { type RootState, actions } from "@/state"
 import type {
     CreateMemoRequest,
@@ -5,6 +6,13 @@ import type {
     UpdateMemoRequest,
 } from "@/state/memolist"
 import { createSelector } from "@reduxjs/toolkit"
+import {
+    differenceInCalendarDays,
+    format,
+    getDay,
+    isSameDay,
+    roundToNearestMinutes,
+} from "date-fns"
 import { useCallback, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -36,7 +44,7 @@ const useMemoListStateSelector = createSelector(
         isLoadingTags,
         tagsError,
     ) => ({
-        memos,
+        memos: groupByDay(memos),
         filter,
         isLoading,
         error,
@@ -107,4 +115,25 @@ export function useListMemosPageState() {
             loadNextTagsPage,
         ],
     )
+}
+
+function groupByDay(
+    memos: Memo[],
+): Record<string, { date: Date; memos: Memo[]; diffToToday: number }> {
+    let grouped: Record<
+        string,
+        { date: Date; memos: Memo[]; diffToToday: number }
+    > = {}
+    let now = roundToNearestMinutes(new Date())
+
+    memos.forEach((memo) => {
+        let day = format(memo.createdAt, "yyyy-mm-dd")
+        let diffToToday = differenceInCalendarDays(now, memo.createdAt)
+        if (!grouped[day]) {
+            grouped[day] = { date: memo.createdAt, memos: [], diffToToday }
+        }
+        grouped[day].memos.push(memo)
+    })
+
+    return grouped
 }

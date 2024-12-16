@@ -2,6 +2,18 @@
     @apply flex gap-4 justify-center w-full;
 }
 
+.memos-list-day {
+    @apply sticky -mb-1 -top-16 z-50 py-1 px-2 -ml-2 w-fit rounded-lg;
+    @apply bg-body/80;
+    @apply text-xl text-subtle-dark;
+
+    backdrop-filter: blur(4px);
+
+    .named-day-date {
+        @apply text-subtle-dark ms-1 text-sm;
+    }
+}
+
 .memos-list {
     @apply flex-1 flex flex-col gap-4 w-full max-w-3xl mx-auto;
 
@@ -12,6 +24,10 @@
         /* lg */
         max-width: 80rem;
         padding-right: 0px;
+    }
+
+    time:first-child {
+        @apply -mb-2;
     }
 }
 

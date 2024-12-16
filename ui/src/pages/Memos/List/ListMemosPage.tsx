@@ -14,6 +14,8 @@ import {
     type Filter,
     useListMemosPageState,
 } from "./state"
+import { useT } from "@/i18n"
+import { DateTime } from "@/components/DateTime"
 
 export interface ListMemosPageProps {
     filter: Filter
@@ -75,20 +77,25 @@ export function ListMemosPage(props: ListMemosPageProps) {
 
     let memoComponents = useMemo(
         () =>
-            memos.map((memo) => (
-                <Memo
-                    key={memo.id}
-                    memo={memo}
-                    tags={tags}
-                    actions={{
-                        edit: !filter.isArchived && !filter.isDeleted,
-                    }}
-                    onClickTag={onClickTag}
-                    updateMemo={updateMemoContentCallback}
-                    doubleClickToEdit={doubleClickToEdit}
-                    className="animate-in slide-in-from-bottom fade-in"
-                    viewTransitionName={`memo-${memo.id}`}
-                />
+            Object.entries(memos).map(([day, { memos, date, diffToToday }]) => (
+                <div key={day} className="memos-list">
+                    <DayHeader date={date} diffToToday={diffToToday} />
+                    {memos.map((memo) => (
+                        <Memo
+                            key={memo.id}
+                            memo={memo}
+                            tags={tags}
+                            actions={{
+                                edit: !filter.isArchived && !filter.isDeleted,
+                            }}
+                            onClickTag={onClickTag}
+                            updateMemo={updateMemoContentCallback}
+                            doubleClickToEdit={doubleClickToEdit}
+                            className="animate-in slide-in-from-bottom fade-in"
+                            viewTransitionName={`memo-${memo.id}`}
+                        />
+                    ))}
+                </div>
             )),
         [
             memos,
@@ -102,7 +109,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
 
     return (
         <div className="memos-list-page pt-12 tablet:pt-0">
-            <div className="memos-list">
+            <div className="grouped-memos-list">
                 {showEditor && (
                     <NewMemoEditor
                         tags={tags}
@@ -111,7 +118,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                     />
                 )}
 
-                <div className="flex flex-col gap-4 relative">
+                <div className="flex flex-col gap-4 relative py-4">
                     {memoComponents}
                     {!isLoading && <EndOfListMarker onReached={onEOLReached} />}
 
@@ -222,4 +229,32 @@ function FiltersSidebar(props: React.PropsWithChildren) {
     }
 
     return props.children
+}
+
+function DayHeader({ date, diffToToday }: { date: Date; diffToToday: number }) {
+    let t = useT("pages/ListMemos")
+    let prefix = ""
+    if (diffToToday < 1) {
+        prefix = t.DayToday
+    } else if (diffToToday <= 2) {
+        prefix = t.DayYesterday
+    }
+
+    if (prefix) {
+        return (
+            <h2 className="memos-list-day">
+                {prefix}
+                <span className="named-day-date">
+                    (
+                    <DateTime date={date} opts={{ dateStyle: "medium" }} />)
+                </span>
+            </h2>
+        )
+    }
+
+    return (
+        <h2 className="memos-list-day">
+            {prefix} <DateTime date={date} opts={{ dateStyle: "medium" }} />
+        </h2>
+    )
 }

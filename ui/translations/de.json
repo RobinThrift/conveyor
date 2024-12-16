@@ -80,6 +80,11 @@
         "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein"
     },
 
+    "pages/ListMemos": {
+        "DayToday": "Heute",
+        "DayYesterday": "Gestern"
+    },
+
     "pages/Settings": {
         "Title": "Settings"
     },

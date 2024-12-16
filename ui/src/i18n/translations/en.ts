@@ -91,6 +91,11 @@ export const translations = {
         ChangePasswordButton: "Change Password",
     },
 
+    "pages/ListMemos": {
+        DayToday: "Today",
+        DayYesterday: "Yesterday",
+    },
+
     "pages/Settings": {
         Title: "Settings",
     },
