@@ -3,7 +3,10 @@ import type { APIToken, APITokenList } from "../src/domain/APIToken"
 import type { Memo, MemoList } from "../src/domain/Memo"
 import type { Attachment } from "../src/domain/Attachment"
 import type { Tag, TagList } from "../src/domain/Tag"
-import type { CreateMemoRequest, UpdateMemoRequest } from "../src/api/memos"
+import type {
+    CreateMemoRequest,
+    UpdateMemoRequest,
+} from "../src/storage/remote/apiv1/memos"
 import {
     sub,
     isSameDay,
