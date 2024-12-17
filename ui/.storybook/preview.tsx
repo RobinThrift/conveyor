@@ -5,18 +5,19 @@ import { mockAPI } from "./mockapi"
 import type { ServerData } from "../src/App/ServerData"
 import { Theme } from "../src/components/Theme"
 import { configureRootStore } from "../src/state"
+import { faker } from "@faker-js/faker"
 
 // Initialize MSW
 initialize({
     onUnhandledRequest: "bypass",
 })
 
-var _mockRootStore: ReturnType<typeof configureRootStore> | undefined
+let _mockRootStore: ReturnType<typeof configureRootStore> | undefined
 
 let serverData: ServerData = {
     account: {
         username: "user",
-        displayName: "Test User",
+        displayName: faker.person.firstName(),
     },
 
     settings: {
