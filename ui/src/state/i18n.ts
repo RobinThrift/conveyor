@@ -12,9 +12,8 @@ import {
     resolveTranslation,
 } from "@/i18n/translations"
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
-import { useMemo } from "react"
 import { useSelector } from "react-redux"
-import type { RootState, StartListening } from "./rootStore"
+import type { StartListening } from "./rootStore"
 import { slice as settings } from "./settings"
 
 export interface I18nState {
@@ -141,21 +140,6 @@ export const registerEffects = (startListening: StartListening) => {
             )
         },
     })
-}
-
-export function useT<K extends keyof Translation>(
-    component: K,
-): Translation[K] {
-    let selector = useMemo(
-        () => (state: RootState) => state.i18n.translations[component],
-        [component],
-    )
-    let translations = useSelector(selector)
-    return translations
-}
-
-export function useDateFnsLocale() {
-    return useSelector(slice.selectors.dateFns)
 }
 
 export function useRegion() {
