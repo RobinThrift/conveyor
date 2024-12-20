@@ -9,6 +9,7 @@ export type Settings = {
         colourScheme: "default" | "rosepine"
         mode: "auto" | "light" | "dark"
         icon: string
+        listLayout: "masonry" | "single"
     }
     controls: {
         vim: boolean

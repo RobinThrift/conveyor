@@ -1,3 +1,4 @@
+import containerQueries from "@tailwindcss/container-queries"
 import typography from "@tailwindcss/typography"
 import animate from "tailwindcss-animate"
 
@@ -20,6 +21,12 @@ export default {
         },
 
         extend: {
+            fontFamily: {
+                sans: ["ui-sans-serif", "system-ui", "sans-serif"],
+                serif: ["Noto Serif HK Variable", "serif"],
+                mono: ["ui-monospace", "SFMono-Regular", "monospace"],
+            },
+
             colors: {
                 primary: {
                     "extra-light":
@@ -111,5 +118,5 @@ export default {
             }),
         },
     },
-    plugins: [typography, animate],
+    plugins: [typography, animate, containerQueries],
 }

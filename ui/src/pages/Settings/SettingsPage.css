@@ -1,9 +1,8 @@
 .settings-page {
-    @apply container mx-auto max-w-4xl;
+    @apply container mx-auto max-w-4xl px-2 tablet:px-4;
 
     h1 {
-        @apply text-4xl mb-4 px-2;
-        font-family: "Bodoni Moda Variable", serif;
+        @apply text-4xl mb-4 px-2 font-serif;
     }
 }
 

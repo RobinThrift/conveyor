@@ -1,0 +1,19 @@
+.single-memo-page {
+    @apply container mx-auto max-w-[80rem] h-full w-full;
+
+    .memo {
+        min-height: calc(100svh - 5lh);
+
+        @media (max-width: 768px) {
+            @apply rounded-none border-0 border-b;
+        }
+    }
+
+    .memo.is-editing {
+        @apply flex;
+
+        .editor {
+            @apply w-full;
+        }
+    }
+}

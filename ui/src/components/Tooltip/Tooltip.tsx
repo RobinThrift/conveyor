@@ -8,7 +8,7 @@ export interface TooltipProps {
     children: React.ReactNode | React.ReactNode[]
     content: React.ReactNode | React.ReactNode[]
 
-    placement?: "top" | "bottom"
+    placement?: "top" | "bottom" | "right" | "left"
 
     disabled?: boolean
     open?: boolean
@@ -27,7 +27,7 @@ export function Tooltip(props: TooltipProps) {
                         side={props.placement ?? "bottom"}
                     >
                         {props.content}
-                        <RadixTooltip.Arrow className="fill-subtle-light drop-shadow-lg" />
+                        <RadixTooltip.Arrow className="fill-subtle-light dark:fill-subtle-extra-dark drop-shadow-lg" />
                     </RadixTooltip.Content>
                 </RadixTooltip.Portal>
             </RadixTooltip.Root>

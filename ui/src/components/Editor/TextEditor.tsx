@@ -6,8 +6,8 @@ import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import { languages } from "@codemirror/language-data"
 import { SearchCursor } from "@codemirror/search"
 import { Vim, getCM, vim } from "@replit/codemirror-vim"
-import { hyperLink } from "@uiw/codemirror-extensions-hyper-link"
 import CodeMirror, { EditorView, type Extension } from "@uiw/react-codemirror"
+import clsx from "clsx"
 import React, { useCallback, useEffect, useMemo } from "react"
 import { fileDropHandler } from "./cmFileDropHandler"
 import { tagsAutoComplete } from "./tagsAutoComplete"
@@ -61,7 +61,6 @@ export function TextEditor(props: TextEditorProps) {
             fileDropHandler(),
             enableVimKeybindings ? vim() : [],
             markdown({ base: markdownLanguage, codeLanguages: languages }),
-            hyperLink,
             tagsAutoComplete(props.tags),
             EditorView.lineWrapping,
         ]
@@ -117,8 +116,9 @@ export function TextEditor(props: TextEditorProps) {
     return (
         <CodeMirror
             id={props.id}
-            minHeight="200px"
-            className="vim-enabled w-full h-full min-h-[200px] -mb-[50px]"
+            className={clsx("text-editor", {
+                "vim-enabled ": enableVimKeybindings,
+            })}
             value={props.content}
             extensions={[extensions]}
             onChange={props.onChange}

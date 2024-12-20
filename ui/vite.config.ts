@@ -24,6 +24,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         resolve: {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
+                "@testhelper": path.resolve(__dirname, ".storybook/helper.ts"),
                 "decode-named-character-reference": path.resolve(
                     __dirname,
                     "node_modules",
@@ -40,7 +41,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                 registerType: "prompt",
                 manifest: false,
                 workbox: {
-                    globPatterns: ["**/*.{js,css.svg}"],
+                    globPatterns: ["**/*.{js,css.svg,woff2}"],
                     navigateFallback: null,
                 },
             }),

@@ -33,6 +33,7 @@ let serverData: ServerData = {
                 "default",
             mode: localStorage.getItem("belt.settings.theme.mode") ?? "auto",
             icon: localStorage.getItem("belt.settings.theme.icon") ?? "default",
+            listLayout: "masonry",
         },
         controls: {
             vim: JSON.parse(
@@ -143,6 +144,13 @@ const preview: Preview = {
                 uiElement.id = "__belt_ui_data__"
                 uiElement.innerHTML = JSON.stringify(serverData)
                 document.body.prepend(uiElement)
+            }
+
+            if (!document.querySelector("meta[name=theme-color]")) {
+                let metaThemeEl = document.createElement("meta")
+                metaThemeEl.name = "theme-color"
+                metaThemeEl.content = ""
+                document.head.prepend(metaThemeEl)
             }
 
             return (

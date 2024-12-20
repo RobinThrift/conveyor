@@ -20,7 +20,7 @@ export const directives: Record<string, React.FC<any>> = {
                 <a href={props.children} target={props.title}>
                     <img src={props.img} alt={props.alt || props.title} />
                 </a>
-                <caption>
+                <figcaption>
                     <h5>
                         <a href={props.children} target={props.title}>
                             {props.title}
@@ -31,7 +31,7 @@ export const directives: Record<string, React.FC<any>> = {
                             {props.description}
                         </a>
                     </p>
-                </caption>
+                </figcaption>
             </figure>
         )
     },

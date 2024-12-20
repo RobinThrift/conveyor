@@ -36,21 +36,45 @@ export const light = {
         theme: "light",
         settings: {},
         styles: [
+            {
+                tag: t.heading,
+                fontWeight: "600",
+                color: palette.light.muted,
+            },
+            {
+                tag: t.heading1,
+                fontSize: "2.25em",
+                fontWeight: "800",
+            },
+            {
+                tag: t.heading2,
+                fontSize: "1.5em",
+                fontWeight: "700",
+            },
+            {
+                tag: t.heading3,
+                fontSize: "1.25em",
+                fontWeight: "600",
+            },
+            {
+                tag: t.heading4,
+                fontWeight: "700",
+            },
+            {
+                tag: t.heading5,
+                fontWeight: "600",
+            },
+            {
+                tag: t.heading6,
+                fontWeight: "600",
+            },
+
             { tag: t.keyword, color: palette.light.rose },
             {
                 tag: [t.name, t.deleted, t.character, t.macroName],
                 color: palette.light.iris,
             },
             { tag: [t.propertyName], color: palette.light.foreground },
-            {
-                tag: [
-                    t.processingInstruction,
-                    t.string,
-                    t.inserted,
-                    t.special(t.string),
-                ],
-                color: palette.light.gold,
-            },
             {
                 tag: [t.function(t.variableName), t.labelName],
                 color: palette.light.foreground,
@@ -77,12 +101,23 @@ export const light = {
                 color: palette.light.love,
             },
             { tag: [t.meta, t.comment], color: palette.light.subtle },
-            { tag: t.heading, fontWeight: "bold", color: palette.light.muted },
+
             {
                 tag: [t.atom, t.bool, t.special(t.variableName)],
                 color: palette.light.love,
             },
+
             { tag: t.invalid, color: palette.light.love },
+
+            {
+                tag: [
+                    t.processingInstruction,
+                    t.string,
+                    t.inserted,
+                    t.special(t.string),
+                ],
+                color: palette.light.gold,
+            },
         ],
     }),
 }
@@ -94,6 +129,39 @@ export const dark = {
         theme: "dark",
         settings: {},
         styles: [
+            {
+                tag: t.heading,
+                fontWeight: "600",
+                color: palette.light.muted,
+            },
+            {
+                tag: t.heading1,
+                fontSize: "2.25em",
+                fontWeight: "800",
+            },
+            {
+                tag: t.heading2,
+                fontSize: "1.5em",
+                fontWeight: "700",
+            },
+            {
+                tag: t.heading3,
+                fontSize: "1.25em",
+                fontWeight: "600",
+            },
+            {
+                tag: t.heading4,
+                fontWeight: "700",
+            },
+            {
+                tag: t.heading5,
+                fontWeight: "600",
+            },
+            {
+                tag: t.heading6,
+                fontWeight: "600",
+            },
+
             { tag: t.keyword, color: palette.dark.rose },
             {
                 tag: [t.name, t.deleted, t.character, t.macroName],
@@ -135,7 +203,6 @@ export const dark = {
                 color: palette.dark.love,
             },
             { tag: [t.meta, t.comment], color: palette.dark.subtle },
-            { tag: t.heading, fontWeight: "bold", color: palette.dark.muted },
             {
                 tag: [t.atom, t.bool, t.special(t.variableName)],
                 color: palette.dark.love,

@@ -154,7 +154,9 @@ export function Memo(props: MemoProps) {
 
     return (
         <article
-            className={clsx("memo", props.className)}
+            className={clsx("@container memo", props.className, {
+                "is-editing": isEditing,
+            })}
             style={{
                 viewTransitionName: props.viewTransitionName,
             }}
@@ -226,7 +228,7 @@ const MemoHeader = React.forwardRef(function MemoHeader(
     let t = useT("components/Memo/DateTime")
 
     return (
-        <div className="flex" ref={forwardedRef}>
+        <div className="memo-header" ref={forwardedRef}>
             <Tooltip
                 className="grid grid-cols-3"
                 content={[
@@ -281,13 +283,14 @@ function MemoActionBar({
     let t = useT("components/Memo/Actions")
 
     return (
-        <div className="flex justify-end flex-1">
+        <div className="memo-action-bar">
             {actions.edit && (
                 <Button
                     iconLeft={<Pencil />}
                     plain={true}
                     size="sm"
                     onClick={activateEditingMode}
+                    className="hidden @xs:flex"
                 />
             )}
 
@@ -298,6 +301,7 @@ function MemoActionBar({
                     plain={true}
                     size="sm"
                     viewTransition
+                    className="hidden @xs:flex"
                 />
             )}
 
@@ -307,6 +311,7 @@ function MemoActionBar({
                     iconRight={<DotsThreeVertical weight="bold" />}
                     size="sm"
                     plain={true}
+                    buttonClassName="hidden @xs:flex"
                     items={[
                         {
                             label: memo.isArchived ? t.Unarchive : t.Archive,
@@ -330,6 +335,45 @@ function MemoActionBar({
                     ]}
                 />
             )}
+
+            <DropdownMenu
+                ariaLabel="More memo actions"
+                iconRight={<DotsThreeVertical weight="bold" />}
+                size="sm"
+                plain={true}
+                buttonClassName="flex @xs:hidden"
+                items={[
+                    {
+                        label: t.View,
+                        icon: <ArrowSquareOut />,
+                        action: activateEditingMode,
+                    },
+                    {
+                        label: t.Edit,
+                        icon: <Pencil />,
+                        action: activateEditingMode,
+                    },
+                    {
+                        label: memo.isArchived ? t.Unarchive : t.Archive,
+                        icon: <Archive />,
+                        action: () =>
+                            updateMemo({
+                                id: memo.id,
+                                isArchived: !memo.isArchived,
+                            }),
+                    },
+                    {
+                        label: memo.isDeleted ? t.Restore : t.Delete,
+                        icon: <TrashSimple />,
+                        destructive: true,
+                        action: () =>
+                            updateMemo({
+                                id: memo.id,
+                                isDeleted: !memo.isDeleted,
+                            }),
+                    },
+                ]}
+            />
         </div>
     )
 }
@@ -358,8 +402,9 @@ function ChangeMemoEditor(props: {
             onSave={createMemo}
             onCancel={props.onCancel}
             autoFocus={true}
-            placholder=""
+            placeholder=""
             placeCursorAt={props.placeCursorAt}
+            className="min-h-[200px]"
         />
     )
 }

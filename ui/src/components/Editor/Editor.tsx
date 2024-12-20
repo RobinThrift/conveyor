@@ -3,7 +3,7 @@ import type { Memo } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
 import { useStateGetter } from "@/hooks/useStateGetter"
 import { useT } from "@/i18n"
-import { CaretDoubleRight } from "@phosphor-icons/react"
+import { FloppyDisk, X } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React, {
     useCallback,
@@ -26,14 +26,18 @@ export interface EditorProps {
     onSave: (memo: Memo) => void
     onCancel?: () => void
     autoFocus?: boolean
-    placholder: string
+    placeholder: string
     placeCursorAt?: { x: number; y: number; snippet?: string }
+    lazy?: boolean
+    buttonPosition?: "top" | "bottom"
 }
 
 export function Editor(props: EditorProps) {
     let t = useT("components/Editor")
 
-    let [showEditor, setShowEditor] = useState(props.memo.content.length !== 0)
+    let [showEditor, setShowEditor] = useState(
+        !(props.lazy ?? true) || props.memo.content.length !== 0,
+    )
 
     let [isChanged, setIsChanged] = useState(false)
     let [content, setContent] = useStateGetter(props.memo.content ?? "")
@@ -71,9 +75,9 @@ export function Editor(props: EditorProps) {
                     onClick={() => startTransition(() => setShowEditor(true))}
                     onFocus={() => startTransition(() => setShowEditor(true))}
                     type="button"
-                    className="appearance-none w-full min-h-[200px] text-left items-start flex text-subtle-extra-dark font-mono text-[13px] p-1 -mb-[50px] cursor-text"
+                    className="placeholder-btn"
                 >
-                    {props.placholder}
+                    {props.placeholder}
                 </button>
             )
         }
@@ -87,13 +91,13 @@ export function Editor(props: EditorProps) {
                 onCancel={onCancel}
                 onSave={onSave}
                 autoFocus={props.autoFocus}
-                placeholder={props.placholder}
+                placeholder={props.placeholder}
                 placeCursorAt={props.placeCursorAt}
             />
         )
     }, [
         showEditor,
-        props.placholder,
+        props.placeholder,
         onSave,
         onCancel,
         props.memo.id,
@@ -105,32 +109,49 @@ export function Editor(props: EditorProps) {
     ])
 
     return (
-        <div className={clsx("editor", props.className)}>
-            <Suspense fallback={<div className="w-full min-h-[200px]" />}>
+        <div
+            className={clsx(
+                "editor",
+                {
+                    "showing-placeholder": !showEditor,
+                },
+                props.className,
+            )}
+        >
+            <Suspense fallback={<div className="w-full min-h-full" />}>
                 {editor}
             </Suspense>
 
-            <div className="editor-buttons">
-                {props.onCancel && (
-                    <Button
-                        outline={true}
-                        onClick={props.onCancel}
-                        variant="danger"
-                        size="sm"
-                    >
-                        {t.Cancel}
-                    </Button>
-                )}
-                <Button
-                    variant="primary"
-                    size="sm"
-                    iconRight={<CaretDoubleRight />}
-                    onClick={onSave}
-                    disabled={!isChanged}
+            {showEditor && (
+                <div
+                    className={clsx("editor-buttons", {
+                        "position-top": props.buttonPosition === "top",
+                    })}
                 >
-                    {t.Save}
-                </Button>
-            </div>
+                    {props.onCancel && (
+                        <Button
+                            onClick={props.onCancel}
+                            variant="danger"
+                            plain
+                            aria-label={t.Cancel}
+                            iconLeft={<X weight="fill" />}
+                        >
+                            {t.Cancel}
+                        </Button>
+                    )}
+
+                    <Button
+                        aria-label={t.Save}
+                        outline
+                        onClick={onSave}
+                        plain
+                        iconLeft={<FloppyDisk weight="fill" />}
+                        disabled={!isChanged}
+                    >
+                        {t.Save}
+                    </Button>
+                </div>
+            )}
         </div>
     )
 }

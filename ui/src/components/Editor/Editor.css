@@ -1,29 +1,46 @@
 .editor {
-    @apply rounded-lg border border-subtle focus-within:border-primary p-3;
+    @apply flex flex-col bg-surface;
     @apply dark:border-subtle-extra-dark;
-    background-color: rgb(var(--surface-bg));
+}
 
-    .cm-theme {
-        display: flex;
-
-        .cm-editor {
-            min-width: 100%;
-        }
-    }
+.placeholder-btn {
+    @apply appearance-none cursor-text;
+    @apply flex items-start w-full min-h-full text-left p-3 flex-grow;
+    @apply text-subtle-dark font-mono text-[13px];
 }
 
 .editor-buttons {
-    @apply sticky bottom-0 right-0 left-0 flex items-center justify-end gap-2 py-3;
-    pointer-events: none;
+    @apply p-2 flex items-center justify-between gap-2;
 
-    .btn {
-        pointer-events: all;
+    &:has(button:only-child) {
+        @apply justify-end;
     }
+
+    &.position-top {
+        order: 1;
+    }
+}
+
+.text-editor {
+    @apply w-full flex-grow flex flex-col p-2;
+    max-height: calc(100% - 5ch);
+}
+
+.cm-editor {
+    @apply w-full h-full flex-grow flex flex-col;
 }
 
 .cm-editor.cm-focused {
     outline: none !important;
-    width: 100%;
+}
+
+.cm-scroller {
+    @apply flex-grow flex-col overscroll-contain;
+    overflow: auto;
+}
+
+.cm-content {
+    @apply flex-grow min-w-full;
 }
 
 .vim-enabled .cm-cursor {
@@ -44,5 +61,5 @@
 }
 
 .cm-placeholder {
-    color: rgb(var(--color-subtle-extra-dark)) !important;
+    color: rgb(var(--color-subtle-dark)) !important;
 }

@@ -37,7 +37,7 @@ export function Theme({
 
         let bgColour = getComputedStyle(
             document.documentElement,
-        ).getPropertyValue("--body-bg")
+        ).getPropertyValue("--navigation-bg")
 
         document
             .querySelector("meta[name=theme-color]")

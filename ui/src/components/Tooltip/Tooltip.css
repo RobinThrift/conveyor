@@ -3,7 +3,7 @@
     @apply rounded-lg shadow-lg;
     @apply bg-surface border border-subtle-light;
     @apply text-center text-sm text-text select-none;
-    @apply dark:border dark:border-subtle-extra-dark;
+    @apply dark:border dark:border-subtle-extra-dark dark:bg-body-contrast dark:text-body;
 
     min-width: var(--radix-tooltip-trigger-width);
 
@@ -13,5 +13,13 @@
 
     &[data-state="closed"][data-side="bottom"] {
         @apply animate-out fade-out slide-out-to-top-1;
+    }
+
+    &[data-state="delayed-open"][data-side="right"] {
+        @apply animate-in fade-in slide-in-from-right-1;
+    }
+
+    &[data-state="delayed-open"][data-side="left"] {
+        @apply animate-in fade-in slide-in-from-left-1;
     }
 }

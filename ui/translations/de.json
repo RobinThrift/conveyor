@@ -7,6 +7,8 @@
     },
 
     "components/Memo/Actions": {
+        "View": "Ansehen",
+        "Edit": "Bearbeiten",
         "Archive": "Archivieren",
         "Delete": "Löschen",
         "Unarchive": "Unarchivieren",
@@ -47,6 +49,12 @@
         "Dismiss": "Schließen"
     },
 
+    "components/Greeting": {
+        "Morning": "Good Morning, ",
+        "Afternoon": "Good Afternoon, ",
+        "Evening": "Good Evening, "
+    },
+
     "pages/Errors/NotFound": {
         "Title": "Nicht gefunden",
         "Detail": "Die Seite kann nicht gefunden werden"
@@ -82,7 +90,10 @@
 
     "pages/ListMemos": {
         "DayToday": "Heute",
-        "DayYesterday": "Gestern"
+        "DayYesterday": "Gestern",
+        "LayoutSelectLabel": "Listenlayout auswählen",
+        "LayoutSingle": "Einzeln",
+        "LayoutMasonry": "Mosaic"
     },
 
     "pages/Settings": {

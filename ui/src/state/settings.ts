@@ -30,6 +30,7 @@ const initialState: SettingsState = {
             colourScheme: "default",
             mode: "auto",
             icon: "default",
+            listLayout: "masonry",
         },
         controls: {
             vim: false,

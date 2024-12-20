@@ -40,7 +40,7 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
 
     return (
         <div
-            className="container mx-auto max-w-[80rem]"
+            className="single-memo-page"
             style={{
                 viewTransitionName: `memo-${props.memoID}`,
             }}
@@ -64,7 +64,7 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
                     onClickTag={onClickTag}
                     updateMemo={updateMemoCallback}
                     doubleClickToEdit={doubleClickToEdit}
-                    className="min-h-[200px]"
+                    className=""
                 />
             )}
         </div>

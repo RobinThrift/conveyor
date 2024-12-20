@@ -1,5 +1,5 @@
 .login-header {
-    @apply flex items-center py-2 fixed right-4 left-4 top-0 border-b border-b-body-contrast;
+    @apply flex items-center py-2 px-4 fixed right-0 left-0 top-0 border-b border-b-body-contrast bg-body;
 
     .logo {
         @apply font-extrabold text-xl flex-1 flex items-start;
@@ -11,7 +11,7 @@
 }
 
 .login-window {
-    @apply flex flex-col mt-28 w-full max-w-[500px] container mx-auto rounded-lg bg-body-contrast text-body shadow-lg;
+    @apply flex flex-col mt-28 w-full max-w-[500px] container mx-auto rounded-lg bg-body-contrast/80 text-body shadow-xl;
     @apply animate-in fade-in-50 duration-100;
 
     h1 {

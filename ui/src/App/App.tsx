@@ -163,19 +163,17 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
 
     return (
         <Theme colourScheme={colourScheme} mode={mode}>
-            <div className="flex flex-col justify-start">
-                <Navigation
-                    active={page?.route === "root" ? "memos.list" : page?.route}
-                />
-                <main className="flex-1 px-2 tablet:px-4 pb-32 pt-2 tablet:pb-4 tablet:pt-20 lg:pt-16 overflow-x-hidden overflow-y-auto max-h-screen">
-                    <Suspense>{pageComp}</Suspense>
-                    <footer className="px-2 py-4 flex justify-center items-center">
-                        <BuildInfo />
-                    </footer>
-                </main>
+            <Navigation
+                active={page?.route === "root" ? "memos.list" : page?.route}
+            />
+            <main className="main">
+                <Suspense>{pageComp}</Suspense>
+                <footer className="app-footer">
+                    <BuildInfo />
+                </footer>
+            </main>
 
-                <Notifications />
-            </div>
+            <Notifications />
         </Theme>
     )
 }

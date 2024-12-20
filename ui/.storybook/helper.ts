@@ -1,38 +1,7 @@
-import type { Tag } from "@/domain/Tag"
-import { Provider } from "@/state"
 import { faker } from "@faker-js/faker"
-import type { Meta, StoryObj } from "@storybook/react"
-import React from "react"
-import { Memo } from "./Memo"
 
-import "@/index.css"
-
-const meta: Meta<typeof Memo> = {
-    title: "Components/Memo",
-    component: Memo,
-    argTypes: {
-        updateMemo: { action: "updateMemo" },
-    },
-    parameters: {
-        layout: "fullscreen",
-    },
-    decorators: (Story, { globals: { configureMockRootStore } }) => (
-        <Provider store={configureMockRootStore()}>
-            <Story />
-        </Provider>
-    ),
-}
-
-export default meta
-type Story = StoryObj<typeof Memo>
-
-export const Basic: Story = {
-    name: "Memo",
-    args: {
-        doubleClickToEdit: true,
-        memo: {
-            id: "12345",
-            content: `# Markdown Content (Heading 1)
+export function generateTestContent(): string {
+    return `# Markdown Content (Heading 1)
 ${faker.lorem.lines({ min: 1, max: 10 })}
 
 ## Paragraphs with Tags (Heading 2)
@@ -75,7 +44,7 @@ This text will be \`monospaced\`... hopefully. ~~Scratch this.~~
 ###### Heading 6
 This is a [link](${faker.internet.url()}), an auto link (http://example.com) and an image will follow:
 
-![image caption](${faker.image.url({ height: 200, width: 200 })})
+![image caption](${faker.image.url({ height: 1500, width: 1800 })})
 
 ***
 
@@ -110,30 +79,5 @@ function parseMarkdown(raw: string): React.ReactNode | React.ReactNode[] {
 ${faker.lorem.paragraph()}
 :::
 
-
-`,
-            isArchived: false,
-            isDeleted: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        },
-        tags: (() => {
-            let tags: Tag[] = []
-
-            for (let i = 0; i < 100; i++) {
-                tags.push({
-                    tag: `#${faker.word.noun()}/${faker.word.noun()}`,
-                    count: 0,
-                })
-            }
-
-            tags.sort()
-            return tags
-        })(),
-    },
-    render: (args) => (
-        <div className="container mx-auto">
-            <Memo {...args} />
-        </div>
-    ),
+`
 }

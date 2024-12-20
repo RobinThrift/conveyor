@@ -4,13 +4,16 @@ import { EndOfListMarker } from "@/components/EndOfListMarker"
 import { Filters } from "@/components/Filters"
 import { Loader } from "@/components/Loader"
 import { Memo, type PartialMemoUpdate } from "@/components/Memo"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/Sheet"
+import { Select } from "@/components/Select"
 import type { Tag } from "@/domain/Tag"
 import { useIsMobile } from "@/hooks/useIsMobile"
 import { useT } from "@/i18n"
+import { useAccountDisplayName } from "@/state/account"
 import { useSetting } from "@/state/settings"
-import { Sliders } from "@phosphor-icons/react"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { List, MagnifyingGlass, Minus, Table } from "@phosphor-icons/react"
+import { animated, config, useSpring } from "@react-spring/web"
+import { useDrag } from "@use-gesture/react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
     type CreateMemoRequest,
     type Filter,
@@ -24,6 +27,8 @@ export interface ListMemosPageProps {
 }
 
 export function ListMemosPage(props: ListMemosPageProps) {
+    let t = useT("pages/ListMemos")
+    let [listLayout, setListLayout] = useSetting("theme.listLayout")
     let [doubleClickToEdit] = useSetting("controls.doubleClickToEdit")
     let showEditor = props.showEditor ?? true
     let {
@@ -80,6 +85,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
             Object.entries(memos).map(([day, { memos, date, diffToToday }]) => (
                 <div key={day} className="memos-list">
                     <DayHeader date={date} diffToToday={diffToToday} />
+                    <hr className="memos-list-day-divider" />
                     {memos.map((memo) => (
                         <Memo
                             key={memo.id}
@@ -108,8 +114,10 @@ export function ListMemosPage(props: ListMemosPageProps) {
     )
 
     return (
-        <div className="memos-list-page pt-12 tablet:pt-0">
+        <div className={`memos-list-page list-layout-${listLayout}`}>
             <div className="grouped-memos-list">
+                <Greeting />
+
                 {showEditor && (
                     <NewMemoEditor
                         tags={tags}
@@ -118,7 +126,33 @@ export function ListMemosPage(props: ListMemosPageProps) {
                     />
                 )}
 
-                <div className="flex flex-col gap-4 relative py-4">
+                <div className="list-layout-select">
+                    <Select
+                        name="select-layout"
+                        ariaLabel={t.LayoutSelectLabel}
+                        value={listLayout}
+                        onChange={setListLayout}
+                    >
+                        <Select.Option value="masonry">
+                            <div className="flex gap-1 items-center">
+                                <List />
+                                <span className="option-label">
+                                    {t.LayoutMasonry}
+                                </span>
+                            </div>
+                        </Select.Option>
+                        <Select.Option value="single">
+                            <div className="flex gap-1 items-center">
+                                <Table />
+                                <span className="option-label">
+                                    {t.LayoutSingle}
+                                </span>
+                            </div>
+                        </Select.Option>
+                    </Select>
+                </div>
+
+                <div className="flex flex-col gap-4 py-4">
                     {memoComponents}
                     {!isLoading && <EndOfListMarker onReached={onEOLReached} />}
 
@@ -192,8 +226,10 @@ function NewMemoEditor(props: {
             memo={newMemo}
             tags={props.tags}
             onSave={createMemo}
-            placholder="Belt out a memo..."
+            placeholder="Belt out a memo..."
             autoFocus={true}
+            className="new-memo-editor"
+            buttonPosition="bottom"
         />
     )
 }
@@ -202,33 +238,105 @@ function FiltersSidebar(props: React.PropsWithChildren) {
     let isMobile = useIsMobile()
 
     if (isMobile) {
-        return (
-            <Sheet>
-                <div className="absolute right-2 top-2 z-40">
-                    <SheetTrigger asChild>
-                        <button
-                            type="button"
-                            className="p-2 bg-navigation-bg text-navigation-fg rounded-full"
-                        >
-                            <Sliders />
-                        </button>
-                    </SheetTrigger>
-                </div>
-
-                <SheetContent
-                    title="Filters"
-                    titleClassName="sr-only"
-                    side="right"
-                >
-                    <div className="bg-body p-3 h-full overflow-auto relative">
-                        {props.children}
-                    </div>
-                </SheetContent>
-            </Sheet>
-        )
+        return <FiltersHeader>{props.children}</FiltersHeader>
     }
 
     return props.children
+}
+
+function FiltersHeader(props: React.PropsWithChildren) {
+    let height = globalThis.innerHeight * 1.1
+    let [{ y }, api] = useSpring(() => ({ y: 0, config: { clamp: true } }))
+
+    let open = ({ canceled = false }: { canceled?: boolean } = {}) => {
+        api.start({
+            y: height,
+            immediate: false,
+            config: canceled ? config.wobbly : config.stiff,
+        })
+    }
+
+    let close = (velocity = 0) => {
+        api.start({
+            y: 0,
+            immediate: false,
+            config: { ...config.stiff, velocity },
+        })
+    }
+
+    let ref = useRef<HTMLDivElement | null>(null)
+
+    useDrag(
+        ({
+            last,
+            velocity: [, vy],
+            direction: [, dy],
+            offset: [, offsetY],
+            cancel,
+            canceled,
+        }) => {
+            if (offsetY < -70 || offsetY > height) {
+                cancel()
+            }
+
+            if (last) {
+                if (offsetY < height * 0.1 || (vy > 0.5 && dy < 0)) {
+                    close(Math.min(vy, 2)) // limit speed top prevent stutter
+                } else {
+                    open({ canceled })
+                }
+
+                return
+            }
+
+            api.start({ y: offsetY, immediate: true })
+        },
+        {
+            from: () => [0, y.get()],
+            filterTaps: true,
+            axis: "y",
+            pointer: { touch: true },
+            target: ref,
+            bounds: { top: 0, bottom: height },
+            rubberband: false,
+        },
+    )
+
+    let style = {
+        transform: y.to(
+            [0, height],
+            ["translateY(-100dvh)", "translateY(0dvh)"],
+        ),
+    }
+
+    let touchAction = y.to((py) => (py >= height ? "auto" : "none"))
+
+    return (
+        <animated.div className="filters-header" style={style}>
+            <animated.div
+                className="filters-header-content"
+                style={{ touchAction }}
+            >
+                {props.children}
+            </animated.div>
+
+            <div ref={ref} className="drag-handle">
+                <button
+                    className="opened-handle"
+                    type="button"
+                    onClick={() => close()}
+                >
+                    <Minus weight="bold" size={48} />
+                </button>
+
+                <div className="closed-handle">
+                    <button type="button" onClick={() => open()}>
+                        <MagnifyingGlass weight="bold" />
+                    </button>
+                </div>
+            </div>
+        </animated.div>
+    )
 }
 
 function DayHeader({ date, diffToToday }: { date: Date; diffToToday: number }) {
@@ -256,5 +364,29 @@ function DayHeader({ date, diffToToday }: { date: Date; diffToToday: number }) {
         <h2 className="memos-list-day">
             {prefix} <DateTime date={date} opts={{ dateStyle: "medium" }} />
         </h2>
+    )
+}
+
+function Greeting() {
+    let t = useT("components/Greeting")
+    let displayName = useAccountDisplayName()
+    let greeting = useMemo(() => {
+        let now = new Date()
+        if (now.getHours() < 12) {
+            return t.Morning
+        }
+
+        if (now.getHours() < 18) {
+            return t.Afternoon
+        }
+
+        return t.Evening
+    }, [t.Morning, t.Evening, t.Afternoon])
+
+    return (
+        <div className="greeting">
+            {greeting}
+            <span>{displayName}</span>
+        </div>
     )
 }

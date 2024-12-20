@@ -23,6 +23,8 @@ export const translations = {
     },
 
     "components/Memo/Actions": {
+        View: "View",
+        Edit: "Edit",
         Archive: "Archive",
         Delete: "Delete",
         Unarchive: "Unarchive",
@@ -63,6 +65,12 @@ export const translations = {
         Dismiss: "Dismiss",
     },
 
+    "components/Greeting": {
+        Morning: "Good Morning, ",
+        Afternoon: "Good Afternoon, ",
+        Evening: "Good Evening, ",
+    },
+
     "pages/Errors/NotFound": {
         Title: "Not Found",
         Detail: "The requested page could not be found",
@@ -94,6 +102,9 @@ export const translations = {
     "pages/ListMemos": {
         DayToday: "Today",
         DayYesterday: "Yesterday",
+        LayoutSelectLabel: "Select list layout",
+        LayoutSingle: "Single",
+        LayoutMasonry: "Masonry",
     },
 
     "pages/Settings": {

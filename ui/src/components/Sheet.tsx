@@ -13,12 +13,10 @@ export interface SheetContentProps {
     children: React.ReactNode | React.ReactNode[]
     title: string
     description?: string
-    side?: "left" | "right"
 }
 
 export function SheetContent({
     children,
-    side = "left",
     titleClassName,
     description,
     title,
@@ -37,17 +35,17 @@ export function SheetContent({
                 {...props}
                 className={clsx(
                     "fixed z-[1001] gap-4 bg-background shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-                    "h-full w-3/4 xs:w-1/3",
-                    {
-                        "inset-y-0 left-0 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left":
-                            side === "left",
-                        "inset-y-0 right-0 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right":
-                            side === "right",
-                    },
+                    "h-[95svh] w-full",
+                    "xs:h-full md:w-3/4 xs:w-1/3",
+                    "inset-y-0 left-0 top-0 data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+                    "xs:inset-y-0 xs:left-0 xs:data-[state=closed]:slide-out-to-left xs:data-[state=open]:slide-in-from-left",
                     props.className,
                 )}
             >
                 {children}
+                <div className="h-5 w-[50%] mx-auto bg-navigation-fg rounded-b-lg flex items-center justify-center">
+                    <div className=" h-2 w-[50%] mx-auto bg-navigation-bg rounded-full" />
+                </div>
             </Dialog.DialogContent>
         </Dialog.Portal>
     )

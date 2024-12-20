@@ -46,6 +46,7 @@ type ThemeSettings struct {
 	ColourScheme string `json:"colourScheme,omitempty"`
 	Mode         string `json:"mode,omitempty"`
 	Icon         string `json:"icon,omitempty"`
+	ListLayout   string `json:"listLayout,omitempty"`
 }
 
 type ControlsSettings struct {
@@ -63,6 +64,7 @@ func NewSettings(s *domain.Settings) *Settings {
 			ColourScheme: s.Theme.ColourScheme,
 			Mode:         s.Theme.Mode,
 			Icon:         s.Theme.Icon,
+			ListLayout:   s.Theme.ListLayout,
 		},
 		Controls: ControlsSettings{
 			Vim:               s.Controls.Vim,

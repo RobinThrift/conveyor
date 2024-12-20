@@ -1,0 +1,7 @@
+.main {
+    @apply sm:flex-1 pb-14 xs:pt-4 tablet:pb-4 tablet:pt-20 lg:pt-16;
+}
+
+.app-footer {
+    @apply px-2 py-4 flex justify-center items-center;
+}

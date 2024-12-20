@@ -15,6 +15,7 @@ type ThemeSettings struct {
 	ColourScheme string
 	Mode         string
 	Icon         string
+	ListLayout   string
 }
 
 type ControlsSettings struct {
@@ -31,6 +32,7 @@ var DefaultSettings = Settings{
 		ColourScheme: "default",
 		Mode:         "auto",
 		Icon:         "default",
+		ListLayout:   "masonry",
 	},
 	Controls: ControlsSettings{
 		Vim:               false,

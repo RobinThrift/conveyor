@@ -101,7 +101,7 @@ export function TagTree({
                         >
                             <div
                                 className={clsx(
-                                    "flex gap-1 items-center cursor-pointer rounded hover:bg-subtle ps-1 pe-2",
+                                    "flex gap-1 items-center cursor-pointer rounded xs:hover:bg-subtle active:bg-subtle ps-1 pe-2",
                                     {
                                         "!bg-primary-light !text-primary-contrast":
                                             isSelected,

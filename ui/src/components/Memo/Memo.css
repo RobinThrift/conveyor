@@ -1,4 +1,16 @@
 .memo {
     @apply rounded-lg border border-subtle bg-surface p-4;
     @apply dark:border-subtle-extra-dark;
+
+    &.is-editing {
+        @apply p-0;
+    }
+}
+
+.memo-header {
+    @apply flex;
+}
+
+.memo-action-bar {
+    @apply flex justify-end flex-1;
 }

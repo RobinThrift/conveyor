@@ -8,6 +8,9 @@ import "@/index.css"
 const meta: Meta<AppProps> = {
     title: "Belt/App",
     component: App,
+    parameters: {
+        layout: "fullscreen",
+    },
     decorators: (Story, { globals: { configureMockRootStore } }) => (
         <Provider store={configureMockRootStore()}>
             <Story />
@@ -20,9 +23,6 @@ type Story = StoryObj<AppProps>
 
 export const Full: Story = {
     name: "App",
-    parameters: {
-        layout: "fullscreen",
-    },
 
     args: {
         components: {

@@ -152,7 +152,6 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
             </div>
             <footer className="login-footer">
                 <BuildInfo />
-                <SelectMode className="max-w-sm" />
             </footer>
         </div>
     )

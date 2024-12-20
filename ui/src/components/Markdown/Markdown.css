@@ -1,8 +1,11 @@
 .content {
-    @apply prose max-w-none;
-    @apply prose-ul:my-0 prose-li:p-0 prose-li:my-0;
+    @apply prose-sm @md:prose-base max-w-none;
+    @apply prose-ul:my-0 prose-li:p-0 prose-li:my-0 prose-p:my-2 sm:prose-p:my-4;
     @apply dark:prose-invert;
     @apply text-text;
+
+    text-wrap: pretty;
+    overflow-wrap: break-word;
 
     h1,
     h2,
@@ -10,12 +13,13 @@
     h4,
     h5,
     h6 {
-        font-family: "Bodoni Moda Variable", serif;
-        @apply mb-0;
+        @apply mb-0 font-serif font-bold;
+        text-wrap: balance;
     }
 
-    text-wrap: pretty;
-    overflow-wrap: break-word;
+    a {
+        @apply text-primary hover:underline;
+    }
 
     li > p {
         @apply my-0;

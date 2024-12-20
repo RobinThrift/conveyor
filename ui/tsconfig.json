@@ -35,7 +35,8 @@
         "skipLibCheck": true,
         "types": ["vite/client", "vite-plugin-pwa/client"],
         "paths": {
-            "@/*": [ "./src/*" ]
+            "@/*": [ "./src/*" ],
+            "@testhelper": [ "./.storybook/helper.ts" ]
         }
     },
     "include": ["src/*.tsx", "src/**/*.tsx", "src/*.ts", "src/**/*.ts"],
