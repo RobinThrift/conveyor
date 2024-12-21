@@ -1,9 +1,9 @@
 .navigation {
-    @apply flex h-12 tablet:h-12 fixed py-1.5 w-fit;
+    @apply flex h-14 tablet:h-12 fixed py-1.5 w-fit;
     @apply left-1/2;
     @apply bg-navigation-bg/80 rounded-lg;
     top: 100dvh;
-    transform: translateY(calc(-100% - 0.25rem)) translateX(-50%);
+    transform: translateY(calc(-100% - 2rem)) translateX(-50%);
     transition: background-color .1s, box-shadow .2s;
     box-shadow: 0 -10px 15px -3px rgb(0 0 0 / 0.1), 0 -4px 6px -4px
         rgb(0 0 0 / 0.1);
