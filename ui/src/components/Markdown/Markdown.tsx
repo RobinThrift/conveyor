@@ -76,7 +76,6 @@ function astToJSX(ctx: Context, ast: Root): ReactNode[] {
                 {/* biome-ignore lint/a11y/useValidAriaRole: false positive */}
                 {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: false positive */}
                 <div className="footnotes" role="doc-endnotes">
-                    <hr />
                     <ol>{ctx.footnotes}</ol>
                 </div>
             </React.Fragment>,
