@@ -6,6 +6,7 @@ import { BuildInfo } from "@/components/BuildInfo"
 import { Notifications } from "@/components/Notifications"
 import { Theme } from "@/components/Theme"
 import { useBaseURL } from "@/hooks/useBaseURL"
+import { useEnsureLoggedIn } from "@/hooks/useEnsureLoggedIn"
 import { ErrorPage } from "@/pages/Errors"
 import { ChangePasswordPage, LoginPage } from "@/pages/Login"
 import { ListMemosPage } from "@/pages/Memos/List"
@@ -19,7 +20,6 @@ import {
     filterToQueryString,
 } from "@/storage/memos"
 import type { ServerData } from "./ServerData"
-import { useEnsureLoggedIn } from "@/hooks/useEnsureLoggedIn"
 
 export type AppProps = Pick<ServerData, "components" | "error">
 
