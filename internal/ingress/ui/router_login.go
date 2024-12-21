@@ -81,6 +81,17 @@ func (router *router) getLogout(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// [GET] /check_login
+func (router *router) getCheckLogin(w http.ResponseWriter, r *http.Request) error {
+	_, ok := session.Get[*auth.Account](r.Context(), "account")
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		return nil
+	}
+
+	return nil
+}
+
 func (router *router) renderLoginPage(w http.ResponseWriter, r *http.Request, validationErrs map[string]string) error {
 	serverData := ui.ServerData{
 		Components: ui.ServerDataComponents{

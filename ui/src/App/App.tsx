@@ -19,6 +19,7 @@ import {
     filterToQueryString,
 } from "@/storage/memos"
 import type { ServerData } from "./ServerData"
+import { useEnsureLoggedIn } from "@/hooks/useEnsureLoggedIn"
 
 export type AppProps = Pick<ServerData, "components" | "error">
 
@@ -41,6 +42,7 @@ export function App(props: AppProps) {
 function AppShell({ ...props }: { components: AppProps["components"] }) {
     let page = useCurrentPage()
     let goto = useGoto()
+    useEnsureLoggedIn(!(page?.route?.includes("login") ?? true))
 
     let baseURL = useBaseURL()
     let { colourScheme, mode } = useTheme()

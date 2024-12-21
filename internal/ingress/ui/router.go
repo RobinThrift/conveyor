@@ -73,6 +73,8 @@ func NewRouter(config Config, mux *http.ServeMux, authCtrl *control.AuthControll
 	mux.Handle("POST /settings/account/change_password", csrfProtectionMiddleware(router.ensureLoggedIn(router.handlerFuncWithErr(router.postAccountChangePassword))))
 
 	mux.Handle("GET /logout", router.handlerFuncWithErr(router.getLogout))
+
+	mux.Handle("GET /check_login", router.handlerFuncWithErr((router.getCheckLogin)))
 }
 
 func (router *router) handlerFuncWithErr(h func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {
