@@ -6,14 +6,12 @@ import TreeView, {
     type INode,
     type ITreeViewOnNodeSelectProps,
 } from "react-accessible-treeview"
-import { EndOfListMarker } from "../EndOfListMarker"
 
 export interface TagTreeProps {
     className?: string
     tags: Tag[]
     selected?: string
     onSelect: (selected?: string) => void
-    onEOLReached: () => void
 }
 
 export function TagTree({
@@ -21,7 +19,6 @@ export function TagTree({
     tags,
     selected,
     onSelect: propagateSelectionChange,
-    onEOLReached,
 }: TagTreeProps) {
     let tagTree = useMemo(() => {
         let tree: Record<string, INode> = {
@@ -147,7 +144,6 @@ export function TagTree({
                     )
                 }}
             />
-            <EndOfListMarker onReached={onEOLReached} />
         </div>
     )
 }

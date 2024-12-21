@@ -60,7 +60,6 @@ export function Filters(props: FiltersProps) {
                     tags={props.tags.tags}
                     onSelect={onSelectTag}
                     selected={props.filters.tag}
-                    onEOLReached={props.tags.nextPage}
                     className="sm:overflow-auto flex-1 pb-2 overscroll-contain"
                 />
 
