@@ -260,7 +260,7 @@
     height: 100dvh;
 
     .filters-header-content {
-        @apply text-navigation-fg rounded-b-lg shadow-lg backdrop-blur-sm pb-12;
+        @apply text-navigation-fg rounded-b-lg shadow-lg backdrop-blur-sm pb-20;
         height: 100dvh;
         background: linear-gradient(
             180deg,
@@ -284,7 +284,7 @@
         touch-action: none;
 
         .opened-handle {
-            @apply flex items-center justify-center relative -mt-12 w-full h-12 text-navigation-fg;
+            @apply flex items-center justify-center relative -mt-20 w-full h-16 text-navigation-fg;
         }
 
         .closed-handle {
