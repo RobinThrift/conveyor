@@ -1,5 +1,5 @@
 .memo {
-    @apply rounded-lg border border-subtle bg-surface p-4;
+    @apply rounded-lg border border-subtle bg-surface p-4 overflow-x-auto;
     @apply dark:border-subtle-extra-dark;
 
     &.is-editing {
