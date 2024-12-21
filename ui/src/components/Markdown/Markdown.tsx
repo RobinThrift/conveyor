@@ -283,7 +283,12 @@ function linkToJSX(ctx: Context, node: Link): ReactNode {
     }
 
     return (
-        <a href={url} title={node.title ?? undefined} key={nodeKey(node)}>
+        <a
+            href={url}
+            title={node.title ?? undefined}
+            key={nodeKey(node)}
+            rel="noreferrer noopener"
+        >
             {node.children.map((c) => astNodeToJSX(ctx, c))}
         </a>
     )
