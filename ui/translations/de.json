@@ -40,6 +40,11 @@
         "SelectModeAriaLabel": "Auswahl des Hell- oder Dunkelmodus"
     },
 
+    "components/Filters": {
+        "TabDate": "Datum",
+        "TabTags": "Tags"
+    },
+
     "components/Filters/Calendar": {
         "Today": "Heute"
     },
@@ -93,7 +98,8 @@
         "DayYesterday": "Gestern",
         "LayoutSelectLabel": "Listenlayout auswählen",
         "LayoutSingle": "Einzeln",
-        "LayoutMasonry": "Mosaic"
+        "LayoutMasonry": "Mosaic",
+        "OpenFilterOverlayButtonLabel": "Filter Overlay öffnen"
     },
 
     "pages/Settings": {

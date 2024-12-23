@@ -58,11 +58,7 @@ export function Navigation(props: NavigationProps) {
                             active: item.route === props.active,
                         })}
                     >
-                        <Link
-                            href={item.url}
-                            viewTransition
-                            aria-label={item.label}
-                        >
+                        <Link href={item.url} aria-label={item.label}>
                             {item.icon}
                             <span>{item.label}</span>
                         </Link>

@@ -6,14 +6,11 @@ import { Loader } from "@/components/Loader"
 import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import { Select } from "@/components/Select"
 import type { Tag } from "@/domain/Tag"
-import { useIsMobile } from "@/hooks/useIsMobile"
 import { useT } from "@/i18n"
 import { useAccountDisplayName } from "@/state/account"
 import { useSetting } from "@/state/settings"
-import { List, MagnifyingGlass, Minus, Table } from "@phosphor-icons/react"
-import { animated, config, useSpring } from "@react-spring/web"
-import { useDrag } from "@use-gesture/react"
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { List, Table } from "@phosphor-icons/react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import {
     type CreateMemoRequest,
     type Filter,
@@ -164,18 +161,16 @@ export function ListMemosPage(props: ListMemosPageProps) {
                 </div>
             </div>
 
-            <FiltersSidebar>
-                <Filters
-                    filters={filter}
-                    tags={{
-                        tags,
-                        isLoading: isLoadingTags,
-                        nextPage: actions.loadNextTagsPage,
-                    }}
-                    onChangeFilter={onChangeFilters}
-                    className="filters-sidebar"
-                />
-            </FiltersSidebar>
+            <Filters
+                filters={filter}
+                tags={{
+                    tags,
+                    isLoading: isLoadingTags,
+                    nextPage: actions.loadNextTagsPage,
+                }}
+                onChangeFilter={onChangeFilters}
+                className="filters-sidebar"
+            />
         </div>
     )
 }
@@ -231,111 +226,6 @@ function NewMemoEditor(props: {
             className="new-memo-editor"
             buttonPosition="bottom"
         />
-    )
-}
-
-function FiltersSidebar(props: React.PropsWithChildren) {
-    let isMobile = useIsMobile()
-
-    if (isMobile) {
-        return <FiltersHeader>{props.children}</FiltersHeader>
-    }
-
-    return props.children
-}
-
-function FiltersHeader(props: React.PropsWithChildren) {
-    let height = globalThis.innerHeight * 1.1
-    let [{ y }, api] = useSpring(() => ({ y: 0, config: { clamp: true } }))
-
-    let open = ({ canceled = false }: { canceled?: boolean } = {}) => {
-        api.start({
-            y: height,
-            immediate: false,
-            config: canceled ? config.wobbly : config.stiff,
-        })
-    }
-
-    let close = (velocity = 0) => {
-        api.start({
-            y: 0,
-            immediate: false,
-            config: { ...config.stiff, velocity },
-        })
-    }
-
-    let ref = useRef<HTMLDivElement | null>(null)
-
-    useDrag(
-        ({
-            last,
-            velocity: [, vy],
-            direction: [, dy],
-            offset: [, offsetY],
-            cancel,
-            canceled,
-        }) => {
-            if (offsetY < -70 || offsetY > height) {
-                cancel()
-            }
-
-            if (last) {
-                if (offsetY < height * 0.1 || (vy > 0.5 && dy < 0)) {
-                    close(Math.min(vy, 2)) // limit speed top prevent stutter
-                } else {
-                    open({ canceled })
-                }
-
-                return
-            }
-
-            api.start({ y: offsetY, immediate: true })
-        },
-        {
-            from: () => [0, y.get()],
-            filterTaps: true,
-            axis: "y",
-            pointer: { touch: true },
-            target: ref,
-            bounds: { top: 0, bottom: height },
-            rubberband: false,
-        },
-    )
-
-    let style = {
-        transform: y.to(
-            [0, height],
-            ["translateY(-100dvh)", "translateY(0dvh)"],
-        ),
-    }
-
-    let touchAction = y.to((py) => (py >= height ? "auto" : "none"))
-
-    return (
-        <animated.div className="filters-header" style={style}>
-            <animated.div
-                className="filters-header-content"
-                style={{ touchAction }}
-            >
-                {props.children}
-            </animated.div>
-
-            <div ref={ref} className="drag-handle">
-                <button
-                    className="opened-handle"
-                    type="button"
-                    onClick={() => close()}
-                >
-                    <Minus weight="bold" size={48} />
-                </button>
-
-                <div className="closed-handle">
-                    <button type="button" onClick={() => open()}>
-                        <MagnifyingGlass weight="bold" />
-                    </button>
-                </div>
-            </div>
-        </animated.div>
     )
 }
 

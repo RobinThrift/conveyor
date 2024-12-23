@@ -56,6 +56,11 @@ export const translations = {
         SelectModeAriaLabel: "Select light/dark mode",
     },
 
+    "components/Filters": {
+        TabDate: "Date",
+        TabTags: "Tags",
+    },
+
     "components/Filters/Calendar": {
         Today: "Today",
     },
@@ -105,6 +110,7 @@ export const translations = {
         LayoutSelectLabel: "Select list layout",
         LayoutSingle: "Single",
         LayoutMasonry: "Masonry",
+        OpenFilterOverlayButtonLabel: "Open Filter Overlay",
     },
 
     "pages/Settings": {
