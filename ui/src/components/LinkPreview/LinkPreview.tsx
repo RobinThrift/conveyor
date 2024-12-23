@@ -56,7 +56,9 @@ export function LinkPreview(props: LinkPreviewProps) {
                 target={props.title}
                 className="preview-img"
             >
-                <span>{props.title ?? props.children}</span>
+                <div>
+                    <span>{props.title ?? props.children}</span>
+                </div>
                 <img src={props.img} alt={props.alt || props.title} />
             </a>
 

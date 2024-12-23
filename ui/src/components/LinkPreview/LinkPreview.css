@@ -11,8 +11,14 @@
             @apply w-full min-h-[2lh];
         }
 
-        span {
-            @apply block absolute right-0 top-0 py-2 px-4 bg-surface/60 rounded-bl-lg border-l border-b border-subtle-extra-light backdrop-blur-sm;
+        & > div {
+            @apply absolute right-0 top-0 py-2 px-4 bg-surface/40  backdrop-blur-sm;
+            @apply rounded-bl-lg border-l border-b border-subtle-extra-light dark:border-subtle-extra-dark;
+
+            & > span {
+                @apply text-black dark:text-white;
+                mix-blend-mode: difference;
+            }
         }
     }
 
