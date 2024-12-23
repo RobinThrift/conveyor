@@ -1,6 +1,6 @@
 import type { APITokenList } from "@/domain/APIToken"
 import type { Pagination } from "@/domain/Pagination"
-import { APIError } from "./APIError"
+import { APIError, UnauthorizedError } from "./APIError"
 
 export async function list({
     pagination,
@@ -20,10 +20,8 @@ export async function list({
 
     let res = await fetch(url, { signal })
 
-    if (!res.ok) {
-        throw new Error(
-            `unknown error fetching API Token list: ${res.status} ${res.statusText}`,
-        )
+    if (res.status === 401) {
+        throw new UnauthorizedError("error fetching API Token list")
     }
 
     if (res.status !== 200) {
@@ -31,12 +29,18 @@ export async function list({
         throw err.withPrefix("error fetching API Token list")
     }
 
+    if (!res.ok) {
+        throw new Error(
+            `unknown error fetching API Token list: ${res.status} ${res.statusText}`,
+        )
+    }
+
     let list = (await res.json()) as APITokenList
 
-    list.items = list.items.map((memo) => ({
-        ...memo,
-        createdAt: new Date(memo.createdAt),
-        expiresAt: new Date(memo.expiresAt),
+    list.items = list.items.map((token) => ({
+        ...token,
+        createdAt: new Date(token.createdAt),
+        expiresAt: new Date(token.expiresAt),
     }))
 
     return list
@@ -64,15 +68,19 @@ export async function create({
         body: JSON.stringify(token),
     })
 
-    if (!res.ok) {
-        throw new Error(
-            `unknown error creating API Token: ${res.status} ${res.statusText}`,
-        )
+    if (res.status === 401) {
+        throw new UnauthorizedError("error creating API Token")
     }
 
     if (res.status !== 201) {
         let err = await APIError.fromHTTPResponse(res)
-        throw err.withPrefix("error creating memo")
+        throw err.withPrefix("error creating API Token")
+    }
+
+    if (!res.ok) {
+        throw new Error(
+            `unknown error creating API Token: ${res.status} ${res.statusText}`,
+        )
     }
 
     return res.json()
@@ -97,14 +105,18 @@ export async function del({
         method: "DELETE",
     })
 
-    if (!res.ok) {
-        throw new Error(
-            `unknown error deleting API Token: ${res.status} ${res.statusText}`,
-        )
+    if (res.status === 401) {
+        throw new UnauthorizedError("error deleting API Token")
     }
 
     if (res.status !== 204) {
         let err = await APIError.fromHTTPResponse(res)
         throw err.withPrefix("error deleting API Token")
+    }
+
+    if (!res.ok) {
+        throw new Error(
+            `unknown error deleting API Token: ${res.status} ${res.statusText}`,
+        )
     }
 }

@@ -131,20 +131,4 @@ export const registerEffects = (startListening: StartListening) => {
             )
         },
     })
-
-    startListening({
-        actionCreator: slice.actions.setError,
-        effect: async ({ payload: { error } }, { dispatch }) => {
-            let [title, message] = error.message.split(/:\n/, 2)
-            dispatch(
-                notifications.actions.add({
-                    notification: {
-                        type: "error",
-                        title,
-                        message,
-                    },
-                }),
-            )
-        },
-    })
 }

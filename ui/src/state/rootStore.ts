@@ -8,6 +8,7 @@ import * as account from "./account"
 import * as apiTokens from "./apitokens"
 import * as attachments from "./attachments"
 import * as buildInfo from "./buildInfo"
+import { registerEffects as registerErrorEffects } from "./errors"
 import * as i18n from "./i18n"
 import * as memoList from "./memolist"
 import * as memos from "./memos"
@@ -55,6 +56,7 @@ export function configureRootStore(initState: {
                         "payload.translations",
                         "payload.dateFns",
                         "payload.data",
+                        /.*\.buttons/,
                     ],
                     ignoredPaths: [
                         "router.routes",
@@ -64,6 +66,7 @@ export function configureRootStore(initState: {
                         "i18n.translations",
                         "i18n.baseTranslations",
                         "i18n.dateFns",
+                        /.*\.buttons/,
                     ],
                 },
             }).prepend(listenerMiddleware.middleware),
@@ -97,6 +100,7 @@ export function configureRootStore(initState: {
     tags.registerEffects(startListening)
     attachments.registerEffects(startListening)
     apiTokens.registerEffects(startListening)
+    registerErrorEffects(startListening)
 
     if (initState.buildInfo) {
         store.dispatch(buildInfo.slice.actions.init(initState.buildInfo))

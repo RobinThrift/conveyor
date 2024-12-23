@@ -1,7 +1,7 @@
 import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
 import type { Pagination } from "@/domain/Pagination"
 import { format, formatRFC3339, parse } from "date-fns"
-import { APIError } from "./APIError"
+import { APIError, UnauthorizedError } from "./APIError"
 
 export type Filter = ListMemosQuery
 
@@ -18,7 +18,16 @@ export async function get({
 
     let res = await fetch(url, { signal })
 
-    if (!res.ok || res.status !== 200) {
+    if (res.status === 401) {
+        throw new UnauthorizedError("error fetching memo list")
+    }
+
+    if (res.status !== 200) {
+        let err = await APIError.fromHTTPResponse(res)
+        throw err.withPrefix("error fetching memo")
+    }
+
+    if (!res.ok) {
         throw new Error(`error fetching memo: ${res.status} ${res.statusText}`)
     }
 
@@ -47,9 +56,18 @@ export async function list({
 
     let res = await fetch(url, { signal })
 
-    if (!res.ok || res.status !== 200) {
+    if (res.status === 401) {
+        throw new UnauthorizedError("error fetching memo list")
+    }
+
+    if (res.status !== 200) {
+        let err = await APIError.fromHTTPResponse(res)
+        throw err.withPrefix("error fetching memo list")
+    }
+
+    if (!res.ok) {
         throw new Error(
-            `error fetching memo list: ${res.status} ${res.statusText}`,
+            `unknown error fetching memo list: ${res.status} ${res.statusText}`,
         )
     }
 
@@ -87,15 +105,19 @@ export async function create({
         body: JSON.stringify(memo),
     })
 
-    if (!res.ok) {
-        throw new Error(
-            `unknown error creating memo: ${res.status} ${res.statusText}`,
-        )
+    if (res.status === 401) {
+        throw new UnauthorizedError("error creating memo")
     }
 
     if (res.status !== 201) {
         let err = await APIError.fromHTTPResponse(res)
         throw err.withPrefix("error creating memo")
+    }
+
+    if (!res.ok) {
+        throw new Error(
+            `unknown error creating memo: ${res.status} ${res.statusText}`,
+        )
     }
 
     let created = await res.json()
@@ -138,15 +160,19 @@ export async function update({
         }),
     })
 
-    if (!res.ok) {
-        throw new Error(
-            `unknown error creating memo: ${res.status} ${res.statusText}`,
-        )
+    if (res.status === 401) {
+        throw new UnauthorizedError("error updating memo")
     }
 
     if (res.status !== 204) {
         let err = await APIError.fromHTTPResponse(res)
-        throw err.withPrefix("error creating memo")
+        throw err.withPrefix("error updating memo")
+    }
+
+    if (!res.ok) {
+        throw new Error(
+            `unknown error updating memo: ${res.status} ${res.statusText}`,
+        )
     }
 }
 

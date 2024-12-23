@@ -38,3 +38,10 @@ export class APIError extends Error {
         return new APIError(body)
     }
 }
+
+export class UnauthorizedError extends Error {
+    constructor(prefix: string) {
+        let msg = `${prefix}: Unauthorized`
+        super(msg)
+    }
+}

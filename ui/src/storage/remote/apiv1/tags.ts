@@ -1,5 +1,6 @@
 import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
+import { UnauthorizedError } from "./APIError"
 
 export async function list({
     pagination,
@@ -20,9 +21,19 @@ export async function list({
 
     let res = await fetch(url, { signal })
 
-    if (!res.ok || res.status !== 200) {
+    if (res.status === 401) {
+        throw new UnauthorizedError("error fetching tag list")
+    }
+
+    if (res.status !== 200) {
         throw new Error(
             `error fetching tag list: ${res.status} ${res.statusText}`,
+        )
+    }
+
+    if (!res.ok) {
+        throw new Error(
+            `unknown error fetching tag list: ${res.status} ${res.statusText}`,
         )
     }
 
