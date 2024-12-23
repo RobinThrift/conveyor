@@ -24,7 +24,6 @@ export const Colours: Story = {
                 let end = l.indexOf(":")
                 return l.substring(start, end)
             })
-        console.log("varnames", varnames)
 
         let swatches = varnames.map((varname) => (
             <div

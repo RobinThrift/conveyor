@@ -21,7 +21,6 @@ export function ChangePasswordPage(props: ChangePasswordPageProps) {
     let csrfToken = useCSRFToken()
     let baseURL = useBaseURL()
     let t = useT("pages/LoginChangePassword")
-    console.log("t", t)
 
     return (
         <div className="h-screen px-2 sm:px-4">
