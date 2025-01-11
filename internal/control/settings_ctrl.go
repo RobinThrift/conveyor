@@ -53,6 +53,7 @@ type SetSettingsCmd struct {
 	ThemeColourScheme         *string
 	ThemeMode                 *string
 	ThemeIcon                 *string
+	ThemeListLayout           *string
 	ControlsVim               *bool
 	ControlsDoubleClickToEdit *bool
 }
@@ -89,6 +90,10 @@ func (sc *SettingsControl) Set(ctx context.Context, cmd SetSettingsCmd) error {
 
 	if cmd.ThemeMode != nil {
 		settings.Theme.Mode = *cmd.ThemeMode
+	}
+
+	if cmd.ThemeListLayout != nil {
+		settings.Theme.ListLayout = *cmd.ThemeListLayout
 	}
 
 	if cmd.ControlsVim != nil {

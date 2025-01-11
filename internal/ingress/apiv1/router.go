@@ -311,6 +311,7 @@ func (r *router) GetSettings(ctx context.Context, req GetSettingsRequestObject) 
 		ThemeColourScheme:         settings.Theme.ColourScheme,
 		ThemeMode:                 settings.Theme.Mode,
 		ThemeIcon:                 settings.Theme.Icon,
+		ThemeListLayout:           settings.Theme.ListLayout,
 		ControlsVim:               settings.Controls.Vim,
 		ControlsDoubleClickToEdit: settings.Controls.DoubleClickToEdit,
 	}, nil
@@ -324,6 +325,7 @@ func (r *router) UpdateSettings(ctx context.Context, req UpdateSettingsRequestOb
 		ThemeColourScheme:         req.Body.ThemeColourScheme,
 		ThemeMode:                 req.Body.ThemeMode,
 		ThemeIcon:                 req.Body.ThemeIcon,
+		ThemeListLayout:           req.Body.ThemeListLayout,
 		ControlsVim:               req.Body.ControlsVim,
 		ControlsDoubleClickToEdit: req.Body.ControlsDoubleClickToEdit,
 	}
