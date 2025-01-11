@@ -2,7 +2,7 @@ import React from "react"
 import { LinkPreview } from "../LinkPreview/LinkPreview"
 
 export const directives: Record<string, React.FC<any>> = {
-    "open-graph-link": LinkPreview,
+    "link-preview": LinkPreview,
 
     details: (
         props: React.PropsWithChildren<{ summary: string; className?: string }>,
