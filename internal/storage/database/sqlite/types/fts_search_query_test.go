@@ -22,6 +22,8 @@ func TestPrepareFTSQueryString(t *testing.T) {
 		{name: "Ignore *", input: `One Two*`, expected: `"One Two"*`},
 		{name: "Special Chars With Prefix", input: `# Test Memo 1*`, expected: `"# Test Memo 1"*`},
 		{name: "Non ASCII", input: `# Übersicht der Änderungen`, expected: `"# Übersicht der Änderungen"`},
+		{name: "Start with star", input: "*github", expected: `*"github"`},
+		{name: "End with star", input: "github*", expected: `"github"*`},
 	}
 
 	for _, tt := range tt {

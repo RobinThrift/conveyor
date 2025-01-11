@@ -49,7 +49,6 @@ func (q *ftsQuery) consume() {
 		q.consumeQuoted()
 	case q.cur == '*':
 		q.o.WriteRune('*')
-		q.next()
 		q.consume()
 	case q.cur == ' ':
 		q.outputCur()
