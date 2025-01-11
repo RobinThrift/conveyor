@@ -2,7 +2,7 @@
 SELECT *
 FROM tags
 WHERE tag > @page_after
-ORDER BY tag DESC
+ORDER BY tag ASC
 LIMIT @page_size;
 
 -- name: CreateTag :exec

@@ -132,7 +132,7 @@ const listTags = `-- name: ListTags :many
 SELECT id, tag, count, created_by, created_at, updated_at
 FROM tags
 WHERE tag > ?1
-ORDER BY tag DESC
+ORDER BY tag ASC
 LIMIT ?2
 `
 
