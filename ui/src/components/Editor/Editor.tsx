@@ -1,9 +1,10 @@
+import { AlertDialog } from "@/components/AlertDialog"
 import { Button } from "@/components/Button"
 import type { Memo } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
 import { useStateGetter } from "@/hooks/useStateGetter"
 import { useT } from "@/i18n"
-import { FloppyDisk, X } from "@phosphor-icons/react"
+import { ArrowLeft, Check, X } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React, {
     useCallback,
@@ -35,6 +36,13 @@ export interface EditorProps {
 export function Editor(props: EditorProps) {
     let t = useT("components/Editor")
 
+    let [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false)
+
+    let confirmDiscard = useCallback(() => {
+        setConfirmationDialogOpen(false)
+        props.onCancel?.()
+    }, [props.onCancel])
+
     let [showEditor, setShowEditor] = useState(
         !(props.lazy ?? true) || props.memo.content.length !== 0,
     )
@@ -50,8 +58,12 @@ export function Editor(props: EditorProps) {
     }, [props.onSave, props.memo, content])
 
     let onCancel = useCallback(() => {
+        if (isChanged) {
+            setConfirmationDialogOpen(true)
+            return
+        }
         props.onCancel?.()
-    }, [props.onCancel])
+    }, [props.onCancel, isChanged])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional
     useEffect(() => {
@@ -118,40 +130,74 @@ export function Editor(props: EditorProps) {
                 props.className,
             )}
         >
-            <Suspense fallback={<div className="w-full min-h-full" />}>
-                {editor}
-            </Suspense>
-
             {showEditor && (
                 <div
                     className={clsx("editor-buttons", {
-                        "position-top": props.buttonPosition === "top",
+                        "position-bottom": props.buttonPosition === "top",
                     })}
                 >
                     {props.onCancel && (
                         <Button
-                            onClick={props.onCancel}
+                            onClick={onCancel}
                             variant="danger"
                             plain
                             aria-label={t.Cancel}
-                            iconLeft={<X weight="fill" />}
+                            iconLeft={
+                                <>
+                                    <X
+                                        weight="fill"
+                                        className="hidden tablet:block"
+                                    />
+                                    <ArrowLeft className="tablet:hidden" />
+                                </>
+                            }
                         >
-                            {t.Cancel}
+                            <span className="sr-only tablet:not-sr-only">
+                                {t.Cancel}
+                            </span>
                         </Button>
                     )}
 
                     <Button
                         aria-label={t.Save}
-                        outline
                         onClick={onSave}
                         plain
-                        iconLeft={<FloppyDisk weight="fill" />}
+                        iconLeft={<Check />}
                         disabled={!isChanged}
                     >
-                        {t.Save}
+                        <span className="sr-only tablet:not-sr-only">
+                            {t.Save}
+                        </span>
                     </Button>
                 </div>
             )}
+            <Suspense fallback={<div className="w-full min-h-full" />}>
+                {editor}
+            </Suspense>
+
+            <AlertDialog
+                open={confirmationDialogOpen}
+                onOpenChange={setConfirmationDialogOpen}
+            >
+                <AlertDialog.Content>
+                    <AlertDialog.Title>
+                        {t.DiscardChangesTitle}
+                    </AlertDialog.Title>
+
+                    <AlertDialog.Description>
+                        {t.DiscardChangesDescription}
+                    </AlertDialog.Description>
+
+                    <AlertDialog.Buttons>
+                        <Button variant="danger" onClick={confirmDiscard}>
+                            {t.DiscardChangesConfirmation}
+                        </Button>
+                        <AlertDialog.CancelButton>
+                            {t.Cancel}
+                        </AlertDialog.CancelButton>
+                    </AlertDialog.Buttons>
+                </AlertDialog.Content>
+            </AlertDialog>
         </div>
     )
 }

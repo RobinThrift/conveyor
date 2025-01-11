@@ -2,7 +2,7 @@ import type { Tag } from "@/domain/Tag"
 import { Provider } from "@/state"
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react"
-import { generateTestContent } from "@testhelper"
+import { generateFullTestContent } from "@testhelper"
 import React from "react"
 import { Editor } from "./Editor"
 
@@ -51,7 +51,7 @@ export const Overview: Story = {
         })(),
     },
     render: (args) => (
-        <div className="container mx-auto h-screen p-8">
+        <div className="tablet:container mx-auto h-screen tablet:p-8">
             <Editor {...args} />
         </div>
     ),
@@ -102,7 +102,7 @@ export const WithContent: Story = {
         lazy: false,
         memo: {
             id: "1235219",
-            content: generateTestContent(),
+            content: generateFullTestContent(),
             isArchived: false,
             isDeleted: false,
             createdAt: faker.date.recent(),

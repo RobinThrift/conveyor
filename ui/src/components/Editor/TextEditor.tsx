@@ -5,7 +5,7 @@ import { useSetting, useTheme } from "@/state/settings"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import { languages } from "@codemirror/language-data"
 import { SearchCursor } from "@codemirror/search"
-import { Vim, getCM, vim } from "@replit/codemirror-vim"
+import { Vim, vim } from "@replit/codemirror-vim"
 import CodeMirror, { EditorView, type Extension } from "@uiw/react-codemirror"
 import clsx from "clsx"
 import React, { useCallback, useEffect, useMemo } from "react"
@@ -76,10 +76,6 @@ export function TextEditor(props: TextEditorProps) {
 
     let onCreateEditor = useCallback(
         (view: EditorView) => {
-            if (enableVimKeybindings) {
-                Vim.handleEx(getCM(view), "startinsert")
-            }
-
             if (!props.placeCursorAt) {
                 return
             }
@@ -110,7 +106,7 @@ export function TextEditor(props: TextEditorProps) {
                 })
             }
         },
-        [props.placeCursorAt, enableVimKeybindings],
+        [props.placeCursorAt],
     )
 
     return (

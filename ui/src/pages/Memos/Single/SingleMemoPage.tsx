@@ -1,14 +1,12 @@
 import { Loader } from "@/components/Loader"
 import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import type { Tag } from "@/domain/Tag"
-import type { Filter } from "@/state/memolist"
 import { useSetting } from "@/state/settings"
 import React, { useCallback, useEffect } from "react"
 import { useSingleMemoPageState } from "./state"
 
 export interface SingleMemoPageProps {
     memoID: string
-    onChangeFilters?: (filter: Filter) => void
 }
 
 export function SingleMemoPage(props: SingleMemoPageProps) {
@@ -21,13 +19,6 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
             actions.load()
         }
     }, [state?.memo, actions.load])
-
-    let onClickTag = useCallback(
-        (tag: string) => {
-            props.onChangeFilters?.({ tag })
-        },
-        [props.onChangeFilters],
-    )
 
     let updateMemoCallback = useCallback(
         (memo: PartialMemoUpdate) => {
@@ -61,7 +52,6 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
                         link: false,
                         edit: !state.memo.isArchived && !state.memo.isDeleted,
                     }}
-                    onClickTag={onClickTag}
                     updateMemo={updateMemoCallback}
                     doubleClickToEdit={doubleClickToEdit}
                     className=""

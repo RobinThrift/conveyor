@@ -2,6 +2,7 @@ import React, { type Key, type ReactNode, useMemo } from "react"
 
 import { Alert } from "@/components/Alert"
 import { Image as ImageComp } from "@/components/Image"
+import { Link } from "@/components/Link"
 import { ArrowUDownLeft } from "@phosphor-icons/react"
 import clsx from "clsx"
 import type {
@@ -18,7 +19,7 @@ import type {
     Heading,
     Image,
     InlineCode,
-    Link,
+    Link as LinkNode,
     List,
     ListItem,
     Node,
@@ -44,26 +45,35 @@ export interface MarkdownProps {
     children: string
     className?: string
     id: string
-    onClickTag: (tag: string) => void
+    onDoubleClick?: React.MouseEventHandler<HTMLDivElement>
 }
 
-export function Markdown(props: MarkdownProps) {
-    let ast = useMarkdownWorker(props.children)
+export const Markdown = React.forwardRef<HTMLDivElement, MarkdownProps>(
+    function Markdown(props, forwardRef) {
+        let ast = useMarkdownWorker(props.children)
 
-    let parsed = useMemo(() => {
-        if (ast) {
-            let ctx: Context = {
-                id: props.id,
-                footnotes: [],
-                onClickTag: props.onClickTag,
+        let parsed = useMemo(() => {
+            if (ast) {
+                let ctx: Context = {
+                    id: props.id,
+                    footnotes: [],
+                }
+
+                return astToJSX(ctx, ast)
             }
+        }, [ast, props.id])
 
-            return astToJSX(ctx, ast)
-        }
-    }, [ast, props.id, props.onClickTag])
-
-    return <div className={clsx("content", props.className)}>{parsed}</div>
-}
+        return (
+            <div
+                ref={forwardRef}
+                className={clsx("content", props.className)}
+                onDoubleClick={props.onDoubleClick}
+            >
+                {parsed}
+            </div>
+        )
+    },
+)
 
 function astToJSX(ctx: Context, ast: Root): ReactNode[] {
     let nodes: ReactNode[] = [
@@ -88,7 +98,6 @@ function astToJSX(ctx: Context, ast: Root): ReactNode[] {
 interface Context {
     id: string
     footnotes: React.ReactNode[]
-    onClickTag: (tag: string) => void
 }
 
 function astNodeToJSX(ctx: Context, node: RootContent): ReactNode {
@@ -276,18 +285,21 @@ function inlineCodeToJSX(node: InlineCode): ReactNode {
     return <code key={nodeKey(node)}>{node.value}</code>
 }
 
-function linkToJSX(ctx: Context, node: Link): ReactNode {
+function linkToJSX(ctx: Context, node: LinkNode): ReactNode {
     let url = node.url
     if (url.startsWith("#")) {
         url = `#${ctx.id}-${url.replace("#", "")}`
     }
 
+    let key = nodeKey(node)
+
     return (
         <a
             href={url}
             title={node.title ?? undefined}
-            key={nodeKey(node)}
+            key={key}
             rel="noreferrer noopener"
+            target={key as string}
         >
             {node.children.map((c) => astNodeToJSX(ctx, c))}
         </a>
@@ -296,17 +308,13 @@ function linkToJSX(ctx: Context, node: Link): ReactNode {
 
 function autoTagLinkToJSX(ctx: Context, node: AutoTagLink): ReactNode {
     return (
-        <a
-            href={node.tag}
+        <Link
+            href={`/memos?filter[tag]=${node.tag}`}
             key={nodeKey(node)}
-            onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                ctx.onClickTag(node.tag)
-            }}
+            rel="tag"
         >
             {node.children.map((c) => astNodeToJSX(ctx, c))}
-        </a>
+        </Link>
     )
 }
 

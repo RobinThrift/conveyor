@@ -5,6 +5,7 @@ import { Router } from "./router"
 import { BuildInfo } from "@/components/BuildInfo"
 import { Notifications } from "@/components/Notifications"
 import { Theme } from "@/components/Theme"
+import { SelectColourScheme, SelectMode } from "@/components/ThemeSwitcher"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useEnsureLoggedIn } from "@/hooks/useEnsureLoggedIn"
 import { ErrorPage } from "@/pages/Errors"
@@ -133,12 +134,7 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
             )
             break
         case "memos.single":
-            pageComp = (
-                <SingleMemoPage
-                    memoID={page.params.id}
-                    onChangeFilters={onChangeFilters}
-                />
-            )
+            pageComp = <SingleMemoPage memoID={page.params.id} />
             break
         case "settings":
             pageComp = (
@@ -168,6 +164,10 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
             <Navigation
                 active={page?.route === "root" ? "memos.list" : page?.route}
             />
+            <div className="hidden lg:flex absolute right-2 top-2 gap-2">
+                <SelectColourScheme className="w-max" />
+                <SelectMode className="w-max" />
+            </div>
             <main className="main">
                 <Suspense>{pageComp}</Suspense>
                 <footer className="app-footer">

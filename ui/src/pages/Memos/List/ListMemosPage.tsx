@@ -1,21 +1,16 @@
 import { DateTime } from "@/components/DateTime"
-import { Editor } from "@/components/Editor"
 import { EndOfListMarker } from "@/components/EndOfListMarker"
-import { Filters } from "@/components/Filters"
 import { Loader } from "@/components/Loader"
 import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import { Select } from "@/components/Select"
-import type { Tag } from "@/domain/Tag"
 import { useT } from "@/i18n"
 import { useAccountDisplayName } from "@/state/account"
 import { useSetting } from "@/state/settings"
 import { List, Table } from "@phosphor-icons/react"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import {
-    type CreateMemoRequest,
-    type Filter,
-    useListMemosPageState,
-} from "./state"
+import React, { useCallback, useEffect, useMemo } from "react"
+import { ListFilter } from "./ListFilter"
+import { NewMemoEditor } from "./NewMemoEditor"
+import { type Filter, useListMemosPageState } from "./state"
 
 export interface ListMemosPageProps {
     filter: Filter
@@ -41,16 +36,6 @@ export function ListMemosPage(props: ListMemosPageProps) {
         }
         actions.loadTags()
     }, [actions.setFilter, actions.loadPage, actions.loadTags, props.filter])
-
-    let onClickTag = useCallback(
-        (tag: string) => {
-            actions.setFilter({
-                ...filter,
-                tag: tag,
-            })
-        },
-        [filter, actions.setFilter],
-    )
 
     let onEOLReached = useCallback(() => {
         if (!isLoading) {
@@ -91,7 +76,8 @@ export function ListMemosPage(props: ListMemosPageProps) {
                             actions={{
                                 edit: !filter.isArchived && !filter.isDeleted,
                             }}
-                            onClickTag={onClickTag}
+                            firstHeadingIsLink
+                            collapsible={listLayout === "masonry"}
                             updateMemo={updateMemoContentCallback}
                             doubleClickToEdit={doubleClickToEdit}
                             className="animate-in slide-in-from-bottom fade-in"
@@ -104,16 +90,26 @@ export function ListMemosPage(props: ListMemosPageProps) {
             memos,
             filter,
             tags,
-            onClickTag,
             updateMemoContentCallback,
             doubleClickToEdit,
+            listLayout,
         ],
     )
 
     return (
         <div className={`memos-list-page list-layout-${listLayout}`}>
+            <ListFilter
+                filter={filter}
+                tags={{
+                    tags,
+                    isLoading: isLoadingTags,
+                    nextPage: actions.loadNextTagsPage,
+                }}
+                onChangeFilter={onChangeFilters}
+            />
+
             <div className="grouped-memos-list">
-                <Greeting />
+                <Header filter={filter} />
 
                 {showEditor && (
                     <NewMemoEditor
@@ -160,72 +156,7 @@ export function ListMemosPage(props: ListMemosPageProps) {
                     )}
                 </div>
             </div>
-
-            <Filters
-                filters={filter}
-                tags={{
-                    tags,
-                    isLoading: isLoadingTags,
-                    nextPage: actions.loadNextTagsPage,
-                }}
-                onChangeFilter={onChangeFilters}
-                className="filters-sidebar"
-            />
         </div>
-    )
-}
-
-function NewMemoEditor(props: {
-    tags: Tag[]
-    createMemo: (memo: CreateMemoRequest) => void
-    inProgress: boolean
-}) {
-    let createMemo = useCallback(
-        (memo: CreateMemoRequest) => {
-            memo.content = memo.content.trim()
-            if (memo.content === "") {
-                return
-            }
-
-            props.createMemo(memo)
-        },
-        [props.createMemo],
-    )
-
-    let [newMemo, setNewMemo] = useState({
-        id: Date.now().toString(),
-        name: "",
-        content: "",
-        isArchived: false,
-        isDeleted: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    })
-
-    useEffect(() => {
-        if (!props.inProgress) {
-            setNewMemo({
-                id: Date.now().toString(),
-                name: "",
-                content: "",
-                isArchived: false,
-                isDeleted: false,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            })
-        }
-    }, [props.inProgress])
-
-    return (
-        <Editor
-            memo={newMemo}
-            tags={props.tags}
-            onSave={createMemo}
-            placeholder="Belt out a memo..."
-            autoFocus={true}
-            className="new-memo-editor"
-            buttonPosition="bottom"
-        />
     )
 }
 
@@ -234,7 +165,7 @@ function DayHeader({ date, diffToToday }: { date: Date; diffToToday: number }) {
     let prefix = ""
     if (diffToToday < 1) {
         prefix = t.DayToday
-    } else if (diffToToday <= 2) {
+    } else if (diffToToday === 1) {
         prefix = t.DayYesterday
     }
 
@@ -257,8 +188,61 @@ function DayHeader({ date, diffToToday }: { date: Date; diffToToday: number }) {
     )
 }
 
+function Header({ filter }: { filter: Filter }) {
+    let t = useT("pages/ListMemos/Header")
+
+    if (!filter) {
+        return (
+            <header className="list-header">
+                <Greeting key="greeting" />
+            </header>
+        )
+    }
+
+    let children: React.ReactNode[] = []
+
+    if (filter.isDeleted) {
+        children.push(t.Deleted, <br />)
+    }
+
+    if (filter.isArchived) {
+        children.push(t.Archived, <br />)
+    }
+
+    if (filter.tag) {
+        children.push(t.MemosForTag, <em key="tag">{`#${filter.tag}`}</em>)
+    }
+
+    if (filter.exactDate) {
+        children.push(
+            children.length === 0
+                ? t.MemosForExactDateStandalone
+                : t.MemosForExactDate,
+            <em key="exactDate">
+                <DateTime
+                    date={filter.exactDate}
+                    opts={{ dateStyle: "medium" }}
+                />
+            </em>,
+        )
+    }
+
+    if (filter.query) {
+        children.push(
+            children.length === 0 ? t.MemosForQueryStandalone : t.MemosForQuery,
+            <em key="query">{`"${filter.query}"`}</em>,
+        )
+    }
+
+    if (children.length === 0) {
+        children = [<Greeting key="greeting" />]
+    }
+
+    return <header className="list-header">{children}</header>
+}
+
 function Greeting() {
-    let t = useT("components/Greeting")
+    let t = useT("pages/ListMemos/Greeting")
     let displayName = useAccountDisplayName()
     let greeting = useMemo(() => {
         let now = new Date()
@@ -276,7 +260,7 @@ function Greeting() {
     return (
         <div className="greeting">
             {greeting}
-            <span>{displayName}</span>
+            <em>{displayName}</em>
         </div>
     )
 }

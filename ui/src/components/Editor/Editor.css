@@ -10,14 +10,14 @@
 }
 
 .editor-buttons {
-    @apply p-2 flex items-center justify-between gap-2;
+    @apply p-2 flex items-center justify-between gap-2 bg-surface sticky top-0 z-10;
+
+    &.position-bottom {
+        order: 2;
+    }
 
     &:has(button:only-child) {
         @apply justify-end;
-    }
-
-    &.position-top {
-        order: 1;
     }
 }
 
@@ -37,6 +37,20 @@
 .cm-scroller {
     @apply flex-grow flex-col overscroll-contain;
     overflow: auto;
+
+    line-height: 1.7142857 !important;
+    font-size: 0.875rem !important;
+
+    @container (max-width: 28rem) {
+        /* sm */
+        font-size: 1rem !important;
+        line-height: 1.75 !important;
+    }
+
+    @media (max-width: 768px) {
+        /* prevent zoom in on iPhones */
+        font-size: 16px !important;
+    }
 }
 
 .cm-content {
@@ -62,4 +76,42 @@
 
 .cm-placeholder {
     color: rgb(var(--color-subtle-dark)) !important;
+}
+
+.cm-heading {
+    color: var(--code-heading);
+}
+
+.cm-heading-1 {
+    color: var(--code-heading);
+    font-size: 1.7em;
+    font-weight: 700;
+}
+
+.cm-heading-2 {
+    color: var(--code-heading);
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+.cm-heading-3 {
+    color: var(--code-heading);
+    font-size: 1.28em;
+    font-weight: 700;
+}
+
+.cm-heading-4 {
+    font-weight: 700;
+    font-size: 1.42em;
+    color: var(--code-heading);
+}
+
+.cm-heading-5 {
+    font-weight: 700;
+    color: var(--code-heading);
+}
+
+.cm-heading-6 {
+    font-weight: 600;
+    color: var(--code-heading);
 }

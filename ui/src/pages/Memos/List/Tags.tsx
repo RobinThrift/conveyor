@@ -7,19 +7,19 @@ import TreeView, {
     type ITreeViewOnNodeSelectProps,
 } from "react-accessible-treeview"
 
-export interface TagTreeProps {
+export interface TagsProps {
     className?: string
     tags: Tag[]
     selected?: string
     onSelect: (selected?: string) => void
 }
 
-export function TagTree({
+export function Tags({
     className,
     tags,
     selected,
     onSelect: propagateSelectionChange,
-}: TagTreeProps) {
+}: TagsProps) {
     let tagTree = useMemo(() => {
         let tree: Record<string, INode> = {
             root: { name: "", id: "root", children: [], parent: null },
@@ -69,18 +69,34 @@ export function TagTree({
         [propagateSelectionChange, selected],
     )
 
+    let expandedIDs = useMemo(() => {
+        if (!selected || !tagTree.find((n) => n.id === selected)) {
+            return []
+        }
+
+        return selected.split("/").reduce((ids, segment) => {
+            if (ids.length === 0) {
+                ids.push(segment)
+            } else {
+                ids.push(`${ids.at(-1)}/${segment}`)
+            }
+            return ids
+        }, [] as string[])
+    }, [selected, tagTree])
+
     if (tags.length === 0) {
         return null
     }
 
     return (
-        <div className={clsx(className)}>
+        <div className={clsx("tags-filter", className)}>
             <TreeView
                 data={tagTree}
                 className=""
                 aria-label="tag tree"
                 onNodeSelect={onSelect}
                 selectedIds={selected ? [selected] : []}
+                defaultExpandedIds={expandedIDs}
                 togglableSelect={true}
                 nodeRenderer={({
                     element,

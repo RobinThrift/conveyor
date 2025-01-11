@@ -1,16 +1,94 @@
 .memo {
-    @apply rounded-lg border border-subtle bg-surface p-4 overflow-x-auto;
-    @apply dark:border-subtle-extra-dark;
+    @apply overflow-x-auto flex flex-col;
 
     &.is-editing {
         @apply p-0;
     }
+
+    @container (width > 28rem) {
+        .memo-date.sm {
+            display: none;
+        }
+
+        .memo-date.md {
+            display: inline;
+        }
+    }
+
+    .show-more-btn {
+        @apply hidden;
+    }
+
+    &.is-collapsed {
+        @apply relative;
+    }
+
+    &.is-collapsed .show-more-btn {
+        @apply flex;
+    }
+
+    &.expanded {
+        max-height: max-content !important;
+        overflow: auto !important;
+    }
 }
 
 .memo-header {
-    @apply flex;
+    @apply flex flex-wrap items-center @md:items-start mb-4;
+
+    &:not(:has(h1)) {
+        @apply flex-nowrap;
+        .memo-date {
+            @apply w-fit;
+            order: 1;
+        }
+        .memo-actions {
+            order: 2;
+        }
+    }
+
+    h1 {
+        @apply w-fit order-1;
+    }
 }
 
-.memo-action-bar {
-    @apply flex justify-end flex-1;
+.memo-actions {
+    @apply flex justify-end flex-1 relative order-3 @sm:order-2 self-center;
+}
+
+.memo-date {
+    @apply text-subtle-dark italic w-fit text-xs @sm:text-sm order-3;
+
+    &.sm {
+        @apply order-2;
+    }
+
+    &.md {
+        @apply hidden @md:w-full @md:order-3;
+    }
+}
+
+.memo-editor-dialog {
+    @apply top-0 overflow-auto p-0;
+    width: 100svw;
+    max-width: none;
+    max-height: 100svh;
+    height: 100svh;
+    transform: translate(-50%, 0%) scale(calc(1 - 0.04 * var(--nested-dialogs)));
+
+    &[data-starting-style],
+    &[data-ending-style] {
+        opacity: 0;
+        transform: translate(-50%, 0%)
+            scale(calc(1 - 0.1 * (var(--nested-dialogs) + 1)));
+    }
+}
+
+.show-more-btn {
+    @apply absolute bottom-0 left-0 right-0 h-16 pb-1 flex justify-center items-end text-2xl;
+    background: linear-gradient(
+        180deg,
+        rgba(var(--surface-bg) / 0),
+        rgba(var(--surface-bg) / 1) 80%
+    );
 }

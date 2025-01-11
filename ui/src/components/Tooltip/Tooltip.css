@@ -1,25 +1,46 @@
 .tooltip {
-    @apply py-1 px-3;
+    @apply py-1 px-3 select-none;
     @apply rounded-lg shadow-lg;
-    @apply bg-surface border border-subtle-light;
+    @apply bg-surface;
     @apply text-center text-sm text-text select-none;
-    @apply dark:border dark:border-subtle-extra-dark dark:bg-body-contrast dark:text-body;
+    @apply outline outline-subtle-light;
+    /* @apply dark:border dark:border-subtle-extra-dark dark:bg-body-contrast dark:text-body; */
 
-    min-width: var(--radix-tooltip-trigger-width);
+    min-width: var(--anchor-width);
 
-    &[data-state="delayed-open"][data-side="bottom"] {
+    &[data-open][data-side="bottom"] {
         @apply animate-in fade-in slide-in-from-top-1;
     }
 
-    &[data-state="closed"][data-side="bottom"] {
+    &[data-closed][data-side="bottom"] {
         @apply animate-out fade-out slide-out-to-top-1;
     }
 
-    &[data-state="delayed-open"][data-side="right"] {
+    &[data-open][data-side="right"] {
         @apply animate-in fade-in slide-in-from-right-1;
     }
 
-    &[data-state="delayed-open"][data-side="left"] {
+    &[data-closed][data-side="left"] {
         @apply animate-in fade-in slide-in-from-left-1;
+    }
+}
+
+.tooltip-arrow {
+    @apply fill-surface;
+
+    &[data-side="bottom"] {
+        @apply top-[1px] -translate-y-full;
+    }
+
+    &[data-side="top"] {
+        @apply bottom-0 translate-y-full rotate-180;
+    }
+
+    &[data-side="left"] {
+        @apply right-[6px] translate-x-full rotate-90;
+    }
+
+    &[data-side="right"] {
+        @apply left-[6px] -translate-x-full -rotate-90;
     }
 }

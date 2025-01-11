@@ -5,7 +5,6 @@ import * as Form from "@radix-ui/react-form"
 import React, { useCallback } from "react"
 
 export function SearchBar(props: {
-    className?: string
     onChange: (v: string) => void
 }) {
     let onChange = useCallback(
@@ -27,7 +26,7 @@ export function SearchBar(props: {
     }, [])
 
     return (
-        <Form.Root className={props.className} onSubmit={onSubmit}>
+        <Form.Root className="list-filter-search" onSubmit={onSubmit}>
             <Input
                 name="q"
                 type="search"

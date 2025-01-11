@@ -1,34 +1,28 @@
+@import "./list-masonry.css";
+
 .memos-list-page {
-    @apply flex gap-4 justify-center w-full;
+    @apply flex flex-col tablet:flex-row gap-4 justify-center w-full;
     @apply tablet:max-w-6xl tablet:container tablet:mx-auto tablet:pt-0;
-    @apply lg:max-w-[2000px];
+    @apply lg:max-w-[2000px] xl:max-w-[2300px];
 }
 
-.greeting {
-    @apply text-4xl text-subtle-extra-dark;
-    @apply relative bg-body w-full pt-16 pb-4 px-2 rounded-b-lg left-0 top-0;
+.list-header {
+    @apply text-xl tablet:text-2xl lg:text-3xl text-subtle-extra-dark;
+    @apply relative bg-body w-full tablet:pt-16 pb-4 px-2 rounded-b-lg left-0 top-0;
     @apply xs:pt-4 lg:px-1;
 
     pointer-events: none;
 
-    & > span {
-        @apply block text-primary font-serif -mt-1 text-5xl;
+    em {
+        @apply block text-primary font-serif -mt-1 not-italic text-balance font-semibold;
+        @apply text-5xl lg:text-6xl;
     }
+}
 
-    &::before {
-        @apply -bottom-12 left-0 size-12 rounded-tl-lg bg-transparent;
-        display: block;
-        position: absolute;
-        content: "";
-        box-shadow: -0.5rem -0.5rem 0 rgba(var(--body-bg) / 90);
-    }
-
-    &::after {
-        @apply -bottom-12 right-0 size-12 rounded-tr-lg bg-transparent;
-        display: block;
-        position: absolute;
-        content: "";
-        box-shadow: 0.5rem -0.5rem 0 rgb(var(--body-bg));
+.grouped-memos-list {
+    @media (min-width: 1024px) {
+        /* tablet */
+        order: 1;
     }
 }
 
@@ -48,17 +42,15 @@
     @apply sticky -mb-1 py-1 px-2 w-fit rounded-lg top-2;
     @apply text-subtle-dark;
     @apply bg-body/80 xs:top-2 xs:text-xl;
+    @apply lg:top-14 lg:-ml-2;
+    @apply xxl:-translate-x-full xxl:-ml-4;
+
     z-index: 200;
 
     backdrop-filter: blur(4px);
 
     .named-day-date {
         @apply text-subtle-dark ms-1 text-xs sm:text-sm;
-    }
-
-    @media (min-width: 2100px) {
-        /* lg */
-        @apply top-14 -ml-2;
     }
 }
 
@@ -80,20 +72,6 @@
 
 .grouped-memos-list {
     width: 100%;
-}
-
-.new-memo-editor {
-    @apply rounded mx-3 border border-subtle;
-    @apply lg:mx-1;
-    min-height: 1ch;
-
-    &:focus-within {
-        @apply shadow;
-    }
-
-    &.editor {
-        @apply bg-surface;
-    }
 }
 
 .memos-list-page .memo.is-editing {
@@ -132,93 +110,20 @@
     }
 }
 
-.memos-list-page.list-layout-masonry .memos-list {
-    display: flex;
-    flex-flow: row wrap;
-    gap: 0.5rem;
-    align-content: space-between;
-
+.memos-list-page .memos-list {
     .memo {
-        width: calc(50% - 0.25rem);
-    }
-
-    .memo:nth-of-type(1) {
-        order: 1;
-        width: 100%;
-    }
-    .memo:nth-of-type(2n) {
-        order: 2;
-    }
-    .memo:nth-of-type(2n + 1) {
-        order: 2;
-    }
-
-    @media (min-width: 1024px) {
-        /* tablet */
-        .memo {
-            width: calc(50% - 0.3rem);
-        }
-
-        gap: 0.6rem;
-
-        .memo:nth-of-type(1) {
-            order: 1;
-            width: 100%;
-        }
-    }
-
-    @media (min-width: 1680px) {
-        /* md */
-        .memo {
-            width: calc(33% - 0.25rem);
-        }
-
-        gap: 0.6rem;
-
-        .memo:nth-of-type(1) {
-            order: 1;
-            width: 100%;
-        }
-        .memo:nth-of-type(3n) {
-            order: 2;
-            width: 33%;
-        }
-    }
-
-    @media (min-width: 2100px) {
-        /* lg */
-        @apply px-1;
-        max-width: none;
-
-        .memo {
-            width: calc(50% - 1rem);
-        }
-
-        gap: 1rem;
-
-        .memo:nth-of-type(2n) {
-            width: 50%;
-        }
-        .memo:nth-of-type(2n + 1) {
-            width: calc(50% - 1rem);
-        }
-        .memo:nth-of-type(1) {
-            order: 1;
-            width: calc(70% - 1rem);
-        }
-        .memo:nth-of-type(2) {
-            order: 1;
-            width: calc(30%);
-        }
+        /* @apply border-b-2 border-body-contrast/50 pb-2; */
+        @apply bg-surface rounded p-2 lg:p-4;
     }
 }
 
-.filters-sidebar {
-    @apply tablet:pe-4 overscroll-none;
+.list-filter {
+    @apply tablet:pe-4 overscroll-none flex flex-col;
 
     @media (min-width: 1024px) {
         /* tablet */
-        @apply relative right-0 mt-28 top-1;
+        order: 2;
+        @apply relative right-0 mt-24 top-1;
         max-width: 300px;
         height: auto;
     }
@@ -228,6 +133,7 @@
     @media (min-width: 1650px) {
         @apply top-4 mt-0;
         position: fixed;
+        width: 350px;
         height: calc(100vh - 1rem);
     }
 
@@ -237,67 +143,229 @@
         position: sticky;
         left: 0;
         right: 0;
-        width: 300px;
+        width: 400px;
         max-width: none;
         height: calc(100vh - 1.5rem);
     }
 }
 
-.filter-overlay {
-    @apply fixed left-0 right-0 top-0 backdrop-blur-sm;
-    transform: translateY(100dvh);
-    z-index: 800;
-    height: 100dvh;
-    background: linear-gradient(
-        180deg,
-        rgba(var(--body-bg) / 1) 5%,
-        rgba(var(--surface-bg) / 0.9) 10%
-    );
-
-    .drag-handle {
-        @apply flex items-center justify-end relative w-full h-20 px-2;
-    }
-}
-
-.dark .filter-overlay {
-    background: linear-gradient(
-        180deg,
-        rgba(var(--body-bg) / 1) 1%,
-        rgba(var(--navigation-bg) / 0.96) 10%
-    );
-}
-
-.filter-overlay-body {
-    @apply h-full w-full px-4 pb-4 overflow-auto;
-
-    .filter-searchbar {
-        @apply mb-4;
+.list-filter-search {
+    @apply flex-1;
+    @media (max-width: 1024px) {
         input {
-            @apply dark:bg-subtle-extra-dark/20;
+            @apply py-1.5 pe-1 ps-7;
+            font-size: 1rem;
         }
     }
 }
 
-.filter-overlay-fab {
-    @apply fixed bottom-20 right-5 size-14 rounded-full bg-primary text-primary-contrast;
-    @apply shadow-lg flex items-center justify-center text-2xl;
-    z-index: 800;
+.date-picker {
+    @apply px-2 w-full relative;
 
-    @media (display-mode: standalone) {
-        @apply bottom-28;
+    .nav {
+        @apply flex items-center absolute top-0 right-0 h-12;
+    }
+
+    .nav-btn {
+        @apply px-0.5 md:!px-1;
+    }
+
+    .dropdowns {
+        @apply flex md:gap-2 relative h-12 items-center w-fit;
+    }
+
+    .dropdown {
+        @apply flex items-center relative rounded px-1 -left-1 text-sm lg:text-base;
+        @apply hover:bg-surface hover:shadow-md cursor-pointer;
+
+        .months-dropdown,
+        .years-dropdown {
+            @apply appearance-none border-0 absolute inset-0 opacity-0 w-full z-20 -left-1;
+        }
+
+        .caption-label {
+            @apply flex items-center cursor-pointer;
+        }
+    }
+
+    .month-grid {
+        @apply w-full;
+    }
+
+    .weekday {
+        @apply text-center p-0 font-semibold text-sm text-subtle-extra-dark;
+    }
+
+    .day {
+        padding: 0;
+
+        &.outside {
+            @apply text-subtle;
+        }
+
+        &.today {
+            @apply text-primary-dark dark:text-primary-light;
+        }
+
+        &.selected {
+            .day-btn {
+                @apply bg-primary text-primary-contrast;
+            }
+        }
+    }
+
+    .day-btn {
+        @apply flex items-center justify-center py-2 text-base rounded-lg;
+        width: 100%;
+
+        &:hover {
+            @apply bg-subtle text-subtle-contrast;
+        }
     }
 }
 
-.filter-tabs-items {
-    @apply mb-4 w-full grid grid-cols-2 items-center gap-2 p-1 bg-subtle-extra-light rounded-lg;
-    @apply dark:bg-subtle-extra-dark/40;
+.short-day-picker {
+    @apply w-full;
+
+    @media (max-width: 1024px) {
+        @apply pt-1;
+    }
+
+    .caption {
+        display: none;
+    }
+
+    .months,
+    .month {
+        @apply w-full;
+    }
+
+    .month-grid {
+        @apply w-full flex flex-col;
+    }
+
+    .weekday {
+        @apply text-center p-0 font-semibold text-xs text-primary-dark;
+    }
+
+    .weekdays {
+        @apply w-full grid grid-cols-7;
+    }
+
+    .weeks {
+        @apply flex flex-row flex-nowrap justify-start items-center w-full overflow-x-auto overscroll-none;
+        scroll-snap-type: x mandatory;
+    }
+
+    .week {
+        @apply grid grid-cols-7;
+        flex-basis: 100%;
+        flex-shrink: 0;
+        scroll-snap-align: center;
+
+        &:has(.hidden):not(:has(.today)) {
+            display: none;
+        }
+    }
+
+    .day {
+        @apply flex p-0;
+
+        &.outside {
+            @apply text-subtle;
+        }
+
+        &.today {
+            @apply text-primary-dark dark:text-primary-light;
+        }
+
+        &.selected {
+            @apply bg-primary-extra-light border-t border-t-primary;
+            @apply items-center justify-center p-2;
+            .day-btn {
+                @apply bg-primary text-primary-contrast rounded-full p-1 -mt-1 -mb-1 size-6;
+            }
+        }
+    }
+
+    .day-btn {
+        @apply flex items-center justify-center py-2 text-sm;
+        width: 100%;
+    }
 }
 
-.filter-tabs-item {
-    @apply w-full text-subtle-extra-dark text-center rounded py-0.5;
-    @apply dark:text-subtle-light;
+.collapsibile-date-picker {
+    @apply flex mb-3 tablet:hidden;
 
-    &[data-state="active"] {
-        @apply text-primary bg-surface shadow;
+    & > .btn {
+        min-height: auto !important;
+
+        &:active {
+            @apply bg-transparent text-primary;
+        }
+
+        &:focus,
+        &:focus-visible {
+            @apply -outline-offset-1 bg-transparent text-primary;
+        }
+
+        svg {
+            @apply size-5;
+        }
+    }
+
+    .date-picker {
+        @apply pt-2;
+        display: none;
+
+        .nav-btn {
+            @apply !px-2;
+        }
+
+        .nav {
+            @apply top-1;
+        }
+    }
+
+    &.expanded {
+        @apply flex-col;
+
+        & > .btn {
+            @apply mt-1 p-0 rounded-t-none;
+        }
+
+        .short-day-picker {
+            display: none;
+        }
+
+        .date-picker {
+            display: block;
+        }
+    }
+}
+
+.tags-filter {
+    @apply sm:overflow-auto flex-1 py-2 overscroll-contain;
+}
+
+.new-memo-editor {
+    @apply rounded border border-subtle;
+    @apply tablet:mx-3 lg:mx-1;
+    min-height: 1ch;
+
+    &:focus-within {
+        @apply shadow;
+    }
+
+    &.editor {
+        @apply bg-surface;
+    }
+}
+
+.new-memo-editor-fab {
+    @apply fixed right-2 bottom-28 rounded-full border-0 size-14 z-20 shadow-lg p-0 tablet:hidden;
+
+    & > svg {
+        @apply size-6;
     }
 }

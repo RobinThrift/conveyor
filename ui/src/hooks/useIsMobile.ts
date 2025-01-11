@@ -1,13 +1,13 @@
-import * as React from "react"
+import { useEffect, useState } from "react"
 
 const MOBILE_BREAKPOINT = 1024
 
 export function useIsMobile() {
-    const [isMobile, setIsMobile] = React.useState<boolean | undefined>(
-        undefined,
+    let [isMobile, setIsMobile] = useState<boolean>(
+        window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`).matches,
     )
 
-    React.useEffect(() => {
+    useEffect(() => {
         let mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
         let onChange = () => {
             setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)

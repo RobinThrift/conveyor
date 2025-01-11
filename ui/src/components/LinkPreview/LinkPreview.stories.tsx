@@ -4,13 +4,14 @@ import React from "react"
 import { LinkPreview } from "./LinkPreview"
 
 import "@/index.css"
+import { generateTitle } from "@testhelper"
 
 const meta: Meta<typeof LinkPreview> = {
     title: "Components/LinkPreview",
     component: LinkPreview,
     decorators: [
         (Story) => (
-            <div className="content">
+            <div className="content @container">
                 <Story />
             </div>
         ),
@@ -24,22 +25,22 @@ export const Overview: Story = {
     args: {
         children: faker.internet.url(),
         img: faker.image.url({ width: 1200, height: 600 }),
-        title: faker.lorem.sentences(1),
-        description: faker.lorem.sentences({ min: 2, max: 6 }),
+        title: generateTitle(),
+        description: faker.lorem.sentences({ min: 1, max: 3 }),
     },
 }
 
 export const MissingImage: Story = {
     args: {
         children: faker.internet.url(),
-        title: faker.lorem.sentences(1),
-        description: faker.lorem.sentences({ min: 2, max: 6 }),
+        title: generateTitle(),
+        description: faker.lorem.sentences({ min: 1, max: 3 }),
     },
 }
 
 export const MissingImageAndDescription: Story = {
     args: {
         children: faker.internet.url(),
-        title: faker.lorem.sentences(1),
+        title: generateTitle(),
     },
 }

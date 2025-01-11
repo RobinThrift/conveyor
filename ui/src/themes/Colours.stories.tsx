@@ -36,7 +36,10 @@ export const Colours: Story = {
                 <span
                     className="text-xs"
                     style={{
-                        color: `rgb(var(${varname}-contrast))`,
+                        color: `rgb(var(${varname}))`,
+                        filter: "invert(1) grayscale(1) brightness(1.3) contrast(9000)",
+                        mixBlendMode: "luminosity",
+                        opacity: 0.95,
                     }}
                 >
                     {varname}

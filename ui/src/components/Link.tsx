@@ -18,7 +18,12 @@ export const Link = React.forwardRef<
     let onClick = useCallback(
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault()
-            goto(new URL(href, globalThis.location.href).pathname, {
+            let url = new URL(href, globalThis.location.href)
+            let location = url.pathname
+            if (url.searchParams.size > 0) {
+                location += `?${url.searchParams.toString()}`
+            }
+            goto(location, {
                 viewTransition,
             })
         },

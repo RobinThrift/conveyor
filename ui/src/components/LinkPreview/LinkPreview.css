@@ -1,6 +1,6 @@
 .link-preview {
     @apply relative rounded-lg overflow-hidden shadow top-0 left-0;
-    @apply w-full my-2 sm:max-w-[50%] sm:float-left sm:clear-left sm:mr-2 sm:mt-0;
+    @apply w-full my-2 @md:max-w-[50%] @md:float-left @md:clear-left @md:mr-2 @md:mt-0;
     @apply sm:hover:shadow-lg sm:hover:-top-0.5 sm:hover:-left-0.5;
     transition: top .2s, left .2s, box-shadow .1s;
 
@@ -10,21 +10,42 @@
         img {
             @apply w-full min-h-[2lh];
         }
+    }
 
-        & > div {
-            @apply absolute right-0 top-0 py-2 px-4 bg-surface/40  backdrop-blur-sm;
-            @apply rounded-bl-lg border-l border-b border-subtle-extra-light dark:border-subtle-extra-dark;
+    .description-container {
+        @apply @sm:absolute bottom-0 left-0 right-0;
+        @apply flex flex-col @sm:flex-row gap-2 items-center justify-between;
+        @apply py-2 px-4;
+        @apply bg-surface @sm:bg-transparent;
 
-            & > span {
-                @apply text-black dark:text-white;
-                mix-blend-mode: difference;
+        @container (min-width: 24rem) {
+            /* sm container size */
+            .description {
+                @apply p-1 rounded;
+                color: white;
+                text-shadow: 1px 1px 5px rgb(0 0 0 / 0.8);
+                mix-blend-mode: lighten;
+                backdrop-filter: contrast(0.7) brightness(0.95);
             }
         }
     }
 
-    .description {
-        @apply py-2 px-4 bg-primary text-primary-contrast;
+    h4 {
+        @apply font-bold;
     }
+
+    .arrow {
+        @apply text-lg p-3 bg-surface items-center justify-center rounded-full text-text shadow;
+        @apply hidden @md:flex;
+
+        &:hover {
+            @apply bg-primary text-primary-contrast;
+        }
+    }
+}
+
+.list-layout-masonry {
+    @apply float-none max-w-full;
 }
 
 .link-preview-hover-card {

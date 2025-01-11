@@ -17,6 +17,7 @@ import {
     add,
 } from "date-fns"
 import { faker } from "@faker-js/faker"
+import { generateMemo } from "./helper"
 import type { UpdateSettingsRequest } from "../src/storage/remote/apiv1/settings"
 import type { CreateAPITokenRequest } from "../src/storage/remote/apiv1/apitokens"
 
@@ -56,11 +57,10 @@ const mockData: MockData = (() => {
 
         let memo = {
             id: `10-${i}`,
-            content: `# Memo ${i}
-
-${faker.lorem.lines({ min: 1, max: 10 })}
-
-#${memoTags.join(" #")}`,
+            content: generateMemo({
+                title: `Memo ${i}`,
+                tags: memoTags,
+            }),
             isArchived: i > 90 && i < 100,
             isDeleted: i > 100,
             createdAt: sub(now, { hours: i * 2 }),
@@ -89,6 +89,12 @@ ${faker.lorem.lines({ min: 1, max: 10 })}
 })()
 
 export const mockAPI: HttpHandler[] = [
+    http.get("iframe.html/check_login", async () => {
+        return new HttpResponse(null, {
+            status: 200,
+        })
+    }),
+
     http.get<{ memoID: string }, UpdateMemoRequest>(
         "/api/v1/memos/:memoID",
         async ({ params }) => {
@@ -165,7 +171,7 @@ export const mockAPI: HttpHandler[] = [
 
             if (
                 filters.tag &&
-                !new RegExp(`#${filters.tag}$`).test(memo.content)
+                !new RegExp(`#${filters.tag}$`, "m").test(memo.content)
             ) {
                 continue
             }

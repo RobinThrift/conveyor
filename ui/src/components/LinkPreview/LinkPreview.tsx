@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "@phosphor-icons/react"
 import * as HoverCard from "@radix-ui/react-hover-card"
 import clsx from "clsx"
 import React from "react"
@@ -20,6 +21,7 @@ export function LinkPreview(props: LinkPreviewProps) {
                 rel="noreferrer noopener"
             >
                 {props.title}
+                <ArrowUpRight className="inline ms-0.5" />
             </a>
         )
     }
@@ -34,6 +36,7 @@ export function LinkPreview(props: LinkPreviewProps) {
                         rel="noreferrer noopener"
                     >
                         {props.title}
+                        <ArrowUpRight className="inline ms-0.5" />
                     </a>
                 </HoverCard.Trigger>
                 <HoverCard.Portal>
@@ -55,14 +58,24 @@ export function LinkPreview(props: LinkPreviewProps) {
                 href={props.children}
                 target={props.title}
                 className="preview-img"
+                rel="noreferrer noopener"
             >
-                <div>
-                    <span>{props.title ?? props.children}</span>
-                </div>
                 <img src={props.img} alt={props.alt || props.title} />
             </a>
-
-            <div className="description">{props.description}</div>
+            <div className="description-container">
+                <div className="description content">
+                    {props.title && <h4>{props.title}</h4>}
+                    <p>{props.description}</p>
+                </div>
+                <a
+                    href={props.children}
+                    target={props.title}
+                    rel="noreferrer noopener"
+                    className="arrow"
+                >
+                    <ArrowUpRight weight="bold" />
+                </a>
+            </div>
         </div>
     )
 }

@@ -4,10 +4,18 @@ import {
     TrashSimple,
     User,
 } from "@phosphor-icons/react"
+import * as RadixDropdownMenu from "@radix-ui/react-dropdown-menu"
 import { action } from "@storybook/addon-actions"
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
-import { DropdownMenu } from "./DropdownMenu"
+import {
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownMenuItemDescription,
+    DropdownMenuItemLabel,
+    DropdownMenuItems,
+    DropdownMenuTrigger,
+} from "./DropdownMenu"
 
 import "@/index.css"
 
@@ -23,47 +31,62 @@ type Story = StoryObj<typeof DropdownMenu>
 export const Basic: Story = {
     name: "DropdownMenu",
     args: {
-        items: [
-            {
-                label: "Edit",
-                action: action("edit"),
-                icon: <Pencil />,
-                description: "Edit the given field",
-            },
-            {
-                label: "Disabled",
-                action: action("disabled"),
-                disabled: true,
-                icon: <User />,
-                description: "Do some action",
-            },
-            {
-                label: "Delete",
-                action: action("delete"),
-                destructive: true,
-                icon: <TrashSimple />,
-                description: "Delete the given field",
-            },
-            {
-                label: "Delete (Disabled)",
-                action: action("delete-disabled"),
-                destructive: true,
-                disabled: true,
-                icon: <TrashSimple />,
-                description: "Disabled destructive action",
-            },
+        children: [
+            <DropdownMenuTrigger key="trigger">
+                Dropdown Menu
+            </DropdownMenuTrigger>,
+            <DropdownMenuItems key="items">
+                <DropdownMenuItem action={action("edit")}>
+                    <DropdownMenuItemLabel icon={<Pencil />}>
+                        Edit
+                    </DropdownMenuItemLabel>
+                    <DropdownMenuItemDescription>
+                        Edit the given field
+                    </DropdownMenuItemDescription>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem action={action("disabled")} disabled>
+                    <DropdownMenuItemLabel icon={<User />}>
+                        Disabled
+                    </DropdownMenuItemLabel>
+                    <DropdownMenuItemDescription>
+                        {" "}
+                        Do some action{" "}
+                    </DropdownMenuItemDescription>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem action={action("delete")} destructive>
+                    <DropdownMenuItemLabel icon={<TrashSimple />}>
+                        Delete
+                    </DropdownMenuItemLabel>
+                    <DropdownMenuItemDescription>
+                        Delete the given field
+                    </DropdownMenuItemDescription>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                    action={action("delete")}
+                    destructive
+                    disabled
+                >
+                    <DropdownMenuItemLabel icon={<TrashSimple />}>
+                        Delete (Disabled)
+                    </DropdownMenuItemLabel>
+                    <DropdownMenuItemDescription>
+                        Disabled destructive action
+                    </DropdownMenuItemDescription>
+                </DropdownMenuItem>
+            </DropdownMenuItems>,
         ],
-
-        iconRight: <DotsThreeVertical />,
-
-        children: "Dropdown Menu",
     },
 
     render: (args) => {
         return (
             <div className="flex gap-3">
                 <DropdownMenu {...args} />
-                <DropdownMenu {...args} open={true} modal={false} />
+                <RadixDropdownMenu.Root modal={false} open={true}>
+                    {args.children}
+                </RadixDropdownMenu.Root>
             </div>
         )
     },
@@ -71,31 +94,49 @@ export const Basic: Story = {
 
 export const Variants: Story = {
     args: {
-        items: [
-            {
-                label: "Edit",
-                action: action("edit"),
-                icon: <Pencil />,
-            },
-            {
-                label: "Disabled",
-                action: action("disabled"),
-                disabled: true,
-                icon: <User />,
-            },
-            {
-                label: "Delete",
-                action: action("delete"),
-                destructive: true,
-                icon: <TrashSimple />,
-            },
-            {
-                label: "Delete (Disabled)",
-                action: action("delete-disabled"),
-                destructive: true,
-                disabled: true,
-                icon: <TrashSimple />,
-            },
+        children: [
+            <DropdownMenuItems key="items">
+                <DropdownMenuItem action={action("edit")}>
+                    <DropdownMenuItemLabel icon={<Pencil />}>
+                        Edit
+                    </DropdownMenuItemLabel>
+                    <DropdownMenuItemDescription>
+                        Edit the given field
+                    </DropdownMenuItemDescription>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem action={action("disabled")} disabled>
+                    <DropdownMenuItemLabel icon={<User />}>
+                        Disabled
+                    </DropdownMenuItemLabel>
+                    <DropdownMenuItemDescription>
+                        {" "}
+                        Do some action{" "}
+                    </DropdownMenuItemDescription>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem action={action("delete")} destructive>
+                    <DropdownMenuItemLabel icon={<TrashSimple />}>
+                        Delete
+                    </DropdownMenuItemLabel>
+                    <DropdownMenuItemDescription>
+                        Delete the given field
+                    </DropdownMenuItemDescription>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                    action={action("delete")}
+                    destructive
+                    disabled
+                >
+                    <DropdownMenuItemLabel icon={<TrashSimple />}>
+                        Delete (Disabled)
+                    </DropdownMenuItemLabel>
+                    <DropdownMenuItemDescription>
+                        Disabled destructive action
+                    </DropdownMenuItemDescription>
+                </DropdownMenuItem>
+            </DropdownMenuItems>,
         ],
     },
 
@@ -103,45 +144,71 @@ export const Variants: Story = {
         return (
             <div className="space-y-2">
                 <div className="flex gap-2">
-                    <DropdownMenu {...args} variant="regular">
-                        Regular
+                    <DropdownMenu {...args}>
+                        <DropdownMenuTrigger variant="regular">
+                            Regular
+                        </DropdownMenuTrigger>
+                        {args.children}
                     </DropdownMenu>
-                    <DropdownMenu {...args} variant="primary">
-                        Subtle
+
+                    <DropdownMenu {...args}>
+                        <DropdownMenuTrigger variant="primary">
+                            Primary
+                        </DropdownMenuTrigger>
+                        {args.children}
                     </DropdownMenu>
                 </div>
 
                 <div className="flex gap-2">
-                    <DropdownMenu {...args} variant="regular" outline={true}>
-                        Outline Regular
+                    <DropdownMenu {...args}>
+                        <DropdownMenuTrigger variant="regular" outline>
+                            Outline Regular
+                        </DropdownMenuTrigger>
+                        {args.children}
                     </DropdownMenu>
-                    <DropdownMenu {...args} variant="primary" outline={true}>
-                        Outline Subtle
+
+                    <DropdownMenu {...args}>
+                        <DropdownMenuTrigger variant="primary" outline>
+                            Outline Primary
+                        </DropdownMenuTrigger>
+                        {args.children}
                     </DropdownMenu>
                 </div>
 
                 <div className="flex gap-2">
-                    <DropdownMenu {...args} variant="regular" plain={true}>
-                        Regular
+                    <DropdownMenu {...args}>
+                        <DropdownMenuTrigger variant="regular" plain>
+                            Plain Regular
+                        </DropdownMenuTrigger>
+                        {args.children}
                     </DropdownMenu>
-                    <DropdownMenu {...args} variant="primary" plain={true}>
-                        Subtle
+
+                    <DropdownMenu {...args}>
+                        <DropdownMenuTrigger variant="primary" plain>
+                            Plain Primary
+                        </DropdownMenuTrigger>
+                        {args.children}
                     </DropdownMenu>
                 </div>
 
                 <div className="flex gap-2">
-                    <DropdownMenu
-                        {...args}
-                        variant="regular"
-                        plain={true}
-                        iconRight={<DotsThreeVertical />}
-                    />
-                    <DropdownMenu
-                        {...args}
-                        variant="primary"
-                        plain={true}
-                        iconRight={<DotsThreeVertical />}
-                    />
+                    <DropdownMenu {...args}>
+                        <DropdownMenuTrigger
+                            variant="regular"
+                            plain
+                            iconRight={<DotsThreeVertical />}
+                        />
+                        {args.children}
+                    </DropdownMenu>
+
+                    <DropdownMenu {...args}>
+                        <DropdownMenuTrigger
+                            variant="primary"
+                            plain
+                            iconRight={<DotsThreeVertical />}
+                        />
+                        {args.children}
+                    </DropdownMenu>
                 </div>
             </div>
         )

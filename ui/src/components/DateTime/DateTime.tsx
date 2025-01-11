@@ -27,7 +27,7 @@ export const DateTime = React.forwardRef<HTMLTimeElement, DateTimeProps>(
                 if (!relative) {
                     return time(
                         date,
-                        opts ?? { dateStyle: "long", timeStyle: "medium" },
+                        opts ?? { dateStyle: "long", timeStyle: "short" },
                     )
                 }
 
@@ -43,7 +43,10 @@ export const DateTime = React.forwardRef<HTMLTimeElement, DateTimeProps>(
                     })
                 }
 
-                return time(date, { dateStyle: "long", timeStyle: "medium" })
+                return time(
+                    date,
+                    opts ?? { dateStyle: "long", timeStyle: "short" },
+                )
             } catch (err) {
                 return t.invalidTime({
                     date: date?.toString(),

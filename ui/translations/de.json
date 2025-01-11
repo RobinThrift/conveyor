@@ -6,6 +6,10 @@
         "Settings": "Einstellungen"
     },
 
+    "components/Memo": {
+        "ShowMore": "Alles Anzeigen"
+    },
+
     "components/Memo/Actions": {
         "View": "Ansehen",
         "Edit": "Bearbeiten",
@@ -22,7 +26,10 @@
 
     "components/Editor": {
         "Cancel": "Abbrechen",
-        "Save": "Speichern"
+        "Save": "Speichern",
+        "DiscardChangesTitle": "Verwerfen",
+        "DiscardChangesDescription": "Bist du dir sicher, dass du die Änderungen verwerfen willst?",
+        "DiscardChangesConfirmation": "Verwerfen"
     },
 
     "components/DateTime": {
@@ -40,24 +47,9 @@
         "SelectModeAriaLabel": "Auswahl des Hell- oder Dunkelmodus"
     },
 
-    "components/Filters": {
-        "TabDate": "Datum",
-        "TabTags": "Tags"
-    },
-
-    "components/Filters/Calendar": {
-        "Today": "Heute"
-    },
-
     "components/Notifications": {
         "Label": "Benachrichtigungen",
         "Dismiss": "Schließen"
-    },
-
-    "components/Greeting": {
-        "Morning": "Good Morning, ",
-        "Afternoon": "Good Afternoon, ",
-        "Evening": "Good Evening, "
     },
 
     "pages/Errors/NotFound": {
@@ -100,6 +92,26 @@
         "LayoutSingle": "Einzeln",
         "LayoutMasonry": "Mosaic",
         "OpenFilterOverlayButtonLabel": "Filter Overlay öffnen"
+    },
+
+    "pages/ListMemos/Header": {
+        "Archived": "Archivierte memos",
+        "Deleted": "Gelöschte Memos",
+        "MemosForTag": "Memos mit dem Tag",
+        "MemosForExactDate": "vom",
+        "MemosForExactDateStandalone": "Memos vom",
+        "MemosForQuery": "mit Inhalt",
+        "MemosForQueryStandalone": "Memos mit Inhalt"
+    },
+
+    "pages/ListMemos/Greeting": {
+        "Morning": "Moin, ",
+        "Afternoon": "Guten Tag, ",
+        "Evening": "Abend, "
+    },
+
+    "pages/ListMemos/DatePicker": {
+        "Today": "Heute"
     },
 
     "pages/Settings": {

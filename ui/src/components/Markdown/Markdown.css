@@ -1,6 +1,7 @@
 .content {
     @apply prose-sm @md:prose-base max-w-none;
-    @apply prose-ul:my-0 prose-li:p-0 prose-li:my-0 prose-p:my-2 sm:prose-p:my-4;
+    @apply prose-ul:my-0 prose-li:p-0 prose-li:my-0 prose-ul:list-disc prose-ol:list-decimal prose-p:my-2 sm:prose-p:my-4;
+    @apply prose-blockquote:text-subtle-extra-dark prose-blockquote:font-serif prose-blockquote:italic prose-blockquote:border-l;
     @apply dark:prose-invert;
     @apply text-text;
 
@@ -14,11 +15,23 @@
     h5,
     h6 {
         @apply mb-0 font-serif font-bold;
-        text-wrap: balance;
+        text-wrap: pretty;
+    }
+
+    @media (max-width: 768px) {
+        @container (width < 50vw) {
+            h1 {
+                @apply text-2xl;
+            }
+        }
     }
 
     a {
         @apply text-primary hover:underline;
+    }
+
+    h1 a {
+        @apply text-text;
     }
 
     li > p {
@@ -42,10 +55,11 @@
     }
 
     .table-wrapper {
-        @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6;
+        @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6 w-full;
         @apply border-subtle-extra-dark;
         table {
             margin: 0;
+            width: 100%;
         }
     }
 
@@ -71,8 +85,12 @@
         }
     }
 
+    pre {
+        @apply overflow-x-auto;
+    }
+
     :where(code):not(pre > code) {
-        @apply bg-sidebar;
+        @apply bg-surface;
     }
 
     :where(code):not(

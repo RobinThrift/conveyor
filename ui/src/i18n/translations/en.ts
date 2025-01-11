@@ -22,6 +22,10 @@ export const translations = {
         Settings: "Settings",
     },
 
+    "components/Memo": {
+        ShowMore: "Show More",
+    },
+
     "components/Memo/Actions": {
         View: "View",
         Edit: "Edit",
@@ -39,6 +43,10 @@ export const translations = {
     "components/Editor": {
         Cancel: "Cancel",
         Save: "Save",
+        DiscardChangesTitle: "Discard Changes",
+        DiscardChangesDescription:
+            "Are you sure you want to discard any changes?",
+        DiscardChangesConfirmation: "Discard",
     },
 
     "components/DateTime": {
@@ -56,24 +64,9 @@ export const translations = {
         SelectModeAriaLabel: "Select light/dark mode",
     },
 
-    "components/Filters": {
-        TabDate: "Date",
-        TabTags: "Tags",
-    },
-
-    "components/Filters/Calendar": {
-        Today: "Today",
-    },
-
     "components/Notifications": {
         Label: "Notifications",
         Dismiss: "Dismiss",
-    },
-
-    "components/Greeting": {
-        Morning: "Good Morning, ",
-        Afternoon: "Good Afternoon, ",
-        Evening: "Good Evening, ",
     },
 
     "pages/Errors/NotFound": {
@@ -111,6 +104,26 @@ export const translations = {
         LayoutSingle: "Single",
         LayoutMasonry: "Masonry",
         OpenFilterOverlayButtonLabel: "Open Filter Overlay",
+    },
+
+    "pages/ListMemos/Header": {
+        Archived: "Archived memos",
+        Deleted: "Deleted Memos",
+        MemosForTag: "Memos tagged",
+        MemosForExactDate: "created on",
+        MemosForExactDateStandalone: "Memos created on",
+        MemosForQuery: "containing",
+        MemosForQueryStandalone: "Memos containing",
+    },
+
+    "pages/ListMemos/Greeting": {
+        Morning: "Good Morning, ",
+        Afternoon: "Good Afternoon, ",
+        Evening: "Good Evening, ",
+    },
+
+    "pages/ListMemos/DatePicker": {
+        Today: "Today",
     },
 
     "pages/Settings": {

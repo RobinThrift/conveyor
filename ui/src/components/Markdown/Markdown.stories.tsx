@@ -1,7 +1,7 @@
 import { Provider } from "@/state"
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react"
-import { generateTestContent } from "@testhelper"
+import { generateFullTestContent } from "@testhelper"
 import React, { useMemo } from "react"
 import { Markdown } from "./Markdown"
 
@@ -22,12 +22,9 @@ type Story = StoryObj<typeof Markdown>
 
 export const Everything: Story = {
     name: "Markdown",
-    argTypes: {
-        onClickTag: { action: "onClickTag" },
-    },
     args: {
         id: "storybook",
-        children: generateTestContent(),
+        children: generateFullTestContent(),
     },
     render: (args) => (
         <div className="container mx-auto">
@@ -277,9 +274,6 @@ spec:
 
 export const Directives: Story = {
     name: "Directives",
-    argTypes: {
-        onClickTag: { action: "onClickTag" },
-    },
     args: {
         id: "storybook",
         children: `
@@ -311,7 +305,7 @@ export const StressTest: Story = {
             for (let i = 0; i <= 100; i++) {
                 allArgs.push({
                     ...args,
-                    children: generateTestContent(),
+                    children: generateFullTestContent(),
                 })
             }
 

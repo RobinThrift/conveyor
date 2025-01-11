@@ -36,38 +36,13 @@ export const light = {
         theme: "light",
         settings: {},
         styles: [
-            {
-                tag: t.heading,
-                fontWeight: "600",
-                color: palette.light.muted,
-            },
-            {
-                tag: t.heading1,
-                fontSize: "2.25em",
-                fontWeight: "800",
-            },
-            {
-                tag: t.heading2,
-                fontSize: "1.5em",
-                fontWeight: "700",
-            },
-            {
-                tag: t.heading3,
-                fontSize: "1.25em",
-                fontWeight: "600",
-            },
-            {
-                tag: t.heading4,
-                fontWeight: "700",
-            },
-            {
-                tag: t.heading5,
-                fontWeight: "600",
-            },
-            {
-                tag: t.heading6,
-                fontWeight: "600",
-            },
+            { tag: t.heading, class: "cm-heading" },
+            { tag: t.heading1, class: "cm-heading-1" },
+            { tag: t.heading2, class: "cm-heading-2" },
+            { tag: t.heading3, class: "cm-heading-3" },
+            { tag: t.heading4, class: "cm-heading-4" },
+            { tag: t.heading5, class: "cm-heading-5" },
+            { tag: t.heading6, class: "cm-heading-6" },
 
             { tag: t.keyword, color: palette.light.rose },
             {
@@ -129,38 +104,13 @@ export const dark = {
         theme: "dark",
         settings: {},
         styles: [
-            {
-                tag: t.heading,
-                fontWeight: "600",
-                color: palette.light.muted,
-            },
-            {
-                tag: t.heading1,
-                fontSize: "2.25em",
-                fontWeight: "800",
-            },
-            {
-                tag: t.heading2,
-                fontSize: "1.5em",
-                fontWeight: "700",
-            },
-            {
-                tag: t.heading3,
-                fontSize: "1.25em",
-                fontWeight: "600",
-            },
-            {
-                tag: t.heading4,
-                fontWeight: "700",
-            },
-            {
-                tag: t.heading5,
-                fontWeight: "600",
-            },
-            {
-                tag: t.heading6,
-                fontWeight: "600",
-            },
+            { tag: t.heading, class: "cm-heading" },
+            { tag: t.heading1, class: "cm-heading-1" },
+            { tag: t.heading2, class: "cm-heading-2" },
+            { tag: t.heading3, class: "cm-heading-3" },
+            { tag: t.heading4, class: "cm-heading-4" },
+            { tag: t.heading5, class: "cm-heading-5" },
+            { tag: t.heading6, class: "cm-heading-6" },
 
             { tag: t.keyword, color: palette.dark.rose },
             {

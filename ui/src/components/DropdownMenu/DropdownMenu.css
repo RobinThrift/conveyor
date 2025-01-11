@@ -71,3 +71,7 @@
 .dropdown-menu-list.sm .dropdown-menu-item {
     @apply px-2 py-1;
 }
+
+.dropdown-menu-item-label {
+    @apply flex items-center gap-2;
+}

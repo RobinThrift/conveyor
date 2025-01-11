@@ -18,6 +18,8 @@ export default {
             sm: "1440px",
             md: "1680px",
             lg: "2100px",
+            xl: "2600px",
+            xxl: "2800px",
         },
 
         extend: {

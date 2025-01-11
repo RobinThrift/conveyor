@@ -125,7 +125,7 @@ function groupByDay(
     let now = roundToNearestMinutes(new Date())
 
     memos.forEach((memo) => {
-        let day = format(memo.createdAt, "yyyy-mm-dd")
+        let day = format(memo.createdAt, "yyyy-MM-dd")
         let diffToToday = differenceInCalendarDays(now, memo.createdAt)
         if (!grouped[day]) {
             grouped[day] = { date: memo.createdAt, memos: [], diffToToday }
