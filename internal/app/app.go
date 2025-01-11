@@ -13,8 +13,6 @@ import (
 	"github.com/RobinThrift/belt/internal/ingress/apiv1"
 	uiIngress "github.com/RobinThrift/belt/internal/ingress/ui"
 	"github.com/RobinThrift/belt/internal/jobs"
-	"github.com/RobinThrift/belt/internal/plugins"
-	"github.com/RobinThrift/belt/internal/plugins/memos/opengraph"
 	"github.com/RobinThrift/belt/internal/server"
 	"github.com/RobinThrift/belt/internal/server/session"
 	"github.com/RobinThrift/belt/internal/storage/database/sqlite"
@@ -70,9 +68,7 @@ func New(config Config) *App {
 	apiTokenCtrl := control.NewAPITokenController(authConfig, apiTokenRepo)
 	authCtrl := control.NewAuthController(authConfig, db, accountCtrl, apiTokenCtrl, localAuthRepo)
 	attachmentCtrl := control.NewAttachmentControl(fs, attachmentRepo)
-	memoCtrl := control.NewMemoControl(db, memoRepo, attachmentRepo, []plugins.Plugin{
-		opengraph.NewOpenGraphPlugin(config.BasePath, attachmentCtrl),
-	})
+	memoCtrl := control.NewMemoControl(db, memoRepo, attachmentRepo)
 	settingsCtrl := control.NewSettingsControl(settingsRepo)
 
 	jobSystem := jobs.NewSystem(db, jobRepo, accountCtrl, time.Now, jobFuncs)
