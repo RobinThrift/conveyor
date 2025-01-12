@@ -16,7 +16,7 @@ COPY ./ui /belt/ui
 
 RUN just build
 
-FROM --platform=$BUILDPLATFORM golang:1.23.3-alpine3.19 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.23.4-alpine3.19 AS builder
 
 RUN apk update && apk upgrade && apk add --no-cache curl &&  \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
