@@ -1,39 +1,100 @@
 .error-page {
-    --step-1: clamp(12.5rem, 10.5699rem + 10.2941vw, 23.4375rem);
-    --step-2: clamp(25rem, 24.2417rem + 4.0441vw, 29.2969rem);
-    --step-3: clamp(36.6211rem, 52.361rem + -12.5919vw, 50rem);
-    --step-4: clamp(45.7764rem, 109.5689rem + -51.034vw, 100rem);
-    --step-5: clamp(57.2205rem, 225.1964rem + -134.3807vw, 200rem);
-
-    h1 {
-        @apply font-black text-transparent absolute -bottom-[5vw] -left-[5vw];
-        @apply animate-in slide-in-from-bottom fade-in duration-300 ease-out;
-
-        -webkit-text-stroke: 4px rgb(var(--color-primary));
-
-        @media (min-width: 768px) {
-            font-size: var(--step-1);
-        }
-
-        @media (min-width: 1024px) {
-            font-size: var(--step-2);
-        }
-
-        @media (min-width: 1440px) {
-            font-size: var(--step-3);
-        }
-
-        @media (min-width: 1680px) {
-            font-size: var(--step-4);
-        }
-
-        @media (min-width: 2100px) {
-            font-size: var(--step-5);
-        }
-    }
+    @apply relative h-[100dvh] px-2 sm:px-4;
 
     .message {
-        @apply text-center relative z-10 p-8 rounded-lg bg-body-contrast text-body space-y-2 shadow-lg;
-        @apply animate-in fade-in-50 duration-100;
+        @apply absolute left-1/2 top-full -translate-y-full -translate-x-1/2 w-full px-2 pb-8;
+
+        @media (min-width: 1440px) {
+            @apply absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-fit;
+        }
+
+        h1 {
+            @apply text-5xl md:text-7xl mb-2 font-semibold;
+
+            color: rgb(var(--body-bg));
+            text-shadow:
+                2px 2px 0 rgb(var(--body-bg-contrast)),
+                -1px -1px 0 rgb(var(--body-bg-contrast)),
+                1px -1px 0 rgb(var(--body-bg-contrast)),
+                -1px 1px 0 rgb(var(--body-bg-contrast)),
+                1px 1px 0 rgb(var(--body-bg-contrast)),
+                4px 4px 0px rgb(var(--body-bg));
+        }
+
+        p {
+            @apply text-subtle-dark text-xl dark:text-text;
+        }
     }
 }
+
+.error-code {
+    @apply fixed pointer-events-none inset-0 flex flex-col items-center justify-center text-center font-semibold select-none;
+    color: rgb(var(--body-bg));
+    text-shadow:
+           3px 3px 0 rgb(var(--body-bg-contrast)),
+         -1px -1px 0 rgb(var(--body-bg-contrast)),
+          1px -1px 0 rgb(var(--body-bg-contrast)),
+          -1px 1px 0 rgb(var(--body-bg-contrast)),
+           1px 1px 0 rgb(var(--body-bg-contrast));
+
+    animation: error-code-in 0.5s;
+    animation-timing-function: ease-out;
+    transform: skew(20deg, -10deg);
+    opacity: 1;
+
+    top: -50vh;
+    left: -20vw;
+    font-size: 15rem;
+    @media (min-width: 768px) {
+        top: -10vh;
+        left: -50vw;
+        font-size: 19rem;
+    }
+
+    em {
+        visibility: hidden;
+        font-style: normal;
+        color: red;
+    }
+
+    .error-code-middle {
+        --error-code-middle-top-start: 0rem;
+        --error-code-middle-top-end: calc(0.74em * -4);
+
+        display: block;
+        position: absolute;
+        width: 10rem;
+        word-wrap: break-word;
+        line-height: 0.74em;
+
+        left: calc(50% - 5.15rem);
+        @media (min-width: 768px) {
+            left: calc(50% - 5.5rem);
+        }
+
+        top: 0rem;
+        animation: error-code-middle infinite 90s linear;
+        animation-delay: 0.4s;
+    }
+}
+
+@keyframes error-code-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes error-code-middle {
+    from {
+        top: var(--error-code-middle-top-start);
+    }
+
+    to {
+        top: var(--error-code-middle-top-end);
+    }
+}
+
