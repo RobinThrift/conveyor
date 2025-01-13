@@ -103,6 +103,7 @@
 
 .logo {
     @apply fixed pointer-events-none inset-0 flex flex-col items-center justify-center text-center font-serif font-semibold select-none;
+    @apply opacity-40 tablet:opacity-100;
     color: rgb(var(--body-bg));
     text-shadow:
         3px 3px 0 rgb(var(--body-bg-contrast)),
@@ -114,7 +115,6 @@
     animation: logo-show 0.8s;
     animation-timing-function: ease-out;
     transform: skew(20deg, -10deg);
-    opacity: 1;
 
     top: -50vh;
     left: -20vw;
@@ -223,6 +223,28 @@
         label {
             @apply sr-only;
         }
+    }
+}
+
+:root.dark {
+    .logo {
+        color: rgb(var(--body-bg-contrast));
+        text-shadow:
+            3px 3px 0 rgb(var(--body-bg)),
+            -1px -1px 0 rgb(var(--body-bg)),
+            1px -1px 0 rgb(var(--body-bg)),
+            -1px 1px 0 rgb(var(--body-bg)),
+            1px 1px 0 rgb(var(--body-bg));
+    }
+
+    .login-window h1 {
+        color: rgb(var(--body-bg-contrast));
+        text-shadow:
+            3px 3px 0 rgb(var(--body-bg)),
+            -1px -1px 0 rgb(var(--body-bg)),
+            1px -1px 0 rgb(var(--body-bg)),
+            -1px 1px 0 rgb(var(--body-bg)),
+            1px 1px 0 rgb(var(--body-bg));
     }
 }
 
