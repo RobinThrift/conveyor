@@ -240,8 +240,15 @@ const MemoContent = React.forwardRef<
     return (
         <>
             <div className="memo-header content" ref={ref}>
-                {title && (
+                {title ? (
                     <h1>
+                        <MemoActions
+                            memo={memo}
+                            actions={actions}
+                            activateEditingMode={activateEditingMode}
+                            updateMemo={updateMemo}
+                        />
+
                         {firstHeadingIsLink ? (
                             <Link href={`/memos/${memo.id}`} viewTransition>
                                 {title}
@@ -250,13 +257,14 @@ const MemoContent = React.forwardRef<
                             title
                         )}
                     </h1>
+                ) : (
+                    <MemoActions
+                        memo={memo}
+                        actions={actions}
+                        activateEditingMode={activateEditingMode}
+                        updateMemo={updateMemo}
+                    />
                 )}
-                <MemoActions
-                    memo={memo}
-                    actions={actions}
-                    activateEditingMode={activateEditingMode}
-                    updateMemo={updateMemo}
-                />
                 <MemoDate createdAt={memo.createdAt} />
             </div>
             {rendered}

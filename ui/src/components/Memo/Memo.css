@@ -24,17 +24,28 @@
 }
 
 .memo-header {
-    @apply grid grid-cols-4;
-    @apply @md:flex @md:flex-wrap @md:gap-1;
-
     h1 {
-        @apply col-span-4 mb-1;
-        @apply @md:col-span-1;
+        @apply mb-1 text-balance;
+    }
+
+    &:not(:has(h1)) {
+        @apply mb-1;
+        .memo-date {
+            @apply w-fit order-1;
+        }
+        .memo-actions {
+            order: 2;
+        }
+    }
+
+    h1::after {
+        clear: both;
     }
 }
 
 .memo-actions {
-    @apply flex justify-end order-2 @md:flex-1;
+    @apply float-right flex items-center;
+    height: 1lh;
 }
 
 .memo-date {
