@@ -13,6 +13,7 @@
         "@storybook/react-vite": "^8.4.7",
         "@storybook/test": "^8.4.7",
         "@tailwindcss/container-queries": "^0.1.1",
+        "@tailwindcss/typography": "^0.5.16",
         "@types/react": "^18.3.12",
         "@types/react-dom": "^18.3.1",
         "@vite-pwa/assets-generator": "^0.2.6",
@@ -29,7 +30,8 @@
         "postcss-import": "^16.1.0",
         "postcss-nesting": "^13.0.1",
         "storybook": "^8.4.7",
-        "tailwindcss": "^3.4.14",
+        "tailwindcss": "^3.4.17",
+        "tailwindcss-animate": "^1.0.7",
         "typescript": "^5.7.2",
         "vite": "^6.0.7",
         "vite-plugin-pwa": "^0.21.1"
@@ -57,7 +59,6 @@
         "@reduxjs/toolkit": "^2.4.0",
         "@replit/codemirror-vim": "^6.2.1",
         "@scalar/api-reference-react": "^0.3.139",
-        "@tailwindcss/typography": "^0.5.15",
         "@types/mdast": "^4.0.4",
         "@uiw/codemirror-theme-quietlight": "^4.23.6",
         "@uiw/codemirror-theme-tokyo-night": "^4.23.6",
@@ -83,7 +84,6 @@
         "react-dom": "^18.3.1",
         "react-medium-image-zoom": "^5.2.11",
         "react-redux": "^9.1.2",
-        "redux": "^5.0.1",
-        "tailwindcss-animate": "^1.0.7"
+        "redux": "^5.0.1"
     }
 }

@@ -69,12 +69,24 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             minify: config.mode !== "development",
             cssMinify: "lightningcss",
 
-            lib: {
-                entry: "./src/index.tsx",
-                name: "index",
-                fileName: () => "index.js",
-                cssFileName: "index.css",
-                formats: ["es"],
+            // lib: {
+            //     entry: "./src/index.tsx",
+            //     name: "index",
+            //     fileName: () => "index.js",
+            //     cssFileName: "index.css",
+            //     formats: ["es"],
+            // },
+
+            rollupOptions: {
+                input: {
+                    "index.js": "./src/index.tsx",
+                },
+                // output: {
+                //     assetFileNames: (assetInfo) => {
+                //         if (assetInfo.name === "style.css") return "index.css"
+                //         return assetInfo.name ?? ""
+                //     },
+                // },
             },
         },
     }
