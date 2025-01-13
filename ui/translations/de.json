@@ -89,9 +89,9 @@
         "DayToday": "Heute",
         "DayYesterday": "Gestern",
         "LayoutSelectLabel": "Listenlayout auswählen",
-        "LayoutSingle": "Einzeln",
         "LayoutMasonry": "Mosaic",
-        "OpenFilterOverlayButtonLabel": "Filter Overlay öffnen"
+        "LayoutSingle": "Einzeln",
+        "LayoutUltraCompact": "Ultra Kompakt"
     },
 
     "pages/ListMemos/Header": {

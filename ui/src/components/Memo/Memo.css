@@ -17,7 +17,8 @@
         @apply flex;
     }
 
-    &.expanded, &.is-editing {
+    &.expanded,
+    &.is-editing {
         max-height: max-content !important;
         overflow: auto !important;
     }

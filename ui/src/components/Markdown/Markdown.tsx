@@ -66,7 +66,7 @@ export const Markdown = React.forwardRef<HTMLDivElement, MarkdownProps>(
         return (
             <div
                 ref={forwardRef}
-                className={clsx("content", props.className)}
+                className={clsx("markdown content", props.className)}
                 onDoubleClick={props.onDoubleClick}
             >
                 {parsed}

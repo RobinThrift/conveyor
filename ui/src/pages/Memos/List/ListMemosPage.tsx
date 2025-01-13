@@ -142,6 +142,14 @@ export function ListMemosPage(props: ListMemosPageProps) {
                                 </span>
                             </div>
                         </Select.Option>
+                        <Select.Option value="ultra-compact">
+                            <div className="flex gap-1 items-center">
+                                <Table />
+                                <span className="option-label">
+                                    {t.LayoutUltraCompact}
+                                </span>
+                            </div>
+                        </Select.Option>
                     </Select>
                 </div>
 

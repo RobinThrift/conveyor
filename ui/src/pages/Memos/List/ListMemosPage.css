@@ -1,4 +1,5 @@
 @import "./list-masonry.css";
+@import "./ultra-compact.css";
 
 .memos-list-page {
     @apply flex flex-col tablet:flex-row gap-4 justify-center w-full;

@@ -101,9 +101,9 @@ export const translations = {
         DayToday: "Today",
         DayYesterday: "Yesterday",
         LayoutSelectLabel: "Select list layout",
-        LayoutSingle: "Single",
         LayoutMasonry: "Masonry",
-        OpenFilterOverlayButtonLabel: "Open Filter Overlay",
+        LayoutSingle: "Single",
+        LayoutUltraCompact: "Ultra Compact",
     },
 
     "pages/ListMemos/Header": {
