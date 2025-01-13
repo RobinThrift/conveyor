@@ -20,3 +20,4 @@
 - [CHANGELOG-v0.4.3.md](./CHANGELOG-v0.4.3.md)
 - [CHANGELOG-v0.4.4.md](./CHANGELOG-v0.4.4.md)
 - [CHANGELOG-v0.5.0.md](./CHANGELOG-v0.5.0.md)
+- [CHANGELOG-v0.5.1.md](./CHANGELOG-v0.5.1.md)
