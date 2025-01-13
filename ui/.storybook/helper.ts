@@ -138,7 +138,7 @@ ${faker.lorem.paragraphs({ min: 1, max: 4 })}
 }
 
 export function generateOpenGraphDirective(): string {
-    return `::open-graph-link[https://github.com/RobinThrift/belt]{img="${faker.image.url({ width: 1200, height: 600 })}" title="${faker.lorem.sentences(1)}" description="${faker.lorem.sentences({ min: 1, max: 3 })}"}`
+    return `::link-preview[https://github.com/RobinThrift/belt]{img="${faker.image.url({ width: 1200, height: 600 })}" title="${faker.lorem.sentences(1)}" description="${faker.lorem.sentences({ min: 1, max: 3 })}"}`
 }
 
 export function generateTable(rows = 3): string {
