@@ -40,8 +40,9 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                 strategies: "generateSW",
                 registerType: "prompt",
                 manifest: false,
+                scope: "/assets/",
                 workbox: {
-                    globPatterns: ["**/*.{js,css.svg,woff2}"],
+                    globPatterns: ["**/*.{js,css,svg,woff2}"],
                     navigateFallback: null,
                 },
             }),
@@ -64,29 +65,22 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             outDir: "build",
             emptyOutDir: true,
             assetsDir: "",
-            manifest: true,
             sourcemap: config.mode === "development" ? "inline" : false,
             minify: config.mode !== "development",
             cssMinify: "lightningcss",
 
-            // lib: {
-            //     entry: "./src/index.tsx",
-            //     name: "index",
-            //     fileName: () => "index.js",
-            //     cssFileName: "index.css",
-            //     formats: ["es"],
-            // },
-
             rollupOptions: {
                 input: {
-                    "index.js": "./src/index.tsx",
+                    index: "./src/index.tsx",
                 },
-                // output: {
-                //     assetFileNames: (assetInfo) => {
-                //         if (assetInfo.name === "style.css") return "index.css"
-                //         return assetInfo.name ?? ""
-                //     },
-                // },
+                output: {
+                    entryFileNames: "[name].js",
+                    assetFileNames: (assetInfo) => {
+                        if (assetInfo.names[0] === "index.css")
+                            return "index.css"
+                        return assetInfo.names[0] ?? ""
+                    },
+                },
             },
         },
     }
