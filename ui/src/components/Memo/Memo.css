@@ -34,37 +34,28 @@
 }
 
 .memo-header {
-    @apply flex flex-wrap items-center @md:items-start mb-4;
-
-    &:not(:has(h1)) {
-        @apply flex-nowrap;
-        .memo-date {
-            @apply w-fit;
-            order: 1;
-        }
-        .memo-actions {
-            order: 2;
-        }
-    }
+    @apply grid grid-cols-4;
+    @apply @md:flex @md:flex-wrap @md:gap-1;
 
     h1 {
-        @apply w-fit order-1;
+        @apply col-span-4 mb-1;
+        @apply @md:col-span-1;
     }
 }
 
 .memo-actions {
-    @apply flex justify-end flex-1 relative order-3 @sm:order-2 self-center;
+    @apply flex justify-end order-2 @md:flex-1;
 }
 
 .memo-date {
-    @apply text-subtle-dark italic w-fit text-xs @sm:text-sm order-3;
+    @apply flex items-center w-fit text-subtle-dark italic text-xs @sm:text-sm;
 
     &.sm {
-        @apply order-2;
+        @apply @md:hidden col-span-3;
     }
 
     &.md {
-        @apply hidden @md:w-full @md:order-3;
+        @apply hidden @md:flex order-3 w-full;
     }
 }
 
