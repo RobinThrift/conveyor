@@ -164,13 +164,19 @@ export function Memo(props: MemoProps) {
         : props.collapsible
     let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
 
+    useEffect(() => {
+        if (isEditing) {
+            setIsExpanded(true)
+        }
+    }, [isEditing])
+
     return (
         <article
             ref={ref}
             className={clsx("@container memo", props.className, {
                 "is-editing": isEditing,
                 "is-collapsed": needsCollapsing && isCollapsed,
-                expanded: needsCollapsing && !isCollapsed,
+                expanded: (needsCollapsing && !isCollapsed) || isExpanded,
             })}
             style={{
                 viewTransitionName: props.viewTransitionName,
@@ -189,22 +195,28 @@ export function Memo(props: MemoProps) {
     )
 }
 
-function MemoContent({
-    memo,
-    firstHeadingIsLink,
-    actions,
-    activateEditingMode,
-    updateMemo,
-    onDoubleClick,
-}: {
-    memo: MemoT
-    firstHeadingIsLink?: boolean
+const MemoContent = React.forwardRef<
+    HTMLDivElement,
+    {
+        memo: MemoT
+        firstHeadingIsLink?: boolean
 
-    actions: MemoActions
-    activateEditingMode: () => void
-    updateMemo: (memo: PartialMemoUpdate) => void
-    onDoubleClick?: (e: React.MouseEvent) => void
-}) {
+        actions: MemoActions
+        activateEditingMode: () => void
+        updateMemo: (memo: PartialMemoUpdate) => void
+        onDoubleClick?: (e: React.MouseEvent) => void
+    }
+>(function MemoContent(
+    {
+        memo,
+        firstHeadingIsLink,
+        actions,
+        activateEditingMode,
+        updateMemo,
+        onDoubleClick,
+    },
+    forwardRef,
+) {
     let ref = useRef(null)
     let isVisible = useOnVisible(ref, { ratio: 0 })
     let { title, body } = splitContent(memo.content)
@@ -212,14 +224,18 @@ function MemoContent({
     let rendered = useMemo(() => {
         if (isVisible) {
             return (
-                <Markdown id={memo.id} onDoubleClick={onDoubleClick}>
+                <Markdown
+                    id={memo.id}
+                    onDoubleClick={onDoubleClick}
+                    ref={forwardRef}
+                >
                     {body}
                 </Markdown>
             )
         }
 
         return body
-    }, [isVisible, body, memo.id, onDoubleClick])
+    }, [isVisible, body, memo.id, onDoubleClick, forwardRef])
 
     return (
         <>
@@ -246,7 +262,7 @@ function MemoContent({
             {rendered}
         </>
     )
-}
+})
 
 export function MemoDate({
     createdAt,

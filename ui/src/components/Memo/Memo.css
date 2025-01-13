@@ -5,16 +5,6 @@
         @apply p-0;
     }
 
-    @container (width > 28rem) {
-        .memo-date.sm {
-            display: none;
-        }
-
-        .memo-date.md {
-            display: inline;
-        }
-    }
-
     .show-more-btn {
         @apply hidden;
     }
@@ -27,7 +17,7 @@
         @apply flex;
     }
 
-    &.expanded {
+    &.expanded, &.is-editing {
         max-height: max-content !important;
         overflow: auto !important;
     }

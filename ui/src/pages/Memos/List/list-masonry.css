@@ -22,7 +22,7 @@
     }
 
     .memo {
-        @apply overflow-hidden;
+        @apply overflow-hidden h-fit;
 
         width: calc(50% - 0.25rem);
         max-height: 80vh;
