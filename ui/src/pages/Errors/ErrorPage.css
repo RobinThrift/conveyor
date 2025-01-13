@@ -31,11 +31,11 @@
     @apply fixed pointer-events-none inset-0 flex flex-col items-center justify-center text-center font-semibold select-none;
     color: rgb(var(--body-bg));
     text-shadow:
-           3px 3px 0 rgb(var(--body-bg-contrast)),
-         -1px -1px 0 rgb(var(--body-bg-contrast)),
-          1px -1px 0 rgb(var(--body-bg-contrast)),
-          -1px 1px 0 rgb(var(--body-bg-contrast)),
-           1px 1px 0 rgb(var(--body-bg-contrast));
+        3px 3px 0 rgb(var(--body-bg-contrast)),
+        -1px -1px 0 rgb(var(--body-bg-contrast)),
+        1px -1px 0 rgb(var(--body-bg-contrast)),
+        -1px 1px 0 rgb(var(--body-bg-contrast)),
+        1px 1px 0 rgb(var(--body-bg-contrast));
 
     animation: error-code-in 0.5s;
     animation-timing-function: ease-out;
@@ -97,4 +97,3 @@
         top: var(--error-code-middle-top-end);
     }
 }
-
