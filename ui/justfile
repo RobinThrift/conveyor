@@ -12,7 +12,7 @@ build: install
 watch mode="development": 
     {{ local_bin }}/vite build --mode {{ mode }} --watch
 
-storybook *flags="":
+storybook *flags="": _generate-icons
     -rm -rf .storybook/public/
     {{ local_bin }}/msw init --save false .storybook/public/
     {{ local_bin }}/storybook dev --no-open {{ flags }}
