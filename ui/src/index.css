@@ -3,6 +3,7 @@
 @import "@fontsource-variable/noto-serif-hk";
 
 @import "./themes/default.css" layer(base);
+@import "./themes/warm.css" layer(base);
 @import "./themes/rosepine.css" layer(base);
 
 @import "./components/Alert/Alert.css" layer(components);

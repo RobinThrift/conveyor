@@ -188,6 +188,7 @@ const preview: Preview = {
                 icon: "contrast",
                 items: [
                     { value: "default", title: "Default" },
+                    { value: "warm", title: "Warm" },
                     { value: "rosepine", title: "Rosé Pine" },
                 ],
                 dynamicTitle: true,

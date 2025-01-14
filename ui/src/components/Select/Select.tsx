@@ -31,7 +31,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
         >
             <RadixSelect.Trigger
                 className={clsx(
-                    "input flex items-center gap-2 justify-between px-2 py-1 text-sm bg-surface",
+                    "input flex items-center gap-2 justify-between px-2 py-1 text-sm bg-surface text-body-contrast",
                     props.className,
                 )}
                 aria-label={props.ariaLabel}
@@ -44,7 +44,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
 
             <RadixSelect.Portal>
                 <RadixSelect.Content className="select-list">
-                    <RadixSelect.ScrollUpButton className="flex py-2 cursor-default items-center justify-center bg-white text-primary">
+                    <RadixSelect.ScrollUpButton className="flex py-2 cursor-default items-center justify-center bg-surface text-primary">
                         <CaretUp />
                     </RadixSelect.ScrollUpButton>
 
@@ -52,7 +52,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
                         {props.children}
                     </RadixSelect.Viewport>
 
-                    <RadixSelect.ScrollDownButton className="flex py-2 cursor-default items-center justify-center bg-white text-primary">
+                    <RadixSelect.ScrollDownButton className="flex py-2 cursor-default items-center justify-center bg-surface text-primary">
                         <CaretDown />
                     </RadixSelect.ScrollDownButton>
                 </RadixSelect.Content>

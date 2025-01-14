@@ -27,6 +27,7 @@ export function SelectColourScheme({
             value={colourScheme}
         >
             <Select.Option value="default">{t.ColoursDefault}</Select.Option>
+            <Select.Option value="warm">{t.ColoursWarm}</Select.Option>
             <Select.Option value="rosepine">{t.RosePine}</Select.Option>
         </Select>
     )
