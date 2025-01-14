@@ -80,11 +80,11 @@ export function generateMemo({
 }: { title: string; tags: string[] }) {
     if (faker.number.float({ min: 0, max: 10 }) > 9.5) {
         return `${generateOpenGraphDirective()}
-${`#${tags.join(" #")}`}`
+#${tags.join(" #")}`
     }
 
     return `# ${title}
-${`#${tags.join(" #")}`}
+#${tags.join(" #")}
 
 ${generateRealisticBody()}
 `

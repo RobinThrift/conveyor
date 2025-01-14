@@ -29,6 +29,7 @@
 
 .list-layout-select {
     @apply relative flex justify-end h-8 -mb-8 top-5 mx-3 lg:mx-1;
+    z-index: 30;
 
     & > button {
         @apply max-w-fit rounded-lg text-body bg-body-contrast;

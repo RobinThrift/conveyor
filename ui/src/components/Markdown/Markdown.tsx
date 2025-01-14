@@ -311,6 +311,7 @@ function autoTagLinkToJSX(ctx: Context, node: AutoTagLink): ReactNode {
         <Link
             href={`/memos?filter[tag]=${node.tag}`}
             key={nodeKey(node)}
+            className="tag-link"
             rel="tag"
         >
             {node.children.map((c) => astNodeToJSX(ctx, c))}
