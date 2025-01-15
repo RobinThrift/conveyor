@@ -169,10 +169,29 @@ export function useGoto() {
     )
 }
 
+export function useGoBack() {
+    return useCallback(
+        ({ viewTransition }: { viewTransition?: boolean } = {}) => {
+            if (viewTransition && "startViewTransition" in document) {
+                document.startViewTransition(() => {
+                    history.back()
+                })
+            } else {
+                history.back()
+            }
+        },
+        [],
+    )
+}
+
 export function useSetPage() {
     let dispatch = useDispatch()
     return useCallback(
         (path: string) => dispatch(slice.actions.setPage({ path })),
         [dispatch],
     )
+}
+
+export function useHasHistory() {
+    return history.length > 0
 }

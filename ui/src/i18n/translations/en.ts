@@ -127,6 +127,10 @@ export const translations = {
         Today: "Today",
     },
 
+    "pages/SingleMemoPage": {
+        Back: "Back",
+    },
+
     "pages/Settings": {
         Title: "Settings",
     },

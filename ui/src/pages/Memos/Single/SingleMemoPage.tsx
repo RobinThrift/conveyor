@@ -1,7 +1,11 @@
+import { Button } from "@/components/Button"
 import { Loader } from "@/components/Loader"
 import { Memo, type PartialMemoUpdate } from "@/components/Memo"
 import type { Tag } from "@/domain/Tag"
+import { useT } from "@/i18n"
+import { useGoBack, useHasHistory } from "@/state/router"
 import { useSetting } from "@/state/settings"
+import { ArrowLeft } from "@phosphor-icons/react"
 import React, { useCallback, useEffect } from "react"
 import { useSingleMemoPageState } from "./state"
 
@@ -10,7 +14,10 @@ export interface SingleMemoPageProps {
 }
 
 export function SingleMemoPage(props: SingleMemoPageProps) {
+    let t = useT("pages/SingleMemoPage")
     let [doubleClickToEdit] = useSetting("controls.doubleClickToEdit")
+    let goBack = useGoBack()
+    let hasHistory = useHasHistory()
 
     let { state, actions } = useSingleMemoPageState(props.memoID)
 
@@ -44,6 +51,16 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
                 </div>
             )}
 
+            {hasHistory && (
+                <Button
+                    plain
+                    ariaLabel={t.Back}
+                    iconRight={<ArrowLeft />}
+                    className="back-btn"
+                    onClick={() => goBack()}
+                />
+            )}
+
             {state?.memo && (
                 <Memo
                     memo={state?.memo}
@@ -54,7 +71,6 @@ export function SingleMemoPage(props: SingleMemoPageProps) {
                     }}
                     updateMemo={updateMemoCallback}
                     doubleClickToEdit={doubleClickToEdit}
-                    className=""
                 />
             )}
         </div>

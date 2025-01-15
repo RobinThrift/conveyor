@@ -1,5 +1,5 @@
 .main {
-    @apply sm:flex-1 pb-14 xs:pt-4 tablet:pb-4 tablet:pt-20 lg:pt-16;
+    @apply sm:flex-1 pb-14 tablet:pb-4 tablet:pt-20 lg:pt-16;
 }
 
 .app-footer {

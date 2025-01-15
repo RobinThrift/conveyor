@@ -115,6 +115,10 @@
         "Today": "Heute"
     },
 
+    "pages/SingleMemoPage": {
+        "Back": "Zurück"
+    },
+
     "pages/Settings": {
         "Title": "Settings"
     },

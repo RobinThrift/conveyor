@@ -61,17 +61,13 @@ interface MemoProps {
 export function Memo(props: MemoProps) {
     let t = useT("components/Memo")
     let [memo, setMemo] = useState(props.memo)
-    let [actions, setActions] = useState({
-        ...defaultActions,
-        ...(props.actions ?? {}),
-    })
-
-    useEffect(() => {
-        setActions({
+    let actions = useMemo(
+        () => ({
             ...defaultActions,
             ...(props.actions ?? {}),
-        })
-    }, [props.actions])
+        }),
+        [props.actions],
+    )
 
     let [isEditing, setIsEditing] = useState(false)
     let [doubleClickPos, setDoubleClickPos] = useState<
@@ -335,14 +331,18 @@ function MemoActions({
                         plain
                     />
                     <DropdownMenu.Items>
-                        <DropdownMenu.Item
-                            className="@xs:hidden"
-                            action={() => goto(`/memos/${memo.id}`)}
-                        >
-                            <DropdownMenu.ItemLabel icon={<ArrowSquareOut />}>
-                                {t.View}
-                            </DropdownMenu.ItemLabel>
-                        </DropdownMenu.Item>
+                        {actions.link && (
+                            <DropdownMenu.Item
+                                className="@xs:hidden"
+                                action={() => goto(`/memos/${memo.id}`)}
+                            >
+                                <DropdownMenu.ItemLabel
+                                    icon={<ArrowSquareOut />}
+                                >
+                                    {t.View}
+                                </DropdownMenu.ItemLabel>
+                            </DropdownMenu.Item>
+                        )}
 
                         <DropdownMenu.Item
                             action={() =>

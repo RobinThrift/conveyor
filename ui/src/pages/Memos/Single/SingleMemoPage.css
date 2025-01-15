@@ -16,4 +16,24 @@
             @apply w-full;
         }
     }
+
+    .back-btn {
+        @apply px-2 py-1 absolute top-3 left-1;
+        @apply tablet:hidden;
+
+        & > svg {
+            @apply size-5;
+        }
+    }
+
+    &:has(.back-btn) .memo-header h1 {
+        @media (max-width: 768px) {
+            text-indent: 2.25rem;
+        }
+    }
+
+    &:has(.back-btn) .memo-header:not(:has(h1)) {
+        @apply flex justify-between items-center pt-1.5;
+        text-indent: 2.25rem;
+    }
 }
