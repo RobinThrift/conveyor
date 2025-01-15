@@ -6,6 +6,7 @@
         var(--radix-popper-available-width)
     );
     max-height: calc(var(--radix-popper-available-height) - 100px);
+    z-index: 9999;
 }
 
 .popover-close {
