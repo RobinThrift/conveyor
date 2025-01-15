@@ -104,6 +104,11 @@
         )::after {
         content: "";
     }
+
+    figure img {
+        @apply my-0 rounded-lg;
+    }
+
 }
 
 .footnotes {
