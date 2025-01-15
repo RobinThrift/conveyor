@@ -109,6 +109,14 @@
         @apply my-0 rounded-lg;
     }
 
+    li>figure {
+        @apply my-0 inline-block;
+        vertical-align: text-top;
+
+        figcaption {
+            @apply py-0 my-0;
+        }
+    }
 }
 
 .footnotes {
