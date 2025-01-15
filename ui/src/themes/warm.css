@@ -148,11 +148,11 @@
     --code-url: var(--code-keyword);
     --code-escape: var(--code-keyword);
 
-    --code-deleted: #E6607B;
-    --code-character: #E6607B;
-    --code-separator: #E6607B;
-    --code-atom: #E6607B;
-    --code-bool: #E6607B;
+    --code-deleted: #e6607b;
+    --code-character: #e6607b;
+    --code-separator: #e6607b;
+    --code-atom: #e6607b;
+    --code-bool: #e6607b;
 
     --code-propertyName: #564063;
     --code-labelName: var(--code-propertyName);
@@ -171,7 +171,7 @@
     --code-self: var(--code-number);
     --code-namespace: var(--code-number);
 
-    --code-comment: #A5C9C9;
+    --code-comment: #a5c9c9;
 
     --code-invalid: #dc252e;
 }
@@ -210,4 +210,3 @@
 
     --code-invalid: #ff5370;
 }
-

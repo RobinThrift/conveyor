@@ -1,8 +1,8 @@
 import type { Settings } from "@/domain/Settings"
 import type { Extension } from "@codemirror/state"
 import * as d from "./default"
-import * as warm from "./warm"
 import * as rosepine from "./rosepine"
+import * as warm from "./warm"
 
 export type ThemeMode = {
     foreground?: string
