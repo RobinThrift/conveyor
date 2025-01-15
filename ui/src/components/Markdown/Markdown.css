@@ -87,6 +87,11 @@
 
     pre {
         @apply overflow-x-auto;
+
+        font-size: inherit;
+        code {
+            font-size: inherit;
+        }
     }
 
     :where(code):not(pre > code) {
@@ -109,7 +114,7 @@
         @apply my-0 rounded-lg;
     }
 
-    li>figure {
+    li > figure {
         @apply my-0 inline-block;
         vertical-align: text-top;
 

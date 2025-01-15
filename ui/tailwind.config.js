@@ -114,6 +114,11 @@ export default {
             },
 
             typography: () => ({
+                sm: {
+                    css: {
+                        fontSize: "16px",
+                    },
+                },
                 DEFAULT: {
                     css: {
                         color: "rgb(var(--text-color))",
