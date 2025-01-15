@@ -1,6 +1,7 @@
 @import "./tailwind.css";
 
 @import "@fontsource-variable/noto-serif-hk";
+@import "@fontsource-variable/inter";
 
 @import "./themes/default.css" layer(base);
 @import "./themes/warm.css" layer(base);

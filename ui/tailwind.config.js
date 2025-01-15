@@ -24,7 +24,12 @@ export default {
 
         extend: {
             fontFamily: {
-                sans: ["ui-sans-serif", "system-ui", "sans-serif"],
+                sans: [
+                    "Inter Variable",
+                    "ui-sans-serif",
+                    "system-ui",
+                    "sans-serif",
+                ],
                 serif: ["Noto Serif HK Variable", "serif"],
                 mono: ["ui-monospace", "SFMono-Regular", "monospace"],
             },
