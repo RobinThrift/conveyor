@@ -34,7 +34,10 @@ export const light = {
     foreground: palette.light.foreground,
     cm: createTheme({
         theme: "light",
-        settings: {},
+        settings: {
+            fontFamily: "var(--font-monospace)",
+            fontSize: "var(--editor-font-size)",
+        },
         styles: [
             { tag: t.heading, class: "cm-heading" },
             { tag: t.heading1, class: "cm-heading-1" },
@@ -102,7 +105,10 @@ export const dark = {
     foreground: palette.dark.foreground,
     cm: createTheme({
         theme: "dark",
-        settings: {},
+        settings: {
+            fontFamily: "var(--font-monospace)",
+            fontSize: "var(--editor-font-size)",
+        },
         styles: [
             { tag: t.heading, class: "cm-heading" },
             { tag: t.heading1, class: "cm-heading-1" },

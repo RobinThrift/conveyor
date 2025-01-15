@@ -1,4 +1,7 @@
 :root {
+    --font-monospace: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+    --editor-font-size: 16px;
+
     --text-color: 10 7 6;
     --body-bg: 253 249 247;
     --body-bg-contrast: 60 60 55;

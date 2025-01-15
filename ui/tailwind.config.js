@@ -31,7 +31,12 @@ export default {
                     "sans-serif",
                 ],
                 serif: ["Noto Serif HK Variable", "serif"],
-                mono: ["ui-monospace", "SFMono-Regular", "monospace"],
+                mono: [
+                    "IBM Plex Mono",
+                    "ui-monospace",
+                    "SFMono-Regular",
+                    "monospace",
+                ],
             },
 
             colors: {

@@ -27,7 +27,7 @@
 }
 
 .cm-editor {
-    @apply w-full h-full flex-grow flex flex-col;
+    @apply w-full h-full flex-grow flex flex-col font-mono;
 }
 
 .cm-editor.cm-focused {
@@ -35,21 +35,21 @@
 }
 
 .cm-scroller {
-    @apply flex-grow flex-col overscroll-contain;
+    @apply flex-grow flex-col overscroll-contain font-mono;
     overflow: auto;
 
     line-height: 1.7142857 !important;
-    font-size: 0.875rem !important;
+    --editor-font-size: 0.875rem;
 
     @container (max-width: 28rem) {
         /* sm */
-        font-size: 1rem !important;
+        --editor-font-size: 1rem !important;
         line-height: 1.75 !important;
     }
 
     @media (max-width: 768px) {
         /* prevent zoom in on iPhones */
-        font-size: 16px !important;
+        --editor-font-size: 16px !important;
     }
 }
 

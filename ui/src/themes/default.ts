@@ -13,7 +13,11 @@ export const light = {
     foreground: defaultSettingsQuietlight.foreground,
     background: defaultSettingsQuietlight.background,
     cm: quietlightInit({
-        settings: { background: "rgb(var(--surface-bg))" },
+        settings: {
+            background: "rgb(var(--surface-bg))",
+            fontFamily: "var(--font-monospace)",
+            fontSize: "var(--editor-font-size)",
+        },
         styles: [
             { tag: t.heading, class: "cm-heading" },
             { tag: t.heading1, class: "cm-heading-1" },
@@ -40,7 +44,11 @@ export const dark = {
     foreground: defaultSettingsTokyoNight.foreground,
     background: defaultSettingsTokyoNight.background,
     cm: tokyoNightInit({
-        settings: { background: "rgb(var(--surface-bg))" },
+        settings: {
+            background: "rgb(var(--surface-bg))",
+            fontFamily: "var(--font-monospace)",
+            fontSize: "var(--editor-font-size)",
+        },
         styles: [
             { tag: t.heading, class: "cm-heading" },
             { tag: t.heading1, class: "cm-heading-1" },

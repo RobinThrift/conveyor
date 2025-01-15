@@ -2,6 +2,7 @@
 
 @import "@fontsource-variable/noto-serif-hk";
 @import "@fontsource-variable/inter";
+@import "@fontsource/ibm-plex-mono";
 
 @import "./themes/default.css" layer(base);
 @import "./themes/warm.css" layer(base);
