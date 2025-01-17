@@ -176,11 +176,53 @@ const fileDropHandlerExt = ViewPlugin.fromClass(
                 },
             })
         }
+
+        onPaste(e: ClipboardEvent) {
+            if (!e.clipboardData) {
+                return
+            }
+
+            if (!e.clipboardData.types.some((t) => t !== "text/plain")) {
+                return
+            }
+
+            e.preventDefault()
+
+            let pos = Math.max(this.view.state.selection.main.anchor - 1, 0)
+
+            let insertStrings = [""]
+
+            Array.from(e.clipboardData?.files ?? []).forEach((file) => {
+                let localID = `${file.name}_${randomID()}`
+                this.dropPositions.set(localID, pos)
+                eventbus.emit("attachments:upload:start", {
+                    taskID: localID,
+                    filename: file.name,
+                    data: file.stream(),
+                })
+
+                if (isImgFile(file.type)) {
+                    insertStrings.push(`![${file.name}](uploading: ${localID})`)
+                } else {
+                    insertStrings.push(`[${file.name}](uploading: ${localID})`)
+                }
+            })
+
+            this.view.dispatch({
+                changes: {
+                    from: pos,
+                    insert: insertStrings.join("\n"),
+                },
+            })
+        }
     },
     {
         eventObservers: {
             drop(e) {
                 this.onDrop(e)
+            },
+            paste(e) {
+                this.onPaste(e)
             },
         },
         decorations: (v) => v.decorations,
