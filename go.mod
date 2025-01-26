@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/alexedwards/scs/v2 v2.8.0
-	github.com/caarlos0/env/v11 v11.2.2
+	github.com/caarlos0/env/v11 v11.3.1
 	github.com/gorilla/csrf v1.7.2
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/pressly/goose/v3 v3.22.1
