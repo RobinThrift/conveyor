@@ -1,5 +1,10 @@
 .main {
-    @apply sm:flex-1 pb-14 tablet:pb-4 tablet:pt-20 lg:pt-16;
+    @apply sm:flex-1 pb-14 tablet:pb-4;
+}
+
+.dialog-open-scroll-lock .main {
+    height: var(--vvp-h, 100dvh);
+    overflow: hidden;
 }
 
 .app-footer {

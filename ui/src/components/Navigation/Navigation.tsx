@@ -1,8 +1,12 @@
-import { Link } from "@/components/Link"
-import { useT } from "@/i18n"
-import { Archive, GearFine, Notepad, TrashSimple } from "@phosphor-icons/react"
 import clsx from "clsx"
-import React, { useMemo } from "react"
+import React from "react"
+
+import { Button } from "@/components/Button"
+import { ArrowLeftIcon, GearIcon } from "@/components/Icons"
+import { LinkButton } from "@/components/Link"
+import { SelectColourScheme, SelectMode } from "@/components/ThemeSwitcher"
+import { useT } from "@/i18n"
+import { useGoBack } from "@/state/global/router"
 
 export interface NavigationProps {
     className?: string
@@ -18,53 +22,38 @@ export interface NavigationItem {
 
 export function Navigation(props: NavigationProps) {
     let t = useT("components/Navigation")
-    const items: NavigationItem[] = useMemo(
-        () => [
-            {
-                label: t.Memos,
-                route: "memos.list",
-                url: "/memos",
-                icon: <Notepad weight="fill" />,
-            },
-            {
-                label: t.Archive,
-                route: "memos.archive",
-                url: "/memos/archive",
-                icon: <Archive weight="fill" />,
-            },
-            {
-                label: t.Bin,
-                route: "memos.bin",
-                url: "/memos/bin",
-                icon: <TrashSimple weight="fill" />,
-            },
-            {
-                label: t.Settings,
-                route: "settings",
-                url: "/settings/interface",
-                icon: <GearFine weight="fill" />,
-            },
-        ],
-        [t.Memos, t.Archive, t.Bin, t.Settings],
-    )
+    let goBack = useGoBack()
 
     return (
-        <nav className={clsx("navigation", props.className)}>
-            <ul className="navigation-items">
-                {items.map((item) => (
-                    <li
-                        key={item.url}
-                        className={clsx("navigation-item", {
-                            active: item.route === props.active,
-                        })}
-                    >
-                        <Link href={item.url} aria-label={item.label}>
-                            {item.icon}
-                            <span>{item.label}</span>
-                        </Link>
-                    </li>
-                ))}
-            </ul>
+        <nav
+            className={clsx("navigation", props.className)}
+            data-active={props.active}
+        >
+            {props.active === "settings" ? (
+                <Button
+                    iconLeft={<ArrowLeftIcon />}
+                    plain
+                    size="lg"
+                    onClick={() =>
+                        goBack({ viewTransition: true, fallback: "/" })
+                    }
+                >
+                    <span className="sr-only">{t.Back}</span>
+                </Button>
+            ) : (
+                <LinkButton
+                    href="/settings/interface"
+                    iconLeft={<GearIcon />}
+                    plain
+                    size="lg"
+                >
+                    <span className="sr-only">{t.Settings}</span>
+                </LinkButton>
+            )}
+            <div className="navigation-theme-selector">
+                <SelectColourScheme className="w-max" />
+                <SelectMode className="w-max" />
+            </div>
         </nav>
     )
 }

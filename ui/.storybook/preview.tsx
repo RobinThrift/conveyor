@@ -4,6 +4,7 @@ import React, { useEffect } from "react"
 import { mockAPI } from "./mockapi"
 import type { ServerData } from "../src/App/ServerData"
 import { Theme } from "../src/components/Theme"
+import { history } from "../src/external/history"
 import { configureRootStore } from "../src/state"
 import { faker } from "@faker-js/faker"
 
@@ -169,8 +170,7 @@ const preview: Preview = {
             }
 
             _mockRootStore = configureRootStore({
-                baseURL: location.pathname,
-                router: { href: location.href },
+                router: { href: history.current },
                 ...serverData,
             })
             return _mockRootStore

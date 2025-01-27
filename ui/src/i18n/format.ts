@@ -1,4 +1,4 @@
-import { useRegion } from "@/state/i18n"
+import { useRegion } from "@/state/global/i18n"
 import { useMemo } from "react"
 import type { supportedRegions } from "./regions"
 

@@ -1,6 +1,6 @@
 import { Select } from "@/components/Select"
 import { useT } from "@/i18n"
-import { useSetting } from "@/state/settings"
+import { useSetting } from "@/state/global/settings"
 import { Moon, Sun, SunHorizon } from "@phosphor-icons/react"
 import React, { useCallback } from "react"
 

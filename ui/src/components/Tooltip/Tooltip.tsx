@@ -22,9 +22,12 @@ export function Tooltip(props: TooltipProps) {
             <BaseUITooltip.Root open={props.open}>
                 <BaseUITooltip.Trigger
                     render={(triggerProps: any) =>
-                        React.Children.map(props.children, (c) =>
-                            React.cloneElement(c as any, triggerProps),
-                        ) as any
+                        React.Children.map(props.children, (c) => {
+                            return React.cloneElement(c as any, {
+                                ...triggerProps,
+                                ...(c as any).props,
+                            })
+                        }) as any
                     }
                 />
                 <BaseUITooltip.Portal>

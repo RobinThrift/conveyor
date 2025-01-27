@@ -1,4 +1,4 @@
-import { useBuildInfo } from "@/state/buildInfo"
+import { useBuildInfo } from "@/state/global/buildInfo"
 import clsx from "clsx"
 import React from "react"
 

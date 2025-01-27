@@ -1,9 +1,9 @@
 import { lazy } from "react"
 
-export type { SingleMemoPageProps } from "./SingleMemoPage"
+export type { MemoSinglePageProps } from "./MemoSinglePage"
 
-export const SingleMemoPage = lazy(() =>
-    import("./SingleMemoPage").then(({ SingleMemoPage }) => ({
-        default: SingleMemoPage,
+export const MemoSinglePage = lazy(() =>
+    import("./MemoSinglePage").then(({ MemoSinglePage }) => ({
+        default: MemoSinglePage,
     })),
 )

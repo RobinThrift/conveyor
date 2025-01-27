@@ -10,11 +10,8 @@
 }
 
 .editor-buttons {
-    @apply p-2 flex items-center justify-between gap-2 bg-surface sticky top-0 z-10;
-
-    &.position-bottom {
-        order: 2;
-    }
+    @apply p-2 flex items-center justify-between gap-2 bg-surface;
+    height: 3rem;
 
     &:has(button:only-child) {
         @apply justify-end;
@@ -22,12 +19,49 @@
 }
 
 .text-editor {
-    @apply w-full flex-grow flex flex-col p-2;
-    max-height: calc(100% - 5ch);
+    @apply flex-1 overflow-auto;
+}
+
+.text-editor-toolbar {
+    @apply bg-surface p-2 flex gap-1 items-center rounded-t overflow-x-auto;
+    position: absolute;
+    height: 3rem;
+    left: 0;
+    right: 0;
+    top: calc(
+        var(--visualviewport-height, 100dvh) +
+        var(--visualviewport-offset-top, 0) -
+        3rem
+    );
+    box-shadow: -1px -2px 4px -2px rgb(0 0 0 / 0.1);
+
+    .toolbar-btn-grp {
+        @apply flex items-center gap-3;
+    }
+
+    .toolbar-btn {
+        @apply px-1.5 py-1.5;
+
+        &[data-state="on"] {
+            background-color: rgb(var(--btn-bg-active));
+        }
+    }
+
+    @media (width > 768px) {
+        @apply top-0 w-fit left-1/2 justify-center -translate-x-1/2 shadow-none;
+    }
+
+    @media (min-width: 1024px) {
+        @apply top-2 absolute;
+    }
+
+    @media (min-width: 2100px) {
+        @apply top-4;
+    }
 }
 
 .cm-editor {
-    @apply w-full h-full flex-grow flex flex-col font-mono;
+    @apply font-mono overflow-hidden;
 }
 
 .cm-editor.cm-focused {
@@ -35,11 +69,12 @@
 }
 
 .cm-scroller {
-    @apply flex-grow flex-col overscroll-contain font-mono;
-    overflow: auto;
+    @apply flex-grow font-mono;
 
     line-height: 1.7142857 !important;
     --editor-font-size: 0.875rem;
+
+    padding-bottom: calc(100dvh - var(--vvp-h));
 
     @container (max-width: 28rem) {
         /* sm */
@@ -51,10 +86,6 @@
         /* prevent zoom in on iPhones */
         --editor-font-size: 16px !important;
     }
-}
-
-.cm-content {
-    @apply flex-grow min-w-full;
 }
 
 .vim-enabled .cm-cursor {

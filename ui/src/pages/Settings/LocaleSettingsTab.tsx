@@ -1,3 +1,5 @@
+import React, { useCallback, useMemo } from "react"
+
 import { Select } from "@/components/Select"
 import {
     type Language,
@@ -6,8 +8,7 @@ import {
     supportedRegions,
     useT,
 } from "@/i18n"
-import { useSetting } from "@/state/settings"
-import React, { useCallback, useMemo } from "react"
+import { useSetting } from "@/state/global/settings"
 
 export const LocaleSettingsTab = React.forwardRef<HTMLDivElement>(
     function LocaleSettingsTab(_, forwardedRef) {

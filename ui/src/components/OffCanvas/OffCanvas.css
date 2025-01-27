@@ -1,0 +1,26 @@
+.offcanvas {
+    @apply fixed left-0 top-0 bottom-0 right-0 max-w-[90dvw];
+    @apply rounded-r bg-surface shadow-lg p-2 overflow-auto;
+    @apply focus:outline-none;
+    z-index: 10000;
+
+    transition: transform 350ms;
+    transform: translate(0%, 0%);
+
+    &[data-starting-style],
+    &[data-ending-style] {
+        transform: translate(-100%, 0%);
+    }
+}
+
+.offcanvas-backdrop {
+    @apply fixed inset-0 bg-black/80 backdrop-blur-sm;
+    z-index: 9999;
+    transition: opacity 300ms;
+    opacity: 1;
+
+    &[data-starting-style],
+    &[data-ending-style] {
+        opacity: 0;
+    }
+}

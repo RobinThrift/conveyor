@@ -1,11 +1,14 @@
 import { registerSW } from "virtual:pwa-register"
-import { Provider, actions, configureRootStore } from "@/state"
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { App } from "./App"
-import "@/index.css"
+
+import { App } from "@/App"
+import { serverData } from "@/App/ServerData"
 import * as eventbus from "@/eventbus"
-import { serverData } from "./App/ServerData"
+import { history } from "@/external/history"
+import { Provider, actions, configureRootStore } from "@/state"
+
+import "@/index.css"
 
 let rootStore = configureRootStore({
     baseURL:
@@ -13,20 +16,20 @@ let rootStore = configureRootStore({
             ?.querySelector("meta[name=base-url]")
             ?.getAttribute("content")
             ?.replace(/\/$/, "") ?? "",
-    router: { href: location.href },
+    router: { href: history.current },
     buildInfo: serverData.buildInfo,
     account: serverData.account,
     settings: serverData.settings,
 })
 
 eventbus.on("notifications:add", (notification) => {
-    rootStore.dispatch(actions.notifications.add({ notification }))
+    rootStore.dispatch(actions.global.notifications.add({ notification }))
 })
 
 const updateSW = registerSW({
     onNeedRefresh() {
         rootStore.dispatch(
-            actions.notifications.add({
+            actions.global.notifications.add({
                 notification: {
                     type: "info",
                     title: "Update Available",
@@ -46,7 +49,7 @@ const updateSW = registerSW({
     onRegisterError: (err) => {
         let [title, message] = err.message.split(/:\n/, 2)
         rootStore.dispatch(
-            actions.notifications.add({
+            actions.global.notifications.add({
                 notification: {
                     type: "error",
                     title,

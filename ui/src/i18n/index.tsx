@@ -1,8 +1,8 @@
 import type { Translation } from "@/i18n/translations"
+import { slice as i18nSlice } from "@/state/global/i18n"
 import type { RootState } from "@/state/rootStore"
 import { useMemo } from "react"
 import { useSelector } from "react-redux"
-import { slice as i18nSlice } from "../state/i18n"
 import type { Language } from "./langauges"
 import type { Region } from "./regions"
 
@@ -23,7 +23,8 @@ export function useT<K extends keyof Translation>(
     component: K,
 ): Translation[K] {
     let selector = useMemo(
-        () => (state: RootState) => state.i18n.translations[component],
+        () => (state: RootState) =>
+            state["global.i18n"].translations[component],
         [component],
     )
     let translations = useSelector(selector)

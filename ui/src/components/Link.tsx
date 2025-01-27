@@ -1,5 +1,5 @@
 import { useBaseURL } from "@/hooks/useBaseURL"
-import { useGoto } from "@/state/router"
+import { useGoto } from "@/state/global/router"
 import clsx from "clsx"
 import React, { useCallback } from "react"
 
@@ -23,7 +23,7 @@ export const Link = React.forwardRef<
             if (url.searchParams.size > 0) {
                 location += `?${url.searchParams.toString()}`
             }
-            goto(location, {
+            goto(location, undefined, {
                 viewTransition,
             })
         },
@@ -67,7 +67,7 @@ export function LinkButton({
 
     let onClick = useCallback(() => {
         if (!external) {
-            goto(new URL(href, globalThis.location.href).pathname, {
+            goto(new URL(href, globalThis.location.href).pathname, undefined, {
                 viewTransition,
             })
         }

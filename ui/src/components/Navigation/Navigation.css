@@ -1,119 +1,15 @@
 .navigation {
-    @apply flex justify-center h-[4.5rem] tablet:h-12 fixed py-2 w-full;
-    @apply fixed left-0 bottom-0;
-    @apply bg-navigation-bg/80 rounded-t;
-    transition: background-color .1s, box-shadow .2s;
-    box-shadow: 0 -10px 15px -3px rgb(0 0 0 / 0.1), 0 -4px 6px -4px
-        rgb(0 0 0 / 0.1);
-    z-index: 700;
+    @apply hidden tablet:flex w-full items-center tablet:p-1 tablet:absolute tablet:top-0;
 
-    backdrop-filter: blur(4px);
+    &[data-active="settings"] {
+        @apply flex;
 
-    @media (display-mode: standalone) {
-        @apply h-24;
-    }
-
-    @media (min-width: 1024px) {
-        @apply top-4 left-1/2 -translate-x-1/2 rounded-lg p-1.5 w-fit;
-        @apply bg-navigation-bg/60 shadow dark:shadow-lg;
-        bottom: unset;
-        backdrop-filter: blur(5px);
-
-        &:hover {
-            @apply bg-navigation-bg/80 shadow-lg dark:shadow-xl;
-        }
-    }
-
-    @media (min-width: 2100px) {
-        @apply top-0 left-0 translate-x-0 rounded-l-none shadow-none opacity-100 py-2 px-4 w-fit;
-        @apply bg-navigation-bg;
-        backdrop-filter: none;
-
-        &:hover {
-            @apply shadow-none bg-navigation-bg;
-        }
-
-        &::before {
-            @apply -bottom-6 left-0 size-6 rounded-tl-xl bg-transparent;
-            display: block;
-            position: absolute;
-            content: "";
-            box-shadow: -0.75rem -0.75rem 0 rgb(var(--navigation-bg));
-        }
-
-        &::after {
-            @apply -right-16 top-0 size-16 rounded-tl-xl bg-transparent;
-            display: block;
-            position: absolute;
-            content: "";
-            box-shadow: -1rem -1.5rem 0 rgb(var(--navigation-bg));
+        .navigation-theme-selector {
+            @apply hidden;
         }
     }
 }
 
-.navigation-items {
-    @apply h-14 w-full grid grid-cols-4 gap-2 px-2;
-
-    @media (display-mode: standalone) {
-        @apply px-3;
-    }
-
-    @media (min-width: 1024px) {
-        @apply w-full h-full grid grid-cols-4 gap-2 px-0;
-    }
-}
-
-.navigation-item {
-    @apply h-full text-navigation-fg rounded-lg;
-    @apply tablet:w-full;
-    transition: background-color .1s, color .1s;
-
-    a {
-        @apply flex flex-col items-center justify-center h-full gap-0.5 @container;
-
-        @media (min-width: 1024px) {
-            @apply flex flex-row h-full w-full items-center justify-center gap-2 px-2 text-sm @container-normal;
-        }
-    }
-
-    span {
-        @apply px-2;
-        font-size: clamp(0.5rem, 0.5rem + 4.0cqi, 1rem);
-        @media (min-width: 1024px) {
-            @apply text-sm;
-        }
-    }
-
-    svg {
-        @apply text-2xl;
-
-        @media (min-width: 1024px) {
-            @apply text-xl;
-        }
-    }
-
-    &:hover {
-        @apply text-primary-extra-light;
-    }
-
-    &.active {
-        @apply px-0 shadow-lg;
-    }
-
-    &.active,
-    &.active:hover {
-        @apply text-primary-contrast bg-primary font-semibold;
-
-        @media (min-width: 2100px) {
-            @apply text-navigation-bg bg-navigation-fg;
-        }
-    }
-
-    @media (min-width: 1024px) {
-        @apply w-full;
-
-        &:hover {
-            @apply bg-navigation-fg/10;
-        }
-    }
+.navigation-theme-selector {
+    @apply hidden lg:flex flex-1 gap-2 justify-end;
 }

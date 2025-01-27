@@ -1,8 +1,9 @@
-import { Button, type ButtonProps } from "@/components//Button"
 import { Dialog as BaseUIDialog } from "@base-ui-components/react/dialog"
-import { X } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React from "react"
+
+import { Button, type ButtonProps } from "@/components//Button"
+import { XIcon } from "@/components/Icons"
 
 export interface DialogProps extends BaseUIDialog.Root.Props {}
 
@@ -55,7 +56,7 @@ export function DialogContent({
                         render={(closeProps) => {
                             return (
                                 <Button
-                                    iconRight={<X />}
+                                    iconRight={<XIcon />}
                                     ariaLabel="Close"
                                     className="dialog-close"
                                     plain

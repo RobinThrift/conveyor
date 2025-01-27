@@ -58,6 +58,7 @@
         "@radix-ui/react-popover": "^1.1.4",
         "@radix-ui/react-select": "^2.1.2",
         "@radix-ui/react-toast": "^1.2.2",
+        "@radix-ui/react-toolbar": "^1.1.1",
         "@reduxjs/toolkit": "^2.4.0",
         "@replit/codemirror-vim": "^6.2.1",
         "@scalar/api-reference-react": "^0.3.139",

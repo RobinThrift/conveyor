@@ -1,7 +1,11 @@
+import { add } from "date-fns"
+import React, { useCallback } from "react"
+
 import { Alert } from "@/components/Alert"
 import { Button } from "@/components/Button"
 import { DateTime } from "@/components/DateTime"
 import * as Form from "@/components/Form"
+import { CaretLeftIcon, CaretRightIcon } from "@/components/Icons"
 import { Input } from "@/components/Input"
 import { Loader } from "@/components/Loader"
 import { Select } from "@/components/Select"
@@ -9,29 +13,39 @@ import { Tooltip } from "@/components/Tooltip"
 import type { APIToken } from "@/domain/APIToken"
 import { useStateGetter } from "@/hooks/useStateGetter"
 import { useT } from "@/i18n"
-import { CaretLeft, CaretRight } from "@phosphor-icons/react"
-import { add } from "date-fns"
-import React, { useCallback, useEffect } from "react"
-import { useSystemSettingsTabState } from "./state"
+import { useSystemSettingsTabState } from "./useSystemSettingsTabState"
 
 export const SystemSettingsTab = React.forwardRef<HTMLDivElement>(
     function SystemSettingsTab(_, forwardedRef) {
-        let { state, actions } = useSystemSettingsTabState()
+        let {
+            apiTokens,
+            isLoading,
+            error,
+            hasNextPage,
+            hasPrevPage,
+            lastCreatedValue,
+            loadPrevPage,
+            loadNextPage,
+            createAPIToken,
+            deleteAPIToken,
+        } = useSystemSettingsTabState()
 
         return (
-            <div ref={forwardedRef} className="settings-section-content">
+            <div
+                ref={forwardedRef}
+                className="settings-system-tab settings-section-content"
+            >
                 <APITokensSections
-                    isLoading={state.isLoading}
-                    apiTokens={state.apiTokens}
-                    hasPreviousPage={state.hasPrevPage}
-                    hasNextPage={state.hasNextPage}
-                    lastCreatedValue={state.lastCreatedValue}
-                    error={state.error}
-                    loadPage={actions.loadPage}
-                    loadPrevPage={actions.loadPrevPage}
-                    loadNextPage={actions.loadNextPage}
-                    createAPIToken={actions.create}
-                    deleteAPIToken={actions.del}
+                    isLoading={isLoading}
+                    apiTokens={apiTokens}
+                    hasPreviousPage={hasPrevPage}
+                    hasNextPage={hasNextPage}
+                    lastCreatedValue={lastCreatedValue}
+                    error={error}
+                    loadPrevPage={loadPrevPage}
+                    loadNextPage={loadNextPage}
+                    createAPIToken={createAPIToken}
+                    deleteAPIToken={deleteAPIToken}
                 />
             </div>
         )
@@ -45,17 +59,12 @@ function APITokensSections(props: {
     hasNextPage: boolean
     lastCreatedValue?: string
     error?: Error
-    loadPage: () => void
     loadNextPage: () => void
     loadPrevPage: () => void
     createAPIToken: (token: { name: string; expiresAt: Date }) => void
     deleteAPIToken: (name: string) => void
 }) {
     let t = useT("pages/Settings/SystemSettings")
-
-    useEffect(() => {
-        props.loadPage()
-    }, [props.loadPage])
 
     return (
         <div className="settings-sub-section">
@@ -74,7 +83,7 @@ function APITokensSections(props: {
                 <CreateNewAPIToken onSubmit={props.createAPIToken} />
 
                 {props.isLoading && (
-                    <div className="absolute inset-0 flex justify-center items-center top-0 bg-body-contrast/80 rounded-lg z-20">
+                    <div className="absolute inset-0 flex justify-center items-centerbg-body-contrast/80 rounded-lg z-20">
                         <Loader />
                     </div>
                 )}
@@ -82,7 +91,7 @@ function APITokensSections(props: {
 
             <div className="settings-sub-section relative mt-4">
                 {props.isLoading && (
-                    <div className="absolute inset-0 flex justify-center items-center top-4 bg-body-contrast/80 rounded-lg">
+                    <div className="absolute inset-0 flex justify-center items-center bg-body-contrast/80 rounded-lg">
                         <Loader />
                     </div>
                 )}
@@ -241,50 +250,49 @@ function APITokensList({
     let t = useT("pages/Settings/SystemSettings/List")
 
     return (
-        <div className="api-tokens-list">
-            <div className="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>{t.ColumName}</th>
-                            <th>{t.ColumExpires}</th>
-                            <th>{t.ColumnCreated}</th>
-                            <th />
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {tokens.map((token) => (
-                            <tr key={token.name}>
-                                <td>{token.name}</td>
-                                <td>
+        <div className="api-tokens-section">
+            <ul className="api-tokens-list">
+                {tokens.map((token) => (
+                    <li key={token.name} className="api-token">
+                        <dl>
+                            <dt className="sr-only">{t.LabelName}</dt>
+                            <dd className="api-token-name">{token.name}</dd>
+
+                            <div className="api-token-expires-at">
+                                <dt>{t.LabelExpires}</dt>
+                                <dd>
                                     <DateTime date={token.expiresAt} />
-                                </td>
-                                <td>
+                                </dd>
+                            </div>
+
+                            <div className="api-token-created-at">
+                                <dt>{t.LabelCreated}</dt>
+                                <dd>
                                     <DateTime
                                         date={token.createdAt}
                                         relative={true}
                                     />
-                                </td>
-                                <td>
-                                    <div className="flex justify-end">
-                                        <Button
-                                            variant="danger"
-                                            size="sm"
-                                            onClick={() => onDelete(token.name)}
-                                        >
-                                            {t.DeleteButton}
-                                        </Button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                                </dd>
+                            </div>
+                        </dl>
+
+                        <div className="flex tablet:justify-end mt-2 tablet:-mt-8">
+                            <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => onDelete(token.name)}
+                            >
+                                {t.DeleteButton}
+                            </Button>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+
             <div className="flex gap-2 mt-2 justify-end">
                 <Tooltip content={t.PrevPage}>
                     <Button
-                        iconLeft={<CaretLeft />}
+                        iconLeft={<CaretLeftIcon />}
                         onClick={prevPage}
                         size="sm"
                         disabled={!hasPreviousPage}
@@ -292,7 +300,7 @@ function APITokensList({
                 </Tooltip>
                 <Tooltip content={t.NextPage}>
                     <Button
-                        iconLeft={<CaretRight />}
+                        iconLeft={<CaretRightIcon />}
                         onClick={nextPage}
                         size="sm"
                         disabled={!hasNextPage}

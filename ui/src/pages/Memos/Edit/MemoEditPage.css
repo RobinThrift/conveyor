@@ -1,0 +1,11 @@
+.memo-edit-page {
+    @apply container mx-auto max-w-[80rem] h-full w-full tablet:p-4 relative;
+
+    .text-editor-toolbar {
+        @apply tablet:top-4;
+    }
+
+    .memo .editor {
+        min-height: 100dvh;
+    }
+}

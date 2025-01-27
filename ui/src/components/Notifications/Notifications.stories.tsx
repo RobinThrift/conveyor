@@ -1,6 +1,6 @@
 import { Button } from "@/components/Button"
 import { Provider } from "@/state"
-import { useNotificationDispatcher } from "@/state/notifications"
+import { useNotificationDispatcher } from "@/state/global/notifications"
 import { faker } from "@faker-js/faker"
 import { Info, Warning, X } from "@phosphor-icons/react"
 import type { Meta, StoryObj } from "@storybook/react"

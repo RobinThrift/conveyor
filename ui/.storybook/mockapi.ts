@@ -28,7 +28,7 @@ interface MockData {
     attachments: (Attachment & { data: Blob })[]
 }
 
-const mockData: MockData = (() => {
+export const mockData: MockData = (() => {
     let now = roundToNearestMinutes(new Date())
 
     let tags: Tag[] = []

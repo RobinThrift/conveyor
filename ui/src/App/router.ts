@@ -1,4 +1,5 @@
-import { useSetPage } from "@/state/router"
+import { history } from "@/external/history"
+import { useSetPage } from "@/state/global/router"
 import React, { useEffect } from "react"
 
 export function Router(props: React.PropsWithChildren) {
@@ -8,10 +9,10 @@ export function Router(props: React.PropsWithChildren) {
         let onPopState = (e: PopStateEvent) => {
             if (!e.hasUAVisualTransition && "startViewTransition" in document) {
                 document.startViewTransition(() => {
-                    setPage(location.href)
+                    setPage(history.current)
                 })
             } else {
-                setPage(location.href)
+                setPage(history.current)
             }
         }
 

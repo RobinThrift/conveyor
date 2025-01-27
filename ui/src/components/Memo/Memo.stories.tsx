@@ -1,8 +1,10 @@
-import type { Tag } from "@/domain/Tag"
-import { Provider } from "@/state"
 import { faker } from "@faker-js/faker"
+import { action } from "@storybook/addon-actions"
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
+
+import { Provider } from "@/state"
+
 import { Memo } from "./Memo"
 
 import "@/index.css"
@@ -10,9 +12,6 @@ import "@/index.css"
 const meta: Meta<typeof Memo> = {
     title: "Components/Memo",
     component: Memo,
-    argTypes: {
-        updateMemo: { action: "updateMemo" },
-    },
     parameters: {
         layout: "fullscreen",
     },
@@ -30,6 +29,12 @@ export const Basic: Story = {
     name: "Memo",
     args: {
         doubleClickToEdit: true,
+        actions: {
+            edit: action("edit"),
+            link: "/memo/10-1",
+            archive: action("archive"),
+            delete: action("delete"),
+        },
         memo: {
             id: "12345",
             content: `# Markdown Content (Heading 1)
@@ -117,19 +122,6 @@ ${faker.lorem.paragraph()}
             createdAt: new Date(),
             updatedAt: new Date(),
         },
-        tags: (() => {
-            let tags: Tag[] = []
-
-            for (let i = 0; i < 100; i++) {
-                tags.push({
-                    tag: `#${faker.word.noun()}/${faker.word.noun()}`,
-                    count: 0,
-                })
-            }
-
-            tags.sort()
-            return tags
-        })(),
     },
     render: (args) => (
         <div className="container mx-auto">

@@ -1,3 +1,6 @@
+import { SignOut } from "@phosphor-icons/react"
+import React from "react"
+
 import { Button } from "@/components/Button"
 import * as Form from "@/components/Form"
 import { Input } from "@/components/Input"
@@ -5,9 +8,8 @@ import { Link } from "@/components/Link"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useCSRFToken } from "@/hooks/useCSRFToken"
 import { useT } from "@/i18n"
-import { useAccountDisplayName } from "@/state/account"
-import { SignOut } from "@phosphor-icons/react"
-import React from "react"
+import { useAccountDisplayName } from "@/state/global/account"
+
 import type { SettingsPageProps } from "./SettingsPage"
 
 export const AccountSettingsTab = React.forwardRef<

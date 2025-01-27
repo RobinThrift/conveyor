@@ -1,9 +1,7 @@
 {
     "components/Navigation": {
-        "Memos": "Memos",
-        "Archive": "Archiv",
-        "Bin": "Müll",
-        "Settings": "Einstellungen"
+        "Settings": "Einstellungen",
+        "Back": "Zurück"
     },
 
     "components/Memo": {
@@ -24,12 +22,32 @@
         "UpdatedAt": "Verändert am"
     },
 
+    "components/MemoList/DayHeader": {
+        "Today": "Heute",
+        "Yesterday": "Gestern"
+    },
+
+    "components/MemoList/LayoutSelect": {
+        "Label": "Listenlayout auswählen",
+        "LayoutMasonry": "Mosaic",
+        "LayoutSingle": "Einzeln",
+        "LayoutUltraCompact": "Ultra Kompakt"
+    },
+
     "components/Editor": {
         "Cancel": "Abbrechen",
         "Save": "Speichern",
         "DiscardChangesTitle": "Verwerfen",
         "DiscardChangesDescription": "Bist du dir sicher, dass du die Änderungen verwerfen willst?",
         "DiscardChangesConfirmation": "Verwerfen"
+    },
+
+    "components/Editor/Toolbar": {
+        "TextFormatting": "Textformatierung",
+        "TextFormattingBold": "Fettgedruckt",
+        "TextFormattingItalic": "Kursiv",
+        "TextFormattingMonospace": "Monospace",
+        "InsertLink": "Link einfügren"
     },
 
     "components/DateTime": {
@@ -51,6 +69,41 @@
     "components/Notifications": {
         "Label": "Benachrichtigungen",
         "Dismiss": "Schließen"
+    },
+
+    "components/Greeting": {
+        "Morning": "Moin, ",
+        "Afternoon": "Moin Moin, ",
+        "Evening": "Moin, "
+    },
+
+    "components/MemoListHeader": {
+        "Archived": "Archivierte memos",
+        "Deleted": "Gelöschte Memos",
+        "MemosForTag": "Memos mit dem Tag",
+        "MemosForExactDate": "vom",
+        "MemosForExactDateStandalone": "Memos vom",
+        "MemosForQuery": "mit Inhalt",
+        "MemosForQueryStandalone": "Memos mit Inhalt"
+    },
+
+    "components/MemoListFilter": {
+        "TriggerLabel": "Mehr filter",
+        "OffScreenTitle": "Tags",
+        "OffScreenDescription": "Tag- und  Zustandsfilters"
+    },
+
+    "components/MemoListFilter/DatePicker": {
+        "Today": "Heute"
+    },
+
+    "components/MemoListFilter/StateFilter": {
+        "Archived": "Archiviert",
+        "Deleted": "Gelöscht"
+    },
+
+    "components/MemoListFilter/TagTree": {
+        "Label": "Tags"
     },
 
     "pages/Errors/NotFound": {
@@ -86,36 +139,7 @@
         "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein"
     },
 
-    "pages/ListMemos": {
-        "DayToday": "Heute",
-        "DayYesterday": "Gestern",
-        "LayoutSelectLabel": "Listenlayout auswählen",
-        "LayoutMasonry": "Mosaic",
-        "LayoutSingle": "Einzeln",
-        "LayoutUltraCompact": "Ultra Kompakt"
-    },
-
-    "pages/ListMemos/Header": {
-        "Archived": "Archivierte memos",
-        "Deleted": "Gelöschte Memos",
-        "MemosForTag": "Memos mit dem Tag",
-        "MemosForExactDate": "vom",
-        "MemosForExactDateStandalone": "Memos vom",
-        "MemosForQuery": "mit Inhalt",
-        "MemosForQueryStandalone": "Memos mit Inhalt"
-    },
-
-    "pages/ListMemos/Greeting": {
-        "Morning": "Moin, ",
-        "Afternoon": "Guten Tag, ",
-        "Evening": "Abend, "
-    },
-
-    "pages/ListMemos/DatePicker": {
-        "Today": "Heute"
-    },
-
-    "pages/SingleMemoPage": {
+    "pages/MemoSinglePage": {
         "Back": "Zurück"
     },
 
@@ -193,9 +217,9 @@
 
     "pages/Settings/SystemSettings/List": {
         "Title": "API Tokens",
-        "ColumName": "Name",
-        "ColumExpires": "Gültig bis",
-        "ColumnCreated": "Erstellt",
+        "LabelName": "Name",
+        "LabelExpires": "Gültig bis",
+        "LabelCreated": "Erstellt",
         "DeleteButton": "Löschen",
         "PrevPage": "Vorherige Seite",
         "NextPage": "Nächste Seite"

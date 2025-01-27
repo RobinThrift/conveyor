@@ -16,10 +16,8 @@ const sharedErrorTranslations: Components = {
 
 export const translations = {
     "components/Navigation": {
-        Memos: "Memos",
-        Archive: "Archive",
-        Bin: "Bin",
         Settings: "Settings",
+        Back: "Back",
     },
 
     "components/Memo": {
@@ -40,6 +38,18 @@ export const translations = {
         UpdatedAt: "Updated at",
     },
 
+    "components/MemoList/DayHeader": {
+        Today: "Today",
+        Yesterday: "Yesterday",
+    },
+
+    "components/MemoList/LayoutSelect": {
+        Label: "Select list layout",
+        LayoutMasonry: "Masonry",
+        LayoutSingle: "Single",
+        LayoutUltraCompact: "Ultra Compact",
+    },
+
     "components/Editor": {
         Cancel: "Cancel",
         Save: "Save",
@@ -47,6 +57,14 @@ export const translations = {
         DiscardChangesDescription:
             "Are you sure you want to discard any changes?",
         DiscardChangesConfirmation: "Discard",
+    },
+
+    "components/Editor/Toolbar": {
+        TextFormatting: "Text formatting",
+        TextFormattingBold: "Bold",
+        TextFormattingItalic: "Italic",
+        TextFormattingMonospace: "Monospace",
+        InsertLink: "Insert Link",
     },
 
     "components/DateTime": {
@@ -68,6 +86,41 @@ export const translations = {
     "components/Notifications": {
         Label: "Notifications",
         Dismiss: "Dismiss",
+    },
+
+    "components/Greeting": {
+        Morning: "Good Morning, ",
+        Afternoon: "Good Afternoon, ",
+        Evening: "Good Evening, ",
+    },
+
+    "components/MemoListHeader": {
+        Archived: "Archived memos",
+        Deleted: "Deleted Memos",
+        MemosForTag: "Memos tagged",
+        MemosForExactDate: "created on",
+        MemosForExactDateStandalone: "Memos created on",
+        MemosForQuery: "containing",
+        MemosForQueryStandalone: "Memos containing",
+    },
+
+    "components/MemoListFilter": {
+        TriggerLabel: "More filter",
+        OffScreenTitle: "Tags",
+        OffScreenDescription: "Tags and state filters",
+    },
+
+    "components/MemoListFilter/DatePicker": {
+        Today: "Today",
+    },
+
+    "components/MemoListFilter/TagTree": {
+        Label: "Tags",
+    },
+
+    "components/MemoListFilter/StateFilter": {
+        Archived: "Archived",
+        Deleted: "Deleted",
     },
 
     "pages/Errors/NotFound": {
@@ -98,36 +151,7 @@ export const translations = {
         ChangePasswordButton: "Change Password",
     },
 
-    "pages/ListMemos": {
-        DayToday: "Today",
-        DayYesterday: "Yesterday",
-        LayoutSelectLabel: "Select list layout",
-        LayoutMasonry: "Masonry",
-        LayoutSingle: "Single",
-        LayoutUltraCompact: "Ultra Compact",
-    },
-
-    "pages/ListMemos/Header": {
-        Archived: "Archived memos",
-        Deleted: "Deleted Memos",
-        MemosForTag: "Memos tagged",
-        MemosForExactDate: "created on",
-        MemosForExactDateStandalone: "Memos created on",
-        MemosForQuery: "containing",
-        MemosForQueryStandalone: "Memos containing",
-    },
-
-    "pages/ListMemos/Greeting": {
-        Morning: "Good Morning, ",
-        Afternoon: "Good Afternoon, ",
-        Evening: "Good Evening, ",
-    },
-
-    "pages/ListMemos/DatePicker": {
-        Today: "Today",
-    },
-
-    "pages/SingleMemoPage": {
+    "pages/MemoSinglePage": {
         Back: "Back",
     },
 
@@ -198,9 +222,9 @@ export const translations = {
 
     "pages/Settings/SystemSettings/List": {
         Title: "API Tokens",
-        ColumName: "Name",
-        ColumExpires: "Expires",
-        ColumnCreated: "Created",
+        LabelName: "Name",
+        LabelExpires: "Expires",
+        LabelCreated: "Created",
         DeleteButton: "Delete",
         PrevPage: "Previous Page",
         NextPage: "Next Page",

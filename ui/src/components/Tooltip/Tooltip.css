@@ -1,10 +1,13 @@
+div[data-floating-ui-portal]:has(.tooltip) div[role="presentation"] {
+    z-index: 99999;
+}
+
 .tooltip {
     @apply py-1 px-3 select-none;
     @apply rounded-lg shadow-lg;
     @apply bg-surface;
     @apply text-center text-sm text-text select-none;
     @apply outline outline-subtle-light;
-    /* @apply dark:border dark:border-subtle-extra-dark dark:bg-body-contrast dark:text-body; */
 
     min-width: var(--anchor-width);
 

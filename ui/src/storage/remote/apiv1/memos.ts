@@ -52,7 +52,7 @@ export async function list({
     signal?: AbortSignal
 }): Promise<MemoList> {
     let url = new URL(`${baseURL}/api/v1/memos`, globalThis.location.href)
-    filterToSearchParams(url.searchParams, filter, pagination)
+    addFilterToSearchParams(url.searchParams, filter, pagination)
 
     let res = await fetch(url, { signal })
 
@@ -186,9 +186,22 @@ export interface FilterQueryParams {
 }
 
 export function filterFromQuery(query: FilterQueryParams): Filter {
-    let filter: Filter = {
-        tag: query["filter[tag]"],
-        query: query["filter[content]"],
+    let filter: Filter = {}
+
+    if (query["filter[tag]"]) {
+        filter.tag = query["filter[tag]"]
+    }
+
+    if (query["filter[content]"]) {
+        filter.query = query["filter[content]"]
+    }
+
+    if (query["filter[is_deleted]"] === "true") {
+        filter.isDeleted = true
+    }
+
+    if (query["filter[is_archived]"] === "true") {
+        filter.isArchived = true
     }
 
     let createdAt = query["filter[created_at]"]
@@ -206,13 +219,16 @@ export function filterFromQuery(query: FilterQueryParams): Filter {
     return filter
 }
 
-export function filterToQueryString(filter: Filter): string {
-    let query = new URLSearchParams()
-    filterToSearchParams(query, filter)
-    return query.toString()
+export function filterToSearchParams(
+    filter: Filter,
+    pagination?: Pagination<Date>,
+) {
+    let searchParams = new URLSearchParams()
+    addFilterToSearchParams(searchParams, filter, pagination)
+    return searchParams
 }
 
-function filterToSearchParams(
+function addFilterToSearchParams(
     searchParams: URLSearchParams,
     filter: Filter,
     pagination?: Pagination<Date>,
@@ -259,4 +275,6 @@ function filterToSearchParams(
         searchParams.delete("filter[is_archived]")
         searchParams.set("filter[is_deleted]", "true")
     }
+
+    return searchParams
 }

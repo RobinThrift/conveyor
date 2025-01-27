@@ -1,24 +1,25 @@
-import { Navigation } from "@/components/Navigation"
 import React, { Suspense, useCallback } from "react"
 import { Router } from "./router"
 
 import { BuildInfo } from "@/components/BuildInfo"
+import { Navigation } from "@/components/Navigation"
 import { Notifications } from "@/components/Notifications"
 import { Theme } from "@/components/Theme"
-import { SelectColourScheme, SelectMode } from "@/components/ThemeSwitcher"
 import { useBaseURL } from "@/hooks/useBaseURL"
 import { useEnsureLoggedIn } from "@/hooks/useEnsureLoggedIn"
 import { ErrorPage } from "@/pages/Errors"
 import { ChangePasswordPage, LoginPage } from "@/pages/Login"
-import { ListMemosPage } from "@/pages/Memos/List"
-import { SingleMemoPage } from "@/pages/Memos/Single"
+import { MemoEditPage } from "@/pages/Memos/Edit"
+import { MemosListPage } from "@/pages/Memos/List"
+import { MemoNewPage } from "@/pages/Memos/New"
+import { MemoSinglePage } from "@/pages/Memos/Single"
 import { SettingsPage } from "@/pages/Settings"
-import { useCurrentPage, useGoto } from "@/state/router"
-import { useTheme } from "@/state/settings"
+import { useCurrentPage, useGoto } from "@/state/global/router"
+import { useTheme } from "@/state/global/settings"
 import {
     type Filter,
     filterFromQuery,
-    filterToQueryString,
+    filterToSearchParams,
 } from "@/storage/memos"
 import type { ServerData } from "./ServerData"
 
@@ -52,16 +53,16 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
 
     let onChangeFilters = useCallback(
         (filter: Filter) => {
-            goto(
-                `${globalThis.location.pathname}?${filterToQueryString(filter)}`,
-            )
+            goto("/", filterToSearchParams(filter))
         },
         [goto],
     )
 
     let onChangeSettingsTab = useCallback(
         (tab: string) => {
-            goto(`${baseURL}/settings/${tab}`, { viewTransition: true })
+            goto(`${baseURL}/settings/${tab}`, undefined, {
+                viewTransition: true,
+            })
         },
         [baseURL, goto],
     )
@@ -100,41 +101,35 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
                 </Theme>
             )
 
-        case "root":
         case "memos.list":
             pageComp = (
-                <ListMemosPage
+                <MemosListPage
                     filter={filterFromQuery(page.search)}
                     onChangeFilters={onChangeFilters}
                 />
             )
             break
-        case "memos.archive":
-            pageComp = (
-                <ListMemosPage
-                    filter={{
-                        ...filterFromQuery(page.search),
-                        isArchived: true,
-                    }}
-                    showEditor={false}
-                    onChangeFilters={onChangeFilters}
-                />
-            )
-            break
-        case "memos.bin":
-            pageComp = (
-                <ListMemosPage
-                    filter={{
-                        ...filterFromQuery(page.search),
-                        isDeleted: true,
-                    }}
-                    showEditor={false}
-                    onChangeFilters={onChangeFilters}
-                />
-            )
-            break
         case "memos.single":
-            pageComp = <SingleMemoPage memoID={page.params.id} />
+            pageComp = <MemoSinglePage memoID={page.params.id} />
+            break
+        case "memos.edit":
+            pageComp = (
+                <MemoEditPage
+                    memoID={page.params.id}
+                    position={
+                        page.search.x && page.search.y
+                            ? {
+                                  x: Number.parseInt(page.search.x, 10),
+                                  y: Number.parseInt(page.search.y, 10),
+                                  snippet: page.search.snippet,
+                              }
+                            : undefined
+                    }
+                />
+            )
+            break
+        case "memos.new":
+            pageComp = <MemoNewPage />
             break
         case "settings":
             pageComp = (
@@ -161,13 +156,7 @@ function AppShell({ ...props }: { components: AppProps["components"] }) {
 
     return (
         <Theme colourScheme={colourScheme} mode={mode}>
-            <Navigation
-                active={page?.route === "root" ? "memos.list" : page?.route}
-            />
-            <div className="hidden lg:flex absolute right-2 top-2 gap-2">
-                <SelectColourScheme className="w-max" />
-                <SelectMode className="w-max" />
-            </div>
+            <Navigation active={page?.route ?? "memos.list"} />
             <main className="main">
                 <Suspense>{pageComp}</Suspense>
                 <footer className="app-footer">

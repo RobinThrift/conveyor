@@ -4,16 +4,14 @@ import { isAnyOf } from "@reduxjs/toolkit"
 
 import type { StartListening } from "./rootStore"
 
-import { slice as apiTokens } from "./apitokens"
-import { slice as memoList } from "./memolist"
-import { slice as memos } from "./memos"
-import { slice as notifications } from "./notifications"
-import { slice as tags } from "./tags"
+import { slice as apiTokens } from "./entities/apitokens"
+import { slice as memos } from "./entities/memos"
+import { slice as tags } from "./entities/tags"
+import { slice as notifications } from "./global/notifications"
 
 export const registerEffects = (startListening: StartListening) => {
     startListening({
         matcher: isAnyOf(
-            memoList.actions.setError,
             memos.actions.setError,
             apiTokens.actions.setError,
             tags.actions.setError,
@@ -42,7 +40,7 @@ export const registerEffects = (startListening: StartListening) => {
                         children: "Login",
                         ariaLabel: "Login",
                         onClick: () => {
-                            window.location.href = `${window.location.protocol}//${window.location.host}${state.router.baseURL}`
+                            window.location.href = `${window.location.protocol}//${window.location.host}${state["global.router"].baseURL}`
                         },
                     },
                 ]

@@ -1,9 +1,9 @@
 import { lazy } from "react"
 
-export type { ListMemosPageProps } from "./ListMemosPage"
+export type { MemosListPageProps } from "./MemosListPage"
 
-export const ListMemosPage = lazy(() =>
-    import("./ListMemosPage").then(({ ListMemosPage }) => ({
-        default: ListMemosPage,
+export const MemosListPage = lazy(() =>
+    import("./MemosListPage").then(({ MemosListPage }) => ({
+        default: MemosListPage,
     })),
 )

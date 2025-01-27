@@ -18,7 +18,7 @@ export const Colours: Story = {
         let varnames = defaultCSS
             .substring(start + 2, end)
             .split("\n")
-            .filter((l) => l.length !== 0)
+            .filter((l) => l.length !== 0 && !l.includes("font"))
             .map((l) => {
                 let start = l.indexOf("-")
                 let end = l.indexOf(":")

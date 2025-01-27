@@ -1,4 +1,4 @@
-import { useNotificationDispatcher } from "@/state/notifications"
+import { useNotificationDispatcher } from "@/state/global/notifications"
 import type { Root } from "mdast"
 import { useEffect, useState } from "react"
 import { MarkdownWorker } from "./parser.worker"

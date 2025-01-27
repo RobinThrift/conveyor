@@ -1,4 +1,4 @@
-import { slice as router } from "@/state/router"
+import { slice as router } from "@/state/global/router"
 import { useSelector } from "react-redux"
 
 export function useBaseURL(): string {

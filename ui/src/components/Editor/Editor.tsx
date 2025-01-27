@@ -1,24 +1,15 @@
+import clsx from "clsx"
+import React, { useEffect, useRef } from "react"
+
 import { AlertDialog } from "@/components/AlertDialog"
 import { Button } from "@/components/Button"
+import { ArrowLeftIcon, CheckIcon, XIcon } from "@/components/Icons"
 import type { Memo } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
-import { useStateGetter } from "@/hooks/useStateGetter"
 import { useT } from "@/i18n"
-import { ArrowLeft, Check, X } from "@phosphor-icons/react"
-import clsx from "clsx"
-import React, {
-    useCallback,
-    useEffect,
-    useState,
-    lazy,
-    Suspense,
-    useMemo,
-    startTransition,
-} from "react"
 
-const TextEditor = lazy(() =>
-    import("./TextEditor").then(({ TextEditor }) => ({ default: TextEditor })),
-)
+import { TextEditor } from "./TextEditor"
+import { useEditorState } from "./useEditorState"
 
 export interface EditorProps {
     className?: string
@@ -29,113 +20,66 @@ export interface EditorProps {
     autoFocus?: boolean
     placeholder: string
     placeCursorAt?: { x: number; y: number; snippet?: string }
-    lazy?: boolean
-    buttonPosition?: "top" | "bottom"
+    overrideKeybindings?: boolean
 }
 
 export function Editor(props: EditorProps) {
     let t = useT("components/Editor")
+    let { confirmationDialog, onSave, onCancel, onChange, isChanged, content } =
+        useEditorState(props)
 
-    let [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false)
+    let isScrolling = useRef<
+        ReturnType<typeof requestAnimationFrame> | undefined
+    >(undefined)
 
-    let confirmDiscard = useCallback(() => {
-        setConfirmationDialogOpen(false)
-        props.onCancel?.()
-    }, [props.onCancel])
-
-    let [showEditor, setShowEditor] = useState(
-        !(props.lazy ?? true) || props.memo.content.length !== 0,
-    )
-
-    let [isChanged, setIsChanged] = useState(false)
-    let [content, setContent] = useStateGetter(props.memo.content ?? "")
-
-    let onSave = useCallback(() => {
-        props.onSave({
-            ...props.memo,
-            content: content(),
-        })
-    }, [props.onSave, props.memo, content])
-
-    let onCancel = useCallback(() => {
-        if (isChanged) {
-            setConfirmationDialogOpen(true)
-            return
-        }
-        props.onCancel?.()
-    }, [props.onCancel, isChanged])
-
-    // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional
     useEffect(() => {
-        setIsChanged(false)
-        setContent(props.memo.content)
-    }, [props.memo.id, props.memo.content, setContent])
+        document.documentElement.style.setProperty(
+            "--visualviewport-height",
+            `${window.visualViewport?.height}px`,
+        )
 
-    let onChange = useCallback(
-        (content: string) => {
-            setContent(content)
-            setIsChanged(true)
-        },
-        [setContent],
-    )
+        document.documentElement.style.setProperty(
+            "--visualviewport-offset-top",
+            `${window.visualViewport?.offsetTop}px`,
+        )
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: extra dependency so the editor can be cleared when used to create a new memo.
-    let editor = useMemo(() => {
-        if (!showEditor) {
-            return (
-                <button
-                    onClick={() => startTransition(() => setShowEditor(true))}
-                    onFocus={() => startTransition(() => setShowEditor(true))}
-                    type="button"
-                    className="placeholder-btn"
-                >
-                    {props.placeholder}
-                </button>
+        let onresize = () => {
+            document.documentElement.style.setProperty(
+                "--visualviewport-height",
+                `${Math.ceil(window.visualViewport?.height ?? 0)}px`,
             )
         }
 
-        return (
-            <TextEditor
-                id={props.memo.id}
-                tags={props.tags}
-                content={content()}
-                onChange={onChange}
-                onCancel={onCancel}
-                onSave={onSave}
-                autoFocus={props.autoFocus}
-                placeholder={props.placeholder}
-                placeCursorAt={props.placeCursorAt}
-            />
-        )
-    }, [
-        showEditor,
-        props.placeholder,
-        onSave,
-        onCancel,
-        props.memo.id,
-        props.tags,
-        props.autoFocus,
-        props.placeCursorAt,
-        onChange,
-        content(),
-    ])
+        let onscroll = () => {
+            if (isScrolling.current) {
+                cancelAnimationFrame(isScrolling.current)
+            }
+
+            isScrolling.current = requestAnimationFrame(() => {
+                document.documentElement.style.setProperty(
+                    "--visualviewport-offset-top",
+                    `${document.documentElement.scrollTop}px`,
+                )
+            })
+        }
+
+        window.visualViewport?.addEventListener("resize", onresize)
+        window.visualViewport?.addEventListener("scroll", onscroll)
+
+        return () => {
+            window.visualViewport?.removeEventListener("resize", onresize)
+            window.visualViewport?.removeEventListener("scrollend", onscroll)
+        }
+    }, [])
 
     return (
-        <div
-            className={clsx(
-                "editor",
-                {
-                    "showing-placeholder": !showEditor,
-                },
-                props.className,
-            )}
-        >
-            {showEditor && (
-                <div
-                    className={clsx("editor-buttons", {
-                        "position-bottom": props.buttonPosition === "top",
-                    })}
-                >
+        <article className="@container memo is-editing">
+            <div
+                className={clsx("editor", props.className, {
+                    "is-changed": isChanged,
+                })}
+            >
+                <div className="editor-buttons">
                     {props.onCancel && (
                         <Button
                             onClick={onCancel}
@@ -144,11 +88,11 @@ export function Editor(props: EditorProps) {
                             aria-label={t.Cancel}
                             iconLeft={
                                 <>
-                                    <X
+                                    <XIcon
                                         weight="fill"
                                         className="hidden tablet:block"
                                     />
-                                    <ArrowLeft className="tablet:hidden" />
+                                    <ArrowLeftIcon className="tablet:hidden" />
                                 </>
                             }
                         >
@@ -162,7 +106,7 @@ export function Editor(props: EditorProps) {
                         aria-label={t.Save}
                         onClick={onSave}
                         plain
-                        iconLeft={<Check />}
+                        iconLeft={<CheckIcon />}
                         disabled={!isChanged}
                     >
                         <span className="sr-only tablet:not-sr-only">
@@ -170,34 +114,92 @@ export function Editor(props: EditorProps) {
                         </span>
                     </Button>
                 </div>
-            )}
-            <Suspense fallback={<div className="w-full min-h-full" />}>
-                {editor}
-            </Suspense>
 
-            <AlertDialog
-                open={confirmationDialogOpen}
-                onOpenChange={setConfirmationDialogOpen}
-            >
-                <AlertDialog.Content>
-                    <AlertDialog.Title>
-                        {t.DiscardChangesTitle}
-                    </AlertDialog.Title>
+                <TextEditor
+                    id={props.memo.id}
+                    tags={props.tags}
+                    content={content()}
+                    onChange={onChange}
+                    onCancel={onCancel}
+                    onSave={onSave}
+                    autoFocus={props.autoFocus}
+                    placeholder={props.placeholder}
+                    placeCursorAt={props.placeCursorAt}
+                    overrideKeybindings={props.overrideKeybindings}
+                />
 
-                    <AlertDialog.Description>
-                        {t.DiscardChangesDescription}
-                    </AlertDialog.Description>
+                <AlertDialog
+                    open={confirmationDialog.isOpen}
+                    onOpenChange={confirmationDialog.setIsOpen}
+                >
+                    <AlertDialog.Content>
+                        <AlertDialog.Title>
+                            {t.DiscardChangesTitle}
+                        </AlertDialog.Title>
 
-                    <AlertDialog.Buttons>
-                        <Button variant="danger" onClick={confirmDiscard}>
-                            {t.DiscardChangesConfirmation}
-                        </Button>
-                        <AlertDialog.CancelButton>
-                            {t.Cancel}
-                        </AlertDialog.CancelButton>
-                    </AlertDialog.Buttons>
-                </AlertDialog.Content>
-            </AlertDialog>
-        </div>
+                        <AlertDialog.Description>
+                            {t.DiscardChangesDescription}
+                        </AlertDialog.Description>
+
+                        <AlertDialog.Buttons>
+                            <Button
+                                variant="danger"
+                                onClick={confirmationDialog.discard}
+                            >
+                                {t.DiscardChangesConfirmation}
+                            </Button>
+                            <AlertDialog.CancelButton>
+                                {t.Cancel}
+                            </AlertDialog.CancelButton>
+                        </AlertDialog.Buttons>
+                    </AlertDialog.Content>
+                </AlertDialog>
+            </div>
+        </article>
     )
 }
+
+// {
+//     "showing-placeholder": !showEditor,
+// },
+
+// <button
+//     onClick={() => startTransition(() => setShowEditor(true))}
+//     onFocus={() => startTransition(() => setShowEditor(true))}
+//     type="button"
+//     className="placeholder-btn"
+// >
+//     {props.placeholder}
+// </button>
+
+// useEffect(() => {
+//     document.documentElement.style.setProperty(
+//         "--vvp-h",
+//         `${window.visualViewport?.height}px`,
+//     )
+//
+//     let onresize = () => {
+//         console.log(
+//             "window.visualViewport.height",
+//             window.visualViewport?.height,
+//         )
+//         console.log("window.innerHeight", window.innerHeight)
+//         console.log(
+//             "document.documentElement.clientHeight",
+//             document.documentElement.clientHeight,
+//         )
+//         console.log(
+//             "document.body.clientHeight",
+//             document.body.clientHeight,
+//         )
+//         document.documentElement.style.setProperty(
+//             "--vvp-h",
+//             `${Math.ceil(window.visualViewport?.height ?? 0)}px`,
+//         )
+//     }
+//
+//     window.visualViewport?.addEventListener("resize", onresize)
+//
+//     return () =>
+//         window.visualViewport?.removeEventListener("resize", onresize)
+// })

@@ -91,17 +91,18 @@ ${generateRealisticBody()}
 }
 
 export function generateRealisticBody(): string {
-    let b = `${faker.lorem.paragraphs({ min: 1, max: 4 })}
-`
+    let b = `${faker.lorem.paragraphs({ min: 1, max: 4 })}`
 
     if (faker.number.int({ min: 0, max: 10 }) > 3) {
-        b += `## ${generateTitle()}
+        b += `
 
+## ${generateTitle()}
 ${faker.lorem.paragraphs({ min: 1, max: 10 })}
 `
 
         if (faker.number.int({ min: 0, max: 10 }) > 3) {
             b += `
+
 ${generateCodeSnippet()}
 `
         }
@@ -115,8 +116,8 @@ ${generateCodeSnippet()}
     }
 
     if (faker.number.int({ min: 0, max: 10 }) > 3) {
-        b += `### ${generateTitle()}
-
+        b += `
+### ${generateTitle()}
 ${faker.lorem.paragraphs({ min: 1, max: 5 })}
 `
 
@@ -128,8 +129,8 @@ ${generateTable()}
     }
 
     if (faker.number.int({ min: 0, max: 10 }) > 7) {
-        b += `#### ${generateTitle()}
-
+        b += `
+#### ${generateTitle()}
 ${faker.lorem.paragraphs({ min: 1, max: 4 })}
 `
     }

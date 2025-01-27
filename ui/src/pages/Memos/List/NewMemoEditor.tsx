@@ -1,106 +1,42 @@
-import { Dialog } from "@/components/Dialog"
+import clsx from "clsx"
+import React from "react"
+
 import { Editor } from "@/components/Editor"
+import { PlusIcon } from "@/components/Icons"
+import { LinkButton } from "@/components/Link"
 import type { Tag } from "@/domain/Tag"
-import { Plus } from "@phosphor-icons/react/dist/ssr"
-import React, { useCallback, useEffect, useState } from "react"
-import type { CreateMemoRequest } from "./state"
+
+import type { CreateMemoRequest } from "./useMemosListPageState"
+import { useNewMemoEditorState } from "./useNewMemoEditorState"
 
 export interface NewMemoEditorProps {
+    className?: string
     tags: Tag[]
     createMemo: (memo: CreateMemoRequest) => void
     inProgress: boolean
 }
 
 export function NewMemoEditor(props: NewMemoEditorProps) {
-    let [newMemoEditorDialogOpen, setNewMemoEditorDialogOpen] = useState(false)
-
-    let createMemo = useCallback(
-        (memo: CreateMemoRequest) => {
-            memo.content = memo.content.trim()
-            if (memo.content === "") {
-                return
-            }
-
-            props.createMemo(memo)
-        },
-        [props.createMemo],
-    )
-
-    let [newMemo, setNewMemo] = useState({
-        id: Date.now().toString(),
-        name: "",
-        content: "",
-        isArchived: false,
-        isDeleted: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    })
-
-    useEffect(() => {
-        if (!props.inProgress) {
-            setNewMemo({
-                id: Date.now().toString(),
-                name: "",
-                content: "",
-                isArchived: false,
-                isDeleted: false,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            })
-        }
-    }, [props.inProgress])
+    let { createMemo, newMemo } = useNewMemoEditorState(props)
 
     return (
         <>
-            <div className="hidden tablet:block">
+            <div className={clsx("new-memo-editor", props.className)}>
                 <Editor
                     memo={newMemo}
                     tags={props.tags}
                     onSave={createMemo}
                     placeholder="Belt out a memo..."
-                    lazy={false}
-                    className="new-memo-editor"
-                    buttonPosition="top"
                 />
             </div>
-
-            <Dialog
-                dismissible={false}
-                open={newMemoEditorDialogOpen}
-                onOpenChange={setNewMemoEditorDialogOpen}
-                modal={true}
+            <LinkButton
+                href="/memos/new"
+                className="new-memo-editor-fab"
+                iconRight={<PlusIcon />}
+                variant="primary"
             >
-                <Dialog.Trigger
-                    className="new-memo-editor-fab"
-                    iconRight={<Plus />}
-                    ariaLabel="New Memo"
-                    variant="primary"
-                />
-
-                <Dialog.Title className="sr-only">New Memo</Dialog.Title>
-
-                <Dialog.Description className="sr-only">
-                    New Memo
-                </Dialog.Description>
-
-                <Dialog.Content
-                    className="memo-editor-dialog"
-                    withCloseButton={false}
-                >
-                    <Editor
-                        memo={newMemo}
-                        tags={props.tags}
-                        onSave={createMemo}
-                        placeholder="Belt out a memo..."
-                        autoFocus={true}
-                        lazy={false}
-                        className="new-memo-editor"
-                        onCancel={() => {
-                            setNewMemoEditorDialogOpen(false)
-                        }}
-                    />
-                </Dialog.Content>
-            </Dialog>
+                <span className="sr-only">New memo</span>
+            </LinkButton>
         </>
     )
 }

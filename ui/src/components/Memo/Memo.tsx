@@ -1,17 +1,13 @@
 import { Button } from "@/components/Button"
 import { DateTime } from "@/components/DateTime"
-import { Dialog } from "@/components/Dialog"
 import { DropdownMenu } from "@/components/DropdownMenu"
-import { Editor } from "@/components/Editor"
 import { Link, LinkButton } from "@/components/Link"
 import { Markdown } from "@/components/Markdown"
-import type { Memo as MemoT } from "@/domain/Memo"
-import type { Tag } from "@/domain/Tag"
-import { useIsMobile } from "@/hooks/useIsMobile"
+import type { MemoID, Memo as MemoT } from "@/domain/Memo"
 import { useOnVisible } from "@/hooks/useLoadOnVisible"
 import { useT } from "@/i18n"
-import type { UpdateMemoRequest } from "@/state/memos"
-import { useGoto } from "@/state/router"
+import type { UpdateMemoRequest } from "@/state/entities/memos"
+import { useGoto } from "@/state/global/router"
 import {
     Archive,
     ArrowSquareOut,
@@ -23,7 +19,6 @@ import {
 import clsx from "clsx"
 import React, {
     startTransition,
-    useCallback,
     useEffect,
     useMemo,
     useRef,
@@ -33,240 +28,149 @@ import React, {
 export type PartialMemoUpdate = UpdateMemoRequest
 
 export interface MemoActions {
-    edit: boolean
-    link: boolean
-    archive: boolean
-    delete: boolean
-}
-
-const defaultActions: MemoActions = {
-    edit: true,
-    link: true,
-    archive: true,
-    delete: true,
+    edit: (
+        memoID: MemoID,
+        position?: { x: number; y: number; snippet?: string },
+    ) => void
+    link: string
+    archive: (memoID: MemoID, isArchived: boolean) => void
+    delete: (memoID: MemoID, isDeleted: boolean) => void
 }
 
 interface MemoProps {
     className?: string
-    firstHeadingIsLink?: boolean
-    collapsible?: boolean
     memo: MemoT
-    tags: Tag[]
+
     actions?: Partial<MemoActions>
-    doubleClickToEdit: boolean
-    updateMemo: (memo: PartialMemoUpdate) => void
-    viewTransitionName?: string
+    doubleClickToEdit?: boolean
+    collapsible?: boolean
 }
 
-export function Memo(props: MemoProps) {
-    let t = useT("components/Memo")
-    let [memo, setMemo] = useState(props.memo)
-    let actions = useMemo(
-        () => ({
-            ...defaultActions,
-            ...(props.actions ?? {}),
-        }),
-        [props.actions],
-    )
+export const Memo = React.forwardRef<HTMLDivElement, MemoProps>(
+    function Memo(props, forwardRef) {
+        let t = useT("components/Memo")
+        let ref = useRef<HTMLDivElement | null>(null)
+        let isVisible = useOnVisible(ref, { ratio: 0 })
+        let { title, body } = splitContent(props.memo.content)
+        let [isExpanded, setIsExpanded] = useState(!props.collapsible)
+        let [needsCollapsing, setNeedsCollapsing] = useState(
+            props.collapsible ?? false,
+        )
+        let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
 
-    let [isEditing, setIsEditing] = useState(false)
-    let [doubleClickPos, setDoubleClickPos] = useState<
-        { x: number; y: number; snippet?: string } | undefined
-    >(undefined)
-    let activateEditingMode = useCallback(
-        () => startTransition(() => setIsEditing(true)),
-        [],
-    )
+        useEffect(() => {
+            if (isExpanded) {
+                return
+            }
 
-    let updateMemoContent = useCallback(
-        (memo: MemoT) => {
-            startTransition(() => {
-                setDoubleClickPos(undefined)
-                setIsEditing(false)
-                setMemo(memo)
+            let el = ref.current
+            if (!el) {
+                return
+            }
+
+            let observer = new ResizeObserver((entries) => {
+                for (let entry of entries) {
+                    setNeedsCollapsing(
+                        entry.target.clientHeight < entry.target.scrollHeight,
+                    )
+                }
             })
-            props.updateMemo({
-                id: memo.id,
-                content: memo.content,
-            })
-        },
-        [props.updateMemo],
-    )
 
-    let updateMemo = useCallback(
-        (memo: PartialMemoUpdate) => {
-            props.updateMemo(memo)
-        },
-        [props.updateMemo],
-    )
+            observer.observe(el)
 
-    let onCancelEditting = useCallback(() => {
-        startTransition(() => {
-            setDoubleClickPos(undefined)
-            setIsEditing(false)
-        })
-    }, [])
+            return () => {
+                observer.disconnect()
+            }
+        }, [isExpanded])
 
-    useEffect(() => {
-        setMemo(props.memo)
-    }, [props.memo])
+        let onDoubleClick = useMemo(() => {
+            if (!props.actions?.edit || !props.doubleClickToEdit) {
+                return
+            }
 
-    let onDoubleClick = useMemo(() => {
-        if (!actions.edit) {
-            return
-        }
-
-        if (props.doubleClickToEdit) {
             return (e: React.MouseEvent) => {
                 startTransition(() => {
                     let caret = caretPositionFromPoint(e.clientX, e.clientY)
                     let snippet = caret
                         ? caret.text.slice(caret.offset)
                         : undefined
-                    setDoubleClickPos({
-                        x: e.clientX,
-                        y: e.clientY,
+
+                    let rect = ref.current?.getBoundingClientRect()
+
+                    props.actions?.edit?.(props.memo.id, {
+                        x: e.clientX - (rect?.x ?? 0),
+                        y: e.clientY - (rect?.y ?? 0),
                         snippet: snippet?.split("\n")[0].trim(),
                     })
-                    setIsEditing(true)
                 })
             }
-        }
-    }, [props.doubleClickToEdit, actions.edit])
+        }, [props.memo.id, props.doubleClickToEdit, props.actions?.edit])
 
-    let children = isEditing ? (
-        <MemoEditor
-            tags={props.tags}
-            memo={memo}
-            updateMemo={updateMemoContent}
-            onCancel={onCancelEditting}
-            placeCursorAt={doubleClickPos}
-        />
-    ) : (
-        <MemoContent
-            memo={memo}
-            firstHeadingIsLink={props.firstHeadingIsLink}
-            actions={actions}
-            activateEditingMode={activateEditingMode}
-            onDoubleClick={onDoubleClick}
-            updateMemo={updateMemo}
-        />
-    )
+        let rendered = useMemo(() => {
+            if (isVisible) {
+                return (
+                    <Markdown
+                        id={props.memo.id}
+                        onDoubleClick={onDoubleClick}
+                        ref={forwardRef}
+                    >
+                        {body}
+                    </Markdown>
+                )
+            }
 
-    let ref = useRef<HTMLDivElement | null>(null)
-    let [isExpanded, setIsExpanded] = useState(!props.collapsible)
-    let needsCollapsing = ref.current
-        ? ref.current.clientHeight < ref.current.scrollHeight
-        : props.collapsible
-    let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
+            return body
+        }, [isVisible, body, props.memo.id, onDoubleClick, forwardRef])
 
-    useEffect(() => {
-        if (isEditing) {
-            setIsExpanded(true)
-        }
-    }, [isEditing])
-
-    return (
-        <article
-            ref={ref}
-            className={clsx("@container memo", props.className, {
-                "is-editing": isEditing,
-                "is-collapsed": needsCollapsing && isCollapsed,
-                expanded: (needsCollapsing && !isCollapsed) || isExpanded,
-            })}
-            style={{
-                viewTransitionName: props.viewTransitionName,
-            }}
-        >
-            {children}
-            <button
-                type="button"
-                aria-label={t.ShowMore}
-                className="show-more-btn"
-                onClick={() => setIsExpanded(true)}
+        return (
+            <article
+                ref={ref}
+                className={clsx("@container memo", props.className, {
+                    "is-collapsed": needsCollapsing && isCollapsed,
+                    expanded: (needsCollapsing && !isCollapsed) || isExpanded,
+                })}
+                style={{
+                    viewTransitionName: `memo-${props.memo.id}`,
+                }}
             >
-                <CaretDown weight="bold" />
-            </button>
-        </article>
-    )
-}
+                <div className="memo-header content">
+                    {title ? (
+                        <h1>
+                            <MemoActions
+                                memo={props.memo}
+                                actions={props.actions}
+                            />
 
-const MemoContent = React.forwardRef<
-    HTMLDivElement,
-    {
-        memo: MemoT
-        firstHeadingIsLink?: boolean
-
-        actions: MemoActions
-        activateEditingMode: () => void
-        updateMemo: (memo: PartialMemoUpdate) => void
-        onDoubleClick?: (e: React.MouseEvent) => void
-    }
->(function MemoContent(
-    {
-        memo,
-        firstHeadingIsLink,
-        actions,
-        activateEditingMode,
-        updateMemo,
-        onDoubleClick,
-    },
-    forwardRef,
-) {
-    let ref = useRef(null)
-    let isVisible = useOnVisible(ref, { ratio: 0 })
-    let { title, body } = splitContent(memo.content)
-
-    let rendered = useMemo(() => {
-        if (isVisible) {
-            return (
-                <Markdown
-                    id={memo.id}
-                    onDoubleClick={onDoubleClick}
-                    ref={forwardRef}
-                >
-                    {body}
-                </Markdown>
-            )
-        }
-
-        return body
-    }, [isVisible, body, memo.id, onDoubleClick, forwardRef])
-
-    return (
-        <>
-            <div className="memo-header content" ref={ref}>
-                {title ? (
-                    <h1>
+                            {props.actions?.link ? (
+                                <Link href={props.actions.link} viewTransition>
+                                    {title}
+                                </Link>
+                            ) : (
+                                title
+                            )}
+                        </h1>
+                    ) : (
                         <MemoActions
-                            memo={memo}
-                            actions={actions}
-                            activateEditingMode={activateEditingMode}
-                            updateMemo={updateMemo}
+                            memo={props.memo}
+                            actions={props.actions}
                         />
+                    )}
+                    <MemoDate createdAt={props.memo.createdAt} />
+                </div>
+                {rendered}
 
-                        {firstHeadingIsLink ? (
-                            <Link href={`/memos/${memo.id}`} viewTransition>
-                                {title}
-                            </Link>
-                        ) : (
-                            title
-                        )}
-                    </h1>
-                ) : (
-                    <MemoActions
-                        memo={memo}
-                        actions={actions}
-                        activateEditingMode={activateEditingMode}
-                        updateMemo={updateMemo}
-                    />
-                )}
-                <MemoDate createdAt={memo.createdAt} />
-            </div>
-            {rendered}
-        </>
-    )
-})
+                <button
+                    type="button"
+                    aria-label={t.ShowMore}
+                    className="show-more-btn"
+                    onClick={() => setIsExpanded(true)}
+                >
+                    <CaretDown weight="bold" />
+                </button>
+            </article>
+        )
+    },
+)
 
 export function MemoDate({
     createdAt,
@@ -289,31 +193,27 @@ export function MemoDate({
 function MemoActions({
     memo,
     actions,
-    activateEditingMode,
-    updateMemo,
 }: {
     memo: MemoT
-    actions: MemoActions
-    activateEditingMode: () => void
-    updateMemo: (memo: PartialMemoUpdate) => void
+    actions?: Partial<MemoActions>
 }) {
     let t = useT("components/Memo/Actions")
     let goto = useGoto()
 
     return (
         <div className="memo-actions not-prose">
-            {actions.edit && (
+            {actions?.edit && (
                 <Button
                     iconLeft={<Pencil />}
                     plain={true}
                     size="sm"
-                    onClick={activateEditingMode}
+                    onClick={() => actions?.edit?.(memo.id)}
                 />
             )}
 
-            {actions.link && (
+            {actions?.link && (
                 <LinkButton
-                    href={`/memos/${memo.id}`}
+                    href={actions.link}
                     iconLeft={<ArrowSquareOut />}
                     plain={true}
                     size="sm"
@@ -322,7 +222,7 @@ function MemoActions({
                 />
             )}
 
-            {(actions.delete || actions.archive) && (
+            {((actions?.delete ?? true) || (actions?.archive ?? true)) && (
                 <DropdownMenu>
                     <DropdownMenu.Trigger
                         ariaLabel="More memo actions"
@@ -331,10 +231,12 @@ function MemoActions({
                         plain
                     />
                     <DropdownMenu.Items>
-                        {actions.link && (
+                        {actions?.link && (
                             <DropdownMenu.Item
                                 className="@xs:hidden"
-                                action={() => goto(`/memos/${memo.id}`)}
+                                action={() =>
+                                    actions?.link && goto(actions.link)
+                                }
                             >
                                 <DropdownMenu.ItemLabel
                                     icon={<ArrowSquareOut />}
@@ -344,32 +246,33 @@ function MemoActions({
                             </DropdownMenu.Item>
                         )}
 
-                        <DropdownMenu.Item
-                            action={() =>
-                                updateMemo({
-                                    id: memo.id,
-                                    isArchived: !memo.isArchived,
-                                })
-                            }
-                        >
-                            <DropdownMenu.ItemLabel icon={<Archive />}>
-                                {memo.isArchived ? t.Unarchive : t.Archive}
-                            </DropdownMenu.ItemLabel>
-                        </DropdownMenu.Item>
+                        {actions?.archive && (
+                            <DropdownMenu.Item
+                                action={() =>
+                                    actions?.archive?.(
+                                        memo.id,
+                                        !memo.isArchived,
+                                    )
+                                }
+                            >
+                                <DropdownMenu.ItemLabel icon={<Archive />}>
+                                    {memo.isArchived ? t.Unarchive : t.Archive}
+                                </DropdownMenu.ItemLabel>
+                            </DropdownMenu.Item>
+                        )}
 
-                        <DropdownMenu.Item
-                            destructive
-                            action={() =>
-                                updateMemo({
-                                    id: memo.id,
-                                    isDeleted: !memo.isDeleted,
-                                })
-                            }
-                        >
-                            <DropdownMenu.ItemLabel icon={<TrashSimple />}>
-                                {memo.isDeleted ? t.Restore : t.Delete}
-                            </DropdownMenu.ItemLabel>
-                        </DropdownMenu.Item>
+                        {actions?.delete && (
+                            <DropdownMenu.Item
+                                destructive
+                                action={() =>
+                                    actions?.delete?.(memo.id, !memo.isDeleted)
+                                }
+                            >
+                                <DropdownMenu.ItemLabel icon={<TrashSimple />}>
+                                    {memo.isDeleted ? t.Restore : t.Delete}
+                                </DropdownMenu.ItemLabel>
+                            </DropdownMenu.Item>
+                        )}
                     </DropdownMenu.Items>
                 </DropdownMenu>
             )}
@@ -377,63 +280,37 @@ function MemoActions({
     )
 }
 
-function MemoEditor(props: {
-    tags: Tag[]
-    memo: MemoT
-    updateMemo: (memo: MemoT) => void
-    onCancel: () => void
-    placeCursorAt?: { x: number; y: number; snippet?: string }
-}) {
-    let isMobile = useIsMobile()
-    let [memoEditorDialogOpen, setMemoEditorDialogOpen] = useState(isMobile)
-    let createMemo = useCallback(
-        (memo: MemoT) => {
-            props.updateMemo({
-                ...memo,
-                content: memo.content.trim(),
-            })
-        },
-        [props.updateMemo],
-    )
-
-    let editor = (
-        <Editor
-            memo={props.memo}
-            tags={props.tags}
-            onSave={createMemo}
-            onCancel={props.onCancel}
-            autoFocus={true}
-            placeholder=""
-            placeCursorAt={props.placeCursorAt}
-            className="min-h-[200px]"
-        />
-    )
-
-    if (isMobile) {
-        return (
-            <Dialog
-                dismissible={false}
-                modal={true}
-                open={memoEditorDialogOpen}
-                onOpenChange={setMemoEditorDialogOpen}
-            >
-                <Dialog.Title className="sr-only">Edit Memo</Dialog.Title>
-                <Dialog.Description className="sr-only">
-                    Edit Memo Dialog
-                </Dialog.Description>
-
-                <Dialog.Content
-                    className="memo-editor-dialog"
-                    withCloseButton={false}
-                >
-                    {editor}
-                </Dialog.Content>
-            </Dialog>
-        )
-    }
-
-    return editor
-}
+// function MemoEditor(props: {
+//     tags: Tag[]
+//     memo: MemoT
+//     updateMemo: (memo: MemoT) => void
+//     onCancel: () => void
+//     placeCursorAt?: { x: number; y: number; snippet?: string }
+//     overrideKeybindings?: boolean
+// }) {
+//     let createMemo = useCallback(
+//         (memo: MemoT) => {
+//             props.updateMemo({
+//                 ...memo,
+//                 content: memo.content.trim(),
+//             })
+//         },
+//         [props.updateMemo],
+//     )
+//
+//     return (
+//         <Editor
+//             memo={props.memo}
+//             tags={props.tags}
+//             onSave={createMemo}
+//             onCancel={props.onCancel}
+//             autoFocus={true}
+//             placeholder=""
+//             placeCursorAt={props.placeCursorAt}
+//             overrideKeybindings={props.overrideKeybindings}
+//         />
+//     )
+// }
 
 function caretPositionFromPoint(
     x: number,

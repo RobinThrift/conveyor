@@ -27,7 +27,6 @@ export const Overview: Story = {
     },
     args: {
         placeholder: "Placeholder text...",
-        lazy: false,
         memo: {
             id: "new",
             content: "",
@@ -51,7 +50,7 @@ export const Overview: Story = {
         })(),
     },
     render: (args) => (
-        <div className="tablet:container mx-auto h-screen tablet:p-8">
+        <div className="tablet:container mx-auto h-screen tablet:p-8 tablet:max-w-[80rem]">
             <Editor {...args} />
         </div>
     ),
@@ -86,7 +85,7 @@ export const Placeholder: Story = {
         })(),
     },
     render: (args) => (
-        <div className="container mx-auto h-screen p-8">
+        <div className="tablet:container mx-auto h-screen tablet:p-8 tablet:max-w-[80rem]">
             <Editor {...args} />
         </div>
     ),
@@ -99,7 +98,6 @@ export const WithContent: Story = {
     args: {
         placeholder: "Placeholder text...",
         className: "h-full",
-        lazy: false,
         memo: {
             id: "1235219",
             content: generateFullTestContent(),
@@ -123,7 +121,7 @@ export const WithContent: Story = {
         })(),
     },
     render: (args) => (
-        <div className="container mx-auto h-screen p-8">
+        <div className="tablet:container mx-auto h-[100dvh] tablet:p-8 tablet:max-w-[80rem]">
             <Editor {...args} />
         </div>
     ),

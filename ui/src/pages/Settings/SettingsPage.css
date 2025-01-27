@@ -2,7 +2,7 @@
     @apply container mx-auto max-w-4xl px-2 tablet:px-4;
 
     h1 {
-        @apply text-4xl mb-4 px-2 font-serif mt-4;
+        @apply text-4xl mb-4 px-2 font-serif;
     }
 }
 
@@ -11,7 +11,7 @@
     @apply pb-4 -mb-8;
 
     &:last-child {
-        @apply mb-0 pb-4;
+        @apply mb-0;
     }
 
     &[data-state="open"] .settings-heading h2 {
@@ -83,61 +83,33 @@
     }
 
     &:last-child {
-        @apply border-none;
+        @apply border-none pb-0;
     }
 }
 
-.settings-section {
-    .table-wrapper {
-        @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6;
-        @apply border-subtle-extra-dark;
+.settings-system-tab {
+    .api-tokens-list {
+        @apply space-y-2;
 
-        table {
-            margin: 0;
-        }
-    }
-
-    table {
-        @apply border-collapse w-full;
-    }
-
-    thead {
-        @apply font-semibold bg-subtle-light;
-        @apply dark:bg-subtle-extra-dark;
-    }
-
-    th {
-        @apply p-2 border-l border-b border-t-0 border-subtle text-left;
-        @apply border-subtle-extra-dark;
-
-        &:first-child {
-            @apply border-l-0;
+        .api-token-name {
+            @apply text-lg font-semibold w-full;
         }
 
-        &:last-child {
-            @apply border-r-0;
-        }
-    }
-
-    td {
-        @apply p-2 border-l border-subtle;
-        @apply border-subtle-extra-dark;
-
-        &:first-child {
-            @apply border-l-0;
+        .api-token {
+            @apply p-2 border border-subtle-dark rounded shadow-md;
         }
 
-        &:last-child {
-            @apply border-r-0;
+        dt {
+            @apply block;
         }
-    }
 
-    .api-tokens-list th:last-child {
-        border-left-width: 0;
-    }
+        .api-token-expires-at {
+            @apply flex gap-2 text-sm;
+        }
 
-    .api-tokens-list td:last-child {
-        border-left-width: 0;
+        .api-token-created-at {
+            @apply flex gap-2 text-xs;
+        }
     }
 }
 
