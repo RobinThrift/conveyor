@@ -1,0 +1,33 @@
+.single-memo-screen {
+    @apply container mx-auto max-w-[80rem] h-full w-full p-2 lg:p-4 relative;
+
+    .memo {
+        min-height: calc(100svh - 5lh);
+
+        @media (max-width: 768px) {
+            @apply rounded-none border-0 border-b;
+        }
+    }
+
+    .back-btn {
+        @apply absolute z-10 top-3 mt-0.5 left-1 tablet:mt-0 tablet:top-4 lg:top-6;
+        @apply rounded px-2 py-1;
+
+        & > svg {
+            @apply size-5;
+        }
+
+        &:hover {
+            @apply bg-subtle;
+        }
+    }
+
+    &:has(.back-btn) .memo-header h1 {
+        text-indent: 2.25rem;
+    }
+
+    &:has(.back-btn) .memo-header:not(:has(h1)) {
+        @apply flex justify-between items-center pt-1.5;
+        text-indent: 2.25rem;
+    }
+}

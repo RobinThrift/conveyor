@@ -1,0 +1,65 @@
+diff --git a/ext/wasm/GNUmakefile b/ext/wasm/GNUmakefile
+index 115374e6..4d2f335f 100644
+--- a/ext/wasm/GNUmakefile
++++ b/ext/wasm/GNUmakefile
+@@ -204,6 +204,8 @@ endif
+ # Most SQLITE_OPT flags are set in sqlite3-wasm.c but we need them
+ # made explicit here for building speedtest1.c.
+ SQLITE_OPT = \
++  -DSQLITE_HAS_CODEC \
++  -DSQLCIPHER_CRYPTO_OPENSSL \
+   -DSQLITE_ENABLE_FTS5 \
+   -DSQLITE_ENABLE_RTREE \
+   -DSQLITE_ENABLE_EXPLAIN_COMMENTS \
+@@ -523,6 +525,7 @@ emcc.cflags += -std=c99 -fPIC
+ # for variadic macros and snprintf() to implement
+ # sqlite3_wasm_enum_json().
+ emcc.cflags += -I. -I$(dir.top)
++emcc.cflags += -I/openssl-src/include
+ ########################################################################
+ # emcc flags specific to building .js/.wasm files...
+ emcc.jsflags := -fPIC
+@@ -540,6 +543,7 @@ emcc.jsflags += $(emcc.exportedRuntimeMethods)
+ emcc.jsflags += -sUSE_CLOSURE_COMPILER=0
+ emcc.jsflags += -sIMPORTED_MEMORY
+ emcc.jsflags += -sSTRICT_JS=0
++emcc.jsflags += -I/openssl-src/include
+ # STRICT_JS disabled due to:
+ #   https://github.com/emscripten-core/emscripten/issues/18610
+ # TL;DR: does not work with MODULARIZE or EXPORT_ES6 as of version
+@@ -869,7 +873,7 @@ $(5): $(4) $$(MAKEFILE) $$(sqlite3-wasm.cfiles) $$(EXPORTED_FUNCTIONS.api) $$(pr
+     $$(emcc.flags.$(1)) $$(emcc.flags.$(1).$(2)) \
+     $$(cflags.common) $$(SQLITE_OPT) \
+     $$(cflags.$(1)) $$(cflags.$(1).$(2)) \
+-    $$(cflags.wasm_extra_init) $$(sqlite3-wasm.cfiles)
++    $$(cflags.wasm_extra_init)  /openssl-src/libcrypto.a $$(sqlite3-wasm.cfiles)
+ 	@$$(call SQLITE3.xJS.ESM-EXPORT-DEFAULT,$(3))
+ 	@dotwasm=$$(basename $$@).wasm; \
+ 	chmod -x $$$$dotwasm; \
+@@ -1016,7 +1020,7 @@ batch: batch-runner.list
+ # emcc.speedtest1.common = emcc flags used by multiple builds of speedtest1
+ # emcc.speedtest1 = emcc flags used by main build of speedtest1
+ emcc.speedtest1.common := $(emcc_opt_full)
+-emcc.speedtest1 := -I. -I$(dir $(sqlite3.canonical.c))
++emcc.speedtest1 := -I. -I$(dir $(sqlite3.canonical.c)) -I/openssl-src/include
+ emcc.speedtest1 += -sENVIRONMENT=web
+ emcc.speedtest1 += -sALLOW_MEMORY_GROWTH
+ emcc.speedtest1 += -sINITIAL_MEMORY=$(emcc.INITIAL_MEMORY.$(emcc.INITIAL_MEMORY))
+@@ -1064,7 +1068,7 @@ speedtest1.js := $(dir.dout)/speedtest1.js
+ speedtest1.wasm := $(dir.dout)/speedtest1.wasm
+ emcc.flags.speedtest1-vanilla := $(cflags.common) -DSQLITE_SPEEDTEST1_WASM
+ 
+-speedtest1.cfiles := $(speedtest1.c) $(sqlite3-wasm.c)
++speedtest1.cfiles := $(speedtest1.c) /openssl-src/libcrypto.a $(sqlite3-wasm.c) 
+ $(eval $(call call-make-pre-post,speedtest1,vanilla))
+ $(speedtest1.js): $(MAKEFILE) $(speedtest1.cfiles) \
+     $(pre-post-speedtest1-vanilla.deps) \
+@@ -1144,7 +1148,7 @@ oz: clean
+ # Sub-makes...
+ 
+ # sqlite.org/fiddle application...
+-include fiddle.make
++# include fiddle.make
+ 
+ # Only add wasmfs if wasmfs.enable=1 or we're running (dist)clean
+ ifneq (,$(filter wasmfs,$(MAKECMDGOALS)))

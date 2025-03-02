@@ -1,0 +1,258 @@
+.main {
+    @apply sm:flex-1 pb-14 tablet:pb-4;
+}
+
+.dialog-open-scroll-lock .main {
+    height: var(--vvp-h, 100dvh);
+    overflow: hidden;
+}
+
+.app-footer {
+    @apply px-2 py-4 flex justify-center items-center;
+}
+
+.unlock-page {
+    @apply relative h-[100dvh] px-2 sm:px-4;
+}
+
+.unlock-page-bg {
+    @apply fixed inset-0 pointer-events-none;
+    isolation: isolate;
+    z-index: -1;
+    background-color: rgb(var(--body-bg));
+
+    .noise {
+        @apply fixed inset-0;
+        filter: contrast(100%);
+        mix-blend-mode: hard-light;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")
+            repeat;
+        background-size: 400px;
+        backdrop-filter: blur(25px);
+    }
+
+    .spot-1,
+    .spot-2,
+    .spot-3 {
+        position: fixed;
+        height: 80vh;
+        width: 80vh;
+    }
+
+    .spot-1 {
+        background-image: radial-gradient(
+            circle,
+            rgba(var(--color-primary) / 1),
+            rgba(var(--color-primary) / 0) 30%
+        );
+
+        top: -40%;
+        left: -60%;
+        @media (min-width: 768px) {
+            background-image: radial-gradient(
+                circle,
+                rgba(var(--color-primary) / 1),
+                rgba(var(--color-primary) / 0) 70%
+            );
+            top: -18%;
+            left: -2%;
+        }
+    }
+
+    .spot-2 {
+        background-image: radial-gradient(
+            circle,
+            rgba(var(--color-danger) / 1),
+            rgba(var(--color-danger) / 0) 40%
+        );
+        width: 100vh;
+
+        top: -25%;
+        left: -90%;
+        @media (min-width: 768px) {
+            background-image: radial-gradient(
+                circle,
+                rgba(var(--color-danger) / 1),
+                rgba(var(--color-danger) / 0) 60%
+            );
+            top: -5%;
+            left: -16%;
+        }
+    }
+
+    .spot-3 {
+        height: 100vh;
+        background-image: radial-gradient(
+            circle,
+            rgba(var(--color-success) / 1),
+            rgba(var(--color-success) / 0) 30%
+        );
+
+        top: -45%;
+        left: -16%;
+        @media (min-width: 768px) {
+            background-image: radial-gradient(
+                circle,
+                rgba(var(--color-success) / 1),
+                rgba(var(--color-success) / 0) 60%
+            );
+            top: -35%;
+            left: 5%;
+        }
+    }
+}
+
+:root.dark .unlock-page-bg .noise {
+    mix-blend-mode: overlay;
+}
+
+.logo {
+    @apply fixed pointer-events-none inset-0 flex flex-col items-center justify-center text-center font-serif font-semibold select-none;
+    @apply opacity-40 tablet:opacity-100;
+    color: rgb(var(--body-bg));
+    text-shadow:
+        3px 3px 0 rgb(var(--body-bg-contrast)),
+        -1px -1px 0 rgb(var(--body-bg-contrast)),
+        1px -1px 0 rgb(var(--body-bg-contrast)),
+        -1px 1px 0 rgb(var(--body-bg-contrast)),
+        1px 1px 0 rgb(var(--body-bg-contrast));
+
+    animation: logo-show 0.8s;
+    animation-timing-function: ease-out;
+    transform: skew(20deg, -10deg);
+
+    top: -50vh;
+    left: -20vw;
+    font-size: 15rem;
+    @media (min-width: 768px) {
+        top: -10vh;
+        left: -50vw;
+        font-size: 19rem;
+    }
+
+    em {
+        visibility: hidden;
+        font-style: normal;
+        color: red;
+    }
+
+    .eeee {
+        --belt-eeee-top-start: 0rem;
+        --belt-eeee-top-end: calc(0.57em * -4);
+
+        display: block;
+        position: absolute;
+        width: 10rem;
+        word-wrap: break-word;
+        line-height: 0.57em;
+
+        left: calc(50% - 5.15rem);
+        @media (min-width: 768px) {
+            left: calc(50% - 5.5rem);
+        }
+
+        top: 0rem;
+        animation: belt-eeee infinite 60s linear;
+        animation-delay: 0.8s;
+    }
+}
+
+@keyframes logo-show {
+    from {
+        transform: skew(10deg, -5deg);
+        opacity: 0;
+    }
+
+    to {
+        transform: skew(20deg, -10deg);
+        opacity: 1;
+    }
+}
+
+@keyframes belt-eeee {
+    from {
+        top: var(--belt-eeee-top-start);
+    }
+
+    to {
+        top: var(--belt-eeee-top-end);
+    }
+}
+
+.unlock-window-positioner {
+    @apply fixed bottom-10 left-2 right-2;
+
+    @media (min-width: 768px) {
+        @apply right-2;
+        left: unset;
+    }
+
+    @media (min-width: 2100px) {
+        @apply right-0 left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center;
+    }
+}
+
+.unlock-window {
+    @apply flex-col w-full max-w-[500px] tablet:min-w-[500px];
+    @apply animate-in fade-in-50 duration-500 slide-in-from-bottom-32;
+
+    h1 {
+        @apply ps-4 text-7xl mb-4 font-serif font-semibold;
+
+        color: rgb(var(--body-bg));
+        text-shadow:
+            2px 2px 0 rgb(var(--body-bg-contrast)),
+            -1px -1px 0 rgb(var(--body-bg-contrast)),
+            1px -1px 0 rgb(var(--body-bg-contrast)),
+            -1px 1px 0 rgb(var(--body-bg-contrast)),
+            1px 1px 0 rgb(var(--body-bg-contrast)),
+            4px 4px 0px rgb(var(--body-bg));
+    }
+
+    .btn.primary {
+        --btn-border-color: var(--body-bg-contrast);
+        @apply border-2;
+    }
+
+    .input-field {
+        @apply flex gap-2 items-center bg-body rounded p-2 text-body-contrast border-body-contrast border-2;
+
+        &[data-invalid="true"] {
+            @apply border border-danger;
+        }
+
+        input {
+            @apply bg-transparent border-none flex-1 focus:outline-none;
+        }
+
+        label {
+            @apply sr-only;
+        }
+    }
+}
+
+:root.dark {
+    .logo {
+        color: rgb(var(--body-bg-contrast));
+        text-shadow:
+            3px 3px 0 rgb(var(--body-bg)),
+            -1px -1px 0 rgb(var(--body-bg)),
+            1px -1px 0 rgb(var(--body-bg)),
+            -1px 1px 0 rgb(var(--body-bg)),
+            1px 1px 0 rgb(var(--body-bg));
+    }
+
+    .unlock-window h1 {
+        color: rgb(var(--body-bg-contrast));
+        text-shadow:
+            3px 3px 0 rgb(var(--body-bg)),
+            -1px -1px 0 rgb(var(--body-bg)),
+            1px -1px 0 rgb(var(--body-bg)),
+            -1px 1px 0 rgb(var(--body-bg)),
+            1px 1px 0 rgb(var(--body-bg));
+    }
+}
+
+.unlock-footer {
+    @apply p-2 flex justify-between items-center fixed bottom-0 left-0 right-0;
+}

@@ -1,0 +1,86 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "organizeImports": {
+        "enabled": true
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "correctness": {
+                "useHookAtTopLevel": "error"
+            },
+            "style": {
+                "useConst": "off",
+                "useFilenamingConvention": {
+                    "level": "error",
+                    "options": {
+                        "strictCase": false,
+                        "requireAscii": true,
+                        "filenameCases": ["camelCase", "PascalCase"]
+                    }
+                }
+            },
+            "complexity": {
+                "noForEach": "off",
+                "noUselessStringConcat": "error",
+                "noUselessFragments": "error",
+                "useDateNow": "error",
+                "useLiteralKeys": "error"
+            },
+            "suspicious": {
+                "noExplicitAny": "off",
+                "noDuplicateJsxProps": "error"
+            },
+            "nursery": {
+                "noNestedTernary": "error",
+                "noTemplateCurlyInString": "error",
+                "noOctalEscape": "error",
+                "noUselessEscapeInRegex": "error",
+                "noExportedImports": "error",
+                "noProcessEnv": "error"
+            }
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "semicolons": "asNeeded"
+        },
+        "jsxRuntime": "reactClassic"
+    },
+    "overrides": [
+        {
+            "include": [
+                "src/external/@types/**/*",
+                "src/@types/**/*",
+                "src/domain/ID.ts",
+                "src/i18n/translations/*",
+                "src/i18n/date-fns/*",
+                "src/storage/database/sqlite/gen/*",
+                "src/storage/database/sqlite/sqlc-plugin/proto/*"
+            ],
+            "linter": {
+                "rules": {
+                    "style": {
+                        "useFilenamingConvention": "off"
+                    }
+                }
+            }
+        },
+
+        {
+            "include": [
+                "./src/external/sqlite-wasm/build/*",
+                "./src/external/thumbhash/thumbhash.*"
+            ],
+            "organizeImports": { "enabled": false },
+            "formatter": { "enabled": false },
+            "linter": { "enabled": false }
+        }
+    ]
+}

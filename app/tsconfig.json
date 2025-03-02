@@ -1,0 +1,46 @@
+{
+    "compilerOptions": {
+        "outDir": "build",
+
+        "jsx": "react",
+
+        "target": "ES2023",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+
+        "incremental": true,
+        "useDefineForClassFields": false,
+        "resolveJsonModule": true,
+        "allowJs": true,
+        "checkJs": false,
+        "maxNodeModuleJsDepth": 1,
+        "declaration": false,
+        "declarationMap": false,
+        "sourceMap": false,
+        "stripInternal": true,
+        "isolatedModules": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true,
+        "noFallthroughCasesInSwitch": true,
+        "allowUnusedLabels": false,
+        "allowUnreachableCode": false,
+
+        "lib": ["ESNext", "DOM", "DOM.AsyncIterable", "WebWorker"],
+        "skipLibCheck": true,
+        "types": ["vite/client", "vite-plugin-pwa/client", "vitest/importMeta"],
+        "paths": {
+            "@/*": [ "./src/*" ],
+            "@translations/*": [ "./translations/*" ]
+        }
+    },
+    "include": ["src/*.tsx", "src/**/*.tsx", "src/*.ts", "src/**/*.ts", "translations/*.ts"],
+    "exclude": ["node_modules"]
+}
+
+

@@ -1,0 +1,106 @@
+version: "2"
+plugins:
+  - name: sqlite3-wasm
+    env:
+    - PATH
+    process:
+      cmd: ./src/storage/database/sqlite/sqlc-plugin/plugin.sh
+sql:
+- engine: "sqlite"
+  queries: "./queries"
+  schema: "./migrations"
+  codegen:
+  - out: ./gen
+    plugin: sqlite3-wasm
+    options:
+      overrides:
+      - column: memos.content
+        type: "Uint8Array<ArrayBufferLike>"
+
+      - column: memos.created_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+      - column: memos.updated_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+      - column: memos_fts.content
+        type: "Uint8Array<ArrayBufferLike>"
+
+      - column: memos_fts.is_archived
+        type: "boolean"
+
+      - column: memos_fts.is_deleted
+        type: "boolean"
+
+      - column: memos_fts.created_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+      - column: memos_fts.updated_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+      - column: tags.created_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+      - column: tags.updated_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+      - column: attachments.sha256
+        type: "Uint8Array<ArrayBufferLike>"
+
+      - column: attachments.created_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+      - column: settings.value
+        type: "any"
+        from_sql:
+          fn: "JSON.parse"
+        to_sql:
+          fn: "JSON.stringify"
+
+      - column: page_after
+        type: "Date | undefined"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"

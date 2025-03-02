@@ -1,0 +1,211 @@
+{
+    "components/Navigation": {
+        "Settings": "Einstellungen",
+        "Back": "Zurück"
+    },
+
+    "components/Memo": {
+        "ShowMore": "Alles Anzeigen"
+    },
+
+    "components/Memo/Actions": {
+        "View": "Ansehen",
+        "Edit": "Bearbeiten",
+        "Archive": "Archivieren",
+        "Delete": "Löschen",
+        "Unarchive": "Unarchivieren",
+        "Restore": "Wiederherstellen"
+    },
+
+    "components/Memo/DateTime": {
+        "CreatedAt": "Erstellt am",
+        "UpdatedAt": "Verändert am"
+    },
+
+    "components/MemoList/DayHeader": {
+        "Today": "Heute",
+        "Yesterday": "Gestern"
+    },
+
+    "components/MemoList/LayoutSelect": {
+        "Label": "Listenlayout auswählen",
+        "LayoutMasonry": "Mosaic",
+        "LayoutSingle": "Einzeln",
+        "LayoutUltraCompact": "Ultra Kompakt"
+    },
+
+    "components/Editor": {
+        "Cancel": "Abbrechen",
+        "Save": "Speichern",
+        "DiscardChangesTitle": "Verwerfen",
+        "DiscardChangesDescription": "Bist du dir sicher, dass du die Änderungen verwerfen willst?",
+        "DiscardChangesConfirmation": "Verwerfen"
+    },
+
+    "components/Editor/Toolbar": {
+        "TextFormatting": "Textformatierung",
+        "TextFormattingBold": "Fettgedruckt",
+        "TextFormattingItalic": "Kursiv",
+        "TextFormattingMonospace": "Monospace",
+        "InsertLink": "Link einfügren"
+    },
+
+    "components/DateTime": {
+        "datetime": "{date} um {time}",
+        "invalidTime": "Ungültiges Datum \"{date}\": {error}"
+    },
+
+    "components/ThemeSwitcher": {
+        "ColoursDefault": "Standard Farben",
+        "ColoursWarm": "Warm",
+        "RosePine": "Rosé Pine",
+        "Auto": "Auto",
+        "Light": "Hell",
+        "Dark": "Dunkel",
+        "SelectColourSchemeAriaLabel": "Farbschemawahl",
+        "SelectModeAriaLabel": "Auswahl des Hell- oder Dunkelmodus"
+    },
+
+    "components/Notifications": {
+        "Label": "Benachrichtigungen",
+        "Dismiss": "Schließen"
+    },
+
+    "components/Greeting": {
+        "Morning": "Moin, ",
+        "Afternoon": "Moin Moin, ",
+        "Evening": "Moin, "
+    },
+
+    "components/MemoListHeader": {
+        "Archived": "Archivierte memos",
+        "Deleted": "Gelöschte Memos",
+        "MemosForTag": "Memos mit dem Tag",
+        "MemosForExactDate": "vom",
+        "MemosForExactDateStandalone": "Memos vom",
+        "MemosForQuery": "mit Inhalt",
+        "MemosForQueryStandalone": "Memos mit Inhalt"
+    },
+
+    "components/MemoListFilter": {
+        "TriggerLabel": "Mehr filter",
+        "OffScreenTitle": "Tags",
+        "OffScreenDescription": "Tag- und  Zustandsfilters"
+    },
+
+    "components/MemoListFilter/DatePicker": {
+        "Today": "Heute"
+    },
+
+    "components/MemoListFilter/StateFilter": {
+        "Archived": "Archiviert",
+        "Deleted": "Gelöscht"
+    },
+
+    "components/MemoListFilter/TagTree": {
+        "Label": "Tags"
+    },
+
+    "screens/Errors/NotFound": {
+        "Title": "Nicht gefunden",
+        "Detail": "Die Seite kann nicht gefunden werden"
+    },
+
+    "screens/Errors/Unauthorized": {
+        "Title": "Nicht Authorisiert",
+        "Detail": "Du hast auf diese Seite keinen Zugriff"
+    },
+
+    "screens/Unlock": {
+        "Invalid/Empty": "{name} darf nicht leer sein",
+        "Title": "Unlock",
+        "PasswordLabel": "Password",
+        "UnlockButton": "Unlock"
+    },
+
+    "screens/SingleMemoScreen": {
+        "Back": "Zurück"
+    },
+
+    "screens/Settings": {
+        "Title": "Settings"
+    },
+
+    "screens/Settings/InterfaceSettings": {
+        "Title": "Einstellungen der Benutzeroberfläche",
+        "Description": "Passe das Aussehen und Verhalten der Benutzeroberfläche an.",
+        "SectionTheme": "Farben und Modus",
+        "LabelColourScheme": "Farbschema",
+        "LabelModeOverride": "Hell/Dunkl-Modus erzwingen",
+        "LabelIcon": "Icon",
+        "SectionControls": "Controls",
+        "LabelEnableVimKeybindings": "Aktiviere Vim keybindings",
+        "LabelEnableDoubleClickToEdit": "Doppelklick auf Memos aktiviert den Editor"
+    },
+
+    "screens/Settings/LocaleSettings": {
+        "Title": "Sprache & Region",
+        "Description": "Setze die Sprache- und Regionseinstellunge",
+        "LabelSelectLanguage": "Sprache",
+        "LabelSelectRegion": "Region"
+    },
+
+    "screens/Settings/AccountSettings": {
+        "Title": "Konto",
+        "Description": "Verwalte dein Konto.",
+
+        "DisplayNameLabel": "Anzeigename",
+        "UpdateDisplayNameButton": "Speichern",
+        "EmptyDisplayName": "Anzeigename darf nicht leer sein",
+        "Logout": "Ausloggen",
+
+        "ChangePasswordTitle": "Password Ändern",
+        "ChangePasswordButton": "Ändern",
+        "Invalid/Empty": "{name} darf nicht leer sein",
+        "CurrentPasswordIncorrect": "Incorrect password",
+        "EmptyCurrentPassword": "Bitte gib Dein aktuelles Passwort ein",
+        "EmptyNewPassword": "Bitte gib ein neues Passwort ein",
+        "EmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
+        "NewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
+        "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein",
+        "CurrentPasswordLabel": "Aktulles Passwort",
+        "NewPasswordLabel": "Neues Passwort",
+        "RepeatNewPasswordLabel": "Neues Passwort wiederholen"
+    },
+
+    "screens/Settings/SystemSettings": {
+        "Title": "System",
+        "SectionAPITokensTitle": "API Tokens",
+        "SectionAPITokensDescription": "Erstelle und lösche API Tokens."
+    },
+
+    "screens/Settings/SystemSettings/New": {
+        "Title": "Neuen API Token erstellen",
+        "FieldNameLabel": "Name",
+        "FieldExpiresInLabel": "Gültigkeit",
+        "FieldExpiresInValueDays": {
+            "one": "{count} Tag",
+            "many": "{count} Tage"
+        },
+        "FieldExpiresInValueMonths": {
+            "one": "{count} Monat",
+            "many": "{count} Monate"
+        },
+        "ButtonLabel": "Neuen Token Erstellen"
+    },
+
+    "screens/Settings/SystemSettings/LastCreated": {
+        "Title": "Neuer API Token",
+        "Notice": "Bitte notieren den Token. DIESER WERT WIRD NIE WIEDER ANGEZEIGT!"
+    },
+
+    "screens/Settings/SystemSettings/List": {
+        "Title": "API Tokens",
+        "LabelName": "Name",
+        "LabelExpires": "Gültig bis",
+        "LabelCreated": "Erstellt",
+        "DeleteButton": "Löschen",
+        "PrevPage": "Vorherige Seite",
+        "NextPage": "Nächste Seite"
+    }
+}

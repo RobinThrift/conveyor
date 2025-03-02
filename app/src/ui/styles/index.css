@@ -1,0 +1,77 @@
+@import "./tailwind.css";
+
+@import "@fontsource-variable/noto-serif-hk";
+@import "@fontsource-variable/inter";
+@import "@fontsource/ibm-plex-mono";
+
+@import "./themes/default.css" layer(base);
+@import "./themes/warm.css" layer(base);
+@import "./themes/rosepine.css" layer(base);
+
+@import "../components/Alert/Alert.css" layer(components);
+@import "../components/Button/Button.css" layer(components);
+@import "../components/Dialog/Dialog.css" layer(components);
+@import "../components/DropdownMenu/DropdownMenu.css" layer(components);
+@import "../components/Editor/Editor.css";
+@import "../components/Image/Image.css" layer(components);
+@import "../components/Input/Input.css" layer(components);
+@import "../components/LinkPreview/LinkPreview.css" layer(components);
+@import "../components/Loader/Loader.css" layer(components);
+@import "../components/Markdown/Code.css";
+@import "../components/Markdown/Markdown.css" layer(components);
+@import "../components/Memo/Memo.css" layer(components);
+@import "../components/MemoList/MemoList.css" layer(components);
+@import "../components/MemoListFilter/MemoListFilter.css" layer(components);
+@import "../components/Navigation/Navigation.css" layer(components);
+@import "../components/Notifications/Notifications.css" layer(components);
+@import "../components/OffCanvas/OffCanvas.css" layer(components);
+@import "../components/Select/Select.css" layer(components);
+@import "../components/Tooltip/Tooltip.css" layer(components);
+@import "../App/App.css" layer(components);
+@import "../screens/SettingsScreen/SettingsScreen.css" layer(components);
+@import "../screens/MainScreen/MainScreen.css" layer(components);
+@import "../screens/NewMemoScreen/NewMemoScreen.css" layer(components);
+@import "../screens/EditMemoScreen/EditMemoScreen.css" layer(components);
+@import "../screens/SingleMemoScreen/SingleMemoScreen.css" layer(components);
+@import "../screens/ErrorScreen/ErrorScreen.css" layer(components);
+@import "../screens/UnlockScreen/UnlockScreen.css" layer(components);
+
+@layer base {
+    body {
+        color: rgb(var(--text-color));
+        background-color: rgb(var(--body-bg));
+    }
+}
+
+.tree-node-group--expanded {
+    position: relative;
+
+    .tree-node {
+        @apply animate-in fade-in-10;
+    }
+}
+
+.tree-node-group--expanded .tree-node {
+    &::before {
+        @apply bg-subtle top-0 bottom-0;
+        margin-left: -9px;
+        content: "";
+        width: 1px;
+        display: block;
+        position: absolute;
+    }
+
+    &:hover {
+        &::before {
+            @apply bg-subtle-dark z-20;
+        }
+    }
+}
+
+.tree-leaf-list-item:only-of-type .tree-node::before {
+    display: none;
+}
+
+:root {
+    view-transition-name: none;
+}
