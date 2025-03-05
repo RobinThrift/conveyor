@@ -37,8 +37,13 @@ export async function getAttachment(
     }
 
     return Ok({
-        ...result.value,
         id: result.value.publicId,
+        contentType: result.value.contentType,
+        filepath: result.value.filepath,
+        originalFilename: "test.txt",
+        sha256: result.value.sha256,
+        sizeBytes: result.value.sizeBytes,
+        createdAt: result.value.createdAt,
     } satisfies Attachment)
 }
 

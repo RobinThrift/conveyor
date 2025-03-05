@@ -4,12 +4,17 @@ import type { Database } from "./db"
 
 import { mapRowToObj, numberToBool } from "./utils"
 
+import {
+    dateToSQLite,
+    dateFromSQLite,
+} from "@/storage/database/sqlite/types/datetime"
+
 const listUnsyncedChangesQuery = `-- name: ListUnsyncedChanges :many
-SELECT id, source, revision, target_type, target_id, value, applied, synced, applied_at, synced_at, created_at, updated_at
+SELECT id, public_id, source, revision, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
 FROM changelog
 WHERE
     CASE WHEN ?1 IS NOT NULL THEN id > ?1 ELSE true END
-    AND synced = false
+    AND is_synced = false
 ORDER BY revision
 LIMIT ?2`
 
@@ -20,16 +25,17 @@ export interface ListUnsyncedChangesArgs {
 
 export interface ListUnsyncedChangesRow {
     id: number
+    publicId: string
     source: string
     revision: number
     targetType: string
     targetId: string
     value: any
-    applied: boolean
-    synced: boolean
-    appliedAt: string | null
-    syncedAt: string | null
-    createdAt: string
+    isApplied: boolean
+    isSynced: boolean
+    appliedAt: Date | undefined
+    syncedAt: Date | undefined
+    createdAt: Date
     updatedAt: string
 }
 
@@ -45,14 +51,17 @@ export async function listUnsyncedChanges(
     )
     return result.map((row) =>
         mapRowToObj<ListUnsyncedChangesRow>(row, {
-            applied: numberToBool,
-            synced: numberToBool,
+            isApplied: numberToBool,
+            isSynced: numberToBool,
+            appliedAt: dateFromSQLite,
+            syncedAt: dateFromSQLite,
+            createdAt: dateFromSQLite,
         }),
     )
 }
 
 const listUnappliedChangesQuery = `-- name: ListUnappliedChanges :many
-SELECT id, source, revision, target_type, target_id, value, applied, synced, applied_at, synced_at, created_at, updated_at
+SELECT id, public_id, source, revision, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
 FROM changelog
 WHERE
     CASE WHEN ?1 IS NOT NULL THEN id > ?1 ELSE true END
@@ -67,16 +76,17 @@ export interface ListUnappliedChangesArgs {
 
 export interface ListUnappliedChangesRow {
     id: number
+    publicId: string
     source: string
     revision: number
     targetType: string
     targetId: string
     value: any
-    applied: boolean
-    synced: boolean
-    appliedAt: string | null
-    syncedAt: string | null
-    createdAt: string
+    isApplied: boolean
+    isSynced: boolean
+    appliedAt: Date | undefined
+    syncedAt: Date | undefined
+    createdAt: Date
     updatedAt: string
 }
 
@@ -92,46 +102,58 @@ export async function listUnappliedChanges(
     )
     return result.map((row) =>
         mapRowToObj<ListUnappliedChangesRow>(row, {
-            applied: numberToBool,
-            synced: numberToBool,
+            isApplied: numberToBool,
+            isSynced: numberToBool,
+            appliedAt: dateFromSQLite,
+            syncedAt: dateFromSQLite,
+            createdAt: dateFromSQLite,
         }),
     )
 }
 
 const createChangelogEntryQuery = `-- name: CreateChangelogEntry :exec
 INSERT INTO changelog(
+    public_id,
     source,
     revision,
     target_type,
     target_id,
     value,
-    synced,
-    applied
+    is_synced,
+    synced_at,
+    is_applied,
+    applied_at
 ) VALUES (
     ?1,
-    (CASE WHEN ?2 > 0 THEN
-        ?2
+    ?2,
+    (CASE WHEN ?3 > 0 THEN
+        ?3
         ELSE
         COALESCE(
-            (SELECT MAX(revision) + 1 as revision FROM changelog WHERE target_type = ?3 AND target_id = ?4),
+            (SELECT MAX(revision) + 1 as revision FROM changelog WHERE target_type = ?4 AND target_id = ?5),
             1
         )
     END),
-    ?3,
     ?4,
     ?5,
     ?6,
-    ?7
-)`
+    ?7,
+    ?8,
+    ?9,
+    ?10
+) ON CONFLICT (public_id) DO NOTHING`
 
 export interface CreateChangelogEntryArgs {
+    publicId: string
     source: string
     revision: any | null
     targetType: string
     targetId: string
     value: any
-    synced: boolean
-    applied: boolean
+    isSynced: boolean
+    syncedAt: Date | undefined
+    isApplied: boolean
+    appliedAt: Date | undefined
 }
 
 export async function createChangelogEntry(
@@ -142,14 +164,77 @@ export async function createChangelogEntry(
     await database.exec(
         createChangelogEntryQuery,
         [
+            args.publicId,
             args.source,
             args.revision,
             args.targetType,
             args.targetId,
             args.value,
-            args.synced,
-            args.applied,
+            args.isSynced,
+            dateToSQLite(args.syncedAt),
+            args.isApplied,
+            dateToSQLite(args.appliedAt),
         ],
+        abort,
+    )
+}
+
+const markChangelogEntriesAsSyncedQuery = `-- name: MarkChangelogEntriesAsSynced :exec
+UPDATE changelog
+SET is_synced = TRUE, synced_at = COALESCE(synced_at, strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP))
+WHERE public_id IN (/*SLICE:public_ids*/?)`
+
+export interface MarkChangelogEntriesAsSyncedArgs {
+    publicIds: string[]
+}
+
+export async function markChangelogEntriesAsSynced(
+    database: Database,
+    args: MarkChangelogEntriesAsSyncedArgs,
+    abort?: AbortSignal,
+) {
+    let markChangelogEntriesAsSyncedQueryWithSliceParams =
+        markChangelogEntriesAsSyncedQuery.replace(
+            "/*SLICE:public_ids*/?",
+            [
+                ...Array(args.publicIds.length)
+                    .keys()
+                    .map((i) => `?${i + 1}`),
+            ].join(","),
+        )
+    await database.exec(
+        markChangelogEntriesAsSyncedQueryWithSliceParams,
+        [...args.publicIds],
+        abort,
+    )
+}
+
+const markChangelogEntriesAsAppliedQuery = `-- name: MarkChangelogEntriesAsApplied :exec
+UPDATE changelog
+SET is_applied = TRUE, applied_at = COALESCE(applied_at, strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP))
+WHERE public_id IN (/*SLICE:public_ids*/?)`
+
+export interface MarkChangelogEntriesAsAppliedArgs {
+    publicIds: string[]
+}
+
+export async function markChangelogEntriesAsApplied(
+    database: Database,
+    args: MarkChangelogEntriesAsAppliedArgs,
+    abort?: AbortSignal,
+) {
+    let markChangelogEntriesAsAppliedQueryWithSliceParams =
+        markChangelogEntriesAsAppliedQuery.replace(
+            "/*SLICE:public_ids*/?",
+            [
+                ...Array(args.publicIds.length)
+                    .keys()
+                    .map((i) => `?${i + 1}`),
+            ].join(","),
+        )
+    await database.exec(
+        markChangelogEntriesAsAppliedQueryWithSliceParams,
+        [...args.publicIds],
         abort,
     )
 }

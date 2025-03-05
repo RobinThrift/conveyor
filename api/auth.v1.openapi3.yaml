@@ -1,0 +1,242 @@
+openapi: 3.0.4
+info:
+  title: Belt Auth API
+  description: This is the Belt Auth API.
+  version: 0.1.0
+servers:
+- url: http://localhost:8081/api/auth/v1
+  description: Local development server.
+
+security:
+  - tokenBearerAuth: []
+
+tags:
+- name: Auth
+
+paths:
+  /token:
+    post:
+      operationId: RequestAuthToken
+      summary: Request a new AuthToken pair.
+      description: Request a new access and refresh token using a supported authentication method.
+      tags: [ Auth ]
+      requestBody:
+        $ref: "#/components/requestBodies/AuthTokenRequest"
+      responses:
+        "201":
+          description: The new access and refresh tokens.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthToken"
+        "303":
+          description: Password change is required.
+          headers:
+            Location:
+              schema:
+                type: string
+                example: "/change-password"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+  /check-access:
+    get:
+      operationId: CheckAccess
+      summary: Check if the provided access token is valid.
+      description: Returns a success response if the current token is valid, otherwise a HTTP error code will be returned.
+      tags: [ Auth ]
+      parameters:
+      - in: header
+        name: Authorization
+        description: Access bearer token.
+        required: true
+        schema:
+          type: string
+          example: "Bearer Bearer 17319685-acb417bbb1db38737881a88"
+      responses:
+        "204":
+          description: The current access token is valid.
+          content: {}
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+components:
+  securitySchemes:
+    tokenBearerAuth:
+      description: API Token sent as a bearer token in the header. When accessing Belt via the API this is the recommended way to pass along the API Token.
+      type: http
+      scheme: bearer
+
+  schemas:
+    AuthToken:
+      type: object
+      description: AuthToken is a pair of access and refresh tokens.
+      properties:
+        accessToken:
+          type: string
+          example:  "25cb52fb7ecc4703add2a697adf62999"
+        expiresAt:
+          type: string
+          format: date-time
+          example: "2024-11-29T13:22:00.000Z"
+        refreshToken:
+          type: string
+          example:  "bba35a92250a4bdc9254ca8c75458374"
+        refreshExpiresAt:
+          type: string
+          format: date-time
+          example: "2024-11-29T13:22:00.000Z"
+      required:
+      -  accessToken
+      -  expiresAt
+      -  refreshToken
+      -  refreshExpiresAt
+      example:
+        accessToken: "25cb52fb7ecc4703add2a697adf62999"
+        expiresAt: "2024-11-29T13:22:00.000Z"
+        refreshToken: "bba35a92250a4bdc9254ca8c75458374"
+        refreshExpiresAt: "2024-11-29T13:22:00.000Z"
+
+    Error:
+      type: object
+      description: Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
+      x-go-type: httperrors.Error
+      x-go-type-import:
+        path: go.robinthrift.com/belt/internal/x/httperrors
+      properties:
+        code:
+          type: integer
+          example: 500
+        type:
+          type: string
+          example: "belt/api/sync/v1/InternalServerError"
+        title:
+          type: string
+          example: "InternalServerError"
+        detail:
+          type: string
+          example: "unknown error"
+      required:
+      - code
+      - type
+      - title
+      - detail
+      example:
+        code: 500
+        detail: unknown error
+        title: InternalServerError
+        type: belt/api/sync/v1/InternalServerError
+
+    AuthTokenRequest:
+      description: Auth token request union
+      oneOf:
+      - $ref: "#/components/schemas/AuthTokenRequestPasswordGrant"
+      - $ref: "#/components/schemas/AuthTokenRequestRefreshTokenGrant"
+      example:
+      - grant_type: "refresh_token"
+        refresh_token: "b31a861a957d418e8a95fcbed26402ba"
+      - grant_type: "password"
+        username: "admin"
+        password: "passwd"
+
+    AuthTokenRequestPasswordGrant:
+      type: object
+      description: Request a new auth token using username and password.
+      properties:
+        grant_type:
+          type: string
+          enum: [ "password" ]
+          example: "password"
+        username:
+          type: string
+          example: "admin"
+        password:
+          type: string
+          example: "passwd"
+      required:
+      - grant_type
+      - username
+      - password
+      example:
+        grant_type: "password"
+        username: "admin"
+        password: "passwd"
+
+
+    AuthTokenRequestRefreshTokenGrant:
+      type: object
+      description: Request a new auth token using a refresh token.
+      properties:
+        grant_type:
+          type: string
+          enum: [ "refresh_token" ]
+          example: "refresh_token"
+        refresh_token:
+          type: string
+          example: "b31a861a957d418e8a95fcbed26402ba"
+      required:
+      - grant_type
+      - refresh_token
+      example:
+        grant_type: "refresh_token"
+        refresh_token: "b31a861a957d418e8a95fcbed26402ba"
+
+  requestBodies:
+    AuthTokenRequest:
+      description: Auth token request
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuthTokenRequest"
+
+
+  responses:
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 400
+            detail: Invalid request body
+            title: Bad Request
+            type: belt/api/sync/v1/BadRequest
+    ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 401
+            detail: You lack the required permissions to perform this action
+            title: Unauthorized
+            type: belt/api/sync/v1/Unauthorized
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 404
+            detail: The requested page could not be found
+            title: Not Found
+            type: belt/api/sync/v1/NotFound
+    ErrorOther:
+      description: Other errors
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+

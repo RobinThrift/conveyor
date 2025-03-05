@@ -1,7 +1,12 @@
-import type { ChangelogEntry, ChangelogEntryList } from "@/domain/Changelog"
+import type {
+    ChangelogEntry,
+    ChangelogEntryID,
+    ChangelogEntryList,
+} from "@/domain/Changelog"
+import { newID } from "@/domain/ID"
 import type { Context } from "@/lib/context"
 import { type DBExec, type Database, withTx } from "@/lib/database"
-import type { AsyncResult } from "@/lib/result"
+import { Ok, type AsyncResult } from "@/lib/result"
 
 export class ChangelogStorage {
     private _sourceName: string
@@ -20,14 +25,32 @@ export class ChangelogStorage {
 
     public async createChangelogEntry(
         ctx: Context<{ db?: DBExec }>,
-        entry: Omit<ChangelogEntry, "source">,
+        entry: Omit<ChangelogEntry, "source" | "id">,
     ): AsyncResult<void> {
         return withTx(ctx, this._db, (ctx) =>
             this._repo.createChangelogEntry(ctx, {
                 ...entry,
+                id: newID(),
                 source: this._sourceName,
+                timestamp: new Date(),
             }),
         )
+    }
+
+    public async insertExternalChangelogEntries(
+        ctx: Context<{ db?: DBExec }>,
+        entries: ChangelogEntry[],
+    ): AsyncResult<void> {
+        return withTx(ctx, this._db, async (ctx) => {
+            for (let entry of entries) {
+                let res = await this._repo.createChangelogEntry(ctx, entry)
+                if (!res.ok) {
+                    return res
+                }
+            }
+
+            return Ok(undefined)
+        })
     }
 
     public async listUnsyncedChangelogEntries(
@@ -57,6 +80,30 @@ export class ChangelogStorage {
             this._repo.listUnappliedChangelogEntries(ctx, args),
         )
     }
+
+    public async markChangelogEntriesAsSynced(
+        ctx: Context<{ db?: DBExec }>,
+        entries: ChangelogEntry[],
+    ): AsyncResult<void> {
+        return withTx(ctx, this._db, async (ctx) => {
+            return this._repo.markChangelogEntriesAsSynced(
+                ctx,
+                entries.map((e) => e.id),
+            )
+        })
+    }
+
+    public async markChangelogEntriesAsApplied(
+        ctx: Context<{ db?: DBExec }>,
+        entries: ChangelogEntry[],
+    ): AsyncResult<void> {
+        return withTx(ctx, this._db, async (ctx) => {
+            return this._repo.markChangelogEntriesAsApplied(
+                ctx,
+                entries.map((e) => e.id),
+            )
+        })
+    }
 }
 
 export interface ChangelogRepo {
@@ -84,4 +131,14 @@ export interface ChangelogRepo {
             }
         },
     ): AsyncResult<ChangelogEntryList>
+
+    markChangelogEntriesAsSynced(
+        ctx: Context<{ db: DBExec }>,
+        entries: ChangelogEntryID[],
+    ): AsyncResult<void>
+
+    markChangelogEntriesAsApplied(
+        ctx: Context<{ db: DBExec }>,
+        entries: ChangelogEntryID[],
+    ): AsyncResult<void>
 }

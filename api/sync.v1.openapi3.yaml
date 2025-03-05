@@ -1,0 +1,425 @@
+openapi: 3.0.4
+info:
+  title: Belt Sync API
+  description: This is the Belt Sync API.
+  version: 0.1.0
+servers:
+- url: http://localhost:8081/api/sync/v1
+  description: Local development server.
+
+security:
+  - tokenBearerAuth: []
+
+tags:
+- name: Sync
+- name: Clients
+- name: Attachments
+
+paths:
+  /clients:
+    post:
+      operationId: RegisterClient
+      tags: [Clients]
+      summary: Register a new client.
+      description: Register a new client for the authenticated account for syncing.
+
+      requestBody:
+        $ref: "#/components/requestBodies/RegisterClientRequest"
+      responses:
+        "201":
+          description: The client was succesfully registered.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+  /clients/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: Client ID
+      schema:
+        type: string
+        example: "e3bd8912-11ee-486b-ada5-4b3ff2994709"
+
+    delete:
+      operationId: UnregisterClient
+      tags: [Clients]
+      summary: Unregister a new client.
+      description: Remove the client from the authenticated account.
+
+      responses:
+        "201":
+          description: The client was succesfully removed.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+  /full:
+    get:
+      operationId: GetFullSync
+      tags: [Sync]
+      summary: Get the full database.
+      description: Returns the full database of the authenticated account.
+
+      responses:
+        "200":
+          description: The latest full SQLite database .
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                example: "0x5"
+        "303":
+          description: Location of the database blob.
+          headers:
+            Location:
+              schema:
+                type: string
+                example: "/blobs/dbs/test.db"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+    post:
+      operationId: UploadFullSyncData
+      tags: [Sync]
+      summary: Upload the full encrypted database.
+      description: Uploads the full database as an ecnrypted blob for the authenticated account.
+
+      parameters:
+      - in: header
+        name: "Content-Encoding"
+        description: Encoding of the uploaded blob.
+        schema:
+          type: string
+          example: gzip
+
+      requestBody:
+        required: true
+        description: The encrypted database blob.
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+              example: "0x5"
+      responses:
+        "201":
+          description: The upload was succesfull.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+
+  /changes:
+    get:
+      parameters:
+      - name: since
+        in: query
+        required: true
+        description: Updates to return that are newer than this timestamp
+        schema:
+          type: string
+          format: date-time
+          example: "2024-11-29T13:22:00.000Z"
+
+      operationId: ListChangelogEntries
+      tags: [Sync]
+      summary: Get list of changes since the specified timestamp.
+      description: Returns a list of encrypted ChangelogEntries newer the specified timestamp.
+
+      responses:
+        "200":
+          description: The list of encrypted ChangelogEntries for the authenticated account that are newer than the `since` parameter.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EncryptedChangelogEntriesList"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+    post:
+      operationId: CreateChangelogEntries
+      tags: [Sync]
+      summary: Create new EncryptedChangelogEntries for other clients to download.
+      description: Add the provided EncryptedChangelogEntries to the sync domain of the authenticated account which can then be downloaded by other clients of the same account.
+
+      requestBody:
+        $ref: "#/components/requestBodies/CreateChangelogEntriesRequest"
+      responses:
+        "201":
+          description: The entries were created succesfully.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+  /attachments:
+    post:
+      operationId: UploadAttachment
+      tags: [Attachments]
+      summary: Upload an attachment
+      description: Upload an encrypted Attachment's raw data at the provided file path.
+
+      parameters:
+      - in: header
+        name: "X-Filepath"
+        description: Full filepath of the attachment.
+        schema:
+          type: string
+          example: a/b/c/image.png
+        required: true
+      - in: header
+        name: "Content-Encoding"
+        description: Encoding of the uploaded data.
+        schema:
+          type: string
+          example: gzip
+
+      requestBody:
+        $ref: "#/components/requestBodies/UploadAttachmentRequest"
+      responses:
+        "201":
+          description: The atttachment was succesfully uploaded.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+
+    delete:
+      operationId: DeleteAttachment
+      tags: [Attachments]
+      summary: Delete an attachment
+      description: Delete an attachment, regardless of wheither it's stil being used.
+
+      responses:
+        "204":
+          description: The attachment was deleted succesfully.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+components:
+  securitySchemes:
+    tokenBearerAuth:
+      description: API Token sent as a bearer token in the header. When accessing Belt via the API this is the recommended way to pass along the API Token.
+      type: http
+      scheme: bearer
+
+  schemas:
+    EncryptedChangelogEntry:
+      description: An encrypted payload describing a change.
+      type: object
+      properties:
+          syncClientID:
+            type: string
+            example: "b59aabdb-b74f-495b-b4cf-313a87f99e7a"
+          data:
+            type: string
+            format: binary
+            example: "0x5"
+            x-go-type: "[]byte"
+          timestamp:
+            type: string
+            format: date-time
+            example: "2024-11-29T13:22:00.000Z"
+      required:
+      - syncClientID
+      - data
+      - timestamp
+      example:
+        syncClientID: "b59aabdb-b74f-495b-b4cf-313a87f99e7a"
+        data: "0x5"
+        timestamp: "2024-11-29T13:22:00.000Z"
+
+    EncryptedChangelogEntriesList:
+      type: object
+      description: A list of EncryptedChangelogEntry.
+      properties:
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/EncryptedChangelogEntry"
+            example:
+              - syncClientID: "b59aabdb-b74f-495b-b4cf-313a87f99e7a"
+                data: "0x5"
+                timestamp: "2024-11-29T13:22:00.000Z"
+      required: [ items]
+      example:
+        items:
+        - syncClientID: "b59aabdb-b74f-495b-b4cf-313a87f99e7a"
+          data: "0x5"
+          timestamp: "2024-11-29T13:22:00.000Z"
+
+    Error:
+      type: object
+      description: Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
+      x-go-type: httperrors.Error
+      x-go-type-import:
+        path: go.robinthrift.com/belt/internal/x/httperrors
+      properties:
+        code:
+          type: integer
+          example: 500
+        type:
+          type: string
+          example: "belt/api/sync/v1/InternalServerError"
+        title:
+          type: string
+          example: "InternalServerError"
+        detail:
+          type: string
+          example: "unknown error"
+      required:
+      - code
+      - type
+      - title
+      - detail
+      example:
+        code: 500
+        detail: unknown error
+        title: InternalServerError
+        type: belt/api/sync/v1/InternalServerError
+
+  requestBodies:
+    RegisterClientRequest:
+      description: Client registration request data.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Data for the client to be reqistered with the sync server.
+            properties:
+                clientID:
+                  type: string
+                  example: "0034a620-cf99-49c3-9dac-10c15489b928"
+            required:
+            - clientID
+            example:
+              clientID: "0034a620-cf99-49c3-9dac-10c15489b928"
+
+    CreateChangelogEntriesRequest:
+      description: Add the provided EncryptedChangelogEntries to the sync domain of the authenticated account.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            description: The list of EncryptedChangelogEntry to create.
+            properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/EncryptedChangelogEntry"
+                  example:
+                    - syncClientID: "b59aabdb-b74f-495b-b4cf-313a87f99e7a"
+                      data: "0x5"
+                      timestamp: "2024-11-29T13:22:00.000Z"
+            required: [ items]
+            example:
+              items:
+              - syncClientID: "b59aabdb-b74f-495b-b4cf-313a87f99e7a"
+                data: "0x5"
+                timestamp: "2024-11-29T13:22:00.000Z"
+
+    UploadAttachmentRequest:
+      required: true
+      description: The attachment's raw data.
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+            example: "0x5"
+
+
+  responses:
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 400
+            detail: Invalid request body
+            title: Bad Request
+            type: belt/api/sync/v1/BadRequest
+    ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 401
+            detail: You lack the required permissions to perform this action
+            title: Unauthorized
+            type: belt/api/sync/v1/Unauthorized
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 404
+            detail: The requested page could not be found
+            title: Not Found
+            type: belt/api/sync/v1/NotFound
+    ErrorOther:
+      description: Other errors
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+

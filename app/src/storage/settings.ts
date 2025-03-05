@@ -1,4 +1,4 @@
-import type { ChangelogEntry } from "@/domain/Changelog"
+import type { ChangelogEntry, SettingChangelogEntry } from "@/domain/Changelog"
 import type { Settings } from "@/domain/Settings"
 import type { Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
@@ -52,9 +52,9 @@ export class SettingsStorage {
                     targetID: setting.key,
                     value: {
                         value: setting.value as any,
-                    },
-                    synced: false,
-                    applied: true,
+                    } satisfies SettingChangelogEntry["value"],
+                    isSynced: false,
+                    isApplied: true,
                 },
             )
             if (!entryCreated.ok) {
@@ -62,6 +62,16 @@ export class SettingsStorage {
             }
 
             return res
+        })
+    }
+
+    public async applyChangelogEntry(
+        ctx: Context<{ db?: DBExec }>,
+        entry: SettingChangelogEntry,
+    ): AsyncResult<void> {
+        return this._repo.updateSetting(ctx.withData("db", this._db), {
+            key: entry.targetID,
+            value: entry.value.value,
         })
     }
 }
@@ -78,6 +88,6 @@ export interface SettingsRepo {
 export interface SettingsStorageChangelog {
     createChangelogEntry(
         ctx: Context<{ db?: DBExec }>,
-        entry: Omit<ChangelogEntry, "source">,
+        entry: Omit<ChangelogEntry, "source" | "id" | "timestamp">,
     ): AsyncResult<void>
 }

@@ -10,7 +10,7 @@ import {
     vi,
 } from "vitest"
 
-import type { MemoChangelogEntry } from "@/domain/Changelog"
+import type { MemoChangelogEntry, MemoContentChanges } from "@/domain/Changelog"
 import type { MemoID, MemoList } from "@/domain/Memo"
 import { BaseContext } from "@/lib/context"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
@@ -24,6 +24,8 @@ import * as memoRepo from "./database/sqlite/memoRepo"
 import { MemoStorage } from "./memos"
 import { encodeText } from "@/lib/textencoding"
 import { MockFS } from "@/lib/testhelper/mockfs"
+import { newID } from "@/domain/ID"
+import { dateFromSQLite, dateToSQLite } from "./database/sqlite/types/datetime"
 
 suite.sequential("storage/memos", () => {
     suite.sequential("Querying", async () => {
@@ -328,11 +330,13 @@ suite.sequential("storage/memos", () => {
                 assert.equal(entry.revision, 1)
                 assert.equal(entry.targetType, "memos")
                 assert.equal(entry.targetID, created.id)
-                assert.deepEqual(entry.value.changes, [
-                    [0, ...content.split("\n")],
-                ])
-                assert.isFalse(entry.synced)
-                assert.isTrue(entry.applied)
+                assert.deepEqual(entry.value, {
+                    created: {
+                        ...created,
+                    },
+                })
+                assert.isFalse(entry.isSynced)
+                assert.isTrue(entry.isApplied)
             })
 
             test("getMemo", async () => {
@@ -763,4 +767,106 @@ suite.sequential("storage/memos", () => {
             )
         })
     })
+
+    suite("applyChangelogEntry", async () => {
+        let [ctx, cancel] = BaseContext.withData("db", undefined).withCancel()
+        let { memoStorage, ...setup } = await memoStorageTestSetup()
+
+        let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+        let numMemos = 10
+
+        let createdMemosIDs: MemoID[] = []
+
+        beforeAll(async () => {
+            await setup.beforeAll()
+
+            for (let i = 0; i < numMemos; i++) {
+                let res = await memoStorage.createMemo(ctx, {
+                    content: `# Test Memo ${i}\n With some more content for memo ${i}`,
+                    createdAt: subHours(now, i),
+                })
+                if (!res.ok) {
+                    throw res.err
+                }
+                createdMemosIDs.push(res.value.id)
+            }
+        })
+
+        afterAll(async () => {
+            cancel()
+            await setup.afterAll()
+        })
+
+        test("applyChangelogEntry", async () => {
+            let changeset: MemoContentChanges["changes"] = [
+                48,
+                [0, "", "", "A new line for Memo 0."],
+            ]
+
+            await assertOkResult(
+                memoStorage.applyChangelogEntry(ctx, {
+                    id: newID(),
+                    source: "tests",
+                    revision: 1,
+                    targetType: "memos",
+                    targetID: createdMemosIDs[0],
+                    isSynced: false,
+                    isApplied: false,
+                    timestamp: new Date(),
+                    value: {
+                        content: {
+                            version: "1",
+                            changes: changeset,
+                        },
+                    },
+                }),
+            )
+
+            let updated = await assertOkResult(
+                memoStorage.getMemo(ctx, createdMemosIDs[0]),
+            )
+
+            assert.equal(
+                updated.content,
+                "# Test Memo 0\n With some more content for memo 0\n\nA new line for Memo 0.",
+            )
+        })
+    })
 })
+
+async function memoStorageTestSetup(): Promise<{
+    memoStorage: MemoStorage
+    beforeAll: () => Promise<void>
+    afterAll: () => Promise<void>
+}> {
+    let db = new SQLite()
+    let fs = new MockFS()
+
+    let changelog = new ChangelogStorage({
+        sourceName: "tests",
+        db,
+        repo: changelogRepo,
+    })
+
+    let attachmentStorage = new AttachmentStorage({
+        db,
+        repo: attachmentRepo,
+        fs,
+        changelog,
+    })
+
+    return {
+        memoStorage: new MemoStorage({
+            db,
+            repo: memoRepo,
+            attachments: attachmentStorage,
+            changelog,
+        }),
+        beforeAll: async () => {
+            await db.open()
+        },
+        afterAll: async () => {
+            await db.close()
+        },
+    }
+}

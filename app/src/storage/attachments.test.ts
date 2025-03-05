@@ -1,4 +1,4 @@
-import { assert, afterAll, suite, test } from "vitest"
+import { assert, afterAll, suite, test, beforeAll } from "vitest"
 
 import type { AttachmentChangelogEntry } from "@/domain/Changelog"
 import { BaseContext } from "@/lib/context"
@@ -12,6 +12,8 @@ import { AttachmentStorage, extractAttachmentIDs } from "./attachments"
 import { ChangelogStorage } from "./changelog"
 import * as attachmentRepo from "./database/sqlite/attachmentRepo"
 import * as changelogRepo from "./database/sqlite/changelogRepo"
+import { newID } from "@/domain/ID"
+import { base64Decode } from "@bufbuild/protobuf/wire"
 
 const attachmentTestContent = Object.freeze({
     "test_file_a.txt": (() => {
@@ -74,9 +76,18 @@ suite.concurrent("storage/attachments", () => {
             assert.equal(entry.revision, 1)
             assert.equal(entry.targetType, "attachments")
             assert.equal(entry.targetID, created)
-            assert.equal(entry.value.method, "created")
-            assert.isFalse(entry.synced)
-            assert.isTrue(entry.applied)
+            assert.deepEqual(entry.value, {
+                created: {
+                    contentType: "application/octet-stream",
+                    filepath:
+                        "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
+                    originalFilename: "test.txt",
+                    sha256: "Qre2VSnlfbVQVK6Bedy8NNSTR20zySWH3XKjtGnfuEs=",
+                    sizeBytes: 23,
+                },
+            })
+            assert.isFalse(entry.isSynced)
+            assert.isTrue(entry.isApplied)
         })
     })
 
@@ -148,6 +159,62 @@ suite.concurrent("storage/attachments", () => {
         })
     })
 
+    suite("applyChangelogEntry", async () => {
+        let [ctx, cancel] = BaseContext.withData("db", undefined).withCancel()
+        let { attachmentStorage, db, setup, cleanup } =
+            await attachmentStorageTestSetup()
+
+        beforeAll(setup)
+
+        afterAll(async () => {
+            cancel()
+            await cleanup()
+        })
+
+        test("applyChangelogEntry", async () => {
+            let id = newID()
+
+            await assertOkResult(
+                attachmentStorage.applyChangelogEntry(ctx, {
+                    id: newID(),
+                    source: "tests",
+                    revision: 1,
+                    targetType: "attachments",
+                    targetID: id,
+                    isSynced: false,
+                    isApplied: false,
+                    timestamp: new Date(),
+                    value: {
+                        created: {
+                            contentType: "application/octet-stream",
+                            filepath:
+                                "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
+                            originalFilename: "test.txt",
+                            sha256: "Qre2VSnlfbVQVK6Bedy8NNSTR20zySWH3XKjtGnfuEs=",
+                            sizeBytes: 23,
+                        },
+                    },
+                }),
+            )
+
+            let row = await assertOkResult(
+                attachmentRepo.getAttachment(ctx.withData("db", db), id),
+            )
+
+            assert.deepEqual(row, {
+                id,
+                contentType: "application/octet-stream",
+                filepath:
+                    "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
+                originalFilename: "test.txt",
+                sha256: base64Decode(
+                    "Qre2VSnlfbVQVK6Bedy8NNSTR20zySWH3XKjtGnfuEs=",
+                ),
+                sizeBytes: 23,
+                createdAt: row.createdAt,
+            })
+        })
+    })
     test.concurrent.each([
         [
             "No Attachments",
@@ -230,3 +297,28 @@ And some more prose with regards to [filename_b](attachment://EdckfatXNS7KYKQwa8
         assert.deepEqual(actual, expected)
     })
 })
+
+async function attachmentStorageTestSetup() {
+    let fs = new MockFS()
+    let db = new SQLite()
+
+    let changelog = new ChangelogStorage({
+        sourceName: "tests",
+        db,
+        repo: changelogRepo,
+    })
+
+    let attachmentStorage = new AttachmentStorage({
+        db,
+        repo: attachmentRepo,
+        fs,
+        changelog,
+    })
+
+    return {
+        attachmentStorage,
+        db,
+        setup: () => db.open(),
+        cleanup: () => db.close(),
+    }
+}

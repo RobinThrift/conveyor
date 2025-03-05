@@ -76,22 +76,23 @@ CREATE UNIQUE INDEX settings_key_idx ON settings(key);
 
 CREATE TABLE changelog (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    public_id   TEXT NOT NULL,
     source      TEXT NOT NULL,
     revision    INTEGER NOT NULL,
     target_type TEXT NOT NULL,
     target_id   TEXT NOT NULL,
     value       BLOB NOT NULL,
 
-    applied    BOOLEAN NOT NULL,
-    synced     BOOLEAN NOT NULL,
+    is_applied  BOOLEAN NOT NULL,
+    is_synced   BOOLEAN NOT NULL,
 
     applied_at  TEXT DEFAULT NULL,
-    synced_at  TEXT DEFAULT NULL,
+    synced_at   TEXT DEFAULT NULL,
 
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)),
     updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP))
 );
-CREATE UNIQUE INDEX changelog_target_id_type_revision_idx ON changelog(target_type,target_id,revision);
+CREATE UNIQUE INDEX changelog_public_id_unique_idx ON changelog(public_id);
 
 
 CREATE VIRTUAL TABLE memos_fts USING fts5(id UNINDEXED, public_id UNINDEXED, content, is_archived UNINDEXED, is_deleted UNINDEXED, created_at UNINDEXED, updated_at UNINDEXED, content='memos', content_rowid='id');

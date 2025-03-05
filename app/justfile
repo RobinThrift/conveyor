@@ -2,25 +2,29 @@ biome_reporter := if env_var_or_default("BIOME_REPORTER", "") != "" { "--reporte
 
 local_bin := absolute_path("./node_modules/.bin")
 
-serve *args="": _generate-icons _build-sqlite
+serve *args="": _gen-icons _build-sqlite
     {{ local_bin }}/vite --mode development --strictPort --port 6155 {{ args }}
 
 build: _build-sqlite install
     {{ local_bin }}/vite build --mode production
-    just _generate-icons
+    just _gen-icons
+
+generate: _gen-sql
 
 watch mode="development": 
     {{ local_bin }}/vite build --mode {{ mode }} --watch
 
-storybook *flags="": _generate-icons _build-sqlite
+storybook *flags="": _gen-icons _build-sqlite
     -rm -rf .storybook/public/
     {{ local_bin }}/msw init --save false .storybook/public/
     {{ local_bin }}/storybook dev --no-open {{ flags }}
 
 test: _build-sqlite install
+    {{ local_bin }}/msw init --save false ./build
     {{ local_bin }}/vitest --run
 
 test-watch: _build-sqlite install
+    {{ local_bin }}/msw init --save false ./build
     {{ local_bin }}/vitest
 
 fmt: install
@@ -44,13 +48,13 @@ install:
 clean:
     rm -rf build build node_modules src/external/sqlite-wasm/build
 
-_generate-icons:
+_gen-icons:
     -mkdir build
     -rm -rf build/icons
     cp -r assets/icons build/icons
     for icon in ./build/icons/*/icon.svg; do {{ local_bin }}/pwa-assets-generator --preset minimal-2023 "$icon"; done
 
-_generate-sql: (_install-tool "sqlc")
+_gen-sql: (_install-tool "sqlc")
     {{ local_bin }}/sqlc generate -f src/storage/database/sqlite/sqlc.yaml
 
 _build-sqlite:

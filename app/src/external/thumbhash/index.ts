@@ -1,3 +1,4 @@
+import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import * as ThumbHash from "./thumbhash"
 
 export async function thumbhashFromFile(file: File): Promise<string> {
@@ -29,15 +30,9 @@ export async function thumbhashFromFile(file: File): Promise<string> {
         pixels.data,
     )
 
-    return btoa(String.fromCharCode(...binaryThumbHash))
+    return encodeToBase64(binaryThumbHash)
 }
 
 export function thumbhashToDataURL(str: string): string {
-    return ThumbHash.thumbHashToDataURL(
-        new Uint8Array(
-            atob(str)
-                .split("")
-                .map((x) => x.charCodeAt(0)),
-        ),
-    )
+    return ThumbHash.thumbHashToDataURL(dataFromBase64(str))
 }

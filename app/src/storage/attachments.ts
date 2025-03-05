@@ -1,5 +1,8 @@
 import type { Attachment, AttachmentID } from "@/domain/Attachment"
-import type { ChangelogEntry } from "@/domain/Changelog"
+import type {
+    AttachmentChangelogEntry,
+    ChangelogEntry,
+} from "@/domain/Changelog"
 import type { MemoID } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
 import { type DBExec, type Database, withTx } from "@/lib/database"
@@ -9,11 +12,12 @@ import { type AsyncResult, Err, Ok, fmtErr } from "@/lib/result"
 
 import { writeAttachment } from "./fs"
 import { FSErrNotFound } from "./fs/errors"
+import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 
 export class AttachmentStorage {
     private _db: Database
     private _repo: AttachmentRepo
-    private _changelog: AttachmentStorageChangelog
+    private _changelog: Changelog
     private _remote?: RemoteAttachmentStorage
 
     private _fs: FS
@@ -28,7 +32,7 @@ export class AttachmentStorage {
         db: Database
         repo: AttachmentRepo
         fs: FS
-        changelog: AttachmentStorageChangelog
+        changelog: Changelog
         remote?: RemoteAttachmentStorage
     }) {
         this._db = db
@@ -134,10 +138,16 @@ export class AttachmentStorage {
             targetType: "attachments",
             targetID: created.value.id,
             value: {
-                method: "created",
-            },
-            synced: false,
-            applied: true,
+                created: {
+                    originalFilename: filename,
+                    contentType: mimeTypeForFilename(filename),
+                    filepath: writeResult.value.filepath,
+                    sha256: encodeToBase64(writeResult.value.sha256),
+                    sizeBytes: writeResult.value.sizeBytes,
+                },
+            } satisfies AttachmentChangelogEntry["value"],
+            isSynced: false,
+            isApplied: true,
         })
         if (!entryCreated.ok) {
             return entryCreated
@@ -222,9 +232,35 @@ export class AttachmentStorage {
             this._repo.listAttachmentsForMemo(ctx, memoID),
         )
     }
+
+    public async applyChangelogEntry(
+        ctx: Context<{ db?: DBExec }>,
+        entry: AttachmentChangelogEntry,
+    ): AsyncResult<void> {
+        if ("created" in entry.value) {
+            let attachment = entry.value.created
+            let created = await withTx(ctx, this._db, (ctx) =>
+                this._repo.createAttachment(ctx, {
+                    ...attachment,
+                    id: entry.targetID,
+                    sha256: dataFromBase64(attachment.sha256),
+                }),
+            )
+            if (!created.ok) {
+                return created
+            }
+            return Ok(undefined)
+        }
+
+        return Err(
+            new Error(
+                `error applying changelog entry to memo: unknown changelog type: ${JSON.stringify(entry.value)}`,
+            ),
+        )
+    }
 }
 
-export interface AttachmentRepo {
+interface AttachmentRepo {
     getAttachment(
         ctx: Context<{ db: DBExec }>,
         id: AttachmentID,
@@ -255,10 +291,10 @@ export interface AttachmentRepo {
     ): AsyncResult<void>
 }
 
-export interface AttachmentStorageChangelog {
+interface Changelog {
     createChangelogEntry(
         ctx: Context<{ db?: DBExec }>,
-        entry: Omit<ChangelogEntry, "source">,
+        entry: Omit<ChangelogEntry, "source" | "id" | "timestamp">,
     ): AsyncResult<void>
 }
 
@@ -279,7 +315,7 @@ export function extractAttachmentIDs(content: string): string[] {
     return attachmentIDs
 }
 
-export interface RemoteAttachmentStorage {
+interface RemoteAttachmentStorage {
     getAttachmentDataByFilepath(
         ctx: Context,
         filepath: string,

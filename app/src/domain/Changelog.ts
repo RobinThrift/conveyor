@@ -1,21 +1,27 @@
 import type { KeyPaths, ValueAt } from "@/lib/getset"
 
-import type { AttachmentID } from "./Attachment"
-import type { MemoID } from "./Memo"
+import type { Attachment, AttachmentID } from "./Attachment"
+import type { Memo, MemoID } from "./Memo"
 import type { Settings } from "./Settings"
+
+export type ChangelogEntryID = string
 
 export interface ChangelogEntry<
     T extends string = string,
     ID = string,
     V = unknown,
 > {
+    id: ChangelogEntryID
     source: string
     revision: number
     targetType: T
     targetID: ID
     value: V
-    synced: boolean
-    applied: boolean
+    isSynced: boolean
+    syncedAt?: Date
+    isApplied: boolean
+    appliedAt?: Date
+    timestamp: Date
 }
 
 export interface ChangelogEntryList {
@@ -26,7 +32,18 @@ export interface ChangelogEntryList {
 export type MemoChangelogEntry = ChangelogEntry<
     "memos",
     MemoID,
-    MemoContentChanges
+    | {
+          created: Memo
+      }
+    | {
+          content: MemoContentChanges
+      }
+    | {
+          isArchived: boolean
+      }
+    | {
+          isDeleted: boolean
+      }
 >
 
 export interface MemoContentChanges {
@@ -37,9 +54,14 @@ export interface MemoContentChanges {
 export type AttachmentChangelogEntry = ChangelogEntry<
     "attachments",
     AttachmentID,
-    {
-        method: "created" | "deleted"
-    }
+    | {
+          created: Omit<Attachment, "id" | "sha256" | "createdAt"> & {
+              sha256: string
+          }
+      }
+    | {
+          deleted: true
+      }
 >
 
 export type SettingChangelogEntry<
@@ -51,3 +73,9 @@ export type SettingChangelogEntry<
         value: ValueAt<Settings, K>
     }
 >
+
+export interface EncryptedChangelogEntry {
+    syncClientID: string
+    data: string
+    timestamp: Date
+}

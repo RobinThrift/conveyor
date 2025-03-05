@@ -1,18 +1,23 @@
-import type { ChangelogEntry, MemoContentChanges } from "@/domain/Changelog"
+import type {
+    ChangelogEntry,
+    MemoChangelogEntry,
+    MemoContentChanges,
+} from "@/domain/Changelog"
 import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
 import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
+import { applyTextChanges } from "@/lib/applyTextChanges"
 import type { Context } from "@/lib/context"
 import { type DBExec, type Database, withTx } from "@/lib/database"
-import type { AsyncResult } from "@/lib/result"
+import { Err, Ok, type AsyncResult } from "@/lib/result"
 
 export type Filter = ListMemosQuery
 
 export class MemoStorage {
     private _repo: MemoRepo
     private _db: Database
-    private _attachments: MemoStorageAttachments
-    private _changelog: MemoStorageChangelog
+    private _attachments: AttachmentStorage
+    private _changelog: ChangelogStorage
 
     constructor({
         db,
@@ -22,8 +27,8 @@ export class MemoStorage {
     }: {
         db: Database
         repo: MemoRepo
-        attachments: MemoStorageAttachments
-        changelog: MemoStorageChangelog
+        attachments: AttachmentStorage
+        changelog: ChangelogStorage
     }) {
         this._db = db
         this._repo = repo
@@ -77,11 +82,10 @@ export class MemoStorage {
                 targetType: "memos",
                 targetID: created.value.id,
                 value: {
-                    version: "1",
-                    changes: [[0, ...created.value.content.split("\n")]],
-                },
-                synced: false,
-                applied: true,
+                    created: created.value,
+                } satisfies MemoChangelogEntry["value"],
+                isSynced: false,
+                isApplied: true,
             })
 
             return created
@@ -99,15 +103,6 @@ export class MemoStorage {
                 return updated
             }
 
-            this._changelog.createChangelogEntry(ctx, {
-                revision: 0,
-                targetType: "memos",
-                targetID: memo.id,
-                value: memo.changes,
-                synced: false,
-                applied: true,
-            })
-
             let res = await this._attachments.updateMemoAttachments(
                 ctx,
                 memo.id,
@@ -117,6 +112,17 @@ export class MemoStorage {
                 return res
             }
 
+            this._changelog.createChangelogEntry(ctx, {
+                revision: 0,
+                targetType: "memos",
+                targetID: memo.id,
+                value: {
+                    content: memo.changes,
+                } satisfies MemoChangelogEntry["value"],
+                isSynced: false,
+                isApplied: true,
+            })
+
             return updated
         })
     }
@@ -125,26 +131,139 @@ export class MemoStorage {
         ctx: Context<{ db?: DBExec }>,
         memoID: MemoID,
     ): AsyncResult<void> {
-        return withTx(ctx, this._db, async (ctx) =>
-            this._repo.deleteMemo(ctx, memoID),
-        )
+        return withTx(ctx, this._db, async (ctx) => {
+            let deleted = await this._repo.deleteMemo(ctx, memoID)
+            if (!deleted.ok) {
+                return deleted
+            }
+
+            return this._changelog.createChangelogEntry(ctx, {
+                revision: 0,
+                targetType: "memos",
+                targetID: memoID,
+                value: {
+                    isDeleted: true,
+                } satisfies MemoChangelogEntry["value"],
+                isSynced: false,
+                isApplied: true,
+            })
+        })
     }
 
     public async undeleteMemo(
         ctx: Context<{ db?: DBExec }>,
         memoID: MemoID,
     ): AsyncResult<void> {
-        return withTx(ctx, this._db, async (ctx) =>
-            this._repo.undeleteMemo(ctx, memoID),
-        )
+        return withTx(ctx, this._db, async (ctx) => {
+            let undeleted = await this._repo.undeleteMemo(ctx, memoID)
+            if (!undeleted.ok) {
+                return undeleted
+            }
+
+            return this._changelog.createChangelogEntry(ctx, {
+                revision: 0,
+                targetType: "memos",
+                targetID: memoID,
+                value: {
+                    isDeleted: false,
+                } satisfies MemoChangelogEntry["value"],
+                isSynced: false,
+                isApplied: true,
+            })
+        })
     }
 
     public async updateMemoArchiveStatus(
         ctx: Context<{ db?: DBExec }>,
         memo: { id: MemoID; isArchived: boolean },
     ): AsyncResult<void> {
-        return withTx(ctx, this._db, (ctx) =>
-            this._repo.updateMemoArchiveStatus(ctx, memo),
+        return withTx(ctx, this._db, async (ctx) => {
+            let updated = await this._repo.updateMemoArchiveStatus(ctx, memo)
+            if (!updated.ok) {
+                return updated
+            }
+
+            return this._changelog.createChangelogEntry(ctx, {
+                revision: 0,
+                targetType: "memos",
+                targetID: memo.id,
+                value: {
+                    isArchived: memo.isArchived,
+                } satisfies MemoChangelogEntry["value"],
+                isSynced: false,
+                isApplied: true,
+            })
+        })
+    }
+
+    public async applyChangelogEntry(
+        ctx: Context<{ db?: DBExec }>,
+        entry: MemoChangelogEntry,
+    ): AsyncResult<void> {
+        if ("created" in entry.value) {
+        }
+
+        let memo = await this._repo.getMemo(
+            ctx.withData("db", this._db),
+            entry.targetID,
+        )
+        if (!memo.ok) {
+            return memo
+        }
+
+        if ("isArchived" in entry.value) {
+            let isArchived = entry.value.isArchived
+            return withTx(ctx, this._db, (ctx) =>
+                this._repo.updateMemoArchiveStatus(ctx, {
+                    id: memo.value.id,
+                    isArchived,
+                }),
+            )
+        }
+
+        if ("isDeleted" in entry.value) {
+            if (entry.value.isDeleted) {
+                return withTx(ctx, this._db, (ctx) =>
+                    this._repo.deleteMemo(ctx, memo.value.id),
+                )
+            }
+            return withTx(ctx, this._db, (ctx) =>
+                this._repo.undeleteMemo(ctx, memo.value.id),
+            )
+        }
+
+        if ("content" in entry.value) {
+            let content = applyTextChanges(
+                memo.value.content,
+                entry.value.content,
+            )
+            return withTx(ctx, this._db, async (ctx) => {
+                let updated = await this._repo.updateMemoContent(ctx, {
+                    id: memo.value.id,
+                    content,
+                })
+
+                if (!updated.ok) {
+                    return updated
+                }
+
+                let res = await this._attachments.updateMemoAttachments(
+                    ctx,
+                    memo.value.id,
+                    content,
+                )
+                if (!res.ok) {
+                    return res
+                }
+
+                return Ok(undefined)
+            })
+        }
+
+        return Err(
+            new Error(
+                `error applying changelog entry to memo: unknown changelog type: ${JSON.stringify(entry.value)}`,
+            ),
         )
     }
 
@@ -170,23 +289,23 @@ export class MemoStorage {
     }
 }
 
-export interface CreateMemoRequest {
+interface CreateMemoRequest {
     content: string
     createdAt?: Date
 }
 
-export interface UpdateMemoContentRequest {
+interface UpdateMemoContentRequest {
     id: MemoID
     content: string
     changes: MemoContentChanges
 }
 
-export interface ListTagsQuery {
+interface ListTagsQuery {
     pageSize: number
     pageAfter?: string
 }
 
-export interface MemoRepo {
+interface MemoRepo {
     getMemo(ctx: Context<{ db: DBExec }>, memoID: MemoID): AsyncResult<Memo>
     listMemos(
         ctx: Context<{ db: DBExec }>,
@@ -206,7 +325,10 @@ export interface MemoRepo {
 
     updateMemoContent(
         ctx: Context<{ db: DBExec }>,
-        memo: UpdateMemoContentRequest,
+        memo: {
+            id: MemoID
+            content: string
+        },
     ): AsyncResult<void>
 
     updateMemoArchiveStatus(
@@ -227,7 +349,7 @@ export interface MemoRepo {
     cleanupDeletedMemos(ctx: Context<{ db: DBExec }>): AsyncResult<number>
 }
 
-export interface MemoStorageAttachments {
+interface AttachmentStorage {
     updateMemoAttachments(
         ctx: Context<{ db?: DBExec }>,
         memoID: MemoID,
@@ -235,9 +357,9 @@ export interface MemoStorageAttachments {
     ): AsyncResult<void>
 }
 
-export interface MemoStorageChangelog {
+interface ChangelogStorage {
     createChangelogEntry(
         ctx: Context<{ db?: DBExec }>,
-        entry: Omit<ChangelogEntry, "source">,
+        entry: Omit<ChangelogEntry, "source" | "id" | "timestamp">,
     ): AsyncResult<void>
 }

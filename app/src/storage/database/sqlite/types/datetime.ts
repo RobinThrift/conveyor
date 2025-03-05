@@ -3,7 +3,12 @@ import { format, parse, transpose } from "date-fns"
 
 const sqliteDateTimeFormat = "yyyy-MM-dd HH:mm:ss'Z'"
 
-export function dateFromSQLite(value: string): Date {
+export function dateFromSQLite(value: null): null
+export function dateFromSQLite(value: string): Date
+export function dateFromSQLite(value: string | null): Date | null {
+    if (!value) {
+        return null
+    }
     return parse(value, sqliteDateTimeFormat, new UTCDateMini())
 }
 
