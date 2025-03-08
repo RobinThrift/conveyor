@@ -8,7 +8,7 @@ import {
 } from "@/lib/i18n"
 import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
-import { useSetting } from "@/ui/state/global/settings"
+import { useSetting } from "@/ui/settings"
 
 export const LocaleSettingsTab = React.forwardRef<HTMLDivElement>(
     function LocaleSettingsTab(_, forwardedRef) {

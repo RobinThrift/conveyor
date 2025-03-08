@@ -1,26 +1,23 @@
 import { assert, afterAll, suite, test } from "vitest"
 
 import { BaseContext } from "@/lib/context"
-import { createKeyFromPassword } from "@/lib/crypto"
-import { toPromise } from "@/lib/result"
 import { MockFS } from "@/lib/testhelper/mockfs"
 import { decodeText, encodeText } from "@/lib/textencoding"
+import { AgeCrypto } from "@/external/age/AgeCrypto"
 
-import { EncrypedFS } from "./encryptedfs"
+import { EncryptedFS } from "./EncryptedFS"
 
-suite("lib/fs/encryptedfs", () => {
+suite("lib/fs/EncryptedFS", () => {
     suite.sequential("read/write", { timeout: 1000 }, async () => {
         let [ctx, cancel] = BaseContext.withCancel()
 
         let mockfs = new MockFS()
-        let fs = new EncrypedFS(
-            mockfs,
-            await toPromise(createKeyFromPassword("lib/fs/encryptedfs")),
-        )
+        let crypto = new AgeCrypto()
+        await crypto.init("lib/fs/EncryptedFS")
+        let fs = new EncryptedFS(mockfs, crypto)
 
         afterAll(() => {
             cancel()
-            fs.terminate()
         })
 
         let content = `# Attachment Test
@@ -29,7 +26,7 @@ This is some test content for an attachment`
         test("write", async () => {
             let encoded = encodeText(content)
 
-            let buf = new SharedArrayBuffer(encoded.byteLength)
+            let buf = new ArrayBuffer(encoded.byteLength)
             new Uint8Array(buf).set(encoded, 0)
 
             let writeResult = await fs.write(ctx, "file.txt", buf)

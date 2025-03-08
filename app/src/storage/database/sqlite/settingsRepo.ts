@@ -6,31 +6,41 @@ import { type AsyncResult, fromPromise, mapResult } from "@/lib/result"
 
 import * as queries from "./gen/settings_sql"
 
-export async function loadSettings(
-    ctx: Context<{ db: DBExec }>,
-): AsyncResult<Settings> {
-    let settings = structuredClone(DEFAULT_SETTINGS)
+export class SettingsRepo {
+    private _db: DBExec
 
-    let result = await fromPromise(
-        queries.listSettings(ctx.data.db, ctx.signal),
-    )
+    constructor(db: DBExec) {
+        this._db = db
+    }
 
-    return mapResult(result, (entries) => {
-        for (let entry of entries) {
-            settings = setPath(
-                settings,
-                entry.key as KeyPaths<Settings>,
-                entry.value,
-            )
-        }
+    public async loadSettings(
+        ctx: Context<{ db: DBExec }>,
+    ): AsyncResult<Settings> {
+        let settings = structuredClone(DEFAULT_SETTINGS)
 
-        return settings
-    })
-}
+        let result = await fromPromise(
+            queries.listSettings(ctx.getData("db", this._db), ctx.signal),
+        )
 
-export async function updateSetting<K extends KeyPaths<Settings>>(
-    ctx: Context<{ db: DBExec }>,
-    args: { key: K; value: ValueAt<Settings, K> },
-): AsyncResult<void> {
-    return fromPromise(queries.saveSetting(ctx.data.db, args, ctx.signal))
+        return mapResult(result, (entries) => {
+            for (let entry of entries) {
+                settings = setPath(
+                    settings,
+                    entry.key as KeyPaths<Settings>,
+                    entry.value,
+                )
+            }
+
+            return settings
+        })
+    }
+
+    public async updateSetting<K extends KeyPaths<Settings>>(
+        ctx: Context<{ db: DBExec }>,
+        args: { key: K; value: ValueAt<Settings, K> },
+    ): AsyncResult<void> {
+        return fromPromise(
+            queries.saveSetting(ctx.getData("db", this._db), args, ctx.signal),
+        )
+    }
 }

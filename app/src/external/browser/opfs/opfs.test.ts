@@ -6,7 +6,7 @@ import { decodeText, encodeText } from "@/lib/textencoding"
 import { OPFS } from "./opfs"
 
 suite("external/browser/opfs", () => {
-    suite.sequential("read/write", { timeout: 500 }, async () => {
+    suite.sequential("read/write", { timeout: 1500 }, async () => {
         let [ctx, cancel] = BaseContext.withCancel()
 
         let fs = new OPFS("attachments")
@@ -22,7 +22,7 @@ This is some test content for an attachment`
         test("write", async () => {
             let encoded = encodeText(content)
 
-            let buf = new SharedArrayBuffer(encoded.byteLength)
+            let buf = new ArrayBuffer(encoded.byteLength)
             new Uint8Array(buf).set(encoded, 0)
 
             let writeResult = await fs.write(ctx, "file.txt", buf)

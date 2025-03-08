@@ -1,5 +1,5 @@
 import { BaseContext, type Context } from "@/lib/context"
-import type { FS } from "@/lib/fs"
+import { type FS, join } from "@/lib/fs"
 import type { AsyncResult } from "@/lib/result"
 
 import { OPFSWorker } from "./opfs.worker"
@@ -96,16 +96,4 @@ export class OPFS implements FS {
             dirpath: join(this._baseDir, dirpath),
         })
     }
-}
-
-function join(...segments: string[]): string {
-    let final = ""
-    for (let s of segments) {
-        if (s[0] === "/") {
-            final += s
-        } else {
-            final += `/${s}`
-        }
-    }
-    return final
 }

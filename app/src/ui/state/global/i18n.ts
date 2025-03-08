@@ -12,7 +12,7 @@ import {
 import type { StartListening } from "@/ui/state/rootStore"
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { useSelector } from "react-redux"
-import { slice as settings } from "./settings"
+import { slice as settings } from "../settings"
 
 export interface I18nState {
     language: Language
@@ -68,7 +68,7 @@ export const slice = createSlice({
 
 export const registerEffects = (startListening: StartListening) => {
     startListening({
-        actionCreator: settings.actions.init,
+        actionCreator: settings.actions.loadDone,
         effect: async ({ payload }, { cancelActiveListeners, dispatch }) => {
             cancelActiveListeners()
 

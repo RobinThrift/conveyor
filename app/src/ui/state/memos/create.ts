@@ -1,9 +1,9 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 
+import type * as MemoCtrl from "@/control/MemoController"
 import type { Memo } from "@/domain/Memo"
-import type * as memoStorage from "@/storage/memos"
 
-export type CreateMemoRequest = memoStorage.CreateMemoRequest
+export type CreateMemoRequest = MemoCtrl.CreateMemoRequest
 
 export interface MemoCreatestate {
     error?: Error

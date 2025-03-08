@@ -4,23 +4,17 @@ import {
     createListenerMiddleware,
 } from "@reduxjs/toolkit"
 
-import type { Account } from "@/domain/Account"
-import type { BuildInfo } from "@/domain/BuildInfo"
-import type { Settings } from "@/domain/Settings"
-import type { AttachmentStorage } from "@/storage/attachments"
-import type { MemoStorage } from "@/storage/memos"
+import type { AttachmentController } from "@/control/AttachmentController"
+import type { MemoController } from "@/control/MemoController"
+import type { SettingsController } from "@/control/SettingsController"
 
+import * as attachments from "./attachments"
 import { registerEffects as registerErrorEffects } from "./errors"
-import * as account from "./global/account"
-import * as buildInfo from "./global/buildInfo"
 import * as i18n from "./global/i18n"
 import * as notifications from "./global/notifications"
 import * as router from "./global/router"
-import * as settings from "./global/settings"
-import * as storage from "./global/storage"
-
-import * as attachments from "./attachments"
 import * as memos from "./memos"
+import * as settings from "./settings"
 import * as tags from "./tags"
 
 const listenerMiddleware = createListenerMiddleware()
@@ -32,20 +26,14 @@ let startListening = listenerMiddleware.startListening.withTypes<
 
 export function configureRootStore(initState: {
     baseURL?: string
-    buildInfo?: BuildInfo
     router?: { href: string }
-    account?: Account
-    settings?: Settings
 }) {
     let rootReducer = combineSlices(
-        storage.slice,
         router.slice,
-        buildInfo.slice,
-        account.slice,
         notifications.slice,
         i18n.slice,
-        settings.slice,
 
+        settings.slice,
         memos.slice,
         tags.slice,
         attachments.slice,
@@ -86,27 +74,9 @@ export function configureRootStore(initState: {
         import.meta.hot.accept(() => store.replaceReducer(rootReducer))
     }
 
-    // storage.registerEffects(startListening)
     router.registerEffects(startListening)
-    settings.registerEffects(startListening)
     i18n.registerEffects(startListening)
-    // attachments.registerEffects(startListening)
-    memos.registerEffects(startListening)
     registerErrorEffects(startListening)
-
-    if (initState.buildInfo) {
-        store.dispatch(buildInfo.slice.actions.init(initState.buildInfo))
-    }
-
-    if (initState.settings) {
-        store.dispatch(settings.slice.actions.init(initState.settings))
-        store.dispatch(
-            i18n.slice.actions.set({
-                language: initState.settings.locale.language,
-                region: initState.settings.locale.region,
-            }),
-        )
-    }
 
     if (initState.router?.href) {
         store.dispatch(
@@ -115,10 +85,6 @@ export function configureRootStore(initState: {
                 baseURL: initState.baseURL,
             }),
         )
-    }
-
-    if (initState.account) {
-        store.dispatch(account.slice.actions.init(initState.account))
     }
 
     return store
@@ -130,25 +96,28 @@ export type RootState = ReturnType<
 export type AppDispatch = ReturnType<typeof configureRootStore>["dispatch"]
 export type StartListening = typeof startListening
 
-export function initializeStorage({
-    memoStorage,
-    attachmentStorage,
+export function configureEffects({
+    memoCtrl,
+    attachmentCtrl,
+    settingsCtrl,
 }: {
-    memoStorage: MemoStorage
-    attachmentStorage: AttachmentStorage
+    memoCtrl: MemoController
+    attachmentCtrl: AttachmentController
+    settingsCtrl: SettingsController
 }) {
-    memos.registerStorageEffects({
-        memoStorage,
-        startListening,
+    memos.registerEffects(startListening, {
+        memoCtrl,
     })
 
-    tags.registerStorageEffects({
-        memoStorage,
-        startListening,
+    tags.registerEffects(startListening, {
+        memoCtrl,
     })
 
-    attachments.registerStorageEffects({
-        attachmentStorage,
-        startListening,
+    attachments.registerEffects(startListening, {
+        attachmentCtrl,
+    })
+
+    settings.registerEffects(startListening, {
+        settingsCtrl,
     })
 }

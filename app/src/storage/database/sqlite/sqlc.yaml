@@ -131,3 +131,21 @@ sql:
         to_sql:
           fn: "dateToSQLite"
           import: "@/storage/database/sqlite/types/datetime"
+
+      - column: auth_token.expires_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+      - column: auth_token.refresh_expires_at
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"

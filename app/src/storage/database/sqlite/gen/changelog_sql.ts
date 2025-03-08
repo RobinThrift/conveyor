@@ -5,8 +5,8 @@ import type { Database } from "./db"
 import { mapRowToObj, numberToBool } from "./utils"
 
 import {
-    dateToSQLite,
     dateFromSQLite,
+    dateToSQLite,
 } from "@/storage/database/sqlite/types/datetime"
 
 const listUnsyncedChangesQuery = `-- name: ListUnsyncedChanges :many

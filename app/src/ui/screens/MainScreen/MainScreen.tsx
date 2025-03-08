@@ -4,7 +4,7 @@ import { EndOfListMarker } from "@/ui/components/EndOfListMarker"
 import { Loader } from "@/ui/components/Loader"
 import { MemoList, MemoListHeader } from "@/ui/components/MemoList"
 import { MemoListFilter } from "@/ui/components/MemoListFilter"
-import { useSetting } from "@/ui/state/global/settings"
+import { useSetting } from "@/ui/settings"
 
 import { NewMemoEditor } from "./NewMemoEditor"
 import { type Filter, useMainScreenState } from "./useMainScreenState"

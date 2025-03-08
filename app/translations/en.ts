@@ -1,18 +1,4 @@
-import { type Components, count, params } from "@/lib/i18n/components"
-
-const sharedErrorTranslations: Components = {
-    Input: {
-        "Invalid/Empty": params("{name} must not be empty"),
-    },
-    "ChangePassword/Errors": {
-        CurrentPasswordIncorrect: "Incorrect password",
-        EmptyCurrentPassword: "Please enter current password",
-        EmptyNewPassword: "Please enter a new password",
-        EmptyRepeateNewPassword: "Please repeat the new password",
-        NewPasswordsDoNotMatch: "New passwords don't match",
-        NewPasswordIsOldPassword: "New password can't be old password",
-    },
-}
+import { type Components, params } from "@/lib/i18n/components"
 
 export const translations = {
     "components/Navigation": {
@@ -134,10 +120,10 @@ export const translations = {
     },
 
     "screens/Unlock": {
-        ...sharedErrorTranslations.Input,
         Title: "Unlock",
         PasswordLabel: "Password",
         UnlockButton: "Unlock",
+        ErrorFieldEmpty: params("{name} must not be empty"),
     },
 
     "screens/SingleMemoScreen": {
@@ -167,55 +153,37 @@ export const translations = {
         LabelSelectRegion: "Region",
     },
 
-    "screens/Settings/AccountSettings": {
-        ...sharedErrorTranslations.Input,
-        ...sharedErrorTranslations["ChangePassword/Errors"],
-        Title: "Account",
-        Description: "Manage your account.",
-        DisplayNameLabel: "Display Name",
-        UpdateDisplayNameButton: "Update",
-        ChangePasswordTitle: "Change Password",
-        CurrentPasswordLabel: "Current Password",
-        NewPasswordLabel: "New Password",
-        RepeatNewPasswordLabel: "Repeat New Password",
-        ChangePasswordButton: "Change",
-        EmptyDisplayName: "Display Name must not be empty",
-        Logout: "Logout",
+    "screens/Settings/SyncSettings": {
+        Title: "Sync",
+        Description: "Setup sync settings and manage credentials.",
     },
 
-    "screens/Settings/SystemSettings": {
-        Title: "System",
-        SectionAPITokensTitle: "API Tokens",
-        SectionAPITokensDescription: "Create and revoke API Access Tokens.",
+    "screens/Settings/SyncSettings/Info": {
+        IsEnabled: "Sync Enabled:",
+        ClientID: "Client ID:",
     },
 
-    "screens/Settings/SystemSettings/New": {
-        Title: "Create API Token",
-        FieldNameLabel: "Name",
-        FieldExpiresInLabel: "Expires In",
-        FieldExpiresInValueDays: count({
-            one: "{count} day",
-            many: "{count} days",
-        }),
-        FieldExpiresInValueMonths: count({
-            one: "{count} month",
-            many: "{count} months",
-        }),
-        ButtonLabel: "Create",
+    "screens/Settings/SyncSettings/Setup": {
+        Title: "Setup",
+        FieldUsernameLabel: "Username",
+        FieldPasswordLabel: "Password",
+        LoginButtonLabel: "Login",
+        ErrorFieldEmpty: params("{name} must not be empty"),
+        ErrorIncorrectCredentials: "Incorrect credentials.",
     },
 
-    "screens/Settings/SystemSettings/LastCreated": {
-        Title: "Created API Token",
-        Notice: "Please note this token. IT WILL NOT BE SHOWN AGAIN!",
-    },
-
-    "screens/Settings/SystemSettings/List": {
-        Title: "API Tokens",
-        LabelName: "Name",
-        LabelExpires: "Expires",
-        LabelCreated: "Created",
-        DeleteButton: "Delete",
-        PrevPage: "Previous Page",
-        NextPage: "Next Page",
+    "screens/Settings/SyncSettings/ChangePassword": {
+        Title: "Change Password",
+        FieldCurrentPasswordLabel: "Current Password",
+        FieldNewPasswordLabel: "New Password",
+        FieldRepeatNewPasswordLabel: "Repeat new Password",
+        ChangePasswordButtonLabel: "Change",
+        ErrorFieldEmpty: params("{name} must not be empty"),
+        ErrorCurrentPasswordIncorrect: "Incorrect password",
+        ErrorEmptyCurrentPassword: "Please enter current password",
+        ErrorEmptyNewPassword: "Please enter a new password",
+        ErrorEmptyRepeateNewPassword: "Please repeat the new password",
+        ErrorNewPasswordsDoNotMatch: "New passwords don't match",
+        ErrorNewPasswordIsOldPassword: "New password can't be old password",
     },
 } satisfies Components

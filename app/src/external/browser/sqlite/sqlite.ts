@@ -2,8 +2,7 @@ import type { SqlValue } from "@sqlite.org/sqlite-wasm"
 
 import { BaseContext, type Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
-import { toPromise } from "@/lib/result"
-import type { Notification } from "@/ui/notifications"
+import { type AsyncResult, Err, toPromise } from "@/lib/result"
 
 import { SQLiteWorker } from "./sqlite.worker"
 
@@ -39,16 +38,16 @@ export class SQLite implements Database {
         // })
     }
 
-    public addEventListener(event: "error", cb: (n: Notification) => void) {
-        this._worker.addEventListener(event, (evt) => {
-            let [title, message] = evt.data.error.message.split(/:\n/, 2)
-            cb({
-                type: "error",
-                title: `SQLiteWorker: ${title}`,
-                message,
-            })
-        })
-    }
+    // public addEventListener(event: "error", cb: (n: Notification) => void) {
+    //     this._worker.addEventListener(event, (evt) => {
+    //         let [title, message] = evt.data.error.message.split(/:\n/, 2)
+    //         cb({
+    //             type: "error",
+    //             title: `SQLiteWorker: ${title}`,
+    //             message,
+    //         })
+    //     })
+    // }
 
     public async open(
         ctx: Context,
@@ -106,15 +105,18 @@ export class SQLite implements Database {
         )
     }
 
-    public async inTransaction<R>(cb: (tx: DBExec) => Promise<R>): Promise<R> {
+    public async inTransaction<R>(
+        ctx: Context<{ db?: DBExec }>,
+        fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
+    ): AsyncResult<R> {
         await this.exec("BEGIN")
         try {
-            let r = await cb(new Transaction(this))
+            let r = await fn(ctx.withData("db", new Transaction(this)))
             await this.exec("COMMIT")
             return r
         } catch (e) {
             await this.exec("ROLLBACK")
-            throw e
+            return Err(e as Error)
         }
     }
 }

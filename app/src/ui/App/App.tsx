@@ -1,10 +1,10 @@
 import React, { Suspense, useCallback } from "react"
 
 import {
-    type Filter,
+    type ListMemosQuery as Filter,
     filterFromQuery,
     filterToSearchParams,
-} from "@/storage/remote/memos"
+} from "@/domain/Memo"
 import { BuildInfo } from "@/ui/components/BuildInfo"
 import { Navigation } from "@/ui/components/Navigation"
 import { Notifications } from "@/ui/components/Notifications"
@@ -16,8 +16,8 @@ import { MainScreen } from "@/ui/screens/MainScreen"
 import { NewMemoScreen } from "@/ui/screens/NewMemoScreen"
 import { SettingsScreen } from "@/ui/screens/SettingsScreen"
 import { SingleMemoScreen } from "@/ui/screens/SingleMemoScreen"
+import { useTheme } from "@/ui/settings"
 import { useCurrentPage, useGoto } from "@/ui/state/global/router"
-import { useTheme } from "@/ui/state/global/settings"
 import { UnlockScreen } from "../screens/UnlockScreen/UnlockScreen"
 import type { ServerData } from "./ServerData"
 import { Router } from "./router"

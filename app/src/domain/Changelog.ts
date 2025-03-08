@@ -33,7 +33,7 @@ export type MemoChangelogEntry = ChangelogEntry<
     "memos",
     MemoID,
     | {
-          created: Memo
+          created: Omit<Memo, "id">
       }
     | {
           content: MemoContentChanges

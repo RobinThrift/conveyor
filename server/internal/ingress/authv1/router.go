@@ -58,7 +58,10 @@ func (router *router) RequestAuthToken(ctx context.Context, req RequestAuthToken
 }
 
 func (router *router) requestAuthTokenUsingPassword(ctx context.Context, req AuthTokenRequestPasswordGrant) (RequestAuthTokenResponseObject, error) {
-	token, err := router.authCtrl.CreateAuthTokenUsingCredentials(ctx, control.CreateAuthTokenUsingCredentialsCmd{})
+	token, err := router.authCtrl.CreateAuthTokenUsingCredentials(ctx, control.CreateAuthTokenUsingCredentialsCmd{
+		Username:        req.Username,
+		PlaintextPasswd: auth.PlaintextPassword(req.Password),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +75,24 @@ func (router *router) requestAuthTokenUsingPassword(ctx context.Context, req Aut
 }
 
 func (router *router) requestAuthTokenUsingRefreshToken(ctx context.Context, req AuthTokenRequestRefreshTokenGrant) (RequestAuthTokenResponseObject, error) {
-	panic("not implemented") // TODO: Implement
+	refreshToken, err := auth.NewPlaintextAuthTokenValueFromString(req.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := router.authCtrl.CreateAuthTokenUsingRefreshToken(ctx, control.CreateAuthTokenUsingRefreshTokenCmd{
+		PlaintextRefreshToken: *refreshToken,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return RequestAuthToken201JSONResponse{
+		AccessToken:      token.Plaintext.Export(),
+		ExpiresAt:        token.ExpiresAt,
+		RefreshToken:     token.RefreshPlaintext.Export(),
+		RefreshExpiresAt: token.RefreshExpiresAt,
+	}, nil
 }
 
 // Check if the provided access token is valid.

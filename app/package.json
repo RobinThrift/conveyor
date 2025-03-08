@@ -69,6 +69,7 @@
         "@replit/codemirror-vim": "^6.2.1",
         "@sqlite.org/sqlite-wasm": "^3.48.0-build4",
         "@types/mdast": "^4.0.4",
+        "age-encryption": "^0.2.1",
         "clsx": "^2.1.1",
         "date-fns": "^4.1.0",
         "mdast-util-directive": "^3.0.0",

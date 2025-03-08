@@ -45,4 +45,3 @@ export class UnauthorizedError extends Error {
         super(msg)
     }
 }
-

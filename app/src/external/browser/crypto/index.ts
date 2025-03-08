@@ -1,1 +1,1 @@
-export * from "./webcrypto"
+export * from "./WebCryptoSha256Hasher"

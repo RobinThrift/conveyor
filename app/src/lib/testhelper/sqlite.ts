@@ -5,7 +5,10 @@ import sqlite3InitModule, {
     type Sqlite3Static,
 } from "@sqlite.org/sqlite-wasm"
 
+import type { Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
+import type { AsyncResult } from "@/lib/result"
+import { fromPromise } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
 
 export class SQLite implements Database {
@@ -29,14 +32,14 @@ export class SQLite implements Database {
         } as InitOptions)
     }
 
-    public async open() {
+    public async open(ctx: Context) {
         this.db = (async () => {
             let sqlite3 = await this.sqlite3
             return new sqlite3.oo1.DB(":memory:")
         })()
         let db = await this.db
         db.exec({ sql: "PRAGMA foreign_keys = true;" })
-        await migrate(this)
+        await migrate(ctx, this)
     }
 
     public async close() {
@@ -74,23 +77,40 @@ export class SQLite implements Database {
         return db.selectObject(sql, args) as R
     }
 
-    public async inTransaction<R>(cb: (tx: DBExec) => Promise<R>): Promise<R> {
-        let unlock = await this.aquireTransactionLock()
-        try {
-            await this.exec("BEGIN DEFERRED TRANSACTION")
-            let r = await cb(this)
-            await this.exec("COMMIT")
-
-            unlock()
-
-            return r
-        } catch (e) {
-            await this.exec("ROLLBACK TRANSACTION")
-
-            unlock()
-
-            throw e
+    public async inTransaction<R>(
+        ctx: Context<{ db?: DBExec }>,
+        fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
+    ): AsyncResult<R> {
+        let tx = ctx.getData("db")
+        if (tx) {
+            return fn(ctx.withData("db", tx))
         }
+
+        let unlock = await fromPromise(this.aquireTransactionLock())
+        if (!unlock.ok) {
+            return unlock
+        }
+
+        let begin = await fromPromise(this.exec("BEGIN DEFERRED TRANSACTION"))
+        if (!begin.ok) {
+            return begin
+        }
+
+        let res = await fn(ctx.withData("db", this))
+        if (!res.ok) {
+            await this.exec("ROLLBACK TRANSACTION")
+            unlock.value()
+            return res
+        }
+
+        let commit = await fromPromise(this.exec("COMMIT"))
+        if (!commit.ok) {
+            unlock.value()
+            return commit
+        }
+
+        unlock.value()
+        return res
     }
 
     private async aquireTransactionLock(): Promise<() => void> {

@@ -7,6 +7,7 @@ export type Settings = {
     }
 
     theme: {
+        displayName: string
         colourScheme: "default" | "warm" | "rosepine"
         mode: "auto" | "light" | "dark"
         icon: string
@@ -20,11 +21,8 @@ export type Settings = {
 
     sync: {
         isEnabled: boolean
+        clientID: string
         serverAddr: string
-        accessToken: string
-        accessTokenExpiresAt: string
-        refreshToken: string
-        refreshTokenExpiresAt: string
     }
 }
 
@@ -35,6 +33,7 @@ export const DEFAULT_SETTINGS: Settings = {
     },
 
     theme: {
+        displayName: "User",
         colourScheme: "default",
         mode: "auto",
         icon: "default",
@@ -48,10 +47,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
     sync: {
         isEnabled: false,
+        clientID: "",
         serverAddr: "",
-        accessToken: "",
-        accessTokenExpiresAt: "",
-        refreshToken: "",
-        refreshTokenExpiresAt: "",
     },
 }

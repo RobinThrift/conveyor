@@ -25,15 +25,11 @@ export const OPFSWorker = createWorker({
             return fh
         }
 
-        let buf = new SharedArrayBuffer(fh.value.getSize())
-
-        let bufarr = new Uint8Array(buf)
-
-        fh.value.read(bufarr)
-
+        let data = new Uint8Array(fh.value.getSize())
+        fh.value.read(data)
         fh.value.close()
 
-        return Ok(buf)
+        return Ok(data.buffer)
     },
 
     write: async (

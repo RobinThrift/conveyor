@@ -3,7 +3,7 @@ import React, { useCallback } from "react"
 import { MoonIcon, SunHorizonIcon, SunIcon } from "@/ui/components/Icons"
 import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
-import { useSetting } from "@/ui/state/global/settings"
+import { useSetting } from "@/ui/settings"
 
 export function SelectColourScheme({
     className,

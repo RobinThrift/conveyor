@@ -19,13 +19,13 @@ storybook *flags="": _gen-icons _build-sqlite
     {{ local_bin }}/msw init --save false .storybook/public/
     {{ local_bin }}/storybook dev --no-open {{ flags }}
 
-test: _build-sqlite install
+test *flags="": _build-sqlite install
     {{ local_bin }}/msw init --save false ./build
-    {{ local_bin }}/vitest --run
+    {{ local_bin }}/vitest --run {{ flags }}
 
-test-watch: _build-sqlite install
+test-watch *flags="": _build-sqlite install
     {{ local_bin }}/msw init --save false ./build
-    {{ local_bin }}/vitest
+    {{ local_bin }}/vitest {{ flags }}
 
 fmt: install
     {{ local_bin }}/biome format --write ./src

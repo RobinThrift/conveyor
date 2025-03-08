@@ -150,62 +150,37 @@
         "LabelSelectRegion": "Region"
     },
 
-    "screens/Settings/AccountSettings": {
-        "Title": "Konto",
-        "Description": "Verwalte dein Konto.",
-
-        "DisplayNameLabel": "Anzeigename",
-        "UpdateDisplayNameButton": "Speichern",
-        "EmptyDisplayName": "Anzeigename darf nicht leer sein",
-        "Logout": "Ausloggen",
-
-        "ChangePasswordTitle": "Password Ändern",
-        "ChangePasswordButton": "Ändern",
-        "Invalid/Empty": "{name} darf nicht leer sein",
-        "CurrentPasswordIncorrect": "Incorrect password",
-        "EmptyCurrentPassword": "Bitte gib Dein aktuelles Passwort ein",
-        "EmptyNewPassword": "Bitte gib ein neues Passwort ein",
-        "EmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
-        "NewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
-        "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein",
-        "CurrentPasswordLabel": "Aktulles Passwort",
-        "NewPasswordLabel": "Neues Passwort",
-        "RepeatNewPasswordLabel": "Neues Passwort wiederholen"
+    "screens/Settings/SyncSettings": {
+        "Title": "Sync",
+        "Description": "Synchronisierungs Optionen einstellen und Zugangsdaten verwalten."
     },
 
-    "screens/Settings/SystemSettings": {
-        "Title": "System",
-        "SectionAPITokensTitle": "API Tokens",
-        "SectionAPITokensDescription": "Erstelle und lösche API Tokens."
+    "screens/Settings/SyncSettings/Info": {
+        "IsEnabled": "Synchronisierung Aktiviert:",
+        "ClientID": "Client ID:"
     },
 
-    "screens/Settings/SystemSettings/New": {
-        "Title": "Neuen API Token erstellen",
-        "FieldNameLabel": "Name",
-        "FieldExpiresInLabel": "Gültigkeit",
-        "FieldExpiresInValueDays": {
-            "one": "{count} Tag",
-            "many": "{count} Tage"
-        },
-        "FieldExpiresInValueMonths": {
-            "one": "{count} Monat",
-            "many": "{count} Monate"
-        },
-        "ButtonLabel": "Neuen Token Erstellen"
+    "screens/Settings/SyncSettings/Setup": {
+        "Title": "Setup",
+        "FieldUsernameLabel": "Benutername",
+        "FieldPasswordLabel": "Passwort",
+        "LoginButtonLabel": "Login",
+        "ErrorFieldEmpty": "{name} darf nicht leer sein",
+        "ErrorIncorrectCredentials": "."
     },
 
-    "screens/Settings/SystemSettings/LastCreated": {
-        "Title": "Neuer API Token",
-        "Notice": "Bitte notieren den Token. DIESER WERT WIRD NIE WIEDER ANGEZEIGT!"
-    },
-
-    "screens/Settings/SystemSettings/List": {
-        "Title": "API Tokens",
-        "LabelName": "Name",
-        "LabelExpires": "Gültig bis",
-        "LabelCreated": "Erstellt",
-        "DeleteButton": "Löschen",
-        "PrevPage": "Vorherige Seite",
-        "NextPage": "Nächste Seite"
+    "screens/Settings/SyncSettings/ChangePassword": {
+        "Title": "Password Ändern",
+        "FieldCurrentPasswordLabel": "Aktulles Passwort",
+        "FieldNewPasswordLabel": "Neues Passwort",
+        "FieldRepeatNewPasswordLabel": "Neues Passwort wiederholen",
+        "ChangePasswordButtonLabel": "Ändern",
+        "ErrorFieldEmpty": "{name} darf nicht leer sein",
+        "ErrorCurrentPasswordIncorrect": "Aktuells Passwort ist falsch",
+        "ErrorEmptyCurrentPassword": "Bitte gib Dein aktuelles Passwort ein",
+        "ErrorEmptyNewPassword": "Bitte gib ein neues Passwort ein",
+        "ErrorEmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
+        "ErrorNewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
+        "ErrorNewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein"
     }
 }

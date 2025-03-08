@@ -1,4 +1,6 @@
-import type { DBExec, Database } from "@/lib/database"
+import type { Context } from "@/lib/context"
+import type { DBExec, Transactioner } from "@/lib/database"
+import { fromAsyncFn } from "@/lib/result"
 
 const migrations = import.meta.glob<boolean, string, string>(
     "./migrations/*.sql",
@@ -8,12 +10,14 @@ const migrations = import.meta.glob<boolean, string, string>(
     },
 )
 
-export async function migrate(db: Database) {
+export async function migrate(ctx: Context, db: DBExec & Transactioner) {
     console.log("running migrations")
 
-    await createMigrationTable(db)
+    let tx: typeof db = ctx.getData("db") ?? db
 
-    let lastAppliedMigration = await db.queryOne<{ version: string }>(
+    await createMigrationTable(tx)
+
+    let lastAppliedMigration = await tx.queryOne<{ version: string }>(
         "SELECT version FROM migrations ORDER BY id DESC LIMIT 1",
     )
 
@@ -49,11 +53,15 @@ export async function migrate(db: Database) {
         try {
             let sql = await migrations[versionFile]()
 
-            await db.inTransaction(async (tx) => {
-                await tx.exec(sql)
-                await tx.exec("INSERT INTO migrations (version) VALUES(?1)", [
-                    version,
-                ])
+            await db.inTransaction(ctx, async (ctx) => {
+                let tx = ctx.getData("db")
+                return fromAsyncFn(async () => {
+                    await tx.exec(sql)
+                    await tx.exec(
+                        "INSERT INTO migrations (version) VALUES(?1)",
+                        [version],
+                    )
+                })
             })
         } catch (e) {
             throw new Error(`error applying migration ${version}: ${e}`)

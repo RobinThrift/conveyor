@@ -2,21 +2,25 @@ import type { Duration } from "@/lib/duration"
 
 export type CancelFunc = (reason?: Error) => void
 
-export interface Context<D = unknown> {
+export interface Context<
+    D extends Record<string, unknown> = Record<string, any>,
+    Err extends Error = Error,
+> {
     signal?: AbortSignal
-    data: D
-    err: any
+    err?: Err
 
     withSignal(signal?: AbortSignal): Context<D>
     withCancel(): [Context<D>, CancelFunc]
     withTimeout(timeout: Duration): [Context<D>, CancelFunc]
     withData<K extends string, V>(key: K, value: V): Context<D & Record<K, V>>
     isCancelled(): boolean
+
+    getData<K extends keyof D>(key: K): D[K]
+    getData<K extends keyof D>(key: K, fallback: D[K]): Required<D>[K]
 }
 
 export const BaseContext: Context = {
     signal: undefined,
-    data: undefined,
     err: undefined,
 
     withSignal(signal?: AbortSignal) {
@@ -35,15 +39,22 @@ export const BaseContext: Context = {
         return new context(BaseContext, {}).withData(key, value)
     },
 
+    getData(_, fallback: any = undefined) {
+        return fallback
+    },
+
     isCancelled() {
         return false
     },
 }
 
-class context<D = unknown> {
+class context<
+    D extends Record<string, unknown> = Record<string, any>,
+    Err extends Error = Error,
+> {
     public signal?: AbortSignal
-    public data: D
-    public err: any
+    public err?: Err
+    private _data: D
     private _isCancelled = false
     private _parent: Context
 
@@ -52,7 +63,7 @@ class context<D = unknown> {
         { signal, data }: { signal?: AbortSignal; data?: D },
     ) {
         this.signal = signal
-        this.data = data as D
+        this._data = (data ?? {}) as D
         this._parent = parent
 
         let onabort = () => {
@@ -74,7 +85,7 @@ class context<D = unknown> {
         }
 
         return new context<D>(this, {
-            data: this.data,
+            data: this._data,
             signal: AbortSignal.any(signals),
         })
     }
@@ -109,11 +120,21 @@ class context<D = unknown> {
     withData<K extends string, V>(key: K, value: V): Context<D & Record<K, V>> {
         return new context<D & Record<K, V>>(this, {
             data: {
-                ...this.data,
+                ...this._data,
                 [key]: value,
             } as D & Record<K, V>,
             signal: this.signal,
         })
+    }
+
+    getData<K extends keyof D>(key: K): D[K]
+    getData<K extends keyof D>(key: K, fallback: D[K]): Required<D>[K]
+    getData<K extends keyof D>(key: K, fallback?: D[K]): D[K] | Required<D>[K] {
+        if (fallback) {
+            return (this._data[key] || fallback) as Required<D>[K]
+        }
+
+        return this._data[key]
     }
 
     isCancelled(): boolean {

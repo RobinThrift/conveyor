@@ -1,5 +1,5 @@
 import type { Context } from "@/lib/context"
-import { type AsyncResult, fromPromise } from "@/lib/result"
+import type { AsyncResult } from "@/lib/result"
 
 declare type DBValue =
     | string
@@ -23,7 +23,17 @@ export interface Database extends DBExec {
 
     close(): Promise<void>
 
-    inTransaction<R>(cb: (tx: DBExec) => Promise<R>): Promise<R>
+    inTransaction<R>(
+        ctx: Context<{ db?: DBExec }>,
+        fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
+    ): AsyncResult<R>
+}
+
+export interface Transactioner {
+    inTransaction<R>(
+        ctx: Context<{ db?: DBExec }>,
+        fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
+    ): AsyncResult<R>
 }
 
 export interface DBExec {
@@ -38,24 +48,4 @@ export interface DBExec {
         args?: DBValue[],
         abort?: AbortSignal,
     ): Promise<R | undefined>
-}
-
-export function withTx<R>(
-    ctx: Context<{ db?: DBExec }>,
-    fallback: Database,
-    fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
-): AsyncResult<R> {
-    if ("db" in ctx.data && typeof ctx.data.db !== "undefined") {
-        return fn(ctx.withData("db", ctx.data.db))
-    }
-
-    return fromPromise(
-        fallback.inTransaction(async (tx) => {
-            let res = await fn(ctx.withData("db", tx))
-            if (!res.ok) {
-                throw res.err
-            }
-            return res.value
-        }),
-    )
 }

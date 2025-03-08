@@ -5,7 +5,7 @@ import { Select } from "@/ui/components/Select"
 import { SelectColourScheme, SelectMode } from "@/ui/components/ThemeSwitcher"
 import { useBaseURL } from "@/ui/hooks/useBaseURL"
 import { useT } from "@/ui/i18n"
-import { useSetting } from "@/ui/state/global/settings"
+import { useSetting } from "@/ui/settings"
 
 export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
     function InterfaceSettingsTab(_, forwardedRef) {
@@ -61,7 +61,7 @@ export const InterfaceSettingsTab = React.forwardRef<HTMLDivElement>(
                             htmlFor="mode"
                             className="flex items-center mt-4 sm:mt-0 font-semibold text-sm"
                         >
-                            {t.LabelModeOverride}
+                            {t.LabelIcon}
                         </label>
                         <Select
                             className="col-span-5"

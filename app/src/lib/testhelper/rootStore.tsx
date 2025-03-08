@@ -1,25 +1,30 @@
 import type { Decorator } from "@storybook/react"
 import React from "react"
 
+import { AttachmentController } from "@/control/AttachmentController"
+import { ChangelogController } from "@/control/ChangelogController"
+import { MemoController } from "@/control/MemoController"
+import { SettingsController } from "@/control/SettingsController"
+import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
 import { history } from "@/external/browser/history"
 import { BaseContext } from "@/lib/context"
 import { toPromise } from "@/lib/result"
 import { generateMockMemos } from "@/lib/testhelper/memos"
 import { SQLite } from "@/lib/testhelper/sqlite"
-import { AttachmentStorage } from "@/storage/attachments"
-import { ChangelogStorage } from "@/storage/changelog"
-import * as attachmentRepo from "@/storage/database/sqlite/attachmentRepo"
-import * as changelogRepo from "@/storage/database/sqlite/changelogRepo"
-import * as memoRepo from "@/storage/database/sqlite/memoRepo"
-import { MemoStorage } from "@/storage/memos"
+import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
+import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
+import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
+import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
 import {
     AttachmentProvider,
-    attachmentContextFromStorage,
+    attachmentContextFromController,
 } from "@/ui/attachments"
 import { Alert } from "@/ui/components/Alert"
 import { usePromise } from "@/ui/hooks/usePromise"
-import { configureRootStore, initializeStorage } from "@/ui/state"
+import { SettingsLoader } from "@/ui/settings"
+import { configureEffects, configureRootStore } from "@/ui/state"
 import { Provider } from "@/ui/state"
+
 import { MockFS } from "./mockfs"
 
 export interface MockRootStoreProviderProps {
@@ -29,9 +34,9 @@ export interface MockRootStoreProviderProps {
 
 export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
     let setup = usePromise(async () => {
-        let sqlite = new SQLite()
+        let db = new SQLite()
 
-        await sqlite.open()
+        await db.open(BaseContext)
 
         let mockFS = new MockFS()
 
@@ -39,36 +44,44 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             router: { href: history.current },
         })
 
-        let changelog = new ChangelogStorage({
+        let changelogCtrl = new ChangelogController({
             sourceName: "storybook",
-            db: sqlite,
-            repo: changelogRepo,
+            transactioner: db,
+            repo: new ChangelogRepo(db),
         })
 
-        let attachmentStorage = new AttachmentStorage({
-            db: sqlite,
-            repo: attachmentRepo,
+        let settingsCtrl = new SettingsController({
+            transactioner: db,
+            repo: new SettingsRepo(db),
+            changelog: changelogCtrl,
+        })
+
+        let attachmentCtrl = new AttachmentController({
+            transactioner: db,
+            repo: new AttachmentRepo(db),
             fs: mockFS,
-            changelog,
+            hasher: new WebCryptoSha256Hasher(),
+            changelog: changelogCtrl,
         })
 
-        let memoStorage = new MemoStorage({
-            db: sqlite,
-            repo: memoRepo,
-            attachments: attachmentStorage,
-            changelog,
+        let memoCtrl = new MemoController({
+            transactioner: db,
+            repo: new MemoRepo(db),
+            attachments: attachmentCtrl,
+            changelog: changelogCtrl,
         })
 
         if (props.generateMockData) {
-            await insertMockData({ memoStorage })
+            await insertMockData({ memoCtrl })
         }
 
-        initializeStorage({
-            memoStorage,
-            attachmentStorage,
+        configureEffects({
+            memoCtrl,
+            attachmentCtrl,
+            settingsCtrl,
         })
 
-        return { rootStore, attachmentStorage }
+        return { rootStore, attachmentCtrl }
     }, [])
 
     if (!setup.resolved) {
@@ -79,14 +92,14 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         return <Alert variant="danger">{setup.error.message}</Alert>
     }
 
-    let { rootStore, attachmentStorage } = setup.result
+    let { rootStore, attachmentCtrl } = setup.result
 
     return (
         <Provider store={rootStore}>
             <AttachmentProvider
-                value={attachmentContextFromStorage(attachmentStorage)}
+                value={attachmentContextFromController(attachmentCtrl)}
             >
-                {props.children}
+                <SettingsLoader>{props.children}</SettingsLoader>
             </AttachmentProvider>
         </Provider>
     )
@@ -105,14 +118,12 @@ export const decoratorWithMockData: Decorator = (Story) => (
 )
 
 async function insertMockData({
-    memoStorage,
+    memoCtrl,
 }: {
-    memoStorage: MemoStorage
+    memoCtrl: MemoController
 }) {
     let { memos } = generateMockMemos()
     for (let memo of memos) {
-        await toPromise(
-            memoStorage.createMemo(BaseContext.withData("db", undefined), memo),
-        )
+        await toPromise(memoCtrl.createMemo(BaseContext, memo))
     }
 }

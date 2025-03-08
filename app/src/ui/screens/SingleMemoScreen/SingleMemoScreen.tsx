@@ -5,8 +5,8 @@ import { ArrowLeftIcon } from "@/ui/components/Icons"
 import { Loader } from "@/ui/components/Loader"
 import { Memo } from "@/ui/components/Memo"
 import { useT } from "@/ui/i18n"
+import { useSetting } from "@/ui/settings"
 import { useGoBack } from "@/ui/state/global/router"
-import { useSetting } from "@/ui/state/global/settings"
 
 import { useSingleMemoScreenState } from "./useSingleMemoScreenState"
 

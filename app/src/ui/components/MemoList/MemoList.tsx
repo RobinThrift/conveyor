@@ -7,7 +7,7 @@ import { ListIcon, TableIcon } from "@/ui/components/Icons"
 import { Memo, type MemoActions } from "@/ui/components/Memo"
 import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
-import { useSetting } from "@/ui/state/global/settings"
+import { useSetting } from "@/ui/settings"
 import {
     differenceInCalendarDays,
     format,

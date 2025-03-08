@@ -2,7 +2,7 @@ import clsx from "clsx"
 import React from "react"
 
 import { useT } from "@/ui/i18n"
-import { useAccountDisplayName } from "@/ui/state/global/account"
+import { useSetting } from "@/ui/settings"
 
 export interface GreetingProps {
     className?: string
@@ -10,7 +10,7 @@ export interface GreetingProps {
 
 export function Greeting(props: GreetingProps) {
     let t = useT("components/Greeting")
-    let displayName = useAccountDisplayName()
+    let [displayName] = useSetting("theme.displayName")
     let now = new Date()
     let greeting = t.Evening
 

@@ -19,15 +19,3 @@ export default meta
 type Story = StoryObj<typeof SettingsScreen>
 
 export const Settings: Story = {}
-
-export const WithErrorsAccount: Story = {
-    name: "With Errors/Account",
-    args: {
-        tab: "account",
-        validationErrors: {
-            current_password: "CurrentPasswordIncorrect",
-            new_password: "NewPasswordIsOldPassword",
-            repeat_new_password: "NewPasswordsDoNotMatch",
-        },
-    },
-}

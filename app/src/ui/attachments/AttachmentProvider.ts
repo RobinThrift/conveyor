@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react"
 
+import type { AttachmentController } from "@/control/AttachmentController"
 import type { Attachment, AttachmentID } from "@/domain/Attachment"
 import { BaseContext } from "@/lib/context"
 import { type AsyncResult, Err } from "@/lib/result"
-import type { AttachmentStorage } from "@/storage/attachments"
 
 export interface AttachmentContext {
     getAttachmentDataByID(
@@ -23,14 +23,11 @@ export function useAttachmentProvider() {
     return useContext(attachmentContext)
 }
 
-export function attachmentContextFromStorage(
-    storage: AttachmentStorage,
+export function attachmentContextFromController(
+    ctrl: AttachmentController,
 ): AttachmentContext {
     return {
         getAttachmentDataByID: (id) =>
-            storage.getAttachmentDataByID(
-                BaseContext.withData("db", undefined),
-                id,
-            ),
+            ctrl.getAttachmentDataByID(BaseContext, id),
     }
 }

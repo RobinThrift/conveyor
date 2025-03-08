@@ -1,47 +1,16 @@
 import type { Context } from "@/lib/context"
-import type { CryptoKey } from "@/lib/crypto"
+import type { Decrypter, Encrypter } from "@/lib/crypto"
 import type { AsyncResult } from "@/lib/result"
 
-import { EncryptedFSWorker } from "./encryptedfs.worker"
 import type { FS } from "./index"
 
-export class EncrypedFS implements FS {
+export class EncryptedFS implements FS {
     private _wrapped: FS
-    private _worker: ReturnType<typeof EncryptedFSWorker.createClient>
-    private _enckey: CryptoKey
+    private _crypto: Encrypter & Decrypter
 
-    constructor(
-        wrapped: FS,
-        enckey: CryptoKey,
-        { onError }: { onError?: (err: Error) => void } = {},
-    ) {
+    constructor(wrapped: FS, crypto: Encrypter & Decrypter) {
         this._wrapped = wrapped
-        this._enckey = enckey
-
-        this._worker = EncryptedFSWorker.createClient(
-            new Worker(
-                new URL("./encryptedfs.worker?worker&url", import.meta.url),
-                {
-                    type: "module",
-                    name: "EncryptedFSWorker",
-                },
-            ),
-        )
-
-        if (onError) {
-            this._worker.addEventListener("error", (evt) => {
-                onError(evt.data.error)
-            })
-        }
-
-        // this._worker.addEventListener("error", (evt) => {
-        //     let [title, message] = evt.data.error.message.split(/:\n/, 2)
-        //     eventbus.emit("notifications:add", {
-        //         type: "error",
-        //         title: `EncryptedFSWorker: ${title}`,
-        //         message,
-        //     })
-        // })
+        this._crypto = crypto
     }
 
     public async read(
@@ -53,10 +22,7 @@ export class EncrypedFS implements FS {
             return raw
         }
 
-        return this._worker.read(ctx, {
-            data: raw.value,
-            enckey: this._enckey,
-        })
+        return this._crypto.decryptData(new Uint8Array(raw.value))
     }
 
     public async write(
@@ -64,10 +30,7 @@ export class EncrypedFS implements FS {
         filepath: string,
         content: ArrayBufferLike,
     ): AsyncResult<number> {
-        let encrypted = await this._worker.write(ctx, {
-            data: content,
-            enckey: this._enckey,
-        })
+        let encrypted = await this._crypto.encryptData(new Uint8Array(content))
         if (!encrypted.ok) {
             return encrypted
         }
@@ -81,9 +44,5 @@ export class EncrypedFS implements FS {
 
     public mkdirp(ctx: Context, dirpath: string): AsyncResult<void> {
         return this._wrapped.mkdirp(ctx, dirpath)
-    }
-
-    public terminate() {
-        this._worker.terminate()
     }
 }

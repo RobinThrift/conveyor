@@ -1,14 +1,17 @@
 import type { EncryptedChangelogEntry } from "@/domain/Changelog"
-import { APIError, UnauthorizedError } from "../apiv1/APIError"
 import type { Context } from "@/lib/context"
 import {
+    type AsyncResult,
     Err,
+    Ok,
+    type Result,
     fmtErr,
     fromPromise,
     fromThrowing,
-    Ok,
-    type AsyncResult,
 } from "@/lib/result"
+import { parseJSON } from "date-fns"
+
+import { APIError, UnauthorizedError } from "../apiv1/APIError"
 
 export class SyncV1APIClient {
     private _baseURL: string
@@ -30,6 +33,7 @@ export class SyncV1APIClient {
         syncClient: { clientID: string },
     ): AsyncResult<void> {
         let req = await this._createBaseRequest(
+            ctx,
             "GET",
             "/api/sync/v1/clients",
             JSON.stringify({ ClientID: syncClient.clientID }),
@@ -65,7 +69,7 @@ export class SyncV1APIClient {
     }
 
     public async getFullSync(ctx: Context): AsyncResult<ArrayBufferLike> {
-        let req = await this._createBaseRequest("GET", "/api/sync/v1/full")
+        let req = await this._createBaseRequest(ctx, "GET", "/api/sync/v1/full")
         if (!req.ok) {
             return req
         }
@@ -111,6 +115,7 @@ export class SyncV1APIClient {
         data: ArrayBufferLike,
     ): AsyncResult<void> {
         let req = await this._createBaseRequest(
+            ctx,
             "POST",
             "/api/sync/v1/full",
             new Uint8Array(data),
@@ -152,6 +157,7 @@ export class SyncV1APIClient {
         since?: Date,
     ): AsyncResult<EncryptedChangelogEntry[]> {
         let req = await this._createBaseRequest(
+            ctx,
             "GET",
             `/api/sync/v1/changes?since=${JSON.stringify(since ?? new Date(2000, 0, 1))}`,
         )
@@ -183,7 +189,7 @@ export class SyncV1APIClient {
             )
         }
 
-        return fromThrowing(() => JSON.parse(data.value))
+        return parseEncryptedChangelogEntryJSON(data.value)
     }
 
     public async uploadChangelogEntries(
@@ -191,6 +197,7 @@ export class SyncV1APIClient {
         entries: EncryptedChangelogEntry[],
     ): AsyncResult<void> {
         let req = await this._createBaseRequest(
+            ctx,
             "POST",
             "/api/sync/v1/changes",
             JSON.stringify(entries),
@@ -227,11 +234,12 @@ export class SyncV1APIClient {
     }
 
     private async _createBaseRequest(
+        ctx: Context,
         method: string,
         path: string,
         body?: BodyInit,
     ): AsyncResult<Request> {
-        let token = await this._tokenStorage.getToken()
+        let token = await this._tokenStorage.getToken(ctx)
         if (!token.ok) {
             return token
         }
@@ -250,5 +258,24 @@ export class SyncV1APIClient {
 }
 
 interface TokenStorage {
-    getToken(): AsyncResult<string>
+    getToken(ctx: Context): AsyncResult<string>
+}
+
+function parseEncryptedChangelogEntryJSON(
+    raw: string,
+): Result<EncryptedChangelogEntry[]> {
+    return fromThrowing(() => {
+        let objs = JSON.parse(raw)
+        let entries: EncryptedChangelogEntry[] = []
+
+        for (let obj of objs) {
+            entries.push({
+                syncClientID: obj.syncClientID,
+                data: obj.data,
+                timestamp: parseJSON(obj.timestamp),
+            })
+        }
+
+        return entries
+    })
 }

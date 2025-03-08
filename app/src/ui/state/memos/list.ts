@@ -1,14 +1,11 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 
+import type * as MemoCtrl from "@/control/MemoController"
 import type { Memo, MemoID, MemoList } from "@/domain/Memo"
 import type { Pagination } from "@/domain/Pagination"
 import { isEqual } from "@/lib/isEqual"
-import type * as memoStorage from "@/storage/memos"
-import type { StartListening } from "@/ui/state/rootStore"
 
-const pageSize = 25
-
-export type Filter = memoStorage.Filter
+export type Filter = MemoCtrl.Filter
 
 interface MemosListState {
     memos: Memo[]
@@ -40,7 +37,7 @@ export const slice = createSlice({
             state,
             _: PayloadAction<{
                 pagination: Pagination<Date>
-                filter?: memoStorage.Filter
+                filter?: MemoCtrl.Filter
             }>,
         ) => {
             state.isLoading = true
@@ -121,57 +118,3 @@ export const slice = createSlice({
         hasNextPage: (state) => state.hasNextPage,
     },
 })
-
-export const registerEffects = (startListening: StartListening) => {
-    startListening({
-        actionCreator: slice.actions.nextPage,
-        effect: async (_, { cancelActiveListeners, dispatch, getState }) => {
-            cancelActiveListeners()
-
-            let state = getState()
-
-            let hasNextPage = slice.selectors.hasNextPage(state.memos)
-            if (!hasNextPage) {
-                return
-            }
-
-            let filter = slice.selectors.filter(state.memos)
-            let nextPage = slice.selectors.nextPage(state.memos)
-
-            dispatch(
-                slice.actions.loadPage({
-                    filter,
-                    pagination: {
-                        after: nextPage,
-                        pageSize,
-                    },
-                }),
-            )
-        },
-    })
-
-    startListening({
-        actionCreator: slice.actions.setFilter,
-        effect: async (_, { cancelActiveListeners, dispatch, getState }) => {
-            cancelActiveListeners()
-
-            let state = getState()
-
-            let isLoading = slice.selectors.isLoading(state.memos)
-            if (!isLoading) {
-                return
-            }
-
-            let filter = slice.selectors.filter(state.memos)
-
-            dispatch(
-                slice.actions.loadPage({
-                    filter,
-                    pagination: {
-                        pageSize,
-                    },
-                }),
-            )
-        },
-    })
-}

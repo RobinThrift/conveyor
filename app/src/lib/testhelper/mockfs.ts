@@ -1,7 +1,6 @@
 import type { Context } from "@/lib/context"
-import type { FS } from "@/lib/fs"
+import { type FS, FSNotFoundError } from "@/lib/fs"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
-import { FSErrNotFound } from "@/storage/fs/errors"
 
 export class MockFS implements FS {
     private _files = new Map<string, ArrayBufferLike>()
@@ -12,7 +11,7 @@ export class MockFS implements FS {
     ): AsyncResult<ArrayBufferLike> {
         let contents = this._files.get(filepath)
         if (!contents) {
-            return Err(new FSErrNotFound(filepath))
+            return Err(new FSNotFoundError(filepath))
         }
 
         return Ok(contents)

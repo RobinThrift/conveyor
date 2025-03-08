@@ -17,9 +17,6 @@ let rootStore = configureRootStore({
             ?.getAttribute("content")
             ?.replace(/\/$/, "") ?? "",
     router: { href: history.current },
-    buildInfo: serverData.buildInfo,
-    account: serverData.account,
-    settings: serverData.settings,
 })
 
 eventbus.on("notifications:add", (notification) => {

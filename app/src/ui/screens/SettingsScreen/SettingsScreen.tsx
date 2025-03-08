@@ -1,13 +1,12 @@
-import { Globe, Palette, User, Wrench } from "@phosphor-icons/react"
 import * as Accordion from "@radix-ui/react-accordion"
 import React from "react"
 
+import { GlobeIcon, PaletteIcon, WrenchIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 
-import { AccountSettingsTab } from "./AccountSettingsTab"
 import { InterfaceSettingsTab } from "./InterfaceSettingsTab"
 import { LocaleSettingsTab } from "./LocaleSettingsTab"
-import { SystemSettingsTab } from "./SystemSettingsTab"
+import { SyncSettingsTab } from "./SyncSettingsTab"
 
 export interface SettingsScreenProps {
     tab: string
@@ -24,8 +23,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
     let t = useT("screens/Settings")
     let tInterface = useT("screens/Settings/InterfaceSettings")
     let tLocale = useT("screens/Settings/LocaleSettings")
-    let tAccount = useT("screens/Settings/AccountSettings")
-    let tSystem = useT("screens/Settings/SystemSettings")
+    let tSync = useT("screens/Settings/SyncSettings")
 
     return (
         <div className="settings-screen">
@@ -47,7 +45,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
                     >
                         <h2>{tInterface.Title}</h2>
                         <small>{tInterface.Description}</small>
-                        <Palette weight="fill" className="icon" />
+                        <PaletteIcon weight="fill" className="icon" />
                     </Accordion.Trigger>
 
                     <Accordion.Content asChild>
@@ -65,31 +63,11 @@ export function SettingsScreen(props: SettingsScreenProps) {
                     >
                         <h2>{tLocale.Title}</h2>
                         <small>{tLocale.Description}</small>
-                        <Globe weight="fill" className="icon" />
+                        <GlobeIcon weight="fill" className="icon" />
                     </Accordion.Trigger>
 
                     <Accordion.Content asChild>
                         <LocaleSettingsTab />
-                    </Accordion.Content>
-                </Accordion.Item>
-
-                <Accordion.Item
-                    value="account"
-                    className="settings-section bg-danger text-danger-contrast"
-                >
-                    <Accordion.Trigger
-                        value="account"
-                        className="settings-heading"
-                    >
-                        <h2>{tAccount.Title}</h2>
-                        <small>{tAccount.Description}</small>
-                        <User weight="fill" className="icon" />
-                    </Accordion.Trigger>
-
-                    <Accordion.Content asChild>
-                        <AccountSettingsTab
-                            validationErrors={props.validationErrors}
-                        />
                     </Accordion.Content>
                 </Accordion.Item>
 
@@ -101,12 +79,12 @@ export function SettingsScreen(props: SettingsScreenProps) {
                         value="system"
                         className="settings-heading"
                     >
-                        <h2>{tSystem.Title}</h2>
-                        <Wrench weight="fill" className="icon" />
+                        <h2>{tSync.Title}</h2>
+                        <WrenchIcon weight="fill" className="icon" />
                     </Accordion.Trigger>
 
                     <Accordion.Content asChild>
-                        <SystemSettingsTab />
+                        <SyncSettingsTab />
                     </Accordion.Content>
                 </Accordion.Item>
             </Accordion.Root>
