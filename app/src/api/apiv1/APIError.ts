@@ -34,8 +34,17 @@ export class APIError extends Error {
     }
 
     static async fromHTTPResponse(res: Response): Promise<APIError> {
-        let body = await res.json()
-        return new APIError(body)
+        try {
+            let body = await res.json()
+            return new APIError(body)
+        } catch (e) {
+            return new APIError({
+                code: res.status,
+                type: (e as Error).name,
+                title: "error parsing request JSON",
+                detail: (e as Error).message,
+            })
+        }
     }
 }
 

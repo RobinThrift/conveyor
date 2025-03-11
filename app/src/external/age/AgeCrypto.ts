@@ -1,6 +1,6 @@
 import * as age from "age-encryption"
 
-import { type AsyncResult, fromPromise, Ok, Err } from "@/lib/result"
+import { type AsyncResult, Err, Ok, fromPromise } from "@/lib/result"
 import type { SenstiveValue } from "@/lib/sensitive"
 
 export class AgeCrypto {

@@ -11,8 +11,6 @@ import {
     format,
 } from "@/lib/i18n"
 
-export { differenceInCalendarDays } from "@/lib/i18n"
-
 export interface I18nContext {
     language: Language
     region: Region

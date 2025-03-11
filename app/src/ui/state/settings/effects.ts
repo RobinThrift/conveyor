@@ -25,7 +25,7 @@ export const registerEffects = (
             cancelActiveListeners()
 
             let loaded = await settingsCtrl.loadSettings(
-                BaseContext.withData("db", undefined).withSignal(signal),
+                BaseContext.withSignal(signal),
             )
 
             if (!loaded.ok) {
@@ -46,7 +46,7 @@ export const registerEffects = (
             cancelActiveListeners()
 
             let updated = await settingsCtrl.updateSetting(
-                BaseContext.withData("db", undefined).withSignal(signal),
+                BaseContext.withSignal(signal),
                 {
                     key: payload.key,
                     value: payload.value,

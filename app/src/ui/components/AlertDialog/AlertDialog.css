@@ -1,0 +1,26 @@
+.alert-dialog .dialog-description {
+    @apply text-text text-base;
+}
+
+.alert-dialog:has(.alert-dialog-icon) {
+    @apply flex flex-wrap;
+
+    .dialog-title {
+        width: 100%;
+    }
+
+    .dialog-btns {
+        width: 100%;
+    }
+
+    .dialog-description {
+        @apply flex-1;
+    }
+}
+
+.alert-dialog .alert-dialog-icon {
+    @apply pe-2;
+    svg {
+        @apply w-10 h-10;
+    }
+}

@@ -1,19 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import React from "react"
 import { ErrorScreen } from "./ErrorScreen"
 
-import { Provider } from "@/ui/state"
 import "@/ui/styles/index.css"
 
 const meta: Meta<typeof ErrorScreen> = {
     title: "Screens/Error",
     component: ErrorScreen,
-
-    decorators: (Story, { globals: { configureMockRootStore } }) => (
-        <Provider store={configureMockRootStore()}>
-            <Story />
-        </Provider>
-    ),
 }
 
 export default meta

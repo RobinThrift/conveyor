@@ -1,5 +1,5 @@
-import { UTCDateMini } from "@date-fns/utc"
-import { format, parse, transpose } from "date-fns"
+import { UTCDateMini, utc } from "@date-fns/utc"
+import { format, parse } from "date-fns"
 
 const sqliteDateTimeFormat = "yyyy-MM-dd HH:mm:ss'Z'"
 
@@ -21,5 +21,5 @@ export function dateToSQLite(value: Date | string | undefined): string | null {
     if (typeof d === "string") {
         d = new Date(value)
     }
-    return format(transpose(d, UTCDateMini), sqliteDateTimeFormat)
+    return format(d, sqliteDateTimeFormat, { in: utc })
 }

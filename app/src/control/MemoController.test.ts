@@ -1,4 +1,4 @@
-import { addDays, addHours, isAfter, subHours } from "date-fns"
+import { addDays, addHours, isAfter, subHours, transpose } from "date-fns"
 import {
     assert,
     afterAll,
@@ -22,6 +22,7 @@ import { encodeText } from "@/lib/textencoding"
 import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
+import { UTCDateMini } from "@date-fns/utc"
 
 import { AttachmentController } from "./AttachmentController"
 import { ChangelogController } from "./ChangelogController"
@@ -31,7 +32,7 @@ suite("control/MemoController", () => {
     suite.sequential("Querying", async () => {
         let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup()
 
-        let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+        let now = transpose(new Date(2024, 2, 15, 12, 0, 0, 0), UTCDateMini)
         let numMemos = 500
 
         let createdMemosIDs: MemoID[] = []

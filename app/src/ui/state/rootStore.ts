@@ -5,16 +5,20 @@ import {
 } from "@reduxjs/toolkit"
 
 import type { AttachmentController } from "@/control/AttachmentController"
+import type { AuthController } from "@/control/AuthController"
 import type { MemoController } from "@/control/MemoController"
 import type { SettingsController } from "@/control/SettingsController"
+import type { SyncController } from "@/control/SyncController"
 
 import * as attachments from "./attachments"
+import * as auth from "./auth"
 import { registerEffects as registerErrorEffects } from "./errors"
 import * as i18n from "./global/i18n"
 import * as notifications from "./global/notifications"
 import * as router from "./global/router"
 import * as memos from "./memos"
 import * as settings from "./settings"
+import * as sync from "./sync"
 import * as tags from "./tags"
 
 const listenerMiddleware = createListenerMiddleware()
@@ -37,6 +41,8 @@ export function configureRootStore(initState: {
         memos.slice,
         tags.slice,
         attachments.slice,
+        sync.slice,
+        auth.slice,
     )
 
     const store = configureStore({
@@ -54,6 +60,7 @@ export function configureRootStore(initState: {
                         "payload.dateFns",
                         "payload.data",
                         "payload.params",
+                        "payload.pagination.after",
                         /.*\.buttons/,
                     ],
                     ignoredPaths: [
@@ -100,10 +107,14 @@ export function configureEffects({
     memoCtrl,
     attachmentCtrl,
     settingsCtrl,
+    syncCtrl,
+    authCtrl,
 }: {
     memoCtrl: MemoController
     attachmentCtrl: AttachmentController
     settingsCtrl: SettingsController
+    syncCtrl: SyncController
+    authCtrl: AuthController
 }) {
     memos.registerEffects(startListening, {
         memoCtrl,
@@ -119,5 +130,14 @@ export function configureEffects({
 
     settings.registerEffects(startListening, {
         settingsCtrl,
+    })
+
+    sync.registerEffects(startListening, {
+        syncCtrl,
+        authCtrl,
+    })
+
+    auth.registerEffects(startListening, {
+        authCtrl,
     })
 }

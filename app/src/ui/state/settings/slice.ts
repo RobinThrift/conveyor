@@ -29,6 +29,7 @@ export const slice = createSlice({
         }),
         loadStart: (state) => {
             state.isLoading = true
+            state.error = undefined
         },
         loadDone: (_, { payload }: PayloadAction<Settings>) => ({
             error: undefined,

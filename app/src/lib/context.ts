@@ -7,13 +7,13 @@ export interface Context<
     Err extends Error = Error,
 > {
     signal?: AbortSignal
-    err?: Err
 
     withSignal(signal?: AbortSignal): Context<D>
     withCancel(): [Context<D>, CancelFunc]
     withTimeout(timeout: Duration): [Context<D>, CancelFunc]
     withData<K extends string, V>(key: K, value: V): Context<D & Record<K, V>>
     isCancelled(): boolean
+    err(): Err | undefined
 
     getData<K extends keyof D>(key: K): D[K]
     getData<K extends keyof D>(key: K, fallback: D[K]): Required<D>[K]
@@ -21,7 +21,6 @@ export interface Context<
 
 export const BaseContext: Context = {
     signal: undefined,
-    err: undefined,
 
     withSignal(signal?: AbortSignal) {
         return new context(BaseContext, { signal })
@@ -46,6 +45,10 @@ export const BaseContext: Context = {
     isCancelled() {
         return false
     },
+
+    err(): Error | undefined {
+        return undefined
+    },
 }
 
 class context<
@@ -53,7 +56,7 @@ class context<
     Err extends Error = Error,
 > {
     public signal?: AbortSignal
-    public err?: Err
+    private _err?: Err
     private _data: D
     private _isCancelled = false
     private _parent: Context
@@ -143,5 +146,15 @@ class context<
         }
 
         return this._parent?.isCancelled() ?? false
+    }
+
+    err(): Err | undefined {
+        if (this._err) {
+            return this._err
+        }
+
+        if (this.signal?.aborted) {
+            return this.signal.reason
+        }
     }
 }

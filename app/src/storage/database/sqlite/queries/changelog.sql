@@ -12,7 +12,7 @@ SELECT *
 FROM changelog
 WHERE
     CASE WHEN @chlg_page_after IS NOT NULL THEN id > @chlg_page_after ELSE true END
-    AND applied = false
+    AND is_applied = false
 ORDER BY revision
 LIMIT @page_size;
 
@@ -21,6 +21,7 @@ INSERT INTO changelog(
     public_id,
     source,
     revision,
+    timestamp,
     target_type,
     target_id,
     value,
@@ -39,6 +40,7 @@ INSERT INTO changelog(
             1
         )
     END),
+    @timestamp,
     @target_type,
     @target_id,
     @value,

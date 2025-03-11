@@ -3,7 +3,7 @@ import { initialize, mswLoader } from "msw-storybook-addon"
 import React, { useEffect } from "react"
 
 import { Theme } from "../src/ui/components/Theme"
-// import { mockAPI } from "./mockapi"
+import { mockAPI } from "./mockapi"
 
 // Initialize MSW
 initialize({
@@ -13,9 +13,9 @@ initialize({
 const preview: Preview = {
     parameters: {
         actions: { argTypesRegex: "^on[A-Z].*" },
-        // msw: {
-        //     handlers: mockAPI,
-        // },
+        msw: {
+            handlers: mockAPI,
+        },
 
         viewport: {
             viewports: {

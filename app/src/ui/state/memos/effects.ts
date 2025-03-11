@@ -113,7 +113,7 @@ export const registerEffects = (
             cancelActiveListeners()
 
             let created = await memoCtrl.createMemo(
-                BaseContext.withData("db", undefined).withSignal(signal),
+                BaseContext.withSignal(signal),
                 payload.memo,
             )
 
@@ -145,12 +145,12 @@ export const registerEffects = (
         ) => {
             cancelActiveListeners()
 
-            let ctx = BaseContext.withData("db", undefined).withSignal(signal)
+            let ctx = BaseContext.withSignal(signal)
 
             let memo = await memoCtrl.getMemo(ctx, payload.id)
             if (!memo.ok) {
                 dispatch(
-                    update.slice.actions.setError({
+                    single.slice.actions.setError({
                         error: memo.err,
                     }),
                 )
@@ -171,7 +171,7 @@ export const registerEffects = (
         ) => {
             cancelActiveListeners()
 
-            let ctx = BaseContext.withData("db", undefined).withSignal(signal)
+            let ctx = BaseContext.withSignal(signal)
 
             if (payload.memo.content) {
                 let updated = await memoCtrl.updateMemoContent(ctx, {

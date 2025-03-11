@@ -25,6 +25,13 @@ import { SettingsLoader } from "@/ui/settings"
 import { configureEffects, configureRootStore } from "@/ui/state"
 import { Provider } from "@/ui/state"
 
+import { AuthV1APIClient } from "@/api/authv1"
+import { SyncV1APIClient } from "@/api/syncv1"
+import { AuthController } from "@/control/AuthController"
+import { SyncController } from "@/control/SyncController"
+import { AgeCrypto } from "@/external/age/AgeCrypto"
+import { TestInMemAuthStorage } from "./TestInMemAuthStorage"
+import { TestInMemSyncStorage } from "./TestInMemSyncStorage"
 import { MockFS } from "./mockfs"
 
 export interface MockRootStoreProviderProps {
@@ -71,6 +78,30 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             changelog: changelogCtrl,
         })
 
+        let authCtrl = new AuthController({
+            origin: globalThis.location.origin,
+            storage: new TestInMemAuthStorage(),
+            authPIClient: new AuthV1APIClient({
+                baseURL: globalThis.location.href,
+            }),
+        })
+
+        let syncCtrl = new SyncController({
+            storage: new TestInMemSyncStorage(),
+            dbPath: "test.db",
+            transactioner: db,
+            syncAPIClient: new SyncV1APIClient({
+                baseURL: globalThis.location.href,
+                tokenStorage: authCtrl,
+            }),
+            memos: memoCtrl,
+            attachments: attachmentCtrl,
+            settings: settingsCtrl,
+            changelog: changelogCtrl,
+            fs: mockFS,
+            crypto: new AgeCrypto(),
+        })
+
         if (props.generateMockData) {
             await insertMockData({ memoCtrl })
         }
@@ -79,7 +110,12 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             memoCtrl,
             attachmentCtrl,
             settingsCtrl,
+            syncCtrl,
+            authCtrl,
         })
+
+        // @ts-expect-error: this is for debugging
+        globalThis.__BELT_DB__ = db
 
         return { rootStore, attachmentCtrl }
     }, [])

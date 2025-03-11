@@ -3,6 +3,7 @@ import clsx from "clsx"
 import React from "react"
 
 import { Button, type ButtonProps } from "@/ui/components/Button"
+import { useT } from "@/ui/i18n"
 
 export interface AlertDialogProps extends BaseUIAlertDialog.Root.Props {}
 
@@ -16,6 +17,7 @@ AlertDialog.Title = AlertDialogTitle
 AlertDialog.Description = AlertDialogDescription
 AlertDialog.Buttons = AlertDialogButtons
 AlertDialog.CancelButton = AlertDialogCancelButton
+AlertDialog.Icon = AlertDialogIcon
 
 export interface AlertDialogTriggerProps extends ButtonProps {}
 
@@ -94,8 +96,15 @@ export type AlertDialogCancelButtonProps = ButtonProps
 
 export function AlertDialogCancelButton({
     className,
+    children: orgChildren,
     ...props
 }: AlertDialogCancelButtonProps) {
+    let t = useT("components/AlertDialog")
+    let children = orgChildren
+    if (!children) {
+        children = [t.CancelButtonLabel]
+    }
+
     return (
         <BaseUIAlertDialog.Close
             render={(closeProps) => (
@@ -104,8 +113,20 @@ export function AlertDialogCancelButton({
                     {...props}
                     {...closeProps}
                     className={clsx("dialog-close-btn", className)}
-                />
+                >
+                    {children}
+                </Button>
             )}
         />
+    )
+}
+
+export function AlertDialogIcon(
+    props: React.PropsWithChildren<{ className?: string }>,
+) {
+    return (
+        <div className={clsx("alert-dialog-icon", props.className)}>
+            {props.children}
+        </div>
     )
 }

@@ -2,9 +2,9 @@ import { type AuthToken, AuthTokenNotFoundError } from "@/auth"
 import type { Context } from "@/lib/context"
 import type { Decrypter, Encrypter } from "@/lib/crypto"
 import { type FS, FSNotFoundError, join } from "@/lib/fs"
+import { parseJSON, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok, fmtErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
-import { parseJSON, parseJSONDate } from "@/lib/json"
 
 export class FSAuthStorage {
     private _cryto: Encrypter & Decrypter

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
 
-import { decorator } from "@/lib/testhelper/rootStore"
+import { decoratorWithMockData } from "@/lib/testhelper/rootStore"
 import "@/ui/styles/index.css"
 
 import { EditMemoScreen } from "./EditMemoScreen"
@@ -15,7 +15,7 @@ const meta: Meta<typeof EditMemoScreen> = {
     },
 
     decorators: [
-        decorator,
+        decoratorWithMockData,
         (Story) => (
             <main className="container mx-auto">
                 <Story />

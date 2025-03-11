@@ -1,8 +1,8 @@
 import type { AuthToken, PlaintextAuthTokenValue } from "@/auth"
 import type { PlaintextPassword } from "@/auth/credentials"
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
 import { parseJSON, parseJSONDate } from "@/lib/json"
+import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 
@@ -14,6 +14,10 @@ export class AuthV1APIClient {
     }: {
         baseURL: string
     }) {
+        this._baseURL = baseURL
+    }
+
+    setBaseURL(baseURL: string) {
         this._baseURL = baseURL
     }
 
@@ -40,6 +44,10 @@ export class AuthV1APIClient {
 
         if (res.value.status === 401) {
             return Err(new UnauthorizedError("invalid credentials"))
+        }
+
+        if (res.value.status === 404) {
+            return Err(new Error("invalid login url"))
         }
 
         if (res.value.status !== 200) {
@@ -83,6 +91,50 @@ export class AuthV1APIClient {
         let body = await res.value.text()
 
         return this._authTokenFromJSON(body)
+    }
+
+    public async changePassword(
+        ctx: Context,
+        {
+            username,
+            currentPassword,
+            newPassword,
+            newPasswordRepeat,
+        }: {
+            username: string
+            currentPassword: PlaintextPassword
+            newPassword: PlaintextPassword
+            newPasswordRepeat: PlaintextPassword
+        },
+    ): AsyncResult<void> {
+        let req = new Request(
+            new URL("/api/auth/v1/change-password", this._baseURL),
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    username,
+                    currentPassword,
+                    newPassword,
+                    newPasswordRepeat,
+                }),
+            },
+        )
+
+        let res = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (!res.ok) {
+            return fmtErr("error changing password: %w", res)
+        }
+
+        if (res.value.status === 401) {
+            return Err(new UnauthorizedError("error changing password"))
+        }
+
+        if (res.value.status !== 200) {
+            let err = await APIError.fromHTTPResponse(res.value)
+            return Err(err.withPrefix("error changing password"))
+        }
+
+        return Ok(undefined)
     }
 
     private _authTokenFromJSON(raw: string) {

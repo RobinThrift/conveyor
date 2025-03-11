@@ -18,12 +18,6 @@ export type Settings = {
         vim: boolean
         doubleClickToEdit: boolean
     }
-
-    sync: {
-        isEnabled: boolean
-        clientID: string
-        serverAddr: string
-    }
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -43,11 +37,5 @@ export const DEFAULT_SETTINGS: Settings = {
     controls: {
         vim: true,
         doubleClickToEdit: true,
-    },
-
-    sync: {
-        isEnabled: false,
-        clientID: "",
-        serverAddr: "",
     },
 }

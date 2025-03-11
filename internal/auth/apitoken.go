@@ -56,7 +56,7 @@ func (p *APITokenValue) MarshalText() ([]byte, error) {
 
 type APITokenValuePair struct {
 	Plaintext APITokenValue
-	Salt      []byte
+	salt      []byte
 }
 
 func NewAPITokenValuePairFromEncoded(value []byte) (*APITokenValuePair, error) {
@@ -77,7 +77,7 @@ func NewAPITokenValuePairFromEncoded(value []byte) (*APITokenValuePair, error) {
 
 	return &APITokenValuePair{
 		Plaintext: APITokenValue(plaintext),
-		Salt:      salt,
+		salt:      salt,
 	}, nil
 }
 
@@ -96,16 +96,16 @@ func NewAPITokenValuePair(tokenLen uint) (*APITokenValuePair, error) {
 
 	return &APITokenValuePair{
 		Plaintext: plaintext,
-		Salt:      salt,
+		salt:      salt,
 	}, nil
 }
 
 func (p *APITokenValuePair) Encrypt(params Argon2Params) []byte {
-	return argon2.IDKey(p.Plaintext, p.Salt, params.Time, params.Memory, params.Threads, params.KeyLen)
+	return argon2.IDKey(p.Plaintext, p.salt, params.Time, params.Memory, params.Threads, params.KeyLen)
 }
 
 func (p *APITokenValuePair) String() string {
-	salt := base64.URLEncoding.EncodeToString(p.Salt)
+	salt := base64.URLEncoding.EncodeToString(p.salt)
 	value := base64.URLEncoding.EncodeToString(p.Plaintext)
 	return salt + "$" + value
 }

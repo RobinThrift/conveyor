@@ -10,7 +10,7 @@ import {
 } from "@/storage/database/sqlite/types/datetime"
 
 const listUnsyncedChangesQuery = `-- name: ListUnsyncedChanges :many
-SELECT id, public_id, source, revision, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
+SELECT id, public_id, source, revision, timestamp, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
 FROM changelog
 WHERE
     CASE WHEN ?1 IS NOT NULL THEN id > ?1 ELSE true END
@@ -28,6 +28,7 @@ export interface ListUnsyncedChangesRow {
     publicId: string
     source: string
     revision: number
+    timestamp: Date
     targetType: string
     targetId: string
     value: any
@@ -51,6 +52,7 @@ export async function listUnsyncedChanges(
     )
     return result.map((row) =>
         mapRowToObj<ListUnsyncedChangesRow>(row, {
+            timestamp: dateFromSQLite,
             isApplied: numberToBool,
             isSynced: numberToBool,
             appliedAt: dateFromSQLite,
@@ -61,11 +63,11 @@ export async function listUnsyncedChanges(
 }
 
 const listUnappliedChangesQuery = `-- name: ListUnappliedChanges :many
-SELECT id, public_id, source, revision, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
+SELECT id, public_id, source, revision, timestamp, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
 FROM changelog
 WHERE
     CASE WHEN ?1 IS NOT NULL THEN id > ?1 ELSE true END
-    AND applied = false
+    AND is_applied = false
 ORDER BY revision
 LIMIT ?2`
 
@@ -79,6 +81,7 @@ export interface ListUnappliedChangesRow {
     publicId: string
     source: string
     revision: number
+    timestamp: Date
     targetType: string
     targetId: string
     value: any
@@ -102,6 +105,7 @@ export async function listUnappliedChanges(
     )
     return result.map((row) =>
         mapRowToObj<ListUnappliedChangesRow>(row, {
+            timestamp: dateFromSQLite,
             isApplied: numberToBool,
             isSynced: numberToBool,
             appliedAt: dateFromSQLite,
@@ -116,6 +120,7 @@ INSERT INTO changelog(
     public_id,
     source,
     revision,
+    timestamp,
     target_type,
     target_id,
     value,
@@ -134,13 +139,14 @@ INSERT INTO changelog(
             1
         )
     END),
+    ?6,
     ?4,
     ?5,
-    ?6,
     ?7,
     ?8,
     ?9,
-    ?10
+    ?10,
+    ?11
 ) ON CONFLICT (public_id) DO NOTHING`
 
 export interface CreateChangelogEntryArgs {
@@ -149,6 +155,7 @@ export interface CreateChangelogEntryArgs {
     revision: any | null
     targetType: string
     targetId: string
+    timestamp: Date
     value: any
     isSynced: boolean
     syncedAt: Date | undefined
@@ -169,6 +176,7 @@ export async function createChangelogEntry(
             args.revision,
             args.targetType,
             args.targetId,
+            dateToSQLite(args.timestamp),
             args.value,
             args.isSynced,
             dateToSQLite(args.syncedAt),

@@ -12,6 +12,8 @@ import {
     mapResult,
     match,
 } from "@/lib/result"
+import { UTCDateMini } from "@date-fns/utc"
+import { transpose } from "date-fns"
 
 import { newID } from "@/domain/ID"
 import { decodeText, encodeText } from "@/lib/textencoding"
@@ -104,12 +106,12 @@ export class MemoRepo {
 
             withCreatedAt: typeof filter?.exactDate !== "undefined",
             createdAt: filter?.exactDate
-                ? dateToSQLite(filter.exactDate)
+                ? dateToSQLite(transpose(filter.exactDate, UTCDateMini))
                 : undefined,
 
             withCreatedAtOrOlder: typeof filter?.startDate !== "undefined",
             createdAtOrOlder: filter?.startDate
-                ? dateToSQLite(filter.startDate)
+                ? dateToSQLite(transpose(filter.startDate, UTCDateMini))
                 : undefined,
 
             withIsArchived: typeof filter?.isArchived !== "undefined",

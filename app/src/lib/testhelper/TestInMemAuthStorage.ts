@@ -1,6 +1,6 @@
-import type { Context } from "@/lib/context"
-import { Err, Ok, type AsyncResult } from "@/lib/result"
 import type { AuthToken } from "@/auth"
+import type { Context } from "@/lib/context"
+import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 export class TestInMemAuthStorage {
     private _tokens = new Map<string, AuthToken>()

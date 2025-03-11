@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
 
 import { Button } from "@/ui/components/Button"
+import { WarningIcon } from "@/ui/components/Icons"
 import "@/ui/styles/index.css"
 
 import { AlertDialog } from "./AlertDialog"
@@ -25,17 +26,18 @@ export const Overview: Story = {
             </AlertDialog.Trigger>,
             <AlertDialog.Content key="content">
                 <AlertDialog.Title>AlertDialog Title</AlertDialog.Title>
+                <AlertDialog.Icon>
+                    <WarningIcon />
+                </AlertDialog.Icon>
                 <AlertDialog.Description>
-                    {faker.lorem.sentence()}
+                    {faker.lorem
+                        .sentences({ min: 5, max: 10 })
+                        .split(".")
+                        .filter((sentence) => sentence.length !== 0)
+                        .map((sentence) => (
+                            <p key={sentence}>{sentence}.</p>
+                        ))}
                 </AlertDialog.Description>
-
-                {faker.lorem
-                    .sentences({ min: 5, max: 10 })
-                    .split(".")
-                    .filter((sentence) => sentence.length !== 0)
-                    .map((sentence) => (
-                        <p key={sentence}>{sentence}.</p>
-                    ))}
 
                 <AlertDialog.Buttons>
                     <Button variant="danger" onClick={action("delete")}>
@@ -57,17 +59,18 @@ export const Design: Story = {
         children: [
             <AlertDialog.Content key="content">
                 <AlertDialog.Title>AlertDialog Title</AlertDialog.Title>
+                <AlertDialog.Icon>
+                    <WarningIcon />
+                </AlertDialog.Icon>
                 <AlertDialog.Description>
-                    {faker.lorem.sentence()}
+                    {faker.lorem
+                        .sentences({ min: 5, max: 10 })
+                        .split(".")
+                        .filter((sentence) => sentence.length !== 0)
+                        .map((sentence) => (
+                            <p key={sentence}>{sentence}.</p>
+                        ))}
                 </AlertDialog.Description>
-
-                {faker.lorem
-                    .sentences({ min: 5, max: 10 })
-                    .split(".")
-                    .filter((sentence) => sentence.length !== 0)
-                    .map((sentence) => (
-                        <p key={sentence}>{sentence}.</p>
-                    ))}
 
                 <AlertDialog.Buttons>
                     <Button variant="danger">Delete</Button>

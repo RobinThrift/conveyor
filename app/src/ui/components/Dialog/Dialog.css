@@ -1,5 +1,5 @@
 .dialog {
-    @apply fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[450px] shadow-lg;
+    @apply fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] shadow-lg;
     @apply rounded-lg bg-surface p-4;
     @apply focus:outline-none;
     z-index: 10000;

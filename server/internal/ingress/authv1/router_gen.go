@@ -80,11 +80,30 @@ type ErrorOther = Error
 // ErrorUnauthorized Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
 type ErrorUnauthorized = Error
 
+// ChangePasswordRequest Data for the current and new password
+type ChangePasswordRequest struct {
+	CurrentPassword   string `json:"currentPassword"`
+	NewPassword       string `json:"newPassword"`
+	NewPasswordRepeat string `json:"newPasswordRepeat"`
+	Username          string `json:"username"`
+}
+
+// ChangePasswordJSONBody defines parameters for ChangePassword.
+type ChangePasswordJSONBody struct {
+	CurrentPassword   string `json:"currentPassword"`
+	NewPassword       string `json:"newPassword"`
+	NewPasswordRepeat string `json:"newPasswordRepeat"`
+	Username          string `json:"username"`
+}
+
 // CheckAccessParams defines parameters for CheckAccess.
 type CheckAccessParams struct {
 	// Authorization Access bearer token.
 	Authorization string `json:"Authorization"`
 }
+
+// ChangePasswordJSONRequestBody defines body for ChangePassword for application/json ContentType.
+type ChangePasswordJSONRequestBody ChangePasswordJSONBody
 
 // RequestAuthTokenJSONRequestBody defines body for RequestAuthToken for application/json ContentType.
 type RequestAuthTokenJSONRequestBody = AuthTokenRequest
@@ -153,6 +172,9 @@ func (t *AuthTokenRequest) UnmarshalJSON(b []byte) error {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Change acocunt password.
+	// (POST /change-password)
+	ChangePassword(w http.ResponseWriter, r *http.Request)
 	// Check if the provided access token is valid.
 	// (GET /check-access)
 	CheckAccess(w http.ResponseWriter, r *http.Request, params CheckAccessParams)
@@ -169,6 +191,26 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ChangePassword operation middleware
+func (siw *ServerInterfaceWrapper) ChangePassword(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ChangePassword(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // CheckAccess operation middleware
 func (siw *ServerInterfaceWrapper) CheckAccess(w http.ResponseWriter, r *http.Request) {
@@ -360,6 +402,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	m.HandleFunc("POST "+options.BaseURL+"/change-password", wrapper.ChangePassword)
 	m.HandleFunc("GET "+options.BaseURL+"/check-access", wrapper.CheckAccess)
 	m.HandleFunc("POST "+options.BaseURL+"/token", wrapper.RequestAuthToken)
 
@@ -373,6 +416,61 @@ type ErrorNotFoundJSONResponse Error
 type ErrorOtherJSONResponse Error
 
 type ErrorUnauthorizedJSONResponse Error
+
+type ChangePasswordRequestObject struct {
+	Body *ChangePasswordJSONRequestBody
+}
+
+type ChangePasswordResponseObject interface {
+	VisitChangePasswordResponse(w http.ResponseWriter) error
+}
+
+type ChangePassword200Response struct {
+}
+
+func (response ChangePassword200Response) VisitChangePasswordResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type ChangePassword400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response ChangePassword400JSONResponse) VisitChangePasswordResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ChangePassword401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response ChangePassword401JSONResponse) VisitChangePasswordResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ChangePassword404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response ChangePassword404JSONResponse) VisitChangePasswordResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ChangePassworddefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response ChangePassworddefaultJSONResponse) VisitChangePasswordResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
 
 type CheckAccessRequestObject struct {
 	Params CheckAccessParams
@@ -483,6 +581,9 @@ func (response RequestAuthTokendefaultJSONResponse) VisitRequestAuthTokenRespons
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Change acocunt password.
+	// (POST /change-password)
+	ChangePassword(ctx context.Context, request ChangePasswordRequestObject) (ChangePasswordResponseObject, error)
 	// Check if the provided access token is valid.
 	// (GET /check-access)
 	CheckAccess(ctx context.Context, request CheckAccessRequestObject) (CheckAccessResponseObject, error)
@@ -518,6 +619,37 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ChangePassword operation middleware
+func (sh *strictHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	var request ChangePasswordRequestObject
+
+	var body ChangePasswordJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ChangePassword(ctx, request.(ChangePasswordRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ChangePassword")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ChangePasswordResponseObject); ok {
+		if err := validResponse.VisitChangePasswordResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // CheckAccess operation middleware

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react"
 
-import { differenceInCalendarDays, useFormat, useT } from "@/ui/i18n"
+import { differenceInCalendarDays } from "@/lib/date"
+import { useFormat, useT } from "@/ui/i18n"
 
 export interface DateTimeProps
     extends Omit<

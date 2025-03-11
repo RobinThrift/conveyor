@@ -1,14 +1,16 @@
-import { fromThrowing, type Result } from "@/lib/result"
+import { type Result, fromThrowing } from "@/lib/result"
 import { parseJSON as dateFnsParseJSON } from "date-fns"
 import { decodeText } from "./textencoding"
 
 export function parseJSON<R, V = unknown>(
-    raw: string | ArrayBufferLike,
+    raw: string | ArrayBufferLike | Uint8Array<ArrayBufferLike>,
     map?: (v: V) => Result<R>,
 ): Result<R> {
     let str: string
     if (typeof raw === "string") {
         str = raw
+    } else if (raw instanceof Uint8Array) {
+        str = decodeText(raw)
     } else {
         str = decodeText(new Uint8Array(raw))
     }

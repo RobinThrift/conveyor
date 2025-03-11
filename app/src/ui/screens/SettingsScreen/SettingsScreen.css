@@ -41,7 +41,7 @@
 
     .checkbox-field {
         @apply flex flex-row-reverse justify-between items-center p-2 gap-2 rounded-lg shadow-lg h-fit;
-        @apply bg-surface text-text;
+        @apply bg-surface text-text border border-transparent;
 
         label {
             @apply flex-1;
@@ -53,6 +53,10 @@
 
         .checkbox {
             @apply rounded-full;
+        }
+
+        &:has([data-state="checked"]) {
+            @apply border-primary;
         }
     }
 

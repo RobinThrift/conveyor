@@ -1,12 +1,12 @@
-import type { Context } from "@/lib/context"
-import { Err, Ok, type AsyncResult } from "@/lib/result"
 import {
-    AuthTokenNotFoundError,
     type AuthToken,
+    AuthTokenNotFoundError,
     type PlaintextAuthTokenValue,
     type PlaintextPassword,
 } from "@/auth"
-import { isAfter, currentDateTime, addMinutes } from "@/lib/date"
+import type { Context } from "@/lib/context"
+import { addMinutes, currentDateTime, isAfter } from "@/lib/date"
+import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 export class AuthController {
     private _origin: string
@@ -27,6 +27,10 @@ export class AuthController {
         this._origin = origin
         this._storage = storage
         this._authPIClient = authPIClient
+    }
+
+    public setOrigin(origin: string) {
+        this._origin = origin
     }
 
     public async getInitialToken(
@@ -72,6 +76,18 @@ export class AuthController {
         }
 
         return Err(new Error("no valid access token or refresh token"))
+    }
+
+    public async changePassword(
+        ctx: Context,
+        creds: {
+            username: string
+            currentPassword: PlaintextPassword
+            newPassword: PlaintextPassword
+            newPasswordRepeat: PlaintextPassword
+        },
+    ): AsyncResult<void> {
+        return this._authPIClient.changePassword(ctx, creds)
     }
 
     private async _refreshToken(ctx: Context): AsyncResult<string> {
@@ -123,6 +139,7 @@ interface AuthStorage {
 }
 
 interface AuthAPIClient {
+    setBaseURL(baseURL: string): void
     getTokenUsingCredentials(
         ctx: Context,
         {
@@ -134,4 +151,18 @@ interface AuthAPIClient {
         ctx: Context,
         { refreshToken }: { refreshToken: PlaintextAuthTokenValue },
     ): AsyncResult<AuthToken>
+    changePassword(
+        ctx: Context,
+        {
+            username,
+            currentPassword,
+            newPassword,
+            newPasswordRepeat,
+        }: {
+            username: string
+            currentPassword: PlaintextPassword
+            newPassword: PlaintextPassword
+            newPasswordRepeat: PlaintextPassword
+        },
+    ): AsyncResult<void>
 }

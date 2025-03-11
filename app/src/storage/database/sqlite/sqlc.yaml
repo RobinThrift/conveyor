@@ -92,6 +92,16 @@ sql:
           fn: "dateToSQLite"
           import: "@/storage/database/sqlite/types/datetime"
 
+      - column: changelog.timestamp
+        type: "Date"
+        from_sql:
+          fn: "dateFromSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
+
       - column: changelog.applied_at
         type: "Date | undefined"
         from_sql:

@@ -62,7 +62,7 @@ suite.sequential("api/syncv1/SyncV1APIClient", async () => {
 })
 
 async function setupSyncV1APIClientTest() {
-    let [ctx, cancel] = BaseContext.withData("db", undefined).withCancel()
+    let [ctx, cancel] = BaseContext.withCancel()
 
     let syncV1APIClient = new SyncV1APIClient({
         baseURL: globalThis.location.href,

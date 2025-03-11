@@ -106,6 +106,10 @@
         "Label": "Tags"
     },
 
+    "components/AlertDialog": {
+        "CancelButtonLabel": "Abbrechen"
+    },
+
     "screens/Errors/NotFound": {
         "Title": "Nicht gefunden",
         "Detail": "Die Seite kann nicht gefunden werden"
@@ -157,15 +161,23 @@
 
     "screens/Settings/SyncSettings/Info": {
         "IsEnabled": "Synchronisierung Aktiviert:",
-        "ClientID": "Client ID:"
+        "ClientID": "Client ID:",
+        "LastSyncAt": "Zuletzt synchronisieret um:",
+        "LastSyncedNever": "Nie",
+        "ManualSyncButtonLabel": "Jetzt Synchronisieren",
+        "ManualFullDownloadButtonLabel": "Vollständigen Datensatz vom Server laden",
+        "ManualFullUploadButtonLabel": "Vollständigen Datensatz zum Server hochladen",
+        "ManualFullDownloadWarning": "Warnung, alle lokalen Daten werden vollständig mit neusten Datensatz vom Server ersetzt. Diese Aktion ist irreversibel!",
+        "ManualFullUploadWarning": "Warnung, der gesammte lokale Datensatz wird als neuste Version zum Server hochgeladen. Sollte ein anderer Client Daten haben die sich nicht in dem hochgeladenen Datensatz befinden und diesen runterladen, könnte es zu Datenverlust kommen."
     },
 
     "screens/Settings/SyncSettings/Setup": {
         "Title": "Setup",
+        "FieldServerLabel": "Server",
         "FieldUsernameLabel": "Benutername",
         "FieldPasswordLabel": "Passwort",
-        "LoginButtonLabel": "Login",
-        "ErrorFieldEmpty": "{name} darf nicht leer sein",
+        "SetupButtonLabel": "Sync Einrichten",
+        "Invalid/Empty": "Bitte gib einen Wert für \"{name}\" ein",
         "ErrorIncorrectCredentials": "."
     },
 
@@ -175,7 +187,7 @@
         "FieldNewPasswordLabel": "Neues Passwort",
         "FieldRepeatNewPasswordLabel": "Neues Passwort wiederholen",
         "ChangePasswordButtonLabel": "Ändern",
-        "ErrorFieldEmpty": "{name} darf nicht leer sein",
+        "Invalid/Empty": "{name} darf nicht leer sein",
         "ErrorCurrentPasswordIncorrect": "Aktuells Passwort ist falsch",
         "ErrorEmptyCurrentPassword": "Bitte gib Dein aktuelles Passwort ein",
         "ErrorEmptyNewPassword": "Bitte gib ein neues Passwort ein",

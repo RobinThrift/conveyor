@@ -9,6 +9,7 @@
 @import "./themes/rosepine.css" layer(base);
 
 @import "../components/Alert/Alert.css" layer(components);
+@import "../components/AlertDialog/AlertDialog.css" layer(components);
 @import "../components/Button/Button.css" layer(components);
 @import "../components/Dialog/Dialog.css" layer(components);
 @import "../components/DropdownMenu/DropdownMenu.css" layer(components);

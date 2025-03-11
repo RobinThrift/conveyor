@@ -27,6 +27,7 @@ export class ChangelogRepo {
                     publicId: entry.id,
                     source: entry.source,
                     revision: entry.revision,
+                    timestamp: entry.timestamp,
                     value: JSON.stringify(entry.value),
                     targetType: entry.targetType,
                     targetId: entry.targetID,
@@ -146,6 +147,6 @@ function changelogEntryRowChangelogEntry(
         syncedAt: row.syncedAt,
         isApplied: row.isApplied,
         appliedAt: row.appliedAt,
-        timestamp: row.createdAt,
+        timestamp: row.timestamp,
     }
 }

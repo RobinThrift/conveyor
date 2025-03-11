@@ -45,6 +45,27 @@ paths:
         default:
           $ref: "#/components/responses/ErrorOther"
 
+  /change-password:
+    post:
+      operationId: ChangePassword
+      summary: Change acocunt password.
+      description: Changes the account password for the provided account.
+      tags: [ Auth ]
+      requestBody:
+        $ref: "#/components/requestBodies/ChangePasswordRequest"
+      responses:
+        "200":
+          description: The password was changed successfully.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
   /check-access:
     get:
       operationId: CheckAccess
@@ -197,6 +218,38 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AuthTokenRequest"
+
+    ChangePasswordRequest:
+      required: true
+      description: "Request data for a password change"
+      content:
+        application/json:
+          schema:
+            type: object
+            description: "Data for the current and new password"
+            properties:
+              username:
+                type: string
+                example: "admin"
+              currentPassword:
+                type: string
+                example: "123456"
+              newPassword:
+                type: string
+                example: "98875"
+              newPasswordRepeat:
+                type: string
+                example: "98875"
+            required:
+            - username
+            - currentPassword
+            - newPassword
+            - newPasswordRepeat
+            example:
+              username: "admin"
+              currentPassword: "passwd"
+              newPassword: "1235"
+              newPasswordRepeat: "1235"
 
 
   responses:

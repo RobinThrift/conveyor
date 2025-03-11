@@ -95,6 +95,25 @@ func (router *router) requestAuthTokenUsingRefreshToken(ctx context.Context, req
 	}, nil
 }
 
+// Change acocunt password.
+// (POST /change-password)
+func (router *router) ChangePassword(ctx context.Context, req ChangePasswordRequestObject) (ChangePasswordResponseObject, error) {
+	err := validateChangePasswordData(req.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = router.authCtrl.ChangeAccountPassword(ctx, control.ChangeAccountPasswordCmd{
+		CurrPasswdPlaintext: auth.PlaintextPassword(req.Body.CurrentPassword),
+		NewPasswdPlaintext:  auth.PlaintextPassword(req.Body.NewPassword),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return ChangePassword200Response{}, nil
+}
+
 // Check if the provided access token is valid.
 // (GET /check-access)
 func (router *router) CheckAccess(ctx context.Context, req CheckAccessRequestObject) (CheckAccessResponseObject, error) {
@@ -122,4 +141,48 @@ func (router *router) CheckAccess(ctx context.Context, req CheckAccessRequestObj
 	}
 
 	return CheckAccess204Response{}, nil
+}
+
+func validateChangePasswordData(body *ChangePasswordJSONRequestBody) error {
+	if body.CurrentPassword == "" {
+		return &httperrors.Error{
+			Code:  http.StatusBadRequest,
+			Title: "EmptyCurrentPassword",
+			Type:  "belt/api/auth/v1/BadRequest",
+		}
+	}
+
+	if body.NewPassword == "" {
+		return &httperrors.Error{
+			Code:  http.StatusBadRequest,
+			Title: "EmptyNewPassword",
+			Type:  "belt/api/auth/v1/BadRequest",
+		}
+	}
+
+	if body.NewPasswordRepeat == "" {
+		return &httperrors.Error{
+			Code:  http.StatusBadRequest,
+			Title: "EmptyRepeateNewPassword",
+			Type:  "belt/api/auth/v1/BadRequest",
+		}
+	}
+
+	if body.NewPassword != body.NewPasswordRepeat {
+		return &httperrors.Error{
+			Code:  http.StatusBadRequest,
+			Title: "NewPasswordsDoNotMatch",
+			Type:  "belt/api/auth/v1/BadRequest",
+		}
+	}
+
+	if body.CurrentPassword == body.NewPassword {
+		return &httperrors.Error{
+			Code:  http.StatusBadRequest,
+			Title: "NewPasswordIsOldPassword",
+			Type:  "belt/api/auth/v1/BadRequest",
+		}
+	}
+
+	return nil
 }

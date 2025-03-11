@@ -77,10 +77,14 @@ CREATE UNIQUE INDEX settings_key_idx ON settings(key);
 CREATE TABLE changelog (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     public_id   TEXT NOT NULL,
+
     source      TEXT NOT NULL,
     revision    INTEGER NOT NULL,
+    timestamp   TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)),
+
     target_type TEXT NOT NULL,
     target_id   TEXT NOT NULL,
+
     value       BLOB NOT NULL,
 
     is_applied  BOOLEAN NOT NULL,

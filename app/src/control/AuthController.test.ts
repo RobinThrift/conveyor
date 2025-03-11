@@ -1,16 +1,16 @@
-import { suite, test, afterAll, assert } from "vitest"
+import { assert, afterAll, suite, test } from "vitest"
 
-import { BaseContext, type Context } from "@/lib/context"
-import { TestInMemAuthStorage } from "@/lib/testhelper/TestInMemAuthStorage"
-import { type AsyncResult, Err, Ok } from "@/lib/result"
+import { UnauthorizedError } from "@/api/apiv1/APIError"
 import type {
     AuthToken,
     PlaintextAuthTokenValue,
     PlaintextPassword,
 } from "@/auth"
+import { BaseContext, type Context } from "@/lib/context"
 import { addDays, addHours, currentDateTime } from "@/lib/date"
+import { type AsyncResult, Err, Ok } from "@/lib/result"
+import { TestInMemAuthStorage } from "@/lib/testhelper/TestInMemAuthStorage"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
-import { UnauthorizedError } from "@/api/apiv1/APIError"
 
 import { AuthController } from "./AuthController"
 
@@ -183,6 +183,15 @@ interface AuthAPIClientMock {
         ctx: Context,
         token: { refreshToken: PlaintextAuthTokenValue },
     ) => AsyncResult<AuthToken>
+    changePassword?: (
+        ctx: Context,
+        creds: {
+            username: string
+            currentPassword: PlaintextPassword
+            newPassword: PlaintextPassword
+            newPasswordRepeat: PlaintextPassword
+        },
+    ) => AsyncResult<void>
 }
 
 async function setupAuthControllerTest({
@@ -198,6 +207,7 @@ async function setupAuthControllerTest({
         origin: "belt.dev",
         storage,
         authPIClient: {
+            setBaseURL: () => {},
             getTokenUsingCredentials:
                 authAPIClient?.getTokenUsingCredentials ??
                 (async () =>
@@ -206,6 +216,9 @@ async function setupAuthControllerTest({
                 authAPIClient?.getTokenUsingRefreshToken ??
                 (async () =>
                     Err(new Error("getTokenUsingRefreshToken unimplemented"))),
+            changePassword:
+                authAPIClient?.changePassword ??
+                (async () => Err(new Error("changePassword unimplemented"))),
         },
     })
 

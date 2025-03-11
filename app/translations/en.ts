@@ -109,6 +109,10 @@ export const translations = {
         Deleted: "Deleted",
     },
 
+    "components/AlertDialog": {
+        CancelButtonLabel: "Cancel",
+    },
+
     "screens/Errors/NotFound": {
         Title: "Not Found",
         Detail: "The requested page could not be found",
@@ -161,14 +165,24 @@ export const translations = {
     "screens/Settings/SyncSettings/Info": {
         IsEnabled: "Sync Enabled:",
         ClientID: "Client ID:",
+        LastSyncAt: "Last synced at:",
+        LastSyncedNever: "Never",
+        ManualSyncButtonLabel: "Sync Now",
+        ManualFullDownloadButtonLabel: "Download Full State from Server",
+        ManualFullUploadButtonLabel: "Upload Full State to Server",
+        ManualFullDownloadWarning:
+            "Warning, this will delete all local memo data and replace it with the latest version from the server. This cannot be undone!",
+        ManualFullUploadWarning:
+            "Wawrning, this will upload the current state and may override exisitng data. If another client with data that is not in this database pulls this state (using a full sync), data may be lost.",
     },
 
     "screens/Settings/SyncSettings/Setup": {
         Title: "Setup",
+        FieldServerLabel: "Server",
         FieldUsernameLabel: "Username",
         FieldPasswordLabel: "Password",
-        LoginButtonLabel: "Login",
-        ErrorFieldEmpty: params("{name} must not be empty"),
+        SetupButtonLabel: "Setup Sync",
+        "Invalid/Empty": params("Please enter a value for {name}"),
         ErrorIncorrectCredentials: "Incorrect credentials.",
     },
 
@@ -178,7 +192,7 @@ export const translations = {
         FieldNewPasswordLabel: "New Password",
         FieldRepeatNewPasswordLabel: "Repeat new Password",
         ChangePasswordButtonLabel: "Change",
-        ErrorFieldEmpty: params("{name} must not be empty"),
+        "Invalid/Empty": params("{name} must not be empty"),
         ErrorCurrentPasswordIncorrect: "Incorrect password",
         ErrorEmptyCurrentPassword: "Please enter current password",
         ErrorEmptyNewPassword: "Please enter a new password",

@@ -28,6 +28,10 @@ export class SyncV1APIClient {
         this._tokenStorage = tokenStorage
     }
 
+    setBaseURL(baseURL: string) {
+        this._baseURL = baseURL
+    }
+
     public async registerClient(
         ctx: Context,
         syncClient: { clientID: string },
