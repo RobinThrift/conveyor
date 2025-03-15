@@ -114,6 +114,18 @@ func (router *router) ChangePassword(ctx context.Context, req ChangePasswordRequ
 	return ChangePassword200Response{}, nil
 }
 
+// Add a new account key.
+// (POST /keys)
+func (router *router) AddAccountKey(ctx context.Context, req AddAccountKeyRequestObject) (AddAccountKeyResponseObject, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+// Get a public key by name.
+// (GET /keys/{name})
+func (router *router) GetAccountKey(ctx context.Context, req GetAccountKeyRequestObject) (GetAccountKeyResponseObject, error) {
+	panic("not implemented") // TODO: Implement
+}
+
 // Check if the provided access token is valid.
 // (GET /check-access)
 func (router *router) CheckAccess(ctx context.Context, req CheckAccessRequestObject) (CheckAccessResponseObject, error) {

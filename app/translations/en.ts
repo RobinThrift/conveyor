@@ -1,6 +1,32 @@
 import { type Components, params } from "@/lib/i18n/components"
 
 export const translations = {
+    "components/AuthForm": {
+        FieldServerLabel: "Server",
+        FieldUsernameLabel: "Username",
+        FieldPasswordLabel: "Password",
+        AuthenticateButtonLabel: "Authenticate",
+        "Invalid/Empty": params("Please enter a value for {name}"),
+        Unauthorized: "Incorrect credentials.",
+        ChangePasswordFormDialogTitle: "Change Password",
+        ChangePasswordFormDialogDescription:
+            "The server has indicated the password must be changed before proceeding.",
+    },
+
+    "components/AuthForm/ChangePasswordForm": {
+        FieldCurrentPasswordLabel: "Current Password",
+        FieldNewPasswordLabel: "New Password",
+        FieldRepeatNewPasswordLabel: "Repeat new Password",
+        ChangePasswordButtonLabel: "Change",
+        "Invalid/Empty": params("{name} must not be empty"),
+        Unauthorized: "Incorrect password",
+        EmptyCurrentPassword: "Please enter current password",
+        EmptyNewPassword: "Please enter a new password",
+        EmptyRepeateNewPassword: "Please repeat the new password",
+        NewPasswordsDoNotMatch: "New passwords don't match",
+        NewPasswordIsOldPassword: "New password can't be old password",
+    },
+
     "components/Navigation": {
         Settings: "Settings",
         Back: "Back",
@@ -123,11 +149,25 @@ export const translations = {
         Detail: "You are not authorized to see this page",
     },
 
+    "screens/InitSetup": {
+        Title: "Setup",
+        NewButtonLabel: "New",
+        FromRemoteButtonLabel: "Existing from Remote",
+        NextButtonLabel: "Next",
+        BackButtonLabel: "Back",
+        ConfigureEncryptionTitle: "Setup Encryption",
+        CandidatePrivateCryptoKeyLabel: "Private Key",
+        GenerateCandidatePrivateCryptoKeyLabel: "Generate Private Key",
+        SelectSyncMethodTitle: "Select Sync Method",
+        SyncMethodLocalOnly: "No Sync (local only)",
+        SyncMethodRemoteSync: "Sync With Remote Server",
+    },
+
     "screens/Unlock": {
         Title: "Unlock",
-        PasswordLabel: "Password",
+        PrivateKeyLabel: "Private Key",
         UnlockButton: "Unlock",
-        ErrorFieldEmpty: params("{name} must not be empty"),
+        "Invalid/Empty": params("{name} must not be empty"),
     },
 
     "screens/SingleMemoScreen": {

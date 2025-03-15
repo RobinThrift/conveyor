@@ -32,3 +32,13 @@ type AccountPassword struct {
 func (id AccountID) String() string {
 	return fmt.Sprint(int64(id))
 }
+
+type AccountKeyID int64
+
+type AccountKey struct {
+	ID        AccountKeyID
+	AccountID AccountID
+	Name      string
+	Type      string
+	Data      []byte
+}

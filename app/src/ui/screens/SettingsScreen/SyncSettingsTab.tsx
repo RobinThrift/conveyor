@@ -1,19 +1,22 @@
-import React, { useCallback } from "react"
+import React from "react"
 
 import type { SyncInfo } from "@/domain/SyncInfo"
 import { Alert } from "@/ui/components/Alert"
 import { AlertDialog } from "@/ui/components/AlertDialog"
+import {
+    AuthForm,
+    type ChangePasswordArgs,
+    ChangePasswordForm,
+} from "@/ui/components/AuthForm"
 import { Button } from "@/ui/components/Button"
 import { DateTime } from "@/ui/components/DateTime"
-import * as Form from "@/ui/components/Form"
 import { WarningIcon } from "@/ui/components/Icons"
-import { Input } from "@/ui/components/Input"
 import { Checkbox } from "@/ui/components/Input/Checkbox"
 import { Loader } from "@/ui/components/Loader"
 import { useT } from "@/ui/i18n"
+import type { AuthStatus } from "@/ui/state"
 
 import {
-    type ChangePasswordCreds,
     type SetupArgs,
     useSyncSettingsTabState,
 } from "./useSyncSettingsTabState"
@@ -28,16 +31,20 @@ export const SyncSettingsTab = React.forwardRef<HTMLDivElement>(
             setup,
             showSetup,
             setShowSetup,
+            showPasswordChange,
             manualSync,
             manualFullDownload,
             manualFullUpload,
-            authIsLoading,
+            authStatus,
             authError,
             changePassword,
         } = useSyncSettingsTabState()
 
         return (
-            <div ref={forwardedRef} className="settings-section-content">
+            <div
+                ref={forwardedRef}
+                className="settings-section-content relative"
+            >
                 <div className="settings-sub-section">
                     <Checkbox
                         label={t.IsEnabled}
@@ -47,32 +54,39 @@ export const SyncSettingsTab = React.forwardRef<HTMLDivElement>(
                     />
                 </div>
 
-                {showSetup && (
-                    <SectionSetupSync
-                        setup={setup}
-                        isLoading={status === "setting-up" || authIsLoading}
-                        error={error || authError}
-                    />
-                )}
-
                 {info.isEnabled && (
                     <SectionSyncInfo
                         manualSync={manualSync}
                         manualFullDownload={manualFullDownload}
                         manualFullUpload={manualFullUpload}
-                        isLoading={status === "setting-up" || authIsLoading}
+                        isLoading={status === "syncing"}
                         error={error}
                         info={info}
                     />
                 )}
 
-                {info.isEnabled && (
+                {showSetup && (
+                    <SectionSetupSync
+                        setup={setup}
+                        authStatus={authStatus}
+                        authError={authError}
+                        changePassword={changePassword}
+                    />
+                )}
+
+                {showPasswordChange && info.isEnabled && (
                     <SectionChangePassword
-                        isLoading={authIsLoading}
+                        status={authStatus}
                         error={authError}
                         username={info.username}
                         changePassword={changePassword}
                     />
+                )}
+
+                {(status === "syncing" || status === "setting-up") && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/40 z-10">
+                        <Loader />
+                    </div>
                 )}
             </div>
         )
@@ -210,217 +224,44 @@ function SectionSyncInfo({
 
 function SectionSetupSync({
     setup,
-    isLoading,
-    error,
-}: { setup: (args: SetupArgs) => void; isLoading: boolean; error?: Error }) {
-    let t = useT("screens/Settings/SyncSettings/Setup")
-
-    let onSubmit = useCallback(
-        (e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault()
-            e.stopPropagation()
-
-            let target = e.target as HTMLFormElement
-
-            let server = target.querySelector("#server") as HTMLInputElement
-            let username = target.querySelector("#username") as HTMLInputElement
-            let password = target.querySelector("#password") as HTMLInputElement
-
-            setup({
-                serverAddr:
-                    server.value ||
-                    `${globalThis.location.protocol}//${globalThis.location.host}`,
-                username: username.value,
-                password: password.value,
-            })
-        },
-        [setup],
-    )
-
+    authStatus,
+    authError,
+    changePassword,
+}: {
+    authStatus: AuthStatus
+    setup: (args: SetupArgs) => void
+    authError?: Error
+    changePassword: (args: ChangePasswordArgs) => void
+}) {
     return (
-        <Form.Root
-            className="settings-sub-section space-y-4 relative"
-            action="#"
-            method="post"
-            onSubmit={onSubmit}
-        >
-            <h3>{t.Title}</h3>
-
-            <Input
-                name="server"
-                type="text"
-                label={t.FieldServerLabel}
-                ariaLabel={t.FieldServerLabel}
-                messages={t}
-                className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
-                inputWrapperClassName="col-span-4"
-                messageClassName="col-span-6"
-                disabled={isLoading}
-            />
-
-            <Input
-                name="username"
-                type="text"
-                label={t.FieldUsernameLabel}
-                ariaLabel={t.FieldUsernameLabel}
-                autoComplete="username"
-                required
-                messages={t}
-                className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
-                inputWrapperClassName="col-span-4"
-                messageClassName="col-span-6"
-                disabled={isLoading}
-            />
-
-            <Input
-                name="password"
-                type="password"
-                label={t.FieldPasswordLabel}
-                ariaLabel={t.FieldPasswordLabel}
-                autoComplete="password"
-                required
-                messages={t}
-                className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
-                inputWrapperClassName="col-span-4"
-                messageClassName="col-span-6"
-                disabled={isLoading}
-            />
-
-            <div className="flex justify-end items-center mt-2">
-                <Button variant="primary" type="submit" disabled={isLoading}>
-                    {t.SetupButtonLabel}
-                </Button>
-            </div>
-
-            {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/40 z-10">
-                    <Loader />
-                </div>
-            )}
-
-            {error && (
-                <Alert variant="danger">
-                    {error.name}: {error.message}
-                </Alert>
-            )}
-        </Form.Root>
+        <AuthForm
+            className="settings-sub-section"
+            login={setup}
+            changePassword={changePassword}
+            status={authStatus}
+            error={authError}
+        />
     )
 }
 
 function SectionChangePassword({
-    isLoading,
+    status,
     error,
     username,
     changePassword,
 }: {
-    isLoading: boolean
+    status: AuthStatus
     error?: Error
     username: string
-    changePassword: (creds: ChangePasswordCreds) => void
+    changePassword: (creds: ChangePasswordArgs) => void
 }) {
-    let t = useT("screens/Settings/SyncSettings/ChangePassword")
-
-    let onSubmit = useCallback(
-        (e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault()
-            e.stopPropagation()
-
-            let target = e.target as HTMLFormElement
-
-            let currentPassword = target.querySelector(
-                "#current_password",
-            ) as HTMLInputElement
-            let newPassword = target.querySelector(
-                "#new_password",
-            ) as HTMLInputElement
-            let newPasswordRepeat = target.querySelector(
-                "#repeat_new_password",
-            ) as HTMLInputElement
-
-            changePassword({
-                username: username,
-                currentPassword: currentPassword.value,
-                newPassword: newPassword.value,
-                newPasswordRepeat: newPasswordRepeat.value,
-            })
-        },
-        [username, changePassword],
-    )
-
     return (
-        <Form.Root
-            className="settings-sub-section space-y-4 relative"
-            action="#"
-            method="post"
-            onSubmit={onSubmit}
-        >
-            <h3>{t.Title}</h3>
-
-            <Input
-                name="current_password"
-                type="password"
-                label={t.FieldCurrentPasswordLabel}
-                ariaLabel={t.FieldCurrentPasswordLabel}
-                autoComplete="current_password"
-                required
-                messages={t}
-                className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!font-semibold !text-sm items-center !mb-0 col-span-2"
-                inputWrapperClassName="col-span-4"
-                messageClassName="col-span-6"
-                disabled={isLoading}
-            />
-
-            <Input
-                name="new_password"
-                type="password"
-                label={t.FieldNewPasswordLabel}
-                ariaLabel={t.FieldNewPasswordLabel}
-                autoComplete="new_password"
-                required
-                messages={t}
-                className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!font-semibold !text-sm items-center !mb-0 col-span-2"
-                inputWrapperClassName="col-span-4"
-                messageClassName="col-span-6"
-                disabled={isLoading}
-            />
-
-            <Input
-                name="repeat_new_password"
-                type="password"
-                label={t.FieldRepeatNewPasswordLabel}
-                ariaLabel={t.FieldRepeatNewPasswordLabel}
-                autoComplete="repeat_new_password"
-                required
-                messages={t}
-                className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!font-semibold !text-sm items-center !mb-0 col-span-2"
-                inputWrapperClassName="col-span-4"
-                messageClassName="col-span-6"
-                disabled={isLoading}
-            />
-
-            <div className="flex justify-end items-center mt-2">
-                <Button size="sm" type="submit" disabled={isLoading}>
-                    {t.ChangePasswordButtonLabel}
-                </Button>
-            </div>
-
-            {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/40 z-10">
-                    <Loader />
-                </div>
-            )}
-
-            {error && (
-                <Alert variant="danger">
-                    {error.name}: {error.message}
-                </Alert>
-            )}
-        </Form.Root>
+        <ChangePasswordForm
+            className="settings-sub-section"
+            username={username}
+            status={status}
+            error={error}
+            changePassword={changePassword}
+        />
     )
 }

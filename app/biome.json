@@ -53,6 +53,16 @@
         },
         "jsxRuntime": "reactClassic"
     },
+    "css": {
+        "formatter": {
+            "enabled": true,
+            "indentStyle": "space",
+            "indentWidth": 4
+        },
+        "linter": {
+            "enabled": true
+        }
+    },
     "overrides": [
         {
             "include": [

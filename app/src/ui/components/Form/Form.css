@@ -1,0 +1,14 @@
+.form-message {
+    @apply p-3 border-2 rounded-lg my-2 flex gap-2 items-start;
+    @apply border-danger-dark bg-danger-light text-danger-contrast;
+
+    & > svg {
+        @apply size-8;
+        min-width: 28px;
+    }
+
+    .content {
+        @apply mt-0.5;
+        color: inherit;
+    }
+}

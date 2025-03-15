@@ -24,6 +24,7 @@ export interface InputProps {
     autoFocus?: boolean
     required?: boolean
     disabled?: boolean
+    readOnly?: boolean
 
     serverInvalid?: boolean
     message?: string
@@ -82,35 +83,39 @@ export function Input(props: InputProps) {
                         onKeyUp={props.onKeyUp}
                         onChange={props.onChange}
                         value={props.value}
+                        readOnly={props.readOnly}
                         defaultValue={props.defaultValue}
                     />
                 </Form.Control>
             </div>
 
             {props.messages && (
-                <Form.Message
-                    className={clsx(
-                        "mt-2 field-message",
-                        props.messageClassName,
-                    )}
-                    match="valueMissing"
-                >
-                    {translate("Invalid/Empty", props.messages, {
-                        name: props.label ?? props.name,
-                    })}
+                <Form.Message match="valueMissing" asChild>
+                    <div
+                        className={clsx(
+                            "mt-2 field-message",
+                            props.messageClassName,
+                        )}
+                    >
+                        {translate("Invalid/Empty", props.messages, {
+                            name: props.label ?? props.name,
+                        })}
+                    </div>
                 </Form.Message>
             )}
 
             {props.message && (
-                <Form.Message
-                    className={clsx(
-                        "mt-2 field-message",
-                        props.messageClassName,
-                    )}
-                >
-                    {translate(props.message, props.messages, {
-                        name: props.label ?? props.name,
-                    })}
+                <Form.Message asChild>
+                    <div
+                        className={clsx(
+                            "mt-2 field-message",
+                            props.messageClassName,
+                        )}
+                    >
+                        {translate(props.message, props.messages, {
+                            name: props.label ?? props.name,
+                        })}
+                    </div>
                 </Form.Message>
             )}
 

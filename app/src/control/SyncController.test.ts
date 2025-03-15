@@ -12,7 +12,7 @@ import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import { BaseContext, type Context } from "@/lib/context"
 import type { Decrypter, Encrypter } from "@/lib/crypto"
 import { parseJSON, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Err, Ok, fmtErr } from "@/lib/result"
+import { type AsyncResult, Err, Ok, fmtErr, toPromise } from "@/lib/result"
 import { TestInMemSyncStorage } from "@/lib/testhelper/TestInMemSyncStorage"
 import { assertOkResult } from "@/lib/testhelper/assertions"
 import { MockFS } from "@/lib/testhelper/mockfs"
@@ -251,7 +251,7 @@ async function setupSyncControllerTest({
     })
 
     let crypto = new AgeCrypto()
-    await crypto.init("control/SyncController")
+    await crypto.init(await toPromise(crypto.generatePrivateKey()))
 
     let syncCtrl = new SyncController({
         storage: new TestInMemSyncStorage(),

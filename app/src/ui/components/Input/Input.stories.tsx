@@ -1,4 +1,4 @@
-import * as Form from "@radix-ui/react-form"
+import { Form } from "@radix-ui/react-form"
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
 
@@ -22,9 +22,9 @@ export const Overview: Story = {
         icon: <CodeIcon />,
     },
     render: (args) => (
-        <Form.Root className="container mx-auto max-w-[300px]">
+        <Form className="container mx-auto max-w-[300px]">
             <Input {...args} />
-        </Form.Root>
+        </Form>
     ),
 }
 
@@ -38,9 +38,9 @@ export const WithError: Story = {
         icon: <UserIcon />,
     },
     render: (args) => (
-        <Form.Root className="container mx-auto max-w-[300px]">
+        <Form className="container mx-auto max-w-[300px]">
             <Input {...args} />
-        </Form.Root>
+        </Form>
     ),
 }
 
@@ -54,11 +54,11 @@ export const WithValidation: Story = {
         required: true,
     },
     render: (args) => (
-        <Form.Root className="container mx-auto max-w-[300px]">
+        <Form className="container mx-auto max-w-[300px]">
             <Input {...args} />
             <Button size="sm" type="reset" className="mt-5">
                 Reset
             </Button>
-        </Form.Root>
+        </Form>
     ),
 }

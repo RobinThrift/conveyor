@@ -10,10 +10,13 @@
 
 @import "../components/Alert/Alert.css" layer(components);
 @import "../components/AlertDialog/AlertDialog.css" layer(components);
+@import "../components/AuthForm/AuthForm.css" layer(components);
 @import "../components/Button/Button.css" layer(components);
+@import "../components/ConveyorBeltTexT/ConveyorBeltTexT.css" layer(components);
 @import "../components/Dialog/Dialog.css" layer(components);
 @import "../components/DropdownMenu/DropdownMenu.css" layer(components);
 @import "../components/Editor/Editor.css";
+@import "../components/Form/Form.css" layer(components);
 @import "../components/Image/Image.css" layer(components);
 @import "../components/Input/Input.css" layer(components);
 @import "../components/LinkPreview/LinkPreview.css" layer(components);
@@ -29,12 +32,13 @@
 @import "../components/Select/Select.css" layer(components);
 @import "../components/Tooltip/Tooltip.css" layer(components);
 @import "../App/App.css" layer(components);
-@import "../screens/SettingsScreen/SettingsScreen.css" layer(components);
+@import "../screens/EditMemoScreen/EditMemoScreen.css" layer(components);
+@import "../screens/ErrorScreen/ErrorScreen.css" layer(components);
+@import "../screens/InitSetupScreen/InitSetupScreen.css" layer(components);
 @import "../screens/MainScreen/MainScreen.css" layer(components);
 @import "../screens/NewMemoScreen/NewMemoScreen.css" layer(components);
-@import "../screens/EditMemoScreen/EditMemoScreen.css" layer(components);
+@import "../screens/SettingsScreen/SettingsScreen.css" layer(components);
 @import "../screens/SingleMemoScreen/SingleMemoScreen.css" layer(components);
-@import "../screens/ErrorScreen/ErrorScreen.css" layer(components);
 @import "../screens/UnlockScreen/UnlockScreen.css" layer(components);
 
 @layer base {

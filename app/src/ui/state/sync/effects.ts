@@ -1,4 +1,3 @@
-import type { AuthController } from "@/control/AuthController"
 import type { SyncController } from "@/control/SyncController"
 import { BaseContext } from "@/lib/context"
 import { randomID } from "@/lib/randomID"
@@ -9,81 +8,122 @@ import { slice } from "./slice"
 
 export const registerEffects = (
     startListening: StartListening,
-    {
-        syncCtrl,
-        authCtrl,
-    }: {
-        syncCtrl: SyncController
-        authCtrl: AuthController
-    },
+    { syncCtrl }: { syncCtrl: SyncController },
 ) => {
+    startListening({
+        actionCreator: auth.actions.setAuthStatus,
+        effect: async (
+            { payload },
+            { cancelActiveListeners, getState, dispatch, signal },
+        ) => {
+            let state = getState()
+            let status = slice.selectors.status(state)
+
+            if (
+                status === "awaiting-authentication" &&
+                (payload.status === "password-change-required" ||
+                    payload.status === "error")
+            ) {
+                dispatch(slice.actions.setStatus({ status: "error" }))
+                return
+            }
+
+            if (payload.status === "not-authenticated") {
+                dispatch(slice.actions.setStatus({ status: "disabled" }))
+                dispatch(slice.actions.setSyncInfo({ isEnabled: false }))
+                return
+            }
+
+            if (payload.status !== "authenticated") {
+                return
+            }
+
+            if (status !== "awaiting-authentication") {
+                return
+            }
+
+            let { server, username } = slice.selectors.setupInfo(state) ?? {}
+            if (!server || !username) {
+                return
+            }
+
+            dispatch(slice.actions.setStatus({ status: "setting-up" }))
+
+            cancelActiveListeners()
+
+            let ctx = BaseContext.withSignal(signal)
+            let clientID = randomID()
+
+            syncCtrl.init(ctx, {
+                server,
+                username,
+                clientID,
+            })
+
+            dispatch(
+                slice.actions.setSyncInfo({
+                    isEnabled: true,
+                    server,
+                    username,
+                    clientID,
+                }),
+            )
+            dispatch(slice.actions.setStatus({ status: "ready" }))
+        },
+    })
+
     startListening({
         actionCreator: slice.actions.setup,
         effect: async (
             { payload },
             { cancelActiveListeners, getState, dispatch, signal },
         ) => {
-            let status = slice.selectors.status(getState())
+            let state = getState()
+
+            let status = slice.selectors.status(state)
             if (status !== "disabled" && status !== "error") {
                 return
             }
 
             cancelActiveListeners()
 
-            dispatch(slice.actions.setStatus({ status: "setting-up" }))
-            dispatch(
-                auth.actions.setAuthStatus({
-                    isLoading: true,
-                }),
-            )
-
-            let ctx = BaseContext.withSignal(signal)
-
-            authCtrl.setOrigin(payload.serverAddr)
-
-            let authed = await authCtrl.getInitialToken(ctx, {
-                username: payload.username,
-                password: payload.password,
-            })
-
-            if (!authed.ok) {
+            let authStatus = auth.selectors.status(state)
+            if (authStatus !== "authenticated") {
                 dispatch(
                     slice.actions.setStatus({
-                        status: "error",
-                        error: authed.err,
+                        status: "awaiting-authentication",
                     }),
                 )
                 dispatch(
-                    auth.actions.setAuthStatus({
-                        isLoading: false,
-                        error: authed.err,
+                    auth.actions.authenticate({
+                        server: payload.server,
+                        username: payload.username,
+                        password: payload.password,
                     }),
                 )
                 return
             }
 
+            dispatch(slice.actions.setStatus({ status: "setting-up" }))
+
+            let ctx = BaseContext.withSignal(signal)
             let clientID = randomID()
 
             syncCtrl.init(ctx, {
-                server: payload.serverAddr,
+                server: payload.server,
                 username: payload.username,
                 clientID,
             })
 
-            dispatch(slice.actions.setStatus({ status: "ready" }))
             dispatch(
                 slice.actions.setSyncInfo({
                     isEnabled: true,
-                    clientID,
-                    server: payload.serverAddr,
+                    server: payload.server,
                     username: payload.username,
+                    clientID,
                 }),
             )
-            dispatch(
-                auth.actions.setAuthStatus({
-                    isLoading: false,
-                }),
-            )
+            dispatch(slice.actions.setStatus({ status: "ready" }))
         },
     })
 

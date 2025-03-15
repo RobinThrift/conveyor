@@ -34,3 +34,17 @@ UPDATE accounts SET
     updated_at = ?
 WHERE id = ?;
 
+
+-- name: GetAccountKey :one
+SELECT * FROM account_keys
+WHERE name = ? AND account_id = ?
+LIMIT 1;
+
+-- name: CreateAccountKey :exec
+INSERT INTO account_keys(
+    account_id,
+    name,
+    type,
+    data
+) VALUES (?, ?, ?, ?)
+ON CONFLICT (account_id, name, data) DO NOTHING;

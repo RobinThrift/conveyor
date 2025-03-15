@@ -381,7 +381,6 @@ components:
             format: binary
             example: "0x5"
 
-
   responses:
     ErrorBadRequest:
       description: Bad Request

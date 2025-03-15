@@ -8,7 +8,9 @@ import type { AttachmentController } from "@/control/AttachmentController"
 import type { AuthController } from "@/control/AuthController"
 import type { MemoController } from "@/control/MemoController"
 import type { SettingsController } from "@/control/SettingsController"
+import type { SetupController } from "@/control/SetupController"
 import type { SyncController } from "@/control/SyncController"
+import type { UnlockController } from "@/control/UnlockController"
 
 import * as attachments from "./attachments"
 import * as auth from "./auth"
@@ -18,8 +20,10 @@ import * as notifications from "./global/notifications"
 import * as router from "./global/router"
 import * as memos from "./memos"
 import * as settings from "./settings"
+import * as setup from "./setup"
 import * as sync from "./sync"
 import * as tags from "./tags"
+import * as unlock from "./unlock"
 
 const listenerMiddleware = createListenerMiddleware()
 
@@ -43,6 +47,8 @@ export function configureRootStore(initState: {
         attachments.slice,
         sync.slice,
         auth.slice,
+        setup.slice,
+        unlock.slice,
     )
 
     const store = configureStore({
@@ -51,6 +57,7 @@ export function configureRootStore(initState: {
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 serializableCheck: {
+                    ignoredActions: ["setup/setupCandidatePrivateCryptoKey"],
                     ignoredActionPaths: [
                         /.*\.(createdAt|updatedAt|expiresAt|exactDate)/,
                         /.*\.error/,
@@ -71,6 +78,7 @@ export function configureRootStore(initState: {
                         "global.i18n.translations",
                         "global.i18n.baseTranslations",
                         "global.i18n.dateFns",
+                        "setup.selectedOptions.candidatePrivateCryptoKey",
                         /.*\.buttons/,
                     ],
                 },
@@ -109,12 +117,16 @@ export function configureEffects({
     settingsCtrl,
     syncCtrl,
     authCtrl,
+    setupCtrl,
+    unlockCtrl,
 }: {
     memoCtrl: MemoController
     attachmentCtrl: AttachmentController
     settingsCtrl: SettingsController
     syncCtrl: SyncController
     authCtrl: AuthController
+    setupCtrl: SetupController
+    unlockCtrl: UnlockController
 }) {
     memos.registerEffects(startListening, {
         memoCtrl,
@@ -134,10 +146,17 @@ export function configureEffects({
 
     sync.registerEffects(startListening, {
         syncCtrl,
-        authCtrl,
     })
 
     auth.registerEffects(startListening, {
         authCtrl,
+    })
+
+    setup.registerEffects(startListening, {
+        setupCtrl,
+    })
+
+    unlock.registerEffects(startListening, {
+        unlockCtrl,
     })
 }

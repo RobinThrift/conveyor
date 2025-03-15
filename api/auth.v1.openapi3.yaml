@@ -12,6 +12,7 @@ security:
 
 tags:
 - name: Auth
+- name: KeyManagment
 
 paths:
   /token:
@@ -29,7 +30,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthToken"
-        "303":
+        "204":
           description: Password change is required.
           headers:
             Location:
@@ -66,6 +67,61 @@ paths:
         default:
           $ref: "#/components/responses/ErrorOther"
 
+  /keys:
+    post:
+      operationId: AddAccountKey
+      tags: [ KeyManagment ]
+      summary: Add a new account key.
+      description: Adds the key to the authenticated accont's list of public keys. If the key already exists, this is a no-op.
+
+      requestBody:
+        $ref: "#/components/requestBodies/AddAccountKeyRequest"
+      responses:
+        "201":
+          description: The public was succesfully added.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+  /keys/{name}:
+    parameters:
+    - name: name
+      in: path
+      required: true
+      description: Public Key Name
+      schema:
+        type: string
+        example: "primary"
+
+    get:
+      operationId: GetAccountKey
+      tags: [ KeyManagment ]
+      summary: Get a public key by name.
+      description: Returns the authenticated account's public key with the given name.
+
+      responses:
+        "200":
+          description: The public key data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountKey"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+
   /check-access:
     get:
       operationId: CheckAccess
@@ -88,6 +144,7 @@ paths:
           $ref: "#/components/responses/ErrorUnauthorized"
         default:
           $ref: "#/components/responses/ErrorOther"
+
 
 components:
   securitySchemes:
@@ -125,6 +182,30 @@ components:
         expiresAt: "2024-11-29T13:22:00.000Z"
         refreshToken: "bba35a92250a4bdc9254ca8c75458374"
         refreshExpiresAt: "2024-11-29T13:22:00.000Z"
+
+    AccountKey:
+      description: An account's public key.
+      type: object
+      properties:
+          name:
+            type: string
+            example: "primary"
+          data:
+            type: string
+            format: binary
+            example: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p"
+            x-go-type: "[]byte"
+          type:
+            type: string
+            example: "agev1"
+      required:
+      - name
+      - data
+      - type
+      example:
+        name: "primary"
+        data: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p"
+        type: "agev1"
 
     Error:
       type: object
@@ -250,6 +331,35 @@ components:
               currentPassword: "passwd"
               newPassword: "1235"
               newPasswordRepeat: "1235"
+
+    AddAccountKeyRequest:
+      description: Requests to add a new public key.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            description: The public key name, type and data.
+            properties:
+                name:
+                  type: string
+                  example: "primary"
+                data:
+                  type: string
+                  format: binary
+                  example: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p"
+                  x-go-type: "[]byte"
+                type:
+                  type: string
+                  example: "agev1"
+            required:
+            - name
+            - data
+            - type
+            example:
+              name: "primary"
+              data: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p"
+              type: "agev1"
 
 
   responses:

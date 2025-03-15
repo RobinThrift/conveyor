@@ -105,3 +105,30 @@ func (r *AccountRepo) Update(ctx context.Context, toUpdate *domain.Account) erro
 		UpdatedAt:              types.NewSQLiteDatetime(time.Now().UTC()),
 	})
 }
+
+func (r *AccountRepo) CreateAccountKey(ctx context.Context, toCreate *domain.AccountKey) error {
+	return queries.CreateAccountKey(ctx, r.db.Conn(ctx), sqlc.CreateAccountKeyParams{
+		AccountID: int64(toCreate.AccountID),
+		Name:      toCreate.Name,
+		Type:      toCreate.Type,
+		Data:      toCreate.Data,
+	})
+}
+
+func (r *AccountRepo) GetAccountKey(ctx context.Context, accountID domain.AccountID, name string) (*domain.AccountKey, error) {
+	row, err := queries.GetAccountKey(ctx, r.db.Conn(ctx), sqlc.GetAccountKeyParams{
+		AccountID: int64(accountID),
+		Name:      name,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.AccountKey{
+		ID:        domain.AccountKeyID(row.ID),
+		AccountID: domain.AccountID(row.AccountID),
+		Name:      row.Name,
+		Type:      row.Type,
+		Data:      row.Data,
+	}, nil
+}

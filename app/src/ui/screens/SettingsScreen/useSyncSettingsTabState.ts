@@ -1,21 +1,15 @@
 import type { PlaintextPassword } from "@/auth"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
+import type { ChangePasswordArgs } from "@/ui/components/AuthForm"
 import { actions } from "@/ui/state"
 import { selectors } from "@/ui/state/selectors"
 
 export interface SetupArgs {
-    serverAddr: string
+    server: string
     username: string
     password: PlaintextPassword
-}
-
-export interface ChangePasswordCreds {
-    username: string
-    currentPassword: PlaintextPassword
-    newPassword: PlaintextPassword
-    newPasswordRepeat: PlaintextPassword
 }
 
 export function useSyncSettingsTabState() {
@@ -47,13 +41,21 @@ export function useSyncSettingsTabState() {
     }, [dispatch])
 
     let authError = useSelector(selectors.auth.error)
-    let authIsLoading = useSelector(selectors.auth.isLoading)
+    let authStatus = useSelector(selectors.auth.status)
     let changePassword = useCallback(
-        (creds: ChangePasswordCreds) => {
-            dispatch(actions.auth.changePassword(creds))
+        (args: ChangePasswordArgs) => {
+            dispatch(actions.auth.changePassword(args))
         },
         [dispatch],
     )
+
+    let [showPasswordChange, setShowPasswordChange] = useState<boolean>(
+        info.isEnabled,
+    )
+
+    useEffect(() => {
+        setShowPasswordChange(info.isEnabled)
+    }, [info.isEnabled])
 
     return {
         status,
@@ -61,12 +63,21 @@ export function useSyncSettingsTabState() {
         info,
         setup,
         showSetup,
-        setShowSetup,
+        setShowSetup: useCallback(
+            (value: boolean) => {
+                if (!value && info.isEnabled) {
+                    dispatch(actions.sync.disable())
+                }
+                setShowSetup(value)
+            },
+            [dispatch, info.isEnabled],
+        ),
+        showPasswordChange,
         manualSync,
         manualFullDownload,
         manualFullUpload,
 
-        authIsLoading,
+        authStatus,
         authError,
         changePassword,
     }

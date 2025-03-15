@@ -1,5 +1,6 @@
 import React from "react"
 
+import { ConveyorBeltText } from "@/ui/components/ConveyorBeltText/ConveyorBeltText"
 import { useT } from "@/ui/i18n"
 
 export type OtherError = {
@@ -35,14 +36,12 @@ export function ErrorScreen(props: ErrorScreenProps) {
                 <div className="noise" />
             </div>
 
-            <div className="error-code" aria-valuetext={code}>
-                <span className="error-code-middle">{code[1].repeat(16)}</span>
-                <span>
-                    {code[0]}
-                    <em>{code[1]}</em>
-                    {code[2]}
-                </span>
-            </div>
+            <ConveyorBeltText
+                className="error-code"
+                start={code[0]}
+                middle={code[1]}
+                end={code[2]}
+            />
 
             <div className="message">
                 <h1>{title}</h1>

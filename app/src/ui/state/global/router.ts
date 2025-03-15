@@ -15,6 +15,7 @@ export { createRoutes } from "./router.types"
 
 let routes = {
     unlock: "/unlock",
+    setup: "/setup",
     main: "/",
     "memos.new": "/memos/new",
     "memos.single": "/memos/:id",

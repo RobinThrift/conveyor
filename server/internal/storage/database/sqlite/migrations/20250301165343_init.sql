@@ -15,6 +15,21 @@ CREATE TABLE accounts (
 );
 CREATE UNIQUE INDEX unique_accounts_username ON accounts(username);
 
+CREATE TABLE account_keys (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id      INTEGER NOT NULL,
+
+    name            TEXT    NOT NULL,
+    type            TEXT    NOT NULL,
+    data            BLOB    NOT NULL,
+
+    created_at      TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)),
+    updated_at      TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP)),
+
+    FOREIGN KEY(account_id) REFERENCES accounts(id)
+);
+CREATE UNIQUE INDEX unique_account_keys ON account_keys(account_id, name, data);
+
 
 CREATE TABLE auth_tokens (
     id                 INTEGER PRIMARY KEY AUTOINCREMENT,

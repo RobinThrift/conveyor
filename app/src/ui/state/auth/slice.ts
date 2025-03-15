@@ -1,31 +1,48 @@
-import type { PlaintextPassword } from "@/auth"
+import { PasswordChangeRequiredError, type PlaintextPassword } from "@/auth"
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
+
+export type AuthStatus =
+    | "not-authenticated"
+    | "authenticating"
+    | "authenticated"
+    | "error"
+    | "password-change-required"
+    | "password-change-in-progress"
+    | "password-change-error"
 
 export interface AuthState {
     error?: Error
-    isLoading: boolean
+    status: AuthStatus
 }
 
 const initialState: AuthState = {
-    isLoading: false,
+    status: "not-authenticated",
 }
 
 export const slice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        getInitialToken: (
+        authenticate: (
             state,
-            _: PayloadAction<{ username: string; password: PlaintextPassword }>,
+            _: PayloadAction<{
+                username: string
+                password: PlaintextPassword
+                server: string
+            }>,
         ) => {
             state.error = undefined
         },
         setAuthStatus: (
             state,
-            { payload }: PayloadAction<{ isLoading: boolean; error?: Error }>,
+            { payload }: PayloadAction<{ status: AuthStatus; error?: Error }>,
         ) => {
-            state.isLoading = payload.isLoading
+            state.status = payload.status
             state.error = payload.error
+
+            if (payload.error instanceof PasswordChangeRequiredError) {
+                state.status = "password-change-required"
+            }
         },
         changePassword: (
             state,
@@ -41,7 +58,7 @@ export const slice = createSlice({
     },
 
     selectors: {
-        isLoading: (state) => state.isLoading,
+        status: (state) => state.status,
         error: (state) => state.error,
     },
 })

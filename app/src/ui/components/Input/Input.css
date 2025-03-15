@@ -48,3 +48,33 @@
     @apply hover:border-primary;
     @apply focus:outline-primary focus:outline-offset-0;
 }
+
+.radio-group {
+    @apply flex flex-col items-start gap-2;
+}
+
+.radio-item {
+    @apply flex items-center gap-2 cursor-pointer;
+
+    & > button {
+        @apply flex size-5 items-center justify-center;
+        @apply rounded-full border outline-none;
+        @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+
+        &[data-unchecked] {
+            @apply border-subtle;
+        }
+
+        &[data-checked] {
+            @apply bg-primary;
+        }
+    }
+}
+
+.radio-indicator {
+    @apply flex before:size-2 before:rounded-full before:bg-gray-50;
+
+    &[data-unchecked] {
+        @apply hidden;
+    }
+}

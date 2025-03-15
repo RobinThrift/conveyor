@@ -1,4 +1,8 @@
-import type { AuthToken, PlaintextAuthTokenValue } from "@/auth"
+import {
+    type AuthToken,
+    PasswordChangeRequiredError,
+    type PlaintextAuthTokenValue,
+} from "@/auth"
 import type { PlaintextPassword } from "@/auth/credentials"
 import type { Context } from "@/lib/context"
 import { parseJSON, parseJSONDate } from "@/lib/json"
@@ -50,7 +54,11 @@ export class AuthV1APIClient {
             return Err(new Error("invalid login url"))
         }
 
-        if (res.value.status !== 200) {
+        if (res.value.status === 204) {
+            return Err(new PasswordChangeRequiredError())
+        }
+
+        if (res.value.status !== 201) {
             let err = await APIError.fromHTTPResponse(res.value)
             return Err(err.withPrefix("error getting token using credentials"))
         }
@@ -81,7 +89,7 @@ export class AuthV1APIClient {
             return Err(new UnauthorizedError("invalid refresh token"))
         }
 
-        if (res.value.status !== 200) {
+        if (res.value.status !== 201) {
             let err = await APIError.fromHTTPResponse(res.value)
             return Err(
                 err.withPrefix("error getting token using refresh token"),
@@ -129,7 +137,7 @@ export class AuthV1APIClient {
             return Err(new UnauthorizedError("error changing password"))
         }
 
-        if (res.value.status !== 200) {
+        if (res.value.status !== 204) {
             let err = await APIError.fromHTTPResponse(res.value)
             return Err(err.withPrefix("error changing password"))
         }

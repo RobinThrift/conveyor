@@ -3,6 +3,7 @@ import { assert, afterAll, suite, test } from "vitest"
 
 import { assertOkResult } from "@/lib/testhelper/assertions"
 
+import { toPromise } from "@/lib/result"
 import { AgeCrypto } from "../age/AgeCrypto"
 import { EncryptedBrowserIndexedDB } from "./EncryptedBrowserIndexedDB"
 
@@ -15,7 +16,7 @@ suite.concurrent(
 
         test("crud", { timeout: 5000 }, async ({ onTestFinished }) => {
             let crypto = new AgeCrypto()
-            await crypto.init("external/browser/EncryptedBrowserIndexedDB/crud")
+            await crypto.init(await toPromise(crypto.generatePrivateKey()))
             let idb = new EncryptedBrowserIndexedDB<{
                 title: string
                 content: string

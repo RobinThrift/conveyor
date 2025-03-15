@@ -52,6 +52,33 @@ func (q *Queries) CreateAccount(ctx context.Context, db DBTX, arg CreateAccountP
 	return err
 }
 
+const createAccountKey = `-- name: CreateAccountKey :exec
+INSERT INTO account_keys(
+    account_id,
+    name,
+    type,
+    data
+) VALUES (?, ?, ?, ?)
+ON CONFLICT (account_id, name, data) DO NOTHING
+`
+
+type CreateAccountKeyParams struct {
+	AccountID int64
+	Name      string
+	Type      string
+	Data      []byte
+}
+
+func (q *Queries) CreateAccountKey(ctx context.Context, db DBTX, arg CreateAccountKeyParams) error {
+	_, err := db.ExecContext(ctx, createAccountKey,
+		arg.AccountID,
+		arg.Name,
+		arg.Type,
+		arg.Data,
+	)
+	return err
+}
+
 const getAccount = `-- name: GetAccount :one
 SELECT
     accounts.id, accounts.username, accounts.algorithm, accounts.params, accounts.salt, accounts.password, accounts.requires_password_change, accounts.created_at, accounts.updated_at
@@ -96,6 +123,32 @@ func (q *Queries) GetAccountByUsername(ctx context.Context, db DBTX, username st
 		&i.Salt,
 		&i.Password,
 		&i.RequiresPasswordChange,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getAccountKey = `-- name: GetAccountKey :one
+SELECT id, account_id, name, type, data, created_at, updated_at FROM account_keys
+WHERE name = ? AND account_id = ?
+LIMIT 1
+`
+
+type GetAccountKeyParams struct {
+	Name      string
+	AccountID int64
+}
+
+func (q *Queries) GetAccountKey(ctx context.Context, db DBTX, arg GetAccountKeyParams) (AccountKey, error) {
+	row := db.QueryRowContext(ctx, getAccountKey, arg.Name, arg.AccountID)
+	var i AccountKey
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.Name,
+		&i.Type,
+		&i.Data,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

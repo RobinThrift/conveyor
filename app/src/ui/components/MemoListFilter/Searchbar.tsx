@@ -1,4 +1,4 @@
-import * as Form from "@radix-ui/react-form"
+import { Form } from "@radix-ui/react-form"
 import React, { useCallback } from "react"
 
 import { MagnifyingGlassIcon } from "@/ui/components/Icons"
@@ -27,13 +27,13 @@ export function SearchBar(props: {
     }, [])
 
     return (
-        <Form.Root className="search" onSubmit={onSubmit}>
+        <Form className="search" onSubmit={onSubmit}>
             <Input
                 name="q"
                 type="search"
                 icon={<MagnifyingGlassIcon weight="duotone" />}
                 onChange={onChangeDebounced}
             />
-        </Form.Root>
+        </Form>
     )
 }

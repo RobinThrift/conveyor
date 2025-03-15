@@ -1,3 +1,1 @@
-import type { SenstiveValue } from "@/lib/sensitive"
-
-export type PlaintextPassword = SenstiveValue
+export type PlaintextPassword = string & { readonly "": unique symbol }

@@ -33,6 +33,13 @@ const (
 	RefreshToken AuthTokenRequestRefreshTokenGrantGrantType = "refresh_token"
 )
 
+// AccountKey An account's public key.
+type AccountKey struct {
+	Data []byte `json:"data"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 // AuthToken AuthToken is a pair of access and refresh tokens.
 type AuthToken struct {
 	AccessToken      string    `json:"accessToken"`
@@ -80,6 +87,13 @@ type ErrorOther = Error
 // ErrorUnauthorized Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
 type ErrorUnauthorized = Error
 
+// AddAccountKeyRequest The public key name, type and data.
+type AddAccountKeyRequest struct {
+	Data []byte `json:"data"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 // ChangePasswordRequest Data for the current and new password
 type ChangePasswordRequest struct {
 	CurrentPassword   string `json:"currentPassword"`
@@ -102,8 +116,18 @@ type CheckAccessParams struct {
 	Authorization string `json:"Authorization"`
 }
 
+// AddAccountKeyJSONBody defines parameters for AddAccountKey.
+type AddAccountKeyJSONBody struct {
+	Data []byte `json:"data"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 // ChangePasswordJSONRequestBody defines body for ChangePassword for application/json ContentType.
 type ChangePasswordJSONRequestBody ChangePasswordJSONBody
+
+// AddAccountKeyJSONRequestBody defines body for AddAccountKey for application/json ContentType.
+type AddAccountKeyJSONRequestBody AddAccountKeyJSONBody
 
 // RequestAuthTokenJSONRequestBody defines body for RequestAuthToken for application/json ContentType.
 type RequestAuthTokenJSONRequestBody = AuthTokenRequest
@@ -178,6 +202,12 @@ type ServerInterface interface {
 	// Check if the provided access token is valid.
 	// (GET /check-access)
 	CheckAccess(w http.ResponseWriter, r *http.Request, params CheckAccessParams)
+	// Add a new account key.
+	// (POST /keys)
+	AddAccountKey(w http.ResponseWriter, r *http.Request)
+	// Get a public key by name.
+	// (GET /keys/{name})
+	GetAccountKey(w http.ResponseWriter, r *http.Request, name string)
 	// Request a new AuthToken pair.
 	// (POST /token)
 	RequestAuthToken(w http.ResponseWriter, r *http.Request)
@@ -253,6 +283,57 @@ func (siw *ServerInterfaceWrapper) CheckAccess(w http.ResponseWriter, r *http.Re
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CheckAccess(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// AddAccountKey operation middleware
+func (siw *ServerInterfaceWrapper) AddAccountKey(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.AddAccountKey(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetAccountKey operation middleware
+func (siw *ServerInterfaceWrapper) GetAccountKey(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", r.PathValue("name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenBearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetAccountKey(w, r, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -404,6 +485,8 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 
 	m.HandleFunc("POST "+options.BaseURL+"/change-password", wrapper.ChangePassword)
 	m.HandleFunc("GET "+options.BaseURL+"/check-access", wrapper.CheckAccess)
+	m.HandleFunc("POST "+options.BaseURL+"/keys", wrapper.AddAccountKey)
+	m.HandleFunc("GET "+options.BaseURL+"/keys/{name}", wrapper.GetAccountKey)
 	m.HandleFunc("POST "+options.BaseURL+"/token", wrapper.RequestAuthToken)
 
 	return m
@@ -509,6 +592,117 @@ func (response CheckAccessdefaultJSONResponse) VisitCheckAccessResponse(w http.R
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type AddAccountKeyRequestObject struct {
+	Body *AddAccountKeyJSONRequestBody
+}
+
+type AddAccountKeyResponseObject interface {
+	VisitAddAccountKeyResponse(w http.ResponseWriter) error
+}
+
+type AddAccountKey201Response struct {
+}
+
+func (response AddAccountKey201Response) VisitAddAccountKeyResponse(w http.ResponseWriter) error {
+	w.WriteHeader(201)
+	return nil
+}
+
+type AddAccountKey400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response AddAccountKey400JSONResponse) VisitAddAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AddAccountKey401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response AddAccountKey401JSONResponse) VisitAddAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AddAccountKey404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response AddAccountKey404JSONResponse) VisitAddAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AddAccountKeydefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response AddAccountKeydefaultJSONResponse) VisitAddAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type GetAccountKeyRequestObject struct {
+	Name string `json:"name"`
+}
+
+type GetAccountKeyResponseObject interface {
+	VisitGetAccountKeyResponse(w http.ResponseWriter) error
+}
+
+type GetAccountKey200JSONResponse AccountKey
+
+func (response GetAccountKey200JSONResponse) VisitGetAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetAccountKey400JSONResponse struct{ ErrorBadRequestJSONResponse }
+
+func (response GetAccountKey400JSONResponse) VisitGetAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetAccountKey401JSONResponse struct{ ErrorUnauthorizedJSONResponse }
+
+func (response GetAccountKey401JSONResponse) VisitGetAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetAccountKey404JSONResponse struct{ ErrorNotFoundJSONResponse }
+
+func (response GetAccountKey404JSONResponse) VisitGetAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetAccountKeydefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response GetAccountKeydefaultJSONResponse) VisitGetAccountKeyResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type RequestAuthTokenRequestObject struct {
 	Body *RequestAuthTokenJSONRequestBody
 }
@@ -526,17 +720,17 @@ func (response RequestAuthToken201JSONResponse) VisitRequestAuthTokenResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type RequestAuthToken303ResponseHeaders struct {
+type RequestAuthToken204ResponseHeaders struct {
 	Location string
 }
 
-type RequestAuthToken303Response struct {
-	Headers RequestAuthToken303ResponseHeaders
+type RequestAuthToken204Response struct {
+	Headers RequestAuthToken204ResponseHeaders
 }
 
-func (response RequestAuthToken303Response) VisitRequestAuthTokenResponse(w http.ResponseWriter) error {
+func (response RequestAuthToken204Response) VisitRequestAuthTokenResponse(w http.ResponseWriter) error {
 	w.Header().Set("Location", fmt.Sprint(response.Headers.Location))
-	w.WriteHeader(303)
+	w.WriteHeader(204)
 	return nil
 }
 
@@ -587,6 +781,12 @@ type StrictServerInterface interface {
 	// Check if the provided access token is valid.
 	// (GET /check-access)
 	CheckAccess(ctx context.Context, request CheckAccessRequestObject) (CheckAccessResponseObject, error)
+	// Add a new account key.
+	// (POST /keys)
+	AddAccountKey(ctx context.Context, request AddAccountKeyRequestObject) (AddAccountKeyResponseObject, error)
+	// Get a public key by name.
+	// (GET /keys/{name})
+	GetAccountKey(ctx context.Context, request GetAccountKeyRequestObject) (GetAccountKeyResponseObject, error)
 	// Request a new AuthToken pair.
 	// (POST /token)
 	RequestAuthToken(ctx context.Context, request RequestAuthTokenRequestObject) (RequestAuthTokenResponseObject, error)
@@ -671,6 +871,63 @@ func (sh *strictHandler) CheckAccess(w http.ResponseWriter, r *http.Request, par
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(CheckAccessResponseObject); ok {
 		if err := validResponse.VisitCheckAccessResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// AddAccountKey operation middleware
+func (sh *strictHandler) AddAccountKey(w http.ResponseWriter, r *http.Request) {
+	var request AddAccountKeyRequestObject
+
+	var body AddAccountKeyJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.AddAccountKey(ctx, request.(AddAccountKeyRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AddAccountKey")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(AddAccountKeyResponseObject); ok {
+		if err := validResponse.VisitAddAccountKeyResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetAccountKey operation middleware
+func (sh *strictHandler) GetAccountKey(w http.ResponseWriter, r *http.Request, name string) {
+	var request GetAccountKeyRequestObject
+
+	request.Name = name
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetAccountKey(ctx, request.(GetAccountKeyRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetAccountKey")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetAccountKeyResponseObject); ok {
+		if err := validResponse.VisitGetAccountKeyResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

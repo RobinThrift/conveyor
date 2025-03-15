@@ -30,13 +30,7 @@ export const Overview: Story = {
                     <WarningIcon />
                 </AlertDialog.Icon>
                 <AlertDialog.Description>
-                    {faker.lorem
-                        .sentences({ min: 5, max: 10 })
-                        .split(".")
-                        .filter((sentence) => sentence.length !== 0)
-                        .map((sentence) => (
-                            <p key={sentence}>{sentence}.</p>
-                        ))}
+                    {faker.lorem.sentences({ min: 5, max: 10 })}
                 </AlertDialog.Description>
 
                 <AlertDialog.Buttons>
@@ -63,13 +57,7 @@ export const Design: Story = {
                     <WarningIcon />
                 </AlertDialog.Icon>
                 <AlertDialog.Description>
-                    {faker.lorem
-                        .sentences({ min: 5, max: 10 })
-                        .split(".")
-                        .filter((sentence) => sentence.length !== 0)
-                        .map((sentence) => (
-                            <p key={sentence}>{sentence}.</p>
-                        ))}
+                    {faker.lorem.sentences({ min: 5, max: 10 })}
                 </AlertDialog.Description>
 
                 <AlertDialog.Buttons>

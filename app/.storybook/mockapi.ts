@@ -23,11 +23,25 @@ export const mockAPI: HttpHandler[] = [
                     refreshToken: "VALID_REFRESH_TOKEN",
                 },
                 {
+                    status: 201,
                     headers: {
                         "content-type": "application/json; charset=utf-8",
                     },
                 },
             )
+        }
+
+        if (
+            body.grant_type === "password" &&
+            body.username === "change" &&
+            body.password === "passwd"
+        ) {
+            return new HttpResponse(null, {
+                status: 204,
+                headers: {
+                    Location: "/change-password",
+                },
+            })
         }
 
         if (
@@ -42,6 +56,7 @@ export const mockAPI: HttpHandler[] = [
                     refreshToken: "VALID_REFRESH_TOKEN",
                 },
                 {
+                    status: 201,
                     headers: {
                         "content-type": "application/json; charset=utf-8",
                     },
@@ -63,5 +78,98 @@ export const mockAPI: HttpHandler[] = [
                 },
             },
         )
+    }),
+
+    http.post<
+        never,
+        {
+            username: string
+            currentPassword: string
+            newPassword: string
+            newPasswordRepeat: string
+        }
+    >("/api/auth/v1/change-password", async ({ request }) => {
+        await delay(500)
+
+        let body = await request.json()
+
+        if (body.username !== "change" && body.username !== "test") {
+            return HttpResponse.json(
+                {
+                    code: 401,
+                    type: "belt/api/v1/auth/Unauthorized",
+                    title: "Unauthorized",
+                },
+                {
+                    status: 401,
+                    statusText: "Unauthorized",
+                    headers: {
+                        "content-type": "application/json; charset=utf-8",
+                    },
+                },
+            )
+        }
+
+        if (body.currentPassword !== "passwd") {
+            return HttpResponse.json(
+                {
+                    code: 401,
+                    type: "belt/api/v1/auth/Unauthorized",
+                    title: "Unauthorized",
+                },
+                {
+                    status: 401,
+                    statusText: "Unauthorized",
+                    headers: {
+                        "content-type": "application/json; charset=utf-8",
+                    },
+                },
+            )
+        }
+
+        if (body.newPassword !== body.newPasswordRepeat) {
+            return HttpResponse.json(
+                {
+                    code: 400,
+                    type: "belt/api/v1/auth/BadRequest",
+                    title: "NewPasswordsDoNotMatch",
+                },
+                {
+                    status: 400,
+                    statusText: "BadRequest",
+                    headers: {
+                        "content-type": "application/json; charset=utf-8",
+                    },
+                },
+            )
+        }
+
+        if (body.newPassword === body.currentPassword) {
+            return HttpResponse.json(
+                {
+                    code: 400,
+                    type: "belt/api/v1/auth/BadRequest",
+                    title: "NewPasswordIsOldPassword",
+                },
+                {
+                    status: 400,
+                    statusText: "BadRequest",
+                    headers: {
+                        "content-type": "application/json; charset=utf-8",
+                    },
+                },
+            )
+        }
+
+        if (body.username === "change" && body.currentPassword === "passwd") {
+            return new HttpResponse(null, { status: 204 })
+        }
+
+        return new HttpResponse(null, {
+            status: 204,
+            headers: {
+                Location: "/change-password",
+            },
+        })
     }),
 ]

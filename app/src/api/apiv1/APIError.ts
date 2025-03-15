@@ -52,5 +52,6 @@ export class UnauthorizedError extends Error {
     constructor(prefix: string) {
         let msg = `${prefix}: Unauthorized`
         super(msg)
+        this.name = "Unauthorized"
     }
 }

@@ -21,6 +21,16 @@ type Account struct {
 	UpdatedAt              types.SQLiteDatetime
 }
 
+type AccountKey struct {
+	ID        int64
+	AccountID int64
+	Name      string
+	Type      string
+	Data      []byte
+	CreatedAt string
+	UpdatedAt string
+}
+
 type AuthToken struct {
 	ID               int64
 	AccountID        domain.AccountID

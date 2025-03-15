@@ -28,8 +28,11 @@ import { Provider } from "@/ui/state"
 import { AuthV1APIClient } from "@/api/authv1"
 import { SyncV1APIClient } from "@/api/syncv1"
 import { AuthController } from "@/control/AuthController"
+import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
+import { UnlockController } from "@/control/UnlockController"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
+import { LocalStorageSetupInfoStorage } from "@/storage/localstorage/LocalStorageSetupInfoStorage"
 import { TestInMemAuthStorage } from "./TestInMemAuthStorage"
 import { TestInMemSyncStorage } from "./TestInMemSyncStorage"
 import { MockFS } from "./mockfs"
@@ -46,6 +49,8 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         await db.open(BaseContext)
 
         let mockFS = new MockFS()
+
+        let crypto = new AgeCrypto()
 
         let rootStore = configureRootStore({
             router: { href: history.current },
@@ -99,8 +104,14 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             settings: settingsCtrl,
             changelog: changelogCtrl,
             fs: mockFS,
-            crypto: new AgeCrypto(),
+            crypto,
         })
+
+        let setupCtrl = new SetupController({
+            storage: new LocalStorageSetupInfoStorage(),
+        })
+
+        let unlockCtrl = new UnlockController({ db, crypto })
 
         if (props.generateMockData) {
             await insertMockData({ memoCtrl })
@@ -112,6 +123,8 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             settingsCtrl,
             syncCtrl,
             authCtrl,
+            setupCtrl,
+            unlockCtrl,
         })
 
         // @ts-expect-error: this is for debugging

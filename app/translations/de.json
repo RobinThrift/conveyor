@@ -1,4 +1,29 @@
 {
+    "components/AuthForm": {
+        "FieldServerLabel": "Server",
+        "FieldUsernameLabel": "Benutername",
+        "FieldPasswordLabel": "Passwort",
+        "AuthenticateButtonLabel": "Authentifizieren",
+        "Invalid/Empty": "Bitte gib einen Wert für \"{name}\" ein",
+        "Unauthorized": "Ungültige Zugansdaten",
+        "ChangePasswordFormDialogTitle": "Password Ändern",
+        "ChangePasswordFormDialogDescription": "Der Server fordert eine Änderung des Passworts bevor fortgefahren werden kann."
+    },
+
+    "components/AuthForm/ChangePasswordForm": {
+        "FieldCurrentPasswordLabel": "Aktulles Passwort",
+        "FieldNewPasswordLabel": "Neues Passwort",
+        "FieldRepeatNewPasswordLabel": "Neues Passwort wiederholen",
+        "ChangePasswordButtonLabel": "Ändern",
+        "Invalid/Empty": "{name} darf nicht leer sein",
+        "Unauthorized": "Aktuells Passwort ist falsch",
+        "EmptyCurrentPassword": "Bitte gib Dein aktuelles Passwort ein",
+        "EmptyNewPassword": "Bitte gib ein neues Passwort ein",
+        "EmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
+        "NewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
+        "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein"
+    },
+
     "components/Navigation": {
         "Settings": "Einstellungen",
         "Back": "Zurück"
@@ -120,11 +145,25 @@
         "Detail": "Du hast auf diese Seite keinen Zugriff"
     },
 
+    "screens/InitSetup": {
+        "Title": "Setup",
+        "NewButtonLabel": "Neu",
+        "FromRemoteButtonLabel": "Existierende Daten",
+        "NextButtonLabel": "Weiter",
+        "BackButtonLabel": "Zurück",
+        "ConfigureEncryptionTitle": "Verschlüsselung Einrichten",
+        "CandidatePrivateCryptoKeyLabel": "Privater Schuüssel",
+        "GenerateCandidatePrivateCryptoKeyLabel": "Privaten Schuüssel generieren",
+        "SelectSyncMethodTitle": "Synchronisierungsmethod",
+        "SyncMethodLocalOnly": "Keine Synchronisierung (nur lokale Daten)",
+        "SyncMethodRemoteSync": "Synchronisierung mit Server"
+    },
+
     "screens/Unlock": {
-        "Invalid/Empty": "{name} darf nicht leer sein",
-        "Title": "Unlock",
-        "PasswordLabel": "Password",
-        "UnlockButton": "Unlock"
+        "Title": "Entsperren",
+        "PasswordLabel": "Privater Schlüssel",
+        "UnlockButton": "Entsperren",
+        "Invalid/Empty": "{name} darf nicht leer sein"
     },
 
     "screens/SingleMemoScreen": {

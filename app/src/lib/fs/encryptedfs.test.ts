@@ -5,6 +5,7 @@ import { BaseContext } from "@/lib/context"
 import { MockFS } from "@/lib/testhelper/mockfs"
 import { decodeText, encodeText } from "@/lib/textencoding"
 
+import { toPromise } from "../result"
 import { EncryptedFS } from "./EncryptedFS"
 
 suite("lib/fs/EncryptedFS", () => {
@@ -13,7 +14,7 @@ suite("lib/fs/EncryptedFS", () => {
 
         let mockfs = new MockFS()
         let crypto = new AgeCrypto()
-        await crypto.init("lib/fs/EncryptedFS")
+        await crypto.init(await toPromise(crypto.generatePrivateKey()))
         let fs = new EncryptedFS(mockfs, crypto)
 
         afterAll(() => {

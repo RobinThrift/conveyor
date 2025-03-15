@@ -20,14 +20,3 @@ export const Unlock: Story = {
         layout: "fullscreen",
     },
 }
-
-export const WithError: Story = {
-    parameters: {
-        layout: "fullscreen",
-    },
-    args: {
-        validationErrors: {
-            form: "Invalid Credentials",
-        },
-    },
-}

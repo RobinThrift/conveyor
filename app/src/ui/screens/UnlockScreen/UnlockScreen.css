@@ -102,75 +102,12 @@
 }
 
 .logo {
-    @apply fixed pointer-events-none inset-0 flex flex-col items-center justify-center text-center font-serif font-semibold select-none;
-    @apply opacity-40 tablet:opacity-100;
-    color: rgb(var(--body-bg));
-    text-shadow:
-        3px 3px 0 rgb(var(--body-bg-contrast)),
-        -1px -1px 0 rgb(var(--body-bg-contrast)),
-        1px -1px 0 rgb(var(--body-bg-contrast)),
-        -1px 1px 0 rgb(var(--body-bg-contrast)),
-        1px 1px 0 rgb(var(--body-bg-contrast));
-
-    animation: logo-show 0.8s;
-    animation-timing-function: ease-out;
-    transform: skew(20deg, -10deg);
-
     top: -50vh;
     left: -20vw;
-    font-size: 15rem;
+
     @media (min-width: 768px) {
         top: -10vh;
         left: -50vw;
-        font-size: 19rem;
-    }
-
-    em {
-        visibility: hidden;
-        font-style: normal;
-        color: red;
-    }
-
-    .eeee {
-        --belt-eeee-top-start: 0rem;
-        --belt-eeee-top-end: calc(0.57em * -4);
-
-        display: block;
-        position: absolute;
-        width: 10rem;
-        word-wrap: break-word;
-        line-height: 0.57em;
-
-        left: calc(50% - 5.15rem);
-        @media (min-width: 768px) {
-            left: calc(50% - 5.5rem);
-        }
-
-        top: 0rem;
-        animation: belt-eeee infinite 60s linear;
-        animation-delay: 0.8s;
-    }
-}
-
-@keyframes logo-show {
-    from {
-        transform: skew(10deg, -5deg);
-        opacity: 0;
-    }
-
-    to {
-        transform: skew(20deg, -10deg);
-        opacity: 1;
-    }
-}
-
-@keyframes belt-eeee {
-    from {
-        top: var(--belt-eeee-top-start);
-    }
-
-    to {
-        top: var(--belt-eeee-top-end);
     }
 }
 
@@ -210,16 +147,6 @@
     }
 
     .input-field {
-        @apply flex gap-2 items-center bg-body rounded p-2 text-body-contrast border-body-contrast border-2;
-
-        &[data-invalid="true"] {
-            @apply border border-danger;
-        }
-
-        input {
-            @apply bg-transparent border-none flex-1 focus:outline-none;
-        }
-
         label {
             @apply sr-only;
         }

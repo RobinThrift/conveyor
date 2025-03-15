@@ -27,9 +27,11 @@ suite.concurrent("control/AuthController", async () => {
                     ) {
                         return Ok<AuthToken>({
                             origin: "belt.dev",
-                            accessToken: "MOCK_ACCESS_TOKEN",
+                            accessToken:
+                                "MOCK_ACCESS_TOKEN" as PlaintextAuthTokenValue,
                             expiresAt: addHours(new Date(), 5),
-                            refreshToken: "MOCK_REFRESH_TOKEN",
+                            refreshToken:
+                                "MOCK_REFRESH_TOKEN" as PlaintextAuthTokenValue,
                             refreshExpiresAt: addDays(new Date(), 30),
                         })
                     }
@@ -44,7 +46,7 @@ suite.concurrent("control/AuthController", async () => {
             await assertOkResult(
                 authCtrl.getInitialToken(ctx, {
                     username: validUsername,
-                    password: validPassword,
+                    password: validPassword as PlaintextPassword,
                 }),
             )
         })
@@ -53,7 +55,7 @@ suite.concurrent("control/AuthController", async () => {
             await assertErrResult(
                 authCtrl.getInitialToken(ctx, {
                     username: "invalid",
-                    password: "password",
+                    password: "password" as PlaintextPassword,
                 }),
             )
         })
@@ -70,9 +72,11 @@ suite.concurrent("control/AuthController", async () => {
                 if (refreshToken === validRefreshToken) {
                     return Ok<AuthToken>({
                         origin: "belt.dev",
-                        accessToken: refreshedAccessToken,
+                        accessToken:
+                            refreshedAccessToken as PlaintextAuthTokenValue,
                         expiresAt: addHours(now, 5),
-                        refreshToken: refreshedRefreshToken,
+                        refreshToken:
+                            refreshedRefreshToken as PlaintextAuthTokenValue,
                         refreshExpiresAt: addDays(now, 30),
                     })
                 }
@@ -99,9 +103,9 @@ suite.concurrent("control/AuthController", async () => {
 
             await storage.saveAuthToken(ctx, {
                 origin: "belt.dev",
-                accessToken: validAccessToken,
+                accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, 1),
-                refreshToken: validRefreshToken,
+                refreshToken: validRefreshToken as PlaintextAuthTokenValue,
                 refreshExpiresAt: addDays(now, 2),
             })
 
@@ -121,9 +125,9 @@ suite.concurrent("control/AuthController", async () => {
 
             await storage.saveAuthToken(ctx, {
                 origin: "belt.dev",
-                accessToken: validAccessToken,
+                accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
-                refreshToken: validRefreshToken,
+                refreshToken: validRefreshToken as PlaintextAuthTokenValue,
                 refreshExpiresAt: addDays(now, 2),
             })
 
@@ -143,9 +147,9 @@ suite.concurrent("control/AuthController", async () => {
 
             await storage.saveAuthToken(ctx, {
                 origin: "belt.dev",
-                accessToken: validAccessToken,
+                accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
-                refreshToken: validRefreshToken,
+                refreshToken: validRefreshToken as PlaintextAuthTokenValue,
                 refreshExpiresAt: addDays(now, -2),
             })
 
@@ -163,9 +167,10 @@ suite.concurrent("control/AuthController", async () => {
 
             await storage.saveAuthToken(ctx, {
                 origin: "belt.dev",
-                accessToken: validAccessToken,
+                accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
-                refreshToken: "INVALID_REFRESH_TOKEN",
+                refreshToken:
+                    "INVALID_REFRESH_TOKEN" as PlaintextAuthTokenValue,
                 refreshExpiresAt: addDays(now, 2),
             })
 

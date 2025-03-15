@@ -3,6 +3,11 @@ import { http, HttpResponse } from "msw"
 import { setupWorker } from "msw/browser"
 import { assert, onTestFinished, suite, test } from "vitest"
 
+import {
+    PasswordChangeRequiredError,
+    type PlaintextAuthTokenValue,
+    type PlaintextPassword,
+} from "@/auth"
 import { BaseContext } from "@/lib/context"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 
@@ -30,19 +35,22 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
                 assert.equal(body.username, username)
                 assert.equal(body.password, password)
 
-                return HttpResponse.json({
-                    accessToken: "MOCK_ACCESS_TOKEN",
-                    expiresAt: addHours(now, 1),
-                    refreshToken: "MOCK_REFRESH_TOKEN",
-                    refreshExpiresAt: addDays(now, 30),
-                })
+                return HttpResponse.json(
+                    {
+                        accessToken: "MOCK_ACCESS_TOKEN",
+                        expiresAt: addHours(now, 1),
+                        refreshToken: "MOCK_REFRESH_TOKEN",
+                        refreshExpiresAt: addDays(now, 30),
+                    },
+                    { status: 201 },
+                )
             }),
         )
 
         let token = await assertOkResult(
             authV1APIClient.getTokenUsingCredentials(ctx, {
                 username,
-                password,
+                password: password as PlaintextPassword,
             }),
         )
 
@@ -85,10 +93,49 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
         let token = await assertErrResult(
             authV1APIClient.getTokenUsingCredentials(ctx, {
                 username,
-                password,
+                password: password as PlaintextPassword,
             }),
         )
         assert.include(token.message, "Unauthorized")
+    })
+
+    test("getTokenUsingCredentials/requiresChange", async () => {
+        let { ctx, setup, cleanup, useMocks, authV1APIClient } =
+            await setupAuthV1APIClientTest()
+
+        await setup()
+        onTestFinished(cleanup)
+
+        let username = "test_user"
+        let password = "passwd"
+
+        useMocks(
+            http.post<
+                never,
+                { username: string; password: string; grant_type: "password" }
+            >("/api/auth/v1/token", async ({ request }) => {
+                let body = await request.json()
+                assert.equal(body.grant_type, "password")
+                assert.equal(body.username, username)
+                assert.equal(body.password, password)
+
+                return new HttpResponse(null, {
+                    status: 204,
+                    headers: {
+                        Location: "/change-password",
+                    },
+                })
+            }),
+        )
+
+        let err = await assertErrResult(
+            authV1APIClient.getTokenUsingCredentials(ctx, {
+                username,
+                password: password as PlaintextPassword,
+            }),
+        )
+
+        assert.instanceOf(err, PasswordChangeRequiredError)
     })
 
     test("getTokenUsingRefreshToken/valid", async () => {
@@ -110,17 +157,22 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
                 assert.equal(body.grant_type, "refresh_token")
                 assert.equal(body.refresh_token, refreshToken)
 
-                return HttpResponse.json({
-                    accessToken: "MOCK_ACCESS_TOKEN",
-                    expiresAt: addHours(now, 1),
-                    refreshToken: "MOCK_REFRESH_TOKEN",
-                    refreshExpiresAt: addDays(now, 30),
-                })
+                return HttpResponse.json(
+                    {
+                        accessToken: "MOCK_ACCESS_TOKEN",
+                        expiresAt: addHours(now, 1),
+                        refreshToken: "MOCK_REFRESH_TOKEN",
+                        refreshExpiresAt: addDays(now, 30),
+                    },
+                    { status: 201 },
+                )
             }),
         )
 
         let token = await assertOkResult(
-            authV1APIClient.getTokenUsingRefreshToken(ctx, { refreshToken }),
+            authV1APIClient.getTokenUsingRefreshToken(ctx, {
+                refreshToken: refreshToken as PlaintextAuthTokenValue,
+            }),
         )
 
         assert.equal(token.accessToken, "MOCK_ACCESS_TOKEN")
@@ -160,7 +212,9 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
         )
 
         let token = await assertErrResult(
-            authV1APIClient.getTokenUsingRefreshToken(ctx, { refreshToken }),
+            authV1APIClient.getTokenUsingRefreshToken(ctx, {
+                refreshToken: refreshToken as PlaintextAuthTokenValue,
+            }),
         )
         assert.include(token.message, "Unauthorized")
     })

@@ -1,0 +1,39 @@
+.setup-window {
+    @apply fixed bottom-10 left-2 right-2;
+
+    @media (min-width: 768px) {
+        @apply right-2;
+        left: unset;
+    }
+
+    @media (min-width: 2100px) {
+        @apply right-0 left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center;
+    }
+}
+
+.setup-window-content {
+    @apply flex-col w-full max-w-[500px] tablet:min-w-[500px];
+    @apply animate-in fade-in-50 duration-500 slide-in-from-bottom-32;
+
+    h1 {
+        @apply text-7xl mb-10 font-serif font-semibold;
+
+        color: rgb(var(--body-bg));
+        text-shadow:
+            2px 2px 0 rgb(var(--body-bg-contrast)),
+            -1px -1px 0 rgb(var(--body-bg-contrast)),
+            1px -1px 0 rgb(var(--body-bg-contrast)),
+            -1px 1px 0 rgb(var(--body-bg-contrast)),
+            1px 1px 0 rgb(var(--body-bg-contrast)),
+            4px 4px 0px rgb(var(--body-bg));
+    }
+
+    .btn.primary {
+        --btn-border-color: var(--body-bg-contrast);
+        @apply border-2;
+    }
+}
+
+.init-setup-screen-footer {
+    @apply fixed bottom-0 p-2 flex justify-end w-full;
+}

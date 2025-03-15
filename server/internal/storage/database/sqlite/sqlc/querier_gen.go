@@ -14,6 +14,7 @@ import (
 type Querier interface {
 	CountAccounts(ctx context.Context, db DBTX) (int64, error)
 	CreateAccount(ctx context.Context, db DBTX, arg CreateAccountParams) error
+	CreateAccountKey(ctx context.Context, db DBTX, arg CreateAccountKeyParams) error
 	CreateAuthToken(ctx context.Context, db DBTX, arg CreateAuthTokenParams) error
 	CreateChangelogEntry(ctx context.Context, db DBTX, arg CreateChangelogEntryParams) error
 	CreateFullSyncEntry(ctx context.Context, db DBTX, arg CreateFullSyncEntryParams) error
@@ -23,6 +24,7 @@ type Querier interface {
 	DeleteSyncClientByPublicID(ctx context.Context, db DBTX, arg DeleteSyncClientByPublicIDParams) error
 	GetAccount(ctx context.Context, db DBTX, id domain.AccountID) (Account, error)
 	GetAccountByUsername(ctx context.Context, db DBTX, username string) (Account, error)
+	GetAccountKey(ctx context.Context, db DBTX, arg GetAccountKeyParams) (AccountKey, error)
 	GetAuthToken(ctx context.Context, db DBTX, value []byte) (AuthToken, error)
 	GetAuthTokenByRefreshValue(ctx context.Context, db DBTX, refreshValue []byte) (AuthToken, error)
 	GetLatestFullSyncEntry(ctx context.Context, db DBTX, accountID domain.AccountID) (FullSyncEnrire, error)
