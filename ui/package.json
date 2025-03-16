@@ -61,7 +61,7 @@
         "@radix-ui/react-toolbar": "^1.1.1",
         "@reduxjs/toolkit": "^2.4.0",
         "@replit/codemirror-vim": "^6.2.1",
-        "@scalar/api-reference-react": "^0.3.139",
+        "@scalar/api-reference-react": "^0.6.0",
         "@types/mdast": "^4.0.4",
         "@uiw/codemirror-theme-quietlight": "^4.23.6",
         "@uiw/codemirror-theme-tokyo-night": "^4.23.6",
