@@ -2,6 +2,7 @@ import type {
     ChangelogEntry,
     ChangelogEntryID,
     ChangelogEntryList,
+    ChangelogTargetType,
 } from "@/domain/Changelog"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
@@ -124,6 +125,23 @@ export class ChangelogRepo {
             ),
         )
     }
+
+    public async listChangelogEntriesForID<C extends ChangelogEntry>(
+        ctx: Context<{ db: DBExec }>,
+        targetID: string,
+    ): AsyncResult<C[]> {
+        return mapResult(
+            fromPromise(
+                queries.listChangelogEntriesForID(
+                    ctx.getData("db", this._db),
+                    { targetId: targetID },
+                    ctx.signal,
+                ),
+            ),
+            (rows) =>
+                rows.map((row) => changelogEntryRowChangelogEntry(row) as C),
+        )
+    }
 }
 
 function changelogEntryRowChangelogEntry(
@@ -140,7 +158,7 @@ function changelogEntryRowChangelogEntry(
         id: row.publicId,
         source: row.source,
         revision: row.revision,
-        targetType: row.targetType,
+        targetType: row.targetType as ChangelogTargetType,
         targetID: row.targetId,
         value,
         isSynced: row.isSynced,

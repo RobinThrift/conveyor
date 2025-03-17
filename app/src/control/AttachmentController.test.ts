@@ -149,26 +149,28 @@ suite.concurrent.only("control/AttachmentController", () => {
         let id = newID()
 
         await assertOkResult(
-            attachmentCtrl.applyChangelogEntry(ctx, {
-                id: newID(),
-                source: "tests",
-                revision: 1,
-                targetType: "attachments",
-                targetID: id,
-                isSynced: false,
-                isApplied: false,
-                timestamp: new Date(),
-                value: {
-                    created: {
-                        contentType: "application/octet-stream",
-                        filepath:
-                            "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
-                        originalFilename: "test.txt",
-                        sha256: "Qre2VSnlfbVQVK6Bedy8NNSTR20zySWH3XKjtGnfuEs=",
-                        sizeBytes: 23,
+            attachmentCtrl.applyChangelogEntries(ctx, [
+                {
+                    id: newID(),
+                    source: "tests",
+                    revision: 1,
+                    targetType: "attachments",
+                    targetID: id,
+                    isSynced: false,
+                    isApplied: false,
+                    timestamp: new Date(),
+                    value: {
+                        created: {
+                            contentType: "application/octet-stream",
+                            filepath:
+                                "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
+                            originalFilename: "test.txt",
+                            sha256: "Qre2VSnlfbVQVK6Bedy8NNSTR20zySWH3XKjtGnfuEs=",
+                            sizeBytes: 23,
+                        },
                     },
                 },
-            }),
+            ]),
         )
 
         let row = await assertOkResult(attachmentRepo.getAttachment(ctx, id))

@@ -231,30 +231,36 @@ export class AttachmentController {
         )
     }
 
-    public async applyChangelogEntry(
+    public async applyChangelogEntries(
         ctx: Context<{ db?: DBExec }>,
-        entry: AttachmentChangelogEntry,
+        entries: AttachmentChangelogEntry[],
     ): AsyncResult<void> {
-        if ("created" in entry.value) {
-            let attachment = entry.value.created
-            let created = await this._transactioner.inTransaction(ctx, (ctx) =>
-                this._repo.createAttachment(ctx, {
-                    ...attachment,
-                    id: entry.targetID,
-                    sha256: dataFromBase64(attachment.sha256),
-                }),
-            )
-            if (!created.ok) {
-                return created
+        for (let entry of entries) {
+            if ("created" in entry.value) {
+                let attachment = entry.value.created
+                let created = await this._transactioner.inTransaction(
+                    ctx,
+                    (ctx) =>
+                        this._repo.createAttachment(ctx, {
+                            ...attachment,
+                            id: entry.targetID,
+                            sha256: dataFromBase64(attachment.sha256),
+                        }),
+                )
+                if (!created.ok) {
+                    return created
+                }
+                continue
             }
-            return Ok(undefined)
+
+            return Err(
+                new Error(
+                    `error applying changelog entry to memo: unknown changelog type: ${JSON.stringify(entry.value)}`,
+                ),
+            )
         }
 
-        return Err(
-            new Error(
-                `error applying changelog entry to memo: unknown changelog type: ${JSON.stringify(entry.value)}`,
-            ),
-        )
+        return Ok(undefined)
     }
 
     private async _writeAttachment(

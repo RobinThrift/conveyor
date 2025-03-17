@@ -18,12 +18,17 @@ export const slice = createSlice({
     name: "single",
     initialState,
     reducers: {
-        setCurrentSingleMemoID: (_s, _a: PayloadAction<{ id: MemoID }>) =>
-            ({
-                memo: undefined,
-                isLoading: true,
-                error: undefined,
-            }) satisfies SingleMemoState,
+        setCurrentSingleMemoID: (
+            state,
+            { payload }: PayloadAction<{ id: MemoID }>,
+        ) => {
+            if (state.memo?.id === payload.id) {
+                return
+            }
+            state.memo = undefined
+            state.isLoading = true
+            state.error = undefined
+        },
 
         setCurrentSingleMemo: (
             state,

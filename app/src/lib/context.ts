@@ -71,7 +71,7 @@ class context<
 
         let onabort = () => {
             this._isCancelled = true
-            this.err = this.signal?.reason
+            this._err = this.signal?.reason
             this.signal?.removeEventListener("abort", onabort)
         }
         this.signal?.addEventListener("abort", onabort)

@@ -35,6 +35,7 @@ import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { LocalStorageSetupInfoStorage } from "@/storage/localstorage/LocalStorageSetupInfoStorage"
 import { TestInMemAuthStorage } from "./TestInMemAuthStorage"
 import { TestInMemSyncStorage } from "./TestInMemSyncStorage"
+import { TestInMemUnlockStorage } from "./TestInMemUnlockStorage"
 import { MockFS } from "./mockfs"
 
 export interface MockRootStoreProviderProps {
@@ -111,7 +112,11 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             storage: new LocalStorageSetupInfoStorage(),
         })
 
-        let unlockCtrl = new UnlockController({ db, crypto })
+        let unlockCtrl = new UnlockController({
+            storage: new TestInMemUnlockStorage(),
+            db,
+            crypto,
+        })
 
         if (props.generateMockData) {
             await insertMockData({ memoCtrl })

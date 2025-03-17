@@ -55,9 +55,8 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/ChangePasswordRequest"
       responses:
-        "200":
+        "204":
           description: The password was changed successfully.
-          content: {}
         "400":
           $ref: "#/components/responses/ErrorBadRequest"
         "401":

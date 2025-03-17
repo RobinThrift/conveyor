@@ -70,7 +70,8 @@ generate: _gen-sqlc _gen-api-v1-server
 
 
 clean:
-    rm -rf {{ local_bin }} build ui/build ui/node_modules test/manual
+    rm -rf {{ local_bin }} ./build ./server/build ./app/build ./app/node_modules ./server/test/manual ./server/internal/ingress/app/assets/*
+    touch ./server/internal/ingress/app/assets/.gitkeep
     go clean -cache
 
 # generate a release with the given tag

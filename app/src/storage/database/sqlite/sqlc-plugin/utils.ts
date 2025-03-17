@@ -504,86 +504,84 @@ function createSliceParamMacro(queryName: string, params: Parameter[]) {
                                     `/*SLICE:${sliceParam.column?.name ?? sliceParam.number}*/?`,
                                 ),
                                 createProperyCallExp(
-                                    factory.createArrayLiteralExpression(
-                                        [
-                                            factory.createSpreadElement(
-                                                createCallChain(
-                                                    [
-                                                        factory.createIdentifier(
-                                                            "Array",
-                                                        ),
+                                    createProperyCallExp(
+                                        factory.createArrayLiteralExpression(
+                                            [
+                                                factory.createSpreadElement(
+                                                    createCallChain(
                                                         [
-                                                            factory.createPropertyAccessExpression(
+                                                            factory.createIdentifier(
+                                                                "Array",
+                                                            ),
+                                                            [
                                                                 factory.createPropertyAccessExpression(
-                                                                    factory.createIdentifier(
-                                                                        "args",
-                                                                    ),
-                                                                    factory.createIdentifier(
-                                                                        argName(
-                                                                            sliceParam.number,
-                                                                            sliceParam.column,
-                                                                        ),
-                                                                    ),
-                                                                ),
-                                                                factory.createIdentifier(
-                                                                    "length",
-                                                                ),
-                                                            ),
-                                                        ],
-                                                    ],
-                                                    ["keys", []],
-                                                    [
-                                                        "map",
-                                                        [
-                                                            factory.createArrowFunction(
-                                                                undefined,
-                                                                undefined,
-                                                                [
-                                                                    factory.createParameterDeclaration(
-                                                                        undefined,
-                                                                        undefined,
+                                                                    factory.createPropertyAccessExpression(
                                                                         factory.createIdentifier(
-                                                                            "i",
+                                                                            "args",
                                                                         ),
-                                                                        undefined,
-                                                                        undefined,
-                                                                        undefined,
-                                                                    ),
-                                                                ],
-                                                                undefined,
-                                                                undefined,
-                                                                factory.createTemplateExpression(
-                                                                    factory.createTemplateHead(
-                                                                        "?",
-                                                                    ),
-                                                                    [
-                                                                        factory.createTemplateSpan(
-                                                                            factory.createBinaryExpression(
-                                                                                factory.createIdentifier(
-                                                                                    "i",
-                                                                                ),
-                                                                                factory.createToken(
-                                                                                    SyntaxKind.PlusToken,
-                                                                                ),
-                                                                                factory.createNumericLiteral(
-                                                                                    sliceParam.number -
-                                                                                        1 +
-                                                                                        1,
-                                                                                ),
-                                                                            ),
-                                                                            factory.createTemplateTail(
-                                                                                "",
+                                                                        factory.createIdentifier(
+                                                                            argName(
+                                                                                sliceParam.number,
+                                                                                sliceParam.column,
                                                                             ),
                                                                         ),
-                                                                    ],
+                                                                    ),
+                                                                    factory.createIdentifier(
+                                                                        "length",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ],
+                                                        ["keys", []],
+                                                    ),
+                                                ),
+                                            ],
+                                            true,
+                                        ),
+                                        "map",
+                                        [
+                                            factory.createArrowFunction(
+                                                undefined,
+                                                undefined,
+                                                [
+                                                    factory.createParameterDeclaration(
+                                                        undefined,
+                                                        undefined,
+                                                        factory.createIdentifier(
+                                                            "i",
+                                                        ),
+                                                        undefined,
+                                                        undefined,
+                                                        undefined,
+                                                    ),
+                                                ],
+                                                undefined,
+                                                undefined,
+                                                factory.createTemplateExpression(
+                                                    factory.createTemplateHead(
+                                                        "?",
+                                                    ),
+                                                    [
+                                                        factory.createTemplateSpan(
+                                                            factory.createBinaryExpression(
+                                                                factory.createIdentifier(
+                                                                    "i",
+                                                                ),
+                                                                factory.createToken(
+                                                                    SyntaxKind.PlusToken,
+                                                                ),
+                                                                factory.createNumericLiteral(
+                                                                    sliceParam.number,
                                                                 ),
                                                             ),
-                                                        ],
+                                                            factory.createTemplateTail(
+                                                                "",
+                                                            ),
+                                                        ),
                                                     ],
                                                 ),
                                             ),
                                         ],
-                                        true,
                                     ),
                                     "join",
                                     [factory.createStringLiteral(",")],

@@ -1,4 +1,11 @@
-import { addDays, addHours, isAfter, subHours, transpose } from "date-fns"
+import {
+    addDays,
+    addHours,
+    isAfter,
+    subHours,
+    subMinutes,
+    transpose,
+} from "date-fns"
 import {
     assert,
     afterAll,
@@ -10,7 +17,7 @@ import {
     vi,
 } from "vitest"
 
-import type { MemoChangelogEntry, MemoContentChanges } from "@/domain/Changelog"
+import type { MemoChangelogEntry } from "@/domain/Changelog"
 import { newID } from "@/domain/ID"
 import type { MemoID, MemoList } from "@/domain/Memo"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto/WebCryptoSha256Hasher"
@@ -24,6 +31,7 @@ import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
 import { UTCDateMini } from "@date-fns/utc"
 
+import { toPromise } from "@/lib/result"
 import { AttachmentController } from "./AttachmentController"
 import { ChangelogController } from "./ChangelogController"
 import { MemoController } from "./MemoController"
@@ -331,7 +339,7 @@ suite("control/MemoController", () => {
                         ...memo,
                         changes: {
                             version: "1",
-                            changes: [[0, "Updated Content for Memo 2"]],
+                            changes: [{ insert: "Updated Content for Memo 2" }],
                         },
                     }),
                 )
@@ -352,7 +360,9 @@ suite("control/MemoController", () => {
                         content: "Updated Content for Memo 99",
                         changes: {
                             version: "1",
-                            changes: [[0, "Updated Content for Memo 99"]],
+                            changes: [
+                                { insert: "Updated Content for Memo 99" },
+                            ],
                         },
                     }),
                 )
@@ -541,10 +551,9 @@ suite("control/MemoController", () => {
                         changes: {
                             version: "1",
                             changes: [
-                                [
-                                    0,
-                                    `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
-                                ],
+                                {
+                                    insert: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
+                                },
                             ],
                         },
                     }),
@@ -581,10 +590,9 @@ suite("control/MemoController", () => {
                     changes: {
                         version: "1",
                         changes: [
-                            [
-                                0,
-                                `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
-                            ],
+                            {
+                                insert: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
+                            },
                         ],
                     },
                 })
@@ -680,66 +688,48 @@ suite("control/MemoController", () => {
                     content,
                     changes: {
                         version: "1",
-                        changes: [[0, content]],
+                        changes: [{ insert: content }],
                     },
                 }),
             )
         })
     })
 
-    suite.concurrent("applyChangelogEntry", async () => {
-        let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup()
-
+    suite.concurrent("applyChangelogEntries", async () => {
         let now = new Date(2024, 2, 15, 12, 0, 0, 0)
-        let numMemos = 10
 
-        let createdMemosIDs: MemoID[] = []
-
-        beforeAll(async () => {
+        test("exisitng Memo", async ({ onTestFinished }) => {
+            let { memoCtrl, ctx, setup, cleanup, insertChangelogEntries } =
+                await memoCtrlTestSetup()
             await setup()
+            onTestFinished(() => cleanup())
 
-            for (let i = 0; i < numMemos; i++) {
-                let res = await memoCtrl.createMemo(ctx, {
-                    content: `# Test Memo ${i}\n With some more content for memo ${i}`,
-                    createdAt: subHours(now, i),
-                })
-                if (!res.ok) {
-                    throw res.err
-                }
-                createdMemosIDs.push(res.value.id)
-            }
-        })
-
-        afterAll(cleanup)
-
-        test("exisitng Memo", async () => {
-            let changeset: MemoContentChanges["changes"] = [
-                48,
-                [0, "", "", "A new line for Memo 0."],
-            ]
-
-            await assertOkResult(
-                memoCtrl.applyChangelogEntry(ctx, {
-                    id: newID(),
-                    source: "tests",
-                    revision: 1,
-                    targetType: "memos",
-                    targetID: createdMemosIDs[0],
-                    isSynced: false,
-                    isApplied: false,
-                    timestamp: new Date(),
-                    value: {
-                        content: {
-                            version: "1",
-                            changes: changeset,
-                        },
-                    },
+            let { id } = await assertOkResult(
+                memoCtrl.createMemo(ctx, {
+                    content:
+                        "# Test Memo 0\n With some more content for memo 0",
+                    createdAt: subHours(now, 1),
                 }),
             )
 
-            let updated = await assertOkResult(
-                memoCtrl.getMemo(ctx, createdMemosIDs[0]),
-            )
+            let entries = await insertChangelogEntries([
+                {
+                    targetID: id,
+                    value: {
+                        content: {
+                            version: "1",
+                            changes: [
+                                { retain: 48 },
+                                { insert: "\n\nA new line for Memo 0." },
+                            ],
+                        },
+                    },
+                },
+            ])
+
+            await assertOkResult(memoCtrl.applyChangelogEntries(ctx, entries))
+
+            let updated = await assertOkResult(memoCtrl.getMemo(ctx, id))
 
             assert.equal(
                 updated.content,
@@ -747,33 +737,120 @@ suite("control/MemoController", () => {
             )
         })
 
-        test("new Memo", async () => {
+        test("new Memo", async ({ onTestFinished }) => {
+            let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup()
+            await setup()
+            onTestFinished(() => cleanup())
+
             let newMemoID = newID()
             await assertOkResult(
-                memoCtrl.applyChangelogEntry(ctx, {
-                    id: newID(),
-                    source: "tests",
-                    revision: 1,
-                    targetType: "memos",
-                    targetID: newMemoID,
-                    isSynced: false,
-                    isApplied: false,
-                    timestamp: new Date(),
-                    value: {
-                        created: {
-                            content: "# Memo 1\nCreated using a changelog",
-                            isArchived: false,
-                            isDeleted: false,
-                            createdAt: now,
-                            updatedAt: now,
+                memoCtrl.applyChangelogEntries(ctx, [
+                    {
+                        id: newID(),
+                        source: "tests",
+                        revision: 1,
+                        targetType: "memos",
+                        targetID: newMemoID,
+                        isSynced: false,
+                        isApplied: false,
+                        timestamp: new Date(),
+                        value: {
+                            created: {
+                                content: "# Memo 1\nCreated using a changelog",
+                                isArchived: false,
+                                isDeleted: false,
+                                createdAt: now,
+                                updatedAt: now,
+                            },
                         },
                     },
-                }),
+                ]),
             )
 
             let created = await assertOkResult(memoCtrl.getMemo(ctx, newMemoID))
 
             assert.equal(created.content, "# Memo 1\nCreated using a changelog")
+        })
+
+        test("Conflicting Change", async ({ onTestFinished }) => {
+            let { memoCtrl, ctx, setup, cleanup, insertChangelogEntries } =
+                await memoCtrlTestSetup()
+            await setup()
+            onTestFinished(() => cleanup())
+
+            let { id } = await assertOkResult(
+                memoCtrl.createMemo(ctx, {
+                    content: `Line 1 to change
+
+Line 2 will be shortened
+
+Line 3 unchanged
+
+Line 4 unchanged`,
+                    createdAt: subHours(now, 1),
+                }),
+            )
+
+            let expected = `Line 1 changed
+
+Line 2 shortened
+
+Line 3 unchanged
+
+Line 3.5 added
+
+Line 4 unchanged`
+
+            let entries = await insertChangelogEntries([
+                {
+                    targetID: id,
+                    value: {
+                        content: {
+                            version: "1",
+                            changes: [
+                                { retain: 25 },
+                                { delete: 17 },
+                                { insert: "shortened" },
+                            ],
+                        },
+                    },
+                },
+                {
+                    targetID: id,
+                    value: {
+                        content: {
+                            version: "1",
+                            changes: [
+                                { retain: 60 },
+                                { insert: "\n\nLine 3.5 added" },
+                            ],
+                        },
+                    },
+                },
+                {
+                    targetID: id,
+                    value: {
+                        content: {
+                            version: "1",
+                            changes: [
+                                { retain: 7 },
+                                { delete: 9 },
+                                { insert: "changed" },
+                            ],
+                        },
+                    },
+                },
+            ])
+
+            await assertOkResult(memoCtrl.applyChangelogEntries(ctx, entries))
+
+            let updated = await assertOkResult(memoCtrl.getMemo(ctx, id))
+
+            assert.equal(
+                updated.content,
+                expected,
+                `acutal: \n${updated.content}\n\nexpected: \n${expected}`,
+            )
         })
     })
 })
@@ -805,11 +882,41 @@ async function memoCtrlTestSetup() {
         changelog: changelogCtrl,
     })
 
+    let insertChangelogEntries = async (
+        entries: Pick<MemoChangelogEntry, "targetID" | "value">[],
+    ): Promise<MemoChangelogEntry[]> => {
+        let now = new Date()
+        let toCreate = [] as MemoChangelogEntry[]
+
+        for (let i = 0; i < entries.length; i++) {
+            let entry = {
+                ...entries[i],
+                id: newID(),
+                source: "insertChangelogEntries",
+                revision: i,
+                targetType: "memos",
+                isSynced: true,
+                syncedAt: subMinutes(now, entries.length - i + 1),
+                isApplied: false,
+                timestamp: subMinutes(now, entries.length - i),
+            } satisfies MemoChangelogEntry
+
+            toCreate.push(entry)
+        }
+
+        await toPromise(
+            changelogCtrl.insertExternalChangelogEntries(ctx, toCreate),
+        )
+
+        return toCreate
+    }
+
     return {
         ctx,
         memoCtrl,
         changelogCtrl,
         attachmentCtrl,
+        insertChangelogEntries,
         setup: async () => {
             await db.open(ctx)
         },

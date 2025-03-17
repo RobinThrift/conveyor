@@ -91,6 +91,10 @@ export class EncryptedBrowserIndexedDB<D> {
         return this._parse(new Uint8Array(decrypted.value))
     }
 
+    public async listKeys(ctx: Context): AsyncResult<IDBValidKey[]> {
+        return this._db.listKeys(ctx, "items")
+    }
+
     public async delete(ctx: Context, key: IDBValidKey): AsyncResult<void> {
         return this._db.delete(ctx, "items", key)
     }

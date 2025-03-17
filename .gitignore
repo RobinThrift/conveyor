@@ -8,6 +8,7 @@ test/manual
 
 build
 *.junit.xml
+server/internal/ingress/app/assets/
 
 node_modules
 ui/.storybook/public

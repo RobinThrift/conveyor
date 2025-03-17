@@ -94,6 +94,63 @@ export class SyncV1APIClient {
             )
         }
 
+        if (res.value.status === 303) {
+            let locHeader = res.value.headers.get("location")
+            if (!locHeader) {
+                return Err(
+                    new Error(
+                        `error fetching full DB from sync server (${this._baseURL}): request returned status 303 but no Location header`,
+                    ),
+                )
+            }
+            return this._downloadDBFromLocation(ctx, locHeader)
+        }
+
+        if (res.value.status !== 200) {
+            let err = await APIError.fromHTTPResponse(res.value)
+            return Err(
+                err.withPrefix(
+                    `error fetching full DB from sync server (${this._baseURL})`,
+                ),
+            )
+        }
+
+        let data = await fromPromise(res.value.arrayBuffer())
+        if (!data.ok) {
+            return fmtErr(
+                `error fetching full DB from sync server (${this._baseURL}): error reading data: %w`,
+                data,
+            )
+        }
+
+        return data
+    }
+
+    private async _downloadDBFromLocation(
+        ctx: Context,
+        location: string,
+    ): AsyncResult<ArrayBufferLike> {
+        let req = await this._createBaseRequest(ctx, "GET", location)
+        if (!req.ok) {
+            return req
+        }
+
+        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
+        if (!res.ok) {
+            return fmtErr(
+                `error fetching full DB from sync server (${this._baseURL}): %w`,
+                res,
+            )
+        }
+
+        if (res.value.status === 401) {
+            return Err(
+                new UnauthorizedError(
+                    `error fetching full DB from sync server (${this._baseURL})`,
+                ),
+            )
+        }
+
         if (res.value.status !== 200) {
             let err = await APIError.fromHTTPResponse(res.value)
             return Err(
@@ -163,7 +220,7 @@ export class SyncV1APIClient {
         let req = await this._createBaseRequest(
             ctx,
             "GET",
-            `/api/sync/v1/changes?since=${JSON.stringify(since ?? new Date(2000, 0, 1))}`,
+            `/api/sync/v1/changes?since=${JSON.parse(JSON.stringify(since ?? new Date(2000, 0, 1)))}`,
         )
         if (!req.ok) {
             return req
@@ -204,7 +261,7 @@ export class SyncV1APIClient {
             ctx,
             "POST",
             "/api/sync/v1/changes",
-            JSON.stringify(entries),
+            JSON.stringify({ items: entries }),
         )
         if (!req.ok) {
             return req
@@ -272,7 +329,7 @@ function parseEncryptedChangelogEntryJSON(
         let objs = JSON.parse(raw)
         let entries: EncryptedChangelogEntry[] = []
 
-        for (let obj of objs) {
+        for (let obj of objs.items) {
             entries.push({
                 syncClientID: obj.syncClientID,
                 data: obj.data,

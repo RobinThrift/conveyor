@@ -11,6 +11,7 @@ import { Input } from "@/ui/components/Input"
 import { SelectMode } from "@/ui/components/ThemeSwitcher"
 import { useT } from "@/ui/i18n"
 
+import { Checkbox } from "@/ui/components/Input/Checkbox"
 import { useUnlockScreenState } from "./useUnlockScreenState"
 
 export function UnlockScreen() {
@@ -30,10 +31,15 @@ export function UnlockScreen() {
                 "#password",
             ) as HTMLInputElement
 
+            let storeKey = target.querySelector(
+                "#store_key",
+            ) as HTMLInputElement
+
             if (plaintextPrivateKey.value) {
                 unlock({
                     plaintextKeyData:
                         plaintextPrivateKey.value as PlaintextPrivateKey,
+                    storeKey: storeKey.dataset.state === "checked",
                 })
             }
         },
@@ -65,7 +71,11 @@ export function UnlockScreen() {
                 <div className="unlock-window">
                     <h1>{t.Title}</h1>
 
-                    <Form action="#" onSubmit={onSubmit} className="p-4">
+                    <Form
+                        action="#"
+                        onSubmit={onSubmit}
+                        className="p-4 space-y-4"
+                    >
                         <Input
                             name="password"
                             icon={<PasswordIcon />}
@@ -77,9 +87,16 @@ export function UnlockScreen() {
                             messages={t}
                         />
 
+                        <Checkbox name="store_key" label={t.StoreKeyLabel} />
+
                         {error && (
                             <Alert variant="danger">
                                 {error.name}: {error.message}
+                                {error.stack && (
+                                    <pre>
+                                        <code>{error.stack}</code>
+                                    </pre>
+                                )}
                             </Alert>
                         )}
 

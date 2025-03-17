@@ -2,6 +2,7 @@ import type { SettingsController } from "@/control/SettingsController"
 import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
+import { Second } from "@/lib/duration"
 import { slice } from "./slice"
 
 export const registerEffects = (
@@ -18,21 +19,31 @@ export const registerEffects = (
             _,
             { cancelActiveListeners, getState, dispatch, signal },
         ) => {
-            if (slice.selectors.isLoaded(getState())) {
+            let state = getState()
+            if (
+                slice.selectors.isLoaded(state) ||
+                slice.selectors.isLoading(state)
+            ) {
                 return
             }
 
             cancelActiveListeners()
 
-            let loaded = await settingsCtrl.loadSettings(
-                BaseContext.withSignal(signal),
+            dispatch(slice.actions.setIsLoading())
+
+            let [ctx, cancel] = BaseContext.withSignal(signal).withTimeout(
+                Second * 5,
             )
+
+            let loaded = await settingsCtrl.loadSettings(ctx)
 
             if (!loaded.ok) {
                 dispatch(slice.actions.setError(loaded.err))
+                cancel()
                 return
             }
 
+            cancel()
             dispatch(slice.actions.loadDone(loaded.value))
         },
     })

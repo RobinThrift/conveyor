@@ -15,13 +15,11 @@ export class IndexedDBAuthStorage {
             keyFrom: (a) => a.origin,
             parse: (raw) =>
                 parseJSON<AuthToken, Record<string, any>>(raw, (obj) => {
-                    let expiresAt = parseJSONDate(obj.value.expiresAt)
+                    let expiresAt = parseJSONDate(obj.expiresAt)
                     if (!expiresAt.ok) {
                         return expiresAt
                     }
-                    let refreshExpiresAt = parseJSONDate(
-                        obj.value.refreshExpiresAt,
-                    )
+                    let refreshExpiresAt = parseJSONDate(obj.refreshExpiresAt)
                     if (!refreshExpiresAt.ok) {
                         return refreshExpiresAt
                     }
@@ -65,5 +63,21 @@ export class IndexedDBAuthStorage {
         authToken: AuthToken,
     ): AsyncResult<void> {
         return this._db.insertOrUpdate(ctx, [authToken])
+    }
+
+    async removeAllAuthTokens(ctx: Context): AsyncResult<void> {
+        let origins = await this._db.listKeys(ctx)
+        if (!origins.ok) {
+            return origins
+        }
+
+        for (let origin of origins.value) {
+            let deleted = await this._db.delete(ctx, origin)
+            if (!deleted.ok) {
+                return deleted
+            }
+        }
+
+        return Ok(undefined)
     }
 }

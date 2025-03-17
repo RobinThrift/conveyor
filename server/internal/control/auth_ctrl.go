@@ -14,6 +14,7 @@ import (
 
 var ErrInvalidCredentials = errors.New("invalid credentials")
 var ErrPasswordEmpty = errors.New("password must not be empty")
+var ErrRequiresPasswordChange = errors.New("password change required")
 
 type AuthController struct {
 	config        AuthConfig
@@ -65,6 +66,10 @@ func (ac *AuthController) CreateAuthTokenUsingCredentials(ctx context.Context, c
 	account, err := ac.getAccountForCredentials(ctx, GetAccountForCredentialsQuery(cmd))
 	if err != nil {
 		return nil, fmt.Errorf("error creating auth token: %w", err)
+	}
+
+	if account.Password.RequiresChange {
+		return nil, ErrRequiresPasswordChange
 	}
 
 	now := time.Now()
@@ -192,12 +197,25 @@ func (ac *AuthController) getAccountForCredentials(ctx context.Context, query Ge
 }
 
 type ChangeAccountPasswordCmd struct {
+	Username            string
 	CurrPasswdPlaintext auth.PlaintextPassword
 	NewPasswdPlaintext  auth.PlaintextPassword
 }
 
 func (ac *AuthController) ChangeAccountPassword(ctx context.Context, cmd ChangeAccountPasswordCmd) error {
 	account := auth.AccountFromCtx(ctx)
+	var err error
+
+	if account == nil {
+		account, err = ac.getAccountForCredentials(ctx, GetAccountForCredentialsQuery{
+			Username:        cmd.Username,
+			PlaintextPasswd: cmd.CurrPasswdPlaintext,
+		})
+		if err != nil {
+			return auth.ErrUnauthorized
+		}
+	}
+
 	if account == nil {
 		return auth.ErrUnauthorized
 	}

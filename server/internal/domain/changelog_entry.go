@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type ChangelogEntryID string
+type ChangelogEntryID uint64
 
 type ChangelogEntry struct {
 	SyncClientID SyncClientID

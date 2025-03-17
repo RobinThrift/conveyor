@@ -33,6 +33,11 @@ export class AuthController {
         this._origin = origin
     }
 
+    public async reset(ctx: Context): AsyncResult<void> {
+        this._current = undefined
+        return this._storage.removeAllAuthTokens(ctx)
+    }
+
     public async getInitialToken(
         ctx: Context,
         creds: { username: string; password: PlaintextPassword },
@@ -136,6 +141,7 @@ export class AuthController {
 interface AuthStorage {
     getAuthToken(ctx: Context, origin: string): AsyncResult<AuthToken>
     saveAuthToken(ctx: Context, authToken: AuthToken): AsyncResult<void>
+    removeAllAuthTokens(ctx: Context): AsyncResult<void>
 }
 
 interface AuthAPIClient {

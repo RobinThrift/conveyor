@@ -40,9 +40,11 @@ export const slice = createSlice({
             state.setup = { server: payload.server, username: payload.username }
             state.error = undefined
         },
+
         setSyncInfo: (state, { payload }: PayloadAction<SyncInfo>) => {
             state.info = payload
         },
+
         setStatus: (
             state,
             { payload }: PayloadAction<{ status: SyncStatus; error?: Error }>,
@@ -50,17 +52,27 @@ export const slice = createSlice({
             state.status = payload.status
             state.error = payload.error
         },
+
         disable: (state) => {
             state.status = "disabled"
             state.info = { isEnabled: false }
         },
+
         syncStart: (state) => {
             state.error = undefined
         },
+
         syncStartUploadFull: (state) => {
             state.error = undefined
         },
+
         syncStartDownloadFull: (state) => {
+            state.error = undefined
+        },
+
+        reset: (state) => {
+            state.status = "disabled"
+            state.info = { isEnabled: false }
             state.error = undefined
         },
     },

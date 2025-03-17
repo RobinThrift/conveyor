@@ -109,7 +109,7 @@ suite.concurrent("control/SettingsController", async () => {
         assert.isTrue(entry.isApplied)
     })
 
-    test("applyChangelogEntry", async ({ onTestFinished }) => {
+    test("applyChangelogEntries", async ({ onTestFinished }) => {
         let { settingsCtrl, ctx, setup, cleanup } =
             await settingsCtrlTestSetup()
 
@@ -117,19 +117,21 @@ suite.concurrent("control/SettingsController", async () => {
         onTestFinished(cleanup)
 
         await assertOkResult(
-            settingsCtrl.applyChangelogEntry(ctx, {
-                id: newID(),
-                source: "tests",
-                revision: 1,
-                targetType: "settings",
-                targetID: "locale.language",
-                isSynced: false,
-                isApplied: false,
-                timestamp: new Date(),
-                value: {
-                    value: "de",
+            settingsCtrl.applyChangelogEntries(ctx, [
+                {
+                    id: newID(),
+                    source: "tests",
+                    revision: 1,
+                    targetType: "settings",
+                    targetID: "locale.language",
+                    isSynced: false,
+                    isApplied: false,
+                    timestamp: new Date(),
+                    value: {
+                        value: "de",
+                    },
                 },
-            }),
+            ]),
         )
 
         let updated = await assertOkResult(settingsCtrl.loadSettings(ctx))

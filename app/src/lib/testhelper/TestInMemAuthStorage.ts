@@ -18,4 +18,9 @@ export class TestInMemAuthStorage {
         this._tokens.set(authToken.origin, authToken)
         return Ok(undefined)
     }
+
+    async removeAllAuthTokens(_: Context): AsyncResult<void> {
+        this._tokens.clear()
+        return Ok(undefined)
+    }
 }

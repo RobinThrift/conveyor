@@ -55,6 +55,11 @@ export const slice = createSlice({
         ) => {
             state.error = undefined
         },
+
+        reset: (state) => {
+            state.status = "not-authenticated"
+            state.error = undefined
+        },
     },
 
     selectors: {

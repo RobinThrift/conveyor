@@ -2,7 +2,10 @@ import type { SyncInfo } from "@/domain/SyncInfo"
 import { EncryptedBrowserIndexedDB } from "@/external/browser/EncryptedBrowserIndexedDB"
 import type { Context } from "@/lib/context"
 import type { Crypto } from "@/lib/crypto"
-import type { AsyncResult } from "@/lib/result"
+import { parseJSON, parseJSONDate } from "@/lib/json"
+import { type AsyncResult, Ok } from "@/lib/result"
+
+const SYNC_INFO_KEY = "SyncInfo"
 
 export class IndexedDBSyncStorage {
     private _db: EncryptedBrowserIndexedDB<SyncInfo>
@@ -11,7 +14,24 @@ export class IndexedDBSyncStorage {
         this._db = new EncryptedBrowserIndexedDB<SyncInfo>({
             name: "SyncStorage",
             crypto,
-            keyFrom: () => "sync_info",
+            keyFrom: () => SYNC_INFO_KEY,
+            parse: (raw) =>
+                parseJSON<SyncInfo, Record<string, any>>(raw, (obj) => {
+                    let lastSyncedAt = obj.lastSyncedAt
+                        ? parseJSONDate(obj.lastSyncedAt)
+                        : undefined
+                    if (lastSyncedAt && !lastSyncedAt.ok) {
+                        return lastSyncedAt
+                    }
+
+                    return Ok({
+                        isEnabled: obj.isEnabled,
+                        server: obj.server,
+                        clientID: obj.clientID,
+                        username: obj.username,
+                        lastSyncedAt: lastSyncedAt?.value,
+                    })
+                }),
         })
     }
 
@@ -24,10 +44,14 @@ export class IndexedDBSyncStorage {
     }
 
     loadSyncInfo(ctx: Context): AsyncResult<SyncInfo | undefined> {
-        return this._db.get(ctx, "SyncInfo")
+        return this._db.get(ctx, SYNC_INFO_KEY)
     }
 
     saveSyncInfo(ctx: Context, info: SyncInfo): AsyncResult<void> {
         return this._db.insertOrUpdate(ctx, [info])
+    }
+
+    removeSyncInfo(ctx: Context): AsyncResult<void> {
+        return this._db.delete(ctx, SYNC_INFO_KEY)
     }
 }

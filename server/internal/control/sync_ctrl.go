@@ -75,7 +75,14 @@ func (sc *SyncController) GetLatestFullSyncEntry(ctx context.Context) (*domain.F
 		return nil, auth.ErrUnauthorized
 	}
 
-	return sc.syncRepo.GetLatestFullSyncEntry(ctx, account.ID)
+	entry, err := sc.syncRepo.GetLatestFullSyncEntry(ctx, account.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	entry.Filepath = path.Join("dbs", fmt.Sprintf("belt_%d.db", entry.Timestamp.Unix()))
+
+	return entry, nil
 }
 
 type SaveFullDBCmd struct {

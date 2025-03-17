@@ -6,8 +6,10 @@ import type { Settings } from "./Settings"
 
 export type ChangelogEntryID = string
 
+export type ChangelogTargetType = "memos" | "attachments" | "settings"
+
 export interface ChangelogEntry<
-    T extends string = string,
+    T extends ChangelogTargetType = ChangelogTargetType,
     ID = string,
     V = unknown,
 > {
@@ -46,9 +48,17 @@ export type MemoChangelogEntry = ChangelogEntry<
       }
 >
 
-export interface MemoContentChanges {
+export type MemoContentChanges = MemoContentChangesV1
+
+export interface MemoContentChangesV1 {
     version: "1"
-    changes: (number | [number, ...string[]])[]
+    changes: MemoContentOpV1[]
+}
+
+export type MemoContentOpV1 = {
+    insert?: string | Record<string, unknown>
+    delete?: number
+    retain?: number | Record<string, unknown>
 }
 
 export type AttachmentChangelogEntry = ChangelogEntry<

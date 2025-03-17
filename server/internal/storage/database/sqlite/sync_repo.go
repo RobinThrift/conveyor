@@ -108,6 +108,10 @@ func (r *SyncRepo) CreateFullSyncEntry(ctx context.Context, entry *domain.FullSy
 func (r *SyncRepo) GetLatestFullSyncEntry(ctx context.Context, accountID domain.AccountID) (*domain.FullSyncEntry, error) {
 	row, err := queries.GetLatestFullSyncEntry(ctx, r.db.Conn(ctx), accountID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.ErrNoFullSyncEntriesFound
+		}
+
 		return nil, err
 	}
 

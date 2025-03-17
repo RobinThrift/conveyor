@@ -504,11 +504,7 @@ export async function updateTagCount(
 ) {
     let updateTagCountQueryWithSliceParams = updateTagCountQuery.replace(
         "/*SLICE:tags*/?",
-        [
-            ...Array(args.tags.length)
-                .keys()
-                .map((i) => `?${i + 1}`),
-        ].join(","),
+        [...Array(args.tags.length).keys()].map((i) => `?${i + 1}`).join(","),
     )
     await database.exec(
         updateTagCountQueryWithSliceParams,
@@ -571,11 +567,9 @@ export async function cleanupeMemoTagConnection(
     let cleanupeMemoTagConnectionQueryWithSliceParams =
         cleanupeMemoTagConnectionQuery.replace(
             "/*SLICE:tags*/?",
-            [
-                ...Array(args.tags.length)
-                    .keys()
-                    .map((i) => `?${i + 2}`),
-            ].join(","),
+            [...Array(args.tags.length).keys()]
+                .map((i) => `?${i + 2}`)
+                .join(","),
         )
     let result = await database.query(
         cleanupeMemoTagConnectionQueryWithSliceParams,

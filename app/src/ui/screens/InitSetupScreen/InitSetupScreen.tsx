@@ -25,6 +25,7 @@ export function InitSetupScreen() {
     let {
         step,
         next,
+        isNew,
         back,
         startNew,
         startFromRemote,
@@ -70,6 +71,7 @@ export function InitSetupScreen() {
             stepComp = (
                 <StepConfigureEncryption
                     back={back}
+                    isNew={isNew}
                     generatePrivateCryptoKey={generatePrivateCryptoKey}
                     importPrivateCryptoKey={importPrivateCryptoKey}
                     checkPrivateCryptoKey={checkPrivateCryptoKey}
@@ -203,6 +205,11 @@ function StepConfigureRemoteSync({
             {error && (
                 <Alert variant="danger">
                     {error.name}: {error.message}
+                    {error.stack && (
+                        <pre>
+                            <code>{error.stack}</code>
+                        </pre>
+                    )}
                 </Alert>
             )}
 
@@ -217,12 +224,14 @@ function StepConfigureEncryption({
     generatePrivateCryptoKey,
     importPrivateCryptoKey,
     checkPrivateCryptoKey,
+    isNew,
     back,
 }: {
     generatePrivateCryptoKey: () => AsyncResult<string>
     candidatePrivateCryptoKey?: PrivateCryptoKey
     importPrivateCryptoKey: (key: string) => void
     checkPrivateCryptoKey: (key: string) => Result<void>
+    isNew: boolean
     back: () => void
 }) {
     let t = useT("screens/InitSetup")
@@ -287,9 +296,11 @@ function StepConfigureEncryption({
                 autoComplete="off"
             />
 
-            <Button variant="primary" onClick={generate}>
-                {t.GenerateCandidatePrivateCryptoKeyLabel}
-            </Button>
+            {isNew && (
+                <Button variant="primary" onClick={generate}>
+                    {t.GenerateCandidatePrivateCryptoKeyLabel}
+                </Button>
+            )}
 
             <div className="flex gap-2 justify-between">
                 <Button variant="primary" onClick={onClickBack}>
@@ -308,6 +319,11 @@ function StepConfigureEncryption({
             {error && (
                 <Alert variant="danger">
                     {error.name}: {error.message}
+                    {error.stack && (
+                        <pre>
+                            <code>{error.stack}</code>
+                        </pre>
+                    )}
                 </Alert>
             )}
         </Form>
@@ -329,6 +345,11 @@ function StepSyncing({
                 <>
                     <Alert variant="danger">
                         {error.name}: {error.message}
+                        {error.stack && (
+                            <pre>
+                                <code>{error.stack}</code>
+                            </pre>
+                        )}
                     </Alert>
 
                     <Button variant="primary" onClick={back}>

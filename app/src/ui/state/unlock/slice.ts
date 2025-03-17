@@ -19,6 +19,7 @@ export const slice = createSlice({
             state,
             _: PayloadAction<{
                 plaintextKeyData: PlaintextPrivateKey
+                storeKey?: boolean
                 db?: {
                     file?: string
                     enableTracing?: boolean

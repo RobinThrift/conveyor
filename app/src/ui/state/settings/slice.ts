@@ -27,7 +27,8 @@ export const slice = createSlice({
             ...state,
             values: setPath(state.values, payload.key, payload.value),
         }),
-        loadStart: (state) => {
+        loadStart: (state) => state,
+        setIsLoading: (state) => {
             state.isLoading = true
             state.error = undefined
         },
@@ -39,6 +40,7 @@ export const slice = createSlice({
         }),
         setError: (state, { payload }: PayloadAction<Error | undefined>) => ({
             ...state,
+            isLoading: false,
             error: payload,
         }),
     },
@@ -50,6 +52,7 @@ export const slice = createSlice({
         ): ValueAt<Settings, K> => getPath(state.values, key),
         isLoading: (state) => state.isLoading,
         isLoaded: (state) => state.isLoaded,
+        error: (state) => state.error,
         mode: (state) => {
             if (state.values.theme.mode === "auto") {
                 return window.matchMedia("(prefers-color-scheme: dark)").matches

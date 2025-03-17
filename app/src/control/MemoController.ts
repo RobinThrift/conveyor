@@ -6,7 +6,7 @@ import type {
 import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
 import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
-import { applyTextChanges } from "@/lib/applyTextChanges"
+import { mergeChanges, resolveChanges } from "@/lib/applyTextChanges"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
@@ -189,7 +189,31 @@ export class MemoController {
         })
     }
 
-    public async applyChangelogEntry(
+    public async applyChangelogEntries(
+        ctx: Context,
+        entries: MemoChangelogEntry[],
+    ): AsyncResult<void> {
+        let skip = new Set<MemoID>()
+
+        for (let entry of entries) {
+            if ("content" in entry.value && skip.has(entry.targetID)) {
+                continue
+            }
+
+            if ("content" in entry.value) {
+                skip.add(entry.targetID)
+            }
+
+            let applied = await this._applyChangelogEntry(ctx, entry)
+            if (!applied.ok) {
+                return applied
+            }
+        }
+
+        return Ok(undefined)
+    }
+
+    private async _applyChangelogEntry(
         ctx: Context,
         entry: MemoChangelogEntry,
     ): AsyncResult<void> {
@@ -241,31 +265,7 @@ export class MemoController {
         }
 
         if ("content" in entry.value) {
-            let content = applyTextChanges(
-                memo.value.content,
-                entry.value.content,
-            )
-            return this._transactioner.inTransaction(ctx, async (ctx) => {
-                let updated = await this._repo.updateMemoContent(ctx, {
-                    id: memo.value.id,
-                    content,
-                })
-
-                if (!updated.ok) {
-                    return updated
-                }
-
-                let res = await this._attachments.updateMemoAttachments(
-                    ctx,
-                    memo.value.id,
-                    content,
-                )
-                if (!res.ok) {
-                    return res
-                }
-
-                return Ok(undefined)
-            })
+            return this._applyMemoContentChangelogEntry(ctx, memo.value)
         }
 
         return Err(
@@ -273,6 +273,46 @@ export class MemoController {
                 `error applying changelog entry to memo: unknown changelog type: ${JSON.stringify(entry.value)}`,
             ),
         )
+    }
+
+    private async _applyMemoContentChangelogEntry(
+        ctx: Context,
+        memo: Memo,
+    ): AsyncResult<void> {
+        let entries =
+            await this._changelog.listChangelogEntriesForID<MemoChangelogEntry>(
+                ctx,
+                memo.id,
+            )
+        if (!entries.ok) {
+            return entries
+        }
+
+        let { changes } = mergeChanges(entries.value)
+
+        let content = resolveChanges(changes)
+
+        return this._transactioner.inTransaction(ctx, async (ctx) => {
+            let updated = await this._repo.updateMemoContent(ctx, {
+                id: memo.id,
+                content,
+            })
+
+            if (!updated.ok) {
+                return updated
+            }
+
+            let res = await this._attachments.updateMemoAttachments(
+                ctx,
+                memo.id,
+                content,
+            )
+            if (!res.ok) {
+                return res
+            }
+
+            return Ok(undefined)
+        })
     }
 
     public async listTags(
@@ -365,4 +405,8 @@ interface Changelog {
         ctx: Context<{ db?: DBExec }>,
         entry: Omit<ChangelogEntry, "source" | "id" | "timestamp">,
     ): AsyncResult<void>
+    listChangelogEntriesForID<C extends ChangelogEntry>(
+        ctx: Context<{ db?: DBExec }>,
+        targetID: string,
+    ): AsyncResult<C[]>
 }

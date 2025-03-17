@@ -129,6 +129,7 @@ async function openFile(
     filepath: string,
     create?: boolean,
 ) {
+    console.log("opfs openFile", rootDir, filepath)
     let { dir: dirname, filename } = splitFilepath(filepath)
     let dir = await getDirHandle(rootDir, dirname)
 

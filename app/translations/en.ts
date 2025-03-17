@@ -166,6 +166,7 @@ export const translations = {
     "screens/Unlock": {
         Title: "Unlock",
         PrivateKeyLabel: "Private Key",
+        StoreKeyLabel: "Store Key for this session",
         UnlockButton: "Unlock",
         "Invalid/Empty": params("{name} must not be empty"),
     },
@@ -213,7 +214,7 @@ export const translations = {
         ManualFullDownloadWarning:
             "Warning, this will delete all local memo data and replace it with the latest version from the server. This cannot be undone!",
         ManualFullUploadWarning:
-            "Wawrning, this will upload the current state and may override exisitng data. If another client with data that is not in this database pulls this state (using a full sync), data may be lost.",
+            "Warning, this will upload the current state and may override exisitng data. If another client with data that is not in this database pulls this state (using a full sync), data may be lost.",
     },
 
     "screens/Settings/SyncSettings/Setup": {

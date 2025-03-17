@@ -3,6 +3,7 @@ import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
 import { PasswordChangeRequiredError } from "@/auth"
+import { fromThrowing } from "@/lib/result"
 import { slice } from "./slice"
 
 export const registerEffects = (
@@ -32,7 +33,18 @@ export const registerEffects = (
                 }),
             )
 
-            authCtrl.setOrigin(payload.server)
+            let serverURL = fromThrowing(() => new URL(payload.server))
+            if (!serverURL.ok) {
+                dispatch(
+                    slice.actions.setAuthStatus({
+                        error: serverURL.err,
+                        status: "error",
+                    }),
+                )
+                return
+            }
+
+            authCtrl.setOrigin(serverURL.value.host)
             let token = await authCtrl.getInitialToken(
                 BaseContext.withSignal(signal),
                 payload,
@@ -107,6 +119,19 @@ export const registerEffects = (
                     status: "not-authenticated",
                 }),
             )
+        },
+    })
+
+    startListening({
+        actionCreator: slice.actions.reset,
+        effect: async (_, { cancelActiveListeners, signal }) => {
+            cancelActiveListeners()
+
+            let reset = await authCtrl.reset(BaseContext.withSignal(signal))
+            if (!reset.ok) {
+                console.error(reset.err)
+                return
+            }
         },
     })
 }

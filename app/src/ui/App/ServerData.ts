@@ -1,10 +1,4 @@
-import type { Account } from "@/domain/Account"
-import type { Settings } from "@/domain/Settings"
-
 export interface ServerData {
-    account: Account
-    settings: Settings
-
     error?: {
         code: number
         title: string

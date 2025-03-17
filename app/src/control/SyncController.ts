@@ -1,7 +1,9 @@
 import type {
     AttachmentChangelogEntry,
     ChangelogEntry,
+    ChangelogEntryID,
     ChangelogEntryList,
+    ChangelogTargetType,
     EncryptedChangelogEntry,
     MemoChangelogEntry,
     SettingChangelogEntry,
@@ -13,7 +15,7 @@ import type { Decrypter, Encrypter } from "@/lib/crypto"
 import type { DBExec, Transactioner } from "@/lib/database"
 import type { FS } from "@/lib/fs"
 import { parseJSON, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Err, Ok, type Result, fmtErr } from "@/lib/result"
+import { type AsyncResult, Err, Ok, fmtErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
 
 export class SyncController {
@@ -27,6 +29,8 @@ export class SyncController {
     private _dbPath: string
     private _fs: FS
     private _crypto: Encrypter & Decrypter
+
+    private _info: SyncInfo = { isEnabled: false }
 
     constructor({
         transactioner,
@@ -67,11 +71,14 @@ export class SyncController {
         ctx: Context,
         info: { server: string; clientID: string; username: string },
     ): AsyncResult<void> {
+        this._info = { ...info, isEnabled: true }
         this._syncAPIClient.setBaseURL(info.server)
-        return this._storage.saveSyncInfo(ctx, {
-            ...info,
-            isEnabled: true,
-        })
+        return this._storage.saveSyncInfo(ctx, this._info)
+    }
+
+    public async reset(ctx: Context): AsyncResult<void> {
+        this._info = { isEnabled: false }
+        return this._storage.removeSyncInfo(ctx)
     }
 
     public async load(ctx: Context): AsyncResult<SyncInfo | undefined> {
@@ -84,10 +91,17 @@ export class SyncController {
             this._syncAPIClient.setBaseURL(info.value.server)
         }
 
+        this._info = info.value ?? this._info
+
         return Ok(info.value)
     }
 
     public async sync(ctx: Context): AsyncResult<void> {
+        let info = this._info
+        if (!info.isEnabled) {
+            return Err(new Error("sync is not enabled"))
+        }
+
         return this._transactioner.inTransaction(ctx, async (ctx) => {
             let serverChanges = await this._fetchChangelogEntries(ctx)
             if (!serverChanges.ok) {
@@ -106,7 +120,10 @@ export class SyncController {
                 return uploaded
             }
 
-            return Ok(undefined)
+            return this._storage.saveSyncInfo(ctx, {
+                ...info,
+                lastSyncedAt: new Date(),
+            })
         })
     }
 
@@ -160,6 +177,12 @@ export class SyncController {
     }
 
     private async _applyChangelogEntries(ctx: Context): AsyncResult<void> {
+        let groupedByType: Partial<
+            Record<ChangelogTargetType, ChangelogEntry[]>
+        > = {}
+
+        let entryIDs = [] as ChangelogEntryID[]
+
         let hasNextPage = true
         let after: number | undefined
         while (hasNextPage) {
@@ -174,17 +197,50 @@ export class SyncController {
             }
 
             for (let entry of page.value.items) {
-                let applied = await this._applyChangelogEntry(ctx, entry)
-                if (!applied.ok) {
-                    return applied
-                }
+                entryIDs.push(entry.id)
+                let entries = groupedByType[entry.targetType] ?? []
+                entries.push(entry)
+                groupedByType[entry.targetType] = entries
+                // let applied = await this._applyChangelogEntry(ctx, entry)
             }
 
             after = page.value.next
             hasNextPage = page.value.next !== undefined
         }
 
-        return Ok(undefined)
+        return this._transactioner.inTransaction(ctx, async (ctx) => {
+            if (groupedByType.attachments) {
+                let applied = await this._attachments.applyChangelogEntries(
+                    ctx,
+                    groupedByType.attachments as AttachmentChangelogEntry[],
+                )
+                if (!applied.ok) {
+                    return applied
+                }
+            }
+
+            if (groupedByType.memos) {
+                let applied = await this._memos.applyChangelogEntries(
+                    ctx,
+                    groupedByType.memos as MemoChangelogEntry[],
+                )
+                if (!applied.ok) {
+                    return applied
+                }
+            }
+
+            if (groupedByType.settings) {
+                let applied = await this._settings.applyChangelogEntries(
+                    ctx,
+                    groupedByType.settings as SettingChangelogEntry[],
+                )
+                if (!applied.ok) {
+                    return applied
+                }
+            }
+
+            return this._changelog.markChangelogEntriesAsApplied(ctx, entryIDs)
+        })
     }
 
     private async _fetchChangelogEntries(
@@ -249,15 +305,11 @@ export class SyncController {
         ctx: Context,
         entries: ChangelogEntry[],
     ): AsyncResult<void> {
-        let syncInfo = await this._storage.loadSyncInfo(ctx)
-        if (!syncInfo.ok) {
-            return syncInfo
-        }
-        if (!syncInfo.value?.isEnabled) {
-            return Err(new Error("sync has not been setup yet"))
+        if (!this._info.isEnabled) {
+            return Err(new Error("sync is not enabled"))
         }
 
-        let clientID = syncInfo.value.clientID
+        let clientID = this._info.clientID
 
         return this._transactioner.inTransaction(ctx, async (ctx) => {
             let marked = await this._changelog.markChangelogEntriesAsSynced(
@@ -360,49 +412,6 @@ export class SyncController {
 
         return Ok(entries)
     }
-
-    private async _applyChangelogEntry(
-        ctx: Context,
-        entry: ChangelogEntry,
-    ): AsyncResult<void> {
-        return this._transactioner.inTransaction(ctx, async (ctx) => {
-            let applied: Result<void, Error>
-            switch (entry.targetType) {
-                case "memos":
-                    applied = await this._memos.applyChangelogEntry(
-                        ctx,
-                        entry as MemoChangelogEntry,
-                    )
-                    break
-                case "attachments":
-                    applied = await this._attachments.applyChangelogEntry(
-                        ctx,
-                        entry as AttachmentChangelogEntry,
-                    )
-                    break
-                case "settings":
-                    applied = await this._settings.applyChangelogEntry(
-                        ctx,
-                        entry as SettingChangelogEntry,
-                    )
-                    break
-                default:
-                    applied = Err(
-                        new Error(
-                            `unknown changelog entry target type ${entry.targetType}`,
-                        ),
-                    )
-            }
-
-            this._changelog.markChangelogEntriesAsApplied(ctx, [entry])
-
-            if (!applied.ok) {
-                return applied
-            }
-
-            return Ok(undefined)
-        })
-    }
 }
 
 interface SyncAPIClient {
@@ -422,26 +431,27 @@ interface SyncAPIClient {
 interface Storage {
     loadSyncInfo(ctx: Context): AsyncResult<SyncInfo | undefined>
     saveSyncInfo(ctx: Context, info: SyncInfo): AsyncResult<void>
+    removeSyncInfo(ctx: Context): AsyncResult<void>
 }
 
 interface Memo {
-    applyChangelogEntry(
+    applyChangelogEntries(
         ctx: Context<{ db?: DBExec }>,
-        entry: MemoChangelogEntry,
+        entries: MemoChangelogEntry[],
     ): AsyncResult<void>
 }
 
 interface Attachments {
-    applyChangelogEntry(
+    applyChangelogEntries(
         ctx: Context<{ db?: DBExec }>,
-        entry: AttachmentChangelogEntry,
+        entries: AttachmentChangelogEntry[],
     ): AsyncResult<void>
 }
 
 interface Settings {
-    applyChangelogEntry(
+    applyChangelogEntries(
         ctx: Context<{ db?: DBExec }>,
-        entry: SettingChangelogEntry,
+        entries: SettingChangelogEntry[],
     ): AsyncResult<void>
 }
 
@@ -473,7 +483,7 @@ interface Changelog {
 
     markChangelogEntriesAsApplied(
         ctx: Context<{ db?: DBExec }>,
-        entries: ChangelogEntry[],
+        entryIDs: ChangelogEntryID[],
     ): AsyncResult<void>
 
     markChangelogEntriesAsSynced(

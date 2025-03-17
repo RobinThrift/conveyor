@@ -15,7 +15,7 @@ FROM changelog
 WHERE
     CASE WHEN ?1 IS NOT NULL THEN id > ?1 ELSE true END
     AND is_synced = false
-ORDER BY revision
+ORDER BY timestamp ASC, revision ASC
 LIMIT ?2`
 
 export interface ListUnsyncedChangesArgs {
@@ -68,7 +68,7 @@ FROM changelog
 WHERE
     CASE WHEN ?1 IS NOT NULL THEN id > ?1 ELSE true END
     AND is_applied = false
-ORDER BY revision
+ORDER BY timestamp ASC, revision ASC
 LIMIT ?2`
 
 export interface ListUnappliedChangesArgs {
@@ -105,6 +105,55 @@ export async function listUnappliedChanges(
     )
     return result.map((row) =>
         mapRowToObj<ListUnappliedChangesRow>(row, {
+            timestamp: dateFromSQLite,
+            isApplied: numberToBool,
+            isSynced: numberToBool,
+            appliedAt: dateFromSQLite,
+            syncedAt: dateFromSQLite,
+            createdAt: dateFromSQLite,
+        }),
+    )
+}
+
+const listChangelogEntriesForIDQuery = `-- name: ListChangelogEntriesForID :many
+SELECT id, public_id, source, revision, timestamp, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
+FROM changelog
+WHERE target_id = ?
+ORDER BY revision ASC, timestamp ASC`
+
+export interface ListChangelogEntriesForIDArgs {
+    targetId: string
+}
+
+export interface ListChangelogEntriesForIDRow {
+    id: number
+    publicId: string
+    source: string
+    revision: number
+    timestamp: Date
+    targetType: string
+    targetId: string
+    value: any
+    isApplied: boolean
+    isSynced: boolean
+    appliedAt: Date | undefined
+    syncedAt: Date | undefined
+    createdAt: Date
+    updatedAt: string
+}
+
+export async function listChangelogEntriesForID(
+    database: Database,
+    args: ListChangelogEntriesForIDArgs,
+    abort?: AbortSignal,
+): Promise<ListChangelogEntriesForIDRow[]> {
+    let result = await database.query(
+        listChangelogEntriesForIDQuery,
+        [args.targetId],
+        abort,
+    )
+    return result.map((row) =>
+        mapRowToObj<ListChangelogEntriesForIDRow>(row, {
             timestamp: dateFromSQLite,
             isApplied: numberToBool,
             isSynced: numberToBool,
@@ -204,11 +253,9 @@ export async function markChangelogEntriesAsSynced(
     let markChangelogEntriesAsSyncedQueryWithSliceParams =
         markChangelogEntriesAsSyncedQuery.replace(
             "/*SLICE:public_ids*/?",
-            [
-                ...Array(args.publicIds.length)
-                    .keys()
-                    .map((i) => `?${i + 1}`),
-            ].join(","),
+            [...Array(args.publicIds.length).keys()]
+                .map((i) => `?${i + 1}`)
+                .join(","),
         )
     await database.exec(
         markChangelogEntriesAsSyncedQueryWithSliceParams,
@@ -234,11 +281,9 @@ export async function markChangelogEntriesAsApplied(
     let markChangelogEntriesAsAppliedQueryWithSliceParams =
         markChangelogEntriesAsAppliedQuery.replace(
             "/*SLICE:public_ids*/?",
-            [
-                ...Array(args.publicIds.length)
-                    .keys()
-                    .map((i) => `?${i + 1}`),
-            ].join(","),
+            [...Array(args.publicIds.length).keys()]
+                .map((i) => `?${i + 1}`)
+                .join(","),
         )
     await database.exec(
         markChangelogEntriesAsAppliedQueryWithSliceParams,

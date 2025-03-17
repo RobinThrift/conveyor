@@ -186,6 +186,44 @@ export class BrowserIndexedDB<Stores extends Record<string, unknown>> {
         })
     }
 
+    public async listKeys<S extends keyof Stores>(
+        ctx: Context,
+        storeName: S,
+    ): AsyncResult<IDBValidKey[]> {
+        return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
+            let maybeStore = fromThrowing(() =>
+                tx.objectStore(storeName as string),
+            )
+            if (!maybeStore.ok) {
+                return maybeStore
+            }
+
+            let store = maybeStore.value
+
+            let getKeysReq = fromThrowing(() => store.getAllKeys())
+            if (!getKeysReq.ok) {
+                return getKeysReq
+            }
+
+            let { resolve, reject, promise } =
+                Promise.withResolvers<IDBValidKey[]>()
+
+            getKeysReq.value.addEventListener("error", () => {
+                reject(getKeysReq.value.error)
+            })
+
+            getKeysReq.value.addEventListener("success", () => {
+                if (ctx.isCancelled()) {
+                    reject(ctx.err())
+                    return
+                }
+                resolve(getKeysReq.value.result)
+            })
+
+            return fromPromise(promise)
+        })
+    }
+
     public async delete<S extends keyof Stores>(
         ctx: Context,
         storeName: S,

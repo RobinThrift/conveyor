@@ -1,9 +1,16 @@
-import type { MemoContentChanges } from "@/domain/Changelog"
-import { applyChangeSetJSON } from "@/external/codemirror/document"
+import type {
+    MemoChangelogEntry,
+    MemoContentChanges,
+    MemoContentOpV1,
+} from "@/domain/Changelog"
+import { changesToString, mergeDeltas } from "@/external/quill"
 
-export function applyTextChanges(
-    base: string,
-    changes: MemoContentChanges,
-): string {
-    return applyChangeSetJSON(base, changes.changes)
+export function mergeChanges(
+    entries: MemoChangelogEntry[],
+): MemoContentChanges {
+    return mergeDeltas(entries)
+}
+
+export function resolveChanges(changes: MemoContentOpV1[]): string {
+    return changesToString(changes)
 }

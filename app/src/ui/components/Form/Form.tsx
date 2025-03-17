@@ -38,6 +38,8 @@ export function FormMessage(props: FormMessageProps) {
 
         if (key in props.messages && typeof props.messages[key] === "string") {
             c.push(props.messages[key] as string)
+        } else {
+            c.push(`${props.error.name}: ${props.error.message}`)
         }
 
         return c

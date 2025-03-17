@@ -6,7 +6,14 @@ import {
 import type { PlaintextPassword } from "@/auth/credentials"
 import type { Context } from "@/lib/context"
 import { parseJSON, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
+import {
+    type AsyncResult,
+    Err,
+    Ok,
+    fmtErr,
+    fromPromise,
+    fromThrowing,
+} from "@/lib/result"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 
@@ -156,8 +163,13 @@ export class AuthV1APIClient {
                 return refreshExpiresAt
             }
 
+            let serverURL = fromThrowing(() => new URL(this._baseURL))
+            if (!serverURL.ok) {
+                return serverURL
+            }
+
             return Ok({
-                origin: this._baseURL,
+                origin: serverURL.value.host,
                 accessToken: obj.accessToken,
                 expiresAt: expiresAt.value,
                 refreshToken: obj.refreshToken,

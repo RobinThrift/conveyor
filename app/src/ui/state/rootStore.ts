@@ -56,8 +56,12 @@ export function configureRootStore(initState: {
 
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
+                thunk: false,
                 serializableCheck: {
-                    ignoredActions: ["setup/setupCandidatePrivateCryptoKey"],
+                    ignoredActions: [
+                        "setup/setupCandidatePrivateCryptoKey",
+                        "settings/setError",
+                    ],
                     ignoredActionPaths: [
                         /.*\.(createdAt|updatedAt|expiresAt|exactDate)/,
                         /.*\.error/,
@@ -68,6 +72,7 @@ export function configureRootStore(initState: {
                         "payload.data",
                         "payload.params",
                         "payload.pagination.after",
+                        "payload.lastSyncedAt",
                         /.*\.buttons/,
                     ],
                     ignoredPaths: [
@@ -80,6 +85,7 @@ export function configureRootStore(initState: {
                         "global.i18n.dateFns",
                         "setup.selectedOptions.candidatePrivateCryptoKey",
                         /.*\.buttons/,
+                        "sync.info.lastSyncedAt",
                     ],
                 },
             }).prepend(listenerMiddleware.middleware),
@@ -160,3 +166,15 @@ export function configureEffects({
         unlockCtrl,
     })
 }
+
+/*
+ logger middleware
+     ((store) =>
+     (next) =>
+     (action) => {
+         console.log("dispatching", action)
+         let result = next(action)
+         console.log("next state", store.getState())
+         return result
+     }) as Middleware
+ */

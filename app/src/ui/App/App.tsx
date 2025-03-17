@@ -12,13 +12,15 @@ import { Theme } from "@/ui/components/Theme"
 import { useBaseURL } from "@/ui/hooks/useBaseURL"
 import { EditMemoScreen } from "@/ui/screens/EditMemoScreen"
 import { ErrorScreen } from "@/ui/screens/ErrorScreen"
+import { InitSetupScreen } from "@/ui/screens/InitSetupScreen/InitSetupScreen"
 import { MainScreen } from "@/ui/screens/MainScreen"
 import { NewMemoScreen } from "@/ui/screens/NewMemoScreen"
 import { SettingsScreen } from "@/ui/screens/SettingsScreen"
 import { SingleMemoScreen } from "@/ui/screens/SingleMemoScreen"
+import { UnlockScreen } from "@/ui/screens/UnlockScreen/UnlockScreen"
 import { useTheme } from "@/ui/settings"
 import { useCurrentPage, useGoto } from "@/ui/state/global/router"
-import { UnlockScreen } from "../screens/UnlockScreen/UnlockScreen"
+
 import type { ServerData } from "./ServerData"
 import { Router } from "./router"
 
@@ -85,6 +87,14 @@ function AppShell() {
                 <Theme colourScheme={colourScheme} mode={mode}>
                     <Suspense>
                         <UnlockScreen />
+                    </Suspense>
+                </Theme>
+            )
+        case "setup":
+            return (
+                <Theme colourScheme={colourScheme} mode={mode}>
+                    <Suspense>
+                        <InitSetupScreen />
                     </Suspense>
                 </Theme>
             )

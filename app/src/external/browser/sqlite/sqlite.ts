@@ -3,6 +3,7 @@ import type { SqlValue } from "@sqlite.org/sqlite-wasm"
 import { BaseContext, type Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import { type AsyncResult, Err, toPromise } from "@/lib/result"
+import { migrate } from "@/storage/database/sqlite/migrator"
 
 import { SQLiteWorker } from "./sqlite.worker"
 
@@ -57,7 +58,11 @@ export class SQLite implements Database {
             enableTracing?: boolean
         },
     ) {
-        await this._worker.open(ctx, params)
+        await toPromise(this._worker.open(ctx, params))
+        await toPromise(
+            this._worker.exec(ctx, { sql: "PRAGMA foreign_keys = true;" }),
+        )
+        await migrate(ctx, this)
     }
 
     public async close() {
@@ -109,6 +114,11 @@ export class SQLite implements Database {
         ctx: Context<{ db?: DBExec }>,
         fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
     ): AsyncResult<R> {
+        let tx = ctx.getData("db")
+        if (tx) {
+            return fn(ctx.withData("db", tx))
+        }
+
         await this.exec("BEGIN")
         try {
             let r = await fn(ctx.withData("db", new Transaction(this)))

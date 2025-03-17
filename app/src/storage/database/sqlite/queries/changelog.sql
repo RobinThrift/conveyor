@@ -4,7 +4,7 @@ FROM changelog
 WHERE
     CASE WHEN @chlg_page_after IS NOT NULL THEN id > @chlg_page_after ELSE true END
     AND is_synced = false
-ORDER BY revision
+ORDER BY timestamp ASC, revision ASC
 LIMIT @page_size;
 
 -- name: ListUnappliedChanges :many
@@ -13,8 +13,14 @@ FROM changelog
 WHERE
     CASE WHEN @chlg_page_after IS NOT NULL THEN id > @chlg_page_after ELSE true END
     AND is_applied = false
-ORDER BY revision
+ORDER BY timestamp ASC, revision ASC
 LIMIT @page_size;
+
+-- name: ListChangelogEntriesForID :many
+SELECT *
+FROM changelog
+WHERE target_id = ?
+ORDER BY revision ASC, timestamp ASC;
 
 -- name: CreateChangelogEntry :exec
 INSERT INTO changelog(

@@ -13,4 +13,9 @@ export class TestInMemSyncStorage {
         this._syncInfo = info
         return Ok(undefined)
     }
+
+    async removeSyncInfo(_: Context): AsyncResult<void> {
+        this._syncInfo = undefined
+        return Ok(undefined)
+    }
 }

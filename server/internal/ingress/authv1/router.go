@@ -63,6 +63,13 @@ func (router *router) requestAuthTokenUsingPassword(ctx context.Context, req Aut
 		PlaintextPasswd: auth.PlaintextPassword(req.Password),
 	})
 	if err != nil {
+		if errors.Is(err, control.ErrInvalidCredentials) {
+			return nil, fmt.Errorf("%w: %v", auth.ErrUnauthorized, err)
+		}
+
+		if errors.Is(err, control.ErrRequiresPasswordChange) {
+			return RequestAuthToken204Response{}, nil
+		}
 		return nil, err
 	}
 
@@ -104,6 +111,7 @@ func (router *router) ChangePassword(ctx context.Context, req ChangePasswordRequ
 	}
 
 	err = router.authCtrl.ChangeAccountPassword(ctx, control.ChangeAccountPasswordCmd{
+		Username:            req.Body.Username,
 		CurrPasswdPlaintext: auth.PlaintextPassword(req.Body.CurrentPassword),
 		NewPasswdPlaintext:  auth.PlaintextPassword(req.Body.NewPassword),
 	})
@@ -111,7 +119,7 @@ func (router *router) ChangePassword(ctx context.Context, req ChangePasswordRequ
 		return nil, err
 	}
 
-	return ChangePassword200Response{}, nil
+	return ChangePassword204Response{}, nil
 }
 
 // Add a new account key.

@@ -162,6 +162,7 @@
     "screens/Unlock": {
         "Title": "Entsperren",
         "PasswordLabel": "Privater Schlüssel",
+        "StoreKeyLabel": "Schlüssel für diese Sitzung speichern",
         "UnlockButton": "Entsperren",
         "Invalid/Empty": "{name} darf nicht leer sein"
     },

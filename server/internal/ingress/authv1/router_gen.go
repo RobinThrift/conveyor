@@ -508,11 +508,11 @@ type ChangePasswordResponseObject interface {
 	VisitChangePasswordResponse(w http.ResponseWriter) error
 }
 
-type ChangePassword200Response struct {
+type ChangePassword204Response struct {
 }
 
-func (response ChangePassword200Response) VisitChangePasswordResponse(w http.ResponseWriter) error {
-	w.WriteHeader(200)
+func (response ChangePassword204Response) VisitChangePasswordResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
 	return nil
 }
 

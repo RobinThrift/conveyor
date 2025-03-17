@@ -99,14 +99,18 @@ export class ChangelogController {
 
     public async markChangelogEntriesAsApplied(
         ctx: Context<{ db?: DBExec }>,
-        entries: ChangelogEntry[],
+        entryIDs: ChangelogEntryID[],
     ): AsyncResult<void> {
         return this._transactioner.inTransaction(ctx, async (ctx) =>
-            this._repo.markChangelogEntriesAsApplied(
-                ctx,
-                entries.map((e) => e.id),
-            ),
+            this._repo.markChangelogEntriesAsApplied(ctx, entryIDs),
         )
+    }
+
+    public async listChangelogEntriesForID<C extends ChangelogEntry>(
+        ctx: Context<{ db?: DBExec }>,
+        targetID: string,
+    ): AsyncResult<C[]> {
+        return this._repo.listChangelogEntriesForID(ctx, targetID)
     }
 }
 
@@ -135,6 +139,11 @@ interface Repo {
             }
         },
     ): AsyncResult<ChangelogEntryList>
+
+    listChangelogEntriesForID<C extends ChangelogEntry>(
+        ctx: Context<{ db?: DBExec }>,
+        targetID: string,
+    ): AsyncResult<C[]>
 
     markChangelogEntriesAsSynced(
         ctx: Context<{ db: DBExec }>,

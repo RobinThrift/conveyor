@@ -10,6 +10,7 @@ import (
 
 	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/control"
+	appingress "go.robinthrift.com/belt/internal/ingress/app"
 	"go.robinthrift.com/belt/internal/ingress/authv1"
 	"go.robinthrift.com/belt/internal/ingress/syncv1"
 	"go.robinthrift.com/belt/internal/jobs"
@@ -73,6 +74,7 @@ func New(config Config) *App {
 	syncv1.New(syncv1.RouterConfig{
 		BasePath: config.BasePath,
 	}, mux, syncCtrl, authCtrl, http.Dir(config.Blobs.Dir))
+	appingress.New(config.BasePath, mux)
 
 	return &App{
 		config: config,

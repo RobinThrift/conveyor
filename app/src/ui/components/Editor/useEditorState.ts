@@ -1,5 +1,6 @@
 import type { MemoContentChanges } from "@/domain/Changelog"
 import type { Memo } from "@/domain/Memo"
+import { diff } from "@/external/quill"
 import { useStateGetter } from "@/ui/hooks/useStateGetter"
 import type { ChangeSet } from "@codemirror/state"
 import { useCallback, useEffect, useState } from "react"
@@ -24,14 +25,18 @@ export function useEditorState(props: {
     )
 
     let onSave = useCallback(() => {
+        let changes: MemoContentChanges = {
+            version: "1",
+            changes: diff(props.memo.content, content()),
+        }
         props.onSave(
             {
                 ...props.memo,
                 content: content(),
             },
-            { version: "1", changes: changeset()?.toJSON() ?? [] },
+            changes,
         )
-    }, [props.onSave, props.memo, content, changeset])
+    }, [props.onSave, props.memo, content])
 
     let onCancel = useCallback(() => {
         if (isChanged) {

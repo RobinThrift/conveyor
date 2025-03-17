@@ -4,6 +4,7 @@ import type { StartListening } from "@/ui/state/rootStore"
 
 import * as auth from "../auth"
 import { slice as router } from "../global/router"
+import * as settings from "../settings"
 import * as sync from "../sync"
 import { slice } from "./slice"
 
@@ -58,6 +59,24 @@ export const registerEffects = (
     })
 
     startListening({
+        actionCreator: slice.actions.setupCandidatePrivateCryptoKey,
+        effect: async (_, { dispatch }) => {
+            dispatch(auth.actions.reset())
+            dispatch(sync.actions.reset())
+        },
+    })
+
+    startListening({
+        actionCreator: slice.actions.setIsSetup,
+        effect: async ({ payload }, { cancelActiveListeners, signal }) => {
+            cancelActiveListeners()
+            setupCtrl.saveSetupInfo(BaseContext.withSignal(signal), {
+                isSetup: payload.isSetup,
+            })
+        },
+    })
+
+    startListening({
         predicate(_, currentState) {
             return (
                 slice.selectors.step(currentState) === "start-sync" &&
@@ -83,22 +102,36 @@ export const registerEffects = (
             { payload },
             { cancelActiveListeners, dispatch, getState },
         ) => {
-            if (slice.selectors.isSetup(getState())) {
+            let state = getState()
+            if (slice.selectors.isSetup(state)) {
                 return
             }
 
-            if (payload.status !== "error") {
+            let step = slice.selectors.step(state)
+            if (step === "sync-error" || step === "remote-error") {
+                dispatch(slice.actions.next())
+                return
+            }
+
+            if (step !== "sync") {
                 return
             }
 
             cancelActiveListeners()
 
-            dispatch(
-                slice.actions.setStep({
-                    step: "sync-error",
-                    error: payload.error,
-                }),
-            )
+            if (payload.status === "error") {
+                dispatch(
+                    slice.actions.setStep({
+                        step: "sync-error",
+                        error: payload.error,
+                    }),
+                )
+                return
+            }
+
+            if (payload.status === "ready") {
+                dispatch(slice.actions.next())
+            }
         },
     })
 
@@ -121,7 +154,6 @@ export const registerEffects = (
             dispatch(
                 slice.actions.setStep({
                     step: "remote-error",
-                    error: payload.error,
                 }),
             )
         },
@@ -142,6 +174,9 @@ export const registerEffects = (
                     isSetup: true,
                 }),
             )
+
+            dispatch(settings.actions.loadStart())
+            dispatch(sync.actions.loadSyncInfo())
 
             dispatch(router.actions.goto({ path: "/" }))
         },

@@ -105,7 +105,7 @@ export const slice = createSlice({
                 isLoading: false,
                 error: payload.error,
                 nextPage: undefined,
-                hasNextPage: true,
+                hasNextPage: false,
             }) satisfies MemosListState,
     },
 

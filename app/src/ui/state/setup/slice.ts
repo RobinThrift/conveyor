@@ -1,7 +1,7 @@
 import { type KeyPaths, type ValueAt, setPath } from "@/lib/getset"
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 
-import type { PrivateCryptoKey } from "@/lib/crypto"
+import type { PlaintextPrivateKey } from "@/lib/crypto"
 
 export type SetupStep =
     | "unknown"
@@ -29,7 +29,7 @@ export interface SetupState {
     selectedOptions: {
         isNew: boolean
         syncMethod: SyncMethod
-        candidatePrivateCryptoKey?: PrivateCryptoKey
+        candidatePrivateCryptoKey?: PlaintextPrivateKey
     }
 }
 
@@ -52,27 +52,31 @@ export const slice = createSlice({
 
         startNew: (state) => {
             state.selectedOptions.isNew = true
-            state.step = "choose-sync-method"
+            state.step = "configure-encryption"
         },
 
         startFromRemote: (state) => {
             state.selectedOptions.isNew = false
-            state.step = "configure-remote-sync"
+            state.step = "configure-encryption"
         },
 
         next: (state) => {
             switch (state.step) {
-                case "configure-remote-sync":
-                    state.step = "configure-encryption"
+                case "configure-encryption":
+                    if (state.selectedOptions.isNew) {
+                        state.step = "choose-sync-method"
+                    } else {
+                        state.step = "configure-remote-sync"
+                    }
                     break
                 case "choose-sync-method":
                     if (state.selectedOptions.syncMethod === "remote-sync") {
                         state.step = "configure-remote-sync"
                     } else {
-                        state.step = "configure-encryption"
+                        state.step = "done"
                     }
                     break
-                case "configure-encryption":
+                case "configure-remote-sync":
                     if (state.selectedOptions.isNew) {
                         state.step = "done"
                     } else {
@@ -80,6 +84,9 @@ export const slice = createSlice({
                     }
                     break
                 case "start-sync":
+                    state.step = "sync"
+                    break
+                case "sync":
                     state.step = "done"
                     break
                 case "remote-error":
@@ -109,14 +116,17 @@ export const slice = createSlice({
 
         setupCandidatePrivateCryptoKey: (
             state,
-            { payload }: PayloadAction<{ key: PrivateCryptoKey }>,
+            {
+                payload,
+            }: PayloadAction<{ plaintextKeyData: PlaintextPrivateKey }>,
         ) => {
-            state.selectedOptions.candidatePrivateCryptoKey = payload.key
+            state.selectedOptions.candidatePrivateCryptoKey =
+                payload.plaintextKeyData
 
             if (state.selectedOptions.isNew) {
-                state.step = "done"
+                state.step = "choose-sync-method"
             } else {
-                state.step = "start-sync"
+                state.step = "configure-remote-sync"
             }
         },
 
@@ -140,6 +150,7 @@ export const slice = createSlice({
         step: (state) => state.step,
         isSetup: (state) => state.isSetup,
         selectedOptions: (state) => state.selectedOptions,
+        isNew: (state) => state.selectedOptions.isNew,
         error: (state) => state.error,
     },
 })

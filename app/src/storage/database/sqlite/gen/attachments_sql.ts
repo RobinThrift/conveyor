@@ -202,11 +202,7 @@ export async function deleteAttachments(
 ) {
     let deleteAttachmentsQueryWithSliceParams = deleteAttachmentsQuery.replace(
         "/*SLICE:ids*/?",
-        [
-            ...Array(args.ids.length)
-                .keys()
-                .map((i) => `?${i + 1}`),
-        ].join(","),
+        [...Array(args.ids.length).keys()].map((i) => `?${i + 1}`).join(","),
     )
     return database.exec(
         deleteAttachmentsQueryWithSliceParams,
@@ -307,11 +303,9 @@ export async function deleteMemoAttachmentLinks(
     let deleteMemoAttachmentLinksQueryWithSliceParams =
         deleteMemoAttachmentLinksQuery.replace(
             "/*SLICE:attachment_ids*/?",
-            [
-                ...Array(args.attachmentIds.length)
-                    .keys()
-                    .map((i) => `?${i + 2}`),
-            ].join(","),
+            [...Array(args.attachmentIds.length).keys()]
+                .map((i) => `?${i + 2}`)
+                .join(","),
         )
     await database.exec(
         deleteMemoAttachmentLinksQueryWithSliceParams,

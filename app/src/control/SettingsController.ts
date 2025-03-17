@@ -3,7 +3,7 @@ import type { Settings } from "@/domain/Settings"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
 import type { KeyPaths, ValueAt } from "@/lib/getset"
-import type { AsyncResult } from "@/lib/result"
+import { type AsyncResult, Ok } from "@/lib/result"
 
 export class SettingsController {
     private _transactioner: Transactioner
@@ -59,14 +59,21 @@ export class SettingsController {
         })
     }
 
-    public async applyChangelogEntry(
+    public async applyChangelogEntries(
         ctx: Context<{ db?: DBExec }>,
-        entry: SettingChangelogEntry,
+        entries: SettingChangelogEntry[],
     ): AsyncResult<void> {
-        return this._repo.updateSetting(ctx, {
-            key: entry.targetID,
-            value: entry.value.value,
-        })
+        for (let entry of entries) {
+            let applied = await this._repo.updateSetting(ctx, {
+                key: entry.targetID,
+                value: entry.value.value,
+            })
+            if (!applied.ok) {
+                return applied
+            }
+        }
+
+        return Ok(undefined)
     }
 }
 

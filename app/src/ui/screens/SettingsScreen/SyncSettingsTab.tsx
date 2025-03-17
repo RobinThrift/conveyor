@@ -120,6 +120,11 @@ function SectionSyncInfo({
             {error && (
                 <Alert variant="danger">
                     {error.name}: {error.message}
+                    {error.stack && (
+                        <pre>
+                            <code>{error.stack}</code>
+                        </pre>
+                    )}
                 </Alert>
             )}
 

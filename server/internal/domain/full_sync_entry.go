@@ -1,8 +1,11 @@
 package domain
 
 import (
+	"errors"
 	"time"
 )
+
+var ErrNoFullSyncEntriesFound = errors.New("no full sync entries found")
 
 type FullSyncEntry struct {
 	AccountID  AccountID

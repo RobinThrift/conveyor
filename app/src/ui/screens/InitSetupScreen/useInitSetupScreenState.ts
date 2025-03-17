@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import { AgePrivateCryptoKey, type Identity } from "@/external/age/AgeCrypto"
+import type { PlaintextPrivateKey } from "@/lib/crypto"
 import { type AsyncResult, fromThrowing } from "@/lib/result"
 import type { ChangePasswordArgs, LoginArgs } from "@/ui/components/AuthForm"
 import { type SyncMethod, actions, selectors } from "@/ui/state"
@@ -9,6 +10,7 @@ import { type SyncMethod, actions, selectors } from "@/ui/state"
 export function useInitSetupScreenState() {
     let dispatch = useDispatch()
     let step = useSelector(selectors.setup.step)
+    let isNew = useSelector(selectors.setup.isNew)
     let error = useSelector(selectors.setup.error)
     let selectedOptions = useSelector(selectors.setup.selectedOptions)
 
@@ -51,7 +53,8 @@ export function useInitSetupScreenState() {
         (key: string) => {
             dispatch(
                 actions.setup.setupCandidatePrivateCryptoKey({
-                    key: new AgePrivateCryptoKey(key as Identity),
+                    plaintextKeyData: new AgePrivateCryptoKey(key as Identity)
+                        .data as string as PlaintextPrivateKey,
                 }),
             )
         },
@@ -66,6 +69,7 @@ export function useInitSetupScreenState() {
 
     return {
         step,
+        isNew,
         error,
         next,
         back,
@@ -86,6 +90,7 @@ export function useStepConfigureRemoteSyncState({
 
     let authError = useSelector(selectors.auth.error)
     let authStatus = useSelector(selectors.auth.status)
+    let syncStatus = useSelector(selectors.sync.status)
 
     let login = useCallback(
         (args: LoginArgs) => {
@@ -102,10 +107,10 @@ export function useStepConfigureRemoteSyncState({
     )
 
     useEffect(() => {
-        if (authStatus === "authenticated") {
+        if (syncStatus === "ready") {
             next()
         }
-    }, [next, authStatus])
+    }, [next, syncStatus])
 
     return {
         authError,

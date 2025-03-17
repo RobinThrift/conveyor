@@ -10,8 +10,11 @@ export function useUnlockScreenState() {
     let error = useSelector(selectors.unlock.error)
 
     let unlock = useCallback(
-        ({ plaintextKeyData }: { plaintextKeyData: PlaintextPrivateKey }) => {
-            dispatch(actions.unlock.unlock({ plaintextKeyData }))
+        ({
+            plaintextKeyData,
+            storeKey,
+        }: { plaintextKeyData: PlaintextPrivateKey; storeKey: boolean }) => {
+            dispatch(actions.unlock.unlock({ plaintextKeyData, storeKey }))
         },
         [dispatch],
     )

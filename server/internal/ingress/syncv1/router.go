@@ -119,12 +119,22 @@ func (router *router) UnregisterClient(ctx context.Context, req UnregisterClient
 func (router *router) GetFullSync(ctx context.Context, req GetFullSyncRequestObject) (GetFullSyncResponseObject, error) {
 	entry, err := router.syncCtrl.GetLatestFullSyncEntry(ctx)
 	if err != nil {
+		if errors.Is(err, domain.ErrNoFullSyncEntriesFound) {
+			return GetFullSync404JSONResponse{
+				ErrorNotFoundJSONResponse: ErrorNotFoundJSONResponse{
+					Code:   http.StatusNotFound,
+					Title:  http.StatusText(http.StatusNotFound),
+					Type:   "belt/api/sync/v1/NotFound",
+					Detail: "No databases available for this accont",
+				},
+			}, nil
+		}
 		return nil, err
 	}
 
 	return GetFullSync303Response{
 		Headers: GetFullSync303ResponseHeaders{
-			Location: entry.Filepath,
+			Location: router.baseURL + "blobs/" + entry.Filepath,
 		},
 	}, nil
 }

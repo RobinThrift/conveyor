@@ -54,11 +54,20 @@ export const registerEffects = (
             let ctx = BaseContext.withSignal(signal)
             let clientID = randomID()
 
-            syncCtrl.init(ctx, {
+            let initRes = await syncCtrl.init(ctx, {
                 server,
                 username,
                 clientID,
             })
+            if (!initRes.ok) {
+                dispatch(
+                    slice.actions.setStatus({
+                        status: "error",
+                        error: initRes.err,
+                    }),
+                )
+                return
+            }
 
             dispatch(
                 slice.actions.setSyncInfo({
@@ -109,11 +118,20 @@ export const registerEffects = (
             let ctx = BaseContext.withSignal(signal)
             let clientID = randomID()
 
-            syncCtrl.init(ctx, {
+            let initRes = await syncCtrl.init(ctx, {
                 server: payload.server,
                 username: payload.username,
                 clientID,
             })
+            if (!initRes.ok) {
+                dispatch(
+                    slice.actions.setStatus({
+                        status: "error",
+                        error: initRes.err,
+                    }),
+                )
+                return
+            }
 
             dispatch(
                 slice.actions.setSyncInfo({
@@ -129,15 +147,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.loadSyncInfo,
-        effect: async (
-            _,
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
-            let status = slice.selectors.status(getState())
-            if (status === "disabled") {
-                return
-            }
-
+        effect: async (_, { cancelActiveListeners, dispatch, signal }) => {
             cancelActiveListeners()
 
             let loaded = await syncCtrl.load(BaseContext.withSignal(signal))
@@ -158,6 +168,7 @@ export const registerEffects = (
                         ...loaded.value,
                     }),
                 )
+                dispatch(slice.actions.setStatus({ status: "ready" }))
             }
         },
     })
@@ -190,6 +201,7 @@ export const registerEffects = (
             }
 
             dispatch(slice.actions.setStatus({ status: "ready" }))
+            dispatch(slice.actions.loadSyncInfo())
         },
     })
 
@@ -256,6 +268,19 @@ export const registerEffects = (
             }
 
             dispatch(slice.actions.setStatus({ status: "ready" }))
+        },
+    })
+
+    startListening({
+        actionCreator: slice.actions.reset,
+        effect: async (_, { cancelActiveListeners, signal }) => {
+            cancelActiveListeners()
+
+            let reset = await syncCtrl.reset(BaseContext.withSignal(signal))
+            if (!reset.ok) {
+                console.error(reset.err)
+                return
+            }
         },
     })
 }
