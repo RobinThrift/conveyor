@@ -3,12 +3,12 @@ import React, { startTransition, useCallback, useEffect, useState } from "react"
 import { DayPicker } from "react-day-picker"
 
 import { Button } from "@/ui/components/Button"
-import { useDateTimeLocale, useT } from "@/ui/i18n"
 import {
     CaretDownIcon,
     CaretLeftIcon,
     CaretRightIcon,
 } from "@/ui/components/Icons"
+import { useDateTimeLocale, useT } from "@/ui/i18n"
 
 export interface DatePickerProps {
     className?: string
