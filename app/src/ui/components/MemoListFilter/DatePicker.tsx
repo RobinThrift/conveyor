@@ -1,10 +1,14 @@
-import { CaretDown, CaretLeft, CaretRight } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React, { startTransition, useCallback, useEffect, useState } from "react"
 import { DayPicker } from "react-day-picker"
 
 import { Button } from "@/ui/components/Button"
 import { useDateTimeLocale, useT } from "@/ui/i18n"
+import {
+    CaretDownIcon,
+    CaretLeftIcon,
+    CaretRightIcon,
+} from "@/ui/components/Icons"
 
 export interface DatePickerProps {
     className?: string
@@ -112,12 +116,20 @@ export function DatePicker({ className, ...props }: DatePickerProps) {
             }
             components={{
                 NextMonthButton: ({ children, ...props }) => (
-                    <Button iconLeft={<CaretRight />} plain={true} {...props} />
+                    <Button
+                        iconLeft={<CaretRightIcon />}
+                        plain={true}
+                        {...props}
+                    />
                 ),
                 PreviousMonthButton: ({ children, ...props }) => (
-                    <Button iconLeft={<CaretLeft />} plain={true} {...props} />
+                    <Button
+                        iconLeft={<CaretLeftIcon />}
+                        plain={true}
+                        {...props}
+                    />
                 ),
-                Chevron: () => <CaretDown className="size-4 ml-1" />,
+                Chevron: () => <CaretDownIcon className="size-4 ml-1" />,
             }}
         />
     )
