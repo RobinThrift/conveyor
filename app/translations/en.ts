@@ -82,6 +82,8 @@ export const translations = {
     "components/DateTime": {
         datetime: params("{date} at {time}"),
         invalidTime: params(`Invalid date "{date}": {error}`),
+        ShowAbsoluteDateTooltip: "Show absolute date",
+        ShowRelativeDateTooltip: "Show relative date",
     },
 
     "components/ThemeSwitcher": {
