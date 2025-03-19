@@ -23,7 +23,7 @@ export function EditMemoScreen(props: EditMemoScreenProps) {
 
     return (
         <div
-            className="memo-edit-screen"
+            className="edit-memo-screen"
             style={{
                 viewTransitionName: `memo-${props.memoID}`,
             }}
