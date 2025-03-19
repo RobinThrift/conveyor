@@ -1,4 +1,3 @@
-import type { Attachment, AttachmentID } from "@/domain/Attachment"
 import type {
     AttachmentChangelogEntry,
     ChangelogEntry,
