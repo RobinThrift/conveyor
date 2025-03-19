@@ -1,6 +1,7 @@
 import { assert, suite, test } from "vitest"
 
 import type {
+    AttachmentChangelogEntry,
     ChangelogEntry,
     EncryptedChangelogEntry,
     SettingChangelogEntry,
@@ -114,6 +115,25 @@ suite.concurrent("control/SyncController", async () => {
                 isApplied: true,
                 timestamp: roundToNearestMinutes(addMinutes(new Date(), -5)),
             } satisfies SettingChangelogEntry,
+            {
+                id: newID(),
+                source: "local",
+                revision: 1,
+                targetType: "attachments",
+                targetID: newID(),
+                value: {
+                    created: {
+                        filepath: "/a/b/c/d/e/f/g",
+                        originalFilename: "test.txt",
+                        contentType: "text/plain",
+                        sizeBytes: 72,
+                        sha256: "ba6d26f67549dc8719ce3a2526b726aed295f3f83aa8c3d11c24dc704272e1d2",
+                    },
+                },
+                isSynced: false,
+                isApplied: true,
+                timestamp: roundToNearestMinutes(addMinutes(new Date(), -5)),
+            } satisfies AttachmentChangelogEntry,
         ]
         let remoteChanges: ChangelogEntry[] = [
             {
@@ -133,6 +153,7 @@ suite.concurrent("control/SyncController", async () => {
             ctx,
             setup,
             cleanup,
+            fs,
             syncCtrl,
             changelogCtrl,
             settingsCtrl,
@@ -158,6 +179,12 @@ suite.concurrent("control/SyncController", async () => {
                     assert.deepEqual(decrypted.value, localChanges)
                     return Ok(undefined)
                 },
+
+                uploadAttachment: async (_ctx, attachment) => {
+                    assert.deepEqual(decodeText(attachment.data), "TEST FILE")
+                    assert.deepEqual(attachment.filepath, "/a/b/c/d/e/f/g")
+                    return Ok(undefined)
+                },
             },
         })
 
@@ -169,6 +196,10 @@ suite.concurrent("control/SyncController", async () => {
 
         await setup()
         onTestFinished(cleanup)
+
+        await assertOkResult(
+            fs.write(ctx, "/a/b/c/d/e/f/g", encodeText("TEST FILE").buffer),
+        )
 
         await assertOkResult(
             changelogCtrl.insertExternalChangelogEntries(ctx, localChanges),
@@ -215,6 +246,13 @@ async function setupSyncControllerTest({
         uploadChangelogEntries?: (
             ctx: Context,
             entries: EncryptedChangelogEntry[],
+        ) => AsyncResult<void>
+        uploadAttachment?: (
+            ctx: Context,
+            attachment: {
+                filepath: string
+                data: Uint8Array<ArrayBufferLike>
+            },
         ) => AsyncResult<void>
     }
 }) {
@@ -273,6 +311,9 @@ async function setupSyncControllerTest({
                 syncAPI?.uploadChangelogEntries ??
                 (async () =>
                     Err(new Error("uploadChangelogEntries unimplemented"))),
+            uploadAttachment:
+                syncAPI?.uploadAttachment ??
+                (async () => Err(new Error("uploadAttachment unimplemented"))),
         },
         memos: memoCtrl,
         attachments: attachmentCtrl,

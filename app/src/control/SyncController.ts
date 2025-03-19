@@ -435,15 +435,11 @@ export class SyncController {
             return Err(new Error("sync is not enabled"))
         }
 
-        let attachment = await this._attachments.getAttachmentByID(
-            ctx,
-            entry.targetID,
-        )
-        if (!attachment.ok) {
-            return fmtErr("error uploading attachment: %w", attachment)
+        if (!("created" in entry.value)) {
+            return Ok(undefined)
         }
 
-        let data = await this._fs.read(ctx, attachment.value.filepath)
+        let data = await this._fs.read(ctx, entry.value.created.filepath)
         if (!data.ok) {
             return fmtErr(
                 "error uploading attachment: error reading data: %w",
@@ -452,7 +448,7 @@ export class SyncController {
         }
 
         return this._syncAPIClient.uploadAttachment(ctx, {
-            filepath: attachment.value.filepath,
+            filepath: entry.value.created.filepath,
             data: new Uint8Array(data.value),
         })
     }
@@ -497,10 +493,6 @@ interface Attachments {
         ctx: Context<{ db?: DBExec }>,
         entries: AttachmentChangelogEntry[],
     ): AsyncResult<void>
-    getAttachmentByID(
-        ctx: Context<{ db?: DBExec }>,
-        id: AttachmentID,
-    ): AsyncResult<Attachment>
 }
 
 interface Settings {
