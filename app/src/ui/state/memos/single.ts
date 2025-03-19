@@ -3,6 +3,7 @@ import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 import type { Memo, MemoID } from "@/domain/Memo"
 
 interface SingleMemoState {
+    memoID?: MemoID
     memo?: Memo
     error?: Error
     isLoading: boolean
@@ -22,12 +23,17 @@ export const slice = createSlice({
             state,
             { payload }: PayloadAction<{ id: MemoID }>,
         ) => {
-            if (state.memo?.id === payload.id) {
+            if (state.memoID === payload.id) {
                 return
             }
+            state.memoID = payload.id
             state.memo = undefined
-            state.isLoading = true
+            state.isLoading = false
             state.error = undefined
+        },
+
+        startLoadingSingleMemo: (state) => {
+            state.isLoading = true
         },
 
         setCurrentSingleMemo: (
@@ -37,6 +43,7 @@ export const slice = createSlice({
             ({
                 ...state,
                 isLoading: false,
+                memoID: payload.memo.id,
                 memo: payload.memo,
                 error: undefined,
             }) satisfies SingleMemoState,
@@ -45,11 +52,13 @@ export const slice = createSlice({
             ({
                 ...state,
                 isLoading: false,
+                memo: undefined,
                 error: payload.error,
             }) satisfies SingleMemoState,
     },
 
     selectors: {
+        currentMemoID: (state) => state.memoID,
         currentMemo: (state) => state.memo,
         isLoadingSingleMemo: (state) => state.isLoading,
         singleMemoError: (state) => state.error,

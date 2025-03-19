@@ -7,6 +7,7 @@ import * as list from "./list"
 import * as single from "./single"
 import * as update from "./update"
 
+import { actions } from "."
 import { selectors } from "./selectors"
 
 const pageSize = 25
@@ -141,9 +142,19 @@ export const registerEffects = (
         actionCreator: single.slice.actions.setCurrentSingleMemoID,
         effect: async (
             { payload },
-            { cancelActiveListeners, dispatch, signal },
+            { cancelActiveListeners, dispatch, getState, signal },
         ) => {
+            let state = getState()
+            if (
+                selectors.isLoadingSingleMemo(state) &&
+                selectors.currentMemoID(state) === payload.id
+            ) {
+                return
+            }
+
             cancelActiveListeners()
+
+            dispatch(actions.startLoadingSingleMemo())
 
             let ctx = BaseContext.withSignal(signal)
 
