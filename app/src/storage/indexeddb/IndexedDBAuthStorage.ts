@@ -28,7 +28,7 @@ export class IndexedDBAuthStorage {
                         origin: obj.origin,
                         accessToken: obj.accessToken,
                         expiresAt: expiresAt.value,
-                        refreshToken: obj.refreshValue,
+                        refreshToken: obj.refreshToken,
                         refreshExpiresAt: refreshExpiresAt.value,
                     })
                 }),

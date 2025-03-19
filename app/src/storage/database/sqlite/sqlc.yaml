@@ -129,6 +129,12 @@ sql:
           fn: "dateToSQLite"
           import: "@/storage/database/sqlite/types/datetime"
 
+      - column: chlg_page_after
+        type: "Date | undefined"
+        to_sql:
+          fn: "dateToSQLite"
+          import: "@/storage/database/sqlite/types/datetime"
+
       - column: settings.value
         type: "any"
         from_sql:

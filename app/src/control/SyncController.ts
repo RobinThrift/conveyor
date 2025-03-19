@@ -1,3 +1,4 @@
+import type { Attachment, AttachmentID } from "@/domain/Attachment"
 import type {
     AttachmentChangelogEntry,
     ChangelogEntry,
@@ -15,7 +16,7 @@ import type { Decrypter, Encrypter } from "@/lib/crypto"
 import type { DBExec, Transactioner } from "@/lib/database"
 import type { FS } from "@/lib/fs"
 import { parseJSON, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Err, Ok, fmtErr } from "@/lib/result"
+import { type AsyncResult, Err, Ok, all, fmtErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
 
 export class SyncController {
@@ -184,7 +185,7 @@ export class SyncController {
         let entryIDs = [] as ChangelogEntryID[]
 
         let hasNextPage = true
-        let after: number | undefined
+        let after: Date | undefined
         while (hasNextPage) {
             let page = await this._changelog.listUnapplidChangelogEntries(ctx, {
                 pagination: {
@@ -201,7 +202,6 @@ export class SyncController {
                 let entries = groupedByType[entry.targetType] ?? []
                 entries.push(entry)
                 groupedByType[entry.targetType] = entries
-                // let applied = await this._applyChangelogEntry(ctx, entry)
             }
 
             after = page.value.next
@@ -270,7 +270,7 @@ export class SyncController {
 
     private async _uploadChangelogEntries(ctx: Context): AsyncResult<void> {
         let hasNextPage = true
-        let after: number | undefined
+        let after: Date | undefined
         while (hasNextPage) {
             let page = await this._changelog.listUnsyncedChangelogEntries(ctx, {
                 pagination: {
@@ -334,6 +334,20 @@ export class SyncController {
             )
             if (!uploaded.ok) {
                 return uploaded
+            }
+
+            let attachmentsUploaded = await all(
+                entries
+                    .filter((e) => e.targetType === "attachments")
+                    .map((e) =>
+                        this._uploadAttachment(
+                            ctx,
+                            e as AttachmentChangelogEntry,
+                        ),
+                    ),
+            )
+            if (!attachmentsUploaded.ok) {
+                return attachmentsUploaded
             }
 
             return Ok(undefined)
@@ -412,6 +426,36 @@ export class SyncController {
 
         return Ok(entries)
     }
+
+    private async _uploadAttachment(
+        ctx: Context,
+        entry: AttachmentChangelogEntry,
+    ): AsyncResult<void> {
+        if (!this._info.isEnabled) {
+            return Err(new Error("sync is not enabled"))
+        }
+
+        let attachment = await this._attachments.getAttachmentByID(
+            ctx,
+            entry.targetID,
+        )
+        if (!attachment.ok) {
+            return fmtErr("error uploading attachment: %w", attachment)
+        }
+
+        let data = await this._fs.read(ctx, attachment.value.filepath)
+        if (!data.ok) {
+            return fmtErr(
+                "error uploading attachment: error reading data: %w",
+                data,
+            )
+        }
+
+        return this._syncAPIClient.uploadAttachment(ctx, {
+            filepath: attachment.value.filepath,
+            data: new Uint8Array(data.value),
+        })
+    }
 }
 
 interface SyncAPIClient {
@@ -425,6 +469,13 @@ interface SyncAPIClient {
     uploadChangelogEntries(
         ctx: Context,
         entries: EncryptedChangelogEntry[],
+    ): AsyncResult<void>
+    uploadAttachment(
+        ctx: Context,
+        attachment: {
+            filepath: string
+            data: Uint8Array<ArrayBufferLike>
+        },
     ): AsyncResult<void>
 }
 
@@ -446,6 +497,10 @@ interface Attachments {
         ctx: Context<{ db?: DBExec }>,
         entries: AttachmentChangelogEntry[],
     ): AsyncResult<void>
+    getAttachmentByID(
+        ctx: Context<{ db?: DBExec }>,
+        id: AttachmentID,
+    ): AsyncResult<Attachment>
 }
 
 interface Settings {
@@ -466,7 +521,7 @@ interface Changelog {
         args: {
             pagination: {
                 pageSize: number
-                after?: number
+                after?: Date
             }
         },
     ): AsyncResult<ChangelogEntryList>
@@ -476,7 +531,7 @@ interface Changelog {
         args: {
             pagination: {
                 pageSize: number
-                after?: number
+                after?: Date
             }
         },
     ): AsyncResult<ChangelogEntryList>

@@ -138,7 +138,7 @@ export function fmtErr<A, E extends Error = Error>(
         return r.then((rr) => {
             if (!rr.ok) {
                 let err = new Error(fmt.replace("%w", rr.err.message), {
-                    cause: rr.err.cause,
+                    cause: rr.err,
                 })
                 err.stack = rr.err.stack
                 return Err(err)
@@ -151,7 +151,7 @@ export function fmtErr<A, E extends Error = Error>(
 
     if (!rr.ok) {
         let err = new Error(fmt.replace("%w", rr.err.message), {
-            cause: rr.err.cause,
+            cause: rr.err,
         })
         err.stack = rr.err.stack
         return Err(err)
@@ -168,6 +168,21 @@ export async function toPromise<T, E extends Error = Error>(
     }
 
     return Promise.resolve(res.value)
+}
+
+export async function all<T>(
+    results: Iterable<AsyncResult<T>>,
+): AsyncResult<T[]> {
+    let resolved = await Promise.all(results)
+    let values: T[] = []
+    for (let r of resolved) {
+        if (!r.ok) {
+            return Err(r.err)
+        }
+        values.push(r.value)
+    }
+
+    return Ok(values)
 }
 
 export function match<

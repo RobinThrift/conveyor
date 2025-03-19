@@ -283,15 +283,75 @@ export class SyncV1APIClient {
             )
         }
 
-        let data = await fromPromise(res.value.text())
-        if (!data.ok) {
+        return Ok(undefined)
+    }
+
+    public async uploadAttachment(
+        ctx: Context,
+        attachment: {
+            filepath: string
+            data: Uint8Array<ArrayBufferLike>
+        },
+    ): AsyncResult<void> {
+        let req = await this._createBaseRequest(
+            ctx,
+            "POST",
+            "/api/sync/v1/attachments",
+            await compressData(attachment.data),
+        )
+        if (!req.ok) {
+            return req
+        }
+
+        req.value.headers.set("X-Filepath", attachment.filepath)
+        req.value.headers.set("Content-Type", "application/octet-stream")
+        req.value.headers.set("Content-Encoding", "gzip")
+
+        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
+        if (!res.ok) {
             return fmtErr(
-                `error uploading changelog entries (${this._baseURL}): error reading data: %w`,
-                data,
+                `error uploading attachment (${this._baseURL}): %w`,
+                res,
+            )
+        }
+
+        if (res.value.status !== 201) {
+            return Err(
+                new Error(
+                    `error uploading attachment (${this._baseURL}): ${res.value.status} ${res.value.statusText}`,
+                ),
             )
         }
 
         return Ok(undefined)
+    }
+
+    public async getAttachmentDataByFilepath(
+        ctx: Context,
+        filepath: string,
+    ): AsyncResult<ArrayBufferLike> {
+        let req = await this._createBaseRequest(ctx, "GET", `/blobs${filepath}`)
+        if (!req.ok) {
+            return req
+        }
+
+        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
+        if (!res.ok) {
+            return fmtErr(
+                `error getting attachment (${req.value.url.toString()}): %w`,
+                res,
+            )
+        }
+
+        if (res.value.status !== 200) {
+            return Err(
+                new Error(
+                    `error uploading attachment (${req.value.url.toString()}): ${res.value.status} ${res.value.statusText}`,
+                ),
+            )
+        }
+
+        return fromPromise(res.value.arrayBuffer())
     }
 
     private async _createBaseRequest(
@@ -338,5 +398,38 @@ function parseEncryptedChangelogEntryJSON(
         }
 
         return entries
+    })
+}
+
+async function compressData(data: Uint8Array<ArrayBufferLike>) {
+    let stream = new ReadableStream({
+        start(controller) {
+            controller.enqueue(data)
+            controller.close()
+        },
+    })
+
+    let { readable, writable } = new TransformStream()
+    stream.pipeThrough(new CompressionStream("gzip")).pipeTo(writable)
+
+    return streamToBlob(readable.getReader())
+}
+
+async function streamToBlob(
+    reader: ReadableStreamDefaultReader,
+): Promise<Blob> {
+    let chunks: BlobPart[] = []
+
+    return reader.read().then(async function read({
+        done,
+        value,
+    }: ReadableStreamReadResult<Uint8Array>): Promise<Blob> {
+        if (done) {
+            return new Blob(chunks)
+        }
+
+        chunks.push(value)
+
+        return reader.read().then(read)
     })
 }

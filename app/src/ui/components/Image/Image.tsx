@@ -3,7 +3,6 @@ import Zoom from "react-medium-image-zoom"
 import "react-medium-image-zoom/dist/styles.css"
 
 import { thumbhashToDataURL } from "@/external/thumbhash"
-import { toPromise } from "@/lib/result"
 import { useAttachmentProvider } from "@/ui/attachments"
 import { XIcon } from "@/ui/components/Icons"
 import { usePromise } from "@/ui/hooks/usePromise"
@@ -27,11 +26,15 @@ export function Image(props: ImageProps) {
             return props.src
         }
 
-        let { data } = await toPromise(
-            attachmentProvider.getAttachmentDataByID(attachment.attachmentID),
+        let load = await attachmentProvider.getAttachmentDataByID(
+            attachment.attachmentID,
         )
+        if (!load.ok) {
+            console.error(load.err)
+            return hash
+        }
 
-        return URL.createObjectURL(new Blob([new Uint8Array(data)]))
+        return URL.createObjectURL(new Blob([new Uint8Array(load.value.data)]))
     }, [props.src, attachment?.attachmentID, attachmentProvider])
 
     return (
@@ -72,7 +75,7 @@ function parseImgURL(
     let th = u.searchParams.get("thumbhash")
 
     return {
-        attachmentID: u.pathname,
+        attachmentID: u.hostname || u.pathname,
         thumbhash: th ? thumbhashToDataURL(th) : undefined,
     }
 }

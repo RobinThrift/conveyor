@@ -21,8 +21,6 @@ export class OPFS implements FS {
             }),
         )
 
-        this._worker.addEventListener
-
         if (onError) {
             this._worker.addEventListener("error", (evt) => {
                 onError(evt.data.error)

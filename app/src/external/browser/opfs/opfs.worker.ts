@@ -1,5 +1,6 @@
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Ok, fmtErr, fromPromise } from "@/lib/result"
+import { FSNotFoundError } from "@/lib/fs"
+import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
 import { createWorker, isWorkerContext } from "@/lib/worker"
 
 const _rootDir = (async () => {
@@ -17,6 +18,12 @@ export const OPFSWorker = createWorker({
     ): AsyncResult<ArrayBufferLike> => {
         let file = await fromPromise(openFile(await _rootDir, filepath))
         if (!file.ok) {
+            if (
+                file.err instanceof DOMException &&
+                file.err.name === "NotFoundError"
+            ) {
+                return Err(new FSNotFoundError(filepath, { cause: file.err }))
+            }
             return file
         }
 
@@ -111,14 +118,7 @@ async function getDirHandle(
             continue
         }
 
-        try {
-            curr = await curr.getDirectoryHandle(dir)
-        } catch (e) {
-            let err = e as Error
-            throw new Error(`${err.message}: ${dir}: ${err.stack}`, {
-                cause: err.cause,
-            })
-        }
+        curr = await curr.getDirectoryHandle(dir)
     }
 
     return curr
@@ -129,7 +129,6 @@ async function openFile(
     filepath: string,
     create?: boolean,
 ) {
-    console.log("opfs openFile", rootDir, filepath)
     let { dir: dirname, filename } = splitFilepath(filepath)
     let dir = await getDirHandle(rootDir, dirname)
 

@@ -49,7 +49,7 @@ export class ChangelogRepo {
         }: {
             pagination: {
                 pageSize: number
-                after?: number
+                after?: Date
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -66,7 +66,7 @@ export class ChangelogRepo {
             ),
             (rows) => ({
                 items: rows.map((row) => changelogEntryRowChangelogEntry(row)),
-                next: rows.at(-1)?.id,
+                next: rows.at(-1)?.timestamp,
             }),
         )
     }
@@ -78,7 +78,7 @@ export class ChangelogRepo {
         }: {
             pagination: {
                 pageSize: number
-                after?: number
+                after?: Date
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -95,7 +95,7 @@ export class ChangelogRepo {
             ),
             (rows) => ({
                 items: rows.map((row) => changelogEntryRowChangelogEntry(row)),
-                next: rows.at(-1)?.id,
+                next: rows.at(-1)?.timestamp,
             }),
         )
     }

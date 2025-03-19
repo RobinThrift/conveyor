@@ -43,6 +43,7 @@ import { IndexedDBSyncStorage } from "@/storage/indexeddb/IndexedDBSyncStorage"
 import { LocalStorageSetupInfoStorage } from "@/storage/localstorage/LocalStorageSetupInfoStorage"
 
 import "@/ui/styles/index.css"
+import { EncryptedRemoteAttachmentFetcher } from "./api/syncv1/EncryptedRemoteAttachmentFetcher"
 import { toPromise } from "./lib/result"
 import { SessionStorageUnlockStorage } from "./storage/sessionstorage/SessionStorageUnlockStorage"
 
@@ -113,7 +114,9 @@ async function main() {
     )
     if (autoUnlock) {
         rootStore.dispatch(
-            actions.unlock.unlock({ plaintextKeyData: autoUnlock }),
+            actions.unlock.unlock({
+                plaintextKeyData: autoUnlock,
+            }),
         )
     } else {
         rootStore.dispatch(actions.setup.loadSetupInfo())
@@ -172,13 +175,28 @@ async function initController() {
 
     let crypto = new AgeCrypto()
 
-    let opfs = new OPFS("belt", {
+    let rawFS = new OPFS("belt", {
         onError: (err) => {
             console.error(err)
         },
     })
 
-    let fs = new EncryptedFS(opfs, crypto)
+    let encryptedFS = new EncryptedFS(rawFS, crypto)
+
+    let authStorage = new IndexedDBAuthStorage(crypto)
+
+    let authCtrl = new AuthController({
+        origin: globalThis.location.host,
+        storage: authStorage,
+        authPIClient: new AuthV1APIClient({
+            baseURL: globalThis.location.href,
+        }),
+    })
+
+    let syncAPIClient = new SyncV1APIClient({
+        baseURL: globalThis.location.href,
+        tokenStorage: authCtrl,
+    })
 
     let changelogCtrl = new ChangelogController({
         sourceName: "web",
@@ -195,8 +213,12 @@ async function initController() {
     let attachmentCtrl = new AttachmentController({
         transactioner: db,
         repo: new AttachmentRepo(db),
-        fs,
+        fs: encryptedFS,
         hasher: new WebCryptoSha256Hasher(),
+        remote: new EncryptedRemoteAttachmentFetcher({
+            syncAPIClient,
+            decrypter: crypto,
+        }),
         changelog: changelogCtrl,
     })
 
@@ -207,31 +229,18 @@ async function initController() {
         changelog: changelogCtrl,
     })
 
-    let authStorage = new IndexedDBAuthStorage(crypto)
-
-    let authCtrl = new AuthController({
-        origin: globalThis.location.host,
-        storage: authStorage,
-        authPIClient: new AuthV1APIClient({
-            baseURL: globalThis.location.href,
-        }),
-    })
-
     let syncStorage = new IndexedDBSyncStorage(crypto)
 
     let syncCtrl = new SyncController({
         storage: syncStorage,
         dbPath: "belt.db",
         transactioner: db,
-        syncAPIClient: new SyncV1APIClient({
-            baseURL: globalThis.location.href,
-            tokenStorage: authCtrl,
-        }),
+        syncAPIClient,
         memos: memoCtrl,
         attachments: attachmentCtrl,
         settings: settingsCtrl,
         changelog: changelogCtrl,
-        fs: opfs,
+        fs: rawFS,
         crypto,
     })
 

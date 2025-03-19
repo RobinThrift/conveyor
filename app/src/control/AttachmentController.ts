@@ -11,6 +11,7 @@ import { mimeTypeForFilename } from "@/lib/mimeTypes"
 import { type AsyncResult, Err, Ok, fmtErr } from "@/lib/result"
 
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
+import { isErr } from "@/lib/errors"
 
 export class AttachmentController {
     private _transactioner: Transactioner
@@ -55,7 +56,7 @@ export class AttachmentController {
 
         let read = await this._fs.read(ctx, attachment.value.filepath)
         if (!read.ok) {
-            if (this._remote && read.err instanceof FSNotFoundError) {
+            if (this._remote && isErr(read.err, FSNotFoundError)) {
                 return this._getAttachmentDataFromRemote(ctx, attachment.value)
             }
             return fmtErr(`error getting attachment: ${id}: %w`, read)
@@ -65,6 +66,19 @@ export class AttachmentController {
             attachment: attachment.value,
             data: read.value,
         })
+    }
+
+    public async getAttachmentByID(
+        ctx: Context<{ db?: DBExec }>,
+        id: AttachmentID,
+    ): AsyncResult<Attachment> {
+        let attachment = await this._repo.getAttachment(ctx, id)
+
+        if (!attachment.ok) {
+            return fmtErr(`error getting attachment: ${id}: %w`, attachment)
+        }
+
+        return attachment
     }
 
     private async _getAttachmentDataFromRemote(
@@ -81,6 +95,23 @@ export class AttachmentController {
         )
         if (!fetched.ok) {
             return fmtErr("error getting attachment from remote: %w", fetched)
+        }
+
+        let mkdirpResult = await this._fs.mkdirp(
+            ctx,
+            dirname(attachment.filepath),
+        )
+        if (!mkdirpResult.ok) {
+            return mkdirpResult
+        }
+
+        let writeResult = await this._fs.write(
+            ctx,
+            attachment.filepath,
+            fetched.value,
+        )
+        if (!writeResult.ok) {
+            return writeResult
         }
 
         return Ok({

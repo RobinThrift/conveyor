@@ -92,11 +92,18 @@ export function createWorker<
             return
         }
 
-        postMessage({
+        let msg = {
             type: "success",
             id: evt.data.id,
             data: result.value,
-        } satisfies WorkerSuccessResponseMessage)
+        } satisfies WorkerSuccessResponseMessage
+        let transferables: Transferable[] = []
+
+        if (result.value instanceof ArrayBuffer) {
+            transferables.push(result.value)
+        }
+
+        postMessage(msg, transferables)
     }
 
     let runIfWorker = () => {

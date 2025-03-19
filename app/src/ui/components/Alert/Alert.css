@@ -7,8 +7,12 @@
     }
 
     .content {
-        @apply mt-0.5;
+        @apply mt-0.5 max-w-full;
         color: inherit;
+
+        pre {
+            @apply overflow-x-auto p-0 m-0 max-w-full me-8;
+        }
     }
 
     &.info {
