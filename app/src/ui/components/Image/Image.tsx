@@ -3,9 +3,8 @@ import Zoom from "react-medium-image-zoom"
 import "react-medium-image-zoom/dist/styles.css"
 
 import { thumbhashToDataURL } from "@/external/thumbhash"
-import { useAttachmentProvider } from "@/ui/attachments"
+import { useAttachment } from "@/ui/attachments"
 import { XIcon } from "@/ui/components/Icons"
-import { usePromise } from "@/ui/hooks/usePromise"
 import clsx from "clsx"
 
 export interface ImageProps {
@@ -17,39 +16,32 @@ export interface ImageProps {
 }
 
 export function Image(props: ImageProps) {
-    let attachmentProvider = useAttachmentProvider()
     let attachment = useMemo(() => parseImgURL(props.src), [props.src])
+    let attachmentData = useAttachment({ id: attachment?.attachmentID })
     let hash = attachment?.thumbhash
 
-    let src = usePromise(async () => {
-        if (!attachment) {
-            return props.src
+    let src = useMemo(() => {
+        if (!attachmentData || !attachmentData?.data) {
+            return undefined
         }
 
-        let load = await attachmentProvider.getAttachmentDataByID(
-            attachment.attachmentID,
+        return URL.createObjectURL(
+            new Blob([new Uint8Array(attachmentData?.data)]),
         )
-        if (!load.ok) {
-            console.error(load.err)
-            return hash
-        }
-
-        return URL.createObjectURL(new Blob([new Uint8Array(load.value.data)]))
-    }, [props.src, attachment?.attachmentID, attachmentProvider])
+    }, [attachmentData])
 
     return (
         <figure id={props.id} className={props.className}>
             <Zoom IconUnzoom={() => <XIcon />} classDialog="image-zoom">
                 <img
-                    src={src.resolved && !src.error ? src.result : hash}
+                    src={src ?? hash}
                     alt={props.alt}
                     loading="lazy"
                     className={clsx({
-                        "animate-pulse": !src.resolved,
+                        "animate-pulse": !src,
                     })}
                     style={{
-                        minWidth:
-                            src.resolved && !src.error ? undefined : "200px",
+                        minWidth: src ? undefined : "200px",
                     }}
                 />
                 <figcaption>{props.caption ?? props.alt}</figcaption>

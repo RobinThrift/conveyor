@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 
 import type { AttachmentController } from "@/control/AttachmentController"
 import type { Attachment, AttachmentID } from "@/domain/Attachment"
@@ -19,7 +19,7 @@ const attachmentContext = createContext<AttachmentContext>({
 
 export const AttachmentProvider = attachmentContext.Provider
 
-export function useAttachmentProvider() {
+function useAttachmentProvider() {
     return useContext(attachmentContext)
 }
 
@@ -30,4 +30,44 @@ export function attachmentContextFromController(
         getAttachmentDataByID: (id) =>
             ctrl.getAttachmentDataByID(BaseContext, id),
     }
+}
+
+export function useAttachment({ id }: { id?: AttachmentID }) {
+    let attachmentProvider = useAttachmentProvider()
+    let [state, setState] = useState<
+        | {
+              id: AttachmentID
+              isLoading: boolean
+              data?: ArrayBufferLike
+              error?: Error
+          }
+        | undefined
+    >(undefined)
+
+    useEffect(() => {
+        if (!id || id === state?.id) {
+            return
+        }
+
+        setState({
+            id,
+            isLoading: true,
+        })
+
+        attachmentProvider.getAttachmentDataByID(id).then((load) => {
+            setState((state) => {
+                if (state?.id !== id) {
+                    return state
+                }
+
+                if (!load.ok) {
+                    return { id, error: load.err, isLoading: false }
+                }
+
+                return { id, data: load.value.data, isLoading: false }
+            })
+        })
+    }, [id, state?.id, attachmentProvider.getAttachmentDataByID])
+
+    return state
 }
