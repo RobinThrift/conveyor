@@ -76,6 +76,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: RobinThrift/action-setup-just@v1
+    - uses: actions/cache@v4
+      with:
+        path: app/src/external/sqlite-wasm/build
+        key: sqlchiper-v4.6.1
 
     - name: "Test"
       run: |
