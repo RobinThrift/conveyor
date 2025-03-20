@@ -16,58 +16,56 @@ export interface DateTimeProps
     date: Date
     relative?: boolean
     opts?: Intl.DateTimeFormatOptions
+    ref?: React.Ref<HTMLTimeElement>
 }
 
-export const DateTime = React.forwardRef<HTMLTimeElement, DateTimeProps>(
-    function DateTime({ relative, date, opts, ...intrinsics }, forwardedRef) {
-        let t = useT("components/DateTime")
-        let { time } = useFormat()
+export function DateTime({
+    relative,
+    date,
+    opts,
+    ref,
+    ...intrinsics
+}: DateTimeProps) {
+    let t = useT("components/DateTime")
+    let { time } = useFormat()
 
-        let formatted = useMemo(() => {
-            try {
-                return time(
-                    date,
-                    opts ?? { dateStyle: "long", timeStyle: "short" },
-                )
-            } catch (err) {
-                return t.invalidTime({
-                    date: date?.toString(),
-                    error: (err as Error).message,
-                })
-            }
-        }, [date, time, opts, t.invalidTime])
-
-        if (relative) {
-            return (
-                <RelativeDateTime
-                    {...intrinsics}
-                    ref={forwardedRef}
-                    date={date}
-                    opts={opts}
-                    absolute={formatted}
-                />
-            )
+    let formatted = useMemo(() => {
+        try {
+            return time(date, opts ?? { dateStyle: "long", timeStyle: "short" })
+        } catch (err) {
+            return t.invalidTime({
+                date: date?.toString(),
+                error: (err as Error).message,
+            })
         }
+    }, [date, time, opts, t.invalidTime])
 
+    if (relative) {
         return (
-            <time
+            <RelativeDateTime
                 {...intrinsics}
-                dateTime={JSON.stringify(date)}
-                ref={forwardedRef}
-            >
-                {formatted}
-            </time>
+                ref={ref}
+                date={date}
+                opts={opts}
+                absolute={formatted}
+            />
         )
-    },
-)
+    }
 
-const RelativeDateTime = React.forwardRef<
-    HTMLTimeElement,
-    Omit<DateTimeProps, "relative"> & { absolute: string }
->(function RelativeDateTime(
-    { date, opts, absolute, ...intrinsics },
-    forwardedRef,
-) {
+    return (
+        <time {...intrinsics} dateTime={JSON.stringify(date)} ref={ref}>
+            {formatted}
+        </time>
+    )
+}
+
+function RelativeDateTime({
+    date,
+    opts,
+    absolute,
+    ref,
+    ...intrinsics
+}: Omit<DateTimeProps, "relative"> & { absolute: string }) {
     let t = useT("components/DateTime")
     let { time, formatDistance } = useFormat()
 
@@ -126,14 +124,10 @@ const RelativeDateTime = React.forwardRef<
                 }
                 aria-pressed={showAbsolute}
             >
-                <time
-                    {...intrinsics}
-                    dateTime={JSON.stringify(date)}
-                    ref={forwardedRef}
-                >
+                <time {...intrinsics} dateTime={JSON.stringify(date)} ref={ref}>
                     {formatted}
                 </time>
             </button>
         </Tooltip>
     )
-})
+}

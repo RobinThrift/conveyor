@@ -21,77 +21,72 @@ import {
     useSyncSettingsTabState,
 } from "./useSyncSettingsTabState"
 
-export const SyncSettingsTab = React.forwardRef<HTMLDivElement>(
-    function SyncSettingsTab(_, forwardedRef) {
-        let t = useT("screens/Settings/SyncSettings/Info")
-        let {
-            status,
-            info,
-            error,
-            setup,
-            showSetup,
-            setShowSetup,
-            showPasswordChange,
-            manualSync,
-            manualFullDownload,
-            manualFullUpload,
-            authStatus,
-            authError,
-            changePassword,
-        } = useSyncSettingsTabState()
+export function SyncSettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
+    let t = useT("screens/Settings/SyncSettings/Info")
+    let {
+        status,
+        info,
+        error,
+        setup,
+        showSetup,
+        setShowSetup,
+        showPasswordChange,
+        manualSync,
+        manualFullDownload,
+        manualFullUpload,
+        authStatus,
+        authError,
+        changePassword,
+    } = useSyncSettingsTabState()
 
-        return (
-            <div
-                ref={forwardedRef}
-                className="settings-section-content relative"
-            >
-                <div className="settings-sub-section">
-                    <Checkbox
-                        label={t.IsEnabled}
-                        name="is_enabled"
-                        value={showSetup}
-                        onChange={(checked) => setShowSetup(checked as boolean)}
-                    />
-                </div>
-
-                {info.isEnabled && (
-                    <SectionSyncInfo
-                        manualSync={manualSync}
-                        manualFullDownload={manualFullDownload}
-                        manualFullUpload={manualFullUpload}
-                        isLoading={status === "syncing"}
-                        error={error}
-                        info={info}
-                    />
-                )}
-
-                {showSetup && (
-                    <SectionSetupSync
-                        setup={setup}
-                        authStatus={authStatus}
-                        authError={authError}
-                        changePassword={changePassword}
-                    />
-                )}
-
-                {showPasswordChange && info.isEnabled && (
-                    <SectionChangePassword
-                        status={authStatus}
-                        error={authError}
-                        username={info.username}
-                        changePassword={changePassword}
-                    />
-                )}
-
-                {(status === "syncing" || status === "setting-up") && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/40 z-10">
-                        <Loader />
-                    </div>
-                )}
+    return (
+        <div ref={ref} className="settings-section-content relative">
+            <div className="settings-sub-section">
+                <Checkbox
+                    label={t.IsEnabled}
+                    name="is_enabled"
+                    value={showSetup}
+                    onChange={(checked) => setShowSetup(checked as boolean)}
+                />
             </div>
-        )
-    },
-)
+
+            {info.isEnabled && (
+                <SectionSyncInfo
+                    manualSync={manualSync}
+                    manualFullDownload={manualFullDownload}
+                    manualFullUpload={manualFullUpload}
+                    isLoading={status === "syncing"}
+                    error={error}
+                    info={info}
+                />
+            )}
+
+            {showSetup && (
+                <SectionSetupSync
+                    setup={setup}
+                    authStatus={authStatus}
+                    authError={authError}
+                    changePassword={changePassword}
+                />
+            )}
+
+            {showPasswordChange && info.isEnabled && (
+                <SectionChangePassword
+                    status={authStatus}
+                    error={authError}
+                    username={info.username}
+                    changePassword={changePassword}
+                />
+            )}
+
+            {(status === "syncing" || status === "setting-up") && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/40 z-10">
+                    <Loader />
+                </div>
+            )}
+        </div>
+    )
+}
 
 function SectionSyncInfo({
     manualSync,

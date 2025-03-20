@@ -20,7 +20,7 @@ export function Image(props: ImageProps) {
     let attachmentData = useAttachment({ id: attachment?.attachmentID })
     let hash = attachment?.thumbhash
 
-    let src = useMemo(() => {
+    let attachmentURL = useMemo(() => {
         if (!attachmentData || !attachmentData?.data) {
             return undefined
         }
@@ -30,18 +30,20 @@ export function Image(props: ImageProps) {
         )
     }, [attachmentData])
 
+    let src = attachmentURL ?? hash ?? props.src
+
     return (
         <figure id={props.id} className={props.className}>
             <Zoom IconUnzoom={() => <XIcon />} classDialog="image-zoom">
                 <img
-                    src={src ?? hash}
+                    src={src}
                     alt={props.alt}
                     loading="lazy"
                     className={clsx({
                         "animate-pulse": !src,
                     })}
                     style={{
-                        minWidth: src ? undefined : "200px",
+                        minWidth: hash && !attachmentURL ? "200px" : undefined,
                     }}
                 />
                 <figcaption>{props.caption ?? props.alt}</figcaption>

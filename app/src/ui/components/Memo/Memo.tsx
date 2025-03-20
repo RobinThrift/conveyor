@@ -45,133 +45,127 @@ interface MemoProps {
     actions?: Partial<MemoActions>
     doubleClickToEdit?: boolean
     collapsible?: boolean
+    ref?: React.Ref<HTMLDivElement>
 }
 
-export const Memo = React.forwardRef<HTMLDivElement, MemoProps>(
-    function Memo(props, forwardRef) {
-        let t = useT("components/Memo")
-        let ref = useRef<HTMLDivElement | null>(null)
-        let isVisible = useOnVisible(ref, { ratio: 0 })
-        let { title, body } = splitContent(props.memo.content)
-        let [isExpanded, setIsExpanded] = useState(!props.collapsible)
-        let [needsCollapsing, setNeedsCollapsing] = useState(
-            props.collapsible ?? false,
-        )
-        let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
+export function Memo(props: MemoProps) {
+    let t = useT("components/Memo")
+    let ref = useRef<HTMLDivElement | null>(null)
+    let isVisible = useOnVisible(ref, { ratio: 0 })
+    let { title, body } = splitContent(props.memo.content)
+    let [isExpanded, setIsExpanded] = useState(!props.collapsible)
+    let [needsCollapsing, setNeedsCollapsing] = useState(
+        props.collapsible ?? false,
+    )
+    let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
 
-        useEffect(() => {
-            if (isExpanded) {
-                return
-            }
+    useEffect(() => {
+        if (isExpanded) {
+            return
+        }
 
-            let el = ref.current
-            if (!el) {
-                return
-            }
+        let el = ref.current
+        if (!el) {
+            return
+        }
 
-            let observer = new ResizeObserver((entries) => {
-                for (let entry of entries) {
-                    setNeedsCollapsing(
-                        entry.target.clientHeight < entry.target.scrollHeight,
-                    )
-                }
-            })
-
-            observer.observe(el)
-
-            return () => {
-                observer.disconnect()
-            }
-        }, [isExpanded])
-
-        let onDoubleClick = useMemo(() => {
-            if (!props.actions?.edit || !props.doubleClickToEdit) {
-                return
-            }
-
-            return (e: React.MouseEvent) => {
-                startTransition(() => {
-                    let caret = caretPositionFromPoint(e.clientX, e.clientY)
-                    let snippet = caret
-                        ? caret.text.slice(caret.offset)
-                        : undefined
-
-                    let rect = ref.current?.getBoundingClientRect()
-
-                    props.actions?.edit?.(props.memo.id, {
-                        x: e.clientX - (rect?.x ?? 0),
-                        y: e.clientY - (rect?.y ?? 0),
-                        snippet: snippet?.split("\n")[0].trim(),
-                    })
-                })
-            }
-        }, [props.memo.id, props.doubleClickToEdit, props.actions?.edit])
-
-        let rendered = useMemo(() => {
-            if (isVisible) {
-                return (
-                    <Markdown
-                        id={props.memo.id}
-                        onDoubleClick={onDoubleClick}
-                        ref={forwardRef}
-                    >
-                        {body}
-                    </Markdown>
+        let observer = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                setNeedsCollapsing(
+                    entry.target.clientHeight < entry.target.scrollHeight,
                 )
             }
+        })
 
-            return body
-        }, [isVisible, body, props.memo.id, onDoubleClick, forwardRef])
+        observer.observe(el)
 
-        return (
-            <article
-                ref={ref}
-                className={clsx("@container memo", props.className, {
-                    "is-collapsed": needsCollapsing && isCollapsed,
-                    expanded: (needsCollapsing && !isCollapsed) || isExpanded,
-                })}
-                style={{
-                    viewTransitionName: `memo-${props.memo.id}`,
-                }}
-            >
-                <div className="memo-header content">
-                    {title ? (
-                        <h1>
-                            <MemoActions
-                                memo={props.memo}
-                                actions={props.actions}
-                            />
+        return () => {
+            observer.disconnect()
+        }
+    }, [isExpanded])
 
-                            {props.actions?.link ? (
-                                <Link href={props.actions.link} viewTransition>
-                                    {title}
-                                </Link>
-                            ) : (
-                                title
-                            )}
-                        </h1>
-                    ) : (
+    let onDoubleClick = useMemo(() => {
+        if (!props.actions?.edit || !props.doubleClickToEdit) {
+            return
+        }
+
+        return (e: React.MouseEvent) => {
+            startTransition(() => {
+                let caret = caretPositionFromPoint(e.clientX, e.clientY)
+                let snippet = caret ? caret.text.slice(caret.offset) : undefined
+
+                let rect = ref.current?.getBoundingClientRect()
+
+                props.actions?.edit?.(props.memo.id, {
+                    x: e.clientX - (rect?.x ?? 0),
+                    y: e.clientY - (rect?.y ?? 0),
+                    snippet: snippet?.split("\n")[0].trim(),
+                })
+            })
+        }
+    }, [props.memo.id, props.doubleClickToEdit, props.actions?.edit])
+
+    let rendered = useMemo(() => {
+        if (isVisible) {
+            return (
+                <Markdown
+                    id={props.memo.id}
+                    onDoubleClick={onDoubleClick}
+                    ref={props.ref}
+                >
+                    {body}
+                </Markdown>
+            )
+        }
+
+        return body
+    }, [isVisible, body, props.memo.id, onDoubleClick, props.ref])
+
+    return (
+        <article
+            ref={ref}
+            className={clsx("@container memo", props.className, {
+                "is-collapsed": needsCollapsing && isCollapsed,
+                expanded: (needsCollapsing && !isCollapsed) || isExpanded,
+            })}
+            style={{
+                viewTransitionName: `memo-${props.memo.id}`,
+            }}
+        >
+            <div className="memo-header content">
+                {title ? (
+                    <h1>
                         <MemoActions
                             memo={props.memo}
                             actions={props.actions}
                         />
-                    )}
-                    <MemoDate createdAt={props.memo.createdAt} />
-                </div>
-                {rendered}
 
-                <button
-                    type="button"
-                    aria-label={t.ShowMore}
-                    className="show-more-btn"
-                    onClick={() => setIsExpanded(true)}
-                >
-                    <CaretDown weight="bold" />
-                </button>
-            </article>
-        )
-    },
-)
+                        {props.actions?.link ? (
+                            <Link href={props.actions.link} viewTransition>
+                                {title}
+                            </Link>
+                        ) : (
+                            title
+                        )}
+                    </h1>
+                ) : (
+                    <MemoActions memo={props.memo} actions={props.actions} />
+                )}
+                <MemoDate createdAt={props.memo.createdAt} />
+            </div>
+            {rendered}
+
+            <button
+                type="button"
+                aria-label={t.ShowMore}
+                className="show-more-btn"
+                onClick={() => setIsExpanded(true)}
+            >
+                <CaretDown weight="bold" />
+            </button>
+        </article>
+    )
+}
 
 export function MemoDate({
     createdAt,

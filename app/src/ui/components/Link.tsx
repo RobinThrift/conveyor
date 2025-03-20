@@ -4,14 +4,16 @@ import React, { useCallback } from "react"
 import { useBaseURL } from "@/ui/hooks/useBaseURL"
 import { useGoto } from "@/ui/state/global/router"
 
-export const Link = React.forwardRef<
-    HTMLAnchorElement,
-    React.AnchorHTMLAttributes<any> & {
-        href: string
-        external?: boolean
-        viewTransition?: boolean
-    }
->(function Link({ external = false, viewTransition, ...props }, forwardedRef) {
+export function Link({
+    external = false,
+    viewTransition,
+    ...props
+}: React.AnchorHTMLAttributes<any> & {
+    ref?: React.Ref<HTMLAnchorElement>
+    href: string
+    external?: boolean
+    viewTransition?: boolean
+}) {
     let baseURL = useBaseURL()
     let href = external ? baseURL + props.href : props.href
     let goto = useGoto()
@@ -33,13 +35,13 @@ export const Link = React.forwardRef<
 
     return (
         <a
-            ref={forwardedRef}
+            ref={props.ref}
             {...props}
             href={href}
             onClick={!external ? onClick : undefined}
         />
     )
-})
+}
 
 export interface LinkButtonProps extends React.AnchorHTMLAttributes<any> {
     iconLeft?: React.ReactNode

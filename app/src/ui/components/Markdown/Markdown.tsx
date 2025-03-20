@@ -12,39 +12,38 @@ import { directives } from "./directives"
 import { useMarkdownWorker } from "./useMarkdownWorker"
 
 export interface MarkdownProps {
+    ref?: React.Ref<HTMLDivElement>
     children: string
     className?: string
     id: string
     onDoubleClick?: React.MouseEventHandler<HTMLDivElement>
 }
 
-export const Markdown = React.forwardRef<HTMLDivElement, MarkdownProps>(
-    function Markdown(props, forwardRef) {
-        let ast = useMarkdownWorker(props.children)
+export function Markdown(props: MarkdownProps) {
+    let ast = useMarkdownWorker(props.children)
 
-        let parsed = useMemo(() => {
-            if (ast) {
-                return astToJSX(ast, props.id, {
-                    componentMap: {
-                        Alert,
-                        Link,
-                        Code,
-                        Image,
-                        FootnoteReturnIcon: ArrowUDownLeftIcon,
-                    },
-                    directives,
-                })
-            }
-        }, [ast, props.id])
+    let parsed = useMemo(() => {
+        if (ast) {
+            return astToJSX(ast, props.id, {
+                componentMap: {
+                    Alert,
+                    Link,
+                    Code,
+                    Image,
+                    FootnoteReturnIcon: ArrowUDownLeftIcon,
+                },
+                directives,
+            })
+        }
+    }, [ast, props.id])
 
-        return (
-            <div
-                ref={forwardRef}
-                className={clsx("markdown content", props.className)}
-                onDoubleClick={props.onDoubleClick}
-            >
-                {parsed}
-            </div>
-        )
-    },
-)
+    return (
+        <div
+            ref={props.ref}
+            className={clsx("markdown content", props.className)}
+            onDoubleClick={props.onDoubleClick}
+        >
+            {parsed}
+        </div>
+    )
+}

@@ -1,9 +1,9 @@
 import { defineConfig, mergeConfig } from "vitest/config"
 import viteConfig from "./vite.config"
 
-export default defineConfig((configEnv) =>
+export default defineConfig(async (configEnv) =>
     mergeConfig(
-        viteConfig(configEnv),
+        await viteConfig(configEnv),
         defineConfig({
             test: {
                 includeSource: ["src/**/*.ts"],

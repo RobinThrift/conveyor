@@ -78,34 +78,33 @@ export function OptionGroup(props: SelectOptionGroupProps) {
 }
 
 export interface SelectOptionProps<T extends string = string> {
+    ref?: React.Ref<HTMLDivElement>
     children: React.ReactNode | React.ReactNode[]
     value: T
     disabled?: boolean
     useCheckbox?: boolean
 }
 
-export const Option = React.forwardRef<HTMLDivElement, SelectOptionProps>(
-    function Option(props, forwardedRef) {
-        return (
-            <RadixSelect.SelectItem
-                className={clsx("select-item", {
-                    nocheckbox: !props.useCheckbox,
-                    "checkbox-item": props.useCheckbox,
-                })}
-                value={props.value}
-                disabled={props.disabled}
-                ref={forwardedRef}
-            >
-                <RadixSelect.ItemText>{props.children}</RadixSelect.ItemText>
-                {props.useCheckbox && (
-                    <RadixSelect.ItemIndicator className="absolute left-1 mt-0.5 inline-flex items-center justify-center text-primary">
-                        <CheckIcon weight="bold" size={14} />
-                    </RadixSelect.ItemIndicator>
-                )}
-            </RadixSelect.SelectItem>
-        )
-    },
-)
+export function Option(props: SelectOptionProps) {
+    return (
+        <RadixSelect.SelectItem
+            className={clsx("select-item", {
+                nocheckbox: !props.useCheckbox,
+                "checkbox-item": props.useCheckbox,
+            })}
+            value={props.value}
+            disabled={props.disabled}
+            ref={props.ref}
+        >
+            <RadixSelect.ItemText>{props.children}</RadixSelect.ItemText>
+            {props.useCheckbox && (
+                <RadixSelect.ItemIndicator className="absolute left-1 mt-0.5 inline-flex items-center justify-center text-primary">
+                    <CheckIcon weight="bold" size={14} />
+                </RadixSelect.ItemIndicator>
+            )}
+        </RadixSelect.SelectItem>
+    )
+}
 
 Select.Group = OptionGroup
 Select.Option = Option

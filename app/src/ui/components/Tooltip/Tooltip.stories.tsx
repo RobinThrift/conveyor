@@ -48,7 +48,7 @@ function render(args: TooltipProps) {
             </Tooltip>
 
             <Tooltip {...args}>
-                <DateTime date={faker.date.recent()} relative />
+                <DateTime date={faker.date.recent()} />
             </Tooltip>
 
             <Tooltip {...args}>

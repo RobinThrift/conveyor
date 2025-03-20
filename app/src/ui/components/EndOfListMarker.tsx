@@ -3,7 +3,7 @@ import React, { useRef } from "react"
 import { useOnIntersection } from "@/ui/hooks/useOnIntersection"
 
 export function EndOfListMarker({ onReached }: { onReached: () => void }) {
-    let ref = useRef<HTMLDivElement | null>(null)
+    let ref = useRef<HTMLDivElement>(null)
     useOnIntersection(
         (isVisible) => {
             if (isVisible) {

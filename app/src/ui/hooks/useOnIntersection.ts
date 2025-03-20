@@ -8,7 +8,7 @@ import {
 export function useOnIntersection(
     onChange: (isVisible: boolean) => void,
     deps: DependencyList,
-    ref: RefObject<HTMLElement>,
+    ref: RefObject<HTMLElement | null>,
     options: IntersectionObserverInit & { ratio: number } = { ratio: 0.1 },
 ) {
     let onChangeMemoed = useCallback(onChange, deps)

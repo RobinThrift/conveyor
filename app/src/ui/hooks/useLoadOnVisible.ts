@@ -1,7 +1,7 @@
 import { type RefObject, useEffect, useState } from "react"
 
 export function useOnVisible(
-    ref: RefObject<HTMLElement>,
+    ref: RefObject<HTMLElement | null>,
     options: IntersectionObserverInit & { ratio: number },
 ) {
     let [isVisible, setIsVisble] = useState(false)
