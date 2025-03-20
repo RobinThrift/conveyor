@@ -95,7 +95,16 @@ func setupAuthController(t *testing.T) *AuthController {
 		Account: &domain.Account{
 			Username: t.Name(),
 		},
-		PlaintextPasswd: auth.PlaintextPassword(t.Name()),
+		PlaintextPasswd: auth.PlaintextPassword(t.Name() + "_init"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = authCtrl.ChangeAccountPassword(t.Context(), ChangeAccountPasswordCmd{
+		Username:            t.Name(),
+		CurrPasswdPlaintext: auth.PlaintextPassword(t.Name() + "_init"),
+		NewPasswdPlaintext:  auth.PlaintextPassword(t.Name()),
 	})
 	if err != nil {
 		t.Fatal(err)

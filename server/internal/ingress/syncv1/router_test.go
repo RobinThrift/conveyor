@@ -117,7 +117,16 @@ func setupSyncV1Router(t *testing.T) (http.Handler, string) {
 		Account: &domain.Account{
 			Username: t.Name(),
 		},
-		PlaintextPasswd: auth.PlaintextPassword(t.Name()),
+		PlaintextPasswd: auth.PlaintextPassword(t.Name() + "_init"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = authCtrl.ChangeAccountPassword(t.Context(), control.ChangeAccountPasswordCmd{
+		Username:            t.Name(),
+		CurrPasswdPlaintext: auth.PlaintextPassword(t.Name() + "_init"),
+		NewPasswdPlaintext:  auth.PlaintextPassword(t.Name()),
 	})
 	if err != nil {
 		t.Fatal(err)
