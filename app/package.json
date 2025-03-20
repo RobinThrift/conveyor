@@ -5,7 +5,7 @@
     "type": "module",
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
-        "@bufbuild/protobuf": "^2.2.3",
+        "@bufbuild/protobuf": "^2.2.5",
         "@faker-js/faker": "^9.2.0",
         "@storybook/addon-essentials": "^8.6.7",
         "@storybook/addon-storysource": "^8.6.7",
