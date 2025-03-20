@@ -1,5 +1,4 @@
 diff --git a/ext/wasm/GNUmakefile b/ext/wasm/GNUmakefile
-index 115374e6..4d2f335f 100644
 --- a/ext/wasm/GNUmakefile
 +++ b/ext/wasm/GNUmakefile
 @@ -204,6 +204,8 @@ endif

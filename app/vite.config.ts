@@ -2,7 +2,6 @@ import path from "node:path"
 import { exec as nodeexec } from "node:child_process"
 import { defineConfig, type UserConfig, searchForWorkspaceRoot } from "vite"
 import react from "@vitejs/plugin-react"
-import { VitePWA } from "vite-plugin-pwa"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
     let vcsInfo = await getVCSInfo()
@@ -48,19 +47,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             },
         },
 
-        plugins: [
-            react(),
-            VitePWA({
-                strategies: "generateSW",
-                registerType: "prompt",
-                manifest: false,
-                scope: "/assets/",
-                workbox: {
-                    globPatterns: ["**/*.{js,css,svg,woff2}"],
-                    navigateFallback: null,
-                },
-            }),
-        ],
+        plugins: [react()],
 
         optimizeDeps: {
             exclude: ["@sqlite.org/sqlite-wasm"],
@@ -87,7 +74,8 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             outDir: "build",
             emptyOutDir: true,
             assetsDir: "",
-            sourcemap: config.mode === "development" ? "inline" : false,
+            // sourcemap: config.mode === "development" ? "inline" : false,
+            sourcemap: "inline",
             minify: config.mode !== "development",
             cssMinify: "lightningcss",
 
@@ -124,8 +112,7 @@ async function getVCSInfo() {
 }
 
 async function exec(cmd: string): Promise<string> {
-    // @ts-expect-error: type checking error due to outdated lib somewhere
-    let { resolve, reject, promise } = Promise.withResolvers()
+    let { resolve, reject, promise } = Promise.withResolvers<string>()
 
     nodeexec(cmd, (err, stdout) => {
         if (err) {

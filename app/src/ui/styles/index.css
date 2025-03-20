@@ -12,7 +12,7 @@
 @import "../components/AlertDialog/AlertDialog.css" layer(components);
 @import "../components/AuthForm/AuthForm.css" layer(components);
 @import "../components/Button/Button.css" layer(components);
-@import "../components/ConveyorBeltTexT/ConveyorBeltTexT.css" layer(components);
+@import "../components/ConveyorBeltText/ConveyorBeltText.css" layer(components);
 @import "../components/Dialog/Dialog.css" layer(components);
 @import "../components/DropdownMenu/DropdownMenu.css" layer(components);
 @import "../components/Editor/Editor.css";

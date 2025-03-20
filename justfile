@@ -1,78 +1,38 @@
-local_bin  := absolute_path("./.bin")
-version    := env_var_or_default("VERSION", "dev")
-
-go_ldflags := env_var_or_default("GO_LDFLAGS", "") + " -X 'github.com/RobinThrift/belt/internal.Version=" + version + "'"
-go_buildflags := env_var_or_default("GO_BUILD_FLAGS", "-trimpath")
-go_test_reporter := env("GO_TEST_REPORTER", "pkgname-and-test-fails")
-go_lint_reporter := env("GO_LINT_REPORTER", "colored-line-number")
-
-import ".scripts/database.justfile"
-import ".scripts/api.justfile"
-import ".scripts/oci.justfile"
+local_bin         := absolute_path("./.bin")
+version           := env_var_or_default("VERSION", "dev")
+oci_repo          := env_var_or_default("OCI_REPO", "ghcr.io/robinthrift/belt")
+oci_platforms     := env_var_or_default("OCI_PLATFORMS", "linux/amd64,linux/arm64")
+docker_cmd        := env_var_or_default("DOCKER_CMD", "buildx build")
+docker_extra_args := env_var_or_default("DOCKER_EXTRA_ARGS", "")
 
 _default:
     @just --list
 
-# run the binary locally and restart on file changes
-run: (_install-tool "watchexec")
-    @mkdir -p test/manual
-    @BELT_LOG_LEVEL="debug" BELT_LOG_FORMAT="console" \
-        BELT_ADDR="localhost:8081" \
-        BELT_SECURE_COOKIES="false" \
-        BELT_DATABASE_PATH="./test/manual/belt.db" \
-        BELT_DATABASE_DEBUG_ENABLED="true" \
-        BELT_ATTACHMENTS_DIR="./test/manual/attachments" \
-        BELT_INIT_USERNAME="user" \
-        BELT_INIT_PASSWORD="password" \
-        {{ local_bin }}/watchexec -r -e go -- go run -trimpath -tags dev ./bin/belt
+build-oci-image:
+    docker {{ docker_cmd }} \
+        --build-arg="VERSION={{ version }}" \
+        --platform="{{ oci_platforms }}" \
+        {{ docker_extra_args }} \
+        -f ./deployment/Dockerfile \
+        -t {{ oci_repo }}:{{ replace_regex(version, "^v", "") }} .
 
-run-prod:
-    cd ui && just install build
-    just build
-    @BELT_LOG_LEVEL="debug" BELT_LOG_FORMAT="console" \
-        BELT_ADDR="localhost:8081" \
-        BELT_SECURE_COOKIES="false" \
-        BELT_DATABASE_PATH="./test/manual/belt.db" \
-        BELT_DATABASE_DEBUG_ENABLED="true" \
-        BELT_ATTACHMENTS_DIR="./test/manual/attachments" \
-        BELT_INIT_USERNAME="user" \
-        BELT_INIT_PASSWORD="password" \
-        ./build/belt
+run-oci-image:
+    -docker rmi {{ oci_repo }}:{{ replace_regex(version, "^v", "") }}
 
-build:
-    go build -ldflags="{{go_ldflags}}" {{ go_buildflags }} -o build/belt ./bin/belt
+    docker build \
+        --build-arg="VERSION={{ version }}" \
+        -f ./deployment/Dockerfile \
+        -t {{ oci_repo }}:{{ replace_regex(version, "^v", "") }} .
 
-export_report := env_var_or_default("EXPORT_REPORT", "false")
-test *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
-    @mkdir -p ui/build && touch ./ui/build/index.js
-    {{ local_bin }}/gotestsum \
-        {{ if export_report == "true" { "--junitfile 'tests.junit.xml' --junitfile-project-name 'RobinThrift/belt' --junitfile-hide-empty-pkg" } else { "" } }} \
-        --format {{ go_test_reporter }} \
-        --format-hide-empty-pkg \
-        -- {{ go_buildflags }} {{ flags }}
-
-test-watch *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
-    @mkdir -p ui/build && touch ./ui/build/index.js
-    {{ local_bin }}/gotestsum --format {{ go_test_reporter }} --format-hide-empty-pkg --watch -- {{ go_buildflags }} {{ flags }}
-
-# lint using staticcheck and golangci-lint
-lint: (_install-tool "staticcheck") (_install-tool "golangci-lint") (_install-tool "sqlc") (_install-tool "vacuum")
-    @mkdir -p ui/build && touch ./ui/build/index.js
-    {{ local_bin }}/staticcheck ./...
-    {{ local_bin }}/golangci-lint run --out-format={{ go_lint_reporter }} ./...
-    {{ local_bin }}/sqlc -f internal/storage/database/sqlite/sqlc.yaml vet
-    {{ local_bin }}/vacuum lint --ruleset .scripts/vacuum.yaml --details --fail-severity warn --no-banner --all-results ./api/apiv1/apiv1.openapi3.yaml
-
-fmt:
-    @go fmt ./...
-
-generate: _gen-sqlc _gen-api-v1-server
-
-
-clean:
-    rm -rf {{ local_bin }} ./build ./server/build ./app/build ./app/node_modules ./server/test/manual ./server/internal/ingress/app/assets/*
-    touch ./server/internal/ingress/app/assets/.gitkeep
-    go clean -cache
+    docker run --rm \
+        -e BELT_LOG_LEVEL="debug" -e BELT_LOG_FORMAT="console" \
+        -e BELT_ADDR=":8081" \
+        -e BELT_SECURE_COOKIES="false" \
+        -e BELT_DATABASE_DEBUG_ENABLED="true" \
+        -e BELT_INIT_USERNAME="user" \
+        -e BELT_INIT_PASSWORD="password" \
+        -p 8081:8081 \
+        {{ oci_repo }}:{{ replace_regex(version, "^v", "") }}
 
 # generate a release with the given tag
 release tag:

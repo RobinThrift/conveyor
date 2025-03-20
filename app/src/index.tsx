@@ -1,4 +1,3 @@
-import { registerSW } from "virtual:pwa-register"
 import React from "react"
 import ReactDOM from "react-dom/client"
 
@@ -65,40 +64,6 @@ async function main() {
 
     eventbus.on("notifications:add", (notification) => {
         rootStore.dispatch(actions.global.notifications.add({ notification }))
-    })
-
-    let updateSW = registerSW({
-        onNeedRefresh() {
-            rootStore.dispatch(
-                actions.global.notifications.add({
-                    notification: {
-                        type: "info",
-                        title: "Update Available",
-                        requiresAction: true,
-                        buttons: [
-                            {
-                                children: "Update",
-                                ariaLabel: "Update",
-                                onClick: () => updateSW(),
-                            },
-                        ],
-                    },
-                }),
-            )
-        },
-
-        onRegisterError: (err) => {
-            let [title, message] = err.message.split(/:\n/, 2)
-            rootStore.dispatch(
-                actions.global.notifications.add({
-                    notification: {
-                        type: "error",
-                        title,
-                        message,
-                    },
-                }),
-            )
-        },
     })
 
     let controller = await initController()

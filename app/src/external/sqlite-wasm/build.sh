@@ -3,8 +3,8 @@
 set -eux
 set -o pipefail
 
-OPENSSL_VERSION="3.4.0"
-SQLCIPHER_VERSION="v4.6.1"
+OPENSSL_VERSION=$(cat `pwd`/openssl_version)
+SQLCIPHER_VERSION=$(cat `pwd`/sqlcipher_version)
 
 mkdir -p `pwd`/build
 

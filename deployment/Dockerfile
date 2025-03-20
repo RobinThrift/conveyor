@@ -1,29 +1,47 @@
-FROM --platform=$BUILDPLATFORM node:23-alpine3.19 AS frontend
+FROM --platform=$BUILDPLATFORM debian:12-slim AS sqlite3-builder
 
-RUN apk update && apk upgrade && apk add --no-cache curl && \
+COPY ./app/src/external/sqlite-wasm/scripts/install-deps.sh /scripts/install-deps.sh
+
+RUN /scripts/install-deps.sh;
+
+COPY ./app/src/external/sqlite-wasm/scripts /scripts
+COPY ./app/src/external/sqlite-wasm/patches /patches
+COPY ./app/src/external/sqlite-wasm /sqlite-wasm
+
+WORKDIR /sqlite-wasm
+
+RUN --mount=type=cache,target=/.cache \
+    /sqlite-wasm/build-in-docker.sh
+
+
+FROM --platform=$BUILDPLATFORM node:23-alpine3.21 AS frontend
+
+RUN apk update && apk upgrade && apk add --no-cache curl git && \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
     just --version
 
-COPY ./ui/package.json /belt/ui/package.json
-COPY ./ui/package-lock.json /belt/ui/package-lock.json
-COPY ./ui/justfile /belt/ui/justfile
+COPY ./app/package.json /belt/app/package.json
+COPY ./app/package-lock.json /belt/app/package-lock.json
+COPY ./app/justfile /belt/app/justfile
 
-WORKDIR /belt/ui
+WORKDIR /belt/app
 
 RUN just install
 
-COPY ./ui /belt/ui
+COPY ./app /belt/app
+COPY .git /belt/.git
+COPY --from=sqlite3-builder /out /belt/app/src/external/sqlite-wasm/build
 
 RUN just build
 
-FROM --platform=$BUILDPLATFORM golang:1.23.4-alpine3.19 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.24.1-alpine3.21 AS builder
 
-RUN apk update && apk upgrade && apk add --no-cache curl &&  \
+RUN apk update && apk upgrade && apk add --no-cache curl git &&  \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
     just --version
 
-COPY . /belt
-COPY --from=frontend /belt/ui/build /belt/ui/build
+COPY ./server /belt
+COPY --from=frontend /belt/app/build /belt/internal/ingress/app/assets
 WORKDIR /belt
 
 ARG VERSION TARGETOS TARGETARCH
@@ -50,7 +68,7 @@ COPY --from=builder --chown=nobody:nobody /run/belt /run
 COPY --from=builder --chown=nobody:nobody /tmp/belt /tmp
 
 ENV BELT_DATABASE_PATH="/run/belt.db"
-ENV BELT_ATTACHMENTS_DIR="/run/attachments"
+ENV BELT_BLOBS_DIR="/run/blobs"
 
 USER nobody
 
