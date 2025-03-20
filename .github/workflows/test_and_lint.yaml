@@ -17,37 +17,42 @@ permissions:
   pull-requests: write
 
 jobs:
-  Lint:
+  Lint-Server:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-go@v5
       with:
-        go-version-file: "go.mod"
-
+        go-version: "stable"
     - uses: RobinThrift/action-setup-just@v1
 
     - name: "Lint Go"
       env:
         GO_LINT_REPORTER: "github-actions"
       run: |
+        cd server && \
         just lint
 
-    - name: "Lint JS"
+  Lint-App:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: RobinThrift/action-setup-just@v1
+    - name: "Lint App"
       env:
         BIOME_REPORTER: "github"
       run: |
-        cd ui && \
+        cd app && \
         just lint
 
-  Test:
+
+  Test-Server:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-go@v5
       with:
-        go-version-file: "go.mod"
-
+        go-version: "stable"
     - uses: RobinThrift/action-setup-just@v1
 
     - name: "Test"
@@ -55,6 +60,7 @@ jobs:
         GO_TEST_REPORTER: "github-actions"
         EXPORT_REPORT: "true"
       run: |
+        cd server &&
         just test
 
     - name: Publish Test Results
@@ -63,4 +69,16 @@ jobs:
       with:
         check_name: "Test Results"
         files: |
-          *.junit.xml
+          server/*.junit.xml
+
+  Test-App:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: RobinThrift/action-setup-just@v1
+
+    - name: "Test"
+      run: |
+        cd app &&
+        npx playwright install &&
+        just test
