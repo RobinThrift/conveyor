@@ -43,6 +43,7 @@ jobs:
         BIOME_REPORTER: "github"
       run: |
         cd app && \
+        just install && \
         just lint
 
 
@@ -83,6 +84,7 @@ jobs:
 
     - name: "Test"
       run: |
-        cd app &&
-        npx playwright install &&
+        cd app && \
+        just install && \
+        npx playwright install && \
         just test
