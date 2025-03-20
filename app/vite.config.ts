@@ -1,10 +1,13 @@
 import path from "node:path"
+import { exec as nodeexec } from "node:child_process"
 import { defineConfig, type UserConfig, searchForWorkspaceRoot } from "vite"
 import react from "@vitejs/plugin-react"
 import { VitePWA } from "vite-plugin-pwa"
 
-export default defineConfig(
-    (config): UserConfig => ({
+export default defineConfig(async (config): Promise<UserConfig> => {
+    let vcsInfo = await getVCSInfo()
+
+    return {
         base: "/assets/",
 
         publicDir: "build/",
@@ -15,11 +18,14 @@ export default defineConfig(
             "import.meta.vitest": "undefined",
 
             "process.env.NODE_ENV": JSON.stringify(config.mode),
-            "process.env.LOG_LEVEL": JSON.stringify("error"),
             __LOG_LEVEL__: JSON.stringify("error"),
-            __VERSION__: JSON.stringify("dev"),
-            __COMMIT_HASH__: JSON.stringify("main"),
-            __COMMIT_DATE__: JSON.stringify(new Date()),
+            __VERSION__: JSON.stringify(
+                vcsInfo.numCommits
+                    ? `${vcsInfo.version}-${vcsInfo.numCommits}`
+                    : vcsInfo.version,
+            ),
+            __COMMIT_HASH__: JSON.stringify(vcsInfo.hash),
+            __COMMIT_DATE__: JSON.stringify(vcsInfo.date),
             __PROJECT_LINK__: JSON.stringify(
                 "https://github.com/RobinThrift/belt",
             ),
@@ -99,5 +105,35 @@ export default defineConfig(
                 },
             },
         },
-    }),
-)
+    }
+})
+
+async function getVCSInfo() {
+    let [version, numCommits, hash] = (
+        await exec("git describe --tags --long --abbrev=40")
+    ).split("-")
+
+    let date = await exec(`git show --no-patch --format=%ci ${version}`)
+
+    return {
+        version,
+        numCommits,
+        hash,
+        date,
+    }
+}
+
+async function exec(cmd: string): Promise<string> {
+    // @ts-expect-error: type checking error due to outdated lib somewhere
+    let { resolve, reject, promise } = Promise.withResolvers()
+
+    nodeexec(cmd, (err, stdout) => {
+        if (err) {
+            reject(err)
+            return
+        }
+        resolve(stdout.trim())
+    })
+
+    return promise
+}
