@@ -54,7 +54,11 @@ export function createWorker<
                                 data: {
                                     id: "ERROR",
                                     type: "error",
-                                    error: err || new Error("unknown error"),
+                                    error:
+                                        err ||
+                                        new Error("unknown error", {
+                                            cause: evt,
+                                        }),
                                 },
                             }),
                         )
