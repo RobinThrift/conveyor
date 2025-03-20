@@ -59,6 +59,39 @@ suite.sequential("api/syncv1/SyncV1APIClient", async () => {
             syncV1APIClient.uploadFullSyncData(ctx, data.buffer),
         )
     })
+
+    test("uploadAttachment", async () => {
+        let { ctx, setup, cleanup, useMocks, syncV1APIClient } =
+            await setupSyncV1APIClientTest()
+
+        await setup()
+        onTestFinished(cleanup)
+
+        let content = "THIS IS TOTALLY A DATABASE"
+        let data = encodeText(content)
+
+        useMocks(
+            http.post("/api/sync/v1/attachments", async ({ request }) => {
+                assert.equal(
+                    decodeText(
+                        // biome-ignore lint/style/noNonNullAssertion: just a atest
+                        await decompressData(request.body!),
+                    ),
+                    content,
+                )
+                return new HttpResponse(null, {
+                    status: 201,
+                })
+            }),
+        )
+
+        await assertOkResult(
+            syncV1APIClient.uploadAttachment(ctx, {
+                filepath: "/a/b/c/d/e/f",
+                data: data,
+            }),
+        )
+    })
 })
 
 async function setupSyncV1APIClientTest() {
@@ -86,4 +119,30 @@ async function setupSyncV1APIClientTest() {
             mockWorker.use(...args)) as typeof mockWorker.use,
         syncV1APIClient,
     }
+}
+
+async function decompressData(
+    stream: ReadableStream<Uint8Array<ArrayBufferLike>>,
+) {
+    let { readable, writable } = new TransformStream()
+    stream.pipeThrough(new DecompressionStream("gzip")).pipeTo(writable)
+
+    let reader = readable.getReader()
+
+    let chunks: BlobPart[] = []
+
+    let blob = await reader.read().then(async function read({
+        done,
+        value,
+    }: ReadableStreamReadResult<Uint8Array>): Promise<Blob> {
+        if (done) {
+            return new Blob(chunks)
+        }
+
+        chunks.push(value)
+
+        return reader.read().then(read)
+    })
+
+    return new Uint8Array(await blob.arrayBuffer())
 }
