@@ -8,6 +8,7 @@ import {
 } from "date-fns"
 import {
     assert,
+    type OnTestFinishedHandler,
     afterAll,
     afterEach,
     beforeAll,
@@ -21,7 +22,7 @@ import type { MemoChangelogEntry } from "@/domain/Changelog"
 import { newID } from "@/domain/ID"
 import type { MemoID, MemoList } from "@/domain/Memo"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto/WebCryptoSha256Hasher"
-import { BaseContext } from "@/lib/context"
+import { BaseContext, type Context } from "@/lib/context"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 import { MockFS } from "@/lib/testhelper/mockfs"
 import { SQLite } from "@/lib/testhelper/sqlite"
@@ -252,16 +253,13 @@ suite("control/MemoController", () => {
     suite.concurrent(
         "CRUD",
         async () => {
-            let { memoCtrl, changelogCtrl, ctx, setup, cleanup } =
-                await memoCtrlTestSetup()
-
-            let now = new Date(2024, 2, 15, 12, 0, 0, 0)
-            let numMemos = 10
-            let createdMemosIDs: MemoID[] = []
-
-            beforeAll(async () => {
-                await setup()
-
+            let insertMemos = async (
+                ctx: Context,
+                memoCtrl: MemoController,
+                now = new Date(2024, 2, 15, 12, 0, 0, 0),
+                numMemos = 10,
+            ) => {
+                let createdMemosIDs: MemoID[] = []
                 for (let i = 0; i < numMemos; i++) {
                     let res = await memoCtrl.createMemo(ctx, {
                         content: `# Test Memo ${i}\n With some more content for memo ${i}`,
@@ -272,11 +270,18 @@ suite("control/MemoController", () => {
                     }
                     createdMemosIDs.push(res.value.id)
                 }
-            })
 
-            afterAll(cleanup)
+                return createdMemosIDs
+            }
 
-            test("createMemo/changelog", async () => {
+            test("createMemo/changelog", async ({ onTestFinished }) => {
+                let { memoCtrl, changelogCtrl, ctx, setup } =
+                    await memoCtrlTestSetup({ onTestFinished })
+                await setup()
+
+                let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+                let numMemos = 10
+
                 let content =
                     "# Test Memo to Check Changelog\nMemo content here."
                 let created = await assertOkResult(
@@ -311,14 +316,30 @@ suite("control/MemoController", () => {
                 assert.isTrue(entry.isApplied)
             })
 
-            test("getMemo", async () => {
+            test("getMemo", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+
+                let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+                let createdMemosIDs = await insertMemos(ctx, memoCtrl, now)
+
                 let result = await assertOkResult(
                     memoCtrl.getMemo(ctx, createdMemosIDs[1]),
                 )
                 assert.isDefined(result)
             })
 
-            test("getMemo/Not Found", async () => {
+            test("getMemo/Not Found", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+
+                let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+                await insertMemos(ctx, memoCtrl, now)
+
                 let error = await assertErrResult(
                     memoCtrl.getMemo(ctx, "INVALID_ID"),
                 )
@@ -326,7 +347,15 @@ suite("control/MemoController", () => {
                 assert.include(error.message, "not found")
             })
 
-            test("updateMemo", async () => {
+            test("updateMemo", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+
+                let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+                let createdMemosIDs = await insertMemos(ctx, memoCtrl, now)
+
                 let memo = await assertOkResult(
                     memoCtrl.getMemo(ctx, createdMemosIDs[2]),
                 )
@@ -353,7 +382,13 @@ suite("control/MemoController", () => {
                 assert.isTrue(isAfter(updated.updatedAt, memo.updatedAt))
             })
 
-            test("updateMemo/Not Found", async () => {
+            test("updateMemo/Not Found", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+                await insertMemos(ctx, memoCtrl)
+
                 let error = await assertErrResult(
                     memoCtrl.updateMemoContent(ctx, {
                         id: "99",
@@ -370,7 +405,13 @@ suite("control/MemoController", () => {
                 assert.include(error.message, "not found")
             })
 
-            test("updateMemoArchiveStatus", async () => {
+            test("updateMemoArchiveStatus", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+                let createdMemosIDs = await insertMemos(ctx, memoCtrl)
+
                 let memo = await assertOkResult(
                     memoCtrl.getMemo(ctx, createdMemosIDs[5]),
                 )
@@ -412,7 +453,15 @@ suite("control/MemoController", () => {
                 )
             })
 
-            test("updateMemoArchiveStatus/Not Found", async () => {
+            test("updateMemoArchiveStatus/Not Found", async ({
+                onTestFinished,
+            }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+                await insertMemos(ctx, memoCtrl)
+
                 let error = await assertErrResult(
                     memoCtrl.updateMemoArchiveStatus(ctx, {
                         id: "INVALID_ID",
@@ -423,7 +472,12 @@ suite("control/MemoController", () => {
                 assert.include(error.message, "not found")
             })
 
-            test("deleteMemo", async () => {
+            test("deleteMemo", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+
                 let created = await assertOkResult(
                     memoCtrl.createMemo(ctx, {
                         content: "Memo To Be Deleted",
@@ -455,7 +509,13 @@ suite("control/MemoController", () => {
                 assert.include(error?.message, "not found")
             })
 
-            test("undeleteMemo", async () => {
+            test("undeleteMemo", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+                let createdMemosIDs = await insertMemos(ctx, memoCtrl)
+
                 let memo = await assertOkResult(
                     memoCtrl.getMemo(ctx, createdMemosIDs[8]),
                 )
@@ -482,7 +542,13 @@ suite("control/MemoController", () => {
                 assert.isTrue(isAfter(deleted.updatedAt, memo.updatedAt))
             })
 
-            test("deleteMemo/Not Found", async () => {
+            test("deleteMemo/Not Found", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+                await insertMemos(ctx, memoCtrl)
+
                 let error = await assertErrResult(
                     memoCtrl.deleteMemo(ctx, "INVALID_ID"),
                 )
@@ -699,10 +765,9 @@ suite("control/MemoController", () => {
         let now = new Date(2024, 2, 15, 12, 0, 0, 0)
 
         test("exisitng Memo", async ({ onTestFinished }) => {
-            let { memoCtrl, ctx, setup, cleanup, insertChangelogEntries } =
-                await memoCtrlTestSetup()
+            let { memoCtrl, ctx, setup, insertChangelogEntries } =
+                await memoCtrlTestSetup({ onTestFinished })
             await setup()
-            onTestFinished(() => cleanup())
 
             let { id } = await assertOkResult(
                 memoCtrl.createMemo(ctx, {
@@ -738,7 +803,9 @@ suite("control/MemoController", () => {
         })
 
         test("new Memo", async ({ onTestFinished }) => {
-            let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup()
+            let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup({
+                onTestFinished,
+            })
             await setup()
             onTestFinished(() => cleanup())
 
@@ -773,10 +840,9 @@ suite("control/MemoController", () => {
         })
 
         test("Conflicting Change", async ({ onTestFinished }) => {
-            let { memoCtrl, ctx, setup, cleanup, insertChangelogEntries } =
-                await memoCtrlTestSetup()
+            let { memoCtrl, ctx, setup, insertChangelogEntries } =
+                await memoCtrlTestSetup({ onTestFinished })
             await setup()
-            onTestFinished(() => cleanup())
 
             let { id } = await assertOkResult(
                 memoCtrl.createMemo(ctx, {
@@ -855,7 +921,11 @@ Line 4 unchanged`
     })
 })
 
-async function memoCtrlTestSetup() {
+async function memoCtrlTestSetup({
+    onTestFinished,
+}: {
+    onTestFinished?: (fn: OnTestFinishedHandler, timeout?: number) => void
+} = {}) {
     let [ctx, cancel] = BaseContext.withCancel()
 
     let db = new SQLite()
@@ -911,6 +981,13 @@ async function memoCtrlTestSetup() {
         return toCreate
     }
 
+    let cleanup = async () => {
+        cancel()
+        await db.close()
+    }
+
+    onTestFinished?.(cleanup)
+
     return {
         ctx,
         memoCtrl,
@@ -920,9 +997,6 @@ async function memoCtrlTestSetup() {
         setup: async () => {
             await db.open(ctx)
         },
-        cleanup: async () => {
-            cancel()
-            await db.close()
-        },
+        cleanup,
     }
 }
