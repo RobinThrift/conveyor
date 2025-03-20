@@ -85,7 +85,7 @@
         "micromark-extension-gfm-table": "^2.1.0",
         "micromark-util-symbol": "^2.0.0",
         "nanoevents": "^9.1.0",
-        "nanoid": "^5.1.0",
+        "nanoid": "^5.1.5",
         "quill-delta": "^5.1.0",
         "react": "^19.0.0",
         "react-accessible-treeview": "^2.11.1",
