@@ -97,17 +97,28 @@ export default defineConfig(async (config): Promise<UserConfig> => {
 })
 
 async function getVCSInfo() {
-    let [version, numCommits, hash] = (
-        await exec("git describe --tags --long --abbrev=40")
-    ).split("-")
+    try {
+        let [version, numCommits, hash] = (
+            await exec("git describe --tags --long --abbrev=40")
+        ).split("-")
 
-    let date = await exec(`git show --no-patch --format=%ci ${version}`)
+        let date = await exec(`git show --no-patch --format=%ci ${version}`)
+
+        return {
+            version,
+            numCommits,
+            hash,
+            date,
+        }
+    } catch (err) {
+        console.warn(err)
+    }
 
     return {
-        version,
-        numCommits,
-        hash,
-        date,
+        version: "dev",
+        numCommits: "0",
+        hash: "",
+        date: new Date(),
     }
 }
 

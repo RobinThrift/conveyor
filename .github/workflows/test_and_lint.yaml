@@ -38,6 +38,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: RobinThrift/action-setup-just@v1
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "latest"
     - name: "Lint App"
       env:
         BIOME_REPORTER: "github"
@@ -77,6 +80,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: RobinThrift/action-setup-just@v1
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "latest"
     - uses: actions/cache@v4
       with:
         path: app/src/external/sqlite-wasm/build

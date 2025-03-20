@@ -40,7 +40,7 @@
         }
     },
     "include": ["src/*.tsx", "src/**/*.tsx", "src/*.ts", "src/**/*.ts", "translations/*.ts"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "src/external/sqlite-wasm/.cache"]
 }
 
 

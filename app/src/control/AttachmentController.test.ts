@@ -31,7 +31,7 @@ const attachmentTestContent = Object.freeze({
     })(),
 })
 
-suite.concurrent.only("control/AttachmentController", () => {
+suite.concurrent("control/AttachmentController", () => {
     test("read/write", async ({ onTestFinished }) => {
         let { attachmentCtrl, changelogCtrl, ctx, setup, cleanup } =
             await attachmentCtrlTestSetup()

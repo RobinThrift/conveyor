@@ -85,7 +85,8 @@
 
         {
             "include": [
-                "./src/external/sqlite-wasm/build/*",
+                "./src/external/sqlite-wasm/build",
+                "./src/external/sqlite-wasm/.cache",
                 "./src/external/thumbhash/thumbhash.*"
             ],
             "organizeImports": { "enabled": false },
