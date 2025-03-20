@@ -59,8 +59,6 @@ _gen-icons:
 _gen-sql: (_install-tool "sqlc")
     {{ local_bin }}/sqlc generate -f src/storage/database/sqlite/sqlc.yaml
 
-openssl_version := "3.4.0"
-sqlcipher_version := "v4.6.1"
 _build-sqlite:
     if [ ! -f ./src/external/sqlite-wasm/build/sqlite3.wasm ]; then (cd ./src/external/sqlite-wasm && ./build.sh) ; fi
     -rm -rf build/sqlite3

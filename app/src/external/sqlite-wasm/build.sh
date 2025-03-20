@@ -9,6 +9,7 @@ SQLCIPHER_VERSION=$(cat `pwd`/sqlcipher_version)
 mkdir -p `pwd`/build
 
 docker run --rm \
+    -v `pwd`/.cache:/.cache \
     -v `pwd`/scripts:/scripts \
     -v `pwd`/patches:/patches \
     -v `pwd`/build:/out \
