@@ -31,6 +31,9 @@ git apply /patches/GNUmakefile.patch
 
 make release
 
+if [ ! -d "$OUTDIR" ]; then
+    mkdir -p "$OUTDIR"
+fi
 
 rm -rf "${OUTDIR}/*"
 
