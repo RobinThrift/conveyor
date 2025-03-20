@@ -1,4 +1,4 @@
-import { type Result, fromThrowing } from "@/lib/result"
+import { Ok, type Result, fromThrowing } from "@/lib/result"
 import { parseJSON as dateFnsParseJSON } from "date-fns"
 import { decodeText } from "./textencoding"
 
@@ -24,4 +24,30 @@ export function parseJSON<R, V = unknown>(
 
 export function parseJSONDate(raw: string): Result<Date> {
     return fromThrowing(() => dateFnsParseJSON(raw))
+}
+
+export function parseJSONDates<
+    R extends object,
+    K extends keyof R,
+    V extends Record<K, unknown>,
+>(...keys: K[]): (v: V) => Result<R> {
+    return (obj) => {
+        let parsed = {
+            ...obj,
+        } as any as R
+
+        for (let key of keys) {
+            if (obj[key]) {
+                continue
+            }
+            let d = parseJSONDate(obj[key] as string)
+            if (!d.ok) {
+                return d
+            }
+
+            parsed[key] = d.value as (typeof parsed)[typeof key]
+        }
+
+        return Ok(parsed as R)
+    }
 }

@@ -1,6 +1,6 @@
-import type { SetupInfo } from "@/domain/SetupInfo"
+import type { IsSetupInfo, SetupInfo } from "@/domain/SetupInfo"
 import type { Context } from "@/lib/context"
-import { parseJSON } from "@/lib/json"
+import { parseJSON, parseJSONDates } from "@/lib/json"
 import { type AsyncResult, Ok } from "@/lib/result"
 
 export class LocalStorageSetupInfoStorage {
@@ -12,7 +12,14 @@ export class LocalStorageSetupInfoStorage {
             return Ok(undefined)
         }
 
-        return parseJSON(data)
+        return parseJSON(
+            data,
+            parseJSONDates<
+                IsSetupInfo,
+                keyof IsSetupInfo,
+                Record<string, unknown>
+            >("setupAt"),
+        )
     }
 
     async saveSetupInfo(_: Context, info: SetupInfo): AsyncResult<void> {

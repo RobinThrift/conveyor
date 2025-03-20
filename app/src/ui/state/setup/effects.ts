@@ -1,4 +1,5 @@
 import type { SetupController } from "@/control/SetupController"
+import { BUILD_INFO } from "@/domain/BuildInfo"
 import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
@@ -70,9 +71,17 @@ export const registerEffects = (
         actionCreator: slice.actions.setIsSetup,
         effect: async ({ payload }, { cancelActiveListeners, signal }) => {
             cancelActiveListeners()
-            setupCtrl.saveSetupInfo(BaseContext.withSignal(signal), {
-                isSetup: payload.isSetup,
-            })
+            if (payload.isSetup) {
+                setupCtrl.saveSetupInfo(BaseContext.withSignal(signal), {
+                    isSetup: true,
+                    setupAt: new Date(),
+                    version: BUILD_INFO.version,
+                })
+            } else {
+                setupCtrl.saveSetupInfo(BaseContext.withSignal(signal), {
+                    isSetup: false,
+                })
+            }
         },
     })
 
