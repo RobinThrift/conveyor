@@ -74,8 +74,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             outDir: "build",
             emptyOutDir: true,
             assetsDir: "",
-            // sourcemap: config.mode === "development" ? "inline" : false,
-            sourcemap: "inline",
+            sourcemap: config.mode === "development" ? "inline" : false,
             minify: config.mode !== "development",
             cssMinify: "lightningcss",
 
