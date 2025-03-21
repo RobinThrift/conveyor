@@ -454,7 +454,7 @@ export class SyncController {
 }
 
 interface SyncAPIClient {
-    setBaseURL(baseUR: string): void
+    setBaseURL(baseURL: string): void
     getFullSync(ctx: Context): AsyncResult<ArrayBufferLike>
     uploadFullSyncData(ctx: Context, data: ArrayBufferLike): AsyncResult<void>
     listChangelogEntries(
