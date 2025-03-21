@@ -2,6 +2,7 @@ package httpmiddleware
 
 import (
 	"bufio"
+	"context"
 	"errors"
 	"log/slog"
 	"net"
@@ -26,7 +27,7 @@ func LogRequests(skipFor []string) func(next http.Handler) http.Handler {
 			wrapped := &statusResponseWriter{w, 200}
 
 			start := time.Now()
-			defer func() {
+			defer func(ctx context.Context) {
 				logFields = append(
 					logFields,
 					slog.Int("status", wrapped.statusCode),
@@ -42,8 +43,8 @@ func LogRequests(skipFor []string) func(next http.Handler) http.Handler {
 					log = slog.ErrorContext
 				}
 
-				log(r.Context(), r.URL.String(), logFields...)
-			}()
+				log(ctx, r.URL.String(), logFields...)
+			}(r.Context())
 
 			next.ServeHTTP(wrapped, r)
 		})
