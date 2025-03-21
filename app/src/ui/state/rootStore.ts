@@ -4,6 +4,7 @@ import {
     createListenerMiddleware,
 } from "@reduxjs/toolkit"
 
+import type { APITokenController } from "@/control/APITokenController"
 import type { AttachmentController } from "@/control/AttachmentController"
 import type { AuthController } from "@/control/AuthController"
 import type { MemoController } from "@/control/MemoController"
@@ -12,6 +13,7 @@ import type { SetupController } from "@/control/SetupController"
 import type { SyncController } from "@/control/SyncController"
 import type { UnlockController } from "@/control/UnlockController"
 
+import * as apitokens from "./apitokens"
 import * as attachments from "./attachments"
 import * as auth from "./auth"
 import { registerEffects as registerErrorEffects } from "./errors"
@@ -49,6 +51,7 @@ export function configureRootStore(initState: {
         auth.slice,
         setup.slice,
         unlock.slice,
+        apitokens.slice,
     )
 
     const store = configureStore({
@@ -125,6 +128,7 @@ export function configureEffects({
     authCtrl,
     setupCtrl,
     unlockCtrl,
+    apiTokenCtrl,
 }: {
     memoCtrl: MemoController
     attachmentCtrl: AttachmentController
@@ -133,6 +137,7 @@ export function configureEffects({
     authCtrl: AuthController
     setupCtrl: SetupController
     unlockCtrl: UnlockController
+    apiTokenCtrl: APITokenController
 }) {
     memos.registerEffects(startListening, {
         memoCtrl,
@@ -164,6 +169,10 @@ export function configureEffects({
 
     unlock.registerEffects(startListening, {
         unlockCtrl,
+    })
+
+    apitokens.registerEffects(startListening, {
+        apiTokenCtrl,
     })
 }
 

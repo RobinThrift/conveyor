@@ -178,3 +178,8 @@ export class AuthV1APIClient {
         })
     }
 }
+
+export interface CreateAPITokenRequest {
+    name: string
+    expiresAt: Date
+}

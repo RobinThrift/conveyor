@@ -47,6 +47,7 @@ func New(config Config) *App {
 	accountRepo := sqlite.NewAccountRepo(db)
 	syncRepo := sqlite.NewSyncRepo(db)
 	authTokenRepo := sqlite.NewAuthTokenRepo(db)
+	apiTokenRepo := sqlite.NewAPITokenRepo(db)
 	jobRepo := sqlite.NewJobRepo(db)
 
 	fs := &filesystem.LocalFSBlobStorage{
@@ -64,13 +65,14 @@ func New(config Config) *App {
 	accountCtrl := control.NewAccountController(db, accountRepo)
 	syncCtrl := control.NewSyncController(db, syncRepo, fs)
 	authCtrl := control.NewAuthController(authConfig, db, accountCtrl, authTokenRepo)
+	apiTokenCtrl := control.NewAPITokenController(authConfig, db, apiTokenRepo, authTokenRepo)
 
 	jobSystem := jobs.NewSystem(db, jobRepo, accountCtrl, time.Now, jobFuncs)
 
 	mux := http.NewServeMux()
 	srv := server.New(server.Config{Addr: config.Addr}, mux)
 
-	authv1.New(config.BasePath, mux, authCtrl)
+	authv1.New(config.BasePath, mux, authCtrl, apiTokenCtrl)
 	syncv1.New(syncv1.RouterConfig{
 		BasePath: config.BasePath,
 	}, mux, syncCtrl, authCtrl, http.Dir(config.Blobs.Dir))

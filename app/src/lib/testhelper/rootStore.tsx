@@ -26,7 +26,9 @@ import { configureEffects, configureRootStore } from "@/ui/state"
 import { Provider } from "@/ui/state"
 
 import { AuthV1APIClient } from "@/api/authv1"
+import { APITokensV1APIClient } from "@/api/authv1/APITokensV1APIClient"
 import { SyncV1APIClient } from "@/api/syncv1"
+import { APITokenController } from "@/control/APITokenController"
 import { AuthController } from "@/control/AuthController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
@@ -118,6 +120,13 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             crypto,
         })
 
+        let apiTokenCtrl = new APITokenController({
+            apiTokenAPIClient: new APITokensV1APIClient({
+                baseURL: globalThis.location.href,
+                tokenStorage: authCtrl,
+            }),
+        })
+
         if (props.generateMockData) {
             await insertMockData({ memoCtrl })
         }
@@ -130,6 +139,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             authCtrl,
             setupCtrl,
             unlockCtrl,
+            apiTokenCtrl,
         })
 
         // @ts-expect-error: this is for debugging

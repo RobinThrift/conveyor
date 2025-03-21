@@ -10,7 +10,12 @@ import {
 } from "@/ui/components/AuthForm"
 import { Button } from "@/ui/components/Button"
 import { DateTime } from "@/ui/components/DateTime"
-import { WarningIcon } from "@/ui/components/Icons"
+import {
+    ArrowsCounterClockwiseIcon,
+    CloudArrowDownIcon,
+    CloudArrowUpIcon,
+    WarningIcon,
+} from "@/ui/components/Icons"
 import { Checkbox } from "@/ui/components/Input/Checkbox"
 import { Loader } from "@/ui/components/Loader"
 import { useT } from "@/ui/i18n"
@@ -144,6 +149,7 @@ function SectionSyncInfo({
                             disabled={isLoading}
                             size="sm"
                             onClick={manualSync}
+                            iconLeft={<ArrowsCounterClockwiseIcon />}
                         >
                             {t.ManualSyncButtonLabel}
                         </Button>
@@ -153,6 +159,7 @@ function SectionSyncInfo({
                                 variant="danger"
                                 disabled={isLoading}
                                 size="sm"
+                                iconLeft={<CloudArrowUpIcon />}
                             >
                                 {t.ManualFullUploadButtonLabel}
                             </AlertDialog.Trigger>
@@ -187,6 +194,7 @@ function SectionSyncInfo({
                                 variant="danger"
                                 disabled={isLoading}
                                 size="sm"
+                                iconRight={<CloudArrowDownIcon />}
                             >
                                 {t.ManualFullDownloadButtonLabel}
                             </AlertDialog.Trigger>

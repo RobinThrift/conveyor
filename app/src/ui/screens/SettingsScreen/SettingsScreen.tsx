@@ -1,9 +1,18 @@
 import * as Accordion from "@radix-ui/react-accordion"
 import React from "react"
 
-import { GlobeIcon, PaletteIcon, WrenchIcon } from "@/ui/components/Icons"
+import {
+    CloudCheckIcon,
+    CloudSlashIcon,
+    GlobeIcon,
+    KeyIcon,
+    PaletteIcon,
+} from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 
+import { selectors } from "@/ui/state"
+import { useSelector } from "react-redux"
+import { APISettingsTab } from "./APISettingsTab"
 import { InterfaceSettingsTab } from "./InterfaceSettingsTab"
 import { LocaleSettingsTab } from "./LocaleSettingsTab"
 import { SyncSettingsTab } from "./SyncSettingsTab"
@@ -24,6 +33,9 @@ export function SettingsScreen(props: SettingsScreenProps) {
     let tInterface = useT("screens/Settings/InterfaceSettings")
     let tLocale = useT("screens/Settings/LocaleSettings")
     let tSync = useT("screens/Settings/SyncSettings")
+    let tAPITokens = useT("screens/Settings/APITokens")
+
+    let isSyncEnabled = useSelector(selectors.sync.isEnabled)
 
     return (
         <div className="settings-screen">
@@ -72,21 +84,45 @@ export function SettingsScreen(props: SettingsScreenProps) {
                 </Accordion.Item>
 
                 <Accordion.Item
-                    value="system"
+                    value="sync"
                     className="settings-section bg-subtle text-subtle-contrast"
                 >
                     <Accordion.Trigger
-                        value="system"
+                        value="sync"
                         className="settings-heading"
                     >
                         <h2>{tSync.Title}</h2>
-                        <WrenchIcon weight="fill" className="icon" />
+                        {isSyncEnabled ? (
+                            <CloudCheckIcon weight="fill" className="icon" />
+                        ) : (
+                            <CloudSlashIcon weight="fill" className="icon" />
+                        )}
                     </Accordion.Trigger>
 
                     <Accordion.Content asChild>
                         <SyncSettingsTab />
                     </Accordion.Content>
                 </Accordion.Item>
+
+                {isSyncEnabled && (
+                    <Accordion.Item
+                        value="apitokens"
+                        className="settings-section bg-success text-success-contrast"
+                    >
+                        <Accordion.Trigger
+                            value="apitokens"
+                            className="settings-heading"
+                        >
+                            <h2>{tAPITokens.Title}</h2>
+                            <small>{tAPITokens.Description}</small>
+                            <KeyIcon weight="fill" className="icon" />
+                        </Accordion.Trigger>
+
+                        <Accordion.Content asChild>
+                            <APISettingsTab />
+                        </Accordion.Content>
+                    </Accordion.Item>
+                )}
             </Accordion.Root>
         </div>
     )

@@ -1,5 +1,23 @@
 import { http, type HttpHandler, HttpResponse, delay } from "msw"
-import { addHours } from "date-fns"
+import { addHours, parseJSON } from "date-fns"
+
+import { generateMockAPITokens } from "../src/lib/testhelper/apitokens"
+import type { APIToken, APITokenList } from "../src/domain/APIToken"
+import {
+    APITokenController,
+    type CreateAPITokenRequest,
+} from "../src/control/APITokenController"
+
+interface MockData {
+    apitokens: (APIToken & { id: number })[]
+}
+
+let mockData: MockData = {
+    apitokens: generateMockAPITokens().map((t, i) => ({
+        id: i,
+        ...t,
+    })),
+}
 
 export const mockAPI: HttpHandler[] = [
     http.post<
@@ -172,4 +190,98 @@ export const mockAPI: HttpHandler[] = [
             },
         })
     }),
+
+    http.get("/api/auth/v1/apitokens", async ({ request }) => {
+        await delay(500)
+
+        let url = new URL(request.url)
+
+        let pageSize = Number.parseInt(
+            url.searchParams.get("page[size]") ?? "100",
+            10,
+        )
+        let after = Number.parseInt(
+            url.searchParams.get("page[after]") ?? "-1",
+            10,
+        )
+
+        let apitokens: APIToken[] = []
+        let take = after === -1
+        let next = ""
+
+        for (let token of mockData.apitokens) {
+            take = take || token.id > after
+            if (!take) {
+                continue
+            }
+
+            if (apitokens.length >= pageSize) {
+                next = token.id.toString()
+                break
+            }
+
+            apitokens.push(token)
+        }
+
+        return HttpResponse.json(
+            {
+                items: apitokens,
+                next: next ? next : undefined,
+            } satisfies APITokenList,
+            { headers: { "content-type": "application/json; charset=utf-8" } },
+        )
+    }),
+
+    http.post<never, CreateAPITokenRequest>(
+        "/api/auth/v1/apitokens",
+        async ({ request }) => {
+            await delay(500)
+
+            let body = await request.json()
+
+            let now = new Date()
+            let token: APIToken = {
+                name: body.name,
+                createdAt: now,
+                expiresAt: parseJSON(body.expiresAt as any),
+            }
+
+            mockData.apitokens = [
+                { id: mockData.apitokens.length, ...token },
+                ...mockData.apitokens,
+            ]
+
+            return HttpResponse.json(
+                { token: body.name },
+                {
+                    status: 201,
+                    headers: {
+                        "content-type": "application/json; charset=utf-8",
+                    },
+                },
+            )
+        },
+    ),
+
+    http.delete<{ name: string }>(
+        "/api/auth/v1/apitokens/:name",
+        async ({ params }) => {
+            await delay(500)
+
+            let index = mockData.apitokens.findIndex(
+                (a) => a.name === params.name,
+            )
+            if (index === -1) {
+                return new HttpResponse(null, {
+                    status: 204,
+                })
+            }
+
+            mockData.apitokens.splice(index, 1)
+
+            return new HttpResponse(null, {
+                status: 204,
+            })
+        },
+    ),
 ]

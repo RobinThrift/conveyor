@@ -53,7 +53,7 @@ func New(config RouterConfig, mux *http.ServeMux, syncCtrl *control.SyncControll
 		BaseRouter:       mux,
 		BaseURL:          config.BasePath + "api/sync/v1",
 		ErrorHandlerFunc: r.errorHandler,
-		Middlewares:      []MiddlewareFunc{httperrors.RecoverHandler, r.checkAuth},
+		Middlewares:      []MiddlewareFunc{httperrors.RecoverHandler, httpmiddleware.NewAuthMiddleware(accountFetcher, r.errorHandler)},
 	})
 
 	mux.Handle(

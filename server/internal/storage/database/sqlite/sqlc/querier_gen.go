@@ -7,30 +7,36 @@ package sqlc
 import (
 	"context"
 
+	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/domain"
 	"go.robinthrift.com/belt/internal/storage/database/sqlite/types"
 )
 
 type Querier interface {
 	CountAccounts(ctx context.Context, db DBTX) (int64, error)
+	CreateAPIToken(ctx context.Context, db DBTX, arg CreateAPITokenParams) error
 	CreateAccount(ctx context.Context, db DBTX, arg CreateAccountParams) error
 	CreateAccountKey(ctx context.Context, db DBTX, arg CreateAccountKeyParams) error
-	CreateAuthToken(ctx context.Context, db DBTX, arg CreateAuthTokenParams) error
+	CreateAuthToken(ctx context.Context, db DBTX, arg CreateAuthTokenParams) (auth.AuthTokenID, error)
 	CreateChangelogEntry(ctx context.Context, db DBTX, arg CreateChangelogEntryParams) error
 	CreateFullSyncEntry(ctx context.Context, db DBTX, arg CreateFullSyncEntryParams) error
 	CreateJob(ctx context.Context, db DBTX, arg CreateJobParams) error
 	CreateSyncClient(ctx context.Context, db DBTX, arg CreateSyncClientParams) error
+	DeleteAPIToken(ctx context.Context, db DBTX, arg DeleteAPITokenParams) error
 	DeleteInvalidTokens(ctx context.Context, db DBTX) error
 	DeleteSyncClientByPublicID(ctx context.Context, db DBTX, arg DeleteSyncClientByPublicIDParams) error
+	GetAPIToken(ctx context.Context, db DBTX, arg GetAPITokenParams) (ApiToken, error)
 	GetAccount(ctx context.Context, db DBTX, id domain.AccountID) (Account, error)
 	GetAccountByUsername(ctx context.Context, db DBTX, username string) (Account, error)
 	GetAccountKey(ctx context.Context, db DBTX, arg GetAccountKeyParams) (AccountKey, error)
 	GetAuthToken(ctx context.Context, db DBTX, value []byte) (AuthToken, error)
+	GetAuthTokenByID(ctx context.Context, db DBTX, arg GetAuthTokenByIDParams) (AuthToken, error)
 	GetAuthTokenByRefreshValue(ctx context.Context, db DBTX, refreshValue []byte) (AuthToken, error)
 	GetLatestFullSyncEntry(ctx context.Context, db DBTX, accountID domain.AccountID) (FullSyncEnrire, error)
 	GetNextWakeUpTime(ctx context.Context, db DBTX) (types.SQLiteDatetime, error)
 	GetSyncClient(ctx context.Context, db DBTX, arg GetSyncClientParams) (SyncClient, error)
 	InvalidateAuthToken(ctx context.Context, db DBTX, value []byte) error
+	ListAPITokens(ctx context.Context, db DBTX, arg ListAPITokensParams) ([]ApiToken, error)
 	ListChangelogEntries(ctx context.Context, db DBTX, arg ListChangelogEntriesParams) ([]ChangelogEntry, error)
 	ListNextJobs(ctx context.Context, db DBTX, scheduledFor string) ([]Job, error)
 	MarkExpiredAuthTokensAsInvalid(ctx context.Context, db DBTX) error

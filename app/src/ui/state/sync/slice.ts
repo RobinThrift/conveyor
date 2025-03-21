@@ -82,5 +82,6 @@ export const slice = createSlice({
         info: (state: SyncState) => state.info,
         error: (state) => state.error,
         setupInfo: (state: SyncState) => state.setup,
+        isEnabled: (state: SyncState) => state.info.isEnabled,
     },
 })

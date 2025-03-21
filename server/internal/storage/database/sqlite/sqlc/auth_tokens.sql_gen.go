@@ -8,11 +8,12 @@ package sqlc
 import (
 	"context"
 
+	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/domain"
 	"go.robinthrift.com/belt/internal/storage/database/sqlite/types"
 )
 
-const createAuthToken = `-- name: CreateAuthToken :exec
+const createAuthToken = `-- name: CreateAuthToken :one
 INSERT INTO auth_tokens(
     account_id,
     value,
@@ -21,6 +22,7 @@ INSERT INTO auth_tokens(
     refresh_expires_at,
     is_valid
 ) VALUES (?, ?, ?, ?, ?, TRUE)
+RETURNING id
 `
 
 type CreateAuthTokenParams struct {
@@ -31,15 +33,17 @@ type CreateAuthTokenParams struct {
 	RefreshExpiresAt types.SQLiteDatetime
 }
 
-func (q *Queries) CreateAuthToken(ctx context.Context, db DBTX, arg CreateAuthTokenParams) error {
-	_, err := db.ExecContext(ctx, createAuthToken,
+func (q *Queries) CreateAuthToken(ctx context.Context, db DBTX, arg CreateAuthTokenParams) (auth.AuthTokenID, error) {
+	row := db.QueryRowContext(ctx, createAuthToken,
 		arg.AccountID,
 		arg.Value,
 		arg.ExpiresAt,
 		arg.RefreshValue,
 		arg.RefreshExpiresAt,
 	)
-	return err
+	var id auth.AuthTokenID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const deleteInvalidTokens = `-- name: DeleteInvalidTokens :exec
@@ -57,6 +61,31 @@ SELECT id, account_id, value, expires_at, refresh_value, refresh_expires_at, is_
 
 func (q *Queries) GetAuthToken(ctx context.Context, db DBTX, value []byte) (AuthToken, error) {
 	row := db.QueryRowContext(ctx, getAuthToken, value)
+	var i AuthToken
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.Value,
+		&i.ExpiresAt,
+		&i.RefreshValue,
+		&i.RefreshExpiresAt,
+		&i.IsValid,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getAuthTokenByID = `-- name: GetAuthTokenByID :one
+SELECT id, account_id, value, expires_at, refresh_value, refresh_expires_at, is_valid, created_at FROM auth_tokens WHERE id = ? AND account_id = ? LIMIT 1
+`
+
+type GetAuthTokenByIDParams struct {
+	ID        auth.AuthTokenID
+	AccountID domain.AccountID
+}
+
+func (q *Queries) GetAuthTokenByID(ctx context.Context, db DBTX, arg GetAuthTokenByIDParams) (AuthToken, error) {
+	row := db.QueryRowContext(ctx, getAuthTokenByID, arg.ID, arg.AccountID)
 	var i AuthToken
 	err := row.Scan(
 		&i.ID,

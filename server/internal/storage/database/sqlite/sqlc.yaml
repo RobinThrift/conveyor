@@ -32,6 +32,11 @@ sql:
           type: "SQLiteDatetime"
           import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
 
+      - column: auth_tokens.id
+        go_type:
+          type: "AuthTokenID"
+          import: "go.robinthrift.com/belt/internal/auth"
+
       - column: auth_tokens.account_id
         go_type:
           type: "AccountID"
@@ -127,6 +132,26 @@ sql:
           import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
 
       - column: jobs.finished_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+
+      - column: api_tokens.id
+        go_type:
+          type: "APITokenID"
+          import: "go.robinthrift.com/belt/internal/domain"
+
+      - column: api_tokens.account_id
+        go_type:
+          type: "AccountID"
+          import: "go.robinthrift.com/belt/internal/domain"
+
+      - column: api_tokens.created_at
+        go_type:
+          type: "SQLiteDatetime"
+          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+
+      - column: api_tokens.expires_at
         go_type:
           type: "SQLiteDatetime"
           import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"

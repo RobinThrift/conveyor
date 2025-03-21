@@ -1,3 +1,4 @@
+import { actions as apitokens } from "./apitokens"
 import { actions as attachments } from "./attachments"
 import { actions as auth } from "./auth"
 import { slice as notifications } from "./global/notifications"
@@ -11,6 +12,8 @@ import { actions as unlock } from "./unlock"
 
 export type { UpdateMemoRequest, Filter, CreateMemoRequest } from "./memos"
 
+export type { CreateAPITokenRequest } from "./apitokens"
+
 export const actions = {
     attachments,
     auth,
@@ -20,6 +23,7 @@ export const actions = {
     sync,
     tags,
     unlock,
+    apitokens,
     router: router.actions,
 
     global: {

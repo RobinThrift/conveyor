@@ -10,6 +10,7 @@ export interface SelectProps<T extends string = string> {
     name: string
     value?: T
     placeholder?: string
+    disabled?: boolean
     children:
         | React.ReactElement<SelectOptionProps>
         | React.ReactElement<SelectOptionProps>[]
@@ -29,6 +30,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
             name={props.name}
             onValueChange={onValueChange}
             value={props.value}
+            disabled={props.disabled}
         >
             <RadixSelect.Trigger
                 className={clsx(

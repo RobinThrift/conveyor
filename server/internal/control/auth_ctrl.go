@@ -26,7 +26,7 @@ type AuthController struct {
 type AuthControllerAuthTokenRepo interface {
 	GetAuthToken(ctx context.Context, value auth.AuthTokenValue) (*auth.AuthToken, error)
 	GetAuthTokenByRefreshValue(ctx context.Context, refreshValue auth.AuthTokenValue) (*auth.AuthToken, error)
-	CreateAuthToken(ctx context.Context, token *auth.AuthToken) error
+	CreateAuthToken(ctx context.Context, token *auth.AuthToken) (auth.AuthTokenID, error)
 	InvalidateAuthToken(ctx context.Context, value auth.AuthTokenValue) error
 	MarkExpiredAuthTokensAsInvalid(ctx context.Context) error
 	DeleteInvalidTokens(ctx context.Context) error
@@ -78,7 +78,7 @@ func (ac *AuthController) CreateAuthTokenUsingCredentials(ctx context.Context, c
 		return nil, fmt.Errorf("error creating auth token: %w", err)
 	}
 
-	err = ac.authTokenRepo.CreateAuthToken(ctx, &auth.AuthToken{
+	_, err = ac.authTokenRepo.CreateAuthToken(ctx, &auth.AuthToken{
 		AccountID:        account.ID,
 		Value:            plaintextToken.Plaintext.Encrypt(ac.config.Argon2Params),
 		ExpiresAt:        plaintextToken.ExpiresAt,
@@ -119,7 +119,7 @@ func (ac *AuthController) CreateAuthTokenUsingRefreshToken(ctx context.Context, 
 			return nil, fmt.Errorf("error creating auth token: %w", err)
 		}
 
-		err = ac.authTokenRepo.CreateAuthToken(ctx, &auth.AuthToken{
+		_, err = ac.authTokenRepo.CreateAuthToken(ctx, &auth.AuthToken{
 			AccountID:        account.ID,
 			Value:            plaintextToken.Plaintext.Encrypt(ac.config.Argon2Params),
 			ExpiresAt:        plaintextToken.ExpiresAt,

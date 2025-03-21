@@ -28,7 +28,10 @@ import {
 } from "@/ui/state"
 
 import { AuthV1APIClient } from "@/api/authv1"
+import { APITokensV1APIClient } from "@/api/authv1/APITokensV1APIClient"
 import { SyncV1APIClient } from "@/api/syncv1"
+import { EncryptedRemoteAttachmentFetcher } from "@/api/syncv1/EncryptedRemoteAttachmentFetcher"
+import { APITokenController } from "@/control/APITokenController"
 import { AuthController } from "@/control/AuthController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
@@ -40,11 +43,10 @@ import { EncryptedFS } from "@/lib/fs/EncryptedFS"
 import { IndexedDBAuthStorage } from "@/storage/indexeddb/IndexedDBAuthStorage"
 import { IndexedDBSyncStorage } from "@/storage/indexeddb/IndexedDBSyncStorage"
 import { LocalStorageSetupInfoStorage } from "@/storage/localstorage/LocalStorageSetupInfoStorage"
+import { SessionStorageUnlockStorage } from "@/storage/sessionstorage/SessionStorageUnlockStorage"
 
 import "@/ui/styles/index.css"
-import { EncryptedRemoteAttachmentFetcher } from "./api/syncv1/EncryptedRemoteAttachmentFetcher"
 import { toPromise } from "./lib/result"
-import { SessionStorageUnlockStorage } from "./storage/sessionstorage/SessionStorageUnlockStorage"
 
 const _ready = Promise.withResolvers<void>()
 
@@ -219,6 +221,13 @@ async function initController() {
         crypto,
     })
 
+    let apiTokenCtrl = new APITokenController({
+        apiTokenAPIClient: new APITokensV1APIClient({
+            baseURL: globalThis.location.href,
+            tokenStorage: authCtrl,
+        }),
+    })
+
     await Promise.all([
         authStorage.open(BaseContext),
         syncStorage.open(BaseContext),
@@ -233,5 +242,6 @@ async function initController() {
         setupCtrl,
         syncCtrl,
         unlockCtrl,
+        apiTokenCtrl,
     }
 }

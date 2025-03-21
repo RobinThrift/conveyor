@@ -1,3 +1,4 @@
+import { selectors as apitokens } from "./apitokens"
 import { selectors as attachments } from "./attachments"
 import { selectors as auth } from "./auth"
 import { selectors as memos } from "./memos"
@@ -16,4 +17,5 @@ export const selectors = {
     sync,
     tags,
     unlock,
+    apitokens,
 }

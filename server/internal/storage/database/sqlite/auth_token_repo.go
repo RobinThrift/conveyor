@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"go.robinthrift.com/belt/internal/auth"
+	"go.robinthrift.com/belt/internal/domain"
 	"go.robinthrift.com/belt/internal/storage/database"
 	"go.robinthrift.com/belt/internal/storage/database/sqlite/sqlc"
 	"go.robinthrift.com/belt/internal/storage/database/sqlite/types"
@@ -21,6 +22,30 @@ func NewAuthTokenRepo(db database.Database) *AuthTokenRepo {
 	return &AuthTokenRepo{db}
 }
 
+func (r *AuthTokenRepo) GetAuthTokenByID(ctx context.Context, accountID domain.AccountID, id auth.AuthTokenID) (*auth.AuthToken, error) {
+	row, err := queries.GetAuthTokenByID(ctx, r.db.Conn(ctx), sqlc.GetAuthTokenByIDParams{
+		ID:        id,
+		AccountID: accountID,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = auth.ErrAuthTokenNotFound
+		}
+
+		return nil, err
+	}
+
+	return &auth.AuthToken{
+		ID:               row.ID,
+		AccountID:        row.AccountID,
+		Value:            row.Value,
+		ExpiresAt:        row.ExpiresAt.Time,
+		RefreshValue:     row.RefreshValue,
+		RefreshExpiresAt: row.RefreshExpiresAt.Time,
+		CreatedAt:        row.CreatedAt.Time,
+	}, nil
+}
+
 func (r *AuthTokenRepo) GetAuthToken(ctx context.Context, value auth.AuthTokenValue) (*auth.AuthToken, error) {
 	row, err := queries.GetAuthToken(ctx, r.db.Conn(ctx), value)
 	if err != nil {
@@ -32,6 +57,7 @@ func (r *AuthTokenRepo) GetAuthToken(ctx context.Context, value auth.AuthTokenVa
 	}
 
 	return &auth.AuthToken{
+		ID:               row.ID,
 		AccountID:        row.AccountID,
 		Value:            row.Value,
 		ExpiresAt:        row.ExpiresAt.Time,
@@ -52,6 +78,7 @@ func (r *AuthTokenRepo) GetAuthTokenByRefreshValue(ctx context.Context, refreshV
 	}
 
 	return &auth.AuthToken{
+		ID:               row.ID,
 		AccountID:        row.AccountID,
 		Value:            row.Value,
 		ExpiresAt:        row.ExpiresAt.Time,
@@ -61,8 +88,8 @@ func (r *AuthTokenRepo) GetAuthTokenByRefreshValue(ctx context.Context, refreshV
 	}, nil
 }
 
-func (r *AuthTokenRepo) CreateAuthToken(ctx context.Context, token *auth.AuthToken) error {
-	err := queries.CreateAuthToken(ctx, r.db.Conn(ctx), sqlc.CreateAuthTokenParams{
+func (r *AuthTokenRepo) CreateAuthToken(ctx context.Context, token *auth.AuthToken) (auth.AuthTokenID, error) {
+	id, err := queries.CreateAuthToken(ctx, r.db.Conn(ctx), sqlc.CreateAuthTokenParams{
 		AccountID:        token.AccountID,
 		Value:            token.Value,
 		ExpiresAt:        types.NewSQLiteDatetime(token.ExpiresAt),
@@ -73,13 +100,13 @@ func (r *AuthTokenRepo) CreateAuthToken(ctx context.Context, token *auth.AuthTok
 	if err != nil {
 		var sqlErr *sqlite.Error
 		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {
-			return fmt.Errorf("invalid account reference")
+			return 0, fmt.Errorf("invalid account reference")
 		}
 
-		return err
+		return 0, err
 	}
 
-	return nil
+	return id, nil
 }
 
 func (r *AuthTokenRepo) InvalidateAuthToken(ctx context.Context, value auth.AuthTokenValue) error {

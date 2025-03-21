@@ -15,7 +15,10 @@ import (
 
 var ErrAuthTokenNotFound = errors.New("auth token not found")
 
+type AuthTokenID int64
+
 type AuthToken struct {
+	ID        AuthTokenID
 	AccountID domain.AccountID
 
 	Value     AuthTokenValue

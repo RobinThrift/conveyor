@@ -1,4 +1,4 @@
-import { type Components, params } from "@/lib/i18n/components"
+import { type Components, params, count } from "@/lib/i18n/components"
 
 export const translations = {
     "components/AuthForm": {
@@ -242,5 +242,40 @@ export const translations = {
         ErrorEmptyRepeateNewPassword: "Please repeat the new password",
         ErrorNewPasswordsDoNotMatch: "New passwords don't match",
         ErrorNewPasswordIsOldPassword: "New password can't be old password",
+    },
+
+    "screens/Settings/APITokens": {
+        Title: "API Tokens",
+        Description: "Manage API Tokens for remote API calls.",
+    },
+
+    "screens/Settings/APITokens/New": {
+        Title: "Create API Token",
+        FieldNameLabel: "Name",
+        FieldExpiresInLabel: "Expires In",
+        FieldExpiresInValueDays: count({
+            one: "{count} day",
+            many: "{count} days",
+        }),
+        FieldExpiresInValueMonths: count({
+            one: "{count} month",
+            many: "{count} months",
+        }),
+        ButtonLabel: "Create",
+    },
+
+    "screens/Settings/APITokens/LastCreated": {
+        Title: "Created API Token",
+        Notice: "Please note this token. IT WILL NOT BE SHOWN AGAIN!",
+    },
+
+    "screens/Settings/APITokens/List": {
+        Title: "API Tokens",
+        LabelName: "Name",
+        LabelExpires: "Expires",
+        LabelCreated: "Created",
+        DeleteButton: "Delete",
+        PrevPage: "Previous Page",
+        NextPage: "Next Page",
     },
 } satisfies Components

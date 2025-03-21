@@ -5,6 +5,7 @@
 package sqlc
 
 import (
+	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/domain"
 	"go.robinthrift.com/belt/internal/storage/database/sqlite/types"
 )
@@ -31,8 +32,17 @@ type AccountKey struct {
 	UpdatedAt string
 }
 
+type ApiToken struct {
+	ID        domain.APITokenID
+	AccountID domain.AccountID
+	TokenID   int64
+	Name      string
+	CreatedAt types.SQLiteDatetime
+	ExpiresAt types.SQLiteDatetime
+}
+
 type AuthToken struct {
-	ID               int64
+	ID               auth.AuthTokenID
 	AccountID        domain.AccountID
 	Value            []byte
 	ExpiresAt        types.SQLiteDatetime

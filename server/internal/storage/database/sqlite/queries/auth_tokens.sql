@@ -1,10 +1,13 @@
 -- name: GetAuthToken :one
 SELECT * FROM auth_tokens WHERE value = ? AND datetime(expires_at) > datetime("now") AND is_valid = TRUE LIMIT 1;
 
+-- name: GetAuthTokenByID :one
+SELECT * FROM auth_tokens WHERE id = ? AND account_id = ? LIMIT 1;
+
 -- name: GetAuthTokenByRefreshValue :one
 SELECT * FROM auth_tokens WHERE refresh_value = ? AND datetime(refresh_expires_at) > datetime("now") AND is_valid = TRUE LIMIT 1;
 
--- name: CreateAuthToken :exec
+-- name: CreateAuthToken :one
 INSERT INTO auth_tokens(
     account_id,
     value,
@@ -12,7 +15,8 @@ INSERT INTO auth_tokens(
     refresh_value,
     refresh_expires_at,
     is_valid
-) VALUES (?, ?, ?, ?, ?, TRUE);
+) VALUES (?, ?, ?, ?, ?, TRUE)
+RETURNING id;
 
 -- name: InvalidateAuthToken :exec
 UPDATE auth_tokens

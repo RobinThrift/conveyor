@@ -79,6 +79,30 @@
     }
 }
 
+.api-tokens-list {
+    @apply space-y-2;
+
+    .api-token-name {
+        @apply text-lg font-semibold w-full;
+    }
+
+    .api-token {
+        @apply p-2 border border-subtle-dark rounded shadow-md;
+    }
+
+    dt {
+        @apply block;
+    }
+
+    .api-token-expires-at {
+        @apply flex gap-2 text-sm;
+    }
+
+    .api-token-created-at {
+        @apply flex gap-2 text-xs;
+    }
+}
+
 .settings-sub-section {
     @apply mt-8 pb-8 border-b border-b-current;
 

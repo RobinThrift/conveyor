@@ -5,20 +5,24 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/control"
+	"go.robinthrift.com/belt/internal/domain"
 	"go.robinthrift.com/belt/internal/x/httperrors"
+	"go.robinthrift.com/belt/internal/x/httpmiddleware"
 )
 
 type router struct {
-	baseURL  string
-	authCtrl *control.AuthController
+	baseURL      string
+	authCtrl     *control.AuthController
+	apiTokenCtrl *control.APITokenController
 }
 
-func New(baseURL string, mux *http.ServeMux, authCtrl *control.AuthController) {
-	r := &router{baseURL, authCtrl}
+func New(baseURL string, mux *http.ServeMux, authCtrl *control.AuthController, apiTokenCtrl *control.APITokenController) {
+	r := &router{baseURL, authCtrl, apiTokenCtrl}
 
 	errorHandler := httperrors.ErrorHandler("belt/api/v1/auth")
 
@@ -29,7 +33,7 @@ func New(baseURL string, mux *http.ServeMux, authCtrl *control.AuthController) {
 		BaseRouter:       mux,
 		BaseURL:          baseURL + "api/auth/v1",
 		ErrorHandlerFunc: errorHandler,
-		Middlewares:      []MiddlewareFunc{httperrors.RecoverHandler},
+		Middlewares:      []MiddlewareFunc{httperrors.RecoverHandler, httpmiddleware.NewAuthMiddleware(authCtrl, errorHandler)},
 	})
 }
 
@@ -132,6 +136,70 @@ func (router *router) AddAccountKey(ctx context.Context, req AddAccountKeyReques
 // (GET /keys/{name})
 func (router *router) GetAccountKey(ctx context.Context, req GetAccountKeyRequestObject) (GetAccountKeyResponseObject, error) {
 	panic("not implemented") // TODO: Implement
+}
+
+// List API Tokens paginated
+// (GET /apitokens)
+func (router *router) ListAPITokens(ctx context.Context, req ListAPITokensRequestObject) (ListAPITokensResponseObject, error) {
+	var pageAfter *domain.APITokenID
+	if req.Params.PageAfter != nil {
+		p, err := strconv.ParseInt(*req.Params.PageAfter, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("%w: invalid pageAfter", httperrors.ErrBadRequest)
+		}
+		pageAfter = (*domain.APITokenID)(&p)
+	}
+
+	query := control.ListAPITokenQuery{
+		PageSize:  req.Params.PageSize,
+		PageAfter: pageAfter,
+	}
+
+	tokens, err := router.apiTokenCtrl.ListAPITokens(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	apiTokens := APITokenList{Items: make([]APIToken, len(tokens.Items))}
+	for i, token := range tokens.Items {
+		apiTokens.Items[i] = APIToken{
+			Name:      token.Name,
+			CreatedAt: token.CreatedAt,
+			ExpiresAt: token.ExpiresAt,
+		}
+	}
+
+	if tokens.Next != nil {
+		next := fmt.Sprint(*tokens.Next)
+		apiTokens.Next = &next
+	}
+
+	return ListAPITokens200JSONResponse(apiTokens), nil
+}
+
+// Create a new API Token
+// (POST /apitokens)
+func (router *router) CreateAPIToken(ctx context.Context, req CreateAPITokenRequestObject) (CreateAPITokenResponseObject, error) {
+	value, err := router.apiTokenCtrl.CreateAPIToken(ctx, control.CreateAPITokenCmd{
+		Name:      req.Body.Name,
+		ExpiresAt: req.Body.ExpiresAt,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return CreateAPIToken201JSONResponse{Token: value}, nil
+}
+
+// Delete API Token
+// (DELETE /apitokens/{name})
+func (router *router) DeleteAPIToken(ctx context.Context, req DeleteAPITokenRequestObject) (DeleteAPITokenResponseObject, error) {
+	err := router.apiTokenCtrl.DeleteAPITokenByName(ctx, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return DeleteAPIToken204Response{}, nil
 }
 
 // Check if the provided access token is valid.

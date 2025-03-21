@@ -236,5 +236,40 @@
         "ErrorEmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
         "ErrorNewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
         "ErrorNewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein"
+    },
+
+    "screens/Settings/APITokens": {
+        "Title": "API Tokens",
+        "Description": "Verwalte API Tokens für API Zugriffe."
+    },
+
+    "screens/Settings/APITokens/New": {
+        "Title": "Neuen API Token erstellen",
+        "FieldNameLabel": "Name",
+        "FieldExpiresInLabel": "Gültigkeit",
+        "FieldExpiresInValueDays": {
+            "one": "{count} Tag",
+            "many": "{count} Tage"
+        },
+        "FieldExpiresInValueMonths": {
+            "one": "{count} Monat",
+            "many": "{count} Monate"
+        },
+        "ButtonLabel": "Neuen Token Erstellen"
+    },
+
+    "screens/Settings/APITokens/LastCreated": {
+        "Title": "Neuer API Token",
+        "Notice": "Bitte notieren den Token. DIESER WERT WIRD NIE WIEDER ANGEZEIGT!"
+    },
+
+    "screens/Settings/APITokens/List": {
+        "Title": "API Tokens",
+        "LabelName": "Name",
+        "LabelExpires": "Gültig bis",
+        "LabelCreated": "Erstellt",
+        "DeleteButton": "Löschen",
+        "PrevPage": "Vorherige Seite",
+        "NextPage": "Nächste Seite"
     }
 }
