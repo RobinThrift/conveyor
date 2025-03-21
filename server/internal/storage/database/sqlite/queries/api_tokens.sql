@@ -4,7 +4,7 @@ SELECT * FROM api_tokens WHERE name = ? AND account_id = ? LIMIT 1;
 -- name: ListAPITokens :many
 SELECT *
 FROM api_tokens
-WHERE id > @page_after
+WHERE id >= @page_after
 AND account_id = @account_id
 ORDER BY id DESC
 LIMIT @page_size;
