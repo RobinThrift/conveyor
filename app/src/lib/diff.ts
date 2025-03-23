@@ -5,6 +5,8 @@ import type {
 } from "@/domain/Changelog"
 import { changesToString, mergeDeltas } from "@/external/quill"
 
+export { diff as calculateDiff } from "@/external/quill"
+
 export function mergeChanges(
     entries: MemoChangelogEntry[],
 ): MemoContentChanges {

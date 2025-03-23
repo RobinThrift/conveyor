@@ -68,13 +68,13 @@ Line 3.5 added
 Line 4 unchanged`
         let changessets = [
             [{ retain: 25 }, { delete: 17 }, { insert: "shortened" }],
-            [{ retain: 60 }, { insert: "\n\nLine 3.5 added" }],
+            [{ retain: 52 }, { insert: "\n\nLine 3.5 added" }],
             [{ retain: 7 }, { delete: 9 }, { insert: "changed" }],
         ]
 
         let diff = new Delta([{ insert: input }])
         for (let changes of changessets) {
-            diff = diff.compose(diff.transform(new Delta(changes)))
+            diff = diff.compose(new Delta(changes))
         }
 
         let actual = changesToString(diff.ops)

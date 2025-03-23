@@ -2,7 +2,6 @@ import type { MemoContentChanges } from "@/domain/Changelog"
 import type { Memo } from "@/domain/Memo"
 import { diff } from "@/external/quill"
 import { useStateGetter } from "@/ui/hooks/useStateGetter"
-import type { ChangeSet } from "@codemirror/state"
 import { useCallback, useEffect, useState } from "react"
 
 export function useEditorState(props: {
@@ -20,9 +19,6 @@ export function useEditorState(props: {
 
     let [isChanged, setIsChanged] = useState(false)
     let [content, setContent] = useStateGetter(props.memo.content ?? "")
-    let [changeset, setChangeset] = useStateGetter<ChangeSet | undefined>(
-        undefined,
-    )
 
     let onSave = useCallback(() => {
         let changes: MemoContentChanges = {
@@ -50,21 +46,14 @@ export function useEditorState(props: {
     useEffect(() => {
         setIsChanged(false)
         setContent(props.memo.content)
-        setChangeset(undefined)
-    }, [props.memo.id, props.memo.content, setContent, setChangeset])
+    }, [props.memo.id, props.memo.content, setContent])
 
     let onChange = useCallback(
-        (content: string, newChangeset: ChangeSet) => {
+        (content: string) => {
             setContent(content)
             setIsChanged(true)
-            let c = changeset()
-            if (c) {
-                setChangeset(c.compose(newChangeset))
-            } else {
-                setChangeset(newChangeset)
-            }
         },
-        [setContent, changeset, setChangeset],
+        [setContent],
     )
 
     return {

@@ -6,9 +6,9 @@ import type {
 import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
 import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
-import { mergeChanges, resolveChanges } from "@/lib/applyTextChanges"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
+import { mergeChanges, resolveChanges } from "@/lib/diff"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 export type Filter = ListMemosQuery
