@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"slices"
 	"strings"
 
 	"go.robinthrift.com/belt/internal/auth"
@@ -15,9 +16,15 @@ func NewAuthMiddleware(accountFetcher interface {
 	GetAccountForAuthToken(ctx context.Context, value auth.PlaintextAuthTokenValue) (*domain.Account, error)
 },
 	errorHandler httperrors.ErrorHandlerFunc,
+	ignoreRoutes []string,
 ) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if slices.Contains(ignoreRoutes, r.URL.Path) {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			token, ok := authTokenFromHeader(r.Header)
 			if !ok {
 				errorHandler(w, r, auth.ErrUnauthorized)

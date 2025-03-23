@@ -21,8 +21,8 @@ type router struct {
 	apiTokenCtrl *control.APITokenController
 }
 
-func New(baseURL string, mux *http.ServeMux, authCtrl *control.AuthController, apiTokenCtrl *control.APITokenController) {
-	r := &router{baseURL, authCtrl, apiTokenCtrl}
+func New(basePath string, mux *http.ServeMux, authCtrl *control.AuthController, apiTokenCtrl *control.APITokenController) {
+	r := &router{basePath, authCtrl, apiTokenCtrl}
 
 	errorHandler := httperrors.ErrorHandler("belt/api/v1/auth")
 
@@ -31,9 +31,18 @@ func New(baseURL string, mux *http.ServeMux, authCtrl *control.AuthController, a
 		ResponseErrorHandlerFunc: errorHandler,
 	}), StdHTTPServerOptions{
 		BaseRouter:       mux,
-		BaseURL:          baseURL + "api/auth/v1",
+		BaseURL:          basePath + "api/auth/v1",
 		ErrorHandlerFunc: errorHandler,
-		Middlewares:      []MiddlewareFunc{httperrors.RecoverHandler, httpmiddleware.NewAuthMiddleware(authCtrl, errorHandler)},
+		Middlewares: []MiddlewareFunc{
+			httperrors.RecoverHandler,
+			httpmiddleware.NewAuthMiddleware(
+				authCtrl,
+				errorHandler,
+				[]string{
+					basePath + "api/auth/v1/token",
+					basePath + "api/auth/v1/change-password"},
+			),
+		},
 	})
 }
 
