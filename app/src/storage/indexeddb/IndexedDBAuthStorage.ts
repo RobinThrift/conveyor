@@ -1,14 +1,14 @@
 import { type AuthToken, AuthTokenNotFoundError } from "@/auth"
 import { EncryptedBrowserIndexedDB } from "@/external/browser/EncryptedBrowserIndexedDB"
 import type { Context } from "@/lib/context"
-import type { Crypto } from "@/lib/crypto"
+import type { Decrypter, Encrypter } from "@/lib/crypto"
 import { parseJSON, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 export class IndexedDBAuthStorage {
     private _db: EncryptedBrowserIndexedDB<AuthToken>
 
-    constructor(crypto: Crypto) {
+    constructor(crypto: Encrypter & Decrypter) {
         this._db = new EncryptedBrowserIndexedDB<AuthToken>({
             name: "AuthStorage",
             crypto,

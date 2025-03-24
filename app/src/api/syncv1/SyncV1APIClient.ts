@@ -38,9 +38,9 @@ export class SyncV1APIClient {
     ): AsyncResult<void> {
         let req = await this._createBaseRequest(
             ctx,
-            "GET",
+            "POST",
             "/api/sync/v1/clients",
-            JSON.stringify({ ClientID: syncClient.clientID }),
+            JSON.stringify({ clientID: syncClient.clientID }),
         )
         if (!req.ok) {
             return req

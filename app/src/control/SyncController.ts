@@ -1,3 +1,4 @@
+import { type AccountKey, PrimaryAccountKeyName } from "@/domain/AccountKey"
 import type {
     AttachmentChangelogEntry,
     ChangelogEntry,
@@ -11,24 +12,26 @@ import type {
 import type { SyncInfo } from "@/domain/SyncInfo"
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import type { Context } from "@/lib/context"
-import type { Decrypter, Encrypter } from "@/lib/crypto"
 import type { DBExec, Transactioner } from "@/lib/database"
 import type { FS } from "@/lib/fs"
 import { parseJSON, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok, all, fmtErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
 
+import type { CryptoController } from "./CryptoController"
+
 export class SyncController {
     private _transactioner: Transactioner
     private _storage: Storage
     private _syncAPIClient: SyncAPIClient
+    private _cryptoRemoteAPI: CryptoRemoteAPI
     private _memos: Memo
     private _attachments: Attachments
     private _settings: Settings
     private _changelog: Changelog
     private _dbPath: string
     private _fs: FS
-    private _crypto: Encrypter & Decrypter
+    private _crypto: CryptoController
 
     private _info: SyncInfo = { isEnabled: false }
 
@@ -43,6 +46,7 @@ export class SyncController {
         dbPath,
         fs,
         crypto,
+        cryptoRemoteAPI,
     }: {
         transactioner: Transactioner
         storage: Storage
@@ -53,7 +57,8 @@ export class SyncController {
         changelog: Changelog
         dbPath: string
         fs: FS
-        crypto: Encrypter & Decrypter
+        crypto: CryptoController
+        cryptoRemoteAPI: CryptoRemoteAPI
     }) {
         this._transactioner = transactioner
         this._storage = storage
@@ -65,6 +70,7 @@ export class SyncController {
         this._dbPath = dbPath
         this._fs = fs
         this._crypto = crypto
+        this._cryptoRemoteAPI = cryptoRemoteAPI
     }
 
     public async init(
@@ -73,6 +79,14 @@ export class SyncController {
     ): AsyncResult<void> {
         this._info = { ...info, isEnabled: true }
         this._syncAPIClient.setBaseURL(info.server)
+
+        let registered = await this._syncAPIClient.registerClient(ctx, {
+            clientID: info.clientID,
+        })
+        if (!registered.ok) {
+            return registered
+        }
+
         return this._storage.saveSyncInfo(ctx, this._info)
     }
 
@@ -100,6 +114,11 @@ export class SyncController {
         let info = this._info
         if (!info.isEnabled) {
             return Err(new Error("sync is not enabled"))
+        }
+
+        let accountKeyUpload = await this._uploadAccountKey(ctx)
+        if (!accountKeyUpload.ok) {
+            return accountKeyUpload
         }
 
         return this._transactioner.inTransaction(ctx, async (ctx) => {
@@ -155,6 +174,11 @@ export class SyncController {
     }
 
     public async uploadFullDB(ctx: Context): AsyncResult<void> {
+        let accountKeyUpload = await this._uploadAccountKey(ctx)
+        if (!accountKeyUpload.ok) {
+            return accountKeyUpload
+        }
+
         let data = await this._fs.read(ctx, this._dbPath)
         if (!data.ok) {
             return fmtErr(
@@ -174,6 +198,19 @@ export class SyncController {
         }
 
         return this._syncAPIClient.uploadFullSyncData(ctx, encrypted.value)
+    }
+
+    private async _uploadAccountKey(ctx: Context): AsyncResult<void> {
+        let publicKey = this._crypto.publicKey
+        if (!publicKey.ok) {
+            return publicKey
+        }
+
+        return this._cryptoRemoteAPI.uploadAccountKey(ctx, {
+            name: PrimaryAccountKeyName,
+            type: publicKey.value.type,
+            data: encodeText(publicKey.value.data).buffer as ArrayBuffer,
+        })
     }
 
     private async _applyChangelogEntries(ctx: Context): AsyncResult<void> {
@@ -455,6 +492,10 @@ export class SyncController {
 
 interface SyncAPIClient {
     setBaseURL(baseURL: string): void
+    registerClient(
+        ctx: Context,
+        syncClient: { clientID: string },
+    ): AsyncResult<void>
     getFullSync(ctx: Context): AsyncResult<ArrayBufferLike>
     uploadFullSyncData(ctx: Context, data: ArrayBufferLike): AsyncResult<void>
     listChangelogEntries(
@@ -536,4 +577,8 @@ interface Changelog {
         ctx: Context<{ db?: DBExec }>,
         entries: ChangelogEntry[],
     ): AsyncResult<void>
+}
+
+interface CryptoRemoteAPI {
+    uploadAccountKey(ctx: Context, accountKey: AccountKey): AsyncResult<void>
 }

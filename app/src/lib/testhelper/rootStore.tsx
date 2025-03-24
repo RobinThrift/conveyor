@@ -27,14 +27,17 @@ import { Provider } from "@/ui/state"
 
 import { AuthV1APIClient } from "@/api/authv1"
 import { APITokensV1APIClient } from "@/api/authv1/APITokensV1APIClient"
+import { AccountKeysV1APIClient } from "@/api/authv1/AccountKeysV1APIClient"
 import { SyncV1APIClient } from "@/api/syncv1"
 import { APITokenController } from "@/control/APITokenController"
 import { AuthController } from "@/control/AuthController"
+import { CryptoController } from "@/control/CryptoController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
 import { UnlockController } from "@/control/UnlockController"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { LocalStorageSetupInfoStorage } from "@/storage/localstorage/LocalStorageSetupInfoStorage"
+
 import { TestInMemAuthStorage } from "./TestInMemAuthStorage"
 import { TestInMemSyncStorage } from "./TestInMemSyncStorage"
 import { TestInMemUnlockStorage } from "./TestInMemUnlockStorage"
@@ -54,6 +57,10 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         let mockFS = new MockFS()
 
         let crypto = new AgeCrypto()
+
+        let cryptoCtrl = new CryptoController({
+            crypto,
+        })
 
         let rootStore = configureRootStore({
             router: { href: history.current },
@@ -102,12 +109,16 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
                 baseURL: globalThis.location.href,
                 tokenStorage: authCtrl,
             }),
+            cryptoRemoteAPI: new AccountKeysV1APIClient({
+                baseURL: globalThis.location.href,
+                tokenStorage: authCtrl,
+            }),
             memos: memoCtrl,
             attachments: attachmentCtrl,
             settings: settingsCtrl,
             changelog: changelogCtrl,
             fs: mockFS,
-            crypto,
+            crypto: cryptoCtrl,
         })
 
         let setupCtrl = new SetupController({
@@ -117,7 +128,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         let unlockCtrl = new UnlockController({
             storage: new TestInMemUnlockStorage(),
             db,
-            crypto,
+            crypto: cryptoCtrl,
         })
 
         let apiTokenCtrl = new APITokenController({

@@ -1,5 +1,5 @@
 import type { Context } from "@/lib/context"
-import type { Crypto } from "@/lib/crypto"
+import type { Decrypter, Encrypter } from "@/lib/crypto"
 import { parseJSON } from "@/lib/json"
 import { type AsyncResult, Ok, type Result } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
@@ -12,7 +12,7 @@ interface EncryptedItem {
 
 export class EncryptedBrowserIndexedDB<D> {
     private _name: string
-    private _crypto: Crypto
+    private _crypto: Encrypter & Decrypter
     private _db = new BrowserIndexedDB<{ items: EncryptedItem }>()
     private _keyFrom: (d: D) => IDBValidKey
     private _stringify: (d: D) => Uint8Array<ArrayBufferLike>
@@ -26,7 +26,7 @@ export class EncryptedBrowserIndexedDB<D> {
         stringify,
     }: {
         name: string
-        crypto: Crypto
+        crypto: Encrypter & Decrypter
         keyFrom: (d: D) => IDBValidKey
         stringify?: (d: D) => Uint8Array<ArrayBufferLike>
         parse?: (raw: Uint8Array<ArrayBufferLike>) => Result<D>

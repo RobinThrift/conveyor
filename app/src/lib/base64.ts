@@ -1,13 +1,23 @@
-export function encodeToBase64(data: Uint8Array<ArrayBufferLike>): string {
-    if (
-        data instanceof Uint8Array &&
-        "toBase64" in data &&
-        typeof data.toBase64 === "function"
-    ) {
-        return data.toBase64() as string
+export function encodeToBase64(
+    data: ArrayBuffer | Uint8Array<ArrayBufferLike>,
+): string {
+    let arr: Uint8Array<ArrayBufferLike>
+
+    if (data instanceof ArrayBuffer) {
+        arr = new Uint8Array(data)
+    } else {
+        arr = data
     }
 
-    return btoa(String.fromCharCode(...data))
+    if (
+        arr instanceof Uint8Array &&
+        "toBase64" in arr &&
+        typeof arr.toBase64 === "function"
+    ) {
+        return arr.toBase64() as string
+    }
+
+    return btoa(String.fromCharCode(...arr))
 }
 
 export function dataFromBase64(data: string): Uint8Array<ArrayBufferLike> {

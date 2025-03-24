@@ -1,5 +1,7 @@
+import { addMinutes, roundToNearestMinutes } from "date-fns"
 import { assert, suite, test } from "vitest"
 
+import type { AccountKey } from "@/domain/AccountKey"
 import type {
     AttachmentChangelogEntry,
     ChangelogEntry,
@@ -23,10 +25,10 @@ import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
 import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
-import { addMinutes, roundToNearestMinutes } from "date-fns"
 
 import { AttachmentController } from "./AttachmentController"
 import { ChangelogController } from "./ChangelogController"
+import { CryptoController } from "./CryptoController"
 import { MemoController } from "./MemoController"
 import { SettingsController } from "./SettingsController"
 import { SyncController } from "./SyncController"
@@ -76,6 +78,14 @@ suite.concurrent("control/SyncController", async () => {
                             content,
                         )
 
+                        return Ok(undefined)
+                    },
+                },
+                cryptoRemoteAPI: {
+                    uploadAccountKey: async (_, accountKey) => {
+                        assert.isDefined(accountKey.data)
+                        assert.equal(accountKey.type, "agev1")
+                        assert.equal(accountKey.name, "primary")
                         return Ok(undefined)
                     },
                 },
@@ -186,6 +196,14 @@ suite.concurrent("control/SyncController", async () => {
                     return Ok(undefined)
                 },
             },
+            cryptoRemoteAPI: {
+                uploadAccountKey: async (_, accountKey) => {
+                    assert.isDefined(accountKey.data)
+                    assert.equal(accountKey.type, "agev1")
+                    assert.equal(accountKey.name, "primary")
+                    return Ok(undefined)
+                },
+            },
         })
 
         syncCtrl.init(ctx, {
@@ -231,6 +249,7 @@ suite.concurrent("control/SyncController", async () => {
 async function setupSyncControllerTest({
     dbPath = "belt_test.db",
     syncAPI,
+    cryptoRemoteAPI,
 }: {
     dbPath?: string
     syncAPI?: {
@@ -253,6 +272,16 @@ async function setupSyncControllerTest({
                 filepath: string
                 data: Uint8Array<ArrayBufferLike>
             },
+        ) => AsyncResult<void>
+        registerClient?: (
+            ctx: Context,
+            syncClient: { clientID: string },
+        ) => AsyncResult<void>
+    }
+    cryptoRemoteAPI?: {
+        uploadAccountKey?: (
+            ctx: Context,
+            accountKey: AccountKey,
         ) => AsyncResult<void>
     }
 }) {
@@ -289,7 +318,13 @@ async function setupSyncControllerTest({
     })
 
     let crypto = new AgeCrypto()
-    await crypto.init(await toPromise(crypto.generatePrivateKey()))
+
+    let cryptoCtrl = new CryptoController({ crypto })
+    await toPromise(
+        cryptoCtrl.init(ctx, {
+            agePrivateCryptoKey: await toPromise(crypto.generatePrivateKey()),
+        }),
+    )
 
     let syncCtrl = new SyncController({
         storage: new TestInMemSyncStorage(),
@@ -314,6 +349,14 @@ async function setupSyncControllerTest({
             uploadAttachment:
                 syncAPI?.uploadAttachment ??
                 (async () => Err(new Error("uploadAttachment unimplemented"))),
+            registerClient:
+                syncAPI?.registerClient ??
+                (async () => Err(new Error("registerClient unimplemented"))),
+        },
+        cryptoRemoteAPI: {
+            uploadAccountKey:
+                cryptoRemoteAPI?.uploadAccountKey ??
+                (async () => Err(new Error("uploadAccountKey unimplemented"))),
         },
         memos: memoCtrl,
         attachments: attachmentCtrl,
@@ -321,7 +364,7 @@ async function setupSyncControllerTest({
         changelog: changelogCtrl,
         dbPath,
         fs,
-        crypto,
+        crypto: cryptoCtrl,
     })
 
     return {

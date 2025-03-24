@@ -3,10 +3,7 @@ import { addHours, parseJSON } from "date-fns"
 
 import { generateMockAPITokens } from "../src/lib/testhelper/apitokens"
 import type { APIToken, APITokenList } from "../src/domain/APIToken"
-import {
-    APITokenController,
-    type CreateAPITokenRequest,
-} from "../src/control/APITokenController"
+import type { CreateAPITokenRequest } from "../src/control/APITokenController"
 
 interface MockData {
     apitokens: (APIToken & { id: number })[]
@@ -281,6 +278,19 @@ export const mockAPI: HttpHandler[] = [
 
             return new HttpResponse(null, {
                 status: 204,
+            })
+        },
+    ),
+
+    http.post<never, CreateAPITokenRequest>(
+        "/api/sync/v1/clients",
+        async ({ request }) => {
+            await delay(500)
+
+            await request.json()
+
+            return new HttpResponse(null, {
+                status: 201,
             })
         },
     ),

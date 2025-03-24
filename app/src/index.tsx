@@ -29,10 +29,12 @@ import {
 
 import { AuthV1APIClient } from "@/api/authv1"
 import { APITokensV1APIClient } from "@/api/authv1/APITokensV1APIClient"
+import { AccountKeysV1APIClient } from "@/api/authv1/AccountKeysV1APIClient"
 import { SyncV1APIClient } from "@/api/syncv1"
 import { EncryptedRemoteAttachmentFetcher } from "@/api/syncv1/EncryptedRemoteAttachmentFetcher"
 import { APITokenController } from "@/control/APITokenController"
 import { AuthController } from "@/control/AuthController"
+import { CryptoController } from "@/control/CryptoController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
 import { UnlockController } from "@/control/UnlockController"
@@ -142,15 +144,19 @@ async function initController() {
 
     let crypto = new AgeCrypto()
 
+    let cryptoCtrl = new CryptoController({
+        crypto,
+    })
+
     let rawFS = new OPFS("belt", {
         onError: (err) => {
             console.error(err)
         },
     })
 
-    let encryptedFS = new EncryptedFS(rawFS, crypto)
+    let encryptedFS = new EncryptedFS(rawFS, cryptoCtrl)
 
-    let authStorage = new IndexedDBAuthStorage(crypto)
+    let authStorage = new IndexedDBAuthStorage(cryptoCtrl)
 
     let authCtrl = new AuthController({
         origin: globalThis.location.host,
@@ -184,7 +190,7 @@ async function initController() {
         hasher: new WebCryptoSha256Hasher(),
         remote: new EncryptedRemoteAttachmentFetcher({
             syncAPIClient,
-            decrypter: crypto,
+            decrypter: cryptoCtrl,
         }),
         changelog: changelogCtrl,
     })
@@ -196,19 +202,23 @@ async function initController() {
         changelog: changelogCtrl,
     })
 
-    let syncStorage = new IndexedDBSyncStorage(crypto)
+    let syncStorage = new IndexedDBSyncStorage(cryptoCtrl)
 
     let syncCtrl = new SyncController({
         storage: syncStorage,
         dbPath: "belt.db",
         transactioner: db,
         syncAPIClient,
+        cryptoRemoteAPI: new AccountKeysV1APIClient({
+            baseURL: globalThis.location.href,
+            tokenStorage: authCtrl,
+        }),
         memos: memoCtrl,
         attachments: attachmentCtrl,
         settings: settingsCtrl,
         changelog: changelogCtrl,
         fs: rawFS,
-        crypto,
+        crypto: cryptoCtrl,
     })
 
     let setupCtrl = new SetupController({
@@ -218,7 +228,7 @@ async function initController() {
     let unlockCtrl = new UnlockController({
         storage: new SessionStorageUnlockStorage(),
         db,
-        crypto,
+        crypto: cryptoCtrl,
     })
 
     let apiTokenCtrl = new APITokenController({
@@ -243,5 +253,6 @@ async function initController() {
         syncCtrl,
         unlockCtrl,
         apiTokenCtrl,
+        cryptoCtrl,
     }
 }

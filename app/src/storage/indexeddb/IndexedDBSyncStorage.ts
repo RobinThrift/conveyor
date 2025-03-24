@@ -1,7 +1,7 @@
 import type { SyncInfo } from "@/domain/SyncInfo"
 import { EncryptedBrowserIndexedDB } from "@/external/browser/EncryptedBrowserIndexedDB"
 import type { Context } from "@/lib/context"
-import type { Crypto } from "@/lib/crypto"
+import type { Decrypter, Encrypter } from "@/lib/crypto"
 import { parseJSON, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Ok } from "@/lib/result"
 
@@ -10,7 +10,7 @@ const SYNC_INFO_KEY = "SyncInfo"
 export class IndexedDBSyncStorage {
     private _db: EncryptedBrowserIndexedDB<SyncInfo>
 
-    constructor(crypto: Crypto) {
+    constructor(crypto: Encrypter & Decrypter) {
         this._db = new EncryptedBrowserIndexedDB<SyncInfo>({
             name: "SyncStorage",
             crypto,

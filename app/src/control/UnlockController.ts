@@ -1,12 +1,13 @@
 import { AgePrivateCryptoKey, type Identity } from "@/external/age/AgeCrypto"
 import type { Context } from "@/lib/context"
-import type { Crypto, PlaintextPrivateKey } from "@/lib/crypto"
+import type { PlaintextPrivateKey } from "@/lib/crypto"
 import type { Database } from "@/lib/database"
 import { type AsyncResult, Ok, fromPromise } from "@/lib/result"
+import type { CryptoController } from "./CryptoController"
 
 export class UnlockController {
     private _storage: Storage
-    private _crypto: Crypto
+    private _crypto: CryptoController
     private _db: Database
 
     public isUnlocked = false
@@ -17,7 +18,7 @@ export class UnlockController {
         db,
     }: {
         storage: Storage
-        crypto: Crypto
+        crypto: CryptoController
         db: Database
     }) {
         this._storage = storage
@@ -69,7 +70,7 @@ export class UnlockController {
         }
 
         let [initRes, openRes] = await Promise.all([
-            this._crypto.init(key),
+            this._crypto.init(ctx, { agePrivateCryptoKey: key }),
             fromPromise(
                 this._db.open(ctx, {
                     enckey: privateKeyStr.value,
