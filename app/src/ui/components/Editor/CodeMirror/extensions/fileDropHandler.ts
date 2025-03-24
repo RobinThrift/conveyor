@@ -15,6 +15,7 @@ import type { AttachmentID } from "@/domain/Attachment"
 import { newID } from "@/domain/ID"
 import { thumbhashFromFile } from "@/external/thumbhash"
 import { html2md } from "@/lib/html2md"
+import { fromThrowing } from "@/lib/result"
 
 const setDroppedPos = StateEffect.define<number | null>({
     map(pos, mapping) {
@@ -190,6 +191,26 @@ const fileDropHandlerExt = (opts: FileDropHandlerOptions) =>
                 e.preventDefault()
 
                 let pos = Math.max(this.view.state.selection.main.from, 0)
+
+                let uri = e.clipboardData.getData("text/uri-list")
+                if (uri) {
+                    let link = `[Link](${uri})`
+                    let url = fromThrowing(() => new URL(uri))
+                    if (url.ok) {
+                        link = `[${url.value.host}${url.value.pathname}](${uri})`
+                    }
+                    this.view.dispatch({
+                        changes: {
+                            from: pos,
+                            to: this.view.state.selection.main.to,
+                            insert: link,
+                        },
+                        selection: EditorSelection.cursor(
+                            this.view.state.selection.main.from + link.length,
+                        ),
+                    })
+                    return
+                }
 
                 if (e.clipboardData.types.some((t) => t === "text/html")) {
                     let converted = html2md(
