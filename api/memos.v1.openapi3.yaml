@@ -159,7 +159,7 @@ components:
       content:
         application/json:
           schema:
-            oneOf:
+            allOf:
             - $ref: "#/components/schemas/PlaintextMemo"
             - $ref: "./sync.v1.openapi3.yaml#/components/schemas/EncryptedChangelogEntry"
             example:

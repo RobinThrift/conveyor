@@ -3,14 +3,11 @@ package memosv1
 import (
 	"compress/gzip"
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/control"
 	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/ingress/syncv1"
 	"go.robinthrift.com/belt/internal/x/httperrors"
 	"go.robinthrift.com/belt/internal/x/httpmiddleware"
 )
@@ -50,34 +47,24 @@ func (router *router) CreateMemo(ctx context.Context, req CreateMemoRequestObjec
 		return nil, httperrors.ErrBadRequest
 	}
 
-	var body struct {
-		PlaintextMemo
-		syncv1.EncryptedChangelogEntry
-	}
-
-	err := json.Unmarshal(req.Body.union, &body)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %v", httperrors.ErrBadRequest, err)
-	}
-
 	var cmd control.CreateMemoChangelogEntryCmd
 	switch {
-	case body.Content != "":
+	case req.Body.Content != "":
 		cmd.PlaintextMemo = &control.PlaintextMemo{
-			Content:   body.Content,
-			CreatedAt: body.CreatedAt,
+			Content:   req.Body.Content,
+			CreatedAt: req.Body.CreatedAt,
 		}
-	case len(body.Data) != 0:
+	case len(req.Body.Data) != 0:
 		cmd.Memo = &domain.ChangelogEntry{
-			SyncClientID: domain.SyncClientID(body.SyncClientID),
-			Data:         body.Data,
-			Timestamp:    body.Timestamp,
+			SyncClientID: domain.SyncClientID(req.Body.SyncClientID),
+			Data:         req.Body.Data,
+			Timestamp:    req.Body.Timestamp,
 		}
 	default:
 		return nil, httperrors.ErrBadRequest
 	}
 
-	err = router.syncCtrl.CreateMemoChangelogEntry(ctx, cmd)
+	err := router.syncCtrl.CreateMemoChangelogEntry(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}

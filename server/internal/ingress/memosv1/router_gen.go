@@ -17,7 +17,6 @@ import (
 
 	"github.com/oapi-codegen/runtime"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
-	externalRef0 "go.robinthrift.com/belt/internal/ingress/syncv1"
 	"go.robinthrift.com/belt/internal/x/httperrors"
 )
 
@@ -53,7 +52,11 @@ type UploadAttachmentResponse struct {
 
 // CreateMemoRequest defines model for CreateMemoRequest.
 type CreateMemoRequest struct {
-	union json.RawMessage
+	Content      string     `json:"content"`
+	CreatedAt    *time.Time `json:"createdAt,omitempty"`
+	Data         []byte     `json:"data"`
+	SyncClientID string     `json:"syncClientID"`
+	Timestamp    time.Time  `json:"timestamp"`
 }
 
 // UploadAttachmentParams defines parameters for UploadAttachment.
@@ -76,73 +79,15 @@ type UploadAttachmentParams struct {
 
 // CreateMemoJSONBody defines parameters for CreateMemo.
 type CreateMemoJSONBody struct {
-	union json.RawMessage
+	Content      string     `json:"content"`
+	CreatedAt    *time.Time `json:"createdAt,omitempty"`
+	Data         []byte     `json:"data"`
+	SyncClientID string     `json:"syncClientID"`
+	Timestamp    time.Time  `json:"timestamp"`
 }
 
 // CreateMemoJSONRequestBody defines body for CreateMemo for application/json ContentType.
 type CreateMemoJSONRequestBody CreateMemoJSONBody
-
-// AsPlaintextMemo returns the union data inside the CreateMemoRequest as a PlaintextMemo
-func (t CreateMemoRequest) AsPlaintextMemo() (PlaintextMemo, error) {
-	var body PlaintextMemo
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromPlaintextMemo overwrites any union data inside the CreateMemoRequest as the provided PlaintextMemo
-func (t *CreateMemoRequest) FromPlaintextMemo(v PlaintextMemo) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergePlaintextMemo performs a merge with any union data inside the CreateMemoRequest, using the provided PlaintextMemo
-func (t *CreateMemoRequest) MergePlaintextMemo(v PlaintextMemo) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsExternalRef0EncryptedChangelogEntry returns the union data inside the CreateMemoRequest as a externalRef0.EncryptedChangelogEntry
-func (t CreateMemoRequest) AsExternalRef0EncryptedChangelogEntry() (externalRef0.EncryptedChangelogEntry, error) {
-	var body externalRef0.EncryptedChangelogEntry
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromExternalRef0EncryptedChangelogEntry overwrites any union data inside the CreateMemoRequest as the provided externalRef0.EncryptedChangelogEntry
-func (t *CreateMemoRequest) FromExternalRef0EncryptedChangelogEntry(v externalRef0.EncryptedChangelogEntry) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeExternalRef0EncryptedChangelogEntry performs a merge with any union data inside the CreateMemoRequest, using the provided externalRef0.EncryptedChangelogEntry
-func (t *CreateMemoRequest) MergeExternalRef0EncryptedChangelogEntry(v externalRef0.EncryptedChangelogEntry) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t CreateMemoRequest) MarshalJSON() ([]byte, error) {
-	b, err := t.union.MarshalJSON()
-	return b, err
-}
-
-func (t *CreateMemoRequest) UnmarshalJSON(b []byte) error {
-	err := t.union.UnmarshalJSON(b)
-	return err
-}
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
