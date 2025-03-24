@@ -8,6 +8,7 @@ const config: StorybookConfig = {
 
     staticDirs: [
         "./public",
+        { from: "../../api", to: "/assets/apispecs" },
         { from: "../build/icons", to: "/assets/icons" },
         { from: "../build/sqlite3", to: "/assets/sqlite3" },
     ],
