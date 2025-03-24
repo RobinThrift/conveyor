@@ -84,6 +84,17 @@ export function SyncSettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
                 />
             )}
 
+            {!info.isEnabled && status === "error" && error ? (
+                <Alert variant="danger">
+                    {error.name}: {error.message}
+                    {error.stack && (
+                        <pre>
+                            <code>{error.stack}</code>
+                        </pre>
+                    )}
+                </Alert>
+            ) : undefined}
+
             {(status === "syncing" || status === "setting-up") && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/40 z-10">
                     <Loader />
