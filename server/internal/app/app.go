@@ -74,7 +74,7 @@ func New(config Config) *App {
 	mux := http.NewServeMux()
 	srv := server.New(server.Config{Addr: config.Addr}, mux)
 
-	authv1.New(config.BasePath, mux, authCtrl, apiTokenCtrl)
+	authv1.New(config.BasePath, mux, authCtrl, accountCtrl, apiTokenCtrl)
 	syncv1.New(syncv1.RouterConfig{
 		BasePath: config.BasePath,
 	}, mux, syncCtrl, authCtrl, http.Dir(config.Blobs.Dir))

@@ -18,11 +18,12 @@ import (
 type router struct {
 	baseURL      string
 	authCtrl     *control.AuthController
+	accountCtrl  *control.AccountControl
 	apiTokenCtrl *control.APITokenController
 }
 
-func New(basePath string, mux *http.ServeMux, authCtrl *control.AuthController, apiTokenCtrl *control.APITokenController) {
-	r := &router{basePath, authCtrl, apiTokenCtrl}
+func New(basePath string, mux *http.ServeMux, authCtrl *control.AuthController, accountCtrl *control.AccountControl, apiTokenCtrl *control.APITokenController) {
+	r := &router{basePath, authCtrl, accountCtrl, apiTokenCtrl}
 
 	errorHandler := httperrors.ErrorHandler("belt/api/v1/auth")
 
@@ -138,13 +139,31 @@ func (router *router) ChangePassword(ctx context.Context, req ChangePasswordRequ
 // Add a new account key.
 // (POST /keys)
 func (router *router) AddAccountKey(ctx context.Context, req AddAccountKeyRequestObject) (AddAccountKeyResponseObject, error) {
-	panic("not implemented") // TODO: Implement
+	err := router.accountCtrl.CreateAccountKey(ctx, &domain.AccountKey{
+		Name: req.Body.Name,
+		Type: req.Body.Type,
+		Data: req.Body.Data,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return AddAccountKey201Response{}, nil
 }
 
 // Get a public key by name.
 // (GET /keys/{name})
 func (router *router) GetAccountKey(ctx context.Context, req GetAccountKeyRequestObject) (GetAccountKeyResponseObject, error) {
-	panic("not implemented") // TODO: Implement
+	key, err := router.accountCtrl.GetAccountKeyByName(ctx, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return GetAccountKey200JSONResponse{
+		Name: key.Name,
+		Type: key.Type,
+		Data: key.Data,
+	}, nil
 }
 
 // List API Tokens paginated
