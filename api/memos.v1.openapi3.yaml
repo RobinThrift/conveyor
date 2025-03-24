@@ -1,0 +1,237 @@
+openapi: 3.0.4
+info:
+  title: Belt Memo API
+  description: This is the Belt Memo API.
+  version: 0.1.0
+servers:
+- url: http://localhost:8081/api/sync/v1
+  description: Local development server.
+
+security:
+  - tokenBearerAuth: []
+
+tags:
+- name: Memos
+- name: Attachments
+
+paths:
+  /memos:
+    post:
+      operationId: CreateMemo
+      tags: [Memos]
+      summary: Create a new memo.
+      description: Create a new memo changelog entry for the authenticated account and encrypt it using the most recent uploaded public key.
+
+      requestBody:
+        $ref: "#/components/requestBodies/CreateMemoRequest"
+      responses:
+        "201":
+          description: The memo was succesfully created.
+          content: {}
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+  /attachments:
+    post:
+      operationId: UploadAttachment
+      tags: [Attachments]
+      summary: Upload an attachment
+      description: Upload an encrypted Attachment's raw data at the provided file path.
+
+      parameters:
+      - in: header
+        name: "Content-Encoding"
+        description: Encoding of the uploaded data.
+        schema:
+          type: string
+          example: gzip
+      - in: header
+        name: "Content-Type"
+        description: Content-Type of the uploaded data.
+        schema:
+          type: string
+          example: image/png
+      - in: header
+        name: "X-Filename"
+        description: Filename of the attachment.
+        schema:
+          type: string
+          example: image.png
+        required: true
+      - in: header
+        name: "X-Filepath"
+        description: Full filepath for the file, required when using X-Encrypted.
+        schema:
+          type: string
+          example: a/b/c/image.png
+        required: false
+      - in: header
+        name: "X-Encrypted"
+        description: Indicate that the content is already encrypted.
+        schema:
+          type: boolean
+          example: true
+        required: false
+
+      requestBody:
+        $ref: "#/components/requestBodies/UploadAttachmentRequest"
+      responses:
+        "201":
+           $ref: "#/components/responses/UploadAttachmentResponse"
+        "400":
+          $ref: "#/components/responses/ErrorBadRequest"
+        "401":
+          $ref: "#/components/responses/ErrorUnauthorized"
+        "404":
+          $ref: "#/components/responses/ErrorNotFound"
+        default:
+          $ref: "#/components/responses/ErrorOther"
+
+
+components:
+  securitySchemes:
+    tokenBearerAuth:
+      description: API Token sent as a bearer token in the header. When accessing Belt via the API this is the recommended way to pass along the API Token.
+      type: http
+      scheme: bearer
+
+  schemas:
+    PlaintextMemo:
+      type: object
+      description: Plaintext memo content.
+      properties:
+        content:
+          type: string
+          example: |-
+            # Title
+            Content of the Memo
+            #tag-a #tag-b
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-11-29T13:32:25Z"
+      required:
+      - content
+      example:
+        content: Slg
+        createdAt: "2024-11-29T13:32:25Z"
+
+    Error:
+      type: object
+      description: Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
+      x-go-type: httperrors.Error
+      x-go-type-import:
+        path: go.robinthrift.com/belt/internal/x/httperrors
+      properties:
+        code:
+          type: integer
+          example: 500
+        type:
+          type: string
+          example: "belt/api/sync/v1/InternalServerError"
+        title:
+          type: string
+          example: "InternalServerError"
+        detail:
+          type: string
+          example: "unknown error"
+      required:
+      - code
+      - type
+      - title
+      - detail
+      example:
+        code: 500
+        detail: unknown error
+        title: InternalServerError
+        type: belt/api/sync/v1/InternalServerError
+
+  requestBodies:
+    CreateMemoRequest:
+      description: Request data for memo creation.
+      required: true
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: "#/components/schemas/PlaintextMemo"
+            - $ref: "./sync.v1.openapi3.yaml#/components/schemas/EncryptedChangelogEntry"
+            example:
+              content: |-
+                # Title
+                Content of the Memo
+                #tag-a #tag-b
+              createdAt: "2024-11-29T13:32:25Z"
+
+    UploadAttachmentRequest:
+      required: true
+      description: The attachment's raw data.
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+            example: "0x5"
+
+  responses:
+    UploadAttachmentResponse:
+      description: Attachment metadata that was created after upload.
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Attachment metadata.
+            properties:
+              id:
+                type: string
+                example: "0b925d1a-e228-4159-886d-839c088525eb"
+            required:
+            - id
+            example:
+              id: "0b925d1a-e228-4159-886d-839c088525eb"
+
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 400
+            detail: Invalid request body
+            title: Bad Request
+            type: belt/api/sync/v1/BadRequest
+    ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 401
+            detail: You lack the required permissions to perform this action
+            title: Unauthorized
+            type: belt/api/sync/v1/Unauthorized
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            code: 404
+            detail: The requested page could not be found
+            title: Not Found
+            type: belt/api/sync/v1/NotFound
+    ErrorOther:
+      description: Other errors
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

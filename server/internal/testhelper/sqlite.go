@@ -1,7 +1,6 @@
 package testhelper
 
 import (
-	"context"
 	"strings"
 	"testing"
 	"time"
@@ -37,7 +36,7 @@ func NewInMemTestSQLite(t *testing.T) *sqlite.SQLite {
 
 // NewFileTestSQLite returns a new SQLite database for tests, using a file instead of an in-memory database.
 // In some rare cases tests may fail with in-memory database, especially when using multiple goroutines.
-func NewFileTestSQLite(ctx context.Context, t *testing.T) *sqlite.SQLite {
+func NewFileTestSQLite(t *testing.T) *sqlite.SQLite {
 	t.Helper()
 
 	db := &sqlite.SQLite{
@@ -53,7 +52,7 @@ func NewFileTestSQLite(ctx context.Context, t *testing.T) *sqlite.SQLite {
 
 	t.Cleanup(func() { db.Close() })
 
-	err = sqlite.RunMigrations(ctx, sqlite.MigrationConfig{LogFormat: "console", LogLevel: "debug"}, db.DB)
+	err = sqlite.RunMigrations(t.Context(), sqlite.MigrationConfig{LogFormat: "console", LogLevel: "debug"}, db.DB)
 	if err != nil {
 		t.Fatal(err)
 	}

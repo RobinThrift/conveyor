@@ -106,12 +106,15 @@ func setupSyncV1Router(t *testing.T) (http.Handler, string) {
 	}
 
 	blobDir := t.TempDir()
-
-	authCtrl := control.NewAuthController(config, db, control.NewAccountController(db, accountRepo), authTokenRepo)
-	syncCtrl := control.NewSyncController(db, syncRepo, &filesystem.LocalFSBlobStorage{
+	blobs := &filesystem.LocalFSBlobStorage{
 		BaseDir: blobDir,
 		TmpDir:  t.TempDir(),
-	})
+	}
+
+	accountCtrl := control.NewAccountController(db, accountRepo)
+	authCtrl := control.NewAuthController(config, db, accountCtrl, authTokenRepo)
+	attachmentCtrl := control.NewAttachmentController(blobs)
+	syncCtrl := control.NewSyncController(db, syncRepo, accountCtrl, attachmentCtrl, blobs)
 
 	err := authCtrl.CreateAccount(t.Context(), control.CreateAccountCmd{
 		Account: &domain.Account{

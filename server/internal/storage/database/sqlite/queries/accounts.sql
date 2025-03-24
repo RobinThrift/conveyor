@@ -35,7 +35,7 @@ UPDATE accounts SET
 WHERE id = ?;
 
 
--- name: GetAccountKey :one
+-- name: GetAccountKeyByName :one
 SELECT * FROM account_keys
 WHERE name = ? AND account_id = ?
 LIMIT 1;

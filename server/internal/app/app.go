@@ -12,6 +12,7 @@ import (
 	"go.robinthrift.com/belt/internal/control"
 	appingress "go.robinthrift.com/belt/internal/ingress/app"
 	"go.robinthrift.com/belt/internal/ingress/authv1"
+	"go.robinthrift.com/belt/internal/ingress/memosv1"
 	"go.robinthrift.com/belt/internal/ingress/syncv1"
 	"go.robinthrift.com/belt/internal/jobs"
 	"go.robinthrift.com/belt/internal/server"
@@ -50,7 +51,7 @@ func New(config Config) *App {
 	apiTokenRepo := sqlite.NewAPITokenRepo(db)
 	jobRepo := sqlite.NewJobRepo(db)
 
-	fs := &filesystem.LocalFSBlobStorage{
+	blobs := &filesystem.LocalFSBlobStorage{
 		BaseDir: config.Blobs.Dir,
 		TmpDir:  os.TempDir(),
 	}
@@ -63,7 +64,8 @@ func New(config Config) *App {
 	}
 
 	accountCtrl := control.NewAccountController(db, accountRepo)
-	syncCtrl := control.NewSyncController(db, syncRepo, fs)
+	attachmentCtrl := control.NewAttachmentController(blobs)
+	syncCtrl := control.NewSyncController(db, syncRepo, accountCtrl, attachmentCtrl, blobs)
 	authCtrl := control.NewAuthController(authConfig, db, accountCtrl, authTokenRepo)
 	apiTokenCtrl := control.NewAPITokenController(authConfig, db, apiTokenRepo, authTokenRepo)
 
@@ -76,6 +78,7 @@ func New(config Config) *App {
 	syncv1.New(syncv1.RouterConfig{
 		BasePath: config.BasePath,
 	}, mux, syncCtrl, authCtrl, http.Dir(config.Blobs.Dir))
+	memosv1.New(config.BasePath, mux, syncCtrl, authCtrl)
 	appingress.New(config.BasePath, mux)
 
 	return &App{

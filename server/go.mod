@@ -3,7 +3,9 @@ module go.robinthrift.com/belt
 go 1.24.0
 
 require (
+	filippo.io/age v1.2.1
 	github.com/caarlos0/env/v11 v11.3.1
+	github.com/matoous/go-nanoid/v2 v2.1.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/pressly/goose/v3 v3.24.1
 	github.com/prometheus/client_golang v1.21.0

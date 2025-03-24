@@ -115,12 +115,15 @@ func (r *AccountRepo) CreateAccountKey(ctx context.Context, toCreate *domain.Acc
 	})
 }
 
-func (r *AccountRepo) GetAccountKey(ctx context.Context, accountID domain.AccountID, name string) (*domain.AccountKey, error) {
-	row, err := queries.GetAccountKey(ctx, r.db.Conn(ctx), sqlc.GetAccountKeyParams{
+func (r *AccountRepo) GetAccountKeyByName(ctx context.Context, accountID domain.AccountID, name string) (*domain.AccountKey, error) {
+	row, err := queries.GetAccountKeyByName(ctx, r.db.Conn(ctx), sqlc.GetAccountKeyByNameParams{
 		AccountID: int64(accountID),
 		Name:      name,
 	})
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w: %s", domain.ErrAccountKeyNotFound, name)
+		}
 		return nil, err
 	}
 

@@ -7,40 +7,38 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"go.robinthrift.com/belt/internal/domain"
 )
 
 func TestLocalFSBlobStorage(t *testing.T) {
+	t.Parallel()
+
 	fs := LocalFSBlobStorage{BaseDir: t.TempDir(), TmpDir: t.TempDir()} //nolint: varnamelen // this is just a test
 
-	files := []struct {
+	tt := []struct {
 		accountID domain.AccountID
 		filename  string
 		data      string
+		size      int64
 	}{
 		{
 			accountID: domain.AccountID(1000),
 			filename:  "test-0.txt",
 			data:      "content for test-0.txt",
+			size:      22,
 		},
 		{
 			accountID: domain.AccountID(1000),
 			filename:  "test-1.txt",
 			data:      "content for test-1.txt",
+			size:      22,
 		},
 	}
 
-	_, err := fs.WriteBlob(files[0].accountID, files[0].filename, strings.NewReader(files[0].data))
-	require.NoError(t, err)
-
-	_, err = fs.WriteBlob(files[0].accountID, files[0].filename, strings.NewReader(files[0].data))
-	require.NoError(t, err)
-
-	assert.FileExists(t, path.Join(fs.BaseDir, fmt.Sprint(files[0].accountID), files[0].filename))
-
-	_, err = fs.WriteBlob(files[0].accountID, files[1].filename, strings.NewReader(files[1].data))
-	require.NoError(t, err)
-
-	assert.FileExists(t, path.Join(fs.BaseDir, fmt.Sprint(files[1].accountID), files[1].filename))
+	for _, tt := range tt {
+		sizeBytes, err := fs.WriteBlob(tt.accountID, tt.filename, strings.NewReader(tt.data))
+		assert.NoError(t, err)
+		assert.Equal(t, tt.size, sizeBytes)
+		assert.FileExists(t, path.Join(fs.BaseDir, fmt.Sprint(tt.accountID), tt.filename))
+	}
 }

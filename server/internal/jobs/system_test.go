@@ -198,7 +198,7 @@ func TestSystem_Scheduled_Wakeup(t *testing.T) {
 func setupJobSystem(t *testing.T, timeNow jobs.SystemTimeNowFunc, jobFuncs map[string]jobs.JobKindWithJSONData) *jobs.System {
 	t.Helper()
 
-	db := testhelper.NewFileTestSQLite(t.Context(), t)
+	db := testhelper.NewFileTestSQLite(t)
 
 	accountRepo := sqlite.NewAccountRepo(db)
 	jobRepo := sqlite.NewJobRepo(db)

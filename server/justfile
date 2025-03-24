@@ -54,7 +54,7 @@ lint: (_install-tool "staticcheck") (_install-tool "golangci-lint") (_install-to
     {{ local_bin }}/staticcheck ./...
     {{ local_bin }}/golangci-lint run --out-format={{ go_lint_reporter }} ./...
     {{ local_bin }}/sqlc -f internal/storage/database/sqlite/sqlc.yaml vet
-    {{ local_bin }}/vacuum lint --ruleset ../.scripts/vacuum.yaml --details --fail-severity warn --no-banner --all-results ../api/*.openapi3.yaml
+    cd ../api && {{ local_bin }}/vacuum lint --ruleset ../.scripts/vacuum.yaml --details --fail-severity warn --no-banner --all-results *.openapi3.yaml
 
 fmt:
     @go fmt ./...
@@ -74,7 +74,16 @@ _gen-sql: (_install-tool "sqlc")
 _gen-api-server-stubs: (_install-tool "oapi-codegen")
     {{ local_bin }}/oapi-codegen -generate types,std-http-server,strict-server -o ./internal/ingress/syncv1/router_gen.go -package syncv1 ../api/sync.v1.openapi3.yaml
     {{ local_bin }}/oapi-codegen -generate types,std-http-server,strict-server -o ./internal/ingress/authv1/router_gen.go -package authv1 ../api/auth.v1.openapi3.yaml
-    sed -i '' -e '1s;^;//lint:file-ignore ST1005 Ignore because generated code\n//lint:file-ignore SA1029 Ignore because generated code\n;' ./internal/ingress/syncv1/router_gen.go ./internal/ingress/authv1/router_gen.go
+    {{ local_bin }}/oapi-codegen \
+        -import-mapping ./sync.v1.openapi3.yaml:go.robinthrift.com/belt/internal/ingress/syncv1 \
+        -generate types,std-http-server,strict-server \
+        -o ./internal/ingress/memosv1/router_gen.go \
+        -package memosv1 \
+        ../api/memos.v1.openapi3.yaml
+    sed -i '' -e '1s;^;//lint:file-ignore ST1005 Ignore because generated code\n//lint:file-ignore SA1029 Ignore because generated code\n;' \
+            ./internal/ingress/syncv1/router_gen.go \
+            ./internal/ingress/memosv1/router_gen.go \
+            ./internal/ingress/authv1/router_gen.go
     go fmt ./...
 
 _install-tool tool:

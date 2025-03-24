@@ -129,19 +129,19 @@ func (q *Queries) GetAccountByUsername(ctx context.Context, db DBTX, username st
 	return i, err
 }
 
-const getAccountKey = `-- name: GetAccountKey :one
+const getAccountKeyByName = `-- name: GetAccountKeyByName :one
 SELECT id, account_id, name, type, data, created_at, updated_at FROM account_keys
 WHERE name = ? AND account_id = ?
 LIMIT 1
 `
 
-type GetAccountKeyParams struct {
+type GetAccountKeyByNameParams struct {
 	Name      string
 	AccountID int64
 }
 
-func (q *Queries) GetAccountKey(ctx context.Context, db DBTX, arg GetAccountKeyParams) (AccountKey, error) {
-	row := db.QueryRowContext(ctx, getAccountKey, arg.Name, arg.AccountID)
+func (q *Queries) GetAccountKeyByName(ctx context.Context, db DBTX, arg GetAccountKeyByNameParams) (AccountKey, error) {
+	row := db.QueryRowContext(ctx, getAccountKeyByName, arg.Name, arg.AccountID)
 	var i AccountKey
 	err := row.Scan(
 		&i.ID,

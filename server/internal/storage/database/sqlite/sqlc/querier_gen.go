@@ -28,7 +28,7 @@ type Querier interface {
 	GetAPIToken(ctx context.Context, db DBTX, arg GetAPITokenParams) (ApiToken, error)
 	GetAccount(ctx context.Context, db DBTX, id domain.AccountID) (Account, error)
 	GetAccountByUsername(ctx context.Context, db DBTX, username string) (Account, error)
-	GetAccountKey(ctx context.Context, db DBTX, arg GetAccountKeyParams) (AccountKey, error)
+	GetAccountKeyByName(ctx context.Context, db DBTX, arg GetAccountKeyByNameParams) (AccountKey, error)
 	GetAuthToken(ctx context.Context, db DBTX, value []byte) (AuthToken, error)
 	GetAuthTokenByID(ctx context.Context, db DBTX, arg GetAuthTokenByIDParams) (AuthToken, error)
 	GetAuthTokenByRefreshValue(ctx context.Context, db DBTX, refreshValue []byte) (AuthToken, error)

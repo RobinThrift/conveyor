@@ -8,6 +8,7 @@ import (
 	"path"
 
 	"go.robinthrift.com/belt/internal/domain"
+	"go.robinthrift.com/belt/internal/storage"
 )
 
 type LocalFSBlobStorage struct {
@@ -16,40 +17,38 @@ type LocalFSBlobStorage struct {
 }
 
 func (lfs *LocalFSBlobStorage) WriteBlob(accountID domain.AccountID, filepath string, data io.Reader) (n int64, err error) {
-	fhandle, err := os.CreateTemp(lfs.TmpDir, fmt.Sprintf("%d_%s", accountID, path.Base(filepath)))
+	target, err := lfs.OpenBlobTarget(accountID, filepath)
 	if err != nil {
 		return 0, err
 	}
 
 	defer func() {
-		if err != nil {
-			err = errors.Join(err, fhandle.Close(), os.Remove(fhandle.Name()))
-		}
+		err = errors.Join(err, target.Close())
 	}()
 
-	n, err = io.Copy(fhandle, data)
+	n, err = io.Copy(target, data)
 	if err != nil {
 		return 0, err
 	}
 
-	finalFilePath := path.Join(lfs.BaseDir, fmt.Sprint(accountID), filepath)
-
-	err = ensureDirExists(path.Dir(finalFilePath))
-	if err != nil {
-		return 0, err
-	}
-
-	err = os.Rename(fhandle.Name(), finalFilePath)
-	if err != nil {
-		// error when transferring across file systems, fallback to simple copy
-		err = copyFile(fhandle, finalFilePath)
-	}
-
+	err = target.Finalize(filepath)
 	if err != nil {
 		return 0, err
 	}
 
 	return n, nil
+}
+
+func (lfs *LocalFSBlobStorage) OpenBlobTarget(accountID domain.AccountID, originalFilename string) (storage.BlobTarget, error) {
+	fhandle, err := os.CreateTemp(lfs.TmpDir, fmt.Sprintf("%d_%s-*", accountID, path.Base(originalFilename)))
+	if err != nil {
+		return nil, fmt.Errorf("error creating temporary file: %w", err)
+	}
+
+	return &BlobTarget{
+		f:       fhandle,
+		baseDir: path.Join(lfs.BaseDir, fmt.Sprint(accountID)),
+	}, nil
 }
 
 func (lfs *LocalFSBlobStorage) RemoveBlob(accountID domain.AccountID, filepath string) error {
@@ -81,6 +80,50 @@ func (lfs *LocalFSBlobStorage) RemoveBlob(accountID domain.AccountID, filepath s
 
 	return nil
 
+}
+
+type BlobTarget struct {
+	f       *os.File
+	baseDir string
+}
+
+func (bt *BlobTarget) Write(b []byte) (int, error) {
+	return bt.f.Write(b)
+}
+
+func (bt *BlobTarget) Close() error {
+	if bt.f != nil {
+		return errors.Join(bt.f.Close(), os.Remove(bt.f.Name()))
+	}
+	return nil
+}
+
+func (bt *BlobTarget) Finalize(filepath string) (err error) {
+	finalFilePath := path.Join(bt.baseDir, filepath)
+
+	err = ensureDirExists(path.Dir(finalFilePath))
+	if err != nil {
+		return err
+	}
+
+	err = bt.f.Close()
+	if err != nil {
+		return fmt.Errorf("error closing temporary file: %w", err)
+	}
+
+	err = os.Rename(bt.f.Name(), finalFilePath)
+	if err != nil {
+		// error when transferring across file systems, fallback to simple copy
+		err = copyFile(bt.f, finalFilePath)
+	}
+
+	if err != nil {
+		return fmt.Errorf("error moving data to final location: %w", err)
+	}
+
+	bt.f = nil
+
+	return nil
 }
 
 func ensureDirExists(dir string) error {

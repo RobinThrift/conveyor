@@ -7,6 +7,7 @@ import (
 )
 
 var ErrAccountNotFound = errors.New("account not found")
+var ErrAccountKeyNotFound = errors.New("account key not found")
 
 type AccountID int64
 
@@ -32,6 +33,8 @@ type AccountPassword struct {
 func (id AccountID) String() string {
 	return fmt.Sprint(int64(id))
 }
+
+const PrimaryAccountKeyName = "primary"
 
 type AccountKeyID int64
 

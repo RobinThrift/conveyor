@@ -209,7 +209,7 @@ func (router *router) UploadAttachment(ctx context.Context, req UploadAttachment
 		defer gr.Close()
 	}
 
-	err := router.syncCtrl.SaveAttachment(ctx, control.SaveAttachmentCmd{
+	err := router.syncCtrl.StoreAttachment(ctx, control.StoreAttachmentCmd{
 		Filepath: req.Params.XFilepath,
 		Content:  content,
 	})
