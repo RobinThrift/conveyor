@@ -14,6 +14,7 @@ import { useT } from "@/ui/i18n"
 import type { ChangeSet } from "@codemirror/state"
 
 import { CodeMirror } from "./CodeMirror"
+import { Milkdown } from "./Milkdown"
 import { useTextEditorState } from "./useTextEditorState"
 
 export interface TextEditorProps {
@@ -27,7 +28,7 @@ export interface TextEditorProps {
     placeholder?: string
     placeCursorAt?: { x: number; y: number; snippet?: string }
 
-    onChange: (text: string, changes: ChangeSet) => void
+    onChange: (text: string) => void
     onSave: () => void
     onCancel: () => void
 
@@ -41,21 +42,37 @@ export interface TextEditorProps {
 export function TextEditor(props: TextEditorProps) {
     let { cmds, onCreateEditor } = useTextEditorState(props)
 
+    // return (
+    //     <>
+    //         <CodeMirror
+    //             id={props.id}
+    //             className={clsx("text-editor", {
+    //                 "vim-enabled ": props.vimModeEnabled,
+    //             })}
+    //             onCreateEditor={onCreateEditor}
+    //             text={props.content}
+    //             onChange={props.onChange}
+    //             autoFocus={props.autoFocus}
+    //             placeholder={props.placeholder}
+    //             transferAttachment={props.transferAttachment}
+    //         />
+    //         <EditorToolbar {...cmds} />
+    //     </>
+    // )
+    //
     return (
         <>
-            <CodeMirror
+            <Milkdown
                 id={props.id}
                 className={clsx("text-editor", {
                     "vim-enabled ": props.vimModeEnabled,
                 })}
-                onCreateEditor={onCreateEditor}
-                text={props.content}
+                value={props.content}
                 onChange={props.onChange}
                 autoFocus={props.autoFocus}
                 placeholder={props.placeholder}
                 transferAttachment={props.transferAttachment}
             />
-            <EditorToolbar {...cmds} />
         </>
     )
 }
