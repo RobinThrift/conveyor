@@ -10,6 +10,10 @@ const meta: Meta<typeof MainScreen> = {
     title: "Screens/Main",
     component: MainScreen,
 
+    parameters: {
+        layout: "fullscreen",
+    },
+
     args: {
         filter: {},
     },
