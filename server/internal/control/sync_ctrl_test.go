@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/domain"
 	"go.robinthrift.com/belt/internal/storage/database/sqlite"
@@ -37,7 +38,7 @@ func TestSyncController_CreateMemoChangelogEntry(t *testing.T) {
 			},
 		})
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("Plaintext/Key Not Found", func(t *testing.T) {
@@ -75,28 +76,28 @@ func TestSyncController_CreateAttachmentChangelogEntry_Unencrypted(t *testing.T)
 		IsEncrytped:      false,
 	})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, id)
 
 	file, err := os.Open(path.Join(setup.blobDir, "1", "c1/89/da/dc/f9/db/36/cc/e1/8a/f5/56/97/61/6e/ee/18/07/e3/4c/43/95/70/3d/5b/cf/46/21/97/50/a2/e0"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	t.Cleanup(func() { file.Close() })
 
 	written := testhelper.AgeDecrypt(t, privateKey, file)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, content, string(written))
 
 	entries, err := setup.syncCtrl.ListChangelogEntries(ctx, ListChangelogEntriesQuery{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Len(t, entries, 1)
 
 	entryJSON := testhelper.AgeDecrypt(t, privateKey, bytes.NewReader(entries[0].Data))
 
 	var entry createAttachmentChangelogEntry
 	err = json.Unmarshal(entryJSON, &entry)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, int64(61), entry.Value.Created.SizeBytes)
 	assert.Equal(t, "/c1/89/da/dc/f9/db/36/cc/e1/8a/f5/56/97/61/6e/ee/18/07/e3/4c/43/95/70/3d/5b/cf/46/21/97/50/a2/e0", entry.Value.Created.Filepath)
@@ -123,11 +124,11 @@ func TestSyncController_CreateAttachmentChangelogEntry_Encrypted(t *testing.T) {
 		sha256:           []byte{0xc1, 0x89, 0xda, 0xdc, 0xf9, 0xdb, 0x36, 0xcc, 0xe1, 0x8a, 0xf5, 0x56, 0x97, 0x61, 0x6e, 0xee, 0x18, 0x07, 0xe3, 0x4c, 0x43, 0x95, 0x70, 0x3d, 0x5b, 0xcf, 0x46, 0x21, 0x97, 0x50, 0xa2, 0xe0},
 	})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, id)
 
 	file, err := os.Open(path.Join(setup.blobDir, "1", "c1/89/da/dc/f9/db/36/cc/e1/8a/f5/56/97/61/6e/ee/18/07/e3/4c/43/95/70/3d/5b/cf/46/21/97/50/a2/e0"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	t.Cleanup(func() { file.Close() })
 
@@ -135,14 +136,14 @@ func TestSyncController_CreateAttachmentChangelogEntry_Encrypted(t *testing.T) {
 	assert.Equal(t, content, string(written))
 
 	entries, err := setup.syncCtrl.ListChangelogEntries(ctx, ListChangelogEntriesQuery{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Len(t, entries, 1)
 
 	entryJSON := testhelper.AgeDecrypt(t, privateKey, bytes.NewReader(entries[0].Data))
 
 	var entry createAttachmentChangelogEntry
 	err = json.Unmarshal(entryJSON, &entry)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, int64(61), entry.Value.Created.SizeBytes)
 	assert.Equal(t, "/c1/89/da/dc/f9/db/36/cc/e1/8a/f5/56/97/61/6e/ee/18/07/e3/4c/43/95/70/3d/5b/cf/46/21/97/50/a2/e0", entry.Value.Created.Filepath)

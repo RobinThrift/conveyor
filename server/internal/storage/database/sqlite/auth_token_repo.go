@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/domain"
@@ -100,7 +99,7 @@ func (r *AuthTokenRepo) CreateAuthToken(ctx context.Context, token *auth.AuthTok
 	if err != nil {
 		var sqlErr *sqlite.Error
 		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {
-			return 0, fmt.Errorf("invalid account reference")
+			return 0, domain.ErrInvalidAccountReference
 		}
 
 		return 0, err
@@ -115,6 +114,7 @@ func (r *AuthTokenRepo) InvalidateAuthToken(ctx context.Context, value auth.Auth
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil
 		}
+
 		return err
 	}
 
@@ -127,6 +127,7 @@ func (r *AuthTokenRepo) MarkExpiredAuthTokensAsInvalid(ctx context.Context) erro
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil
 		}
+
 		return err
 	}
 
@@ -139,6 +140,7 @@ func (r *AuthTokenRepo) DeleteInvalidTokens(ctx context.Context) error {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil
 		}
+
 		return err
 	}
 

@@ -22,6 +22,7 @@ func (a *Argon2Params) ToJSONString() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error marshalling argon2 prams to JSON: %w", err)
 	}
+
 	return string(b), nil
 }
 
@@ -40,6 +41,7 @@ func CheckPassword(candidatePlain PlaintextPassword, hash []byte, salt, paramsJS
 
 func EncryptPassword(plaintextPasswd PlaintextPassword, params Argon2Params) ([]byte, []byte, error) {
 	var salt [16]byte
+
 	_, err := rand.Read(salt[:])
 	if err != nil {
 		return nil, nil, fmt.Errorf("error generating random salt: %w", err)

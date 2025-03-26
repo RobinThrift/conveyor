@@ -7,13 +7,14 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.robinthrift.com/belt/internal/domain"
 )
 
 func TestLocalFSBlobStorage(t *testing.T) {
 	t.Parallel()
 
-	fs := LocalFSBlobStorage{BaseDir: t.TempDir(), TmpDir: t.TempDir()} //nolint: varnamelen // this is just a test
+	fs := LocalFSBlobStorage{BaseDir: t.TempDir(), TmpDir: t.TempDir()}
 
 	tt := []struct {
 		accountID domain.AccountID
@@ -37,7 +38,7 @@ func TestLocalFSBlobStorage(t *testing.T) {
 
 	for _, tt := range tt {
 		sizeBytes, err := fs.WriteBlob(tt.accountID, tt.filename, strings.NewReader(tt.data))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, tt.size, sizeBytes)
 		assert.FileExists(t, path.Join(fs.BaseDir, fmt.Sprint(tt.accountID), tt.filename))
 	}

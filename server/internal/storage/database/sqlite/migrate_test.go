@@ -8,7 +8,9 @@ import (
 )
 
 func TestRunMigrations(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
+	t.Parallel()
+
+	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 
 	db := newTestDB(ctx, t)

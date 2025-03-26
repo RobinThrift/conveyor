@@ -14,10 +14,11 @@ import (
 )
 
 var ErrAuthTokenNotFound = errors.New("auth token not found")
+var ErrInvalidTokenForm = errors.New("invalid token format")
 
-type AuthTokenID int64
+type AuthTokenID int64 //nolint:revive // name is explicitly longer for clarity
 
-type AuthToken struct {
+type AuthToken struct { //nolint:revive // name is explicitly longer for clarity
 	ID        AuthTokenID
 	AccountID domain.AccountID
 
@@ -30,7 +31,7 @@ type AuthToken struct {
 	CreatedAt time.Time
 }
 
-type AuthTokenValue = sensitive.Value
+type AuthTokenValue = sensitive.Value //nolint:revive // name is explicitly longer for clarity
 
 type PlaintextAuthToken struct {
 	Plaintext PlaintextAuthTokenValue
@@ -46,19 +47,19 @@ type PlaintextAuthTokenValue struct {
 }
 
 func NewPlaintextAuthTokenValueFromString(value string) (*PlaintextAuthTokenValue, error) {
-	parts := strings.SplitN(value, "$", 2)
-	if len(parts) != 2 {
-		return nil, errors.New("invalid token format")
+	parts := strings.SplitN(value, "$", 2) //nolint:mnd // false positive
+	if len(parts) != 2 {                   //nolint:mnd // false positive
+		return nil, ErrInvalidTokenForm
 	}
 
 	plaintext, err := base64.URLEncoding.DecodeString(parts[1])
 	if err != nil {
-		return nil, fmt.Errorf("invalid token value: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidTokenForm, err)
 	}
 
 	salt, err := base64.URLEncoding.DecodeString(parts[0])
 	if err != nil {
-		return nil, fmt.Errorf("invalid token salt: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidTokenForm, err)
 	}
 
 	return &PlaintextAuthTokenValue{
@@ -68,25 +69,29 @@ func NewPlaintextAuthTokenValueFromString(value string) (*PlaintextAuthTokenValu
 }
 
 func NewPlaintextAuthToken(tokenLen uint, expiresAt time.Time, refreshExpiresAt time.Time) (*PlaintextAuthToken, error) {
-	valueSalt := make([]byte, 16)
+	valueSalt := make([]byte, 16) //nolint:mnd // false positive
+
 	_, err := rand.Read(valueSalt)
 	if err != nil {
 		return nil, fmt.Errorf("error generating random value for token salt: %w", err)
-
 	}
+
 	valuePlaintext := make([]byte, tokenLen)
+
 	_, err = rand.Read(valuePlaintext)
 	if err != nil {
 		return nil, fmt.Errorf("error generating random value for token: %w", err)
 	}
 
-	refreshSalt := make([]byte, 16)
+	refreshSalt := make([]byte, 16) //nolint:mnd // false positive
+
 	_, err = rand.Read(refreshSalt)
 	if err != nil {
 		return nil, fmt.Errorf("error generating random value for refresh token salt: %w", err)
 	}
 
 	refreshPlaintext := make([]byte, tokenLen)
+
 	_, err = rand.Read(refreshPlaintext)
 	if err != nil {
 		return nil, fmt.Errorf("error generating random value for refresh token: %w", err)
@@ -113,5 +118,6 @@ func (v *PlaintextAuthTokenValue) Encrypt(params Argon2Params) []byte {
 func (v *PlaintextAuthTokenValue) Export() string {
 	salt := base64.URLEncoding.EncodeToString(v.salt)
 	value := base64.URLEncoding.EncodeToString(v.Value)
+
 	return salt + "$" + value
 }

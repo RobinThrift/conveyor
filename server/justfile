@@ -4,7 +4,7 @@ version    := env_var_or_default("VERSION", "dev")
 go_ldflags := env_var_or_default("GO_LDFLAGS", "") + " -X 'go.robinthrift.com/belt/internal.Version=" + version + "'"
 go_buildflags := env_var_or_default("GO_BUILD_FLAGS", "-trimpath")
 go_test_reporter := env("GO_TEST_REPORTER", "pkgname-and-test-fails")
-go_lint_reporter := env("GO_LINT_REPORTER", "colored-line-number")
+go_lint_reporter := env("GO_LINT_REPORTER", "")
 
 _default:
     @just --list
@@ -52,7 +52,7 @@ test-watch *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
 # lint using staticcheck and golangci-lint
 lint: (_install-tool "staticcheck") (_install-tool "golangci-lint") (_install-tool "sqlc") (_install-tool "vacuum")
     {{ local_bin }}/staticcheck ./...
-    {{ local_bin }}/golangci-lint run --out-format={{ go_lint_reporter }} ./...
+    {{ local_bin }}/golangci-lint run {{ go_lint_reporter }} --fix ./...
     {{ local_bin }}/sqlc -f internal/storage/database/sqlite/sqlc.yaml vet
     cd ../api && {{ local_bin }}/vacuum lint --ruleset ../.scripts/vacuum.yaml --details --fail-severity warn --no-banner --all-results *.openapi3.yaml
 

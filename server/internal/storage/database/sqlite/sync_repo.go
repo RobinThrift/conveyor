@@ -30,8 +30,9 @@ func (r *SyncRepo) CreateSyncClient(ctx context.Context, client *domain.SyncClie
 	if err != nil {
 		var sqlErr *sqlite.Error
 		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {
-			return fmt.Errorf("invalid account reference")
+			return domain.ErrInvalidAccountReference
 		}
+
 		return err
 	}
 
@@ -47,6 +48,7 @@ func (r *SyncRepo) DeleteSyncClient(ctx context.Context, client *domain.SyncClie
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil
 		}
+
 		return err
 	}
 

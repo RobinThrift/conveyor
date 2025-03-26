@@ -2,7 +2,6 @@ package syncv1
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/control"
 	"go.robinthrift.com/belt/internal/domain"
@@ -18,15 +18,18 @@ import (
 	"go.robinthrift.com/belt/internal/testhelper"
 )
 
-func TestRouter_Attachments(t *testing.T) {
+func TestRouter_Attachments(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 	mux, token := setupSyncV1Router(t)
 
 	content := "attachment content"
 
 	uploadAttachment := func(t *testing.T) {
+		t.Helper()
+
 		req := httptest.NewRequest(http.MethodPost, "/api/sync/v1/attachments", bytes.NewReader([]byte(content)))
 		req.Header.Add(authHeader, "Bearer "+token)
 		req.Header.Add("X-Filepath", "a/b/c/d/test")
+
 		w := httptest.NewRecorder()
 
 		mux.ServeHTTP(w, req)
@@ -35,28 +38,29 @@ func TestRouter_Attachments(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, res.StatusCode)
 	}
 
-	t.Run("Get", func(t *testing.T) {
+	t.Run("Get", func(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 		uploadAttachment(t)
 
 		req := httptest.NewRequest(http.MethodGet, "/blobs/a/b/c/d/test", nil)
 		req.Header.Add(authHeader, "Bearer "+token)
+
 		w := httptest.NewRecorder()
 
 		mux.ServeHTTP(w, req)
 
 		res := w.Result()
 		body, err := io.ReadAll(res.Body)
-		assert.NoError(t, err)
-		fmt.Println(res.Header)
+		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 		assert.Equal(t, content, string(body))
 	})
 
-	t.Run("Not Found", func(t *testing.T) {
+	t.Run("Not Found", func(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 		uploadAttachment(t)
 
 		req := httptest.NewRequest(http.MethodGet, "/blobs/a/b/c/d/not_found", nil)
 		req.Header.Add(authHeader, "Bearer "+token)
+
 		w := httptest.NewRecorder()
 
 		mux.ServeHTTP(w, req)
@@ -65,11 +69,12 @@ func TestRouter_Attachments(t *testing.T) {
 		assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	})
 
-	t.Run("Invalid Auth", func(t *testing.T) {
+	t.Run("Invalid Auth", func(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 		uploadAttachment(t)
 
 		req := httptest.NewRequest(http.MethodGet, "/blobs/a/b/c/d/test", nil)
 		req.Header.Add(authHeader, "Bearer INVALID_TOKEN")
+
 		w := httptest.NewRecorder()
 
 		mux.ServeHTTP(w, req)
@@ -78,7 +83,7 @@ func TestRouter_Attachments(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 	})
 
-	t.Run("No Auth", func(t *testing.T) {
+	t.Run("No Auth", func(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 		uploadAttachment(t)
 
 		req := httptest.NewRequest(http.MethodGet, "/blobs/a/b/c/d/test", nil)
@@ -92,6 +97,8 @@ func TestRouter_Attachments(t *testing.T) {
 }
 
 func setupSyncV1Router(t *testing.T) (http.Handler, string) {
+	t.Helper()
+
 	db := testhelper.NewInMemTestSQLite(t)
 
 	accountRepo := sqlite.NewAccountRepo(db)

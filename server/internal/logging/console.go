@@ -3,7 +3,6 @@ package logging
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"runtime"
@@ -14,6 +13,7 @@ import (
 	"log/slog"
 )
 
+//nolint:gochecknoglobals
 var cwd, _ = os.Getwd()
 
 type consoleHandler struct {
@@ -30,7 +30,7 @@ func (h *consoleHandler) Enabled(_ context.Context, l slog.Level) bool {
 	return l >= h.level
 }
 
-func (h *consoleHandler) Handle(ctx context.Context, record slog.Record) error {
+func (h *consoleHandler) Handle(_ context.Context, record slog.Record) error { //nolint:cyclop
 	var msg bytes.Buffer
 
 	if h.level <= slog.LevelDebug {
@@ -40,6 +40,7 @@ func (h *consoleHandler) Handle(ctx context.Context, record slog.Record) error {
 
 	if !h.noColor {
 		color := ""
+
 		switch record.Level {
 		case slog.LevelDebug:
 			color = "\x1b[34m" // blue
@@ -68,7 +69,7 @@ func (h *consoleHandler) Handle(ctx context.Context, record slog.Record) error {
 
 		msg.WriteString(file)
 		msg.WriteString(":")
-		msg.WriteString(fmt.Sprint(line))
+		msg.WriteString(strconv.Itoa(line))
 		msg.WriteString(" ")
 
 		if !h.noColor {
@@ -84,22 +85,26 @@ func (h *consoleHandler) Handle(ctx context.Context, record slog.Record) error {
 
 	record.Attrs(func(a slog.Attr) bool {
 		h.writeAttr(&msg, a)
+
 		return true
 	})
 
 	msg.WriteString("\n")
 
 	_, err := h.out.Write(msg.Bytes())
+
 	return err
 }
 
 func (h *consoleHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	nextAttrs := h.attrs
+
 	if h.group != "" {
 		args := make([]any, 0, len(attrs))
 		for _, attr := range attrs {
 			args = append(args, attr)
 		}
+
 		nextAttrs = append(nextAttrs, slog.Group(h.group, args...))
 	} else {
 		nextAttrs = append(nextAttrs, attrs...)
@@ -123,6 +128,7 @@ func (h *consoleHandler) WithGroup(name string) slog.Handler {
 
 func (h *consoleHandler) writeAttr(msg *bytes.Buffer, a slog.Attr) {
 	msg.WriteRune(' ')
+
 	if a.Key == "error" && !h.noColor {
 		msg.WriteString("\x1b[31m")
 		msg.WriteString(a.Key)
@@ -134,7 +140,6 @@ func (h *consoleHandler) writeAttr(msg *bytes.Buffer, a slog.Attr) {
 	msg.WriteString(`="`)
 	msg.WriteString(a.Value.String())
 	msg.WriteRune('"')
-
 }
 
 func determineNoColor() bool {

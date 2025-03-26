@@ -5,22 +5,23 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.robinthrift.com/belt/internal/auth"
 	"go.robinthrift.com/belt/internal/domain"
 	"go.robinthrift.com/belt/internal/storage/database/sqlite"
 	"go.robinthrift.com/belt/internal/testhelper"
 )
 
-func TestAuthController_CreateAuthTokenUsingCredentials(t *testing.T) {
+func TestAuthController_CreateAuthTokenUsingCredentials(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 	authCtrl := setupAuthController(t)
 	username := t.Name()
 	passwd := auth.PlaintextPassword(t.Name())
-	t.Run("Valid Credentials", func(t *testing.T) {
+	t.Run("Valid Credentials", func(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 		token, err := authCtrl.CreateAuthTokenUsingCredentials(t.Context(), CreateAuthTokenUsingCredentialsCmd{
 			Username:        username,
 			PlaintextPasswd: passwd,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		assert.Len(t, token.Plaintext.Value, 32)
 		assert.Len(t, token.RefreshPlaintext.Value, 32)
@@ -32,38 +33,40 @@ func TestAuthController_CreateAuthTokenUsingCredentials(t *testing.T) {
 		assert.True(t, token.RefreshExpiresAt.After(time.Now()))
 	})
 
-	t.Run("Invalid Username", func(t *testing.T) {
+	t.Run("Invalid Username", func(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 		token, err := authCtrl.CreateAuthTokenUsingCredentials(t.Context(), CreateAuthTokenUsingCredentialsCmd{
 			Username:        "incorrect_username",
 			PlaintextPasswd: passwd,
 		})
-		assert.ErrorIs(t, err, ErrInvalidCredentials)
+		require.ErrorIs(t, err, ErrInvalidCredentials)
 		assert.Nil(t, token)
 	})
 
-	t.Run("Invalid Password", func(t *testing.T) {
+	t.Run("Invalid Password", func(t *testing.T) { //nolint:paralleltest // @TODO: check why these fail when run in parallel
 		token, err := authCtrl.CreateAuthTokenUsingCredentials(t.Context(), CreateAuthTokenUsingCredentialsCmd{
 			Username:        username,
 			PlaintextPasswd: auth.PlaintextPassword("incorrect password"),
 		})
-		assert.ErrorIs(t, err, ErrInvalidCredentials)
+		require.ErrorIs(t, err, ErrInvalidCredentials)
 		assert.Nil(t, token)
 	})
 }
 
 func TestAuthController_CreateAuthTokenUsingRefreshToken(t *testing.T) {
+	t.Parallel()
+
 	authCtrl := setupAuthController(t)
 
 	token, err := authCtrl.CreateAuthTokenUsingCredentials(t.Context(), CreateAuthTokenUsingCredentialsCmd{
 		Username:        t.Name(),
 		PlaintextPasswd: auth.PlaintextPassword(t.Name()),
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	refreshed, err := authCtrl.CreateAuthTokenUsingRefreshToken(t.Context(), CreateAuthTokenUsingRefreshTokenCmd{
 		PlaintextRefreshToken: token.RefreshPlaintext,
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Contains(t, refreshed.Plaintext.Export(), "$")
 	assert.Contains(t, refreshed.RefreshPlaintext.Export(), "$")
@@ -73,10 +76,12 @@ func TestAuthController_CreateAuthTokenUsingRefreshToken(t *testing.T) {
 	_, err = authCtrl.CreateAuthTokenUsingRefreshToken(t.Context(), CreateAuthTokenUsingRefreshTokenCmd{
 		PlaintextRefreshToken: token.Plaintext,
 	})
-	assert.ErrorIs(t, err, ErrInvalidCredentials)
+	require.ErrorIs(t, err, ErrInvalidCredentials)
 }
 
 func setupAuthController(t *testing.T) *AuthController {
+	t.Helper()
+
 	db := testhelper.NewInMemTestSQLite(t)
 
 	accountRepo := sqlite.NewAccountRepo(db)
@@ -98,7 +103,7 @@ func setupAuthController(t *testing.T) *AuthController {
 		PlaintextPasswd: auth.PlaintextPassword(t.Name() + "_init"),
 	})
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("error creating account: %v", err)
 	}
 
 	err = authCtrl.ChangeAccountPassword(t.Context(), ChangeAccountPasswordCmd{
@@ -107,7 +112,7 @@ func setupAuthController(t *testing.T) *AuthController {
 		NewPasswdPlaintext:  auth.PlaintextPassword(t.Name()),
 	})
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("error changin account password: %v", err)
 	}
 
 	return authCtrl

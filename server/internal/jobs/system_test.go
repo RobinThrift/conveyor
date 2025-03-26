@@ -21,11 +21,13 @@ func TestSystem_Schedule_Now(t *testing.T) {
 	ctx := auth.CtxWithAccount(t.Context(), &domain.Account{ID: 1})
 
 	type jobData struct{ Foo string }
+
 	jobChan := make(chan jobData, 1)
 
 	system := setupJobSystem(t, time.Now, map[string]jobs.JobKindWithJSONData{
-		t.Name(): jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(ctx context.Context, data jobData) (*domain.JobResult, error) {
+		t.Name(): jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(_ context.Context, data jobData) (*domain.JobResult, error) {
 			jobChan <- data
+
 			return &domain.JobResult{Message: "Done " + data.Foo}, nil
 		})),
 	})
@@ -54,11 +56,13 @@ func TestSystem_Schedule_Past(t *testing.T) {
 	ctx := auth.CtxWithAccount(t.Context(), &domain.Account{ID: 1})
 
 	type jobData struct{ Foo string }
+
 	jobChan := make(chan jobData, 1)
 
 	system := setupJobSystem(t, time.Now, map[string]jobs.JobKindWithJSONData{
-		t.Name(): jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(ctx context.Context, data jobData) (*domain.JobResult, error) {
+		t.Name(): jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(_ context.Context, data jobData) (*domain.JobResult, error) {
 			jobChan <- data
+
 			return &domain.JobResult{Message: "Done " + data.Foo}, nil
 		})),
 	})
@@ -88,6 +92,7 @@ func TestSystem_Schedule_Future(t *testing.T) {
 	ctx := auth.CtxWithAccount(t.Context(), &domain.Account{ID: 1})
 
 	type jobData struct{ Foo string }
+
 	jobChan := make(chan jobData, 1)
 
 	timeNow := time.Now()
@@ -96,11 +101,12 @@ func TestSystem_Schedule_Future(t *testing.T) {
 	}
 
 	system := setupJobSystem(t, timeNowFunc, map[string]jobs.JobKindWithJSONData{
-		t.Name(): jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(ctx context.Context, data jobData) (*domain.JobResult, error) {
+		t.Name(): jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(_ context.Context, data jobData) (*domain.JobResult, error) {
 			jobChan <- data
+
 			return &domain.JobResult{Message: "Done " + data.Foo}, nil
 		})),
-		"trigger": jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(ctx context.Context, data jobData) (*domain.JobResult, error) {
+		"trigger": jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(_ context.Context, _ jobData) (*domain.JobResult, error) {
 			return &domain.JobResult{}, nil
 		})),
 	})
@@ -151,11 +157,13 @@ func TestSystem_Scheduled_Wakeup(t *testing.T) {
 	ctx := auth.CtxWithAccount(t.Context(), &domain.Account{ID: 1})
 
 	type jobData struct{ Foo string }
+
 	jobChan := make(chan jobData, 1)
 
 	system := setupJobSystem(t, time.Now, map[string]jobs.JobKindWithJSONData{
-		t.Name(): jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(ctx context.Context, data jobData) (*domain.JobResult, error) {
+		t.Name(): jobs.NewJobKindWithJSONData(jobKindFunc[jobData](func(_ context.Context, data jobData) (*domain.JobResult, error) {
 			jobChan <- data
+
 			return &domain.JobResult{Message: "Done " + data.Foo}, nil
 		})),
 	})

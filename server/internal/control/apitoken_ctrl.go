@@ -111,6 +111,7 @@ func (atc *APITokenController) DeleteAPITokenByName(ctx context.Context, name st
 			if errors.Is(err, domain.ErrAPITokenNotFound) {
 				return nil
 			}
+
 			return err
 		}
 
@@ -119,6 +120,7 @@ func (atc *APITokenController) DeleteAPITokenByName(ctx context.Context, name st
 			if errors.Is(err, auth.ErrAuthTokenNotFound) {
 				return nil
 			}
+
 			return err
 		}
 

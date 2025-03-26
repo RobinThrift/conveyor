@@ -1,3 +1,4 @@
+//nolint:mnd // config values
 package app
 
 import (
@@ -61,6 +62,7 @@ type Init struct {
 	Password string `env:"PASSWORD"`
 }
 
+//nolint:gochecknoglobals
 var defaultConfig = Config{
 	Addr:     ":8080",
 	BasePath: "/",
@@ -124,5 +126,6 @@ func getEnvDefault(name string, d string) string {
 	if !ok {
 		return d
 	}
+
 	return s
 }

@@ -47,6 +47,7 @@ func (isj *initSetup) run(ctx context.Context) error {
 
 	if skipInitSetup {
 		slog.DebugContext(ctx, "skipping initial setup: already setup")
+
 		return nil
 	}
 

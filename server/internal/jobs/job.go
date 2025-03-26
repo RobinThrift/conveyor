@@ -24,6 +24,7 @@ func NewJobKindWithJSONData[T any](kind JobKind[T]) JobKindWithJSONData {
 
 func (e *jobKindeWithJSONData[T]) Exec(ctx context.Context, raw []byte) (*domain.JobResult, error) {
 	var data T
+
 	err := json.Unmarshal(raw, &data)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling job data JSON: %w", err)

@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-type SQLiteJSON struct {
+type SQLiteJSON struct { //nolint:recvcheck // receiver types are chosen intentionally
 	Data any
 	Raw  []byte
 }
@@ -26,7 +26,7 @@ func (sj *SQLiteJSON) Scan(src any) error {
 
 	str, ok := src.(string)
 	if !ok {
-		return fmt.Errorf("invalid json type: expected string, got %T", src)
+		return fmt.Errorf("invalid json type: expected string, got %T", src) //nolint:err113
 	}
 
 	sj.Raw = []byte(str)
@@ -36,6 +36,7 @@ func (sj *SQLiteJSON) Scan(src any) error {
 
 func (sj SQLiteJSON) Value() (driver.Value, error) {
 	j, err := json.Marshal(sj.Data)
+
 	return driver.Value(string(j)), err
 }
 

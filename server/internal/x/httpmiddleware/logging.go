@@ -18,6 +18,7 @@ func LogRequests(skipFor []string) func(next http.Handler) http.Handler {
 			for _, s := range skipFor {
 				if strings.HasPrefix(r.URL.Path, s) {
 					next.ServeHTTP(w, r)
+
 					return
 				}
 			}
@@ -39,7 +40,7 @@ func LogRequests(skipFor []string) func(next http.Handler) http.Handler {
 				if p := recover(); p != nil {
 					logFields = append(logFields, slog.Any("error", p))
 					log = slog.ErrorContext
-				} else if wrapped.statusCode >= 400 {
+				} else if wrapped.statusCode >= http.StatusBadRequest {
 					log = slog.ErrorContext
 				}
 
@@ -69,7 +70,7 @@ func (srw *statusResponseWriter) Unwrap() http.ResponseWriter {
 func (srw *statusResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	h, ok := srw.ResponseWriter.(http.Hijacker)
 	if !ok {
-		return nil, nil, errors.New("underlying http.ResponseWriter does not implement http.Hijacker")
+		return nil, nil, errors.New("underlying http.ResponseWriter does not implement http.Hijacker") //nolint:err113
 	}
 
 	return h.Hijack()

@@ -126,7 +126,6 @@ func (sc *SyncController) SaveFullDB(ctx context.Context, cmd SaveFullDBCmd) err
 			Sha256Hash: h.Sum(nil),
 		})
 	})
-
 }
 
 type ListChangelogEntriesQuery struct {
@@ -178,6 +177,8 @@ type PlaintextMemo struct {
 	CreatedAt *time.Time
 }
 
+var ErrInvalidCreateMemoCmd = errors.New("either Memo or PlaintextMemo MUST be set on CreateMemoCmd")
+
 func (sc *SyncController) CreateMemoChangelogEntry(ctx context.Context, cmd CreateMemoChangelogEntryCmd) error {
 	account := auth.AccountFromCtx(ctx)
 	if account == nil {
@@ -185,6 +186,7 @@ func (sc *SyncController) CreateMemoChangelogEntry(ctx context.Context, cmd Crea
 	}
 
 	var memo domain.ChangelogEntry
+
 	switch {
 	case cmd.Memo != nil:
 		memo = *cmd.Memo
@@ -193,9 +195,10 @@ func (sc *SyncController) CreateMemoChangelogEntry(ctx context.Context, cmd Crea
 		if err != nil {
 			return err
 		}
+
 		memo = *entry
 	default:
-		return fmt.Errorf("either Memo or PlaintextMemo MUST be set on CreateMemoCmd")
+		return ErrInvalidCreateMemoCmd
 	}
 
 	memo.AccountID = account.ID
@@ -223,8 +226,10 @@ func (sc *SyncController) CreateAttachmentChangelogEntry(ctx context.Context, cm
 	}
 
 	var id string
+
 	err := sc.transactioner.InTransaction(ctx, func(ctx context.Context) (err error) {
 		id, err = sc.createAttachmentChangelogEntry(ctx, &cmd)
+
 		return err
 	})
 	if err != nil {
@@ -251,13 +256,14 @@ func (sc *SyncController) createAttachmentChangelogEntry(ctx context.Context, cm
 	if err != nil {
 		return id, fmt.Errorf("error opening blob target: %w", err)
 	}
+
 	defer func() {
 		err = errors.Join(err, blob.Close())
 	}()
 
 	cmd.recipient, err = age.ParseX25519Recipient(string(key.Data))
 	if err != nil {
-		return id, fmt.Errorf("error parsing encryption key: %v", err)
+		return id, fmt.Errorf("error parsing encryption key: %w", err)
 	}
 
 	if cmd.IsEncrytped {
@@ -298,10 +304,12 @@ func (sc *SyncController) writeUnencryptedDataForAttachmentChangelogEntry(cmd *C
 	tee := io.TeeReader(cmd.Data, h)
 
 	encrypterClosed := false
+
 	encrypter, err := age.Encrypt(blob, cmd.recipient)
 	if err != nil {
 		return fmt.Errorf("error starting encrypter: %w", err)
 	}
+
 	defer func() {
 		if !encrypterClosed {
 			if closeErr := encrypter.Close(); closeErr != nil {
@@ -322,6 +330,7 @@ func (sc *SyncController) writeUnencryptedDataForAttachmentChangelogEntry(cmd *C
 	}
 
 	encrypterClosed = true
+
 	err = encrypter.Close()
 	if err != nil {
 		return fmt.Errorf("error closing encrypter: %w", err)
@@ -347,7 +356,7 @@ func (sc *SyncController) newCreateMemoChangelogEntry(ctx context.Context, memo 
 
 	recipient, err := age.ParseX25519Recipient(string(key.Data))
 	if err != nil {
-		return nil, fmt.Errorf("error parsing encryption key: %v", err)
+		return nil, fmt.Errorf("error parsing encryption key: %w", err)
 	}
 
 	id, err := gonanoid.New()
@@ -392,7 +401,7 @@ func (sc *SyncController) newCreateMemoChangelogEntry(ctx context.Context, memo 
 	}
 
 	if err := w.Close(); err != nil {
-		return nil, fmt.Errorf("error closing encrypted data: %v", err)
+		return nil, fmt.Errorf("error closing encrypted data: %w", err)
 	}
 
 	return &domain.ChangelogEntry{
@@ -428,6 +437,7 @@ func (sc *SyncController) newCreateAttachmentChangelogEntry(cmd *CreateAttachmen
 	if entry.Value.Created.Filepath[0] != '/' {
 		entry.Value.Created.Filepath = "/" + entry.Value.Created.Filepath
 	}
+
 	entry.Value.Created.OriginalFilename = cmd.OriginalFilename
 	entry.Value.Created.ContentType = cmd.ContentType
 	entry.Value.Created.SizeBytes = cmd.sizeBytes
@@ -446,7 +456,7 @@ func (sc *SyncController) newCreateAttachmentChangelogEntry(cmd *CreateAttachmen
 	}
 
 	if err := w.Close(); err != nil {
-		return "", nil, fmt.Errorf("error closing encrypted data: %v", err)
+		return "", nil, fmt.Errorf("error closing encrypted data: %w", err)
 	}
 
 	return attachmentID, &domain.ChangelogEntry{

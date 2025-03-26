@@ -1,7 +1,6 @@
 package app
 
 import (
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -36,6 +35,7 @@ type uiError struct {
 	Detail string
 }
 
+//nolint:gochecknoglobals
 var buildInfo = version.GetBuildInfo()
 
 func render(w http.ResponseWriter, data pageData) error {
@@ -53,15 +53,15 @@ func render(w http.ResponseWriter, data pageData) error {
 	data.ServerData.BuildInfo.CommitDate = buildInfo.Date
 	data.ServerData.BuildInfo.GoVersion = buildInfo.GoVersion
 
-	encoded, err := json.Marshal(data.ServerData)
+	encoded, err := json.Marshal(data.ServerData) //nolint:musttag
 	if err != nil {
 		return fmt.Errorf("error marshalling ui data to json: %w", err)
 	}
 
 	tmpldata.Title = data.Title
 	tmpldata.AssetURL = data.AssetURL
-	tmpldata.BaseURL = template.HTMLAttr(`content="` + data.BaseURL + `"`)
-	tmpldata.UIData = template.HTML(encoded)
+	tmpldata.BaseURL = template.HTMLAttr(`content="` + data.BaseURL + `"`) //nolint:gosec // Non-issue because we control the value
+	tmpldata.UIData = template.HTML(encoded)                               //nolint:gosec // Non-issue because we control the value
 
 	return rootTemplate.Execute(w, tmpldata)
 }

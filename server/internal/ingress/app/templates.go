@@ -11,9 +11,11 @@ import (
 //go:embed templates/root.tmpl.html
 var rootTemplateRaw string
 
+//nolint:gochecknoglobals
 var rootTemplate = template.Must(template.New("root.html").Parse(rootTemplateRaw))
 
 //go:embed templates/error.tmpl.html
 var errorPageTemplateRaw string
 
+//nolint:gochecknoglobals
 var errorPageTemplate = template.Must(template.New("error.html").Parse(errorPageTemplateRaw))

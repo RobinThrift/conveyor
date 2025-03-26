@@ -2,11 +2,12 @@ package domain
 
 import (
 	"errors"
-	"fmt"
+	"strconv"
 	"time"
 )
 
 var ErrAccountNotFound = errors.New("account not found")
+var ErrInvalidAccountReference = errors.New("invalid account reference")
 var ErrAccountKeyNotFound = errors.New("account key not found")
 
 type AccountID int64
@@ -31,7 +32,7 @@ type AccountPassword struct {
 }
 
 func (id AccountID) String() string {
-	return fmt.Sprint(int64(id))
+	return strconv.FormatInt(int64(id), 10)
 }
 
 const PrimaryAccountKeyName = "primary"

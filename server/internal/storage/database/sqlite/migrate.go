@@ -10,7 +10,7 @@ import (
 	"github.com/pressly/goose/v3"
 	"go.robinthrift.com/belt/internal/logging"
 
-	_ "modernc.org/sqlite"
+	_ "modernc.org/sqlite" // blank import because DB driver
 )
 
 //go:embed migrations/*.sql
@@ -25,6 +25,7 @@ func RunMigrations(ctx context.Context, config MigrationConfig, db *sql.DB) erro
 	slog.InfoContext(ctx, "running migrations")
 
 	goose.SetBaseFS(migrations)
+
 	err := goose.SetDialect("sqlite3")
 	if err != nil {
 		panic(err)
@@ -45,5 +46,6 @@ func RunMigrations(ctx context.Context, config MigrationConfig, db *sql.DB) erro
 	}
 
 	slog.InfoContext(ctx, "successfully ran migrations")
+
 	return nil
 }

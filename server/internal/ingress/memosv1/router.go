@@ -40,14 +40,14 @@ func New(basePath string, mux *http.ServeMux, syncCtrl *control.SyncController, 
 	})
 }
 
-// Create a new memo.
-// (POST /memos)
+// (POST /memos).
 func (router *router) CreateMemo(ctx context.Context, req CreateMemoRequestObject) (CreateMemoResponseObject, error) {
 	if req.Body == nil {
 		return nil, httperrors.ErrBadRequest
 	}
 
 	var cmd control.CreateMemoChangelogEntryCmd
+
 	switch {
 	case req.Body.Content != "":
 		cmd.PlaintextMemo = &control.PlaintextMemo{
@@ -72,8 +72,7 @@ func (router *router) CreateMemo(ctx context.Context, req CreateMemoRequestObjec
 	return CreateMemo201Response{}, nil
 }
 
-// Upload an attachment
-// (POST /attachments)
+// (POST /attachments).
 func (router *router) UploadAttachment(ctx context.Context, req UploadAttachmentRequestObject) (UploadAttachmentResponseObject, error) {
 	content := req.Body
 	if req.Params.ContentEncoding != nil && *req.Params.ContentEncoding == "gzip" {
@@ -81,7 +80,9 @@ func (router *router) UploadAttachment(ctx context.Context, req UploadAttachment
 		if err != nil {
 			return nil, err
 		}
+
 		content = gr
+
 		defer gr.Close()
 	}
 

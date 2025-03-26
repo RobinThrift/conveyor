@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -29,7 +30,7 @@ type App struct {
 	jobs      *jobs.System
 }
 
-func New(config Config) *App {
+func New(config Config) *App { //nolint:funlen
 	db := &sqlite.SQLite{
 		File:         config.Database.Path,
 		EnableWAL:    config.Database.EnableWAL,
@@ -57,7 +58,8 @@ func New(config Config) *App {
 	}
 
 	authConfig := control.AuthConfig{
-		Argon2Params:              argon2Params,
+		Argon2Params: argon2Params,
+		//nolint:mnd // config values
 		AuthTokenLength:           32,
 		AccessTokenValidDuration:  config.AccessTokenValidDuration,
 		RefreshTokenValidDuration: config.RefreshTokenValidDuration,
@@ -111,7 +113,8 @@ func (a *App) Start(ctx context.Context) error {
 	}
 
 	slog.InfoContext(ctx, fmt.Sprintf("starting server on %v", a.config.Addr))
-	if err := a.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+
+	if err := a.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 
@@ -120,5 +123,6 @@ func (a *App) Start(ctx context.Context) error {
 
 func (a *App) Stop(ctx context.Context) error {
 	slog.InfoContext(ctx, "stopping http server")
+
 	return a.srv.Shutdown(ctx)
 }

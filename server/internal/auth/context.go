@@ -16,6 +16,7 @@ func CtxWithAccount(ctx context.Context, a *domain.Account) context.Context {
 
 func AccountFromCtx(ctx context.Context) *domain.Account {
 	val := ctx.Value(ctxAccountKey)
+
 	a, ok := val.(*domain.Account)
 	if !ok {
 		return nil

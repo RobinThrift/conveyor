@@ -49,7 +49,7 @@ func run(ctx context.Context, args []string) error {
 				Name: "golangci-lint",
 				Src: recipes.Source{
 					Type:        recipes.SourceTypeGoInstall,
-					URLTemplate: "github.com/golangci/golangci-lint/cmd/golangci-lint",
+					URLTemplate: "github.com/golangci/golangci-lint/v2/cmd/golangci-lint",
 				},
 				Test: []string{"--version"},
 			},

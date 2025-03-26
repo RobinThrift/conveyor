@@ -42,10 +42,11 @@ func NewHandler(loglevel string, format string) (slog.Handler, slog.Level, error
 	case "info":
 		level = slog.LevelInfo
 	default:
-		return nil, 0, fmt.Errorf("unknown log level '%s'", loglevel)
+		return nil, 0, fmt.Errorf("unknown log level '%s'", loglevel) //nolint:err113
 	}
 
 	var handler slog.Handler
+
 	switch format {
 	case "console":
 		noColor := determineNoColor()
@@ -53,7 +54,7 @@ func NewHandler(loglevel string, format string) (slog.Handler, slog.Level, error
 	case "json":
 		handler = &ctxHandler{handler: slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: level}), emitLogInTrace: true}
 	default:
-		return nil, 0, fmt.Errorf("unknown log format '%s'", format)
+		return nil, 0, fmt.Errorf("unknown log format '%s'", format) //nolint:err113
 	}
 
 	return handler, level, nil

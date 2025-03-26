@@ -14,7 +14,7 @@ import (
 func TestJobRepo_CRUD(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	t.Cleanup(cancel)
 
 	repo := setupJobRepo(ctx, t)
@@ -25,7 +25,7 @@ func TestJobRepo_CRUD(t *testing.T) {
 	now := time.Now().UTC().Round(time.Second)
 	scheduleFor := now.Add(-time.Second * time.Duration(numJobs/2))
 
-	for i := 0; i < numJobs; i++ {
+	for i := range numJobs {
 		scheduleFor = scheduleFor.Add(time.Second)
 		err := repo.CreateJob(ctx, &domain.Job{
 			State:        domain.JobStateScheduled,
@@ -66,13 +66,13 @@ func TestJobRepo_CRUD(t *testing.T) {
 	// List all Jobs again, as they are all marked as "done" now, the list should be empty
 	jobs, err = repo.ListNextJobs(ctx, now)
 	require.NoError(t, err)
-	assert.Len(t, jobs, 0)
+	assert.Empty(t, jobs)
 }
 
 func TestJobRepo_GetNextWakeUpTime(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	t.Cleanup(cancel)
 
 	repo := setupJobRepo(ctx, t)
@@ -81,7 +81,7 @@ func TestJobRepo_GetNextWakeUpTime(t *testing.T) {
 	now := time.Now().UTC().Round(time.Second)
 	scheduleFor := now.Add(-time.Second * time.Duration(numJobs/2))
 
-	for i := 0; i < numJobs; i++ {
+	for i := range numJobs {
 		scheduleFor = scheduleFor.Add(time.Second)
 		err := repo.CreateJob(ctx, &domain.Job{
 			State:        domain.JobStateScheduled,

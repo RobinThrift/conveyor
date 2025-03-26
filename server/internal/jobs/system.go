@@ -57,10 +57,12 @@ func NewSystem(transactioner database.Transactioner, repo SystemJobRepo, account
 func (s *System) Start(ctx context.Context) {
 	slog.InfoContext(ctx, "starting job system")
 	s.scheduleWakeup(ctx)
+
 	for {
 		select {
 		case <-ctx.Done():
 			slog.InfoContext(ctx, "stopping job system")
+
 			return
 		case <-s.wakeup:
 			s.startJobExecution(ctx)
@@ -98,6 +100,7 @@ func (s *System) Schedule(ctx context.Context, job *domain.Job) error {
 func (s *System) scheduleWakeup(ctx context.Context) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
 	if s.isRunning {
 		return
 	}
@@ -105,6 +108,7 @@ func (s *System) scheduleWakeup(ctx context.Context) {
 	next, err := s.repo.GetNextWakeUpTime(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "error getting next wake-up time", slog.Any("error", err))
+
 		return
 	}
 
@@ -121,6 +125,8 @@ func (s *System) scheduleWakeup(ctx context.Context) {
 	})
 }
 
+const defaultJobExecutionTimeout = time.Minute * 10
+
 func (s *System) startJobExecution(ctx context.Context) {
 	s.mu.Lock()
 	s.isRunning = true
@@ -133,7 +139,7 @@ func (s *System) startJobExecution(ctx context.Context) {
 		s.scheduleWakeup(ctx)
 	}()
 
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*10)
+	ctx, cancel := context.WithTimeout(ctx, defaultJobExecutionTimeout)
 	defer cancel()
 
 	err := s.transactioner.InTransaction(ctx, func(ctx context.Context) error {
@@ -148,6 +154,7 @@ func (s *System) startJobExecution(ctx context.Context) {
 func (s *System) execJobs(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
 	jobs, err := s.repo.ListNextJobs(ctx, s.now())
 	if err != nil {
 		return err
@@ -177,12 +184,12 @@ func (s *System) execJobs(ctx context.Context) error {
 func (s *System) execJob(ctx context.Context, job *domain.Job) (*domain.JobResult, error) {
 	kind, ok := s.jobKinds[job.Kind]
 	if !ok {
-		return nil, fmt.Errorf("unknown job kind '%s'", job.Kind)
+		return nil, fmt.Errorf("%w: %s", ErrUnknownJobKind, job.Kind)
 	}
 
 	ctx = tracing.RequestIDWithCtx(ctx, tracing.NewRequestID())
 
 	ctx = auth.CtxWithAccount(ctx, &domain.Account{})
 
-	return kind.Exec(ctx, job.Data.([]byte))
+	return kind.Exec(ctx, job.Data.([]byte)) //nolint:forcetypeassert // @TODO: This should probably be fixed
 }

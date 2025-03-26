@@ -52,7 +52,8 @@ func ErrorHandler(prefix string) ErrorHandlerFunc {
 			}
 		}
 
-		if asAPIErr, ok := err.(*Error); ok {
+		var asAPIErr *Error
+		if ok := errors.As(err, &asAPIErr); ok {
 			apiErr = *asAPIErr
 		}
 
@@ -61,15 +62,16 @@ func ErrorHandler(prefix string) ErrorHandlerFunc {
 		b, err := json.Marshal(apiErr)
 		if err != nil {
 			slog.ErrorContext(r.Context(), "error while trying to marshal api error to json", slog.Any("error", err))
+
 			return
 		}
 
 		_, err = w.Write(b)
 		if err != nil {
 			slog.ErrorContext(r.Context(), "error while writing http response", slog.Any("error", err))
+
 			return
 		}
-
 	}
 }
 
@@ -77,7 +79,7 @@ func RecoverHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func(ctx context.Context) {
 			if p := recover(); p != nil {
-				if p == http.ErrAbortHandler {
+				if err, ok := p.(error); ok && errors.Is(err, http.ErrAbortHandler) {
 					// we don't recover http.ErrAbortHandler so the response
 					// to the client is aborted, this should not be logged
 					panic(p)
@@ -97,12 +99,14 @@ func RecoverHandler(next http.Handler) http.Handler {
 				b, err := json.Marshal(apiErr)
 				if err != nil {
 					slog.ErrorContext(ctx, "error while trying to marshal api error to json", slog.Any("error", err))
+
 					return
 				}
 
 				_, err = w.Write(b)
 				if err != nil {
 					slog.ErrorContext(ctx, "error while writing http response", slog.Any("error", err))
+
 					return
 				}
 			}

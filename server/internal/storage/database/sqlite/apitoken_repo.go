@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"go.robinthrift.com/belt/internal/domain"
 	"go.robinthrift.com/belt/internal/storage/database"
@@ -44,16 +43,25 @@ func (r *APITokenRepo) GetAPITokenByName(ctx context.Context, accountID domain.A
 	}, nil
 }
 
+const maxPageSize = 50
+
 func (r *APITokenRepo) ListAPITokens(ctx context.Context, accountID domain.AccountID, query domain.ListAPITokenQuery) (*domain.APITokenList, error) {
 	pageAfter := domain.APITokenID(0)
 	if query.PageAfter != nil {
 		pageAfter = *query.PageAfter
 	}
 
+	var pageSize int64
+	if query.PageSize >= maxPageSize {
+		pageSize = maxPageSize
+	} else {
+		pageSize = int64(query.PageSize)
+	}
+
 	rows, err := queries.ListAPITokens(ctx, r.db.Conn(ctx), sqlc.ListAPITokensParams{
 		AccountID: accountID,
 		PageAfter: pageAfter,
-		PageSize:  int64(query.PageSize),
+		PageSize:  pageSize,
 	})
 	if err != nil {
 		return nil, err
@@ -94,7 +102,7 @@ func (r *APITokenRepo) CreateAPIToken(ctx context.Context, token *domain.APIToke
 	if err != nil {
 		var sqlErr *sqlite.Error
 		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {
-			return fmt.Errorf("invalid account reference")
+			return domain.ErrInvalidAccountReference
 		}
 
 		return err
@@ -112,6 +120,7 @@ func (r *APITokenRepo) DeleteAPITokenByName(ctx context.Context, accountID domai
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil
 		}
+
 		return err
 	}
 

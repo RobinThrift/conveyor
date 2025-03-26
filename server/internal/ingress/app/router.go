@@ -29,6 +29,7 @@ func New(basePath string, mux *http.ServeMux) {
 		if err != nil {
 			router.renderErrorPage(w, r, err)
 		}
+
 		return nil
 	})))
 }
@@ -92,14 +93,17 @@ func (router *appRouter) renderErrorPage(w http.ResponseWriter, r *http.Request,
 
 func joinPath(elem ...string) string {
 	var p string
+
 	if !strings.HasPrefix(elem[0], "/") {
 		elem[0] = "/" + elem[0]
 		p = path.Join(elem...)[1:]
 	} else {
 		p = path.Join(elem...)
 	}
+
 	if strings.HasSuffix(elem[len(elem)-1], "/") && !strings.HasSuffix(p, "/") {
 		p += "/"
 	}
+
 	return p
 }

@@ -10,7 +10,7 @@ import (
 	"go.robinthrift.com/belt/internal/storage/database"
 	"go.robinthrift.com/belt/internal/storage/database/sqlite/sqlc"
 
-	_ "modernc.org/sqlite"
+	_ "modernc.org/sqlite" // blank import because DB driver
 )
 
 type SQLite struct {
@@ -21,6 +21,7 @@ type SQLite struct {
 	*sql.DB
 }
 
+//nolint:gochecknoglobals
 var queries = sqlc.New()
 
 func (sq *SQLite) Open() error {
@@ -84,15 +85,17 @@ func (sq *SQLite) InTransaction(ctx context.Context, fn func(ctx context.Context
 	if err != nil {
 		err = fmt.Errorf("error setting foreign key check to deferred: %w", err)
 		if rbErr := tx.Rollback(); rbErr != nil {
-			return fmt.Errorf("error rolling back: %w. original error: %v", rbErr, err)
+			return fmt.Errorf("error rolling back: %w. original error: %w", rbErr, err)
 		}
+
 		return err
 	}
 
 	if err := fn(ctx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
-			return fmt.Errorf("error rolling back: %w. original error: %v", rbErr, err)
+			return fmt.Errorf("error rolling back: %w. original error: %w", rbErr, err)
 		}
+
 		return err
 	}
 
@@ -109,6 +112,7 @@ const ctxTxKey = ctxTxKeyType("ctxTxKey")
 
 func txFromCtx(ctx context.Context) (database.Executor, bool) {
 	tx, ok := ctx.Value(ctxTxKey).(database.Executor)
+
 	return tx, ok
 }
 
@@ -122,6 +126,7 @@ type debugExecutor struct {
 
 func (d *debugExecutor) ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error) {
 	slog.DebugContext(ctx, "executing query", slog.String("query", query), slog.Any("args", args))
+
 	return d.exec.ExecContext(ctx, query, args...)
 }
 
@@ -131,10 +136,12 @@ func (d *debugExecutor) PrepareContext(ctx context.Context, query string) (*sql.
 
 func (d *debugExecutor) QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error) {
 	slog.DebugContext(ctx, "executing query", slog.String("query", query), slog.Any("args", args))
+
 	return d.exec.QueryContext(ctx, query, args...)
 }
 
 func (d *debugExecutor) QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row {
 	slog.DebugContext(ctx, "executing query", slog.String("query", query), slog.Any("args", args))
+
 	return d.exec.QueryRowContext(ctx, query, args...)
 }

@@ -124,6 +124,7 @@ func (r *AccountRepo) GetAccountKeyByName(ctx context.Context, accountID domain.
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%w: %s", domain.ErrAccountKeyNotFound, name)
 		}
+
 		return nil, err
 	}
 

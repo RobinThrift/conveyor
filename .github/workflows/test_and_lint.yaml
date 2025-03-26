@@ -28,10 +28,19 @@ jobs:
 
     - name: "Lint Go"
       env:
-        GO_LINT_REPORTER: "github-actions"
+        GO_LINT_REPORTER: "--output.junit-xml.path=lint.junit.xml --output.junit-xml.extended"
       run: |
         cd server && \
         just lint
+
+    - name: Publish Lint Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        check_name: "Lint Results"
+        files: |
+          server/*.junit.xml
+
 
   Lint-App:
     runs-on: ubuntu-latest

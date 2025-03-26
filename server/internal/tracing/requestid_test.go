@@ -1,17 +1,17 @@
 package tracing
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRequestFromContext(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	ctx = RequestIDWithCtx(ctx, "test")
 
@@ -19,7 +19,7 @@ func TestRequestFromContext(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, "test", fromCtx)
 
-	fromCtx, ok = RequestIDFromCtx(context.Background())
+	fromCtx, ok = RequestIDFromCtx(t.Context())
 	assert.False(t, ok)
 	assert.Empty(t, fromCtx)
 }
@@ -28,7 +28,7 @@ func TestHTTPHeader(t *testing.T) {
 	t.Parallel()
 
 	req, err := http.NewRequest(http.MethodGet, "http://example.com", nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	fromHeader, ok := RequestIDFromHeader(req.Header)
 	assert.False(t, ok)

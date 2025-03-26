@@ -17,7 +17,7 @@ func (p *Value) LogValue() slog.Value {
 }
 
 // Format implements the [fmt.Formatter] interface.
-func (p *Value) Format(f fmt.State, verb rune) {
+func (p *Value) Format(f fmt.State, _ rune) {
 	f.Write([]byte(p.String())) //nolint: errcheck // false can't check
 }
 

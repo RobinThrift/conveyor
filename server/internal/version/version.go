@@ -1,3 +1,4 @@
+//nolint:gochecknoglobals
 package version
 
 import (
@@ -23,6 +24,7 @@ func GetBuildInfo() *BuildInfo {
 	once.Do(func() {
 		buildInfo.Version = Version
 		buildInfo.GoVersion = runtime.Version()
+
 		if info, ok := debug.ReadBuildInfo(); ok {
 			for _, setting := range info.Settings {
 				switch setting.Key {

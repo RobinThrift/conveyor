@@ -23,6 +23,7 @@ func RequestIDWithCtx(ctx context.Context, id string) context.Context {
 
 func RequestIDFromCtx(ctx context.Context) (string, bool) {
 	val := ctx.Value(ctxReqIDKey)
+
 	id, ok := val.(string)
 	if ok {
 		return id, true

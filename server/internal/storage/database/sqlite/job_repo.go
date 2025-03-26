@@ -27,6 +27,7 @@ func (r *JobRepo) GetNextWakeUpTime(ctx context.Context) (time.Time, error) {
 		if errors.Is(err, sql.ErrNoRows) {
 			return time.Time{}, nil
 		}
+
 		return time.Time{}, fmt.Errorf("error getting next wakeup time: %w", err)
 	}
 
@@ -41,7 +42,7 @@ func (r *JobRepo) ListNextJobs(ctx context.Context, scheduledFor time.Time) ([]*
 
 	list := make([]*domain.Job, 0, len(res))
 	for _, j := range res {
-		list = append(list, &domain.Job{
+		list = append(list, &domain.Job{ //nolint:forcetypeassert // @TODO: check why this is cast
 			ID:           j.ID,
 			State:        domain.JobState(j.State.(string)),
 			Kind:         j.Kind,

@@ -11,6 +11,8 @@ import (
 	"go.robinthrift.com/belt/internal/storage"
 )
 
+var ErrExistsButNotDir = errors.New("exists but is not a directory")
+
 type LocalFSBlobStorage struct {
 	BaseDir string
 	TmpDir  string
@@ -79,7 +81,6 @@ func (lfs *LocalFSBlobStorage) RemoveBlob(accountID domain.AccountID, filepath s
 	}
 
 	return nil
-
 }
 
 type BlobTarget struct {
@@ -95,6 +96,7 @@ func (bt *BlobTarget) Close() error {
 	if bt.f != nil {
 		return errors.Join(bt.f.Close(), os.Remove(bt.f.Name()))
 	}
+
 	return nil
 }
 
@@ -126,6 +128,8 @@ func (bt *BlobTarget) Finalize(filepath string) (err error) {
 	return nil
 }
 
+const dirPermissions = 0o755
+
 func ensureDirExists(dir string) error {
 	stat, err := os.Stat(dir)
 	if err != nil {
@@ -135,11 +139,11 @@ func ensureDirExists(dir string) error {
 	}
 
 	if stat == nil {
-		return os.MkdirAll(dir, 0755)
+		return os.MkdirAll(dir, dirPermissions)
 	}
 
 	if !stat.IsDir() {
-		return fmt.Errorf("%s exists but is not a directory", dir)
+		return fmt.Errorf("%w: %s", ErrExistsButNotDir, dir)
 	}
 
 	return nil
@@ -154,6 +158,8 @@ func isEmptyDir(dir string) (bool, error) {
 	return len(entries) == 0, nil
 }
 
+const filePerms = 0o644
+
 func copyFile(fhandle *os.File, targetPath string) error {
 	src, err := os.Open(fhandle.Name())
 	if err != nil {
@@ -161,7 +167,7 @@ func copyFile(fhandle *os.File, targetPath string) error {
 	}
 	defer src.Close()
 
-	target, err := os.OpenFile(targetPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+	target, err := os.OpenFile(targetPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, filePerms)
 	if err != nil {
 		return err
 	}

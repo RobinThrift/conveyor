@@ -23,13 +23,14 @@ type Tracing struct {
 	propagator propagation.TextMapPropagator
 }
 
+//nolint:gochecknoglobals
 var noopTracerProvider = noop.NewTracerProvider()
 
 // New creates a new tracing setup with the correct resource, trace providers, exporters and propagators.
 // If not enabled, it will return nil.
 func New(ctx context.Context, config Config) (*Tracing, error) {
 	if !config.Enabled || config.Output.OTELGRPCExporter == nil {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 
 	exporter, err := newExporter(ctx, config)
@@ -61,6 +62,7 @@ func New(ctx context.Context, config Config) (*Tracing, error) {
 	}
 
 	var expoterOpt tracesdk.TracerProviderOption
+
 	if config.Output.OTELGRPCExporter != nil {
 		if config.Output.OTELGRPCExporter.Sync {
 			expoterOpt = tracesdk.WithSyncer(exporter)
@@ -89,7 +91,7 @@ func NewGlobal(ctx context.Context, config Config) (*Tracing, error) {
 	}
 
 	if t == nil {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 
 	otel.SetTracerProvider(t.provider)
@@ -109,11 +111,11 @@ func newPropagator() propagation.TextMapPropagator {
 
 func newExporter(ctx context.Context, config Config) (tracesdk.SpanExporter, error) {
 	if !config.Enabled {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 
 	if config.Output.OTELGRPCExporter == nil || config.Output.OTELGRPCExporter.Endpoint == "" {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 
 	opts := []otlptracegrpc.Option{otlptracegrpc.WithEndpoint(config.Output.OTELGRPCExporter.Endpoint)}
@@ -130,6 +132,7 @@ func (t *Tracing) Tracer(name string, opts ...trace.TracerOption) trace.Tracer {
 	if t == nil {
 		return noopTracerProvider.Tracer(name)
 	}
+
 	return t.provider.Tracer(name, opts...)
 }
 
@@ -137,6 +140,7 @@ func (t *Tracing) Provider() trace.TracerProvider {
 	if t == nil {
 		return noopTracerProvider
 	}
+
 	return t.provider
 }
 
@@ -144,16 +148,8 @@ func (t *Tracing) Propagator() propagation.TextMapPropagator {
 	if t == nil {
 		return nil
 	}
+
 	return t.propagator
-}
-
-// Start is a stup method so [Tracing] can be used with [supervisor.Supervisor].
-func (t *Tracing) Start(ctx context.Context) error {
-	if t == nil {
-		return nil
-	}
-
-	return nil
 }
 
 // Stop all the components of the tracing setup. This function is safe to call even if [t] is a nil pointer.

@@ -62,6 +62,7 @@ func addTraceID(ctx context.Context, record *slog.Record, emitLogInTrace bool) {
 		record.Attrs(func(attr slog.Attr) bool {
 			// @TODO: Add correct conversion from log attrs to span attrs
 			eventAttrs = append(eventAttrs, attribute.String(attr.Key, attr.Value.String()))
+
 			return true
 		})
 

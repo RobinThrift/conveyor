@@ -13,10 +13,12 @@ import (
 )
 
 func TestAPITokenRepo_CRUD(t *testing.T) {
+	t.Parallel()
+
 	t.Run("GetAPITokenByName", func(t *testing.T) {
 		t.Parallel()
 
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 		t.Cleanup(cancel)
 
 		setup := setupAPITokenRepo(ctx, t)
@@ -30,7 +32,7 @@ func TestAPITokenRepo_CRUD(t *testing.T) {
 	t.Run("GetAPITokenByName/Not Found", func(t *testing.T) {
 		t.Parallel()
 
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 		t.Cleanup(cancel)
 
 		setup := setupAPITokenRepo(ctx, t)
@@ -44,7 +46,7 @@ func TestAPITokenRepo_CRUD(t *testing.T) {
 	t.Run("ListAPITokens", func(t *testing.T) {
 		t.Parallel()
 
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 		t.Cleanup(cancel)
 
 		numTokens := 100
@@ -53,8 +55,11 @@ func TestAPITokenRepo_CRUD(t *testing.T) {
 		setup.createAPITokens(ctx, numTokens)
 
 		var lastAPITokenID *domain.APITokenID
+
 		var lastReferncesTokenID int64
+
 		total := 0
+
 		for i := 0; i < numTokens; i += 25 {
 			q := domain.ListAPITokenQuery{
 				PageSize:  25,
@@ -77,7 +82,7 @@ func TestAPITokenRepo_CRUD(t *testing.T) {
 	t.Run("DeleteAPIToken", func(t *testing.T) {
 		t.Parallel()
 
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 		t.Cleanup(cancel)
 
 		setup := setupAPITokenRepo(ctx, t)
@@ -151,8 +156,8 @@ func setupAPITokenRepo(ctx context.Context, t *testing.T) apiTokenRepoTestSetup 
 
 				values[i] = plaintextToken.Plaintext.Export()
 			}
-			return values
 
+			return values
 		},
 	}
 }

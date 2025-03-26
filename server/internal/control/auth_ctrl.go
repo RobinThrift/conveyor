@@ -14,6 +14,7 @@ import (
 
 var ErrInvalidCredentials = errors.New("invalid credentials")
 var ErrPasswordEmpty = errors.New("password must not be empty")
+var ErrInitialPasswordEmpty = errors.New("initial password must not be empty")
 var ErrRequiresPasswordChange = errors.New("password change required")
 
 type AuthController struct {
@@ -46,12 +47,12 @@ func NewAuthController(config AuthConfig, transactioner database.Transactioner, 
 func (ac *AuthController) GetAccountForAuthToken(ctx context.Context, plaintextToken auth.PlaintextAuthTokenValue) (*domain.Account, error) {
 	token, err := ac.authTokenRepo.GetAuthToken(ctx, auth.AuthTokenValue(plaintextToken.Encrypt(ac.config.Argon2Params)))
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidCredentials, err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidCredentials, err)
 	}
 
 	account, err := ac.accountCtrl.Get(ctx, token.AccountID)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidCredentials, err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidCredentials, err)
 	}
 
 	return account, nil
@@ -73,6 +74,7 @@ func (ac *AuthController) CreateAuthTokenUsingCredentials(ctx context.Context, c
 	}
 
 	now := time.Now()
+
 	plaintextToken, err := auth.NewPlaintextAuthToken(ac.config.AuthTokenLength, now.Add(ac.config.AccessTokenValidDuration), now.Add(ac.config.RefreshTokenValidDuration))
 	if err != nil {
 		return nil, fmt.Errorf("error creating auth token: %w", err)
@@ -99,7 +101,7 @@ type CreateAuthTokenUsingRefreshTokenCmd struct {
 func (ac *AuthController) CreateAuthTokenUsingRefreshToken(ctx context.Context, cmd CreateAuthTokenUsingRefreshTokenCmd) (*auth.PlaintextAuthToken, error) {
 	token, err := ac.authTokenRepo.GetAuthTokenByRefreshValue(ctx, auth.AuthTokenValue(cmd.PlaintextRefreshToken.Encrypt(ac.config.Argon2Params)))
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidCredentials, err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidCredentials, err)
 	}
 
 	account, err := ac.accountCtrl.Get(ctx, token.AccountID)
@@ -114,6 +116,7 @@ func (ac *AuthController) CreateAuthTokenUsingRefreshToken(ctx context.Context, 
 		}
 
 		now := time.Now()
+
 		plaintextToken, err := auth.NewPlaintextAuthToken(ac.config.AuthTokenLength, now.Add(ac.config.AccessTokenValidDuration), now.Add(ac.config.RefreshTokenValidDuration))
 		if err != nil {
 			return nil, fmt.Errorf("error creating auth token: %w", err)
@@ -142,7 +145,7 @@ type CreateAccountCmd struct {
 func (ac *AuthController) CreateAccount(ctx context.Context, cmd CreateAccountCmd) error {
 	return ac.transactioner.InTransaction(ctx, func(ctx context.Context) error {
 		if len(cmd.PlaintextPasswd) == 0 {
-			return errors.New("initial password cannot be empty")
+			return ErrInitialPasswordEmpty
 		}
 
 		params, err := ac.config.Argon2Params.ToJSONString()
@@ -186,6 +189,7 @@ func (ac *AuthController) getAccountForCredentials(ctx context.Context, query Ge
 	passwordMatch, err := auth.CheckPassword(query.PlaintextPasswd, account.Password.Password, account.Password.Salt, []byte(account.Password.Params))
 	if err != nil {
 		slog.ErrorContext(ctx, "error comparing account password", slog.Any("error", err), slog.String("username", query.Username))
+
 		return nil, ErrInvalidCredentials
 	}
 
@@ -204,6 +208,7 @@ type ChangeAccountPasswordCmd struct {
 
 func (ac *AuthController) ChangeAccountPassword(ctx context.Context, cmd ChangeAccountPasswordCmd) error {
 	account := auth.AccountFromCtx(ctx)
+
 	var err error
 
 	if account == nil {
@@ -223,6 +228,7 @@ func (ac *AuthController) ChangeAccountPassword(ctx context.Context, cmd ChangeA
 	passwordMatch, err := auth.CheckPassword(cmd.CurrPasswdPlaintext, account.Password.Password, account.Password.Salt, []byte(account.Password.Params))
 	if err != nil {
 		slog.ErrorContext(ctx, "error comparing account password", slog.Any("error", err), slog.String("username", account.Username))
+
 		return ErrInvalidCredentials
 	}
 
@@ -251,6 +257,7 @@ func (ac *AuthController) ChangeAccountPassword(ctx context.Context, cmd ChangeA
 	err = ac.accountCtrl.Update(ctx, account)
 	if err != nil {
 		slog.ErrorContext(ctx, "error updating account in DB", slog.Any("error", err), slog.String("username", account.Username))
+
 		return err
 	}
 

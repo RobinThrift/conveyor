@@ -47,12 +47,11 @@ func New(basePath string, mux *http.ServeMux, authCtrl *control.AuthController, 
 	})
 }
 
-// Request a new AuthToken pair.
-// (POST /token)
+// (POST /token).
 func (router *router) RequestAuthToken(ctx context.Context, req RequestAuthTokenRequestObject) (RequestAuthTokenResponseObject, error) {
 	passwordGrantReq, err := req.Body.AsAuthTokenRequestPasswordGrant()
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", httperrors.ErrBadRequest, err)
+		return nil, fmt.Errorf("%w: %w", httperrors.ErrBadRequest, err)
 	}
 
 	if passwordGrantReq.GrantType == "password" {
@@ -61,7 +60,7 @@ func (router *router) RequestAuthToken(ctx context.Context, req RequestAuthToken
 
 	refreshTokenGrantReq, err := req.Body.AsAuthTokenRequestRefreshTokenGrant()
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", httperrors.ErrBadRequest, err)
+		return nil, fmt.Errorf("%w: %w", httperrors.ErrBadRequest, err)
 	}
 
 	if refreshTokenGrantReq.GrantType == "refresh_token" {
@@ -78,12 +77,13 @@ func (router *router) requestAuthTokenUsingPassword(ctx context.Context, req Aut
 	})
 	if err != nil {
 		if errors.Is(err, control.ErrInvalidCredentials) {
-			return nil, fmt.Errorf("%w: %v", auth.ErrUnauthorized, err)
+			return nil, fmt.Errorf("%w: %w", auth.ErrUnauthorized, err)
 		}
 
 		if errors.Is(err, control.ErrRequiresPasswordChange) {
 			return RequestAuthToken204Response{}, nil
 		}
+
 		return nil, err
 	}
 
@@ -116,8 +116,7 @@ func (router *router) requestAuthTokenUsingRefreshToken(ctx context.Context, req
 	}, nil
 }
 
-// Change acocunt password.
-// (POST /change-password)
+// (POST /change-password).
 func (router *router) ChangePassword(ctx context.Context, req ChangePasswordRequestObject) (ChangePasswordResponseObject, error) {
 	err := validateChangePasswordData(req.Body)
 	if err != nil {
@@ -136,8 +135,7 @@ func (router *router) ChangePassword(ctx context.Context, req ChangePasswordRequ
 	return ChangePassword204Response{}, nil
 }
 
-// Add a new account key.
-// (POST /keys)
+// (POST /keys).
 func (router *router) AddAccountKey(ctx context.Context, req AddAccountKeyRequestObject) (AddAccountKeyResponseObject, error) {
 	err := router.accountCtrl.CreateAccountKey(ctx, &domain.AccountKey{
 		Name: req.Body.Name,
@@ -151,8 +149,7 @@ func (router *router) AddAccountKey(ctx context.Context, req AddAccountKeyReques
 	return AddAccountKey201Response{}, nil
 }
 
-// Get a public key by name.
-// (GET /keys/{name})
+// (GET /keys/{name}).
 func (router *router) GetAccountKey(ctx context.Context, req GetAccountKeyRequestObject) (GetAccountKeyResponseObject, error) {
 	key, err := router.accountCtrl.GetAccountKeyByName(ctx, req.Name)
 	if err != nil {
@@ -166,15 +163,16 @@ func (router *router) GetAccountKey(ctx context.Context, req GetAccountKeyReques
 	}, nil
 }
 
-// List API Tokens paginated
-// (GET /apitokens)
+// (GET /apitokens).
 func (router *router) ListAPITokens(ctx context.Context, req ListAPITokensRequestObject) (ListAPITokensResponseObject, error) {
 	var pageAfter *domain.APITokenID
+
 	if req.Params.PageAfter != nil {
 		p, err := strconv.ParseInt(*req.Params.PageAfter, 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("%w: invalid pageAfter", httperrors.ErrBadRequest)
 		}
+
 		pageAfter = (*domain.APITokenID)(&p)
 	}
 
@@ -205,8 +203,7 @@ func (router *router) ListAPITokens(ctx context.Context, req ListAPITokensReques
 	return ListAPITokens200JSONResponse(apiTokens), nil
 }
 
-// Create a new API Token
-// (POST /apitokens)
+// (POST /apitokens).
 func (router *router) CreateAPIToken(ctx context.Context, req CreateAPITokenRequestObject) (CreateAPITokenResponseObject, error) {
 	value, err := router.apiTokenCtrl.CreateAPIToken(ctx, control.CreateAPITokenCmd{
 		Name:      req.Body.Name,
@@ -219,8 +216,7 @@ func (router *router) CreateAPIToken(ctx context.Context, req CreateAPITokenRequ
 	return CreateAPIToken201JSONResponse{Token: value}, nil
 }
 
-// Delete API Token
-// (DELETE /apitokens/{name})
+// (DELETE /apitokens/{name}).
 func (router *router) DeleteAPIToken(ctx context.Context, req DeleteAPITokenRequestObject) (DeleteAPITokenResponseObject, error) {
 	err := router.apiTokenCtrl.DeleteAPITokenByName(ctx, req.Name)
 	if err != nil {
@@ -230,8 +226,7 @@ func (router *router) DeleteAPIToken(ctx context.Context, req DeleteAPITokenRequ
 	return DeleteAPIToken204Response{}, nil
 }
 
-// Check if the provided access token is valid.
-// (GET /check-access)
+// (GET /check-access).
 func (router *router) CheckAccess(ctx context.Context, req CheckAccessRequestObject) (CheckAccessResponseObject, error) {
 	bearer := strings.TrimPrefix(req.Params.Authorization, "Bearer ")
 	if bearer == "" || bearer == "Bearer" {

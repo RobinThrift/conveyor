@@ -69,12 +69,14 @@ func New(config RouterConfig, mux *http.ServeMux, syncCtrl *control.SyncControll
 func (router *router) serveBlobs(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusNotFound)
+
 		return
 	}
 
 	account := auth.AccountFromCtx(r.Context())
 	if account == nil {
 		w.WriteHeader(http.StatusNotFound)
+
 		return
 	}
 
@@ -88,8 +90,7 @@ func (router *router) serveBlobs(w http.ResponseWriter, r *http.Request) {
 	router.serveBlobHandler.ServeHTTP(w, fixedReq)
 }
 
-// Register a new client.
-// (POST /clients)
+// (POST /clients).
 func (router *router) RegisterClient(ctx context.Context, req RegisterClientRequestObject) (RegisterClientResponseObject, error) {
 	err := router.syncCtrl.RegisterClient(ctx, control.RegisterClientCmd{
 		ClientID: domain.SyncClientID(req.Body.ClientID),
@@ -101,8 +102,7 @@ func (router *router) RegisterClient(ctx context.Context, req RegisterClientRequ
 	return RegisterClient201Response{}, nil
 }
 
-// Unregister a new client.
-// (DELETE /clients/{id})
+// (DELETE /clients/{id}).
 func (router *router) UnregisterClient(ctx context.Context, req UnregisterClientRequestObject) (UnregisterClientResponseObject, error) {
 	err := router.syncCtrl.UnregisterClient(ctx, control.UnregisterClientCmd{
 		ClientID: domain.SyncClientID(req.Id),
@@ -114,9 +114,8 @@ func (router *router) UnregisterClient(ctx context.Context, req UnregisterClient
 	return UnregisterClient201Response{}, nil
 }
 
-// Get the full database.
-// (GET /full)
-func (router *router) GetFullSync(ctx context.Context, req GetFullSyncRequestObject) (GetFullSyncResponseObject, error) {
+// (GET /full).
+func (router *router) GetFullSync(ctx context.Context, _ GetFullSyncRequestObject) (GetFullSyncResponseObject, error) {
 	entry, err := router.syncCtrl.GetLatestFullSyncEntry(ctx)
 	if err != nil {
 		if errors.Is(err, domain.ErrNoFullSyncEntriesFound) {
@@ -129,6 +128,7 @@ func (router *router) GetFullSync(ctx context.Context, req GetFullSyncRequestObj
 				},
 			}, nil
 		}
+
 		return nil, err
 	}
 
@@ -139,8 +139,7 @@ func (router *router) GetFullSync(ctx context.Context, req GetFullSyncRequestObj
 	}, nil
 }
 
-// Upload the full encrypted database.
-// (POST /full)
+// (POST /full).
 func (router *router) UploadFullSyncData(ctx context.Context, req UploadFullSyncDataRequestObject) (UploadFullSyncDataResponseObject, error) {
 	err := router.syncCtrl.SaveFullDB(ctx, control.SaveFullDBCmd{Data: req.Body})
 	if err != nil {
@@ -150,8 +149,7 @@ func (router *router) UploadFullSyncData(ctx context.Context, req UploadFullSync
 	return UploadFullSyncData201Response{}, nil
 }
 
-// Get list of changes since the specified timestamp.
-// (GET /changes)
+// (GET /changes).
 func (router *router) ListChangelogEntries(ctx context.Context, req ListChangelogEntriesRequestObject) (ListChangelogEntriesResponseObject, error) {
 	entries, err := router.syncCtrl.ListChangelogEntries(ctx, control.ListChangelogEntriesQuery{
 		Since: req.Params.Since,
@@ -174,8 +172,7 @@ func (router *router) ListChangelogEntries(ctx context.Context, req ListChangelo
 	}, nil
 }
 
-// Create new EncryptedChangelogEntries for other clients to download.
-// (POST /changes)
+// (POST /changes).
 func (router *router) CreateChangelogEntries(ctx context.Context, req CreateChangelogEntriesRequestObject) (CreateChangelogEntriesResponseObject, error) {
 	entries := make([]domain.ChangelogEntry, 0, len(req.Body.Items))
 	for _, entry := range req.Body.Items {
@@ -196,8 +193,7 @@ func (router *router) CreateChangelogEntries(ctx context.Context, req CreateChan
 	return CreateChangelogEntries201Response{}, nil
 }
 
-// Upload an attachment
-// (POST /attachments/{filename})
+// (POST /attachments/{filename}).
 func (router *router) UploadAttachment(ctx context.Context, req UploadAttachmentRequestObject) (UploadAttachmentResponseObject, error) {
 	content := req.Body
 	if req.Params.ContentEncoding != nil && *req.Params.ContentEncoding == "gzip" {
@@ -205,7 +201,9 @@ func (router *router) UploadAttachment(ctx context.Context, req UploadAttachment
 		if err != nil {
 			return nil, err
 		}
+
 		content = gr
+
 		defer gr.Close()
 	}
 
@@ -220,9 +218,8 @@ func (router *router) UploadAttachment(ctx context.Context, req UploadAttachment
 	return UploadAttachment201Response{}, nil
 }
 
-// Delete an attachment
-// (DELETE /attachments/{filename})
-func (router *router) DeleteAttachment(ctx context.Context, req DeleteAttachmentRequestObject) (DeleteAttachmentResponseObject, error) {
+// (DELETE /attachments/{filename}).
+func (router *router) DeleteAttachment(_ context.Context, _ DeleteAttachmentRequestObject) (DeleteAttachmentResponseObject, error) {
 	return DeleteAttachment204Response{}, nil
 }
 
@@ -231,12 +228,14 @@ func (router *router) checkAuth(next http.Handler) http.Handler {
 		token, ok := authTokenFromHeader(r.Header)
 		if !ok {
 			router.errorHandler(w, r, auth.ErrUnauthorized)
+
 			return
 		}
 
 		account, err := router.accountFetcher.GetAccountForAuthToken(r.Context(), *token)
 		if account == nil || errors.Is(err, auth.ErrUnauthorized) {
 			router.errorHandler(w, r, auth.ErrUnauthorized)
+
 			return
 		}
 
@@ -246,6 +245,7 @@ func (router *router) checkAuth(next http.Handler) http.Handler {
 				Title: http.StatusText(http.StatusInternalServerError),
 				Type:  "belt/api/sync/v1/InternalServerError",
 			})
+
 			return
 		}
 

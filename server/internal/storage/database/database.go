@@ -13,10 +13,10 @@ type Database interface {
 }
 
 type Executor interface {
-	ExecContext(context.Context, string, ...any) (sql.Result, error)
-	PrepareContext(context.Context, string) (*sql.Stmt, error)
-	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
-	QueryRowContext(context.Context, string, ...any) *sql.Row
+	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
 }
 
 type Transactioner interface {
@@ -25,6 +25,7 @@ type Transactioner interface {
 
 func InTransaction[R any](ctx context.Context, db Transactioner, fn func(ctx context.Context) (R, error)) (R, error) {
 	var result R
+
 	err := db.InTransaction(ctx, func(ctx context.Context) error {
 		r, err := fn(ctx)
 		if err != nil {
