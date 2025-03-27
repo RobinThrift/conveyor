@@ -67,6 +67,8 @@ export async function migrate(ctx: Context, db: DBExec & Transactioner) {
             throw new Error(`error applying migration ${version}: ${e}`)
         }
     }
+
+    console.log("database fully migrated")
 }
 
 async function createMigrationTable(db: DBExec) {

@@ -11,11 +11,13 @@ export class SQLite implements Database {
     private _baseCtx: Context
     private _worker: ReturnType<typeof SQLiteWorker.createClient>
     private _currentTransaction: Promise<void> = Promise.resolve()
+    private _ready: ReturnType<typeof Promise.withResolvers<void>>
 
     constructor({
         baseCtx,
         onError,
     }: { baseCtx?: Context; onError?: (err: Error) => void } = {}) {
+        this._ready = Promise.withResolvers()
         this._baseCtx = baseCtx ?? BaseContext
         this._worker = SQLiteWorker.createClient(
             new Worker(new URL("./sqlite.worker?worker&url", import.meta.url), {
@@ -63,6 +65,7 @@ export class SQLite implements Database {
         await toPromise(
             this._worker.exec(ctx, { sql: "PRAGMA foreign_keys = true;" }),
         )
+        this._ready.resolve()
         await migrate(ctx, this)
     }
 
@@ -77,6 +80,7 @@ export class SQLite implements Database {
         args?: (SqlValue | boolean)[],
         abort?: AbortSignal,
     ): Promise<number> {
+        await this._ready.promise
         return toPromise(
             this._worker.exec(this._baseCtx.withSignal(abort), {
                 sql,
@@ -90,6 +94,7 @@ export class SQLite implements Database {
         args?: (SqlValue | boolean)[],
         abort?: AbortSignal,
     ): Promise<R[]> {
+        await this._ready.promise
         return toPromise(
             this._worker.query<R>(this._baseCtx.withSignal(abort), {
                 sql,
@@ -103,6 +108,7 @@ export class SQLite implements Database {
         args?: (SqlValue | boolean)[],
         abort?: AbortSignal,
     ): Promise<R | undefined> {
+        await this._ready.promise
         return toPromise(
             this._worker.queryOne<R>(this._baseCtx.withSignal(abort), {
                 sql,
@@ -115,6 +121,8 @@ export class SQLite implements Database {
         ctx: Context<{ db?: DBExec }>,
         fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
     ): AsyncResult<R> {
+        await this._ready.promise
+
         let tx = ctx.getData("db")
         if (tx) {
             return fn(ctx.withData("db", tx))
