@@ -2,6 +2,9 @@ biome_reporter := if env_var_or_default("BIOME_REPORTER", "") != "" { "--reporte
 
 local_bin := absolute_path("./node_modules/.bin")
 
+_default:
+    @just --list
+
 serve *args="": _gen-icons _build-sqlite
     {{ local_bin }}/vite --mode development --strictPort --port 6155 {{ args }}
 
@@ -28,6 +31,16 @@ test *flags="": _build-sqlite install
 test-watch *flags="": _build-sqlite install
     {{ local_bin }}/msw init --save false ./build
     {{ local_bin }}/vitest {{ flags }}
+
+# Run the end-to-end tests using playwright
+# Flags:
+# --ui: Starts the interactive UI mode
+# --debug: Runs the tests in debug mode
+# Commands:
+# codegen: Auto generate tests with Codegen
+# test: Run tests
+test-e2e *flags="test": _build-sqlite install
+    {{ local_bin }}/playwright {{ flags }}
 
 fmt: install
     {{ local_bin }}/biome format --write ./src

@@ -13,3 +13,9 @@ server/internal/ingress/app/assets/
 node_modules
 app/.storybook/public
 .cache
+
+# Playwright
+test-results
+playwright-report
+blob-report
+playwrighm

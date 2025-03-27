@@ -23,17 +23,32 @@ run: (_install-tool "watchexec")
         {{ local_bin }}/watchexec -r -e go -- go run -trimpath -tags dev ./bin/belt
 
 run-prod:
-    cd ui && just install build
+    cd ../app && just install build
     just build
     @BELT_LOG_LEVEL="debug" BELT_LOG_FORMAT="console" \
         BELT_ADDR="localhost:8081" \
-        BELT_SECURE_COOKIES="false" \
         BELT_DATABASE_PATH="./test/manual/belt.db" \
         BELT_DATABASE_DEBUG_ENABLED="true" \
         BELT_BLOBS_DIR="./test/manual/blobs" \
         BELT_INIT_USERNAME="user" \
         BELT_INIT_PASSWORD="password" \
         ./build/belt
+
+_run-for-e2e-test:
+    #!/usr/bin/env bash
+    set -eux
+    set -o pipefail
+    TEMPDIR=$(mktemp -d)
+    trap "rm -rf $TEMPDIR" EXIT SIGHUP SIGINT SIGQUIT SIGTERM
+    export BELT_LOG_LEVEL="debug"
+    export BELT_LOG_FORMAT="console"
+    export BELT_ADDR="localhost:8081"
+    export BELT_DATABASE_PATH="$TEMPDIR/belt.db"
+    export BELT_BLOBS_DIR="$TEMPDIR/blobs"
+    export BELT_DATABASE_DEBUG_ENABLED="true"
+    export BELT_INIT_USERNAME="user"
+    export BELT_INIT_PASSWORD="pls-change-e2e-tests"
+    go run -trimpath -tags dev ./bin/belt
 
 build:
     go build -ldflags="{{go_ldflags}}" {{ go_buildflags }} -o build/belt ./bin/belt

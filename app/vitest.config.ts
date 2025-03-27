@@ -7,6 +7,7 @@ export default defineConfig(async (configEnv) =>
         defineConfig({
             test: {
                 includeSource: ["src/**/*.ts"],
+                include: ["src/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
 
                 typecheck: {
                     enabled: true,
