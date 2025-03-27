@@ -2,7 +2,7 @@ import type { SqlValue } from "@sqlite.org/sqlite-wasm"
 
 import { BaseContext, type Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
-import { type AsyncResult, Err, toPromise } from "@/lib/result"
+import { type AsyncResult, fromPromise, toPromise } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
 
 import { SQLiteWorker } from "./sqlite.worker"
@@ -10,6 +10,7 @@ import { SQLiteWorker } from "./sqlite.worker"
 export class SQLite implements Database {
     private _baseCtx: Context
     private _worker: ReturnType<typeof SQLiteWorker.createClient>
+    private _currentTransaction: Promise<void> = Promise.resolve()
 
     constructor({
         baseCtx,
@@ -119,15 +120,36 @@ export class SQLite implements Database {
             return fn(ctx.withData("db", tx))
         }
 
-        await this.exec("BEGIN")
+        let transaction = Promise.withResolvers<void>()
+
         try {
-            let r = await fn(ctx.withData("db", new Transaction(this)))
-            await this.exec("COMMIT")
-            return r
-        } catch (e) {
-            await this.exec("ROLLBACK")
-            return Err(e as Error)
+            await this._currentTransaction
+        } catch {
+            // ignore errors
         }
+        this._currentTransaction = transaction.promise
+
+        let begin = await fromPromise(this.exec("BEGIN TRANSACTION"))
+        if (!begin.ok) {
+            transaction.resolve()
+            return begin
+        }
+
+        let res = await fn(ctx.withData("db", new Transaction(this)))
+        if (!res.ok) {
+            transaction.resolve()
+            await this.exec("ROLLBACK TRANSACTION")
+            return res
+        }
+
+        let commit = await fromPromise(this.exec("COMMIT"))
+        if (!commit.ok) {
+            transaction.resolve()
+            return commit
+        }
+
+        transaction.resolve()
+        return res
     }
 }
 
