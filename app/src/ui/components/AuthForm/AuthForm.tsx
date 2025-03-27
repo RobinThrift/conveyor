@@ -54,7 +54,7 @@ export function AuthForm(props: AuthFormProps) {
                     labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
                     inputWrapperClassName="col-span-4"
                     messageClassName="col-span-6"
-                    disabled={isLoading}
+                    disabled={isLoading || showChangePasswordDialog}
                 />
 
                 <Input
@@ -69,7 +69,7 @@ export function AuthForm(props: AuthFormProps) {
                     labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
                     inputWrapperClassName="col-span-4"
                     messageClassName="col-span-6"
-                    disabled={isLoading}
+                    disabled={isLoading || showChangePasswordDialog}
                 />
 
                 <Input
@@ -82,7 +82,7 @@ export function AuthForm(props: AuthFormProps) {
                     labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
                     inputWrapperClassName="col-span-4"
                     messageClassName="col-span-6"
-                    disabled={isLoading}
+                    disabled={isLoading || showChangePasswordDialog}
                 />
 
                 <div className="flex justify-end items-center mt-2">
