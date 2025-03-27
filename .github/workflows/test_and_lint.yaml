@@ -24,6 +24,8 @@ jobs:
     - uses: actions/setup-go@v5
       with:
         go-version: "stable"
+        cache-dependency-path: |
+          server/go.sum
     - uses: RobinThrift/action-setup-just@v1
 
     - name: "Lint Go"
@@ -66,6 +68,8 @@ jobs:
     - uses: actions/setup-go@v5
       with:
         go-version: "stable"
+        cache-dependency-path: |
+          server/go.sum
     - uses: RobinThrift/action-setup-just@v1
 
     - name: "Test"
@@ -112,6 +116,8 @@ jobs:
     - uses: actions/setup-go@v5
       with:
         go-version: "stable"
+        cache-dependency-path: |
+          server/go.sum
     - uses: actions/setup-node@v4
       with:
         node-version: "latest"
