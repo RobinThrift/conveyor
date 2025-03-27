@@ -52,7 +52,7 @@ export default defineConfig({
         },
         {
             command: "just serve",
-            url: "http://localhost:6155/assets/index.css",
+            url: "http://localhost:6155/assets/src/index.tsx",
             reuseExistingServer: true,
         },
     ],
