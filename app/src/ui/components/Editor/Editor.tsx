@@ -15,6 +15,7 @@ import { useEditorState } from "./useEditorState"
 
 export interface EditorProps {
     className?: string
+
     vimModeEnabled?: boolean
 
     placeholder: string

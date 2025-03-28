@@ -35,7 +35,7 @@ export const DEFAULT_SETTINGS: Settings = {
     },
 
     controls: {
-        vim: true,
+        vim: false,
         doubleClickToEdit: true,
     },
 }

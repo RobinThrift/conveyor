@@ -17,15 +17,16 @@ import { CodeMirror } from "./CodeMirror"
 import { useTextEditorState } from "./useTextEditorState"
 
 export interface TextEditorProps {
-    vimModeEnabled?: boolean
-
     id: string
+
     tags: Tag[]
     content: string
     autoFocus?: boolean
     overrideKeybindings?: boolean
     placeholder?: string
     placeCursorAt?: { x: number; y: number; snippet?: string }
+
+    vimModeEnabled?: boolean
 
     onChange: (text: string, changes: ChangeSet) => void
     onSave: () => void
@@ -49,6 +50,7 @@ export function TextEditor(props: TextEditorProps) {
                     "vim-enabled ": props.vimModeEnabled,
                 })}
                 onCreateEditor={onCreateEditor}
+                vimModeEnabled={props.vimModeEnabled}
                 text={props.content}
                 onChange={props.onChange}
                 autoFocus={props.autoFocus}

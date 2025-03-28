@@ -1,3 +1,4 @@
+import { createSelector } from "@reduxjs/toolkit"
 import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -7,6 +8,11 @@ import { type UpdateMemoRequest, actions, selectors } from "@/ui/state"
 import { useGoBack } from "@/ui/state/global/router"
 
 export type { UpdateMemoRequest } from "@/ui/state"
+
+const settingsSelector = createSelector(
+    [(state) => selectors.settings.value(state, "controls.vim")],
+    (vimModeEnabled) => ({ vimModeEnabled }),
+)
 
 export function useEditMemoScreenState(props: { memoID: MemoID }) {
     let transferAttachment = useAttachmentTransferer()
@@ -20,6 +26,8 @@ export function useEditMemoScreenState(props: { memoID: MemoID }) {
 
     let isLoading = isUpdatingMemo || isLoadingMemo
     let error = updateMemoError ?? singleMemoError
+
+    let settings = useSelector(settingsSelector)
 
     let goBack = useGoBack()
 
@@ -65,6 +73,7 @@ export function useEditMemoScreenState(props: { memoID: MemoID }) {
         tags,
         isLoading,
         error,
+        settings,
         updateMemo,
         cancelEdit,
         transferAttachment,

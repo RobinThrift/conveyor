@@ -18,8 +18,15 @@ export interface EditMemoScreenProps {
 }
 
 export function EditMemoScreen(props: EditMemoScreenProps) {
-    let { isLoading, memo, tags, updateMemo, cancelEdit, transferAttachment } =
-        useEditMemoScreenState(props)
+    let {
+        isLoading,
+        memo,
+        tags,
+        updateMemo,
+        cancelEdit,
+        transferAttachment,
+        settings,
+    } = useEditMemoScreenState(props)
 
     return (
         <div
@@ -33,6 +40,7 @@ export function EditMemoScreen(props: EditMemoScreenProps) {
                     <MemoEditor
                         memo={memo}
                         tags={tags}
+                        settings={settings}
                         placeCursorAt={props.position}
                         updateMemo={updateMemo}
                         onCancel={cancelEdit}
@@ -57,6 +65,9 @@ function MemoEditor(props: {
     overrideKeybindings?: boolean
     updateMemo: (req: { memo: UpdateMemoRequest }) => void
     onCancel: () => void
+    settings: {
+        vimModeEnabled: boolean
+    }
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
@@ -88,6 +99,7 @@ function MemoEditor(props: {
             onSave={onSave}
             onCancel={props.onCancel}
             transferAttachment={props.transferAttachment}
+            vimModeEnabled={props.settings.vimModeEnabled}
         />
     )
 }
