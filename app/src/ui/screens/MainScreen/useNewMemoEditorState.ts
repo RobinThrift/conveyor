@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 
+import { newID } from "@/domain/ID"
 import { useAttachmentTransferer } from "@/ui/attachments"
 import type { CreateMemoRequest } from "@/ui/state/actions"
 
@@ -24,7 +25,7 @@ export function useNewMemoEditorState(props: {
     )
 
     let [newMemo, setNewMemo] = useState({
-        id: Date.now().toString(),
+        id: newID(),
         name: "",
         content: "",
         isArchived: false,
@@ -36,7 +37,7 @@ export function useNewMemoEditorState(props: {
     useEffect(() => {
         if (!props.inProgress) {
             setNewMemo({
-                id: Date.now().toString(),
+                id: newID(),
                 name: "",
                 content: "",
                 isArchived: false,

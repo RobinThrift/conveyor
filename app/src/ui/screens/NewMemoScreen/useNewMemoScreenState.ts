@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
+import { newID } from "@/domain/ID"
 import { useAttachmentTransferer } from "@/ui/attachments"
 import { type CreateMemoRequest, actions, selectors } from "@/ui/state"
 import { useGoBack } from "@/ui/state/global/router"
@@ -38,7 +39,7 @@ export function useNewMemoScreenState() {
 
     let newMemo = useMemo(
         () => ({
-            id: Date.now().toString(),
+            id: newID(),
             name: "",
             content: "",
             isArchived: false,

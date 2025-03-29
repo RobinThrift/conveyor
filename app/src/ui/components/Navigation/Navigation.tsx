@@ -27,6 +27,7 @@ export function Navigation(props: NavigationProps) {
     return (
         <nav
             className={clsx("navigation", props.className)}
+            data-tauri-drag-region
             data-active={props.active}
         >
             {props.active === "settings" ? (

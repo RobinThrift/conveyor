@@ -1,0 +1,16 @@
+"$schema" = "schemas/schema.json"
+
+[[permission]]
+identifier = "sqlite-allow-all"
+description = "Enables all SQLite command."
+commands.allow = [
+    "plugin:sqlite|open",
+    "plugin:sqlite|close",
+    "plugin:sqlite|exec",
+    "plugin:sqlite|query",
+    "plugin:sqlite|tx_begin",
+    "plugin:sqlite|tx_commit",
+    "plugin:sqlite|tx_rollback",
+    "plugin:sqlite|tx_exec",
+    "plugin:sqlite|tx_query",
+]

@@ -18,4 +18,8 @@ app/.storybook/public
 test-results
 playwright-report
 blob-report
-playwrighm
+playwright
+
+# Cargo
+app/src-tauri/target
+app/src-tauri/gen/schemas
