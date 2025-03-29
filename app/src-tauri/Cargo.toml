@@ -1,0 +1,35 @@
+[package]
+name = "app"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["Robin Thrift"]
+license = "BSD-3-Clause"
+repository = "https://github.com/robinthrift/belt"
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.1.0", features = [] }
+
+[dependencies]
+futures-core = "0.3"
+indexmap = { version = "2", features = ["serde"] }
+libsqlite3-sys = { version = "0.30.1", features = ["bundled-sqlcipher"], optional = false, default-features = false }
+log = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sqlx = { version = "0.8", features = ["json", "time", "sqlite", "runtime-tokio"] }
+tauri = { version = "2.4.0", features = [] }
+tauri-plugin-fs = "2"
+tauri-plugin-log = "2.0.0-rc"
+tauri-plugin-os = "2"
+thiserror = "2"
+time = "0.3"
+tokio = { version = "1", features = ["sync"] }
+
+[target."cfg(target_os = \"macos\")".dependencies]
+cocoa = "0.26"

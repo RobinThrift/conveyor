@@ -1,5 +1,5 @@
-import type { EditorView } from "@codemirror/view"
 import { SearchCursor } from "@codemirror/search"
+import type { EditorView } from "@codemirror/view"
 import { useCallback, useEffect, useMemo, useRef } from "react"
 
 import type { Tag } from "@/domain/Tag"

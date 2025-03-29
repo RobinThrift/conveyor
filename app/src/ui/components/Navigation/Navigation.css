@@ -13,3 +13,11 @@
 .navigation-theme-selector {
     @apply hidden lg:flex flex-1 gap-2 justify-end;
 }
+
+.tauri .navigation {
+    @apply pe-4;
+
+    & > .btn:first-child {
+        @apply mt-6;
+    }
+}

@@ -18,4 +18,8 @@ app/.storybook/public
 test-results
 playwright-report
 blob-report
-playwrighm
+playwright
+
+# Cargo
+**/target/
+**/gen/schemas/

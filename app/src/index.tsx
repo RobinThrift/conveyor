@@ -7,7 +7,10 @@ import { MemoController } from "@/control/MemoController"
 import { SettingsController } from "@/control/SettingsController"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
 import { history } from "@/external/browser/history"
-import { SQLite } from "@/external/browser/sqlite"
+import { SQLite as WebSQLite } from "@/external/browser/sqlite"
+import { TauriFS } from "@/external/tauri/TauriFS"
+import { TauriSQLite } from "@/external/tauri/TauriSQLite"
+import { BaseContext, type Context } from "@/lib/context"
 import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
@@ -40,7 +43,6 @@ import { SyncController } from "@/control/SyncController"
 import { UnlockController } from "@/control/UnlockController"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { OPFS } from "@/external/browser/opfs"
-import { BaseContext } from "@/lib/context"
 import { EncryptedFS } from "@/lib/fs/EncryptedFS"
 import { IndexedDBAuthStorage } from "@/storage/indexeddb/IndexedDBAuthStorage"
 import { IndexedDBSyncStorage } from "@/storage/indexeddb/IndexedDBSyncStorage"
@@ -55,6 +57,11 @@ const _ready = Promise.withResolvers<void>()
 main()
 
 async function main() {
+    // biome-ignore lint/nursery/noProcessEnv: will be removed soon
+    if (process.env.ENV === "TAURI") {
+        document.body.classList.add("tauri")
+    }
+
     let ctx = BaseContext
 
     let rootStore = configureRootStore({
@@ -136,7 +143,7 @@ async function main() {
 }
 
 async function initController() {
-    let db = new SQLite({
+    let db = SQLite({
         onError: (err) => {
             console.error(err)
         },
@@ -148,11 +155,13 @@ async function initController() {
         crypto,
     })
 
-    let rawFS = new OPFS("belt", {
+    let rawFS = FS("belt", {
         onError: (err) => {
             console.error(err)
         },
     })
+
+    await rawFS.mkdirp(BaseContext, ".")
 
     let encryptedFS = new EncryptedFS(rawFS, cryptoCtrl)
 
@@ -255,4 +264,24 @@ async function initController() {
         apiTokenCtrl,
         cryptoCtrl,
     }
+}
+
+function SQLite(
+    params: { baseCtx?: Context; onError?: (err: Error) => void } = {},
+) {
+    // biome-ignore lint/nursery/noProcessEnv: will be removed soon
+    if (process.env.ENV === "TAURI") {
+        return new TauriSQLite()
+    }
+
+    return new WebSQLite(params)
+}
+
+function FS(baseDir: string, params: { onError?: (err: Error) => void } = {}) {
+    // biome-ignore lint/nursery/noProcessEnv: will be removed soon
+    if (process.env.ENV === "TAURI") {
+        return new TauriFS(baseDir)
+    }
+
+    return new OPFS(baseDir, params)
 }

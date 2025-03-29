@@ -1,13 +1,17 @@
 import path from "node:path"
 import { exec as nodeexec } from "node:child_process"
+import * as process from "node:process"
 import { defineConfig, type UserConfig, searchForWorkspaceRoot } from "vite"
-import react from "@vitejs/plugin-react"
+import react from "@vitejs/plugin-react-swc"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
     let vcsInfo = await getVCSInfo()
 
+    let isTauri = process.env.TAURI_ENV_DEBUG
+    let host = process.env.TAURI_DEV_HOST
+
     return {
-        base: "/assets/",
+        base: isTauri ? "/" : "/assets/",
 
         publicDir: "build/",
 
@@ -15,6 +19,8 @@ export default defineConfig(async (config): Promise<UserConfig> => {
 
         define: {
             "import.meta.vitest": "undefined",
+
+            "process.env.ENV": JSON.stringify(isTauri ? "TAURI" : "WEB"),
 
             "process.env.NODE_ENV": JSON.stringify(config.mode),
             __LOG_LEVEL__: JSON.stringify("error"),
@@ -54,6 +60,13 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         },
 
         server: {
+            host: host || false,
+
+            headers: {
+                "Cross-Origin-Opener-Policy": "same-origin",
+                "Cross-Origin-Embedder-Policy": "require-corp",
+            },
+
             proxy: {
                 "^/assets/icons/.*": {
                     target: "http://localhost:6155",
@@ -64,9 +77,17 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                         ),
                 },
             },
-            headers: {
-                "Cross-Origin-Opener-Policy": "same-origin",
-                "Cross-Origin-Embedder-Policy": "require-corp",
+
+            hmr: host
+                ? {
+                      protocol: "ws",
+                      host,
+                      port: 1421,
+                  }
+                : undefined,
+
+            watch: {
+                ignored: ["**/src-tauri/**"],
             },
         },
 

@@ -83,9 +83,9 @@ export const registerEffects = (
 
             if (!unlocked.ok) {
                 dispatch(
-                    slice.actions.setIsUnlocked({
+                    setup.actions.setStep({
+                        step: "configure-encryption",
                         error: unlocked.err,
-                        isUnlocked: false,
                     }),
                 )
                 return

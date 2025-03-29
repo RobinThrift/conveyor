@@ -75,6 +75,7 @@ export function InitSetupScreen() {
                     generatePrivateCryptoKey={generatePrivateCryptoKey}
                     importPrivateCryptoKey={importPrivateCryptoKey}
                     checkPrivateCryptoKey={checkPrivateCryptoKey}
+                    error={error}
                 />
             )
             break
@@ -226,18 +227,20 @@ function StepConfigureEncryption({
     checkPrivateCryptoKey,
     isNew,
     back,
+    error,
 }: {
     generatePrivateCryptoKey: () => AsyncResult<string>
     candidatePrivateCryptoKey?: PrivateCryptoKey
     importPrivateCryptoKey: (key: string) => void
     checkPrivateCryptoKey: (key: string) => Result<void>
     isNew: boolean
+    error?: Error
     back: () => void
 }) {
     let t = useT("screens/InitSetup")
 
     let [value, setValue] = useStateGetter("")
-    let [error, setError] = useState<Error | undefined>(undefined)
+    let [genError, setGnError] = useState<Error | undefined>(undefined)
 
     let onChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,7 +254,7 @@ function StepConfigureEncryption({
             generatePrivateCryptoKey().then((key) => {
                 e.preventDefault()
                 if (!key.ok) {
-                    setError(key.err)
+                    setGnError(key.err)
                     return
                 }
 
@@ -267,7 +270,7 @@ function StepConfigureEncryption({
 
             let checked = checkPrivateCryptoKey(value())
             if (!checked.ok) {
-                setError(checked.err)
+                setGnError(checked.err)
                 return
             }
 
@@ -315,6 +318,17 @@ function StepConfigureEncryption({
                     {t.NextButtonLabel}
                 </Button>
             </div>
+
+            {genError && (
+                <Alert variant="danger">
+                    {genError.name}: {genError.message}
+                    {genError.stack && (
+                        <pre>
+                            <code>{genError.stack}</code>
+                        </pre>
+                    )}
+                </Alert>
+            )}
 
             {error && (
                 <Alert variant="danger">
