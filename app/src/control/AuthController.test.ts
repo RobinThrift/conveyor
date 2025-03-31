@@ -1,15 +1,16 @@
 import { assert, afterAll, suite, test } from "vitest"
 
 import { UnauthorizedError } from "@/api/apiv1/APIError"
-import type {
-    AuthToken,
-    PlaintextAuthTokenValue,
-    PlaintextPassword,
+import {
+    type AuthToken,
+    AuthTokenNotFoundError,
+    type PlaintextAuthTokenValue,
+    type PlaintextPassword,
 } from "@/auth"
 import { BaseContext, type Context } from "@/lib/context"
 import { addDays, addHours, currentDateTime } from "@/lib/date"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
-import { TestInMemAuthStorage } from "@/lib/testhelper/TestInMemAuthStorage"
+import { TestInMemKVStore } from "@/lib/testhelper/TestInMemKVStore"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 
 import { AuthController } from "./AuthController"
@@ -101,7 +102,7 @@ suite.concurrent("control/AuthController", async () => {
                 })
             onTestFinished(cleanup)
 
-            await storage.saveAuthToken(ctx, {
+            await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, 1),
@@ -123,7 +124,7 @@ suite.concurrent("control/AuthController", async () => {
                 })
             onTestFinished(cleanup)
 
-            await storage.saveAuthToken(ctx, {
+            await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
@@ -145,7 +146,7 @@ suite.concurrent("control/AuthController", async () => {
                 })
             onTestFinished(cleanup)
 
-            await storage.saveAuthToken(ctx, {
+            await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
@@ -165,7 +166,7 @@ suite.concurrent("control/AuthController", async () => {
                 })
             onTestFinished(cleanup)
 
-            await storage.saveAuthToken(ctx, {
+            await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
@@ -206,7 +207,12 @@ async function setupAuthControllerTest({
 } = {}) {
     let [ctx, cancel] = BaseContext.withCancel()
 
-    let storage = new TestInMemAuthStorage()
+    let storage = new TestInMemKVStore<
+        {
+            [key: string]: AuthToken
+        },
+        AuthTokenNotFoundError
+    >({ NotFoundErr: AuthTokenNotFoundError })
 
     let authCtrl = new AuthController({
         origin: "conveyor.dev",

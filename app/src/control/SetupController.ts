@@ -1,8 +1,11 @@
 import type { SetupInfo } from "@/domain/SetupInfo"
+import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import type { Context } from "@/lib/context"
 import type { AsyncResult } from "@/lib/result"
 
 export class SetupController {
+    static storageKey = "setup-info"
+
     private _storage: Storage
 
     constructor({ storage }: { storage: Storage }) {
@@ -10,15 +13,12 @@ export class SetupController {
     }
 
     loadSetupInfo(ctx: Context): AsyncResult<SetupInfo | undefined> {
-        return this._storage.loadSetupInfo(ctx)
+        return this._storage.getItem(ctx, SetupController.storageKey)
     }
 
     saveSetupInfo(ctx: Context, info: SetupInfo): AsyncResult<void> {
-        return this._storage.saveSetupInfo(ctx, info)
+        return this._storage.setItem(ctx, SetupController.storageKey, info)
     }
 }
 
-interface Storage {
-    loadSetupInfo(ctx: Context): AsyncResult<SetupInfo | undefined>
-    saveSetupInfo(ctx: Context, info: SetupInfo): AsyncResult<void>
-}
+type Storage = SingleItemKVStore<typeof SetupController.storageKey, SetupInfo>

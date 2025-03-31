@@ -1,8 +1,9 @@
-import { locale as loadLocale, platform } from "@tauri-apps/plugin-os"
 import { appConfigDir } from "@tauri-apps/api/path"
+import { locale as loadLocale, platform } from "@tauri-apps/plugin-os"
 
 import { setEnv } from "@/env"
 import { TauriFS } from "@/external/tauri/TauriFS"
+import { TauriKVStoreContainer } from "@/external/tauri/TauriKVStore"
 import { TauriSQLite } from "@/external/tauri/TauriSQLite"
 
 import type { PlatformDependencies, PlatformInitArgs } from "./init.platform"
@@ -22,8 +23,15 @@ export async function init({
         console.log("Tauri AppConfigDir: ", await appConfigDir())
     }
 
+    let kvContainer = new TauriKVStoreContainer()
+
     return {
         db: new TauriSQLite(),
         fs: new TauriFS(fs.baseDir),
+        kvContainers: {
+            fast: kvContainer,
+            permanent: kvContainer,
+            ephemeral: kvContainer,
+        },
     }
 }

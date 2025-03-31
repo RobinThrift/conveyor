@@ -10,17 +10,20 @@ import type {
     SettingChangelogEntry,
 } from "@/domain/Changelog"
 import type { SyncInfo } from "@/domain/SyncInfo"
+import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
 import type { FS } from "@/lib/fs"
-import { parseJSON, parseJSONDate } from "@/lib/json"
+import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok, all, fmtErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
 
 import type { CryptoController } from "./CryptoController"
 
 export class SyncController {
+    static storageKey = "sync-info"
+
     private _transactioner: Transactioner
     private _storage: Storage
     private _syncAPIClient: SyncAPIClient
@@ -87,16 +90,16 @@ export class SyncController {
             return registered
         }
 
-        return this._storage.saveSyncInfo(ctx, this._info)
+        return this._storage.setItem(ctx, SyncController.storageKey, this._info)
     }
 
     public async reset(ctx: Context): AsyncResult<void> {
         this._info = { isEnabled: false }
-        return this._storage.removeSyncInfo(ctx)
+        return this._storage.removeItem(ctx, SyncController.storageKey)
     }
 
     public async load(ctx: Context): AsyncResult<SyncInfo | undefined> {
-        let info = await this._storage.loadSyncInfo(ctx)
+        let info = await this._storage.getItem(ctx, SyncController.storageKey)
         if (!info.ok) {
             return info
         }
@@ -139,7 +142,7 @@ export class SyncController {
                 return uploaded
             }
 
-            return this._storage.saveSyncInfo(ctx, {
+            return this._storage.setItem(ctx, SyncController.storageKey, {
                 ...info,
                 lastSyncedAt: new Date(),
             })
@@ -427,7 +430,7 @@ export class SyncController {
                 return fmtErr("error decrytping changelog entry: %w", decrypted)
             }
 
-            let parsed = parseJSON<ChangelogEntry, Record<string, any>>(
+            let parsed = jsonDeserialize<ChangelogEntry, Record<string, any>>(
                 decrypted.value,
                 (obj) => {
                     // let appliedAt = parseJSONDate(obj.appliedAt)
@@ -515,11 +518,7 @@ interface SyncAPIClient {
     ): AsyncResult<void>
 }
 
-interface Storage {
-    loadSyncInfo(ctx: Context): AsyncResult<SyncInfo | undefined>
-    saveSyncInfo(ctx: Context, info: SyncInfo): AsyncResult<void>
-    removeSyncInfo(ctx: Context): AsyncResult<void>
-}
+type Storage = SingleItemKVStore<typeof SyncController.storageKey, SyncInfo>
 
 interface Memo {
     applyChangelogEntries(

@@ -5,7 +5,7 @@ import {
 } from "@/auth"
 import type { PlaintextPassword } from "@/auth/credentials"
 import type { Context } from "@/lib/context"
-import { parseJSON, parseJSONDate } from "@/lib/json"
+import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import {
     type AsyncResult,
     Err,
@@ -153,7 +153,7 @@ export class AuthV1APIClient {
     }
 
     private _authTokenFromJSON(raw: string) {
-        return parseJSON<AuthToken, Record<string, any>>(raw, (obj) => {
+        return jsonDeserialize<AuthToken, Record<string, any>>(raw, (obj) => {
             let expiresAt = parseJSONDate(obj.expiresAt)
             if (!expiresAt.ok) {
                 return expiresAt

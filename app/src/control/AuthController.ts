@@ -4,6 +4,7 @@ import {
     type PlaintextAuthTokenValue,
     type PlaintextPassword,
 } from "@/auth"
+import type { KVStore } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
 import { addMinutes, currentDateTime, isAfter } from "@/lib/date"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
@@ -35,7 +36,7 @@ export class AuthController {
 
     public async reset(ctx: Context): AsyncResult<void> {
         this._current = undefined
-        return this._storage.removeAllAuthTokens(ctx)
+        return this._storage.clear(ctx)
     }
 
     public async getInitialToken(
@@ -50,7 +51,11 @@ export class AuthController {
             return token
         }
 
-        let saved = await this._storage.saveAuthToken(ctx, token.value)
+        let saved = await this._storage.setItem(
+            ctx,
+            token.value.origin,
+            token.value,
+        )
         if (!saved.ok) {
             return saved
         }
@@ -108,7 +113,11 @@ export class AuthController {
             return token
         }
 
-        let saved = await this._storage.saveAuthToken(ctx, token.value)
+        let saved = await this._storage.setItem(
+            ctx,
+            token.value.origin,
+            token.value,
+        )
         if (!saved.ok) {
             return saved
         }
@@ -124,7 +133,7 @@ export class AuthController {
             return Ok(this._current)
         }
 
-        let loaded = await this._storage.getAuthToken(ctx, this._origin)
+        let loaded = await this._storage.getItem(ctx, this._origin)
         if (!loaded.ok) {
             if (loaded.err instanceof AuthTokenNotFoundError) {
                 return Ok(undefined)
@@ -138,11 +147,9 @@ export class AuthController {
     }
 }
 
-interface AuthStorage {
-    getAuthToken(ctx: Context, origin: string): AsyncResult<AuthToken>
-    saveAuthToken(ctx: Context, authToken: AuthToken): AsyncResult<void>
-    removeAllAuthTokens(ctx: Context): AsyncResult<void>
-}
+type AuthStorage = KVStore<{
+    [key: string]: AuthToken
+}>
 
 interface AuthAPIClient {
     setBaseURL(baseURL: string): void

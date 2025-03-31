@@ -9,14 +9,16 @@ import type {
     SettingChangelogEntry,
 } from "@/domain/Changelog"
 import { newID } from "@/domain/ID"
+import type { SyncInfo } from "@/domain/SyncInfo"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto/WebCryptoSha256Hasher"
+import { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import { BaseContext, type Context } from "@/lib/context"
 import type { Decrypter, Encrypter } from "@/lib/crypto"
-import { parseJSON, parseJSONDate } from "@/lib/json"
+import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok, fmtErr, toPromise } from "@/lib/result"
-import { TestInMemSyncStorage } from "@/lib/testhelper/TestInMemSyncStorage"
+import { TestInMemKVStore } from "@/lib/testhelper/TestInMemKVStore"
 import { assertOkResult } from "@/lib/testhelper/assertions"
 import { MockFS } from "@/lib/testhelper/mockfs"
 import { SQLite } from "@/lib/testhelper/sqlite"
@@ -327,7 +329,13 @@ async function setupSyncControllerTest({
     )
 
     let syncCtrl = new SyncController({
-        storage: new TestInMemSyncStorage(),
+        storage: new SingleItemKVStore<
+            typeof SyncController.storageKey,
+            SyncInfo
+        >(
+            SyncController.storageKey,
+            new TestInMemKVStore<Record<string, any>>(),
+        ),
         transactioner: db,
         syncAPIClient: {
             setBaseURL: () => {},
@@ -421,7 +429,7 @@ async function decryptChangeLogEntries(
             return fmtErr("error decrytping changelog entry: %w", decrypted)
         }
 
-        let parsed = parseJSON<ChangelogEntry, Record<string, any>>(
+        let parsed = jsonDeserialize<ChangelogEntry, Record<string, any>>(
             decrypted.value,
             (obj) => {
                 let timestamp = parseJSONDate(obj.timestamp)

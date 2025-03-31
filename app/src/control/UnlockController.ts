@@ -1,9 +1,12 @@
+import type { CryptoController } from "@/control/CryptoController"
 import { AgePrivateCryptoKey, type Identity } from "@/external/age/AgeCrypto"
+import type { KVStore } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 import type { Database } from "@/lib/database"
 import { type AsyncResult, Ok, fromPromise } from "@/lib/result"
-import type { CryptoController } from "./CryptoController"
+
+const _plaintextPrivateKeyStorageKey = "private-key"
 
 export class UnlockController {
     private _storage: Storage
@@ -28,7 +31,7 @@ export class UnlockController {
 
     public async reset(ctx: Context): AsyncResult<void> {
         this.isUnlocked = false
-        return this._storage.removePlaintextPrivateKey(ctx)
+        return this._storage.removeItem(ctx, _plaintextPrivateKeyStorageKey)
     }
 
     public async tryGetPlaintextPrivateKey(
@@ -38,7 +41,7 @@ export class UnlockController {
             return Ok(undefined)
         }
 
-        return this._storage.getPlaintextPrivateKey(ctx)
+        return this._storage.getItem(ctx, _plaintextPrivateKeyStorageKey)
     }
 
     public async unlock(
@@ -90,20 +93,17 @@ export class UnlockController {
         this.isUnlocked = true
 
         if (storeKey) {
-            return this._storage.storePlaintextPrivateKey(ctx, plaintextKeyData)
+            return this._storage.setItem(
+                ctx,
+                _plaintextPrivateKeyStorageKey,
+                plaintextKeyData,
+            )
         }
 
         return Ok(undefined)
     }
 }
 
-interface Storage {
-    getPlaintextPrivateKey(
-        ctx: Context,
-    ): AsyncResult<PlaintextPrivateKey | undefined>
-    storePlaintextPrivateKey(
-        ctx: Context,
-        key: PlaintextPrivateKey,
-    ): AsyncResult<void>
-    removePlaintextPrivateKey(_: Context): AsyncResult<void>
-}
+type Storage = KVStore<{
+    [_plaintextPrivateKeyStorageKey]: PlaintextPrivateKey
+}>

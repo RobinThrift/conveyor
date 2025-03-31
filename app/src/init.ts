@@ -3,6 +3,7 @@ import { APITokensV1APIClient } from "@/api/authv1/APITokensV1APIClient"
 import { AccountKeysV1APIClient } from "@/api/authv1/AccountKeysV1APIClient"
 import { SyncV1APIClient } from "@/api/syncv1"
 import { EncryptedRemoteAttachmentFetcher } from "@/api/syncv1/EncryptedRemoteAttachmentFetcher"
+import { type AuthToken, authTokenFromJSON } from "@/auth"
 import { APITokenController } from "@/control/APITokenController"
 import { AttachmentController } from "@/control/AttachmentController"
 import { AuthController } from "@/control/AuthController"
@@ -13,9 +14,11 @@ import { SettingsController } from "@/control/SettingsController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
 import { UnlockController } from "@/control/UnlockController"
+import type { SyncInfo } from "@/domain/SyncInfo"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
 import { history } from "@/external/browser/history"
+import { EncryptedKVStore, SingleItemKVStore } from "@/lib/KVStore"
 import { BaseContext, type Context } from "@/lib/context"
 import { EncryptedFS } from "@/lib/fs/EncryptedFS"
 import { toPromise } from "@/lib/result"
@@ -23,10 +26,6 @@ import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
 import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
-import { IndexedDBAuthStorage } from "@/storage/indexeddb/IndexedDBAuthStorage"
-import { IndexedDBSyncStorage } from "@/storage/indexeddb/IndexedDBSyncStorage"
-import { LocalStorageSetupInfoStorage } from "@/storage/localstorage/LocalStorageSetupInfoStorage"
-import { SessionStorageUnlockStorage } from "@/storage/sessionstorage/SessionStorageUnlockStorage"
 import * as eventbus from "@/ui/eventbus"
 import { actions, configureEffects, configureRootStore } from "@/ui/state"
 
@@ -80,11 +79,15 @@ async function initController(platform: PlatformDependencies) {
 
     let encryptedFS = new EncryptedFS(platform.fs, cryptoCtrl)
 
-    let authStorage = new IndexedDBAuthStorage(cryptoCtrl)
-
     let authCtrl = new AuthController({
         origin: globalThis.location.host,
-        storage: authStorage,
+        storage: new EncryptedKVStore<{
+            [key: string]: AuthToken
+        }>({
+            kv: platform.kvContainers.permanent.getKVStore("auth"),
+            crypto,
+            deseerialize: authTokenFromJSON,
+        }),
         authPIClient: new AuthV1APIClient({
             baseURL: globalThis.location.href,
         }),
@@ -126,10 +129,16 @@ async function initController(platform: PlatformDependencies) {
         changelog: changelogCtrl,
     })
 
-    let syncStorage = new IndexedDBSyncStorage(cryptoCtrl)
-
     let syncCtrl = new SyncController({
-        storage: syncStorage,
+        storage: new SingleItemKVStore(
+            SyncController.storageKey,
+            new EncryptedKVStore<
+                Record<typeof SyncController.storageKey, SyncInfo>
+            >({
+                kv: platform.kvContainers.permanent.getKVStore("sync"),
+                crypto,
+            }),
+        ),
         dbPath: "conveyor.db",
         transactioner: platform.db,
         syncAPIClient,
@@ -146,11 +155,14 @@ async function initController(platform: PlatformDependencies) {
     })
 
     let setupCtrl = new SetupController({
-        storage: new LocalStorageSetupInfoStorage(),
+        storage: new SingleItemKVStore(
+            SetupController.storageKey,
+            platform.kvContainers.fast.getKVStore("setup"),
+        ),
     })
 
     let unlockCtrl = new UnlockController({
-        storage: new SessionStorageUnlockStorage(),
+        storage: platform.kvContainers.ephemeral.getKVStore("unlock"),
         db: platform.db,
         crypto: cryptoCtrl,
     })
@@ -161,11 +173,6 @@ async function initController(platform: PlatformDependencies) {
             tokenStorage: authCtrl,
         }),
     })
-
-    await Promise.all([
-        authStorage.open(BaseContext),
-        syncStorage.open(BaseContext),
-    ])
 
     return {
         attachmentCtrl,

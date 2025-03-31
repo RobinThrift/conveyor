@@ -1,27 +1,126 @@
+import type { KVStore, KVStoreContainer } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
 import {
     type AsyncResult,
     Err,
     Ok,
+    type Result,
     fromPromise,
     fromThrowing,
 } from "@/lib/result"
 
-type BrowserIndexedDBMigration = (db: IDBDatabase) => AsyncResult<void>
+type KVRow<V> = {
+    key: IDBValidKey
+    value: V
+}
 
-export class BrowserIndexedDB<Stores extends Record<string, unknown>> {
+export class IndexDBKVStore<
+    Name extends string,
+    Items extends Record<string, unknown>,
+    NotFoundError extends Error = never,
+> implements KVStore<Items>
+{
+    private _db: IndexedDBKVStoreContainer<Name>
+    private _name: Name
+    private _instantiate: <K extends keyof Items>(
+        raw: Record<string, unknown> | ArrayBufferLike,
+    ) => Result<Items[K]>
+    private NotFoundErr?: NotFoundError extends Error
+        ? { new (key: string): NotFoundError }
+        : never
+
+    constructor(
+        name: Name,
+        db: IndexedDBKVStoreContainer<Name>,
+        {
+            instantiate,
+            NotFoundErr,
+        }: {
+            instantiate?: <K extends keyof Items>(
+                raw: Record<string, unknown> | ArrayBufferLike,
+            ) => Result<Items[K]>
+            NotFoundErr?: NotFoundError extends Error
+                ? { new (key: string): NotFoundError }
+                : never
+        },
+    ) {
+        this._name = name
+        this._db = db
+        this._instantiate = instantiate ?? ((raw: any) => Ok(raw))
+        this.NotFoundErr = NotFoundErr
+    }
+
+    public async getItem<K extends keyof Items>(
+        ctx: Context,
+        key: K,
+    ): AsyncResult<Items[K] | undefined> {
+        let item = await this._db.get<Items[K]>(ctx, this._name, key as string)
+        if (!item.ok) {
+            return item
+        }
+
+        if (!item.value && typeof this.NotFoundErr === "function") {
+            return Err(new this.NotFoundErr(key as string))
+        }
+
+        if (!item.value) {
+            return Ok(item.value)
+        }
+
+        return this._instantiate(item.value.value as any)
+    }
+
+    public async setItem<K extends keyof Items>(
+        ctx: Context,
+        key: K,
+        value: Items[K],
+    ): AsyncResult<void> {
+        return this._db.insertOrUpdate(ctx, this._name, [
+            {
+                key: key as string,
+                value,
+            },
+        ])
+    }
+
+    public async removeItem<K extends keyof Items>(
+        ctx: Context,
+        key: K,
+    ): AsyncResult<void> {
+        return this._db.delete(ctx, this._name, key as string)
+    }
+
+    public async clear(ctx: Context): AsyncResult<void> {
+        let keys = await this._db.listKeys(ctx, this._name)
+        if (!keys.ok) {
+            return keys
+        }
+
+        for (let key of keys.value) {
+            let deleted = await this._db.delete(ctx, this._name, key)
+            if (!deleted.ok) {
+                return deleted
+            }
+        }
+
+        return Ok(undefined)
+    }
+}
+
+export class IndexedDBKVStoreContainer<Stores extends string>
+    implements KVStoreContainer<Stores>
+{
     private _db!: IDBDatabase
 
-    async open(
+    static async open<Stores extends string>(
         ctx: Context,
         name: string,
-        migrations: BrowserIndexedDBMigration[],
-    ): AsyncResult<void> {
+        stores: Stores[],
+        version: number,
+    ): AsyncResult<IndexedDBKVStoreContainer<Stores>> {
         let { resolve, reject, promise } = Promise.withResolvers<IDBDatabase>()
 
-        let version = migrations.length
-
-        let req = globalThis.indexedDB.open(name, migrations.length)
+        let req = globalThis.indexedDB.open(name, version)
 
         req.addEventListener("error", () => {
             reject(
@@ -39,21 +138,41 @@ export class BrowserIndexedDB<Stores extends Record<string, unknown>> {
             resolve(req.result)
         })
 
-        req.addEventListener("upgradeneeded", async (evt) => {
-            let toApply = migrations.slice(Math.max(evt.oldVersion, 0))
-            if (toApply.length === 0) {
+        req.addEventListener("upgradeneeded", async () => {
+            if (ctx.isCancelled()) {
+                reject(ctx.err())
                 return
             }
 
-            for (let migration of toApply) {
+            let existing = new Set(Array.from(req.result.objectStoreNames))
+            let requested = new Set<string>(stores)
+
+            for (let store of existing.union(requested)) {
                 if (ctx.isCancelled()) {
                     reject(ctx.err())
                     return
                 }
 
-                let res = await migration(req.result)
-                if (!res.ok) {
-                    reject(res.err)
+                try {
+                    // exists
+                    if (existing.has(store) && requested.has(store)) {
+                        continue
+                    }
+
+                    // removed
+                    if (existing.has(store) && !requested.has(store)) {
+                        req.result.deleteObjectStore(store)
+                        continue
+                    }
+
+                    // new
+                    if (!existing.has(store)) {
+                        req.result.createObjectStore(store, {
+                            keyPath: "key",
+                        })
+                    }
+                } catch (err) {
+                    reject(err)
                     return
                 }
             }
@@ -81,19 +200,37 @@ export class BrowserIndexedDB<Stores extends Record<string, unknown>> {
             return db
         }
 
-        this._db = db.value
+        let backing = new IndexedDBKVStoreContainer<Stores>()
+        backing._db = db.value
 
-        return Ok(undefined)
+        return Ok(backing)
     }
 
     public close() {
         return this._db.close()
     }
 
-    public async insertOrUpdate<S extends keyof Stores>(
+    public getKVStore<
+        Items extends Record<string, unknown>,
+        NotFoundError extends Error = never,
+    >(
+        name: Stores,
+        opts: {
+            instantiate?: <K extends keyof Items>(
+                raw: Record<string, unknown> | ArrayBufferLike,
+            ) => Result<Items[K]>
+            NotFoundErr?: NotFoundError extends Error
+                ? { new (key: string): NotFoundError }
+                : never
+        } = {},
+    ): IndexDBKVStore<Stores, Items, NotFoundError> {
+        return new IndexDBKVStore(name, this, opts)
+    }
+
+    public async insertOrUpdate<Item>(
         ctx: Context,
-        storeName: S,
-        data: Stores[S][],
+        storeName: Stores,
+        data: KVRow<Item>[],
     ): AsyncResult<void> {
         return this._inTransaction(ctx, storeName, "readwrite", async (tx) => {
             let maybeStore = fromThrowing(() =>
@@ -119,11 +256,11 @@ export class BrowserIndexedDB<Stores extends Record<string, unknown>> {
         })
     }
 
-    public async get<S extends keyof Stores>(
+    public async get<R>(
         ctx: Context,
-        storeName: S,
+        storeName: Stores,
         key: IDBValidKey,
-    ): AsyncResult<Stores[S] | undefined> {
+    ): AsyncResult<KVRow<R> | undefined> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
             let maybeStore = fromThrowing(() =>
                 tx.objectStore(storeName as string),
@@ -143,52 +280,9 @@ export class BrowserIndexedDB<Stores extends Record<string, unknown>> {
         })
     }
 
-    public async query<S extends keyof Stores>(
+    public async listKeys(
         ctx: Context,
-        storeName: S,
-        predicate: (item: Stores[S]) => boolean,
-    ): AsyncResult<Stores[S][]> {
-        return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let maybeStore = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
-            if (!maybeStore.ok) {
-                return maybeStore
-            }
-
-            let store = maybeStore.value
-
-            let getAllReq = fromThrowing(() => store.getAll())
-            if (!getAllReq.ok) {
-                return getAllReq
-            }
-
-            let { resolve, reject, promise } =
-                Promise.withResolvers<Stores[S][]>()
-
-            getAllReq.value.addEventListener("error", () => {
-                reject(getAllReq.value.error)
-            })
-
-            getAllReq.value.addEventListener("success", () => {
-                let items: Stores[S][] = []
-
-                for (let item of getAllReq.value.result) {
-                    if (predicate(item)) {
-                        items.push(item)
-                    }
-                }
-
-                resolve(items)
-            })
-
-            return fromPromise(promise)
-        })
-    }
-
-    public async listKeys<S extends keyof Stores>(
-        ctx: Context,
-        storeName: S,
+        storeName: Stores,
     ): AsyncResult<IDBValidKey[]> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
             let maybeStore = fromThrowing(() =>
@@ -224,9 +318,9 @@ export class BrowserIndexedDB<Stores extends Record<string, unknown>> {
         })
     }
 
-    public async delete<S extends keyof Stores>(
+    public async delete(
         ctx: Context,
-        storeName: S,
+        storeName: Stores,
         key: IDBValidKey,
     ): AsyncResult<void> {
         return this._inTransaction(ctx, storeName, "readwrite", async (tx) => {
@@ -248,9 +342,9 @@ export class BrowserIndexedDB<Stores extends Record<string, unknown>> {
         })
     }
 
-    private async _inTransaction<S extends keyof Stores, R>(
+    private async _inTransaction<R>(
         ctx: Context,
-        storeName: S,
+        storeName: Stores,
         mode: IDBTransactionMode,
         fn: (tx: IDBTransaction) => AsyncResult<R>,
     ): AsyncResult<R> {

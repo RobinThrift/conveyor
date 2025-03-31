@@ -6,12 +6,17 @@ import { actions, selectors } from "@/ui/state"
 
 export function SettingsLoader({ children }: React.PropsWithChildren) {
     let isSetup = useSelector(selectors.setup.isSetup)
+    let isUnlocked = useSelector(selectors.unlock.isUnlocked)
     let isLoading = useSelector(selectors.settings.isLoading)
     let isLoaded = useSelector(selectors.settings.isLoaded)
     let error = useSelector(selectors.settings.error)
     let dispatch = useDispatch()
 
     useEffect(() => {
+        if (!isSetup || !isUnlocked) {
+            return
+        }
+
         if (error) {
             // @TODO: better error reporting
             console.error("settings load error", error)
@@ -23,9 +28,9 @@ export function SettingsLoader({ children }: React.PropsWithChildren) {
         }
 
         dispatch(actions.settings.loadStart())
-    }, [isLoaded, isLoading, error, dispatch])
+    }, [isSetup, isUnlocked, isLoaded, isLoading, error, dispatch])
 
-    if (!isSetup) {
+    if (!isSetup || !isUnlocked) {
         return children
     }
 

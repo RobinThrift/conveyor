@@ -1,5 +1,5 @@
 import type { Context } from "@/lib/context"
-import { parseJSON, parseJSONDate } from "@/lib/json"
+import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
 
 import type { APIToken, APITokenList } from "@/domain/APIToken"
@@ -71,7 +71,7 @@ export class APITokensV1APIClient {
             )
         }
 
-        return parseJSON(
+        return jsonDeserialize(
             await res.value.text(),
             (raw: {
                 next?: string
@@ -143,7 +143,7 @@ export class APITokensV1APIClient {
             )
         }
 
-        return parseJSON(await res.value.text())
+        return jsonDeserialize(await res.value.text())
     }
 
     public async deleteAPIToken(ctx: Context, name: string): AsyncResult<void> {

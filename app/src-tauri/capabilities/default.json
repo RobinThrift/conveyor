@@ -1,20 +1,23 @@
 {
-    "$schema": "../gen/schemas/desktop-schema.json",
-    "identifier": "default",
-    "description": "enables the default permissions",
-    "windows": ["main"],
-    "permissions": [
-        "core:default",
-        "os:allow-platform",
-        "os:allow-locale",
-        "core:window:allow-start-dragging",
-        "sqlite-allow-all",
-        "fs:default",
-        "fs:allow-appconfig-meta-recursive",
-        "fs:allow-appconfig-read-recursive",
-        "fs:allow-appconfig-write-recursive",
-        "fs:allow-applocaldata-read-recursive",
-        "fs:allow-applocaldata-write-recursive",
-        "os:default"
-    ]
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "enables the default permissions",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "os:allow-platform",
+    "os:allow-locale",
+    "core:window:allow-start-dragging",
+    "sqlite-allow-all",
+    "fs:default",
+    "fs:allow-appconfig-meta-recursive",
+    "fs:allow-appconfig-read-recursive",
+    "fs:allow-appconfig-write-recursive",
+    "fs:allow-applocaldata-read-recursive",
+    "fs:allow-applocaldata-write-recursive",
+    "os:default",
+    "store:default"
+  ]
 }

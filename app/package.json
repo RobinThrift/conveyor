@@ -73,6 +73,7 @@
         "@sqlite.org/sqlite-wasm": "^3.48.0-build4",
         "@tauri-apps/plugin-fs": "^2.2.0",
         "@tauri-apps/plugin-os": "^2.2.1",
+        "@tauri-apps/plugin-store": "^2.2.0",
         "@types/mdast": "^4.0.4",
         "age-encryption": "^0.2.1",
         "clsx": "^2.1.1",

@@ -5,6 +5,7 @@ import { AttachmentController } from "@/control/AttachmentController"
 import { ChangelogController } from "@/control/ChangelogController"
 import { MemoController } from "@/control/MemoController"
 import { SettingsController } from "@/control/SettingsController"
+import type { SyncInfo } from "@/domain/SyncInfo"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
 import { history } from "@/external/browser/history"
 import { BaseContext } from "@/lib/context"
@@ -29,18 +30,19 @@ import { AuthV1APIClient } from "@/api/authv1"
 import { APITokensV1APIClient } from "@/api/authv1/APITokensV1APIClient"
 import { AccountKeysV1APIClient } from "@/api/authv1/AccountKeysV1APIClient"
 import { SyncV1APIClient } from "@/api/syncv1"
+import type { AuthToken } from "@/auth"
 import { APITokenController } from "@/control/APITokenController"
 import { AuthController } from "@/control/AuthController"
 import { CryptoController } from "@/control/CryptoController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
 import { UnlockController } from "@/control/UnlockController"
+import type { SetupInfo } from "@/domain/SetupInfo"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
-import { LocalStorageSetupInfoStorage } from "@/storage/localstorage/LocalStorageSetupInfoStorage"
+import { SingleItemKVStore } from "@/lib/KVStore"
+import type { PlaintextPrivateKey } from "@/lib/crypto"
 
-import { TestInMemAuthStorage } from "./TestInMemAuthStorage"
-import { TestInMemSyncStorage } from "./TestInMemSyncStorage"
-import { TestInMemUnlockStorage } from "./TestInMemUnlockStorage"
+import { TestInMemKVStore } from "./TestInMemKVStore"
 import { MockFS } from "./mockfs"
 
 export interface MockRootStoreProviderProps {
@@ -95,14 +97,22 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
 
         let authCtrl = new AuthController({
             origin: globalThis.location.origin,
-            storage: new TestInMemAuthStorage(),
+            storage: new TestInMemKVStore<{
+                [key: string]: AuthToken
+            }>(),
             authPIClient: new AuthV1APIClient({
                 baseURL: globalThis.location.href,
             }),
         })
 
         let syncCtrl = new SyncController({
-            storage: new TestInMemSyncStorage(),
+            storage: new SingleItemKVStore<
+                typeof SyncController.storageKey,
+                SyncInfo
+            >(
+                SyncController.storageKey,
+                new TestInMemKVStore<Record<string, any>>(),
+            ),
             dbPath: "test.db",
             transactioner: db,
             syncAPIClient: new SyncV1APIClient({
@@ -122,11 +132,19 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         })
 
         let setupCtrl = new SetupController({
-            storage: new LocalStorageSetupInfoStorage(),
+            storage: new SingleItemKVStore<
+                typeof SetupController.storageKey,
+                SetupInfo
+            >(
+                SetupController.storageKey,
+                new TestInMemKVStore<Record<string, any>>(),
+            ),
         })
 
         let unlockCtrl = new UnlockController({
-            storage: new TestInMemUnlockStorage(),
+            storage: new TestInMemKVStore<{
+                "private-key": PlaintextPrivateKey
+            }>(),
             db,
             crypto: cryptoCtrl,
         })

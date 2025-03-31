@@ -27,6 +27,7 @@ tauri = { version = "2.4.0", features = [] }
 tauri-plugin-fs = "2"
 tauri-plugin-log = "2.0.0-rc"
 tauri-plugin-os = "2"
+tauri-plugin-store = "2"
 thiserror = "2"
 time = "0.3"
 tokio = { version = "1", features = ["sync"] }
