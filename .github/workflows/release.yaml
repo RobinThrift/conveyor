@@ -64,3 +64,61 @@ jobs:
         bodyFile: "CHANGELOG/CHANGELOG-${{ github.ref_name }}.md"
         allowUpdates: true
 
+
+  Build-App-Dmd:
+    needs: [Create-Release]
+
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest'
+            args: '--target x86_64-apple-darwin'
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+
+    - uses: RobinThrift/action-setup-just@v1
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "latest"
+
+    - uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
+      with:
+        # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
+        targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+    - uses: swatinem/rust-cache@v2
+      with:
+        workspaces: "./app/src-tauri -> target"
+
+    - uses: actions/cache@v4
+      with:
+        path: app/src/external/sqlite-wasm/build
+        key: sqlchiper-v4.6.1
+
+    - name: "Build Frontend"
+      run: |
+        cd app
+        just install
+        just build
+
+    - uses: tauri-apps/tauri-action@v0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        projectPath: "./app"
+        args: ${{ matrix.args }}
+        tagName: ${{ github.ref_name }}
+        releaseName: "Conveyor ${{ github.ref_name }}"
+
