@@ -189,7 +189,7 @@ ${faker.lorem.paragraphs({ min: 1, max: 4 })}
 }
 
 export function generateOpenGraphDirective(): string {
-    return `::link-preview[https://github.com/RobinThrift/belt]{img="${faker.image.url({ width: 1200, height: 600 })}" title="${faker.lorem.sentences(1)}" description="${faker.lorem.sentences({ min: 1, max: 3 })}"}`
+    return `::link-preview[https://github.com/RobinThrift/conveyor]{img="${faker.image.url({ width: 1200, height: 600 })}" title="${faker.lorem.sentences(1)}" description="${faker.lorem.sentences({ min: 1, max: 3 })}"}`
 }
 
 export function generateTable(rows = 3): string {
@@ -226,7 +226,7 @@ func run(ctx context.Context) error {
 	startCtx, startCtxCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer startCtxCancel()
 
-	config, err := app.ParseConfig("BELT_")
+	config, err := app.ParseConfig("CONVEYOR_")
 	if err != nil {
 		return err
 	}

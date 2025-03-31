@@ -22,7 +22,7 @@ function loadServerData(): ServerData {
     if (!_serverData) {
         _serverData = JSON.parse(
             // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
-            document.getElementById("__belt_ui_data__")!.innerHTML,
+            document.getElementById("__conveyor_ui_data__")!.innerHTML,
         )
     }
 

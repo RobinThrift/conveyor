@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"go.robinthrift.com/belt/internal/storage/database/sqlite"
+	"go.robinthrift.com/conveyor/internal/storage/database/sqlite"
 )
 
 func NewInMemTestSQLite(t *testing.T) *sqlite.SQLite {

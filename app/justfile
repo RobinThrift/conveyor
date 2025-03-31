@@ -25,7 +25,7 @@ watch mode="development":
 tauri cmd *args="":
     {{ local_bin }}/tauri {{ cmd }} {{ args }}
 
-storybook *flags="": _gen-icons _build-sqlite
+storybook *flags="-p 6007": _gen-icons _build-sqlite
     -rm -rf .storybook/public/
     {{ local_bin }}/msw init --save false .storybook/public/
     {{ local_bin }}/storybook dev --no-open {{ flags }}

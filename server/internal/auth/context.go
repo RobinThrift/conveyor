@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	"go.robinthrift.com/belt/internal/domain"
+	"go.robinthrift.com/conveyor/internal/domain"
 )
 
 type ctxAccountKeyType string

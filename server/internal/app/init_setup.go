@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/control"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/storage/database"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/control"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/storage/database"
 )
 
 type initSetupConfig struct {

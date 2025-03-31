@@ -5,11 +5,11 @@ import (
 	"context"
 	"net/http"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/control"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/x/httperrors"
-	"go.robinthrift.com/belt/internal/x/httpmiddleware"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/control"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/x/httperrors"
+	"go.robinthrift.com/conveyor/internal/x/httpmiddleware"
 )
 
 type router struct {
@@ -26,7 +26,7 @@ func New(basePath string, mux *http.ServeMux, syncCtrl *control.SyncController, 
 	r := &router{
 		syncCtrl:       syncCtrl,
 		accountFetcher: accountFetcher,
-		errorHandler:   httperrors.ErrorHandler("belt/api/memos/v1"),
+		errorHandler:   httperrors.ErrorHandler("conveyor/api/memos/v1"),
 	}
 
 	HandlerWithOptions(NewStrictHandlerWithOptions(r, nil, StrictHTTPServerOptions{

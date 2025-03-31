@@ -1,8 +1,8 @@
 {
     "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-    "productName": "Belt",
+    "productName": "Conveyor",
     "version": "0.1.0",
-    "identifier": "com.robinthrift.belt",
+    "identifier": "com.robinthrift.conveyor",
     "build": {
         "frontendDist": "../build",
         "devUrl": "http://localhost:6155",

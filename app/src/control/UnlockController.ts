@@ -74,7 +74,7 @@ export class UnlockController {
             fromPromise(
                 this._db.open(ctx, {
                     enckey: privateKeyStr.value,
-                    file: db?.file ?? "belt/belt.db",
+                    file: db?.file ?? "conveyor.db",
                     enableTracing: db?.enableTracing ?? false,
                 }),
             ),

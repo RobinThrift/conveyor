@@ -102,12 +102,20 @@
 }
 
 .logo {
-    top: -50vh;
-    left: -20vw;
+    top: 0vh;
+    left: 0vw;
 
     @media (min-width: 768px) {
-        top: -10vh;
-        left: -50vw;
+        left: 0;
+    }
+
+    @media (min-width: 1440px) {
+        top: -40vh;
+    }
+
+    @media (min-width: 1680px) {
+        top: -50vh;
+        left: -10vw;
     }
 }
 

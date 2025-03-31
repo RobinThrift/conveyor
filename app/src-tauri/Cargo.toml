@@ -1,12 +1,12 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
+name = "conveyor"
+version = "0.10.0"
+description = "Conveyor Tauri app."
 authors = ["Robin Thrift"]
 license = "BSD-3-Clause"
-repository = "https://github.com/robinthrift/belt"
+repository = "https://github.com/robinthrift/conveyor"
 edition = "2021"
-rust-version = "1.77.2"
+rust-version = "1.85.1"
 
 [lib]
 name = "app_lib"

@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"time"
 
-	"go.robinthrift.com/belt/internal/storage/database"
-	"go.robinthrift.com/belt/internal/storage/database/sqlite/sqlc"
+	"go.robinthrift.com/conveyor/internal/storage/database"
+	"go.robinthrift.com/conveyor/internal/storage/database/sqlite/sqlc"
 
 	_ "modernc.org/sqlite" // blank import because DB driver
 )

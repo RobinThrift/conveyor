@@ -3,7 +3,7 @@ import type { PlaintextPrivateKey } from "@/lib/crypto"
 import { type AsyncResult, Ok } from "@/lib/result"
 
 export class SessionStorageUnlockStorage {
-    private _plaintextPrivateKeyStorageKey = "belt.private-key"
+    private _plaintextPrivateKeyStorageKey = "conveyor.private-key"
 
     async getPlaintextPrivateKey(
         _: Context,

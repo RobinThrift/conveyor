@@ -1,7 +1,7 @@
 package app
 
 import (
-	"go.robinthrift.com/belt/internal/jobs"
+	"go.robinthrift.com/conveyor/internal/jobs"
 )
 
 //nolint:gochecknoglobals

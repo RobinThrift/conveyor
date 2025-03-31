@@ -12,10 +12,10 @@ import (
 	"path"
 	"time"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/storage"
-	"go.robinthrift.com/belt/internal/storage/database"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/storage"
+	"go.robinthrift.com/conveyor/internal/storage/database"
 
 	"filippo.io/age"
 	gonanoid "github.com/matoous/go-nanoid/v2"
@@ -90,7 +90,7 @@ func (sc *SyncController) GetLatestFullSyncEntry(ctx context.Context) (*domain.F
 		return nil, err
 	}
 
-	entry.Filepath = path.Join("dbs", fmt.Sprintf("belt_%d.db", entry.Timestamp.Unix()))
+	entry.Filepath = path.Join("dbs", fmt.Sprintf("conveyor_%d.db", entry.Timestamp.Unix()))
 
 	return entry, nil
 }
@@ -107,7 +107,7 @@ func (sc *SyncController) SaveFullDB(ctx context.Context, cmd SaveFullDBCmd) err
 
 	return sc.transactioner.InTransaction(ctx, func(ctx context.Context) error {
 		timestamp := time.Now()
-		filepath := path.Join("dbs", fmt.Sprintf("belt_%d.db", timestamp.Unix()))
+		filepath := path.Join("dbs", fmt.Sprintf("conveyor_%d.db", timestamp.Unix()))
 
 		h := sha256.New()
 

@@ -9,16 +9,16 @@ import (
 	"os"
 	"time"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/control"
-	appingress "go.robinthrift.com/belt/internal/ingress/app"
-	"go.robinthrift.com/belt/internal/ingress/authv1"
-	"go.robinthrift.com/belt/internal/ingress/memosv1"
-	"go.robinthrift.com/belt/internal/ingress/syncv1"
-	"go.robinthrift.com/belt/internal/jobs"
-	"go.robinthrift.com/belt/internal/server"
-	"go.robinthrift.com/belt/internal/storage/database/sqlite"
-	"go.robinthrift.com/belt/internal/storage/filesystem"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/control"
+	appingress "go.robinthrift.com/conveyor/internal/ingress/app"
+	"go.robinthrift.com/conveyor/internal/ingress/authv1"
+	"go.robinthrift.com/conveyor/internal/ingress/memosv1"
+	"go.robinthrift.com/conveyor/internal/ingress/syncv1"
+	"go.robinthrift.com/conveyor/internal/jobs"
+	"go.robinthrift.com/conveyor/internal/server"
+	"go.robinthrift.com/conveyor/internal/storage/database/sqlite"
+	"go.robinthrift.com/conveyor/internal/storage/filesystem"
 )
 
 type App struct {

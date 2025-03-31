@@ -7,9 +7,9 @@ import (
 	"slices"
 	"strings"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/x/httperrors"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/x/httperrors"
 )
 
 func NewAuthMiddleware(accountFetcher interface {
@@ -44,7 +44,7 @@ func NewAuthMiddleware(accountFetcher interface {
 				errorHandler(w, r, &httperrors.Error{
 					Code:  http.StatusInternalServerError,
 					Title: http.StatusText(http.StatusInternalServerError),
-					Type:  "belt/api/sync/v1/InternalServerError",
+					Type:  "conveyor/api/sync/v1/InternalServerError",
 				})
 
 				return

@@ -5,9 +5,9 @@
 package sqlc
 
 import (
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 )
 
 type Account struct {

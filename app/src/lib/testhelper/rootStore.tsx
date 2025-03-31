@@ -154,7 +154,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         })
 
         // @ts-expect-error: this is for debugging
-        globalThis.__BELT_DB__ = db
+        globalThis.__CONVEYOR_DB__ = db
 
         return { rootStore, attachmentCtrl }
     }, [])

@@ -6,7 +6,7 @@ import { Button } from "@/ui/components/Button"
 import defaultCSS from "./default.css?inline"
 
 const meta: Meta = {
-    title: "Belt/Colours",
+    title: "Conveyor/Colours",
 }
 
 export default meta

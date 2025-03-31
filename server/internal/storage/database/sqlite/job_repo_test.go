@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.robinthrift.com/belt/internal/domain"
+	"go.robinthrift.com/conveyor/internal/domain"
 )
 
 func TestJobRepo_CRUD(t *testing.T) {

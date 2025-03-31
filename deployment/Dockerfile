@@ -20,17 +20,17 @@ RUN apk update && apk upgrade && apk add --no-cache curl git && \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
     just --version
 
-COPY ./app/package.json /belt/app/package.json
-COPY ./app/package-lock.json /belt/app/package-lock.json
-COPY ./app/justfile /belt/app/justfile
+COPY ./app/package.json /conveyor/app/package.json
+COPY ./app/package-lock.json /conveyor/app/package-lock.json
+COPY ./app/justfile /conveyor/app/justfile
 
-WORKDIR /belt/app
+WORKDIR /conveyor/app
 
 RUN just install
 
-COPY ./app /belt/app
-COPY .git /belt/.git
-COPY --from=sqlite3-builder /out /belt/app/src/external/sqlite-wasm/build
+COPY ./app /conveyor/app
+COPY .git /conveyor/.git
+COPY --from=sqlite3-builder /out /conveyor/app/src/external/sqlite-wasm/build
 
 RUN just build
 
@@ -40,9 +40,9 @@ RUN apk update && apk upgrade && apk add --no-cache curl git &&  \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
     just --version
 
-COPY ./server /belt
-COPY --from=frontend /belt/app/build /belt/internal/ingress/app/assets
-WORKDIR /belt
+COPY ./server /conveyor
+COPY --from=frontend /conveyor/app/build /conveyor/internal/ingress/app/assets
+WORKDIR /conveyor
 
 ARG VERSION TARGETOS TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/go-build \
@@ -54,23 +54,23 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Create a nonroot user to copy
 RUN echo "nobody:*:65534:65534:nobody:/_nonexistent:/bin/false" > /etc/passwd.nonroot
 
-RUN mkdir -p /run/belt/files /tmp/belt
+RUN mkdir -p /run/conveyor/files /tmp/conveyor
 
 FROM scratch
 
-LABEL org.opencontainers.image.source=https://github.com/RobinThrift/belt
+LABEL org.opencontainers.image.source=https://github.com/RobinThrift/conveyor
 LABEL org.opencontainers.image.licenses=BSD-3-Clause
 
-COPY --from=builder /belt/build/belt /belt
+COPY --from=builder /conveyor/build/conveyor /conveyor
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd.nonroot /etc/passwd
-COPY --from=builder --chown=nobody:nobody /run/belt /run
-COPY --from=builder --chown=nobody:nobody /tmp/belt /tmp
+COPY --from=builder --chown=nobody:nobody /run/conveyor /run
+COPY --from=builder --chown=nobody:nobody /tmp/conveyor /tmp
 
-ENV BELT_DATABASE_PATH="/run/belt.db"
-ENV BELT_BLOBS_DIR="/run/blobs"
+ENV conveyor_DATABASE_PATH="/run/conveyor.db"
+ENV conveyor_BLOBS_DIR="/run/blobs"
 
 USER nobody
 
-CMD ["/belt"]
+CMD ["/conveyor"]
 

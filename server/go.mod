@@ -1,4 +1,4 @@
-module go.robinthrift.com/belt
+module go.robinthrift.com/conveyor
 
 go 1.24.0
 

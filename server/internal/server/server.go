@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.robinthrift.com/belt/internal/x/httpmiddleware"
+	"go.robinthrift.com/conveyor/internal/x/httpmiddleware"
 )
 
 type Config struct {

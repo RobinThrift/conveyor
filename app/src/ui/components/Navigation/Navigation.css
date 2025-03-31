@@ -14,7 +14,7 @@
     @apply hidden lg:flex flex-1 gap-2 justify-end;
 }
 
-.tauri .navigation {
+body.macos .navigation {
     @apply pe-4;
 
     & > .btn:first-child {

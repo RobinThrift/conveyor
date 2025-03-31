@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/x/sensitive"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/x/sensitive"
 	"golang.org/x/crypto/argon2"
 )
 

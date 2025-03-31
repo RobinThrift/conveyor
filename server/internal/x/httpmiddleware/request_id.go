@@ -3,7 +3,7 @@ package httpmiddleware
 import (
 	"net/http"
 
-	"go.robinthrift.com/belt/internal/tracing"
+	"go.robinthrift.com/conveyor/internal/tracing"
 )
 
 func SetRequestID(next http.Handler) http.Handler {

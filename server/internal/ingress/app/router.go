@@ -8,8 +8,8 @@ import (
 	"path"
 	"strings"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/x/httpmiddleware"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/x/httpmiddleware"
 )
 
 type appRouter struct {
@@ -25,7 +25,7 @@ func New(basePath string, mux *http.ServeMux) {
 		w.Header().Add("Cross-Origin-Opener-Policy", "same-origin")
 		w.Header().Add("Cross-Origin-Embedder-Policy", "require-corp")
 
-		err := router.renderUI(w, pageData{Title: "Belt"})
+		err := router.renderUI(w, pageData{Title: "Conveyor"})
 		if err != nil {
 			router.renderErrorPage(w, r, err)
 		}

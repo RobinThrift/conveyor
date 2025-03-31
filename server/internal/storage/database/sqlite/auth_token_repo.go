@@ -5,11 +5,11 @@ import (
 	"database/sql"
 	"errors"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/storage/database"
-	"go.robinthrift.com/belt/internal/storage/database/sqlite/sqlc"
-	"go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/storage/database"
+	"go.robinthrift.com/conveyor/internal/storage/database/sqlite/sqlc"
+	"go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 	"modernc.org/sqlite"
 )
 

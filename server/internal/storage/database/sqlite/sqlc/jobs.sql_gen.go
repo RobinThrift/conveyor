@@ -8,7 +8,7 @@ package sqlc
 import (
 	"context"
 
-	"go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+	"go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 )
 
 const createJob = `-- name: CreateJob :exec

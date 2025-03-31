@@ -9,8 +9,8 @@ import (
 
 	"github.com/caarlos0/env/v11"
 	"github.com/subosito/gotenv"
-	"go.robinthrift.com/belt/internal/tracing"
-	"go.robinthrift.com/belt/internal/version"
+	"go.robinthrift.com/conveyor/internal/tracing"
+	"go.robinthrift.com/conveyor/internal/version"
 )
 
 type Config struct {
@@ -70,7 +70,7 @@ var defaultConfig = Config{
 		Dir: "blobs",
 	},
 	Database: Database{
-		Path:      "belt.db",
+		Path:      "conveyor.db",
 		EnableWAL: true,
 		Timeout:   time.Second * 10,
 	},
@@ -92,7 +92,7 @@ var defaultConfig = Config{
 		Enabled: false,
 		Info: tracing.Info{
 			ID:        getEnvDefault("SERVICE_ID", getEnvDefault("POD_NAME", getEnvDefault("HOSTNAME", ""))),
-			Name:      getEnvDefault("SERVICE_NAME", "belt"),
+			Name:      getEnvDefault("SERVICE_NAME", "conveyor"),
 			Version:   version.Version,
 			Namespace: getEnvDefault("POD_NAMESPACE", ""),
 			Node:      getEnvDefault("NODE_NAME", ""),

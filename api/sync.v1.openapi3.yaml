@@ -1,7 +1,7 @@
 openapi: 3.0.4
 info:
-  title: Belt Sync API
-  description: This is the Belt Sync API.
+  title: Conveyor Sync API
+  description: This is the Conveyor Sync API.
   version: 0.1.0
 servers:
 - url: http://localhost:8081/api/sync/v1
@@ -250,7 +250,7 @@ paths:
 components:
   securitySchemes:
     tokenBearerAuth:
-      description: API Token sent as a bearer token in the header. When accessing Belt via the API this is the recommended way to pass along the API Token.
+      description: API Token sent as a bearer token in the header. When accessing Conveyor via the API this is the recommended way to pass along the API Token.
       type: http
       scheme: bearer
 
@@ -304,14 +304,14 @@ components:
       description: Follows RFC7807 (https://datatracker.ietf.org/doc/html/rfc7807)
       x-go-type: httperrors.Error
       x-go-type-import:
-        path: go.robinthrift.com/belt/internal/x/httperrors
+        path: go.robinthrift.com/conveyor/internal/x/httperrors
       properties:
         code:
           type: integer
           example: 500
         type:
           type: string
-          example: "belt/api/sync/v1/InternalServerError"
+          example: "conveyor/api/sync/v1/InternalServerError"
         title:
           type: string
           example: "InternalServerError"
@@ -327,7 +327,7 @@ components:
         code: 500
         detail: unknown error
         title: InternalServerError
-        type: belt/api/sync/v1/InternalServerError
+        type: conveyor/api/sync/v1/InternalServerError
 
   requestBodies:
     RegisterClientRequest:
@@ -392,7 +392,7 @@ components:
             code: 400
             detail: Invalid request body
             title: Bad Request
-            type: belt/api/sync/v1/BadRequest
+            type: conveyor/api/sync/v1/BadRequest
     ErrorUnauthorized:
       description: Unauthorized
       content:
@@ -403,7 +403,7 @@ components:
             code: 401
             detail: You lack the required permissions to perform this action
             title: Unauthorized
-            type: belt/api/sync/v1/Unauthorized
+            type: conveyor/api/sync/v1/Unauthorized
     ErrorNotFound:
       description: Not Found
       content:
@@ -414,7 +414,7 @@ components:
             code: 404
             detail: The requested page could not be found
             title: Not Found
-            type: belt/api/sync/v1/NotFound
+            type: conveyor/api/sync/v1/NotFound
     ErrorOther:
       description: Other errors
       content:

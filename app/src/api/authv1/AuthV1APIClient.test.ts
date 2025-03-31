@@ -81,7 +81,7 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
                     return HttpResponse.json(
                         {
                             code: 401,
-                            type: "belt/api/v1/auth/Unauthorized",
+                            type: "conveyor/api/v1/auth/Unauthorized",
                             title: "UnauthorizedError",
                         },
                         { status: 401 },
@@ -203,7 +203,7 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
                 return HttpResponse.json(
                     {
                         code: 401,
-                        type: "belt/api/v1/auth/Unauthorized",
+                        type: "conveyor/api/v1/auth/Unauthorized",
                         title: "UnauthorizedError",
                     },
                     { status: 401 },

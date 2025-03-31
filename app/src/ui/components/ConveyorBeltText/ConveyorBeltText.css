@@ -4,8 +4,11 @@
     --conveyor-belt-text-line-height: var(
         --conveyor-belt-text-lowercase-line-height
     );
+    --conveyor-belt-text-font-size: 5.5rem;
+    --conveyor-belt-middle-width: var(--conveyor-belt-text-font-size);
 
-    @apply fixed pointer-events-none inset-0 flex flex-col items-center justify-center text-center font-semibold select-none;
+    @apply fixed inset-0 flex flex-col items-center justify-center text-center font-semibold;
+    @apply pointer-events-none select-none;
     color: rgb(var(--body-bg));
     text-shadow:
         3px 3px 0 rgb(var(--body-bg-contrast)),
@@ -19,9 +22,25 @@
     transform: skew(20deg, -10deg);
     opacity: 1;
 
-    font-size: 15rem;
+    font-size: var(--conveyor-belt-text-font-size, 15rem);
     @media (min-width: 768px) {
-        font-size: 19rem;
+        --conveyor-belt-text-font-size: 10rem;
+    }
+
+    @media (min-width: 1024px) {
+        --conveyor-belt-text-font-size: 15rem;
+    }
+
+    @media (min-width: 1440px) {
+        --conveyor-belt-text-font-size: 19rem;
+    }
+
+    @media (min-width: 1680px) {
+        --conveyor-belt-text-font-size: 20rem;
+    }
+
+    @media (min-width: 2100px) {
+        --conveyor-belt-text-font-size: 30rem;
     }
 
     em {
@@ -31,26 +50,26 @@
     }
 
     .conveyor-belt-text-middle {
-        --conveyor-belt-text-middle-top-start: 0rem;
+        --conveyor-belt-text-middle-top-start: calc(
+            var(--conveyor-belt-text-line-height) *
+            -1
+        );
         --conveyor-belt-text-middle-top-end: calc(
             var(--conveyor-belt-text-line-height) *
-            -4
+            -2
         );
 
         display: block;
         position: absolute;
-        width: 10rem;
+        width: var(--conveyor-belt-middle-width);
         word-wrap: break-word;
         line-height: var(--conveyor-belt-text-line-height);
 
-        left: calc(50% - 5.15rem);
-        @media (min-width: 768px) {
-            left: calc(50% - 5.5rem);
-        }
+        left: calc(var(--conveyor-belt-text-middle-offset, 50%));
 
-        top: 0rem;
-        animation: conveyor-belt-text-middle infinite 90s linear;
-        animation-delay: 0.4s;
+        top: var(--conveyor-belt-text-middle-top-start);
+        animation: conveyor-belt-text-middle infinite 30s linear;
+        animation-delay: 0.2s;
     }
 }
 

@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/control"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/x/httperrors"
-	"go.robinthrift.com/belt/internal/x/httpmiddleware"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/control"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/x/httperrors"
+	"go.robinthrift.com/conveyor/internal/x/httpmiddleware"
 )
 
 type router struct {
@@ -25,7 +25,7 @@ type router struct {
 func New(basePath string, mux *http.ServeMux, authCtrl *control.AuthController, accountCtrl *control.AccountControl, apiTokenCtrl *control.APITokenController) {
 	r := &router{basePath, authCtrl, accountCtrl, apiTokenCtrl}
 
-	errorHandler := httperrors.ErrorHandler("belt/api/v1/auth")
+	errorHandler := httperrors.ErrorHandler("conveyor/api/v1/auth")
 
 	HandlerWithOptions(NewStrictHandlerWithOptions(r, nil, StrictHTTPServerOptions{
 		RequestErrorHandlerFunc:  errorHandler,
@@ -247,7 +247,7 @@ func (router *router) CheckAccess(ctx context.Context, req CheckAccessRequestObj
 		return nil, &httperrors.Error{
 			Code:  http.StatusInternalServerError,
 			Title: http.StatusText(http.StatusInternalServerError),
-			Type:  "belt/api/auth/v1/InternalServerError",
+			Type:  "conveyor/api/auth/v1/InternalServerError",
 		}
 	}
 
@@ -259,7 +259,7 @@ func validateChangePasswordData(body *ChangePasswordJSONRequestBody) error {
 		return &httperrors.Error{
 			Code:  http.StatusBadRequest,
 			Title: "EmptyCurrentPassword",
-			Type:  "belt/api/auth/v1/BadRequest",
+			Type:  "conveyor/api/auth/v1/BadRequest",
 		}
 	}
 
@@ -267,7 +267,7 @@ func validateChangePasswordData(body *ChangePasswordJSONRequestBody) error {
 		return &httperrors.Error{
 			Code:  http.StatusBadRequest,
 			Title: "EmptyNewPassword",
-			Type:  "belt/api/auth/v1/BadRequest",
+			Type:  "conveyor/api/auth/v1/BadRequest",
 		}
 	}
 
@@ -275,7 +275,7 @@ func validateChangePasswordData(body *ChangePasswordJSONRequestBody) error {
 		return &httperrors.Error{
 			Code:  http.StatusBadRequest,
 			Title: "EmptyRepeateNewPassword",
-			Type:  "belt/api/auth/v1/BadRequest",
+			Type:  "conveyor/api/auth/v1/BadRequest",
 		}
 	}
 
@@ -283,7 +283,7 @@ func validateChangePasswordData(body *ChangePasswordJSONRequestBody) error {
 		return &httperrors.Error{
 			Code:  http.StatusBadRequest,
 			Title: "NewPasswordsDoNotMatch",
-			Type:  "belt/api/auth/v1/BadRequest",
+			Type:  "conveyor/api/auth/v1/BadRequest",
 		}
 	}
 
@@ -291,7 +291,7 @@ func validateChangePasswordData(body *ChangePasswordJSONRequestBody) error {
 		return &httperrors.Error{
 			Code:  http.StatusBadRequest,
 			Title: "NewPasswordIsOldPassword",
-			Type:  "belt/api/auth/v1/BadRequest",
+			Type:  "conveyor/api/auth/v1/BadRequest",
 		}
 	}
 

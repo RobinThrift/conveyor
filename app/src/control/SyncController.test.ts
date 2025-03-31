@@ -241,13 +241,13 @@ suite.concurrent("control/SyncController", async () => {
 
         let settings = await assertOkResult(settingsCtrl.loadSettings(ctx))
 
-        assert.equal(settings.controls.vim, true)
+        assert.equal(settings.controls.vim, false)
         assert.equal(settings.theme.mode, "dark")
     })
 })
 
 async function setupSyncControllerTest({
-    dbPath = "belt_test.db",
+    dbPath = "conveyor_test.db",
     syncAPI,
     cryptoRemoteAPI,
 }: {

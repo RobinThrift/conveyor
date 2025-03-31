@@ -26,7 +26,7 @@ suite.concurrent("control/AuthController", async () => {
                         password === validPassword
                     ) {
                         return Ok<AuthToken>({
-                            origin: "belt.dev",
+                            origin: "conveyor.dev",
                             accessToken:
                                 "MOCK_ACCESS_TOKEN" as PlaintextAuthTokenValue,
                             expiresAt: addHours(new Date(), 5),
@@ -71,7 +71,7 @@ suite.concurrent("control/AuthController", async () => {
             getTokenUsingRefreshToken: async (_, { refreshToken }) => {
                 if (refreshToken === validRefreshToken) {
                     return Ok<AuthToken>({
-                        origin: "belt.dev",
+                        origin: "conveyor.dev",
                         accessToken:
                             refreshedAccessToken as PlaintextAuthTokenValue,
                         expiresAt: addHours(now, 5),
@@ -102,7 +102,7 @@ suite.concurrent("control/AuthController", async () => {
             onTestFinished(cleanup)
 
             await storage.saveAuthToken(ctx, {
-                origin: "belt.dev",
+                origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, 1),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
@@ -124,7 +124,7 @@ suite.concurrent("control/AuthController", async () => {
             onTestFinished(cleanup)
 
             await storage.saveAuthToken(ctx, {
-                origin: "belt.dev",
+                origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
@@ -146,7 +146,7 @@ suite.concurrent("control/AuthController", async () => {
             onTestFinished(cleanup)
 
             await storage.saveAuthToken(ctx, {
-                origin: "belt.dev",
+                origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
@@ -166,7 +166,7 @@ suite.concurrent("control/AuthController", async () => {
             onTestFinished(cleanup)
 
             await storage.saveAuthToken(ctx, {
-                origin: "belt.dev",
+                origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: addHours(now, -5),
                 refreshToken:
@@ -209,7 +209,7 @@ async function setupAuthControllerTest({
     let storage = new TestInMemAuthStorage()
 
     let authCtrl = new AuthController({
-        origin: "belt.dev",
+        origin: "conveyor.dev",
         storage,
         authPIClient: {
             setBaseURL: () => {},

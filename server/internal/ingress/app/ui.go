@@ -6,7 +6,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"go.robinthrift.com/belt/internal/version"
+	"go.robinthrift.com/conveyor/internal/version"
 )
 
 type pageData struct {

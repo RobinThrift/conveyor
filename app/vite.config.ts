@@ -20,9 +20,8 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         define: {
             "import.meta.vitest": "undefined",
 
-            "process.env.ENV": JSON.stringify(isTauri ? "TAURI" : "WEB"),
-
             "process.env.NODE_ENV": JSON.stringify(config.mode),
+            __PLATFORM__: JSON.stringify(isTauri ? "TAURI" : "WEB"),
             __LOG_LEVEL__: JSON.stringify("error"),
             __VERSION__: JSON.stringify(
                 vcsInfo.numCommits
@@ -32,7 +31,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             __COMMIT_HASH__: JSON.stringify(vcsInfo.hash),
             __COMMIT_DATE__: JSON.stringify(vcsInfo.date),
             __PROJECT_LINK__: JSON.stringify(
-                "https://github.com/RobinThrift/belt",
+                "https://github.com/RobinThrift/conveyor",
             ),
         },
 

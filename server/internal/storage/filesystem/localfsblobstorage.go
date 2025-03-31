@@ -7,8 +7,8 @@ import (
 	"os"
 	"path"
 
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/storage"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/storage"
 )
 
 var ErrExistsButNotDir = errors.New("exists but is not a directory")

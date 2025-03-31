@@ -20,87 +20,87 @@ sql:
       - column: accounts.id
         go_type:
           type: "AccountID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: accounts.created_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: accounts.updated_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: auth_tokens.id
         go_type:
           type: "AuthTokenID"
-          import: "go.robinthrift.com/belt/internal/auth"
+          import: "go.robinthrift.com/conveyor/internal/auth"
 
       - column: auth_tokens.account_id
         go_type:
           type: "AccountID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: auth_tokens.created_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: auth_tokens.expires_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: auth_tokens.refresh_expires_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: sync_clients.public_id
         go_type:
           type: "SyncClientID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: sync_clients.account_id
         go_type:
           type: "AccountID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: sync_clients.created_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: sync_clients.updated_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: full_sync_enrires.timestamp
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: full_sync_enrires.account_id
         go_type:
           type: "AccountID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: changelog_entries.id
         go_type:
           type: "ChangelogEntryID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: changelog_entries.sync_client_id
         go_type:
           type: "SyncClientID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: changelog_entries.account_id
         go_type:
           type: "AccountID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: changelog_entries.data
         go_type:
@@ -109,49 +109,49 @@ sql:
       - column: changelog_entries.timestamp
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: jobs.scheduled_for
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: jobs.data
         go_type:
           type: "SQLiteJSON"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: jobs.result
         go_type:
           type: "SQLiteJSON"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: jobs.created_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: jobs.finished_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: api_tokens.id
         go_type:
           type: "APITokenID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: api_tokens.account_id
         go_type:
           type: "AccountID"
-          import: "go.robinthrift.com/belt/internal/domain"
+          import: "go.robinthrift.com/conveyor/internal/domain"
 
       - column: api_tokens.created_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"
 
       - column: api_tokens.expires_at
         go_type:
           type: "SQLiteDatetime"
-          import: "go.robinthrift.com/belt/internal/storage/database/sqlite/types"
+          import: "go.robinthrift.com/conveyor/internal/storage/database/sqlite/types"

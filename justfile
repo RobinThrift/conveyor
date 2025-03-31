@@ -1,6 +1,6 @@
 local_bin         := absolute_path("./.bin")
 version           := env_var_or_default("VERSION", "dev")
-oci_repo          := env_var_or_default("OCI_REPO", "ghcr.io/robinthrift/belt")
+oci_repo          := env_var_or_default("OCI_REPO", "ghcr.io/robinthrift/conveyor")
 oci_platforms     := env_var_or_default("OCI_PLATFORMS", "linux/amd64,linux/arm64")
 docker_cmd        := env_var_or_default("DOCKER_CMD", "buildx build")
 docker_extra_args := env_var_or_default("DOCKER_EXTRA_ARGS", "")
@@ -25,12 +25,12 @@ run-oci-image:
         -t {{ oci_repo }}:{{ replace_regex(version, "^v", "") }} .
 
     docker run --rm \
-        -e BELT_LOG_LEVEL="debug" -e BELT_LOG_FORMAT="console" \
-        -e BELT_ADDR=":8081" \
-        -e BELT_SECURE_COOKIES="false" \
-        -e BELT_DATABASE_DEBUG_ENABLED="true" \
-        -e BELT_INIT_USERNAME="user" \
-        -e BELT_INIT_PASSWORD="password" \
+        -e CONVEYOR_LOG_LEVEL="debug" -e CONVEYOR_LOG_FORMAT="console" \
+        -e CONVEYOR_ADDR=":8081" \
+        -e CONVEYOR_SECURE_COOKIES="false" \
+        -e CONVEYOR_DATABASE_DEBUG_ENABLED="true" \
+        -e CONVEYOR_INIT_USERNAME="user" \
+        -e CONVEYOR_INIT_PASSWORD="password" \
         -p 8081:8081 \
         {{ oci_repo }}:{{ replace_regex(version, "^v", "") }}
 

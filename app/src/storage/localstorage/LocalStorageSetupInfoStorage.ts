@@ -4,7 +4,7 @@ import { parseJSON, parseJSONDates } from "@/lib/json"
 import { type AsyncResult, Ok } from "@/lib/result"
 
 export class LocalStorageSetupInfoStorage {
-    private _key = "belt.setup-info"
+    private _key = "conveyor.setup-info"
 
     async loadSetupInfo(_: Context): AsyncResult<SetupInfo | undefined> {
         let data = globalThis.localStorage.getItem(this._key)

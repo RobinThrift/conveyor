@@ -63,7 +63,7 @@ func run(ctx context.Context) error {
 	startCtx, startCtxCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer startCtxCancel()
 
-	config, err := app.ParseConfig("BELT_")
+	config, err := app.ParseConfig("CONVEYOR_")
 	if err != nil {
 		return err
 	}
@@ -276,7 +276,7 @@ export const Directives: Story = {
         children: `
 # Directives
 
-::link-preview[https://github.com/RobinThrift/belt/]{title="GitHub - RobinThrift/belt" description="Contribute to RobinThrift/belt development by creating an account on GitHub." img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/belt"  alt="Contribute to RobinThrift/belt development by creating an account on GitHub."}
+::link-preview[https://github.com/RobinThrift/conveyor/]{title="GitHub - RobinThrift/conveyor" description="Contribute to RobinThrift/conveyor development by creating an account on GitHub." img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/conveyor"  alt="Contribute to RobinThrift/conveyor development by creating an account on GitHub."}
 
 #tag-a #tab-b
 

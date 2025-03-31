@@ -12,8 +12,8 @@ type Story = StoryObj<typeof ConveyorBeltText>
 export const Overview: Story = {
     name: "ConveyorBeltText",
     args: {
-        start: "B",
-        middle: "e",
-        end: "lt",
+        start: "Co",
+        middle: "n",
+        end: "veyor",
     },
 }

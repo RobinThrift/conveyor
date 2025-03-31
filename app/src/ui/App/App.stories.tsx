@@ -6,7 +6,7 @@ import "@/ui/styles/index.css"
 import { App, type AppProps } from "./App"
 
 const meta: Meta<AppProps> = {
-    title: "Belt/App",
+    title: "Conveyor/App",
     component: App,
     parameters: {
         layout: "fullscreen",

@@ -9,11 +9,11 @@ import (
 	"net/url"
 	"strings"
 
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/control"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/x/httperrors"
-	"go.robinthrift.com/belt/internal/x/httpmiddleware"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/control"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/x/httperrors"
+	"go.robinthrift.com/conveyor/internal/x/httpmiddleware"
 )
 
 type router struct {
@@ -43,7 +43,7 @@ func New(config RouterConfig, mux *http.ServeMux, syncCtrl *control.SyncControll
 		accountFetcher: accountFetcher,
 
 		serveBlobHandler: http.FileServer(blobFS),
-		errorHandler:     httperrors.ErrorHandler("belt/api/v1/sync"),
+		errorHandler:     httperrors.ErrorHandler("conveyor/api/v1/sync"),
 	}
 
 	HandlerWithOptions(NewStrictHandlerWithOptions(r, nil, StrictHTTPServerOptions{
@@ -123,7 +123,7 @@ func (router *router) GetFullSync(ctx context.Context, _ GetFullSyncRequestObjec
 				ErrorNotFoundJSONResponse: ErrorNotFoundJSONResponse{
 					Code:   http.StatusNotFound,
 					Title:  http.StatusText(http.StatusNotFound),
-					Type:   "belt/api/sync/v1/NotFound",
+					Type:   "conveyor/api/sync/v1/NotFound",
 					Detail: "No databases available for this accont",
 				},
 			}, nil
@@ -243,7 +243,7 @@ func (router *router) checkAuth(next http.Handler) http.Handler {
 			router.errorHandler(w, r, &httperrors.Error{
 				Code:  http.StatusInternalServerError,
 				Title: http.StatusText(http.StatusInternalServerError),
-				Type:  "belt/api/sync/v1/InternalServerError",
+				Type:  "conveyor/api/sync/v1/InternalServerError",
 			})
 
 			return

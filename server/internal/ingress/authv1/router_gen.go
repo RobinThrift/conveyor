@@ -16,7 +16,7 @@ import (
 
 	"github.com/oapi-codegen/runtime"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
-	"go.robinthrift.com/belt/internal/x/httperrors"
+	"go.robinthrift.com/conveyor/internal/x/httperrors"
 )
 
 const (

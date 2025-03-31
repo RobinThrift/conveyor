@@ -10,11 +10,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.robinthrift.com/belt/internal/auth"
-	"go.robinthrift.com/belt/internal/domain"
-	"go.robinthrift.com/belt/internal/storage/database/sqlite"
-	"go.robinthrift.com/belt/internal/storage/filesystem"
-	"go.robinthrift.com/belt/internal/testhelper"
+	"go.robinthrift.com/conveyor/internal/auth"
+	"go.robinthrift.com/conveyor/internal/domain"
+	"go.robinthrift.com/conveyor/internal/storage/database/sqlite"
+	"go.robinthrift.com/conveyor/internal/storage/filesystem"
+	"go.robinthrift.com/conveyor/internal/testhelper"
 )
 
 const privateKey = "AGE-SECRET-KEY-1WZ5GFZQGKFZGT8S758UUADDCCQTYE05PU7XG2XZ786HDJ9T325SQ9DG7WG"

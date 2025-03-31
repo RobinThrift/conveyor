@@ -104,7 +104,7 @@ function parseMarkdown(raw: string): React.ReactNode | React.ReactNode[] {
 
 ## Directives
 
-::link-preview[https://github.com/RobinThrift/belt/]{img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/belt" title="GitHub - RobinThrift/belt" description="Contribute to RobinThrift/belt development by creating an account on GitHub."}
+::link-preview[https://github.com/RobinThrift/conveyor/]{img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/conveyor" title="GitHub - RobinThrift/conveyor" description="Contribute to RobinThrift/conveyor development by creating an account on GitHub."}
 
 :::details{className="text-primary" summary="Collapsible"}
 ${faker.lorem.paragraph()}

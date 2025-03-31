@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"go.robinthrift.com/belt/internal/x/sensitive"
+	"go.robinthrift.com/conveyor/internal/x/sensitive"
 )
 
 type PlaintextPassword = sensitive.Value

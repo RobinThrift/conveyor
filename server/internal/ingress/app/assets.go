@@ -8,7 +8,7 @@ import (
 	"io/fs"
 	"net/http"
 
-	"go.robinthrift.com/belt/internal/x/httpmiddleware"
+	"go.robinthrift.com/conveyor/internal/x/httpmiddleware"
 )
 
 //go:embed assets/*

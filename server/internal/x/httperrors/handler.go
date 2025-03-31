@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"go.robinthrift.com/belt/internal/auth"
+	"go.robinthrift.com/conveyor/internal/auth"
 )
 
 var ErrBadRequest = errors.New("invalid request")
@@ -91,7 +91,7 @@ func RecoverHandler(next http.Handler) http.Handler {
 					Code:   http.StatusInternalServerError,
 					Detail: fmt.Sprint(p),
 					Title:  http.StatusText(http.StatusInternalServerError),
-					Type:   "belt/api/v1/InternalServerError",
+					Type:   "conveyor/api/v1/InternalServerError",
 				}
 
 				w.WriteHeader(apiErr.Code)

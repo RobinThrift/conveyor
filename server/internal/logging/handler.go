@@ -7,7 +7,7 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-	"go.robinthrift.com/belt/internal/tracing"
+	"go.robinthrift.com/conveyor/internal/tracing"
 )
 
 type ctxHandler struct {

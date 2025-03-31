@@ -80,16 +80,6 @@ export function InterfaceSettingsTab({
                                 <span>(Default)</span>
                             </div>
                         </Select.Option>
-
-                        <Select.Option value="fat-b">
-                            <div className="icon-select-option">
-                                <img
-                                    src={`${baseURL}/assets/icons/fat-b/pwa-192x192.png`}
-                                    alt="fat-b"
-                                />
-                                <span>(Fat B)</span>
-                            </div>
-                        </Select.Option>
                     </Select>
                 </div>
             </div>

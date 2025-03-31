@@ -8,7 +8,7 @@ import (
 	"log/slog"
 
 	"github.com/pressly/goose/v3"
-	"go.robinthrift.com/belt/internal/logging"
+	"go.robinthrift.com/conveyor/internal/logging"
 
 	_ "modernc.org/sqlite" // blank import because DB driver
 )

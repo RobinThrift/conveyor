@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"go.robinthrift.com/belt/internal/domain"
+	"go.robinthrift.com/conveyor/internal/domain"
 )
 
 type JobKind[T any] interface {

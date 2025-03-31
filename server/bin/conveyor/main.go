@@ -8,9 +8,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/RobinThrift/belt/internal/app"
-	"github.com/RobinThrift/belt/internal/logging"
-	"github.com/RobinThrift/belt/internal/tracing"
+	"go.robinthrift.com/conveyor/internal/app"
+	"go.robinthrift.com/conveyor/internal/logging"
+	"go.robinthrift.com/conveyor/internal/tracing"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func run(ctx context.Context) error {
 	startCtx, startCtxCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer startCtxCancel()
 
-	config, err := app.ParseConfig("BELT_")
+	config, err := app.ParseConfig("CONVEYOR_")
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,8 @@ func run(ctx context.Context) error {
 
 	errs := make(chan error)
 
-	app := app.New(config) //nolint: contextcheck // false positive
+	app := app.New(config)
+
 	go func() {
 		errs <- app.Start(startCtx)
 	}()
