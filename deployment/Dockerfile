@@ -67,8 +67,8 @@ COPY --from=builder /etc/passwd.nonroot /etc/passwd
 COPY --from=builder --chown=nobody:nobody /run/conveyor /run
 COPY --from=builder --chown=nobody:nobody /tmp/conveyor /tmp
 
-ENV conveyor_DATABASE_PATH="/run/conveyor.db"
-ENV conveyor_BLOBS_DIR="/run/blobs"
+ENV CONVEYOR_DATABASE_PATH="/run/conveyor.db"
+ENV CONVEYOR_BLOBS_DIR="/run/blobs"
 
 USER nobody
 
