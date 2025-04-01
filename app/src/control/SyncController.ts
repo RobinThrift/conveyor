@@ -14,13 +14,13 @@ import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
-import { join, type FS } from "@/lib/fs"
+import { type FS, join } from "@/lib/fs"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok, all, fmtErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
 
-import type { CryptoController } from "./CryptoController"
 import { ATTACHMENT_BASE_DIR } from "@/domain/Attachment"
+import type { CryptoController } from "./CryptoController"
 
 export class SyncController {
     static storageKey = "sync-info"

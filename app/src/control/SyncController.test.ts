@@ -28,6 +28,7 @@ import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
 import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
 
+import { ATTACHMENT_BASE_DIR } from "@/domain/Attachment"
 import { AttachmentController } from "./AttachmentController"
 import { ChangelogController } from "./ChangelogController"
 import { CryptoController } from "./CryptoController"
@@ -218,7 +219,11 @@ suite.concurrent("control/SyncController", async () => {
         onTestFinished(cleanup)
 
         await assertOkResult(
-            fs.write(ctx, "/a/b/c/d/e/f/g", encodeText("TEST FILE").buffer),
+            fs.write(
+                ctx,
+                `/${ATTACHMENT_BASE_DIR}/a/b/c/d/e/f/g`,
+                encodeText("TEST FILE").buffer,
+            ),
         )
 
         await assertOkResult(
