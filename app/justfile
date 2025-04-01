@@ -73,7 +73,7 @@ _gen-icons:
     -mkdir build
     -rm -rf build/icons
     cp -r assets/icons build/icons
-    for icon in ./build/icons/*/icon.svg; do {{ local_bin }}/pwa-assets-generator --preset minimal-2023 "$icon"; done
+    for icon in ./build/icons/*/icon.svg; do {{ local_bin }}/pwa-assets-generator --override=false --manifest=false --preset minimal-2023 "$icon"; done
 
 _gen-sql: (_install-tool "sqlc")
     {{ local_bin }}/sqlc generate -f src/storage/database/sqlite/sqlc.yaml

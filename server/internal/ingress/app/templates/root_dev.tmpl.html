@@ -5,14 +5,14 @@
 		<meta httpEquiv="X-UA-Compatible" content="ie=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
 		<meta name="base-url" {{ .BaseURL }} />
-		<meta name="csrf-token" {{ .CSRFToken }} />
 
-		<link rel="icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/favicon.ico" sizes="48x48">
+        <link rel="icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/favicon.ico" sizes="48x48">
 		<link rel="icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/icon.svg" sizes="any" type="image/svg+xml">
 		<link rel="apple-touch-icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/apple-touch-icon-180x180.png">
-		<!-- <link rel="manifest" href="{{ .AssetURL }}/manifest.json" /> -->
-
-		<meta name="theme-color" content="" />
+		<link rel="manifest" href="{{ .AssetURL }}/manifest.json" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<meta name="theme-color" content="transparent" />
 
 		<title>{{ .Title }}</title>
 

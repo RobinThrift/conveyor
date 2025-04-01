@@ -20,7 +20,7 @@ main()
 async function main() {
     let { rootStore, attachmentCtrl } = await init()
 
-    document.body.classList.add(Env.platform)
+    document.body.classList.add(`platform-${Env.platform}`)
 
     ReactDOM.createRoot(
         // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway

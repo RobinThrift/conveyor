@@ -1,0 +1,43 @@
+{
+    "name": "Conveyor",
+    "short_name": "Conveyor",
+    "start_url": "{{ .BaseURL }}",
+    "background_color": "transparent",
+    "theme_color": "transparent",
+    "display": "standalone",
+    "display_override": ["window-controls-overlay", "tabbed"],
+    "icons": [
+        {
+            "src": "{{ .AssetURL}}/icons/{{ .Icon }}/pwa-64x64.png",
+            "sizes": "64x64",
+            "type": "image/png"
+        },
+        {
+            "src": "{{ .AssetURL}}/icons/{{ .Icon }}/pwa-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "{{ .AssetURL}}/icons/{{ .Icon }}/pwa-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "{{ .AssetURL}}/icons/{{ .Icon }}/maskable-icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "New Memo",
+            "short_name": "New",
+            "description": "Create a new memo",
+            "url": "{{.BaseURL }}memos/new"
+        }
+    ],
+    "note_taking": {
+        "new_note_url": "{{ .BaseURL }}memos/new"
+    }
+}

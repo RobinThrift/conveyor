@@ -15,3 +15,5 @@ export interface AttachmentList {
     Items: Attachment[]
     next?: string
 }
+
+export const ATTACHMENT_BASE_DIR = "attachments"

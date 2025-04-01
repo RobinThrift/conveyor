@@ -40,12 +40,11 @@ var buildInfo = version.GetBuildInfo()
 
 func render(w http.ResponseWriter, data pageData) error {
 	var tmpldata struct {
-		UIData    template.HTML
-		CSRFToken template.HTMLAttr
-		AssetURL  string
-		Icon      string
-		BaseURL   template.HTMLAttr
-		Title     string
+		UIData   template.HTML
+		AssetURL string
+		Icon     string
+		BaseURL  template.HTMLAttr
+		Title    string
 	}
 
 	data.ServerData.BuildInfo.Version = buildInfo.Version
@@ -59,6 +58,7 @@ func render(w http.ResponseWriter, data pageData) error {
 	}
 
 	tmpldata.Title = data.Title
+	tmpldata.Icon = "default"
 	tmpldata.AssetURL = data.AssetURL
 	tmpldata.BaseURL = template.HTMLAttr(`content="` + data.BaseURL + `"`) //nolint:gosec // Non-issue because we control the value
 	tmpldata.UIData = template.HTML(encoded)                               //nolint:gosec // Non-issue because we control the value

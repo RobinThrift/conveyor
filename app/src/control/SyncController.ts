@@ -14,12 +14,13 @@ import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
-import type { FS } from "@/lib/fs"
+import { join, type FS } from "@/lib/fs"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok, all, fmtErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
 
 import type { CryptoController } from "./CryptoController"
+import { ATTACHMENT_BASE_DIR } from "@/domain/Attachment"
 
 export class SyncController {
     static storageKey = "sync-info"
@@ -478,7 +479,10 @@ export class SyncController {
             return Ok(undefined)
         }
 
-        let data = await this._fs.read(ctx, entry.value.created.filepath)
+        let data = await this._fs.read(
+            ctx,
+            join(ATTACHMENT_BASE_DIR, entry.value.created.filepath),
+        )
         if (!data.ok) {
             return fmtErr(
                 "error uploading attachment: error reading data: %w",

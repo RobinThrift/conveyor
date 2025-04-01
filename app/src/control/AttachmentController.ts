@@ -1,4 +1,8 @@
-import type { Attachment, AttachmentID } from "@/domain/Attachment"
+import {
+    ATTACHMENT_BASE_DIR,
+    type Attachment,
+    type AttachmentID,
+} from "@/domain/Attachment"
 import type {
     AttachmentChangelogEntry,
     ChangelogEntry,
@@ -6,7 +10,7 @@ import type {
 import type { MemoID } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
-import { type FS, FSNotFoundError, dirname } from "@/lib/fs"
+import { type FS, FSNotFoundError, dirname, join } from "@/lib/fs"
 import { mimeTypeForFilename } from "@/lib/mimeTypes"
 import { type AsyncResult, Err, Ok, fmtErr } from "@/lib/result"
 
@@ -54,7 +58,10 @@ export class AttachmentController {
             return fmtErr(`error getting attachment: ${id}: %w`, attachment)
         }
 
-        let read = await this._fs.read(ctx, attachment.value.filepath)
+        let read = await this._fs.read(
+            ctx,
+            this._filepath(attachment.value.filepath),
+        )
         if (!read.ok) {
             if (this._remote && isErr(read.err, FSNotFoundError)) {
                 return this._getAttachmentDataFromRemote(ctx, attachment.value)
@@ -99,7 +106,7 @@ export class AttachmentController {
 
         let mkdirpResult = await this._fs.mkdirp(
             ctx,
-            dirname(attachment.filepath),
+            this._filepath(dirname(attachment.filepath)),
         )
         if (!mkdirpResult.ok) {
             return mkdirpResult
@@ -107,7 +114,7 @@ export class AttachmentController {
 
         let writeResult = await this._fs.write(
             ctx,
-            attachment.filepath,
+            this._filepath(attachment.filepath),
             fetched.value,
         )
         if (!writeResult.ok) {
@@ -321,12 +328,23 @@ export class AttachmentController {
             filepath += `/${h}`
         }
 
-        let mkdirpResult = await this._fs.mkdirp(ctx, dirname(filepath))
+        console.log(this._filepath(dirname(filepath)))
+
+        let mkdirpResult = await this._fs.mkdirp(
+            ctx,
+            this._filepath(dirname(filepath)),
+        )
         if (!mkdirpResult.ok) {
             return mkdirpResult
         }
 
-        let writeResult = await this._fs.write(ctx, filepath, content)
+        console.log(this._filepath(filepath))
+
+        let writeResult = await this._fs.write(
+            ctx,
+            this._filepath(filepath),
+            content,
+        )
         if (!writeResult.ok) {
             return writeResult
         }
@@ -336,6 +354,10 @@ export class AttachmentController {
             sizeBytes: content.byteLength,
             filepath,
         })
+    }
+
+    private _filepath(filepath: string): string {
+        return join(ATTACHMENT_BASE_DIR, filepath)
     }
 }
 

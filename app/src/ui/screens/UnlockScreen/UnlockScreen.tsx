@@ -57,9 +57,9 @@ export function UnlockScreen() {
 
             <ConveyorBeltText
                 className="logo"
-                start="B"
-                middle="e"
-                end="lt"
+                start="Co"
+                middle="n"
+                end="veyor"
                 aria-hidden
             />
 

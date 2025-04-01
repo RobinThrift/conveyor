@@ -19,6 +19,8 @@ type appRouter struct {
 func New(basePath string, mux *http.ServeMux) {
 	router := appRouter{basePath: basePath}
 
+	mux.Handle("/assets/manifest.json", httpmiddleware.GzipCompression(http.HandlerFunc(router.serveManifestJSON)))
+
 	mux.Handle("/assets/", serveAssets(basePath+"assets/"))
 
 	mux.Handle("/", httpmiddleware.GzipCompression(router.handlerFuncWithErr(func(w http.ResponseWriter, r *http.Request) error {
@@ -39,6 +41,22 @@ func (router *appRouter) handlerFuncWithErr(h func(w http.ResponseWriter, r *htt
 		if err := h(w, r); err != nil {
 			router.renderErrorPage(w, r, err)
 		}
+	}
+}
+func (router *appRouter) serveManifestJSON(w http.ResponseWriter, r *http.Request) {
+	tmpldata := struct {
+		BaseURL  string
+		AssetURL string
+		Icon     string
+	}{
+		BaseURL:  router.basePath,
+		AssetURL: joinPath(router.basePath, "/assets"),
+		Icon:     "default",
+	}
+
+	err := manifestJSONTemplate.Execute(w, tmpldata)
+	if err != nil {
+		slog.ErrorContext(r.Context(), "error rendering manifest.json template", slog.Any("error", err))
 	}
 }
 

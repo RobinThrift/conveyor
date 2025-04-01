@@ -1,5 +1,5 @@
 interface _Env {
-    platform: "web" | "macos" | "tauri-generic"
+    platform: "web" | "pwa" | "macos" | "tauri-generic"
     lang: readonly string[]
 }
 

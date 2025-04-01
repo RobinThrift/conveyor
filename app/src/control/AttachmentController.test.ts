@@ -33,7 +33,7 @@ const attachmentTestContent = Object.freeze({
 
 suite.concurrent("control/AttachmentController", () => {
     test("read/write", async ({ onTestFinished }) => {
-        let { attachmentCtrl, changelogCtrl, ctx, setup, cleanup } =
+        let { attachmentCtrl, changelogCtrl, fs, ctx, setup, cleanup } =
             await attachmentCtrlTestSetup()
 
         await setup()
@@ -70,6 +70,12 @@ suite.concurrent("control/AttachmentController", () => {
         })
         assert.isFalse(entry.isSynced)
         assert.isTrue(entry.isApplied)
+
+        assert.isTrue(
+            fs.hasFile(
+                "/attachments/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
+            ),
+        )
     })
 
     suite.concurrent("Remote Fallback", async () => {
@@ -109,6 +115,12 @@ suite.concurrent("control/AttachmentController", () => {
             assert.isDefined(attachment)
             assert.isDefined(data)
             assert.equal(data, attachmentTestContent["test_file_a.txt"])
+
+            assert.isTrue(
+                fs.hasFile(
+                    "/attachments/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
+                ),
+            )
         })
 
         test("not found", async ({ onTestFinished }) => {

@@ -94,7 +94,11 @@
 }
 
 .unlock-screen-header {
-    @apply fixed right-2 top-2 lg:right-4;
+    @apply fixed pr-2 top-2 lg:pr-4;
+
+    -webkit-app-region: drag;
+    min-height: env(titlebar-area-height);
+    right: calc(env(titlebar-area-x, 0) * 2);
 
     .mode-select {
         @apply w-36;

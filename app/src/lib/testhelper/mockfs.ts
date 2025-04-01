@@ -38,4 +38,8 @@ export class MockFS implements FS {
     public removeAllFiles() {
         this._files = new Map<string, ArrayBufferLike>()
     }
+
+    public hasFile(path: string) {
+        return this._files.has(path)
+    }
 }

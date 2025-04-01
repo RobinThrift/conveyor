@@ -22,7 +22,7 @@ export async function init({
     let sqlite = new SQLite(db)
 
     setEnv({
-        platform: "web",
+        platform: isStandalone() ? "pwa" : "web",
         lang: navigator.languages ? navigator.languages : [navigator.language],
     })
 
@@ -51,4 +51,16 @@ export async function init({
             ephemeral: new SessionStorageKVStoreContainer(),
         },
     }
+}
+
+function isStandalone() {
+    if (!("standalone" in globalThis.navigator)) {
+        return false
+    }
+
+    if (typeof globalThis.navigator.standalone === "undefined") {
+        return false
+    }
+
+    return globalThis.navigator.standalone as boolean
 }

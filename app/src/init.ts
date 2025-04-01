@@ -48,7 +48,7 @@ export async function init() {
             },
         },
         fs: {
-            baseDir: "conveyor",
+            baseDir: "",
             onError: (err) => {
                 console.error(err)
             },

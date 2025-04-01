@@ -17,3 +17,9 @@ var rootTemplate = template.Must(template.New("root.html").Parse(rootTemplateRaw
 var errorPageTemplateRaw string
 
 var errorPageTemplate = template.Must(template.New("error.html").Parse(errorPageTemplateRaw))
+
+//go:embed templates/manifest.tmpl.json
+var manifestJSONTemplateRaw string
+
+//nolint:gochecknoglobals
+var manifestJSONTemplate = template.Must(template.New("manifest.json").Parse(manifestJSONTemplateRaw))
