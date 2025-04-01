@@ -328,8 +328,6 @@ export class AttachmentController {
             filepath += `/${h}`
         }
 
-        console.log(this._filepath(dirname(filepath)))
-
         let mkdirpResult = await this._fs.mkdirp(
             ctx,
             this._filepath(dirname(filepath)),
@@ -337,8 +335,6 @@ export class AttachmentController {
         if (!mkdirpResult.ok) {
             return mkdirpResult
         }
-
-        console.log(this._filepath(filepath))
 
         let writeResult = await this._fs.write(
             ctx,
