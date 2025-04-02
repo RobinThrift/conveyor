@@ -32,3 +32,4 @@
 - [CHANGELOG-v0.9.2.md](./CHANGELOG-v0.9.2.md)
 - [CHANGELOG-v0.10.0.md](./CHANGELOG-v0.10.0.md)
 - [CHANGELOG-v0.11.0.md](./CHANGELOG-v0.11.0.md)
+- [CHANGELOG-v0.12.0.md](./CHANGELOG-v0.12.0.md)
