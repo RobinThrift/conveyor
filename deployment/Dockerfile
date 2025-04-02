@@ -34,7 +34,7 @@ COPY --from=sqlite3-builder /out /conveyor/app/src/external/sqlite-wasm/build
 
 RUN just build
 
-FROM --platform=$BUILDPLATFORM golang:1.24.1-alpine3.21 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.24.2-alpine3.21 AS builder
 
 RUN apk update && apk upgrade && apk add --no-cache curl git &&  \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
