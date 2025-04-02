@@ -1,7 +1,7 @@
 import { addDays, addHours, isAfter } from "date-fns"
 import { http, HttpResponse } from "msw"
 import { setupWorker } from "msw/browser"
-import { assert, onTestFinished, suite, test } from "vitest"
+import { assert, suite, test } from "vitest"
 
 import {
     PasswordChangeRequiredError,
@@ -14,7 +14,7 @@ import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 import { AuthV1APIClient } from "./AuthV1APIClient"
 
 suite.sequential("api/syncv1/AuthV1APIClient", async () => {
-    test("getTokenUsingCredentials/valid", async () => {
+    test("getTokenUsingCredentials/valid", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, authV1APIClient } =
             await setupAuthV1APIClientTest()
 
@@ -61,7 +61,7 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
         assert.isTrue(isAfter(token.refreshExpiresAt, token.expiresAt))
     })
 
-    test("getTokenUsingCredentials/invalid", async () => {
+    test("getTokenUsingCredentials/invalid", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, authV1APIClient } =
             await setupAuthV1APIClientTest()
 
@@ -99,7 +99,9 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
         assert.include(token.message, "Unauthorized")
     })
 
-    test("getTokenUsingCredentials/requiresChange", async () => {
+    test("getTokenUsingCredentials/requiresChange", async ({
+        onTestFinished,
+    }) => {
         let { ctx, setup, cleanup, useMocks, authV1APIClient } =
             await setupAuthV1APIClientTest()
 
@@ -138,7 +140,7 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
         assert.instanceOf(err, PasswordChangeRequiredError)
     })
 
-    test("getTokenUsingRefreshToken/valid", async () => {
+    test("getTokenUsingRefreshToken/valid", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, authV1APIClient } =
             await setupAuthV1APIClientTest()
 
@@ -182,7 +184,7 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
         assert.isTrue(isAfter(token.refreshExpiresAt, token.expiresAt))
     })
 
-    test("getTokenUsingRefreshToken/invalid", async () => {
+    test("getTokenUsingRefreshToken/invalid", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, authV1APIClient } =
             await setupAuthV1APIClientTest()
 

@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw"
 import { setupWorker } from "msw/browser"
-import { assert, onTestFinished, suite, test } from "vitest"
+import { assert, suite, test } from "vitest"
 
 import { BaseContext } from "@/lib/context"
 import { assertOkResult } from "@/lib/testhelper/assertions"
@@ -12,7 +12,7 @@ import { decodeText, encodeText } from "@/lib/textencoding"
 import { AccountKeysV1APIClient } from "./AccountKeysV1APIClient"
 
 suite.sequential("api/syncv1/AccountKeysV1APIClient", async () => {
-    test("uploadAccountKey", async () => {
+    test("uploadAccountKey", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, authV1APIClient } =
             await setupAuthV1APIClientTest()
 

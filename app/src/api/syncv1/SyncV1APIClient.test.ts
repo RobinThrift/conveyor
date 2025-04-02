@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw"
 import { setupWorker } from "msw/browser"
-import { assert, onTestFinished, suite, test } from "vitest"
+import { assert, suite, test } from "vitest"
 
 import { BaseContext } from "@/lib/context"
 import { Ok } from "@/lib/result"
@@ -10,7 +10,7 @@ import { decodeText, encodeText } from "@/lib/textencoding"
 import { SyncV1APIClient } from "./SyncV1APIClient"
 
 suite.sequential("api/syncv1/SyncV1APIClient", async () => {
-    test("getFullSync", async () => {
+    test("getFullSync", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, syncV1APIClient } =
             await setupSyncV1APIClientTest()
 
@@ -33,7 +33,7 @@ suite.sequential("api/syncv1/SyncV1APIClient", async () => {
         assert.equal(decodeText(new Uint8Array(fetched)), content)
     })
 
-    test("uploadFullDB", async () => {
+    test("uploadFullDB", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, syncV1APIClient } =
             await setupSyncV1APIClientTest()
 
@@ -60,7 +60,7 @@ suite.sequential("api/syncv1/SyncV1APIClient", async () => {
         )
     })
 
-    test("uploadAttachment", async () => {
+    test("uploadAttachment", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, syncV1APIClient } =
             await setupSyncV1APIClientTest()
 
