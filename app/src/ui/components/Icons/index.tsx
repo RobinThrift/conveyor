@@ -1,6 +1,7 @@
 export { Archive as ArchiveIcon } from "@phosphor-icons/react/Archive"
 export { ArrowLeft as ArrowLeftIcon } from "@phosphor-icons/react/ArrowLeft"
 export { ArrowUDownLeft as ArrowUDownLeftIcon } from "@phosphor-icons/react/ArrowUDownLeft"
+export { ArrowUpRight as ArrowUpRightIcon } from "@phosphor-icons/react/ArrowUpRight"
 export { ArrowsCounterClockwise as ArrowsCounterClockwiseIcon } from "@phosphor-icons/react/ArrowsCounterClockwise"
 export { CaretDown as CaretDownIcon } from "@phosphor-icons/react/CaretDown"
 export { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/CaretLeft"

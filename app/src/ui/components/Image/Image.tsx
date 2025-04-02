@@ -1,18 +1,14 @@
 import React, { useMemo } from "react"
-import Zoom from "react-medium-image-zoom"
 import "react-medium-image-zoom/dist/styles.css"
 
 import { thumbhashToDataURL } from "@/external/thumbhash"
 import { useAttachment } from "@/ui/attachments"
-import { XIcon } from "@/ui/components/Icons"
 import clsx from "clsx"
 
 export interface ImageProps {
     className?: string
-    id?: string
-    alt: string
     src: string
-    caption?: string
+    alt: string
 }
 
 export function Image(props: ImageProps) {
@@ -32,23 +28,25 @@ export function Image(props: ImageProps) {
 
     let src = attachmentURL ?? hash ?? props.src
 
+    let isLoading =
+        typeof attachment !== "undefined" &&
+        typeof attachmentURL === "undefined"
+
     return (
-        <figure id={props.id} className={props.className}>
-            <Zoom IconUnzoom={() => <XIcon />} classDialog="image-zoom">
-                <img
-                    src={src}
-                    alt={props.alt}
-                    loading="lazy"
-                    className={clsx({
-                        "animate-pulse": !src,
-                    })}
-                    style={{
-                        minWidth: hash && !attachmentURL ? "200px" : undefined,
-                    }}
-                />
-                <figcaption>{props.caption ?? props.alt}</figcaption>
-            </Zoom>
-        </figure>
+        <img
+            src={src}
+            alt={props.alt}
+            loading="lazy"
+            className={clsx(
+                {
+                    "animate-pulse": isLoading,
+                },
+                props.className,
+            )}
+            style={{
+                minWidth: hash && !attachmentURL ? "200px" : undefined,
+            }}
+        />
     )
 }
 

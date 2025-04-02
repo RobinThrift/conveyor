@@ -7,29 +7,55 @@ import { Second } from "@/lib/duration"
 import { type AsyncResult, Ok } from "@/lib/result"
 import { delay } from "@/lib/testhelper/delay"
 import { AttachmentProvider } from "@/ui/attachments"
+
 import "@/ui/styles/index.css"
 
-import { Image } from "./Image"
+import { Figure } from "./Figure"
 
-const meta: Meta<typeof Image> = {
-    title: "Components/Image",
-    component: Image,
+const meta: Meta<typeof Figure> = {
+    title: "Components/Figure",
+    component: Figure,
 }
 
 export default meta
-type Story = StoryObj<typeof Image>
+type Story = StoryObj<typeof Figure>
 
 export const Overview: Story = {
-    name: "Image",
+    name: "Figure",
 
     parameters: {
         layout: "centered",
     },
 
     args: {
-        className: "max-w-[800px]",
+        className: "max-w-[200px]",
         alt: faker.lorem.words(5),
-        src: faker.image.url({ width: 1600, height: 1400 }),
+        caption: faker.lorem.words(10),
+    },
+
+    render: (args) => {
+        return (
+            <article className="container">
+                <p>{faker.lorem.paragraph()}</p>
+                <p>{faker.lorem.paragraph()}</p>
+                <Figure
+                    {...args}
+                    src={faker.image.url({ width: 1600, height: 1400 })}
+                />
+                <p>{faker.lorem.paragraph()}</p>
+                <p>{faker.lorem.paragraph()}</p>
+                <Figure
+                    {...args}
+                    src={faker.image.url({ width: 2000, height: 2000 })}
+                />
+                <p>{faker.lorem.paragraph()}</p>
+                <Figure
+                    {...args}
+                    src={faker.image.url({ width: 1400, height: 1600 })}
+                />
+                <p>{faker.lorem.paragraph()}</p>
+            </article>
+        )
     },
 }
 

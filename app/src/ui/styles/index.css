@@ -16,8 +16,8 @@
 @import "../components/Dialog/Dialog.css" layer(components);
 @import "../components/DropdownMenu/DropdownMenu.css" layer(components);
 @import "../components/Editor/Editor.css";
+@import "../components/Figure/Figure.css" layer(components);
 @import "../components/Form/Form.css" layer(components);
-@import "../components/Image/Image.css" layer(components);
 @import "../components/Input/Input.css" layer(components);
 @import "../components/LinkPreview/LinkPreview.css" layer(components);
 @import "../components/Loader/Loader.css" layer(components);
