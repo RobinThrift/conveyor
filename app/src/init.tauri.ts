@@ -2,6 +2,7 @@ import { appConfigDir } from "@tauri-apps/api/path"
 import { locale as loadLocale, platform } from "@tauri-apps/plugin-os"
 
 import { setEnv } from "@/env"
+import { SessionStorageKVStoreContainer } from "@/external/browser/SessionStorageKVStore"
 import { TauriFS } from "@/external/tauri/TauriFS"
 import { TauriKVStoreContainer } from "@/external/tauri/TauriKVStore"
 import { TauriSQLite } from "@/external/tauri/TauriSQLite"
@@ -31,7 +32,7 @@ export async function init({
         kvContainers: {
             fast: kvContainer,
             permanent: kvContainer,
-            ephemeral: kvContainer,
+            ephemeral: new SessionStorageKVStoreContainer(),
         },
     }
 }
