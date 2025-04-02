@@ -4,14 +4,17 @@ import { invoke } from "@tauri-apps/api/core"
 import type { Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import { type AsyncResult, fromPromise } from "@/lib/result"
+import { Lock } from "@/lib/Lock"
+import { newID } from "@/domain/ID"
 import { migrate } from "@/storage/database/sqlite/migrator"
 
 export class TauriSQLite implements Database {
     private _handle = ""
     private _ready: ReturnType<typeof Promise.withResolvers<void>>
-    private _currentTransaction: Promise<void> = Promise.resolve()
+    private _lock: Lock
 
     constructor() {
+        this._lock = new Lock(`sqlite_${newID()}}`)
         this._ready = Promise.withResolvers()
     }
 
@@ -160,36 +163,27 @@ export class TauriSQLite implements Database {
             return fn(ctx.withData("db", tx))
         }
 
-        let transaction = Promise.withResolvers<void>()
+        return this._lock.run(ctx, async (ctx: Context) => {
+            let begin = await fromPromise(this._begin(ctx))
+            if (!begin.ok) {
+                return begin
+            }
 
-        try {
-            await this._currentTransaction
-        } catch {
-            // ignore errors
-        }
-        this._currentTransaction = transaction.promise
+            let res = await fn(
+                ctx.withData("db", new Transaction(this._handle)),
+            )
+            if (!res.ok) {
+                await this._rollback(ctx)
+                return res
+            }
 
-        let begin = await fromPromise(this._begin(ctx))
-        if (!begin.ok) {
-            transaction.resolve()
-            return begin
-        }
+            let commit = await fromPromise(this._commit(ctx))
+            if (!commit.ok) {
+                return commit
+            }
 
-        let res = await fn(ctx.withData("db", new Transaction(this._handle)))
-        if (!res.ok) {
-            transaction.resolve()
-            await this._rollback(ctx)
             return res
-        }
-
-        let commit = await fromPromise(this._commit(ctx))
-        if (!commit.ok) {
-            transaction.resolve()
-            return commit
-        }
-
-        transaction.resolve()
-        return res
+        })
     }
 }
 

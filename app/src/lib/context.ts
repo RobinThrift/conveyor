@@ -4,7 +4,6 @@ export type CancelFunc = (reason?: Error) => void
 
 export interface Context<
     D extends Record<string, unknown> = Record<string, any>,
-    Err extends Error = Error,
 > {
     signal?: AbortSignal
 
@@ -13,7 +12,7 @@ export interface Context<
     withTimeout(timeout: Duration): [Context<D>, CancelFunc]
     withData<K extends string, V>(key: K, value: V): Context<D & Record<K, V>>
     isCancelled(): boolean
-    err(): Err | undefined
+    err(): Error | undefined
 
     getData<K extends keyof D>(key: K): D[K]
     getData<K extends keyof D>(key: K, fallback: D[K]): Required<D>[K]
@@ -51,12 +50,9 @@ export const BaseContext: Context = {
     },
 }
 
-class context<
-    D extends Record<string, unknown> = Record<string, any>,
-    Err extends Error = Error,
-> {
+class context<D extends Record<string, unknown> = Record<string, any>> {
     public signal?: AbortSignal
-    private _err?: Err
+    private _err?: Error
     private _data: D
     private _isCancelled = false
     private _parent: Context
@@ -148,13 +144,17 @@ class context<
         return this._parent?.isCancelled() ?? false
     }
 
-    err(): Err | undefined {
+    err(): Error | undefined {
         if (this._err) {
             return this._err
         }
 
         if (this.signal?.aborted) {
             return this.signal.reason
+        }
+
+        if (this._isCancelled) {
+            return new Error("context cancelled for unknown reason")
         }
     }
 }

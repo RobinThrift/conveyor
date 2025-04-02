@@ -10,9 +10,7 @@ import {
     assert,
     type OnTestFinishedHandler,
     afterAll,
-    afterEach,
     beforeAll,
-    beforeEach,
     suite,
     test,
     vi,
@@ -405,53 +403,59 @@ suite("control/MemoController", () => {
                 assert.include(error.message, "not found")
             })
 
-            test("updateMemoArchiveStatus", async ({ onTestFinished }) => {
-                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
-                    onTestFinished,
-                })
-                await setup()
-                let createdMemosIDs = await insertMemos(ctx, memoCtrl)
+            test.sequential(
+                "updateMemoArchiveStatus",
+                async ({ onTestFinished }) => {
+                    let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                        onTestFinished,
+                    })
+                    await setup()
+                    let createdMemosIDs = await insertMemos(ctx, memoCtrl)
 
-                let memo = await assertOkResult(
-                    memoCtrl.getMemo(ctx, createdMemosIDs[5]),
-                )
+                    let memo = await assertOkResult(
+                        memoCtrl.getMemo(ctx, createdMemosIDs[5]),
+                    )
 
-                vi.useFakeTimers()
-                vi.setSystemTime(addHours(memo.updatedAt, 1))
-                await assertOkResult(
-                    memoCtrl.updateMemoArchiveStatus(ctx, {
-                        id: memo.id,
-                        isArchived: true,
-                    }),
-                )
-                vi.useRealTimers()
+                    vi.useFakeTimers()
+                    vi.setSystemTime(addHours(memo.updatedAt, 1))
+                    await assertOkResult(
+                        memoCtrl.updateMemoArchiveStatus(ctx, {
+                            id: memo.id,
+                            isArchived: true,
+                        }),
+                    )
+                    vi.useRealTimers()
 
-                let updated = await assertOkResult(
-                    memoCtrl.getMemo(ctx, memo.id),
-                )
+                    let updated = await assertOkResult(
+                        memoCtrl.getMemo(ctx, memo.id),
+                    )
 
-                assert.isTrue(updated.isArchived)
-                assert.isTrue(isAfter(updated.updatedAt, memo.updatedAt))
+                    assert.isTrue(updated.isArchived)
+                    assert.isTrue(
+                        isAfter(updated.updatedAt, memo.updatedAt),
+                        `updated.updatedAt: ${updated.updatedAt} memo.updatedAt: ${memo.updatedAt}`,
+                    )
 
-                vi.useFakeTimers()
-                vi.setSystemTime(addHours(memo.updatedAt, 1))
-                await assertOkResult(
-                    memoCtrl.updateMemoArchiveStatus(ctx, {
-                        id: memo.id,
-                        isArchived: false,
-                    }),
-                )
-                vi.useRealTimers()
+                    vi.useFakeTimers()
+                    vi.setSystemTime(addHours(memo.updatedAt, 1))
+                    await assertOkResult(
+                        memoCtrl.updateMemoArchiveStatus(ctx, {
+                            id: memo.id,
+                            isArchived: false,
+                        }),
+                    )
+                    vi.useRealTimers()
 
-                let noLongerArchived = await assertOkResult(
-                    memoCtrl.getMemo(ctx, memo.id),
-                )
+                    let noLongerArchived = await assertOkResult(
+                        memoCtrl.getMemo(ctx, memo.id),
+                    )
 
-                assert.isFalse(noLongerArchived.isArchived)
-                assert.isTrue(
-                    isAfter(noLongerArchived.updatedAt, memo.updatedAt),
-                )
-            })
+                    assert.isFalse(noLongerArchived.isArchived)
+                    assert.isTrue(
+                        isAfter(noLongerArchived.updatedAt, memo.updatedAt),
+                    )
+                },
+            )
 
             test("updateMemoArchiveStatus/Not Found", async ({
                 onTestFinished,
@@ -559,34 +563,39 @@ suite("control/MemoController", () => {
         30000,
     )
 
-    suite.sequential("Tags", async () => {
-        let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup()
-
-        let numMemos = 10
-        let createdMemosIDs: MemoID[] = []
-
-        beforeEach(async () => {
-            await setup()
-            createdMemosIDs = []
-
-            let now = new Date()
-
+    suite.concurrent("Tags", async () => {
+        let insertMemos = async (
+            ctx: Context,
+            memoCtrl: MemoController,
+            numMemos = 10,
+            now = new Date(2024, 2, 15, 12, 0, 0, 0),
+        ) => {
+            let createdMemosIDs: MemoID[] = []
             for (let i = 0; i < numMemos; i++) {
                 let res = await memoCtrl.createMemo(ctx, {
                     content: `# Test Memo ${i}\n With some more content for memo ${i} #tag-${i} #shared-tag`,
-                    createdAt: now,
+                    createdAt: subHours(now, i),
                 })
-
                 if (!res.ok) {
                     throw res.err
                 }
                 createdMemosIDs.push(res.value.id)
             }
-        })
 
-        afterEach(cleanup)
+            return createdMemosIDs
+        }
 
-        test("Tags for newly created Memos exist", async () => {
+        test("Tags for newly created Memos exist", async ({
+            onTestFinished,
+        }) => {
+            let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                onTestFinished,
+            })
+            await setup()
+
+            let numMemos = 10
+            await insertMemos(ctx, memoCtrl, numMemos)
+
             let tags = await assertOkResult(
                 memoCtrl.listTags(ctx, {
                     pagination: { pageSize: numMemos * 2 },
@@ -608,74 +617,106 @@ suite("control/MemoController", () => {
             }
         })
 
-        test("Tag count doesn't change after Memo update if no tags were added or removed", async () => {
-            for (let i = 0; i < numMemos; i++) {
-                await assertOkResult(
-                    memoCtrl.updateMemoContent(ctx, {
+        test.sequential(
+            "Tag count doesn't change after Memo update if no tags were added or removed",
+            async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+
+                let numMemos = 10
+                let createdMemosIDs = await insertMemos(ctx, memoCtrl, numMemos)
+
+                for (let i = 0; i < numMemos; i++) {
+                    await assertOkResult(
+                        memoCtrl.updateMemoContent(ctx, {
+                            id: createdMemosIDs[i],
+                            content: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
+                            changes: {
+                                version: "1",
+                                changes: [
+                                    {
+                                        insert: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
+                                    },
+                                ],
+                            },
+                        }),
+                    )
+                }
+
+                let tags = await assertOkResult(
+                    memoCtrl.listTags(ctx, {
+                        pagination: { pageSize: numMemos * 2 },
+                    }),
+                )
+
+                assert.equal(
+                    tags.items.length,
+                    numMemos + 1,
+                    "one for each unique memo tag and one extra for the shared tag",
+                )
+
+                for (let tag of tags.items) {
+                    if (tag.tag === "shared-tag") {
+                        assert.equal(tag.count, numMemos)
+                    } else {
+                        assert.equal(tag.count, 1)
+                    }
+                }
+            },
+        )
+
+        test.sequential(
+            "Tags are removed when count reaches 0",
+            async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+
+                let numMemos = 10
+                let createdMemosIDs = await insertMemos(ctx, memoCtrl, numMemos)
+
+                // Update Memos, removing unique tags tags
+                for (let i = 0; i < numMemos; i++) {
+                    await memoCtrl.updateMemoContent(ctx, {
                         id: createdMemosIDs[i],
-                        content: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
+                        content: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
                         changes: {
                             version: "1",
                             changes: [
                                 {
-                                    insert: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
+                                    insert: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
                                 },
                             ],
                         },
+                    })
+                }
+
+                let tags = await assertOkResult(
+                    memoCtrl.listTags(ctx, {
+                        pagination: { pageSize: numMemos * 2 },
                     }),
                 )
-            }
 
-            let tags = await assertOkResult(
-                memoCtrl.listTags(ctx, {
-                    pagination: { pageSize: numMemos * 2 },
-                }),
-            )
+                assert.equal(tags.items.length, 1)
 
-            assert.equal(
-                tags.items.length,
-                numMemos + 1,
-                "one for each unique memo tag and one extra for the shared tag",
-            )
+                assert.equal(tags.items[0].count, numMemos)
+            },
+        )
 
-            for (let tag of tags.items) {
-                if (tag.tag === "shared-tag") {
-                    assert.equal(tag.count, numMemos)
-                } else {
-                    assert.equal(tag.count, 1)
-                }
-            }
-        })
+        test("Tag count is reduced when Memos are deleted", async ({
+            onTestFinished,
+        }) => {
+            let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                onTestFinished,
+            })
+            await setup()
 
-        test("Tags are removed when count reaches 0", async () => {
-            // Update Memos, removing unique tags tags
-            for (let i = 0; i < numMemos; i++) {
-                await memoCtrl.updateMemoContent(ctx, {
-                    id: createdMemosIDs[i],
-                    content: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
-                    changes: {
-                        version: "1",
-                        changes: [
-                            {
-                                insert: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
-                            },
-                        ],
-                    },
-                })
-            }
+            let numMemos = 10
+            let createdMemosIDs = await insertMemos(ctx, memoCtrl, numMemos)
 
-            let tags = await assertOkResult(
-                memoCtrl.listTags(ctx, {
-                    pagination: { pageSize: numMemos * 2 },
-                }),
-            )
-
-            assert.equal(tags.items.length, 1)
-
-            assert.equal(tags.items[0].count, numMemos)
-        })
-
-        test("Tag count is reduced when Memos are deleted", async () => {
             let expectedDeletedTags: string[] = []
             for (let i = 0; i < numMemos / 2; i++) {
                 expectedDeletedTags.push(`tag-${i}`)

@@ -8,16 +8,19 @@ import sqlite3InitModule, {
 import type { Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import type { AsyncResult } from "@/lib/result"
-import { fromPromise } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
+import { fromPromise } from "@/lib/result"
+import { Lock } from "@/lib/Lock"
+import { newID } from "@/domain/ID"
 
 export class SQLite implements Database {
     private sqlite3: Promise<Sqlite3Static>
     private db: Promise<SQliteDatabase> = undefined as any
-    private currentTransaction: Promise<void> = Promise.resolve()
-    private lock = new Int32Array(new ArrayBuffer(4))
+    private _lock: Lock
 
     constructor() {
+        this._lock = new Lock(`sqlite_${newID()}}`)
+
         this.sqlite3 = sqlite3InitModule({
             print: (msg) => console.log(msg),
             printErr: (err) => console.error(err),
@@ -86,47 +89,26 @@ export class SQLite implements Database {
             return fn(ctx.withData("db", tx))
         }
 
-        let unlock = await fromPromise(this.aquireTransactionLock())
-        if (!unlock.ok) {
-            return unlock
-        }
+        return this._lock.run(ctx, async (ctx: Context) => {
+            let begin = await fromPromise(
+                this.exec("BEGIN DEFERRED TRANSACTION"),
+            )
+            if (!begin.ok) {
+                return begin
+            }
 
-        let begin = await fromPromise(this.exec("BEGIN DEFERRED TRANSACTION"))
-        if (!begin.ok) {
-            return begin
-        }
+            let res = await fn(ctx.withData("db", this))
+            if (!res.ok) {
+                await this.exec("ROLLBACK TRANSACTION")
+                return res
+            }
 
-        let res = await fn(ctx.withData("db", this))
-        if (!res.ok) {
-            await this.exec("ROLLBACK TRANSACTION")
-            unlock.value()
+            let commit = await fromPromise(this.exec("COMMIT TRANSACTION"))
+            if (!commit.ok) {
+                return commit
+            }
+
             return res
-        }
-
-        let commit = await fromPromise(this.exec("COMMIT"))
-        if (!commit.ok) {
-            unlock.value()
-            return commit
-        }
-
-        unlock.value()
-        return res
-    }
-
-    private async aquireTransactionLock(): Promise<() => void> {
-        let locked = Atomics.compareExchange(this.lock, 0, 0, 1)
-        if (locked !== 0) {
-            await this.currentTransaction
-
-            return this.aquireTransactionLock()
-        }
-
-        let currentTransaction = Promise.withResolvers<void>()
-        this.currentTransaction = currentTransaction.promise
-
-        return () => {
-            Atomics.store(this.lock, 0, 0)
-            currentTransaction.resolve()
-        }
+        })
     }
 }

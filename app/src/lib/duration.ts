@@ -1,3 +1,6 @@
+/**
+ * Represents a duration in Milliseconds.
+ */
 export type Duration = number
 
 export const Millisecond: Duration = 1

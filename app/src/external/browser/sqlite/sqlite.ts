@@ -4,19 +4,22 @@ import { BaseContext, type Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import { type AsyncResult, fromPromise, toPromise } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
+import { Lock } from "@/lib/Lock"
+import { newID } from "@/domain/ID"
 
 import { SQLiteWorker } from "./sqlite.worker"
 
 export class SQLite implements Database {
     private _baseCtx: Context
     private _worker: ReturnType<typeof SQLiteWorker.createClient>
-    private _currentTransaction: Promise<void> = Promise.resolve()
+    private _lock: Lock
     private _ready: ReturnType<typeof Promise.withResolvers<void>>
 
     constructor({
         baseCtx,
         onError,
     }: { baseCtx?: Context; onError?: (err: Error) => void } = {}) {
+        this._lock = new Lock(`sqlite_${newID()}}`)
         this._ready = Promise.withResolvers()
         this._baseCtx = baseCtx ?? BaseContext
         this._worker = SQLiteWorker.createClient(
@@ -128,36 +131,27 @@ export class SQLite implements Database {
             return fn(ctx.withData("db", tx))
         }
 
-        let transaction = Promise.withResolvers<void>()
+        return this._lock.run(ctx, async (ctx: Context) => {
+            let begin = await fromPromise(
+                this.exec("BEGIN DEFERRED TRANSACTION"),
+            )
+            if (!begin.ok) {
+                return begin
+            }
 
-        try {
-            await this._currentTransaction
-        } catch {
-            // ignore errors
-        }
-        this._currentTransaction = transaction.promise
+            let res = await fn(ctx.withData("db", new Transaction(this)))
+            if (!res.ok) {
+                await this.exec("ROLLBACK TRANSACTION")
+                return res
+            }
 
-        let begin = await fromPromise(this.exec("BEGIN TRANSACTION"))
-        if (!begin.ok) {
-            transaction.resolve()
-            return begin
-        }
+            let commit = await fromPromise(this.exec("COMMIT TRANSACTION"))
+            if (!commit.ok) {
+                return commit
+            }
 
-        let res = await fn(ctx.withData("db", new Transaction(this)))
-        if (!res.ok) {
-            transaction.resolve()
-            await this.exec("ROLLBACK TRANSACTION")
             return res
-        }
-
-        let commit = await fromPromise(this.exec("COMMIT"))
-        if (!commit.ok) {
-            transaction.resolve()
-            return commit
-        }
-
-        transaction.resolve()
-        return res
+        })
     }
 }
 
