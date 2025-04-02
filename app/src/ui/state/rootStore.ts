@@ -114,6 +114,8 @@ export function configureRootStore(initState: {
     return store
 }
 
+export type RootStore = ReturnType<typeof configureRootStore>
+
 export type RootState = ReturnType<
     ReturnType<typeof configureRootStore>["getState"]
 >

@@ -5,13 +5,13 @@ import sqlite3InitModule, {
     type Sqlite3Static,
 } from "@sqlite.org/sqlite-wasm"
 
+import { newID } from "@/domain/ID"
+import { Lock } from "@/lib/Lock"
 import type { Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import type { AsyncResult } from "@/lib/result"
-import { migrate } from "@/storage/database/sqlite/migrator"
 import { fromPromise } from "@/lib/result"
-import { Lock } from "@/lib/Lock"
-import { newID } from "@/domain/ID"
+import { migrate } from "@/storage/database/sqlite/migrator"
 
 export class SQLite implements Database {
     private sqlite3: Promise<Sqlite3Static>

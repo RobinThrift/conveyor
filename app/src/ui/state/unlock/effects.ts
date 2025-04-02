@@ -58,6 +58,7 @@ export const registerEffects = (
 
             dispatch(settings.actions.loadStart())
             dispatch(sync.actions.loadSyncInfo())
+            dispatch(sync.actions.syncStart())
         },
     })
 

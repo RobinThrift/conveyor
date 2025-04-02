@@ -24,12 +24,22 @@ export const registerEffects = (
                 (payload.status === "password-change-required" ||
                     payload.status === "error")
             ) {
-                dispatch(slice.actions.setStatus({ status: "error" }))
+                dispatch(
+                    slice.actions.setStatus({
+                        status: "error",
+                        isSyncRequested: false,
+                    }),
+                )
                 return
             }
 
             if (payload.status === "not-authenticated") {
-                dispatch(slice.actions.setStatus({ status: "disabled" }))
+                dispatch(
+                    slice.actions.setStatus({
+                        status: "disabled",
+                        isSyncRequested: false,
+                    }),
+                )
                 dispatch(slice.actions.setSyncInfo({ isEnabled: false }))
                 return
             }
@@ -64,6 +74,7 @@ export const registerEffects = (
                     slice.actions.setStatus({
                         status: "error",
                         error: initRes.err,
+                        isSyncRequested: false,
                     }),
                 )
                 return
@@ -128,6 +139,7 @@ export const registerEffects = (
                     slice.actions.setStatus({
                         status: "error",
                         error: initRes.err,
+                        isSyncRequested: false,
                     }),
                 )
                 return
@@ -157,6 +169,7 @@ export const registerEffects = (
                     slice.actions.setStatus({
                         status: "error",
                         error: loaded.err,
+                        isSyncRequested: false,
                     }),
                 )
                 return
@@ -174,16 +187,16 @@ export const registerEffects = (
     })
 
     startListening({
-        actionCreator: slice.actions.syncStart,
-        effect: async (
-            _,
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
-            let status = slice.selectors.status(getState())
-            if (!(status === "ready" || status === "error")) {
-                return
-            }
+        predicate(_, state) {
+            let status = slice.selectors.status(state)
+            return (
+                slice.selectors.isEnabled(state) &&
+                slice.selectors.isSyncRequested(state) &&
+                (status === "ready" || status === "error")
+            )
+        },
 
+        effect: async (_, { cancelActiveListeners, dispatch, signal }) => {
             cancelActiveListeners()
 
             dispatch(slice.actions.setStatus({ status: "syncing" }))
@@ -195,12 +208,18 @@ export const registerEffects = (
                     slice.actions.setStatus({
                         status: "error",
                         error: synced.err,
+                        isSyncRequested: false,
                     }),
                 )
                 return
             }
 
-            dispatch(slice.actions.setStatus({ status: "ready" }))
+            dispatch(
+                slice.actions.setStatus({
+                    status: "ready",
+                    isSyncRequested: false,
+                }),
+            )
             dispatch(slice.actions.loadSyncInfo())
         },
     })
@@ -229,12 +248,18 @@ export const registerEffects = (
                     slice.actions.setStatus({
                         status: "error",
                         error: synced.err,
+                        isSyncRequested: false,
                     }),
                 )
                 return
             }
 
-            dispatch(slice.actions.setStatus({ status: "ready" }))
+            dispatch(
+                slice.actions.setStatus({
+                    status: "ready",
+                    isSyncRequested: false,
+                }),
+            )
         },
     })
 
@@ -262,12 +287,18 @@ export const registerEffects = (
                     slice.actions.setStatus({
                         status: "error",
                         error: synced.err,
+                        isSyncRequested: false,
                     }),
                 )
                 return
             }
 
-            dispatch(slice.actions.setStatus({ status: "ready" }))
+            dispatch(
+                slice.actions.setStatus({
+                    status: "ready",
+                    isSyncRequested: false,
+                }),
+            )
         },
     })
 

@@ -15,11 +15,13 @@ export interface SyncState {
     status: SyncStatus
     setup?: { server: string; username: string }
     info: SyncInfo
+    isSyncRequested: boolean
 }
 
 const initialState: SyncState = {
     status: "disabled",
     info: { isEnabled: false },
+    isSyncRequested: false,
 }
 
 export const slice = createSlice({
@@ -47,10 +49,18 @@ export const slice = createSlice({
 
         setStatus: (
             state,
-            { payload }: PayloadAction<{ status: SyncStatus; error?: Error }>,
+            {
+                payload,
+            }: PayloadAction<{
+                status: SyncStatus
+                error?: Error
+                isSyncRequested?: boolean
+            }>,
         ) => {
             state.status = payload.status
             state.error = payload.error
+            state.isSyncRequested =
+                payload.isSyncRequested ?? state.isSyncRequested
         },
 
         disable: (state) => {
@@ -60,6 +70,7 @@ export const slice = createSlice({
 
         syncStart: (state) => {
             state.error = undefined
+            state.isSyncRequested = true
         },
 
         syncStartUploadFull: (state) => {
@@ -74,6 +85,7 @@ export const slice = createSlice({
             state.status = "disabled"
             state.info = { isEnabled: false }
             state.error = undefined
+            state.isSyncRequested = false
         },
     },
 
@@ -83,5 +95,6 @@ export const slice = createSlice({
         error: (state) => state.error,
         setupInfo: (state: SyncState) => state.setup,
         isEnabled: (state: SyncState) => state.info.isEnabled,
+        isSyncRequested: (state: SyncState) => state.isSyncRequested,
     },
 })

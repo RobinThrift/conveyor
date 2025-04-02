@@ -9,6 +9,7 @@ import { AttachmentController } from "@/control/AttachmentController"
 import { AuthController } from "@/control/AuthController"
 import { ChangelogController } from "@/control/ChangelogController"
 import { CryptoController } from "@/control/CryptoController"
+import { JobController } from "@/control/JobController"
 import { MemoController } from "@/control/MemoController"
 import { SettingsController } from "@/control/SettingsController"
 import { SetupController } from "@/control/SetupController"
@@ -18,8 +19,11 @@ import type { SyncInfo } from "@/domain/SyncInfo"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
 import { history } from "@/external/browser/history"
+import { EventJobTrigger, ScheduleJobTrigger } from "@/jobs"
+import { SyncJob } from "@/jobs/SyncJob"
 import { EncryptedKVStore, SingleItemKVStore } from "@/lib/KVStore"
 import { BaseContext, type Context } from "@/lib/context"
+import { Minute } from "@/lib/duration"
 import { EncryptedFS } from "@/lib/fs/EncryptedFS"
 import { toPromise } from "@/lib/result"
 import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
@@ -27,7 +31,12 @@ import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
 import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
 import * as eventbus from "@/ui/eventbus"
-import { actions, configureEffects, configureRootStore } from "@/ui/state"
+import {
+    type RootStore,
+    actions,
+    configureEffects,
+    configureRootStore,
+} from "@/ui/state"
 
 import type { InitPlatform, PlatformDependencies } from "./init.platform"
 
@@ -64,6 +73,8 @@ export async function init() {
         rootStore,
         unlockCtrl: controller.unlockCtrl,
     })
+
+    initJobs({ jobCtrl: controller.jobCtrl, rootStore: rootStore })
 
     return { rootStore, attachmentCtrl: controller.attachmentCtrl }
 }
@@ -174,17 +185,37 @@ async function initController(platform: PlatformDependencies) {
         }),
     })
 
+    let jobCtrl = new JobController()
+
     return {
+        apiTokenCtrl,
         attachmentCtrl,
         authCtrl,
+        cryptoCtrl,
+        jobCtrl,
         memoCtrl,
         settingsCtrl,
         setupCtrl,
         syncCtrl,
         unlockCtrl,
-        apiTokenCtrl,
-        cryptoCtrl,
     }
+}
+
+function initJobs({
+    jobCtrl,
+    rootStore,
+}: { jobCtrl: JobController; rootStore: RootStore }) {
+    window.addEventListener("unload", async () => {
+        jobCtrl.stop()
+    })
+
+    let syncJob = new SyncJob(rootStore.dispatch)
+
+    jobCtrl.scheduleJob(syncJob, new EventJobTrigger(window, "online"))
+
+    jobCtrl.scheduleJob(syncJob, new ScheduleJobTrigger(5 * Minute))
+
+    jobCtrl.start()
 }
 
 function initRootStore(controller: {
@@ -211,7 +242,7 @@ function initRootStore(controller: {
     return rootStore
 }
 
-function initEventBus(rootStore: ReturnType<typeof configureRootStore>) {
+function initEventBus(rootStore: RootStore) {
     eventbus.on("notifications:add", (notification) => {
         rootStore.dispatch(actions.global.notifications.add({ notification }))
     })
