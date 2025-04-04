@@ -149,7 +149,7 @@ fn bind_args(sql: &str, values: Vec<JsonValue>) -> Query<'_, Sqlite, SqliteArgum
             query = query.bind(number.as_f64().unwrap_or_default())
         } else if let Some(arr) = value.as_array() {
             query = query.bind(
-                arr.into_iter()
+                arr.iter()
                     .map(|v| v.as_u64().unwrap_or_default() as u8)
                     .collect::<Vec<_>>(),
             )
