@@ -1,0 +1,15 @@
+name: Updated Go Dependencies
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+    - "**/go.mod"
+    - "**/go.sum"
+    - "**.go"
+
+jobs:
+  Sync-Server:
+    name: "Sync Server"
+    uses: RobinThrift/conveyor/.github/workflows/_sync-server-test-lint.yaml@main
+    secrets: inherit

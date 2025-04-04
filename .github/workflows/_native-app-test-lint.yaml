@@ -1,0 +1,26 @@
+name: Native App Test and Lint
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: RobinThrift/action-setup-just@v1
+
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        components: "clippy"
+
+    - uses: swatinem/rust-cache@v2
+      with:
+        workspaces: "./app/src-tauri -> target"
+
+    - name: "Lint Native App"
+      run: |
+        cd app/src-tauri
+        cargo clippy

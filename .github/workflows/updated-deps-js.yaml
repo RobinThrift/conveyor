@@ -1,0 +1,14 @@
+name: Updated JS Dependencies
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+    - "**/package-lock.json"
+
+jobs:
+  App:
+    name: "App"
+    uses: RobinThrift/conveyor/.github/workflows/_app-test-lint.yaml@main
+    secrets: inherit
+

@@ -3,134 +3,29 @@ name: Test and Lint
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  issues: read
-  checks: write
-  pull-requests: write
-
 jobs:
-  Lint-Server:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
-      with:
-        go-version: "stable"
-        cache-dependency-path: |
-          server/go.sum
-    - uses: RobinThrift/action-setup-just@v1
+  Sync-Server:
+    name: "Sync Server"
+    uses: RobinThrift/conveyor/.github/workflows/_sync-server-test-lint.yaml@main
+    secrets: inherit
 
-    - name: "Lint Go"
-      env:
-        GO_LINT_REPORTER: "--output.junit-xml.path=lint.junit.xml --output.junit-xml.extended"
-      run: |
-        cd server && \
-        just lint
+  App:
+    name: "App"
+    uses: RobinThrift/conveyor/.github/workflows/_app-test-lint.yaml@main
+    secrets: inherit
 
-    - name: Publish Lint Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        check_name: "Lint Results"
-        files: |
-          server/*.junit.xml
+  Native-App:
+    name: "Native App"
+    uses: RobinThrift/conveyor/.github/workflows/_native-test-lint.yaml@main
+    secrets: inherit
 
+  E2E-Tests:
+    name: "E2E Tests"
+    uses: RobinThrift/conveyor/.github/workflows/_e2e-tests.yaml@main
+    secrets: inherit
 
-  Lint-App:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: RobinThrift/action-setup-just@v1
-    - uses: actions/setup-node@v4
-      with:
-        node-version: "latest"
-    - name: "Lint App"
-      env:
-        BIOME_REPORTER: "github"
-      run: |
-        cd app && \
-        just install && \
-        just lint
-
-
-  Test-Server:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
-      with:
-        go-version: "stable"
-        cache-dependency-path: |
-          server/go.sum
-    - uses: RobinThrift/action-setup-just@v1
-
-    - name: "Test"
-      env:
-        GO_TEST_REPORTER: "github-actions"
-        EXPORT_REPORT: "true"
-      run: |
-        cd server &&
-        just test
-
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        check_name: "Test Results"
-        files: |
-          server/*.junit.xml
-
-  Test-App:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: RobinThrift/action-setup-just@v1
-    - uses: actions/setup-node@v4
-      with:
-        node-version: "latest"
-    - uses: actions/cache@v4
-      with:
-        path: app/src/external/sqlite-wasm/build
-        key: sqlchiper-v4.6.1
-
-    - name: "Test"
-      run: |
-        cd app
-        just install
-        ./node_modules/.bin/playwright install chromium-headless-shell
-        just test
-
-  Run-End-To-End-Tests:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: RobinThrift/action-setup-just@v1
-    - uses: actions/setup-go@v5
-      with:
-        go-version: "stable"
-        cache-dependency-path: |
-          server/go.sum
-    - uses: actions/setup-node@v4
-      with:
-        node-version: "latest"
-    - uses: actions/cache@v4
-      with:
-        path: app/src/external/sqlite-wasm/build
-        key: sqlchiper-v4.6.1
-
-    - name: "App E2E Tests"
-      run: |
-        cd server 
-        just build
-        cd ../app
-        just install
-        ./node_modules/.bin/playwright install chromium-headless-shell --with-deps
-        just test-e2e

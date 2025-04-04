@@ -1,0 +1,64 @@
+name: Sync Server Test and Lint
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: "stable"
+        cache-dependency-path: |
+          server/go.sum
+
+    - uses: RobinThrift/action-setup-just@v1
+
+    - name: "Lint Go"
+      env:
+        GO_LINT_REPORTER: "--output.junit-xml.path=lint.junit.xml --output.junit-xml.extended"
+      run: |
+        cd server && \
+        just lint
+
+    - name: Publish Lint Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        check_name: "Lint Results"
+        files: |
+          server/*.junit.xml
+
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: "stable"
+        cache-dependency-path: |
+          server/go.sum
+
+    - uses: RobinThrift/action-setup-just@v1
+
+    - name: "Test"
+      env:
+        GO_TEST_REPORTER: "github-actions"
+        EXPORT_REPORT: "true"
+      run: |
+        cd server &&
+        just test
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        check_name: "Test Results"
+        files: |
+          server/*.junit.xml
+

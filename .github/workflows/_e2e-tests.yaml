@@ -1,0 +1,38 @@
+name: E2E Tests
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  Run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: RobinThrift/action-setup-just@v1
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: "stable"
+        cache-dependency-path: |
+          server/go.sum
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "latest"
+
+    - uses: actions/cache@v4
+      with:
+        path: app/src/external/sqlite-wasm/build
+        key: sqlchiper-v4.6.1
+
+    - name: "App E2E Tests"
+      run: |
+        cd server 
+        just build
+        cd ../app
+        just install
+        ./node_modules/.bin/playwright install chromium-headless-shell --with-deps
+        just test-e2e
+

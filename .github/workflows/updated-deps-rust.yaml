@@ -1,0 +1,14 @@
+name: Updated Rust Dependencies
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+    - "**/Cargo.toml"
+    - "**/Cargo.lock"
+
+jobs:
+  Native-App:
+    name: "Native App"
+    uses: RobinThrift/conveyor/.github/workflows/_native-test-lint.yaml@main
+    secrets: inherit
