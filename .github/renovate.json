@@ -16,7 +16,7 @@
     "osvVulnerabilityAlerts": true,
 
     "lockFileMaintenance": { "enabled": true },
-    "enabledManagers": ["gomod", "npm", "dockerfile", "github-actions", "custom.regex"],
+    "enabledManagers": ["gomod", "npm", "cargo", "dockerfile", "github-actions", "custom.regex"],
 
     "packageRules": [
         { "matchDatasources": ["go"], "addLabels": ["go"] },
@@ -52,6 +52,9 @@
             "matchManagers": ["npm"],
             "matchPackageNames": ["/^@storybook/", "/.*-storybook-/", "/^storybook$/"]
         },
+
+        { "matchDatasources": ["crate"], "addLabels": ["rust"] },
+
 
         { "matchManagers": ["dockerfile"], "addLabels": ["docker"] },
 
