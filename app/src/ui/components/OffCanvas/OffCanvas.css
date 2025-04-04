@@ -1,7 +1,7 @@
 .offcanvas {
     @apply fixed left-0 top-0 bottom-0 right-0 max-w-[90dvw];
     @apply rounded-r bg-surface shadow-lg p-2 overflow-auto;
-    @apply focus:outline-none;
+    @apply focus:outline-hidden;
     z-index: 10000;
 
     transition: transform 350ms;

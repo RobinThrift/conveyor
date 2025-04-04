@@ -19,7 +19,7 @@
         }
 
         .nav-btn {
-            @apply px-0.5 md:!px-1;
+            @apply px-0.5 md:px-1!;
         }
 
         .dropdowns {
@@ -27,7 +27,7 @@
         }
 
         .dropdown {
-            @apply flex items-center relative rounded px-1 -left-1 text-sm lg:text-base;
+            @apply flex items-center relative rounded-sm px-1 -left-1 text-sm lg:text-base;
             @apply hover:bg-surface hover:shadow-md cursor-pointer;
 
             .months-dropdown,
@@ -178,7 +178,7 @@
             display: none;
 
             .nav-btn {
-                @apply !px-2;
+                @apply px-2!;
             }
 
             .nav {
@@ -212,7 +212,7 @@
     @apply grid grid-cols-2 gap-1 items-center justify-stretch w-full bg-surface rounded-lg p-1 my-2;
 
     .state-filter-item {
-        @apply flex gap-2 items-center justify-center p-1 text-sm rounded;
+        @apply flex gap-2 items-center justify-center p-1 text-sm rounded-sm;
 
         &:hover {
             @apply bg-subtle text-subtle-contrast;

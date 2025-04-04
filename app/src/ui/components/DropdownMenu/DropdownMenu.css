@@ -1,6 +1,6 @@
 .dropdown-menu-list {
     @apply p-1 overflow-auto rounded-md bg-surface shadow-lg;
-    @apply ring-1 ring-black ring-opacity-5;
+    @apply ring-1 ring-black/50;
     @apply dark:border dark:border-subtle-extra-dark;
     z-index: 9999;
 
@@ -16,7 +16,7 @@
 }
 
 .dropdown-menu-item {
-    @apply w-full rounded-md px-3 py-2 box-border outline-none text-sm;
+    @apply w-full rounded-md px-3 py-2 box-border outline-hidden text-sm;
     @apply cursor-pointer;
 
     min-width: max-content;

@@ -16,6 +16,10 @@
 
 .navigation-theme-selector {
     @apply hidden lg:flex flex-1 gap-2 justify-end;
+
+    .input {
+        @apply w-fit;
+    }
 }
 
 body.platform-macos .navigation {

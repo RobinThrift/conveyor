@@ -413,7 +413,7 @@ function footnoteDefinitionToJSX(
             <a
                 href={`#fnref:${doc.id}-${node.identifier}`}
                 role="doc-backlink"
-                className="ml-1 p-1 relative top-0.5 inline-flex hover:text-primary-contrast hover:bg-primary rounded"
+                className="ml-1 p-1 relative top-0.5 inline-flex hover:text-primary-contrast hover:bg-primary rounded-sm"
             >
                 {doc.componentMap.FootnoteReturnIcon && (
                     <doc.componentMap.FootnoteReturnIcon />

@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 @import "./tailwind.css";
 
 @import "@fontsource-variable/noto-serif-hk";
@@ -8,38 +10,38 @@
 @import "./themes/warm.css" layer(base);
 @import "./themes/rosepine.css" layer(base);
 
-@import "../components/Alert/Alert.css" layer(components);
-@import "../components/AlertDialog/AlertDialog.css" layer(components);
-@import "../components/AuthForm/AuthForm.css" layer(components);
-@import "../components/Button/Button.css" layer(components);
-@import "../components/ConveyorBeltText/ConveyorBeltText.css" layer(components);
-@import "../components/Dialog/Dialog.css" layer(components);
-@import "../components/DropdownMenu/DropdownMenu.css" layer(components);
+@import "../components/Alert/Alert.css";
+@import "../components/AlertDialog/AlertDialog.css";
+@import "../components/AuthForm/AuthForm.css";
+@import "../components/Button/Button.css";
+@import "../components/ConveyorBeltText/ConveyorBeltText.css";
+@import "../components/Dialog/Dialog.css";
+@import "../components/DropdownMenu/DropdownMenu.css";
 @import "../components/Editor/Editor.css";
-@import "../components/Figure/Figure.css" layer(components);
-@import "../components/Form/Form.css" layer(components);
-@import "../components/Input/Input.css" layer(components);
-@import "../components/LinkPreview/LinkPreview.css" layer(components);
-@import "../components/Loader/Loader.css" layer(components);
+@import "../components/Figure/Figure.css";
+@import "../components/Form/Form.css";
+@import "../components/Input/Input.css";
+@import "../components/LinkPreview/LinkPreview.css";
+@import "../components/Loader/Loader.css";
 @import "../components/Markdown/Code.css";
-@import "../components/Markdown/Markdown.css" layer(components);
-@import "../components/Memo/Memo.css" layer(components);
-@import "../components/MemoList/MemoList.css" layer(components);
-@import "../components/MemoListFilter/MemoListFilter.css" layer(components);
-@import "../components/Navigation/Navigation.css" layer(components);
-@import "../components/Notifications/Notifications.css" layer(components);
-@import "../components/OffCanvas/OffCanvas.css" layer(components);
-@import "../components/Select/Select.css" layer(components);
-@import "../components/Tooltip/Tooltip.css" layer(components);
-@import "../App/App.css" layer(components);
-@import "../screens/EditMemoScreen/EditMemoScreen.css" layer(components);
-@import "../screens/ErrorScreen/ErrorScreen.css" layer(components);
-@import "../screens/InitSetupScreen/InitSetupScreen.css" layer(components);
-@import "../screens/MainScreen/MainScreen.css" layer(components);
-@import "../screens/NewMemoScreen/NewMemoScreen.css" layer(components);
-@import "../screens/SettingsScreen/SettingsScreen.css" layer(components);
-@import "../screens/SingleMemoScreen/SingleMemoScreen.css" layer(components);
-@import "../screens/UnlockScreen/UnlockScreen.css" layer(components);
+@import "../components/Markdown/Markdown.css";
+@import "../components/Memo/Memo.css";
+@import "../components/MemoList/MemoList.css";
+@import "../components/MemoListFilter/MemoListFilter.css";
+@import "../components/Navigation/Navigation.css";
+@import "../components/Notifications/Notifications.css";
+@import "../components/OffCanvas/OffCanvas.css";
+@import "../components/Select/Select.css";
+@import "../components/Tooltip/Tooltip.css";
+@import "../App/App.css";
+@import "../screens/EditMemoScreen/EditMemoScreen.css";
+@import "../screens/ErrorScreen/ErrorScreen.css";
+@import "../screens/InitSetupScreen/InitSetupScreen.css";
+@import "../screens/MainScreen/MainScreen.css";
+@import "../screens/NewMemoScreen/NewMemoScreen.css";
+@import "../screens/SettingsScreen/SettingsScreen.css";
+@import "../screens/SingleMemoScreen/SingleMemoScreen.css";
+@import "../screens/UnlockScreen/UnlockScreen.css";
 
 @layer base {
     body {

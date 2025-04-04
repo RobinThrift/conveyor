@@ -51,7 +51,7 @@ export function AuthForm(props: AuthFormProps) {
                     required
                     messages={t}
                     className="md:grid grid-cols-6 space-y-1"
-                    labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
+                    labelClassName="mb-0! font-semibold! text-sm! items-center col-span-2"
                     inputWrapperClassName="col-span-4"
                     messageClassName="col-span-6"
                     disabled={isLoading || showChangePasswordDialog}
@@ -66,7 +66,7 @@ export function AuthForm(props: AuthFormProps) {
                     required
                     messages={t}
                     className="md:grid grid-cols-6 space-y-1"
-                    labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
+                    labelClassName="mb-0! font-semibold! text-sm! items-center col-span-2"
                     inputWrapperClassName="col-span-4"
                     messageClassName="col-span-6"
                     disabled={isLoading || showChangePasswordDialog}
@@ -79,7 +79,7 @@ export function AuthForm(props: AuthFormProps) {
                     ariaLabel={t.FieldServerLabel}
                     messages={t}
                     className="md:grid grid-cols-6 space-y-1"
-                    labelClassName="!mb-0 !font-semibold !text-sm items-center col-span-2"
+                    labelClassName="mb-0! font-semibold! text-sm! items-center col-span-2"
                     inputWrapperClassName="col-span-4"
                     messageClassName="col-span-6"
                     disabled={isLoading || showChangePasswordDialog}

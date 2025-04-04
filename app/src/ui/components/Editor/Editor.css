@@ -5,7 +5,7 @@
 
 .placeholder-btn {
     @apply appearance-none cursor-text;
-    @apply flex items-start w-full min-h-full text-left p-3 flex-grow;
+    @apply flex items-start w-full min-h-full text-left p-3 grow;
     @apply text-subtle-dark font-mono text-[13px];
 }
 
@@ -72,7 +72,7 @@
 }
 
 .cm-scroller {
-    @apply flex-grow font-mono;
+    @apply grow font-mono;
 
     line-height: 1.7142857 !important;
     --editor-font-size: 0.875rem;

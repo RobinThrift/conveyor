@@ -2,6 +2,7 @@ import path from "node:path"
 import { exec as nodeexec } from "node:child_process"
 import * as process from "node:process"
 import { defineConfig, type UserConfig, searchForWorkspaceRoot } from "vite"
+import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react-swc"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
@@ -52,7 +53,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             },
         },
 
-        plugins: [react()],
+        plugins: [tailwindcss(), react()],
 
         optimizeDeps: {
             exclude: ["@sqlite.org/sqlite-wasm"],

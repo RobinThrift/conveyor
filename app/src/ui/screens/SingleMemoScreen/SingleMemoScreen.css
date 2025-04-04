@@ -11,7 +11,7 @@
 
     .back-btn {
         @apply absolute z-10 top-3 mt-0.5 left-1 tablet:mt-0 tablet:top-4 lg:top-6;
-        @apply rounded px-2 py-1;
+        @apply rounded-sm px-2 py-1;
 
         & > svg {
             @apply size-5;

@@ -1,7 +1,7 @@
 .dialog {
     @apply fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[500px] shadow-lg;
     @apply rounded-lg bg-surface p-4;
-    @apply focus:outline-none;
+    @apply focus:outline-hidden;
     z-index: 10000;
 
     top: calc(50% + 1.25rem * var(--nested-dialogs));
@@ -46,7 +46,7 @@
 .dialog-close {
     @appy appearance-none;
     @apply absolute right-1 top-1 inline-flex size-8 items-center justify-center p-0;
-    @apply focus:outline-none;
+    @apply focus:outline-hidden;
 
     & > svg {
         @apply size-4;

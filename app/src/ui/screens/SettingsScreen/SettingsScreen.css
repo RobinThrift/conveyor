@@ -87,7 +87,7 @@
     }
 
     .api-token {
-        @apply p-2 border border-subtle-dark rounded shadow-md;
+        @apply p-2 border border-subtle-dark rounded-sm shadow-md;
     }
 
     dt {

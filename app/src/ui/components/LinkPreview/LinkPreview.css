@@ -1,8 +1,8 @@
 .link-preview {
-    @apply relative rounded-lg overflow-hidden shadow top-0 left-0;
+    @apply relative rounded-lg overflow-hidden shadow-sm top-0 left-0;
     @apply w-full my-2 @md:max-w-[50%] @md:float-left @md:clear-left @md:mr-2 @md:mt-0;
     @apply sm:hover:shadow-lg sm:hover:-top-0.5 sm:hover:-left-0.5;
-    transition: top .2s, left .2s, box-shadow .1s;
+    transition: top 0.2s, left 0.2s, box-shadow 0.1s;
 
     .preview-img {
         @apply block relative;
@@ -21,7 +21,7 @@
         @container (min-width: 24rem) {
             /* sm container size */
             .description {
-                @apply p-1 rounded;
+                @apply p-1 rounded-sm;
                 color: white;
                 text-shadow: 1px 1px 5px rgb(0 0 0 / 0.8);
                 mix-blend-mode: lighten;
@@ -35,7 +35,7 @@
     }
 
     .arrow {
-        @apply text-lg p-3 bg-surface items-center justify-center rounded-full text-text shadow;
+        @apply text-lg p-3 bg-surface items-center justify-center rounded-full text-text shadow-sm;
         @apply hidden @md:flex;
 
         &:hover {

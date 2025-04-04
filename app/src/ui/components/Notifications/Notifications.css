@@ -1,5 +1,5 @@
 .notifications-viewport {
-    @apply flex-col gap-2.5 outline-none p-4;
+    @apply flex-col gap-2.5 outline-hidden p-4;
     display: flex;
     width: 390px;
     max-width: 100vw;

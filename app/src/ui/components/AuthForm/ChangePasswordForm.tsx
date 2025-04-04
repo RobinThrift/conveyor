@@ -74,7 +74,7 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
                 required
                 messages={t}
                 className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!font-semibold !text-sm items-center !mb-0 col-span-2"
+                labelClassName="font-semibold! text-sm! items-center mb-0! col-span-2"
                 inputWrapperClassName="col-span-4"
                 messageClassName="col-span-6"
                 disabled={isLoading}
@@ -89,7 +89,7 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
                 required
                 messages={t}
                 className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!font-semibold !text-sm items-center !mb-0 col-span-2"
+                labelClassName="font-semibold! text-sm! items-center mb-0! col-span-2"
                 inputWrapperClassName="col-span-4"
                 messageClassName="col-span-6"
                 disabled={isLoading}
@@ -104,7 +104,7 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
                 required
                 messages={t}
                 className="md:grid grid-cols-6 space-y-1"
-                labelClassName="!font-semibold !text-sm items-center !mb-0 col-span-2"
+                labelClassName="font-semibold! text-sm! items-center mb-0! col-span-2"
                 inputWrapperClassName="col-span-4"
                 messageClassName="col-span-6"
                 disabled={isLoading}

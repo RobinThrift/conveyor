@@ -70,7 +70,7 @@ const markTransferring = (id: string) =>
     Decoration.mark({
         id,
         attributes: {
-            class: "relative rounded-sm before:content-[''] before:animate-pulse before:absolute before:h-[130%] before:w-full before:rounded-sm before:bg-success/50",
+            class: "relative rounded-xs before:content-[''] before:animate-pulse before:absolute before:h-[130%] before:w-full before:rounded-xs before:bg-success/50",
         },
     })
 
@@ -78,7 +78,7 @@ const markError = (id: string) =>
     Decoration.mark({
         id,
         attributes: {
-            class: "bg-danger/75 text-danger-contrast rounded-sm",
+            class: "bg-danger/75 text-danger-contrast rounded-xs",
         },
     })
 

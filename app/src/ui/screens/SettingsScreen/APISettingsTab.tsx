@@ -129,7 +129,7 @@ function CreateNewAPIToken({
                     value={name()}
                     onChange={onChangeName}
                     className="sm:mb-0 md:grid grid-cols-6 space-y-1"
-                    labelClassName="!font-semibold !text-sm items-center !mb-0 col-span-2"
+                    labelClassName="font-semibold! text-sm! items-center mb-0! col-span-2"
                     inputWrapperClassName="col-span-4"
                     disabled={isLoading}
                 />
@@ -144,7 +144,7 @@ function CreateNewAPIToken({
                     <Select
                         name="api_token_expires_in"
                         ariaLabel={t.FieldExpiresInLabel}
-                        className="col-span-4 !py-2"
+                        className="col-span-4 py-2!"
                         value={expiresIn()}
                         onChange={setExpiresIn}
                         disabled={isLoading}
@@ -183,11 +183,11 @@ function LastCreatedAPIToken({ value }: { value: string }) {
     }, [])
 
     return (
-        <div className="bg-success border-success-dark p-4 rounded">
+        <div className="bg-success border-success-dark p-4 rounded-sm">
             <h4 className="text-success-contrast">{t.Title}</h4>
             <p className="text-success-contrast my-2">{t.Notice}</p>
             <input
-                className="input px-2 py-1 bg-success-light border-success-light focus:border-success-dark focus:outline-none focus:ring-0"
+                className="input px-2 py-1 bg-success-light border-success-light focus:border-success-dark focus:outline-hidden focus:ring-0"
                 readOnly
                 value={value}
                 onFocus={onFocus}
