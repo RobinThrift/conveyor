@@ -10,5 +10,5 @@ on:
 jobs:
   Native-App:
     name: "Native App"
-    uses: RobinThrift/conveyor/.github/workflows/_native-test-lint.yaml@main
+    uses: RobinThrift/conveyor/.github/workflows/_native-app-test-lint.yaml@main
     secrets: inherit
