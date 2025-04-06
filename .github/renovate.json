@@ -42,9 +42,21 @@
         },
 
         {
+            "groupName": "JavaScript CodeMirror Packages",
+            "matchManagers": ["npm"],
+            "matchPackageNames": ["/^codemirror/"]
+        },
+
+        {
             "groupName": "JavaScript Vite Packages",
             "matchManagers": ["npm"],
-            "matchPackageNames": ["/^vite$/", "/^@vitejs/plugin-react$/", "/^vitest$/"]
+            "matchPackageNames": [
+                "/^vite$/",
+                "/^@vitejs/plugin-react-swc$/",
+                "/^vitest$/",
+                "/^vitest/browser$/",
+                "/^vitest-browser-react$/"
+            ]
         },
 
         {
@@ -54,7 +66,6 @@
         },
 
         { "matchDatasources": ["crate"], "addLabels": ["rust"] },
-
 
         { "matchManagers": ["dockerfile"], "addLabels": ["docker"] },
 
