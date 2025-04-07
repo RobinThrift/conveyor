@@ -19,13 +19,13 @@ Vim.defineEx("cquit", "cq", (cm: { cm6: EditorView }) => {
     eventbus.emit(`vim:quit:${cm.cm6.dom.parentElement?.id ?? "global"}`)
 })
 
-Vim.map("A", "g$a")
-Vim.map("I", "g0i")
+Vim.map("A", "g$a", "normal")
+Vim.map("I", "g0i", "normal")
 
-Vim.map("j", "gj")
+Vim.map("j", "gj", "normal")
 Vim.map("j", "gj", "visual")
 
-Vim.map("k", "gk")
+Vim.map("k", "gk", "normal")
 Vim.map("k", "gk", "visual")
 
 export { vim } from "@replit/codemirror-vim"
