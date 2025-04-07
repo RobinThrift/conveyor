@@ -61,7 +61,7 @@
         "@radix-ui/react-select": "^2.1.6",
         "@radix-ui/react-toast": "^1.2.6",
         "@radix-ui/react-toolbar": "^1.1.2",
-        "@reduxjs/toolkit": "^2.4.0",
+        "@reduxjs/toolkit": "^2.6.1",
         "@replit/codemirror-vim": "^6.3.0",
         "@sqlite.org/sqlite-wasm": "^3.48.0-build4",
         "@tauri-apps/plugin-fs": "^2.2.0",
