@@ -16,12 +16,12 @@
 
 		<title>{{ .Title }}</title>
 
-		<link rel="stylesheet" href="{{ .AssetURL }}/index.css?hash={{ .CommitHash }}" />
+		<link rel="stylesheet" href="{{ .AssetURL }}/index.{{ .CommitHash }}.css" />
 	</head>
 	<body>
 		<div id="__CONVEYOR_UI_ROOT__"></div>
 
 		<script type="conveyor_ui/data" id="__conveyor_ui_data__">{{ .UIData }}</script>
-		<script src="{{ .AssetURL }}/index.js?hash={{ .CommitHash }}" type="module"></script>
+		<script src="{{ .AssetURL }}/index.{{ .CommitHash }}.js" type="module"></script>
 	</body>
 </html>

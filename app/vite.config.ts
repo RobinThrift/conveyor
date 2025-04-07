@@ -104,10 +104,10 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                     index: "./src/index.tsx",
                 },
                 output: {
-                    entryFileNames: "[name].js",
+                    entryFileNames: `[name].${vcsInfo.hash.substring(0, 16)}.js`,
                     assetFileNames: (assetInfo) => {
                         if (assetInfo.names[0] === "index.css")
-                            return "index.css"
+                            return `index.${vcsInfo.hash.substring(0, 16)}.css`
                         return assetInfo.names[0] ?? ""
                     },
                 },
@@ -127,7 +127,7 @@ async function getVCSInfo() {
         return {
             version,
             numCommits,
-            hash,
+            hash: hash.substring(1),
             date,
         }
     } catch (err) {
@@ -137,7 +137,7 @@ async function getVCSInfo() {
     return {
         version: "dev",
         numCommits: "0",
-        hash: "",
+        hash: "dev",
         date: new Date(),
     }
 }
