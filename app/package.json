@@ -23,7 +23,7 @@
         "@vite-pwa/assets-generator": "^1.0.0",
         "@vitejs/plugin-react-swc": "^3.8.1",
         "@vitest/browser": "^3.1.1",
-        "lightningcss": "^1.28.1",
+        "lightningcss": "^1.29.3",
         "micromark-util-types": "^2.0.0",
         "msw": "^2.7.3",
         "msw-storybook-addon": "^2.0.4",
