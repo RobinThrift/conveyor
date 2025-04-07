@@ -241,3 +241,32 @@
         @apply bg-subtle-extra-light grid-cols-1 grid-cols-1;
     }
 }
+
+.tag-tree-item {
+    .icon,
+    & > span {
+        @apply text-subtle-dark;
+    }
+
+    &[data-expanded] .tag-tree-item-expand-toggle-btn {
+        @apply rotate-90 mt-1;
+    }
+
+    &[data-selected] .tag-tree-item-expand-toggle {
+        @apply bg-primary-light! text-primary-contrast!;
+        .icon,
+        & > span {
+            @apply text-primary-contrast;
+        }
+    }
+}
+
+.tag-tree-item-expand-toggle {
+    @apply flex gap-1 items-center cursor-pointer rounded-sm xs:hover:bg-subtle active:bg-subtle ps-1 pe-2;
+    padding-left: calc((var(--tree-item-level, 1) - 1) * var(--spacing, 0) * 8);
+}
+
+.tag-tree-item-expand-toggle-btn {
+    @apply w-5;
+    transition: rotate 0.25s;
+}

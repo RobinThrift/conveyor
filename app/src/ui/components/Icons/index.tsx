@@ -1,3 +1,5 @@
+import { lazy } from "react"
+
 export { Archive as ArchiveIcon } from "@phosphor-icons/react/Archive"
 export { ArrowLeft as ArrowLeftIcon } from "@phosphor-icons/react/ArrowLeft"
 export { ArrowUDownLeft as ArrowUDownLeftIcon } from "@phosphor-icons/react/ArrowUDownLeft"
@@ -35,3 +37,9 @@ export { TrashSimple as BinIcon } from "@phosphor-icons/react/TrashSimple"
 export { User as UserIcon } from "@phosphor-icons/react/User"
 export { Warning as WarningIcon } from "@phosphor-icons/react/Warning"
 export { X as XIcon } from "@phosphor-icons/react/X"
+
+export const HashIcon = lazy(() =>
+    import("@phosphor-icons/react/Hash").then(({ Hash }) => ({
+        default: Hash,
+    })),
+)

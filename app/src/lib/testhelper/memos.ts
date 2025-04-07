@@ -12,10 +12,23 @@ export function generateMockMemos() {
     let memos: Memo[] = []
 
     for (let i = 0; i < 100; i++) {
-        tags.push({
-            tag: `${faker.word.noun()}/${faker.word.noun()}`,
-            count: 0,
-        })
+        let n = faker.number.int({ min: 0, max: 100 })
+        if (n > 50) {
+            tags.push({
+                tag: faker.word.noun(),
+                count: 0,
+            })
+        } else if (n > 30) {
+            tags.push({
+                tag: `${faker.word.noun()}/${faker.word.noun()}`,
+                count: 0,
+            })
+        } else {
+            tags.push({
+                tag: `${faker.word.noun()}/${faker.word.noun()}/${faker.word.noun()}`,
+                count: 0,
+            })
+        }
     }
 
     tags.sort()

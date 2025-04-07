@@ -1,11 +1,17 @@
-import type { Tag } from "@/domain/Tag"
-import { CaretRight, Hash } from "@phosphor-icons/react"
 import clsx from "clsx"
-import React, { useCallback, useMemo } from "react"
-import TreeView, {
-    type INode,
-    type ITreeViewOnNodeSelectProps,
-} from "react-accessible-treeview"
+import React, { type Key, useCallback, useMemo } from "react"
+import {
+    Button,
+    Collection,
+    type Selection,
+    Tree,
+    TreeItem,
+    TreeItemContent,
+} from "react-aria-components"
+
+import type { Tag } from "@/domain/Tag"
+import { CaretRightIcon, HashIcon } from "@/ui/components/Icons"
+import { useStateSet } from "@/ui/hooks/useStateSet"
 
 export interface TagTreeProps {
     className?: string
@@ -14,67 +20,136 @@ export interface TagTreeProps {
     onSelect: (selected?: string) => void
 }
 
-export function TagTree({
-    className,
+interface TreeItemT {
+    id: string
+    tag: string
+    count: number
+    children: TreeItemT[]
+}
+
+export function TagTree({ className, ...props }: TagTreeProps) {
+    let {
+        tagTree,
+        expandedIDs,
+        selected,
+        onAction,
+        onSelectionChange,
+        onExpandedChange,
+    } = useTagTreeState(props)
+
+    if (props.tags.length === 0) {
+        return null
+    }
+
+    return (
+        <div className={clsx("tag-tree", className)}>
+            <Tree
+                aria-label="Tag tree"
+                selectionMode="single"
+                selectionBehavior="toggle"
+                items={tagTree}
+                expandedKeys={expandedIDs}
+                selectedKeys={selected ? [selected] : []}
+                onAction={onAction}
+                onSelectionChange={onSelectionChange}
+                onExpandedChange={onExpandedChange}
+            >
+                {function renderItem(item) {
+                    return (
+                        <TreeItem
+                            textValue={item.tag}
+                            className="tag-tree-item"
+                        >
+                            <TreeItemContent>
+                                {({ hasChildItems }) => (
+                                    <div className="tag-tree-item-expand-toggle">
+                                        {hasChildItems && (
+                                            <Button
+                                                slot="chevron"
+                                                className="tag-tree-item-expand-toggle-btn"
+                                            >
+                                                <CaretRightIcon />
+                                            </Button>
+                                        )}
+                                        <HashIcon className={"icon"} />
+                                        {item.tag}
+                                        <span className="text-subtle-dark">
+                                            {item.count
+                                                ? ` (${item.count})`
+                                                : null}
+                                        </span>
+                                    </div>
+                                )}
+                            </TreeItemContent>
+                            <Collection items={item.children}>
+                                {renderItem}
+                            </Collection>
+                        </TreeItem>
+                    )
+                }}
+            </Tree>
+        </div>
+    )
+}
+
+function useTagTreeState({
     tags,
     selected,
     onSelect: propagateSelectionChange,
 }: TagTreeProps) {
-    let tagTree = useMemo(() => {
-        let tree: Record<string, INode> = {
-            root: { name: "", id: "root", children: [], parent: null },
+    let [tagTree, disabledKeys]: [TreeItemT[], Set<string>] = useMemo(() => {
+        let tree: Record<string, TreeItemT> = {}
+        let items: TreeItemT[] = []
+        let disabledKeys = new Set<string>()
+
+        for (let tag of tags) {
+            let segments = tag.tag.replace("#", "").split("/")
+
+            let parentID = ""
+            for (let segment of segments) {
+                let id = parentID === "" ? segment : `${parentID}/${segment}`
+                let count = id === tag.tag ? tag.count : 0
+
+                let item: TreeItemT = {
+                    id: id,
+                    tag: segment,
+                    count,
+                    children: [],
+                }
+
+                if (item.count === 0) {
+                    disabledKeys.add(id)
+                }
+
+                let parent = tree[parentID]
+
+                if (!parent) {
+                    if (!tree[id]) {
+                        tree[id] = item
+                        items.push(item)
+                    }
+                    parentID = id
+                    continue
+                }
+
+                parent.children.push(item)
+
+                tree[id] = item
+                parentID = id
+            }
         }
 
-        tags.forEach((tag) => {
-            let segments = tag.tag.replace("#", "").split("/")
-            let id = ""
-            segments.forEach((segment) => {
-                let parent = id
-                id = id === "" ? segment : `${id}/${segment}`
-                let metadata = { count: id === tag.tag ? tag.count : 0 }
-                if (!tree[id]) {
-                    tree[id] = {
-                        id,
-                        name: segment,
-                        parent: parent || "root",
-                        children: [],
-                        metadata,
-                    }
-                } else {
-                    tree[id].metadata = metadata
-                }
-            })
-        })
-
-        let nodes: INode[] = []
-
-        Object.values(tree).forEach((node) => {
-            if (node.parent) {
-                tree[node.parent]?.children.push(node.id)
-            }
-            nodes.push(node)
-        })
-
-        return nodes
+        return [items, disabledKeys]
     }, [tags])
 
-    let onSelect = useCallback(
-        ({ element }: ITreeViewOnNodeSelectProps) => {
-            if (element.id === selected) {
-                propagateSelectionChange(undefined)
-            } else {
-                propagateSelectionChange(element.id as string)
-            }
-        },
-        [propagateSelectionChange, selected],
-    )
+    let [manuallyExpanded, manuallyExpandedSetter] = useStateSet<string>([])
 
     let expandedIDs = useMemo(() => {
-        if (!selected || !tagTree.find((n) => n.id === selected)) {
-            return []
+        if (!selected || !tags.find((n) => n.tag === selected)) {
+            return manuallyExpanded
         }
 
-        return selected.split("/").reduce((ids, segment) => {
+        let selectedPath = selected.split("/").reduce((ids, segment) => {
             if (ids.length === 0) {
                 ids.push(segment)
             } else {
@@ -82,84 +157,70 @@ export function TagTree({
             }
             return ids
         }, [] as string[])
-    }, [selected, tagTree])
 
-    if (tags.length === 0) {
-        return null
-    }
+        return [...manuallyExpanded, ...selectedPath]
+    }, [selected, tags, manuallyExpanded])
 
-    return (
-        <div className={clsx("tag-tree", className)}>
-            <TreeView
-                data={tagTree}
-                className=""
-                aria-label="tag tree"
-                onNodeSelect={onSelect}
-                selectedIds={selected ? [selected] : []}
-                defaultExpandedIds={expandedIDs}
-                togglableSelect={true}
-                nodeRenderer={({
-                    element,
-                    getNodeProps,
-                    level,
-                    isExpanded,
-                    isSelected,
-                    handleExpand,
-                }) => {
-                    let { className, onClick } = getNodeProps()
-                    return (
-                        <div
-                            className={className}
-                            style={{ marginLeft: 20 * (level - 1) }}
-                        >
-                            <div
-                                className={clsx(
-                                    "flex gap-1 items-center cursor-pointer rounded-sm xs:hover:bg-subtle active:bg-subtle ps-1 pe-2",
-                                    {
-                                        "bg-primary-light! text-primary-contrast!":
-                                            isSelected,
-                                    },
-                                )}
-                            >
-                                <Hash
-                                    className={clsx({
-                                        "text-subtle-dark": !isSelected,
-                                        "text-primary-contrast": isSelected,
-                                    })}
-                                />
-                                <button
-                                    className="flex-1 appearance-none text-left"
-                                    onClick={
-                                        element.metadata?.count
-                                            ? onClick
-                                            : handleExpand
-                                    }
-                                    type="button"
-                                >
-                                    {element.name}
-                                    {element.metadata?.count
-                                        ? ` (${element.metadata.count})`
-                                        : null}
-                                </button>
+    let onAction = useCallback(
+        (tag: Key) => {
+            if (disabledKeys.has(tag as string)) {
+                manuallyExpandedSetter.toggle(tag as string)
+                return
+            }
 
-                                {element.children.length !== 0 && (
-                                    <button
-                                        type="button"
-                                        className="appearance-none"
-                                        onClick={handleExpand}
-                                    >
-                                        <CaretRight
-                                            className={clsx("transition", {
-                                                "rotate-90": isExpanded,
-                                            })}
-                                        />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    )
-                }}
-            />
-        </div>
+            if (tag === selected) {
+                propagateSelectionChange(undefined)
+            } else {
+                propagateSelectionChange(tag as string)
+            }
+        },
+        [
+            selected,
+            disabledKeys,
+            propagateSelectionChange,
+            manuallyExpandedSetter.toggle,
+        ],
     )
+
+    let onSelectionChange = useCallback(
+        (selection: Selection) => {
+            if (selection === "all") {
+                return
+            }
+
+            let tag = ([...selection][0] as string) ?? ""
+            if (disabledKeys.has(tag)) {
+                manuallyExpandedSetter.toggle(tag)
+                return
+            }
+
+            if (tag === selected) {
+                propagateSelectionChange(undefined)
+            } else {
+                propagateSelectionChange(tag)
+            }
+        },
+        [
+            selected,
+            disabledKeys,
+            propagateSelectionChange,
+            manuallyExpandedSetter.toggle,
+        ],
+    )
+
+    let onExpandedChange = useCallback(
+        (expanded: Set<Key>) => {
+            manuallyExpandedSetter.add(expanded as Set<string>)
+        },
+        [manuallyExpandedSetter.add],
+    )
+
+    return {
+        tagTree,
+        expandedIDs,
+        selected,
+        onAction,
+        onSelectionChange,
+        onExpandedChange,
+    }
 }

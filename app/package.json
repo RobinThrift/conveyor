@@ -87,7 +87,7 @@
         "nanoevents": "^9.1.0",
         "nanoid": "^5.1.5",
         "quill-delta": "^5.1.0",
-        "react-accessible-treeview": "^2.11.1",
+        "react-aria-components": "^1.7.1",
         "react-day-picker": "^9.6.3",
         "react-medium-image-zoom": "^5.2.14",
         "react-redux": "^9.2.0",
