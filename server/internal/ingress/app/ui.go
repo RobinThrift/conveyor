@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 
 	"go.robinthrift.com/conveyor/internal/version"
 )
@@ -40,17 +41,19 @@ var buildInfo = version.GetBuildInfo()
 
 func render(w http.ResponseWriter, data pageData) error {
 	var tmpldata struct {
-		UIData   template.HTML
-		AssetURL string
-		Icon     string
-		BaseURL  template.HTMLAttr
-		Title    string
+		UIData     template.HTML
+		CommitHash string
+		AssetURL   string
+		Icon       string
+		BaseURL    template.HTMLAttr
+		Title      string
 	}
 
 	data.ServerData.BuildInfo.Version = buildInfo.Version
 	data.ServerData.BuildInfo.CommitHash = buildInfo.Hash
-	data.ServerData.BuildInfo.CommitDate = buildInfo.Date
+	data.ServerData.BuildInfo.CommitDate = buildInfo.Date.Format(time.RFC3339)
 	data.ServerData.BuildInfo.GoVersion = buildInfo.GoVersion
+	tmpldata.CommitHash = buildInfo.Hash
 
 	encoded, err := json.Marshal(data.ServerData) //nolint:musttag
 	if err != nil {

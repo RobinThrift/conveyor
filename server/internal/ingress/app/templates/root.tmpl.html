@@ -6,22 +6,22 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
 		<meta name="base-url" {{ .BaseURL }} />
 
-        <link rel="icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/favicon.ico" sizes="48x48">
-		<link rel="icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/icon.svg" sizes="any" type="image/svg+xml">
-		<link rel="apple-touch-icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/apple-touch-icon-180x180.png">
-		<link rel="manifest" href="{{ .AssetURL }}/manifest.json" />
+        <link rel="icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/favicon.ico?hash={{ .CommitHash }}" sizes="48x48">
+		<link rel="icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/icon.svg?hash={{ .CommitHash }}" sizes="any" type="image/svg+xml">
+		<link rel="apple-touch-icon" href="{{ .AssetURL }}/icons/{{ .Icon }}/apple-touch-icon-180x180.png?hash={{ .CommitHash }}">
+		<link rel="manifest" href="{{ .AssetURL }}/manifest.json?hash={{ .CommitHash }}" />
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 		<meta name="theme-color" content="transparent" />
 
 		<title>{{ .Title }}</title>
 
-		<link rel="stylesheet" href="{{ .AssetURL }}/index.css" />
+		<link rel="stylesheet" href="{{ .AssetURL }}/index.css?hash={{ .CommitHash }}" />
 	</head>
 	<body>
 		<div id="__CONVEYOR_UI_ROOT__"></div>
 
 		<script type="conveyor_ui/data" id="__conveyor_ui_data__">{{ .UIData }}</script>
-		<script src="{{ .AssetURL }}/index.js" type="module"></script>
+		<script src="{{ .AssetURL }}/index.js?hash={{ .CommitHash }}" type="module"></script>
 	</body>
 </html>

@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"runtime/debug"
 	"sync"
+	"time"
 )
 
 var Version = "dev"
@@ -12,7 +13,7 @@ var Version = "dev"
 type BuildInfo struct {
 	Version   string
 	Hash      string
-	Date      string
+	Date      time.Time
 	GoVersion string
 }
 
@@ -31,7 +32,7 @@ func GetBuildInfo() *BuildInfo {
 				case "vcs.revision":
 					buildInfo.Hash = setting.Value
 				case "vcs.time":
-					buildInfo.Date = setting.Value
+					buildInfo.Date, _ = time.Parse(time.RFC3339, setting.Value)
 				}
 			}
 		}
