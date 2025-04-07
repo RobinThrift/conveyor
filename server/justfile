@@ -24,7 +24,13 @@ run: (_install-tool "watchexec")
 
 run-prod:
     cd ../app && just install build
+    rm -rf internal/ingress/app/assets
+    cp -r ../app/build internal/ingress/app/assets
+    touch internal/ingress/app/assets/.gitkeep
     just build
+    rm -rf internal/ingress/app/assets
+    mkdir internal/ingress/app/assets
+    touch internal/ingress/app/assets/.gitkeep
     @CONVEYOR_LOG_LEVEL="debug" CONVEYOR_LOG_FORMAT="console" \
         CONVEYOR_ADDR="localhost:8081" \
         CONVEYOR_DATABASE_PATH="./test/manual/conveyor.db" \
