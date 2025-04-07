@@ -12,7 +12,7 @@ var buildInfo = version.GetBuildInfo()
 func Cache(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		etag := r.Header.Get("If-None-Match")
-		if etag == buildInfo.Hash {
+		if etag != "" && etag == buildInfo.Hash {
 			w.WriteHeader(http.StatusNotModified)
 
 			return
