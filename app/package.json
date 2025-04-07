@@ -6,7 +6,7 @@
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
         "@bufbuild/protobuf": "^2.2.5",
-        "@faker-js/faker": "^9.2.0",
+        "@faker-js/faker": "^9.6.0",
         "@playwright/test": "^1.51.1",
         "@scalar/api-reference-react": "^0.6.6",
         "@storybook/addon-essentials": "^8.6.7",
