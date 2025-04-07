@@ -40,9 +40,10 @@ RUN apk update && apk upgrade && apk add --no-cache curl git &&  \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
     just --version
 
-COPY ./server /conveyor
-COPY --from=frontend /conveyor/app/build /conveyor/internal/ingress/app/assets
-WORKDIR /conveyor
+COPY .git /conveyor/.git
+COPY ./server /conveyor/server
+COPY --from=frontend /conveyor/app/build /conveyor/sever/internal/ingress/app/assets
+WORKDIR /conveyor/server
 
 ARG VERSION TARGETOS TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/go-build \
@@ -61,7 +62,7 @@ FROM scratch
 LABEL org.opencontainers.image.source=https://github.com/RobinThrift/conveyor
 LABEL org.opencontainers.image.licenses=BSD-3-Clause
 
-COPY --from=builder /conveyor/build/conveyor /conveyor
+COPY --from=builder /conveyor/sever/build/conveyor /conveyor
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd.nonroot /etc/passwd
 COPY --from=builder --chown=nobody:nobody /run/conveyor /run
