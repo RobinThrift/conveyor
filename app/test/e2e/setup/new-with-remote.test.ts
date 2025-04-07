@@ -29,10 +29,8 @@ test("setup/new/with-remote", async ({ page }) => {
     ])
 
     await page.locator(".text-editor").click()
-    await page.getByRole("textbox").pressSequentially("# Test Memo")
-    await page.getByRole("textbox").press("Enter")
-    await page.getByRole("textbox").press("Enter")
-    await page.getByRole("textbox").pressSequentially("With Some Content")
+    await page.getByLabel("Text formatting").isVisible()
+    await page.getByRole("textbox").fill("# Test Memo\n\nWith Some Content")
     await page.getByRole("button", { name: "Save" }).click()
 
     await expect(page.getByText(/^Test Memo/)).toBeInViewport({
