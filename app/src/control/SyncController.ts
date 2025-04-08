@@ -225,7 +225,7 @@ export class SyncController {
         let entryIDs = [] as ChangelogEntryID[]
 
         let hasNextPage = true
-        let after: Date | undefined
+        let after: [number, Date] | undefined
         while (hasNextPage) {
             let page = await this._changelog.listUnapplidChangelogEntries(ctx, {
                 pagination: {
@@ -310,7 +310,7 @@ export class SyncController {
 
     private async _uploadChangelogEntries(ctx: Context): AsyncResult<void> {
         let hasNextPage = true
-        let after: Date | undefined
+        let after: [number, Date] | undefined
         while (hasNextPage) {
             let page = await this._changelog.listUnsyncedChangelogEntries(ctx, {
                 pagination: {
@@ -556,7 +556,7 @@ interface Changelog {
         args: {
             pagination: {
                 pageSize: number
-                after?: Date
+                after?: [number, Date]
             }
         },
     ): AsyncResult<ChangelogEntryList>
@@ -566,7 +566,7 @@ interface Changelog {
         args: {
             pagination: {
                 pageSize: number
-                after?: Date
+                after?: [number, Date]
             }
         },
     ): AsyncResult<ChangelogEntryList>

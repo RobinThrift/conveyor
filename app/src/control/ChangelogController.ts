@@ -62,7 +62,7 @@ export class ChangelogController {
         args: {
             pagination: {
                 pageSize: number
-                after?: Date
+                after?: [number, Date]
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -76,7 +76,7 @@ export class ChangelogController {
         args: {
             pagination: {
                 pageSize: number
-                after?: Date
+                after?: [number, Date]
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -125,7 +125,7 @@ interface Repo {
         args: {
             pagination: {
                 pageSize: number
-                after?: Date
+                after?: [number, Date]
             }
         },
     ): AsyncResult<ChangelogEntryList>
@@ -135,7 +135,7 @@ interface Repo {
         args: {
             pagination: {
                 pageSize: number
-                after?: Date
+                after?: [number, Date]
             }
         },
     ): AsyncResult<ChangelogEntryList>

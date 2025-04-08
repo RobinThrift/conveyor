@@ -28,7 +28,7 @@ export interface ChangelogEntry<
 
 export interface ChangelogEntryList {
     items: ChangelogEntry[]
-    next?: Date
+    next?: [number, Date]
 }
 
 export type MemoChangelogEntry = ChangelogEntry<

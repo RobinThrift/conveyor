@@ -129,11 +129,14 @@ sql:
           fn: "dateToSQLite"
           import: "@/storage/database/sqlite/types/datetime"
 
-      - column: chlg_page_after
+      - column: chlg_page_after_date
         type: "Date | undefined"
         to_sql:
           fn: "dateToSQLite"
           import: "@/storage/database/sqlite/types/datetime"
+
+      - column: chlg_page_after_id
+        type: "number | null"
 
       - column: settings.value
         type: "any"

@@ -2,19 +2,32 @@
 SELECT *
 FROM changelog
 WHERE
-    CASE WHEN @chlg_page_after IS NOT NULL THEN datetime(timestamp) > datetime(@chlg_page_after) ELSE true END
+    CASE
+        WHEN @chlg_page_after_date IS NOT NULL AND @chlg_page_after_id IS NOT NULL AND datetime(timestamp) = datetime(@chlg_page_after_date) THEN
+             id > @chlg_page_after_id
+        WHEN @chlg_page_after_date IS NOT NULL THEN
+            datetime(timestamp) > datetime(@chlg_page_after_date)
+        ELSE true
+    END
     AND is_synced = false
-ORDER BY timestamp ASC, revision ASC
+ORDER BY timestamp ASC, revision ASC, id ASC
 LIMIT @page_size;
 
 -- name: ListUnappliedChanges :many
 SELECT *
 FROM changelog
 WHERE
-    CASE WHEN @chlg_page_after IS NOT NULL THEN datetime(timestamp) > datetime(@chlg_page_after) ELSE true END
+    CASE
+        WHEN @chlg_page_after_date IS NOT NULL AND @chlg_page_after_id IS NOT NULL AND datetime(timestamp) = datetime(@chlg_page_after_date) THEN
+             id > @chlg_page_after_id
+        WHEN @chlg_page_after_date IS NOT NULL THEN
+            datetime(timestamp) > datetime(@chlg_page_after_date)
+        ELSE true
+    END
     AND is_applied = false
-ORDER BY timestamp ASC, revision ASC
+ORDER BY timestamp ASC, revision ASC, id ASC
 LIMIT @page_size;
+
 
 -- name: ListChangelogEntriesForID :many
 SELECT *

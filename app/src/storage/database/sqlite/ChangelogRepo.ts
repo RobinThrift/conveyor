@@ -49,7 +49,7 @@ export class ChangelogRepo {
         }: {
             pagination: {
                 pageSize: number
-                after?: Date
+                after?: [number, Date]
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -59,15 +59,25 @@ export class ChangelogRepo {
                     ctx.getData("db", this._db),
                     {
                         pageSize: pagination.pageSize,
-                        chlgPageAfter: pagination.after,
+                        chlgPageAfterDate: pagination.after
+                            ? pagination.after[1]
+                            : undefined,
+                        chlgPageAfterId: pagination.after
+                            ? pagination.after[0]
+                            : null,
                     },
                     ctx.signal,
                 ),
             ),
-            (rows) => ({
-                items: rows.map((row) => changelogEntryRowChangelogEntry(row)),
-                next: rows.at(-1)?.timestamp,
-            }),
+            (rows) => {
+                let last = rows.at(-1)
+                return {
+                    items: rows.map((row) =>
+                        changelogEntryRowChangelogEntry(row),
+                    ),
+                    next: last ? [last.id, last.timestamp] : undefined,
+                }
+            },
         )
     }
 
@@ -78,7 +88,7 @@ export class ChangelogRepo {
         }: {
             pagination: {
                 pageSize: number
-                after?: Date
+                after?: [number, Date]
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -88,15 +98,25 @@ export class ChangelogRepo {
                     ctx.getData("db", this._db),
                     {
                         pageSize: pagination.pageSize,
-                        chlgPageAfter: pagination.after,
+                        chlgPageAfterDate: pagination.after
+                            ? pagination.after[1]
+                            : undefined,
+                        chlgPageAfterId: pagination.after
+                            ? pagination.after[0]
+                            : null,
                     },
                     ctx.signal,
                 ),
             ),
-            (rows) => ({
-                items: rows.map((row) => changelogEntryRowChangelogEntry(row)),
-                next: rows.at(-1)?.timestamp,
-            }),
+            (rows) => {
+                let last = rows.at(-1)
+                return {
+                    items: rows.map((row) =>
+                        changelogEntryRowChangelogEntry(row),
+                    ),
+                    next: last ? [last.id, last.timestamp] : undefined,
+                }
+            },
         )
     }
 

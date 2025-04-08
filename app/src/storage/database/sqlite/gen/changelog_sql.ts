@@ -13,13 +13,20 @@ const listUnsyncedChangesQuery = `-- name: ListUnsyncedChanges :many
 SELECT id, public_id, source, revision, timestamp, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
 FROM changelog
 WHERE
-    CASE WHEN ?1 IS NOT NULL THEN datetime(timestamp) > datetime(?1) ELSE true END
+    CASE
+        WHEN ?1 IS NOT NULL AND ?2 IS NOT NULL AND datetime(timestamp) = datetime(?1) THEN
+             id > ?2
+        WHEN ?1 IS NOT NULL THEN
+            datetime(timestamp) > datetime(?1)
+        ELSE true
+    END
     AND is_synced = false
-ORDER BY timestamp ASC, revision ASC
-LIMIT ?2`
+ORDER BY timestamp ASC, revision ASC, id ASC
+LIMIT ?3`
 
 export interface ListUnsyncedChangesArgs {
-    chlgPageAfter: Date | undefined
+    chlgPageAfterDate: Date | undefined
+    chlgPageAfterId: number | null
     pageSize: number
 }
 
@@ -47,7 +54,11 @@ export async function listUnsyncedChanges(
 ): Promise<ListUnsyncedChangesRow[]> {
     let result = await database.query(
         listUnsyncedChangesQuery,
-        [dateToSQLite(args.chlgPageAfter), args.pageSize],
+        [
+            dateToSQLite(args.chlgPageAfterDate),
+            args.chlgPageAfterId,
+            args.pageSize,
+        ],
         abort,
     )
     return result.map((row) =>
@@ -66,13 +77,20 @@ const listUnappliedChangesQuery = `-- name: ListUnappliedChanges :many
 SELECT id, public_id, source, revision, timestamp, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
 FROM changelog
 WHERE
-    CASE WHEN ?1 IS NOT NULL THEN datetime(timestamp) > datetime(?1) ELSE true END
+    CASE
+        WHEN ?1 IS NOT NULL AND ?2 IS NOT NULL AND datetime(timestamp) = datetime(?1) THEN
+             id > ?2
+        WHEN ?1 IS NOT NULL THEN
+            datetime(timestamp) > datetime(?1)
+        ELSE true
+    END
     AND is_applied = false
-ORDER BY timestamp ASC, revision ASC
-LIMIT ?2`
+ORDER BY timestamp ASC, revision ASC, id ASC
+LIMIT ?3`
 
 export interface ListUnappliedChangesArgs {
-    chlgPageAfter: Date | undefined
+    chlgPageAfterDate: Date | undefined
+    chlgPageAfterId: number | null
     pageSize: number
 }
 
@@ -100,7 +118,11 @@ export async function listUnappliedChanges(
 ): Promise<ListUnappliedChangesRow[]> {
     let result = await database.query(
         listUnappliedChangesQuery,
-        [dateToSQLite(args.chlgPageAfter), args.pageSize],
+        [
+            dateToSQLite(args.chlgPageAfterDate),
+            args.chlgPageAfterId,
+            args.pageSize,
+        ],
         abort,
     )
     return result.map((row) =>
