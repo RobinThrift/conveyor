@@ -119,6 +119,8 @@ function useTagTreeState({
 
                 if (item.count === 0) {
                     disabledKeys.add(id)
+                } else {
+                    disabledKeys.delete(id)
                 }
 
                 let parent = tree[parentID]
@@ -132,9 +134,17 @@ function useTagTreeState({
                     continue
                 }
 
-                parent.children.push(item)
+                let exists = tree[id]
+                if (exists) {
+                    exists.count = Math.max(exists.count, count)
+                    if (exists.count !== 0) {
+                        disabledKeys.delete(id)
+                    }
+                } else {
+                    parent.children.push(item)
+                    tree[id] = item
+                }
 
-                tree[id] = item
                 parentID = id
             }
         }
