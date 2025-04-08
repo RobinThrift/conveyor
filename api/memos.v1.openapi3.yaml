@@ -4,7 +4,7 @@ info:
   description: This is the Conveyor Memo API.
   version: 0.1.0
 servers:
-- url: http://localhost:8081/api/sync/v1
+- url: http://localhost:8081/api/memos/v1
   description: Local development server.
 
 security:
