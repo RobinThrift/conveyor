@@ -12,46 +12,38 @@
     }
 
     .date-picker {
-        @apply px-2 w-full relative;
+        @apply px-2 w-full;
 
-        .nav {
-            @apply flex items-center absolute top-0 right-0 h-12;
-        }
+        .date-picker-header {
+            @apply flex items-center justify-between mb-1;
 
-        .nav-btn {
-            @apply px-0.5 md:px-1!;
-        }
-
-        .dropdowns {
-            @apply flex md:gap-2 relative h-12 items-center w-fit;
-        }
-
-        .dropdown {
-            @apply flex items-center relative rounded-sm px-1 -left-1 text-sm lg:text-base;
-            @apply hover:bg-surface hover:shadow-md cursor-pointer;
-
-            .months-dropdown,
-            .years-dropdown {
-                @apply appearance-none border-0 absolute inset-0 opacity-0 w-full z-20 -left-1;
-            }
-
-            .caption-label {
-                @apply flex items-center cursor-pointer;
+            .btn {
+                @apply px-0.5 md:px-1!;
             }
         }
 
-        .month-grid {
-            @apply w-full;
+        .date-picker-dropdowns {
+            @apply flex gap-2;
+
+            select {
+                @apply hover:bg-surface hover:shadow-sm cursor-pointer p-0.5;
+            }
         }
 
-        .weekday {
-            @apply text-center p-0 font-semibold text-sm text-subtle-extra-dark;
+        .calendar-grid {
+            @apply w-full text-center;
         }
 
-        .day {
+        .calendar-grid-header .calendar-grid-cell {
+            @apply text-center p-0 font-semibold text-sm text-subtle-extra-dark pointer-events-none;
+        }
+
+        .calendar-grid-body .calendar-grid-cell {
+            @apply cursor-pointer;
+
             padding: 0;
 
-            &.outside {
+            &[data-outside-month] {
                 @apply text-subtle;
             }
 
@@ -59,14 +51,10 @@
                 @apply text-primary-dark dark:text-primary-light;
             }
 
-            &.selected {
-                .day-btn {
-                    @apply bg-primary text-primary-contrast;
-                }
+            &[data-selected] {
+                @apply bg-primary text-primary-contrast;
             }
-        }
 
-        .day-btn {
             @apply flex items-center justify-center py-2 text-base rounded-lg;
             width: 100%;
 
@@ -74,8 +62,8 @@
                 @apply bg-subtle text-subtle-contrast;
             }
 
-            &[disabled] {
-                @apply text-subtle;
+            &[data-disabled] {
+                @apply text-subtle cursor-default;
                 &:hover {
                     @apply bg-transparent text-subtle;
                 }
@@ -84,31 +72,55 @@
     }
 
     .short-day-picker {
-        @apply w-full;
+        @apply w-full flex;
 
         @media (max-width: 1024px) {
             @apply pt-1;
         }
 
-        .caption {
-            display: none;
-        }
-
-        .months,
-        .month {
-            @apply w-full;
-        }
-
-        .month-grid {
+        .calendar-grid {
             @apply w-full flex flex-col;
         }
 
-        .weekday {
-            @apply text-center p-0 font-semibold text-xs text-primary-dark;
+        .calendar-grid-header {
+            @apply w-full flex pointer-events-none;
+
+            tr {
+                @apply w-full grid grid-cols-7;
+            }
         }
 
-        .weekdays {
-            @apply w-full grid grid-cols-7;
+        .calendar-grid-body {
+            @apply w-full flex flex-row flex-nowrap justify-start items-center w-full overflow-x-auto overscroll-none;
+            scroll-snap-type: x mandatory;
+
+            tr {
+                @apply grid grid-cols-7;
+                flex-basis: 100%;
+                flex-shrink: 0;
+                scroll-snap-align: center;
+            }
+        }
+
+        .calendar-grid-cell {
+            @apply flex items-center justify-center py-2 text-sm cursor-pointer;
+            width: 100%;
+
+            &[data-outside-month] {
+                @apply text-subtle;
+            }
+
+            &[data-disabled] {
+                @apply text-subtle cursor-default;
+            }
+
+            &.today {
+                @apply text-primary-dark dark:text-primary-light;
+            }
+
+            &[data-selected] {
+                @apply bg-primary-extra-light border-t border-t-primary;
+            }
         }
 
         .weeks {
@@ -126,35 +138,10 @@
                 display: none;
             }
         }
-
-        .day {
-            @apply flex p-0;
-
-            &.outside {
-                @apply text-subtle;
-            }
-
-            &.today {
-                @apply text-primary-dark dark:text-primary-light;
-            }
-
-            &.selected {
-                @apply bg-primary-extra-light border-t border-t-primary;
-                @apply items-center justify-center p-2;
-                .day-btn {
-                    @apply bg-primary text-primary-contrast rounded-full p-1 -mt-1 -mb-1 size-6;
-                }
-            }
-        }
-
-        .day-btn {
-            @apply flex items-center justify-center py-2 text-sm;
-            width: 100%;
-        }
     }
 
     .collapsibile-date-picker {
-        @apply flex mb-3 tablet:hidden;
+        @apply flex flex-col mb-3 tablet:hidden;
 
         & > .btn {
             min-height: auto !important;

@@ -121,6 +121,7 @@
     },
 
     "components/MemoListFilter/DatePicker": {
+        "Label": "Memos für einen Tag suchen",
         "Today": "Heute"
     },
 

@@ -1,6 +1,7 @@
-import { Ok, type Result, fromThrowing } from "@/lib/result"
 import { parseJSON as dateFnsParseJSON } from "date-fns"
-import { decodeText } from "./textencoding"
+
+import { Ok, type Result, fromThrowing } from "@/lib/result"
+import { decodeText } from "@/lib/textencoding"
 
 export function jsonDeserialize<R, V = unknown>(
     raw: string | ArrayBufferLike | Uint8Array<ArrayBufferLike>,

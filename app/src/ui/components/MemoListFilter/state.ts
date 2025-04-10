@@ -1,5 +1,7 @@
-import type { ListMemosQuery } from "@/domain/Memo"
 import { useCallback, useMemo, useState } from "react"
+
+import { CalendarDate } from "@/lib/i18n"
+import type { ListMemosQuery } from "@/domain/Memo"
 
 export type Filter = ListMemosQuery
 
@@ -21,7 +23,7 @@ export function useMemoListFilterState(props: {
     )
 
     let onSelectDate = useCallback(
-        (date: Date | undefined) => {
+        (date: CalendarDate | undefined) => {
             props.onChangeFilter({
                 ...props.filter,
                 exactDate: date,

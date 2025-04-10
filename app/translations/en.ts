@@ -125,6 +125,7 @@ export const translations = {
     },
 
     "components/MemoListFilter/DatePicker": {
+        Label: "Filter Memos by Date",
         Today: "Today",
     },
 

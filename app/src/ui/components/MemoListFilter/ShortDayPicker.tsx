@@ -1,57 +1,41 @@
 import clsx from "clsx"
-import React, {
-    startTransition,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from "react"
-import { DayPicker } from "react-day-picker"
+import React, { useCallback, useRef, useState, useEffect, useMemo } from "react"
+import {
+    Calendar as AriaCalendar,
+    CalendarGrid as AriaCalendarGrid,
+    CalendarGridHeader as AriaCalendarGridHeader,
+    CalendarHeaderCell as AriaCalendarHeaderCell,
+    CalendarGridBody as AriaCalendarGridBody,
+    Heading as AriaHeading,
+    DateValue,
+} from "react-aria-components"
 
-import { useDateTimeLocale } from "@/ui/i18n"
+import { type CalendarDate, currentDateTime, isSameDay } from "@/lib/i18n"
+
+import { CalendarCell } from "./CalendarCell"
 
 export interface ShortDayPickerProps {
     className?: string
-    selected?: Date
-    onSelect: (date?: Date) => void
+    selected?: CalendarDate
+    onSelect: (date?: CalendarDate) => void
 }
 
-export function ShortDayPicker({ ...props }: ShortDayPickerProps) {
+export function ShortDayPicker(props: ShortDayPickerProps) {
     let scrollToRef = useRef<HTMLTableCellElement | null>(null)
-    let dateTimeLocale = useDateTimeLocale()
-    let [selected, setSelected] = useState<Date | undefined>(
-        props.selected ?? new Date(),
-    )
-    let [month, setMonth] = useState<Date | undefined>(
-        props.selected ?? new Date(),
+    let [focusedDate, setFocusedDate] = useState<CalendarDate>(
+        props.selected ?? currentDateTime(),
     )
 
-    let onSelect = useCallback(
-        (date: Date | undefined) => {
-            setSelected(date)
-            setMonth(date)
-            props.onSelect(date)
+    let today = useMemo(() => {
+        return currentDateTime()
+    }, [])
+
+    let onChange = useCallback(
+        (value: DateValue) => {
+            props.onSelect(value as CalendarDate)
         },
         [props.onSelect],
     )
-
-    useEffect(() => {
-        startTransition(() => {
-            setSelected((selected) => {
-                if (props.selected !== selected) {
-                    return props.selected
-                }
-                return selected
-            })
-
-            setMonth((month) => {
-                if (props.selected !== month) {
-                    return props.selected
-                }
-                return month
-            })
-        })
-    }, [props.selected])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: we need to rerender when the ref changes
     useEffect(() => {
@@ -64,59 +48,45 @@ export function ShortDayPicker({ ...props }: ShortDayPickerProps) {
     }, [scrollToRef.current])
 
     return (
-        <DayPicker
+        <AriaCalendar
+            aria-label="Appointment date"
+            maxValue={today}
+            firstDayOfWeek="mon"
+            visibleDuration={{ months: 1 }}
+            focusedValue={focusedDate}
+            onChange={onChange}
+            onFocusChange={setFocusedDate}
+            value={props.selected ?? null}
             className={clsx("short-day-picker", props.className)}
-            onSelect={onSelect}
-            selected={selected}
-            month={month}
-            weekStartsOn={dateTimeLocale?.options?.weekStartsOn || 1}
-            fixedWeeks
-            locale={dateTimeLocale}
-            mode="single"
-            hidden={{ after: new Date() }}
-            hideNavigation
-            showOutsideDays={true}
-            classNames={{
-                caption_label: "caption",
-
-                months: "months",
-                month: "month",
-                month_grid: "month-grid",
-
-                weekdays: "weekdays",
-                weekday: "weekday",
-                weeks: "weeks",
-                week: "week",
-
-                day: "day",
-                day_button: "day-btn",
-                hidden: "hidden",
-                today: "today",
-                outside: "outside",
-                selected: "selected",
-                day_hidden: "bg-subtle-extra-light",
-            }}
-            components={{
-                Day: ({ day, modifiers: _, ...tdProps }) => {
-                    if (
-                        selected &&
-                        "data-selected" in tdProps &&
-                        tdProps["data-selected"]
-                    ) {
-                        return <td {...tdProps} ref={scrollToRef} />
-                    }
-
-                    if (
-                        !selected &&
-                        "data-today" in tdProps &&
-                        tdProps["data-today"]
-                    ) {
-                        return <td {...tdProps} ref={scrollToRef} />
-                    }
-
-                    return <td {...tdProps} />
-                },
-            }}
-        />
+        >
+            <header className="sr-only">
+                <AriaHeading />
+            </header>
+            <AriaCalendarGrid className="calendar-grid">
+                <AriaCalendarGridHeader className="calendar-grid-header">
+                    {(day) => (
+                        <AriaCalendarHeaderCell className="calendar-grid-cell">
+                            {day}
+                        </AriaCalendarHeaderCell>
+                    )}
+                </AriaCalendarGridHeader>
+                <AriaCalendarGridBody className="calendar-grid-body">
+                    {(date) => {
+                        let setScrollRef =
+                            (!props.selected && isSameDay(today, date)) ||
+                            (props.selected && isSameDay(props.selected, date))
+                        return (
+                            <CalendarCell
+                                ref={setScrollRef ? scrollToRef : undefined}
+                                className={clsx("calendar-grid-cell", {
+                                    today: isSameDay(today, date),
+                                })}
+                                date={date}
+                            />
+                        )
+                    }}
+                </AriaCalendarGridBody>
+            </AriaCalendarGrid>
+        </AriaCalendar>
     )
 }

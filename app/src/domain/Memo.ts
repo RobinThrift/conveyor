@@ -1,6 +1,8 @@
-import { format, formatRFC3339, parse } from "date-fns"
-
-import type { Pagination } from "./Pagination"
+import {
+    type CalendarDate,
+    type CalendarDateTime,
+    parseDateISO8601,
+} from "@/lib/i18n"
 
 export type MemoID = string
 
@@ -9,20 +11,20 @@ export interface Memo {
     content: string
     isArchived: boolean
     isDeleted: boolean
-    createdAt: Date
-    updatedAt: Date
+    createdAt: CalendarDateTime
+    updatedAt: CalendarDateTime
 }
 
 export interface MemoList {
     items: Memo[]
-    next?: Date
+    next?: CalendarDateTime
 }
 
 export interface ListMemosQuery {
     tag?: string
     query?: string
-    exactDate?: Date
-    startDate?: Date
+    exactDate?: CalendarDate
+    startDate?: CalendarDate
     isArchived?: boolean
     isDeleted?: boolean
 }
@@ -62,39 +64,62 @@ export function filterFromQuery(query: FilterQueryParams): ListMemosQuery {
 
     let opCreatedAt = query["op[created_at]"]
     if (opCreatedAt && opCreatedAt === "<=") {
-        filter.startDate = parse(createdAt, "yyyy-MM-dd", new Date())
+        filter.startDate = parseDateISO8601(createdAt)
     } else {
-        filter.exactDate = parse(createdAt, "yyyy-MM-dd", new Date())
+        filter.exactDate = parseDateISO8601(createdAt)
     }
 
     return filter
 }
 
-export function filterToSearchParams(
-    filter: ListMemosQuery,
-    pagination?: Pagination<Date>,
-) {
+export function filterFromSearchParams(query: URLSearchParams): ListMemosQuery {
+    let filter: ListMemosQuery = {}
+
+    let tagFilter = query.get("filter[tag]")
+    if (tagFilter) {
+        filter.tag = tagFilter
+    }
+
+    let contentFilter = query.get("filter[content]")
+    if (contentFilter) {
+        filter.query = contentFilter
+    }
+
+    let isDeletedFilter = query.get("filter[is_deleted]") === "true"
+    if (isDeletedFilter) {
+        filter.isDeleted = true
+    }
+
+    let isArchivedFilter = query.get("filter[is_archived]") === "true"
+    if (isArchivedFilter) {
+        filter.isArchived = true
+    }
+
+    let createdAtFilter = query.get("filter[created_at]")
+    if (!createdAtFilter) {
+        return filter
+    }
+
+    let opCreatedAt = query.get("op[created_at]")
+    if (opCreatedAt && opCreatedAt === "<=") {
+        filter.startDate = parseDateISO8601(createdAtFilter)
+    } else {
+        filter.exactDate = parseDateISO8601(createdAtFilter)
+    }
+
+    return filter
+}
+
+export function filterToSearchParams(filter: ListMemosQuery) {
     let searchParams = new URLSearchParams()
-    addFilterToSearchParams(searchParams, filter, pagination)
+    addFilterToSearchParams(searchParams, filter)
     return searchParams
 }
 
 function addFilterToSearchParams(
     searchParams: URLSearchParams,
     filter: ListMemosQuery,
-    pagination?: Pagination<Date>,
 ) {
-    if (pagination) {
-        searchParams.set("page[size]", `${pagination.pageSize}`)
-
-        if (pagination.after) {
-            searchParams.set(
-                "page[after]",
-                `${formatRFC3339(pagination.after)}`,
-            )
-        }
-    }
-
     if (filter.tag) {
         searchParams.set("filter[tag]", filter.tag)
     }
@@ -104,17 +129,11 @@ function addFilterToSearchParams(
     }
 
     if (filter.exactDate) {
-        searchParams.set(
-            "filter[created_at]",
-            format(filter.exactDate, "yyyy-MM-dd"),
-        )
+        searchParams.set("filter[created_at]", filter.exactDate.toString()) // ISO8601: yyyy-MM-dd
     }
 
     if (filter.startDate) {
-        searchParams.set(
-            "filter[created_at]",
-            format(filter.startDate, "yyyy-MM-dd"),
-        )
+        searchParams.set("filter[created_at]", filter.startDate.toString()) // ISO8601: yyyy-MM-dd
         searchParams.set("op[created_at]", "<=")
     }
 

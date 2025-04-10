@@ -104,7 +104,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
                     ariaLabel="Expand Date Picker"
                     plain
                     size="sm"
-                    onClick={() => datepicker.setExpanded(!datepicker.expanded)}
+                    onPress={() => datepicker.setExpanded(!datepicker.expanded)}
                 />
             </div>
 
@@ -124,7 +124,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
             <StateFilter
                 onSelect={onSelectStateFilter}
                 selected={props.filter}
-                className="hidden tablet:grid"
+                className="hidden! tablet:grid!"
             />
         </div>
     )

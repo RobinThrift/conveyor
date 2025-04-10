@@ -1,11 +1,11 @@
 import clsx from "clsx"
 import React from "react"
+import {
+    Button as AriaButton,
+    ButtonProps as AriaButtonProps,
+} from "react-aria-components"
 
-export interface ButtonProps
-    extends React.DetailedHTMLProps<
-        React.ButtonHTMLAttributes<HTMLButtonElement>,
-        HTMLButtonElement
-    > {
+export interface ButtonProps extends AriaButtonProps {
     className?: string
     children?: React.ReactNode | undefined
     iconLeft?: React.ReactNode
@@ -35,7 +35,7 @@ export function Button(props: ButtonProps) {
     } = props
 
     return (
-        <button
+        <AriaButton
             {...intrinsics}
             ref={props.ref}
             aria-label={props.ariaLabel}
@@ -60,6 +60,6 @@ export function Button(props: ButtonProps) {
             ) : (
                 iconRight && iconRight
             )}
-        </button>
+        </AriaButton>
     )
 }
