@@ -3,10 +3,11 @@ import React, { useMemo } from "react"
 
 import type { Memo as MemoT } from "@/domain/Memo"
 import {
+    calendarDateFromDate,
+    currentDateTime,
     differenceInCalendarDays,
-    format,
     roundToNearestMinutes,
-} from "@/lib/date"
+} from "@/lib/i18n"
 import { DateTime } from "@/ui/components/DateTime"
 import { ListIcon, TableIcon } from "@/ui/components/Icons"
 import { Memo, type MemoActions } from "@/ui/components/Memo"
@@ -142,11 +143,11 @@ function groupByDay(
         string,
         { date: Date; memos: MemoT[]; diffToToday: number }
     > = {}
-    let now = roundToNearestMinutes(new Date())
+    let now = roundToNearestMinutes(currentDateTime())
 
     memos.forEach((memo) => {
-        let day = format(memo.createdAt, "yyyy-MM-dd")
-        let diffToToday = differenceInCalendarDays(now, memo.createdAt)
+        let day = calendarDateFromDate(memo.createdAt).toString()
+        let diffToToday = differenceInCalendarDays(memo.createdAt, now)
         if (!grouped[day]) {
             grouped[day] = { date: memo.createdAt, memos: [], diffToToday }
         }

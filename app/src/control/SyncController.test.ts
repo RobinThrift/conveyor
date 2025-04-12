@@ -1,4 +1,3 @@
-import { addMinutes, roundToNearestMinutes } from "date-fns"
 import { assert, suite, test } from "vitest"
 
 import type { AccountKey } from "@/domain/AccountKey"
@@ -29,6 +28,7 @@ import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
 import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
 
 import { ATTACHMENT_BASE_DIR } from "@/domain/Attachment"
+import { currentDateTime, roundToNearestMinutes } from "@/lib/i18n"
 import { AttachmentController } from "./AttachmentController"
 import { ChangelogController } from "./ChangelogController"
 import { CryptoController } from "./CryptoController"
@@ -115,7 +115,9 @@ suite.concurrent("control/SyncController", async () => {
                 value: { value: true },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(addMinutes(new Date(), -5)),
+                timestamp: roundToNearestMinutes(
+                    currentDateTime().subtract({ minutes: 5 }),
+                ).toDate("utc"),
             } satisfies SettingChangelogEntry,
             {
                 id: newID(),
@@ -126,7 +128,9 @@ suite.concurrent("control/SyncController", async () => {
                 value: { value: "light" },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(addMinutes(new Date(), -5)),
+                timestamp: roundToNearestMinutes(
+                    currentDateTime().subtract({ minutes: 5 }),
+                ).toDate("utc"),
             } satisfies SettingChangelogEntry,
             {
                 id: newID(),
@@ -145,7 +149,9 @@ suite.concurrent("control/SyncController", async () => {
                 },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(addMinutes(new Date(), -5)),
+                timestamp: roundToNearestMinutes(
+                    currentDateTime().subtract({ minutes: 5 }),
+                ).toDate("utc"),
             } satisfies AttachmentChangelogEntry,
         ]
         let remoteChanges: ChangelogEntry[] = [
@@ -158,7 +164,9 @@ suite.concurrent("control/SyncController", async () => {
                 value: { value: "dark" },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(addMinutes(new Date(), 5)),
+                timestamp: roundToNearestMinutes(
+                    currentDateTime().add({ minutes: 5 }),
+                ).toDate("utc"),
             } satisfies SettingChangelogEntry,
         ]
 

@@ -1,4 +1,3 @@
-import { DateFormatter } from "@internationalized/date"
 import clsx from "clsx"
 import React, { useCallback, useMemo, useState } from "react"
 import {
@@ -12,13 +11,13 @@ import {
 
 import {
     type CalendarDate,
-    currentDateTime,
+    currentDate,
     getLocalTimeZone,
     isSameDay,
 } from "@/lib/i18n"
 import { Button } from "@/ui/components/Button"
 import { CaretLeftIcon, CaretRightIcon } from "@/ui/components/Icons"
-import { useT } from "@/ui/i18n"
+import { useFormat, useT } from "@/ui/i18n"
 
 import { CalendarCell } from "./CalendarCell"
 
@@ -31,15 +30,15 @@ export interface DatePickerProps {
 export function DatePicker({ className, ...props }: DatePickerProps) {
     let t = useT("components/MemoListFilter/DatePicker")
     let [focusedDate, setFocusedDate] = useState<CalendarDate>(
-        props.selected ?? currentDateTime(),
+        props.selected ?? currentDate(),
     )
 
     let onClickTodayBtn = useCallback(() => {
-        setFocusedDate(currentDateTime())
+        setFocusedDate(currentDate())
     }, [])
 
     let today = useMemo(() => {
-        return currentDateTime()
+        return currentDate()
     }, [])
 
     let onChange = useCallback(
@@ -207,9 +206,7 @@ function MonthDropdown({
     maxValue: CalendarDate
     setMonth: (m: CalendarDate) => void
 }) {
-    let formatter = useMemo(() => {
-        return new DateFormatter("en", { month: "long" })
-    }, [])
+    let { formatDateTime } = useFormat()
 
     let months = useMemo(() => {
         let months: { value: number; label: string; isDisabled: boolean }[] = []
@@ -218,13 +215,15 @@ function MonthDropdown({
             let date = currentMonth.set({ month: i })
             months.push({
                 value: i,
-                label: formatter.format(date.toDate(getLocalTimeZone())),
+                label: formatDateTime(date.toDate(getLocalTimeZone()), {
+                    month: "long",
+                }),
                 isDisabled: maxValue.compare(date) < 0,
             })
         }
 
         return months
-    }, [currentMonth, formatter])
+    }, [currentMonth, formatDateTime, maxValue.compare])
 
     let onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         let value = Number(e.target.value)
@@ -260,9 +259,7 @@ function YearDropdown({
     maxValue: CalendarDate
     setYear: (m: CalendarDate) => void
 }) {
-    let formatter = useMemo(() => {
-        return new DateFormatter("en", { year: "numeric" })
-    }, [])
+    let { formatDateTime } = useFormat()
 
     let years = useMemo(() => {
         let years = []
@@ -273,11 +270,13 @@ function YearDropdown({
             }
             years.push({
                 value: date,
-                formatted: formatter.format(date.toDate(getLocalTimeZone())),
+                formatted: formatDateTime(date.toDate(getLocalTimeZone()), {
+                    year: "numeric",
+                }),
             })
         }
         return years
-    }, [currentYear.year])
+    }, [formatDateTime, currentYear.add, maxValue.year])
 
     let onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         let index = Number(e.target.value)
@@ -288,7 +287,7 @@ function YearDropdown({
     return (
         <select aria-label="Year" onChange={onChange} value={20}>
             {years.map((year, i) => (
-                <option key={i} value={i}>
+                <option key={year.formatted} value={i}>
                     {year.formatted}
                 </option>
             ))}

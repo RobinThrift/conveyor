@@ -1,11 +1,8 @@
 import {
-    type DateTimeLocale,
     type Language,
     type Region,
     type Translation,
     fallback,
-    fallbackDateTimeLocale,
-    loadDateTimeLocale,
     loadTranslation,
     resolveTranslation,
 } from "@/lib/i18n"
@@ -19,14 +16,12 @@ export interface I18nState {
     region: Region
 
     translations: Translation
-    dateFns: DateTimeLocale
 }
 
 const initialState: I18nState = {
     language: "en",
     region: "gb",
     translations: fallback,
-    dateFns: fallbackDateTimeLocale,
 }
 
 export const slice = createSlice({
@@ -50,17 +45,14 @@ export const slice = createSlice({
                 payload,
             }: PayloadAction<{
                 translations: Translation
-                dateFns: DateTimeLocale
             }>,
         ) => ({
             ...state,
             translations: payload.translations,
-            dateFns: payload.dateFns,
         }),
     },
 
     selectors: {
-        dateFns: (state) => state.dateFns,
         region: (state) => state.region,
         language: (state) => state.language,
     },
@@ -121,13 +113,11 @@ export const registerEffects = (startListening: StartListening) => {
             let state = {
                 language: slice.selectors.language(getState()),
                 region: slice.selectors.region(getState()),
-                dateFns: slice.selectors.dateFns(getState()),
             }
 
-            let [translationJSON, dateFns] = await Promise.all([
-                loadTranslation(`${state.language}-${state.region}`),
-                loadDateTimeLocale(state.region),
-            ])
+            let translationJSON = await loadTranslation(
+                `${state.language}-${state.region}`,
+            )
 
             let translations: ReturnType<typeof resolveTranslation> | undefined
             if (translationJSON) {
@@ -139,7 +129,6 @@ export const registerEffects = (startListening: StartListening) => {
             dispatch(
                 slice.actions.setTranslations({
                     translations: translations ?? fallback,
-                    dateFns: dateFns ?? state.dateFns,
                 }),
             )
         },

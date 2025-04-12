@@ -157,9 +157,9 @@ function SectionSyncInfo({
                     <div className="flex gap-2">
                         <Button
                             variant="primary"
-                            disabled={isLoading}
+                            isDisabled={isLoading}
                             size="sm"
-                            onClick={manualSync}
+                            onPress={manualSync}
                             iconLeft={<ArrowsCounterClockwiseIcon />}
                         >
                             {t.ManualSyncButtonLabel}
@@ -168,7 +168,7 @@ function SectionSyncInfo({
                         <AlertDialog>
                             <AlertDialog.Trigger
                                 variant="danger"
-                                disabled={isLoading}
+                                isDisabled={isLoading}
                                 size="sm"
                                 iconLeft={<CloudArrowUpIcon />}
                             >
@@ -191,7 +191,7 @@ function SectionSyncInfo({
                                 <AlertDialog.Buttons>
                                     <Button
                                         variant="danger"
-                                        onClick={manualFullUpload}
+                                        onPress={manualFullUpload}
                                     >
                                         {t.ManualFullUploadButtonLabel}
                                     </Button>
@@ -203,7 +203,7 @@ function SectionSyncInfo({
                         <AlertDialog>
                             <AlertDialog.Trigger
                                 variant="danger"
-                                disabled={isLoading}
+                                isDisabled={isLoading}
                                 size="sm"
                                 iconRight={<CloudArrowDownIcon />}
                             >
@@ -226,7 +226,7 @@ function SectionSyncInfo({
                                 <AlertDialog.Buttons>
                                     <Button
                                         variant="danger"
-                                        onClick={manualFullDownload}
+                                        onPress={manualFullDownload}
                                     >
                                         {t.ManualFullDownloadButtonLabel}
                                     </Button>

@@ -8,11 +8,11 @@ import {
     type PlaintextPassword,
 } from "@/auth"
 import { BaseContext, type Context } from "@/lib/context"
-import { addDays, addHours, currentDateTime } from "@/lib/date"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
 import { TestInMemKVStore } from "@/lib/testhelper/TestInMemKVStore"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 
+import { currentDateTime } from "@/lib/i18n"
 import { AuthController } from "./AuthController"
 
 suite.concurrent("control/AuthController", async () => {
@@ -30,10 +30,14 @@ suite.concurrent("control/AuthController", async () => {
                             origin: "conveyor.dev",
                             accessToken:
                                 "MOCK_ACCESS_TOKEN" as PlaintextAuthTokenValue,
-                            expiresAt: addHours(new Date(), 5),
+                            expiresAt: currentDateTime()
+                                .add({ hours: 5 })
+                                .toDate("utc"),
                             refreshToken:
                                 "MOCK_REFRESH_TOKEN" as PlaintextAuthTokenValue,
-                            refreshExpiresAt: addDays(new Date(), 30),
+                            refreshExpiresAt: currentDateTime()
+                                .add({ days: 30 })
+                                .toDate("utc"),
                         })
                     }
 
@@ -75,10 +79,10 @@ suite.concurrent("control/AuthController", async () => {
                         origin: "conveyor.dev",
                         accessToken:
                             refreshedAccessToken as PlaintextAuthTokenValue,
-                        expiresAt: addHours(now, 5),
+                        expiresAt: now.add({ hours: 5 }).toDate("utc"),
                         refreshToken:
                             refreshedRefreshToken as PlaintextAuthTokenValue,
-                        refreshExpiresAt: addDays(now, 30),
+                        refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
                     })
                 }
 
@@ -105,9 +109,9 @@ suite.concurrent("control/AuthController", async () => {
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
-                expiresAt: addHours(now, 1),
+                expiresAt: now.add({ hours: 1 }).toDate("utc"),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
-                refreshExpiresAt: addDays(now, 2),
+                refreshExpiresAt: now.add({ days: 2 }).toDate("utc"),
             })
 
             let token = await assertOkResult(authCtrl.getToken(ctx))
@@ -127,9 +131,9 @@ suite.concurrent("control/AuthController", async () => {
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
-                expiresAt: addHours(now, -5),
+                expiresAt: now.subtract({ hours: 5 }).toDate("utc"),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
-                refreshExpiresAt: addDays(now, 2),
+                refreshExpiresAt: now.add({ days: 2 }).toDate("utc"),
             })
 
             let token = await assertOkResult(authCtrl.getToken(ctx))
@@ -149,9 +153,9 @@ suite.concurrent("control/AuthController", async () => {
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
-                expiresAt: addHours(now, -5),
+                expiresAt: now.subtract({ hours: 5 }).toDate("utc"),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
-                refreshExpiresAt: addDays(now, -2),
+                refreshExpiresAt: now.subtract({ days: 2 }).toDate("utc"),
             })
 
             await assertErrResult(authCtrl.getToken(ctx))
@@ -169,10 +173,10 @@ suite.concurrent("control/AuthController", async () => {
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
-                expiresAt: addHours(now, -5),
+                expiresAt: now.subtract({ hours: 5 }).toDate("utc"),
                 refreshToken:
                     "INVALID_REFRESH_TOKEN" as PlaintextAuthTokenValue,
-                refreshExpiresAt: addDays(now, 2),
+                refreshExpiresAt: now.add({ days: 2 }).toDate("utc"),
             })
 
             await assertErrResult(authCtrl.getToken(ctx))

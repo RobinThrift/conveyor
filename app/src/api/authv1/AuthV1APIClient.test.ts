@@ -1,4 +1,3 @@
-import { addDays, addHours, isAfter } from "date-fns"
 import { http, HttpResponse } from "msw"
 import { setupWorker } from "msw/browser"
 import { assert, suite, test } from "vitest"
@@ -9,6 +8,7 @@ import {
     type PlaintextPassword,
 } from "@/auth"
 import { BaseContext } from "@/lib/context"
+import { currentDateTime, isAfter } from "@/lib/i18n"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 
 import { AuthV1APIClient } from "./AuthV1APIClient"
@@ -23,7 +23,7 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
 
         let username = "test_user"
         let password = "passwd"
-        let now = new Date()
+        let now = currentDateTime()
 
         useMocks(
             http.post<
@@ -38,9 +38,9 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
                 return HttpResponse.json(
                     {
                         accessToken: "MOCK_ACCESS_TOKEN",
-                        expiresAt: addHours(now, 1),
+                        expiresAt: now.add({ hours: 1 }).toDate("utc"),
                         refreshToken: "MOCK_REFRESH_TOKEN",
-                        refreshExpiresAt: addDays(now, 30),
+                        refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
                     },
                     { status: 201 },
                 )
@@ -148,7 +148,7 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
         onTestFinished(cleanup)
 
         let refreshToken = "TEST_VALID_REFRESH_TOKEN"
-        let now = new Date()
+        let now = currentDateTime()
 
         useMocks(
             http.post<
@@ -162,9 +162,9 @@ suite.sequential("api/syncv1/AuthV1APIClient", async () => {
                 return HttpResponse.json(
                     {
                         accessToken: "MOCK_ACCESS_TOKEN",
-                        expiresAt: addHours(now, 1),
+                        expiresAt: now.add({ hours: 1 }).toDate("utc"),
                         refreshToken: "MOCK_REFRESH_TOKEN",
-                        refreshExpiresAt: addDays(now, 30),
+                        refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
                     },
                     { status: 201 },
                 )

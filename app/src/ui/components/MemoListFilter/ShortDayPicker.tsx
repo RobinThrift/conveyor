@@ -10,7 +10,7 @@ import {
     type DateValue,
 } from "react-aria-components"
 
-import { type CalendarDate, currentDateTime, isSameDay } from "@/lib/i18n"
+import { type CalendarDate, currentDate, isSameDay } from "@/lib/i18n"
 
 import { CalendarCell } from "./CalendarCell"
 
@@ -23,11 +23,11 @@ export interface ShortDayPickerProps {
 export function ShortDayPicker(props: ShortDayPickerProps) {
     let scrollToRef = useRef<HTMLTableCellElement | null>(null)
     let [focusedDate, setFocusedDate] = useState<CalendarDate>(
-        props.selected ?? currentDateTime(),
+        props.selected ?? currentDate(),
     )
 
     let today = useMemo(() => {
-        return currentDateTime()
+        return currentDate()
     }, [])
 
     let onChange = useCallback(

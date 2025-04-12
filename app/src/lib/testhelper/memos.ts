@@ -1,11 +1,11 @@
 import { faker } from "@faker-js/faker"
-import { roundToNearestMinutes, sub } from "date-fns"
 
 import type { Memo } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
+import { currentDateTime, roundToNearestMinutes } from "@/lib/i18n"
 
 export function generateMockMemos() {
-    let now = roundToNearestMinutes(new Date())
+    let now = roundToNearestMinutes(currentDateTime())
 
     let tags: Tag[] = []
 
@@ -53,8 +53,8 @@ export function generateMockMemos() {
             }),
             isArchived: i > 90 && i < 100,
             isDeleted: i > 100,
-            createdAt: sub(now, { hours: i * 2 }),
-            updatedAt: sub(now, { hours: i }),
+            createdAt: now.subtract({ hours: i * 2 }).toDate("utc"),
+            updatedAt: now.subtract({ hours: i }).toDate("utc"),
         }
 
         memos.push(memo)

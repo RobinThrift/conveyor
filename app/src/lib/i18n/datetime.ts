@@ -42,10 +42,11 @@ export function calendarDateTimeFromDate(date: Date): CalendarDateTime {
 
 export function isAfter(
     a: Date | CalendarDateTime | CalendarDate,
-    b: CalendarDateTime | CalendarDate,
+    b: Date | CalendarDateTime | CalendarDate,
 ) {
     let first = a instanceof Date ? calendarDateTimeFromDate(a) : a
-    return first.compare(b) < 0
+    let second = b instanceof Date ? calendarDateTimeFromDate(b) : b
+    return first.compare(second) > 0
 }
 
 export function differenceInCalendarDays(
@@ -60,8 +61,8 @@ export function differenceInCalendarDays(
 
 export function roundToNearestMinutes(d: CalendarDateTime) {
     if (d.second >= 30) {
-        return d.set({ second: 0 }).cycle("minute", 1)
+        return d.set({ second: 0, millisecond: 0 }).cycle("minute", 1)
     }
 
-    return d.set({ second: 0 })
+    return d.set({ second: 0, millisecond: 0 })
 }

@@ -1,5 +1,5 @@
 import type { APIToken } from "@/domain/APIToken"
-import { add, currentDateTime, sub } from "@/lib/date"
+import { currentDateTime } from "@/lib/i18n"
 
 export function generateMockAPITokens(n = 100): APIToken[] {
     let now = currentDateTime()
@@ -8,8 +8,11 @@ export function generateMockAPITokens(n = 100): APIToken[] {
     for (let i = 0; i < n; i++) {
         apitokens.push({
             name: `Token_${i}`,
-            createdAt: sub(now, { hours: i * 2 }),
-            expiresAt: sub(add(now, { hours: 5 }), { days: i }),
+            createdAt: now.subtract({ hours: i * 2 }).toDate("utc"),
+            expiresAt: now
+                .add({ hours: 5 })
+                .subtract({ days: i })
+                .toDate("utc"),
         })
     }
 

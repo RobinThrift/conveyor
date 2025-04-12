@@ -1,6 +1,4 @@
-import { parseJSON as dateFnsParseJSON } from "date-fns"
-
-import { Ok, type Result, fromThrowing } from "@/lib/result"
+import { Ok, type Result, fmtErr, fromThrowing } from "@/lib/result"
 import { decodeText } from "@/lib/textencoding"
 
 export function jsonDeserialize<R, V = unknown>(
@@ -24,7 +22,12 @@ export function jsonDeserialize<R, V = unknown>(
 }
 
 export function parseJSONDate(raw: string): Result<Date> {
-    return fromThrowing(() => dateFnsParseJSON(raw))
+    let res = fromThrowing(() => new Date(raw))
+    if (!res.ok) {
+        return fmtErr(`error parsing JSON date: '${raw}': %w`, res)
+    }
+
+    return res
 }
 
 export function parseJSONDates<

@@ -1,7 +1,6 @@
 import React, { useCallback } from "react"
 
 import type { APIToken } from "@/domain/APIToken"
-import { add } from "@/lib/date"
 import { Alert } from "@/ui/components/Alert"
 import { Button } from "@/ui/components/Button"
 import { DateTime } from "@/ui/components/DateTime"
@@ -14,6 +13,7 @@ import { Tooltip } from "@/ui/components/Tooltip"
 import { useStateGetter } from "@/ui/hooks/useStateGetter"
 import { useT } from "@/ui/i18n"
 
+import { currentDateTime } from "@/lib/i18n"
 import { useAPITokensTabState } from "./useAPITokensTabState"
 
 export function APISettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
@@ -91,28 +91,28 @@ function CreateNewAPIToken({
             e.preventDefault()
             e.stopPropagation()
 
-            let expiresAt = new Date()
+            let expiresAt = currentDateTime()
             switch (expiresIn()) {
                 case "1d":
-                    expiresAt = add(expiresAt, { days: 1 })
+                    expiresAt = expiresAt.add({ days: 1 })
                     break
                 case "7d":
-                    expiresAt = add(expiresAt, { days: 7 })
+                    expiresAt = expiresAt.add({ days: 7 })
                     break
                 case "30d":
-                    expiresAt = add(expiresAt, { days: 30 })
+                    expiresAt = expiresAt.add({ days: 30 })
                     break
                 case "6m":
-                    expiresAt = add(expiresAt, { months: 6 })
+                    expiresAt = expiresAt.add({ months: 6 })
                     break
                 case "12m":
-                    expiresAt = add(expiresAt, { months: 12 })
+                    expiresAt = expiresAt.add({ months: 12 })
                     break
             }
 
             create({
                 name: name(),
-                expiresAt,
+                expiresAt: expiresAt.toDate("utc"),
             })
         },
         [create, name, expiresIn],
@@ -167,7 +167,7 @@ function CreateNewAPIToken({
                     </Select>
                 </div>
 
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" isDisabled={isLoading}>
                     {t.ButtonLabel}
                 </Button>
             </div>
@@ -244,7 +244,7 @@ function APITokensList({
                             <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => onDelete(token.name)}
+                                onPress={() => onDelete(token.name)}
                             >
                                 {t.DeleteButton}
                             </Button>
@@ -257,17 +257,17 @@ function APITokensList({
                 <Tooltip content={t.PrevPage}>
                     <Button
                         iconLeft={<CaretLeftIcon />}
-                        onClick={prevPage}
+                        onPress={prevPage}
                         size="sm"
-                        disabled={!hasPreviousPage}
+                        isDisabled={!hasPreviousPage}
                     />
                 </Tooltip>
                 <Tooltip content={t.NextPage}>
                     <Button
                         iconLeft={<CaretRightIcon />}
-                        onClick={nextPage}
+                        onPress={nextPage}
                         size="sm"
-                        disabled={!hasNextPage}
+                        isDisabled={!hasNextPage}
                     />
                 </Tooltip>
             </div>

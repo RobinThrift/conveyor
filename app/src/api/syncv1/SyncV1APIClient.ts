@@ -1,5 +1,6 @@
 import type { EncryptedChangelogEntry } from "@/domain/Changelog"
 import type { Context } from "@/lib/context"
+import { parseJSONDate } from "@/lib/json"
 import {
     type AsyncResult,
     Err,
@@ -9,7 +10,6 @@ import {
     fromPromise,
     fromThrowing,
 } from "@/lib/result"
-import { parseJSON } from "date-fns"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 
@@ -390,10 +390,14 @@ function parseEncryptedChangelogEntryJSON(
         let entries: EncryptedChangelogEntry[] = []
 
         for (let obj of objs.items) {
+            let timestamp = parseJSONDate(obj.timestamp)
+            if (!timestamp.ok) {
+                throw timestamp.err
+            }
             entries.push({
                 syncClientID: obj.syncClientID,
                 data: obj.data,
-                timestamp: parseJSON(obj.timestamp),
+                timestamp: timestamp.value,
             })
         }
 

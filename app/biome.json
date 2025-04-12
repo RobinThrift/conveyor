@@ -70,7 +70,6 @@
                 "src/@types/**/*",
                 "src/domain/ID.ts",
                 "src/i18n/translations/*",
-                "src/i18n/date-fns/*",
                 "src/storage/database/sqlite/gen/*",
                 "src/storage/database/sqlite/sqlc-plugin/proto/*"
             ],

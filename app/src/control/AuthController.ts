@@ -6,7 +6,7 @@ import {
 } from "@/auth"
 import type { KVStore } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
-import { addMinutes, currentDateTime, isAfter } from "@/lib/date"
+import { currentDateTime, isAfter } from "@/lib/i18n"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 export class AuthController {
@@ -73,14 +73,14 @@ export class AuthController {
         let now = currentDateTime()
         if (
             this._current?.expiresAt &&
-            isAfter(this._current.expiresAt, addMinutes(now, 1))
+            isAfter(this._current.expiresAt, now.add({ minutes: 1 }))
         ) {
             return Ok(this._current.accessToken)
         }
 
         if (
             this._current?.refreshExpiresAt &&
-            isAfter(this._current.refreshExpiresAt, addMinutes(now, 1))
+            isAfter(this._current.refreshExpiresAt, now.add({ minutes: 1 }))
         ) {
             return this._refreshToken(ctx)
         }

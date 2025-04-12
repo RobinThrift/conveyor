@@ -1,4 +1,3 @@
-import { addDays, addHours, isAfter, subHours, subMinutes } from "date-fns"
 import {
     assert,
     type OnTestFinishedHandler,
@@ -22,7 +21,13 @@ import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
 
-import { CalendarDateTime, toCalendarDate } from "@/lib/i18n"
+import {
+    CalendarDateTime,
+    calendarDateTimeFromDate,
+    currentDateTime,
+    isAfter,
+    toCalendarDate,
+} from "@/lib/i18n"
 import { toPromise } from "@/lib/result"
 import { AttachmentController } from "./AttachmentController"
 import { ChangelogController } from "./ChangelogController"
@@ -86,9 +91,6 @@ suite("control/MemoController", () => {
                     }),
                 )
 
-                console.log("total", total)
-                console.log("firstMemoDate", list.items.at(0)?.createdAt)
-                console.log("lastMemoDate", list.items.at(-1)?.createdAt)
                 assert.equal(list.items.length, 25, `i = ${i}`)
                 assert.notEqual(lastMemoID, list.items[0].id, `i = ${i}`)
 
@@ -253,14 +255,14 @@ suite("control/MemoController", () => {
             let insertMemos = async (
                 ctx: Context,
                 memoCtrl: MemoController,
-                now = new Date(2024, 2, 15, 12, 0, 0, 0),
+                now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0),
                 numMemos = 10,
             ) => {
                 let createdMemosIDs: MemoID[] = []
                 for (let i = 0; i < numMemos; i++) {
                     let res = await memoCtrl.createMemo(ctx, {
                         content: `# Test Memo ${i}\n With some more content for memo ${i}`,
-                        createdAt: subHours(now, i),
+                        createdAt: now.subtract({ hours: i }).toDate("utc"),
                     })
                     if (!res.ok) {
                         throw res.err
@@ -319,7 +321,7 @@ suite("control/MemoController", () => {
                 })
                 await setup()
 
-                let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+                let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
                 let createdMemosIDs = await insertMemos(ctx, memoCtrl, now)
 
                 let result = await assertOkResult(
@@ -334,7 +336,7 @@ suite("control/MemoController", () => {
                 })
                 await setup()
 
-                let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+                let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
                 await insertMemos(ctx, memoCtrl, now)
 
                 let error = await assertErrResult(
@@ -350,7 +352,7 @@ suite("control/MemoController", () => {
                 })
                 await setup()
 
-                let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+                let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
                 let createdMemosIDs = await insertMemos(ctx, memoCtrl, now)
 
                 let memo = await assertOkResult(
@@ -359,7 +361,11 @@ suite("control/MemoController", () => {
                 memo.content = "Updated Content for Memo 2"
 
                 vi.useFakeTimers()
-                vi.setSystemTime(addHours(memo.updatedAt, 1))
+                vi.setSystemTime(
+                    calendarDateTimeFromDate(memo.updatedAt)
+                        .add({ hours: 1 })
+                        .toDate("utc"),
+                )
                 await assertOkResult(
                     memoCtrl.updateMemoContent(ctx, {
                         ...memo,
@@ -416,7 +422,11 @@ suite("control/MemoController", () => {
                     )
 
                     vi.useFakeTimers()
-                    vi.setSystemTime(addHours(memo.updatedAt, 1))
+                    vi.setSystemTime(
+                        calendarDateTimeFromDate(memo.updatedAt)
+                            .add({ hours: 1 })
+                            .toDate("utc"),
+                    )
                     await assertOkResult(
                         memoCtrl.updateMemoArchiveStatus(ctx, {
                             id: memo.id,
@@ -436,7 +446,11 @@ suite("control/MemoController", () => {
                     )
 
                     vi.useFakeTimers()
-                    vi.setSystemTime(addHours(memo.updatedAt, 1))
+                    vi.setSystemTime(
+                        calendarDateTimeFromDate(memo.updatedAt)
+                            .add({ hours: 1 })
+                            .toDate("utc"),
+                    )
                     await assertOkResult(
                         memoCtrl.updateMemoArchiveStatus(ctx, {
                             id: memo.id,
@@ -487,9 +501,9 @@ suite("control/MemoController", () => {
                     }),
                 )
 
-                let now = new Date()
+                let now = currentDateTime()
                 vi.useFakeTimers()
-                vi.setSystemTime(addHours(now, 1))
+                vi.setSystemTime(now.add({ hours: 1 }).toDate("utc"))
                 await assertOkResult(memoCtrl.deleteMemo(ctx, created.id))
                 vi.useRealTimers()
 
@@ -501,7 +515,7 @@ suite("control/MemoController", () => {
                 assert.isTrue(isAfter(deleted.updatedAt, created.updatedAt))
 
                 vi.useFakeTimers()
-                vi.setSystemTime(addDays(now, 40))
+                vi.setSystemTime(now.add({ days: 40 }).toDate("utc"))
                 await assertOkResult(memoCtrl.cleanupDeletedMemos(ctx))
                 vi.useRealTimers()
 
@@ -524,7 +538,11 @@ suite("control/MemoController", () => {
                 )
 
                 vi.useFakeTimers()
-                vi.setSystemTime(addHours(memo.updatedAt, 1))
+                vi.setSystemTime(
+                    calendarDateTimeFromDate(memo.updatedAt)
+                        .add({ hours: 1 })
+                        .toDate("utc"),
+                )
                 await assertOkResult(memoCtrl.deleteMemo(ctx, memo.id))
                 vi.useRealTimers()
 
@@ -567,13 +585,13 @@ suite("control/MemoController", () => {
             ctx: Context,
             memoCtrl: MemoController,
             numMemos = 10,
-            now = new Date(2024, 2, 15, 12, 0, 0, 0),
+            now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0),
         ) => {
             let createdMemosIDs: MemoID[] = []
             for (let i = 0; i < numMemos; i++) {
                 let res = await memoCtrl.createMemo(ctx, {
                     content: `# Test Memo ${i}\n With some more content for memo ${i} #tag-${i} #shared-tag`,
-                    createdAt: subHours(now, i),
+                    createdAt: now.subtract({ hours: i }).toDate("utc"),
                 })
                 if (!res.ok) {
                     throw res.err
@@ -802,7 +820,7 @@ suite("control/MemoController", () => {
     })
 
     suite.concurrent("applyChangelogEntries", async () => {
-        let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+        let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
 
         test("exisitng Memo", async ({ onTestFinished }) => {
             let { memoCtrl, ctx, setup, insertChangelogEntries } =
@@ -813,7 +831,7 @@ suite("control/MemoController", () => {
                 memoCtrl.createMemo(ctx, {
                     content:
                         "# Test Memo 0\n With some more content for memo 0",
-                    createdAt: subHours(now, 1),
+                    createdAt: now.subtract({ hours: 1 }).toDate("utc"),
                 }),
             )
 
@@ -866,8 +884,8 @@ suite("control/MemoController", () => {
                                 content: "# Memo 1\nCreated using a changelog",
                                 isArchived: false,
                                 isDeleted: false,
-                                createdAt: now,
-                                updatedAt: now,
+                                createdAt: now.toDate("utc"),
+                                updatedAt: now.toDate("utc"),
                             },
                         },
                     },
@@ -893,7 +911,7 @@ Line 2 will be shortened
 Line 3 unchanged
 
 Line 4 unchanged`,
-                    createdAt: subHours(now, 1),
+                    createdAt: now.subtract({ hours: 1 }).toDate("utc"),
                 }),
             )
 
@@ -995,7 +1013,7 @@ async function memoCtrlTestSetup({
     let insertChangelogEntries = async (
         entries: Pick<MemoChangelogEntry, "targetID" | "value">[],
     ): Promise<MemoChangelogEntry[]> => {
-        let now = new Date()
+        let now = currentDateTime()
         let toCreate = [] as MemoChangelogEntry[]
 
         for (let i = 0; i < entries.length; i++) {
@@ -1006,9 +1024,13 @@ async function memoCtrlTestSetup({
                 revision: i,
                 targetType: "memos",
                 isSynced: true,
-                syncedAt: subMinutes(now, entries.length - i + 1),
+                syncedAt: now
+                    .subtract({ minutes: entries.length - i + 1 })
+                    .toDate("utc"),
                 isApplied: false,
-                timestamp: subMinutes(now, entries.length - i),
+                timestamp: now
+                    .subtract({ minutes: entries.length - i })
+                    .toDate("utc"),
             } satisfies MemoChangelogEntry
 
             toCreate.push(entry)
