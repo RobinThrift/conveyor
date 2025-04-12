@@ -26,7 +26,7 @@ export function Image(props: ImageProps) {
         )
     }, [attachmentData])
 
-    let src = attachmentURL ?? hash ?? props.src
+    let src = attachment ? (attachmentURL ?? hash) : props.src
 
     let isLoading =
         typeof attachment !== "undefined" &&
