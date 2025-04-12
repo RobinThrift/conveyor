@@ -2,7 +2,7 @@ import clsx from "clsx"
 import React from "react"
 import {
     Button as AriaButton,
-    ButtonProps as AriaButtonProps,
+    type ButtonProps as AriaButtonProps,
 } from "react-aria-components"
 
 export interface ButtonProps extends AriaButtonProps {

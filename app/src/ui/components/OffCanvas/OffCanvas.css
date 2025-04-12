@@ -1,26 +1,61 @@
-.offcanvas {
-    @apply fixed left-0 top-0 bottom-0 right-0 max-w-[90dvw];
-    @apply rounded-r bg-surface shadow-lg p-2 overflow-auto;
-    @apply focus:outline-hidden;
+.offcanvas-modal {
+}
+
+.react-aria-ModalOverlay {
+    @apply fixed left-0 top-0 bottom-0 right-0;
+    @apply animate-in slide-in-from-left ease-linear duration-200;
+
     z-index: 10000;
 
-    transition: transform 350ms;
-    transform: translate(0%, 0%);
-
-    &[data-starting-style],
-    &[data-ending-style] {
-        transform: translate(-100%, 0%);
+    &[data-exiting] {
+        @apply animate-out slide-out-to-left ease-linear duration-200;
     }
 }
 
-.offcanvas-backdrop {
-    @apply fixed inset-0 bg-black/80 backdrop-blur-sm;
-    z-index: 9999;
-    transition: opacity 300ms;
-    opacity: 1;
+.offcanvas {
+    @apply h-full rounded-r-lg bg-surface p-2 overflow-auto shadow-md;
+    @apply focus:outline-hidden;
+    @apply fixed left-0 top-0 bottom-0 right-0;
 
-    &[data-starting-style],
-    &[data-ending-style] {
+    width: 90dvw;
+}
+
+.offcanvas-drag-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20%;
+    height: 100%;
+    z-index: 10000;
+    touch-action: none;
+}
+
+.offcanvas-backdrop {
+    @apply fixed inset-0 bg-black/60;
+    z-index: 9999;
+    transition: opacity 250ms;
+    opacity: 1;
+    backdrop-filter: blur(2px);
+
+    &[data-entering] {
         opacity: 0;
+    }
+
+    &[data-exiting] {
+        opacity: 0;
+    }
+}
+
+:root {
+    main {
+        transition: all 200ms;
+    }
+
+    &:has(.offcanvas-backdrop) main {
+        transform: perspective(100px) translateZ(-5px);
+    }
+
+    &:has(.offcanvas-backdrop[data-exiting]) main {
+        transform: perspective(100px) translateZ(0px);
     }
 }
