@@ -27,10 +27,10 @@ export interface MemoListFilterProps {
 
 export function MemoListFilter(props: MemoListFilterProps) {
     let {
+        tagTreeState,
         datepicker,
         onChangeSearch,
         onSelectDate,
-        onSelectTag,
         onSelectStateFilter,
     } = useMemoListFilterState(props)
     let t = useT("components/MemoListFilter")
@@ -39,24 +39,17 @@ export function MemoListFilter(props: MemoListFilterProps) {
     return (
         <div className="memo-list-filter">
             <div className="flex gap-1 px-2 py-2">
-                <OffCanvas modal={true}>
-                    <OffCanvas.Trigger
+                <OffCanvas aria-lable={t.OffScreenDescription}>
+                    <Button
                         iconRight=<Hash />
                         plain
                         className="filter-offcanvas-trigger"
                     >
                         <span className="sr-only">{t.TriggerLabel}</span>
-                    </OffCanvas.Trigger>
+                    </Button>
                     <OffCanvas.Content className="filter-offcanvas">
                         <OffCanvas.Title>{t.OffScreenTitle}</OffCanvas.Title>
-                        <OffCanvas.Description className="sr-only">
-                            {t.OffScreenDescription}
-                        </OffCanvas.Description>
-                        <TagTree
-                            tags={props.tags}
-                            onSelect={onSelectTag}
-                            selected={props.filter.tag}
-                        />
+                        <TagTree {...tagTreeState} tags={props.tags} />
 
                         <StateFilter
                             onSelect={onSelectStateFilter}
@@ -114,17 +107,11 @@ export function MemoListFilter(props: MemoListFilterProps) {
                 className="hidden tablet:block"
             />
 
-            <TagTree
-                tags={props.tags}
-                onSelect={onSelectTag}
-                selected={props.filter.tag}
-                className="hidden tablet:block"
-            />
+            <TagTree {...tagTreeState} tags={props.tags} />
 
             <StateFilter
                 onSelect={onSelectStateFilter}
                 selected={props.filter}
-                className="hidden! tablet:grid!"
             />
         </div>
     )

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
 export interface UseStateSetter<S> {
+    set(s: Set<S>): void
     add(s: Iterable<S>): void
     toggle(s: S): void
     delete(s: S): void
@@ -12,6 +13,10 @@ export function useStateSet<S>(
     let [values, setValues] = useState<S[]>([])
     let state = useRef<Set<S>>(new Set())
     let setter = useRef<UseStateSetter<S>>({
+        set: (s: Set<S>) => {
+            state.current = s
+            setValues([...state.current.values()])
+        },
         add: (s: Iterable<S>) => {
             Iterator.from(s).forEach((v) => {
                 state.current.add(v)
