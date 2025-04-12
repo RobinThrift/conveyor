@@ -1,6 +1,3 @@
-.offcanvas-modal {
-}
-
 .react-aria-ModalOverlay {
     @apply fixed left-0 top-0 bottom-0 right-0;
     @apply animate-in slide-in-from-left ease-linear duration-200;
