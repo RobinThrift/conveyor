@@ -141,9 +141,9 @@ function PermanentNotification({
                     >
                         <Button
                             {...btn}
-                            onClick={(e) => {
+                            onPress={(e) => {
                                 onOpenChange(false)
-                                btn.onClick?.(e)
+                                btn.onPress?.(e)
                             }}
                         />
                     </Toast.Action>

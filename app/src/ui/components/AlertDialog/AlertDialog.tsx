@@ -24,7 +24,7 @@ export interface AlertDialogTriggerProps extends ButtonProps {}
 export function AlertDialogTrigger(props: AlertDialogTriggerProps) {
     return (
         <BaseUIAlertDialog.Trigger
-            disabled={props.disabled}
+            disabled={props.isDisabled}
             render={(triggerProps) => (
                 <Button
                     {...props}

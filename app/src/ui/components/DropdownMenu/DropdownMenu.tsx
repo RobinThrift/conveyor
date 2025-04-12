@@ -25,7 +25,7 @@ export interface DropdownMenuTriggerProps extends ButtonProps {}
 
 export function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
     return (
-        <RadixDropdownMenu.Trigger asChild disabled={props.disabled}>
+        <RadixDropdownMenu.Trigger asChild disabled={props.isDisabled}>
             <Button
                 {...props}
                 className={clsx("dropdown-menu-btn", props.className)}

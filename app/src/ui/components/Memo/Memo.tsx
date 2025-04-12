@@ -202,7 +202,7 @@ function MemoActions({
                     iconLeft={<Pencil />}
                     plain={true}
                     size="sm"
-                    onClick={() => actions?.edit?.(memo.id)}
+                    onPress={() => actions?.edit?.(memo.id)}
                 />
             )}
 

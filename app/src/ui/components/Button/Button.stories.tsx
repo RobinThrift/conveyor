@@ -198,7 +198,7 @@ export const Icons: Story = {
 
 export const States: Story = {
     args: {
-        disabled: true,
+        isDisabled: true,
     },
     render: (args) => {
         return (

@@ -95,7 +95,7 @@ export function Editor(props: EditorProps) {
                 <div className="editor-buttons">
                     {props.onCancel && (
                         <Button
-                            onClick={onCancel}
+                            onPress={onCancel}
                             variant="danger"
                             plain
                             aria-label={t.Cancel}
@@ -117,10 +117,10 @@ export function Editor(props: EditorProps) {
 
                     <Button
                         aria-label={t.Save}
-                        onClick={onSave}
+                        onPress={onSave}
                         plain
                         iconLeft={<CheckIcon />}
-                        disabled={!isChanged}
+                        isDisabled={!isChanged}
                     >
                         <span className="sr-only tablet:not-sr-only">
                             {t.Save}
@@ -158,7 +158,7 @@ export function Editor(props: EditorProps) {
                         <AlertDialog.Buttons>
                             <Button
                                 variant="danger"
-                                onClick={confirmationDialog.discard}
+                                onPress={confirmationDialog.discard}
                             >
                                 {t.DiscardChangesConfirmation}
                             </Button>

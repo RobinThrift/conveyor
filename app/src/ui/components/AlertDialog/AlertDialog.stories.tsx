@@ -34,10 +34,10 @@ export const Overview: Story = {
                 </AlertDialog.Description>
 
                 <AlertDialog.Buttons>
-                    <Button variant="danger" onClick={action("delete")}>
+                    <Button variant="danger" onPress={action("delete")}>
                         Delete
                     </Button>
-                    <AlertDialog.CancelButton onClick={action("cancel")}>
+                    <AlertDialog.CancelButton onPress={action("cancel")}>
                         Cancel
                     </AlertDialog.CancelButton>
                 </AlertDialog.Buttons>

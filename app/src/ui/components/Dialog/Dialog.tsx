@@ -23,7 +23,7 @@ export interface DialogTriggerProps extends ButtonProps {}
 export function DialogTrigger(props: DialogTriggerProps) {
     return (
         <BaseUIDialog.Trigger
-            disabled={props.disabled}
+            disabled={props.isDisabled}
             render={(triggerProps) => (
                 <Button
                     {...props}

@@ -128,11 +128,11 @@ function StepChooseStart({
     let t = useT("screens/InitSetup")
     return (
         <div className="flex flex-col gap-2">
-            <Button variant="primary" onClick={startNew} size="lg">
+            <Button variant="primary" onPress={startNew} size="lg">
                 {t.NewButtonLabel}
             </Button>
 
-            <Button variant="primary" onClick={startFromRemote} size="lg">
+            <Button variant="primary" onPress={startFromRemote} size="lg">
                 {t.FromRemoteButtonLabel}
             </Button>
         </div>
@@ -168,11 +168,11 @@ function StepChooseSyncMethod({
             </RadioGroup>
 
             <div className="flex gap-2 justify-between">
-                <Button variant="primary" onClick={back}>
+                <Button variant="primary" onPress={back}>
                     {t.BackButtonLabel}
                 </Button>
 
-                <Button variant="primary" onClick={next} size="lg">
+                <Button variant="primary" onPress={next} size="lg">
                     {t.NextButtonLabel}
                 </Button>
             </div>
@@ -214,7 +214,7 @@ function StepConfigureRemoteSync({
                 </Alert>
             )}
 
-            <Button variant="primary" onClick={back}>
+            <Button variant="primary" onPress={back}>
                 {t.BackButtonLabel}
             </Button>
         </div>
@@ -249,20 +249,16 @@ function StepConfigureEncryption({
         [setValue],
     )
 
-    let generate = useCallback(
-        (e: React.MouseEvent) => {
-            generatePrivateCryptoKey().then((key) => {
-                e.preventDefault()
-                if (!key.ok) {
-                    setGnError(key.err)
-                    return
-                }
+    let generate = useCallback(() => {
+        generatePrivateCryptoKey().then((key) => {
+            if (!key.ok) {
+                setGnError(key.err)
+                return
+            }
 
-                setValue(key.value)
-            })
-        },
-        [generatePrivateCryptoKey, setValue],
-    )
+            setValue(key.value)
+        })
+    }, [generatePrivateCryptoKey, setValue])
 
     let onSubmit = useCallback(
         (e: React.FormEvent) => {
@@ -279,13 +275,9 @@ function StepConfigureEncryption({
         [checkPrivateCryptoKey, importPrivateCryptoKey, value],
     )
 
-    let onClickBack = useCallback(
-        (e: React.MouseEvent) => {
-            e.preventDefault()
-            back()
-        },
-        [back],
-    )
+    let onClickBack = useCallback(() => {
+        back()
+    }, [back])
 
     return (
         <Form className="flex flex-col gap-4" onSubmit={onSubmit}>
@@ -300,20 +292,20 @@ function StepConfigureEncryption({
             />
 
             {isNew && (
-                <Button variant="primary" onClick={generate}>
+                <Button variant="primary" onPress={generate}>
                     {t.GenerateCandidatePrivateCryptoKeyLabel}
                 </Button>
             )}
 
             <div className="flex gap-2 justify-between">
-                <Button variant="primary" onClick={onClickBack}>
+                <Button variant="primary" onPress={onClickBack}>
                     {t.BackButtonLabel}
                 </Button>
 
                 <Button
                     variant="primary"
                     type="submit"
-                    disabled={value().length === 0}
+                    isDisabled={value().length === 0}
                 >
                     {t.NextButtonLabel}
                 </Button>
@@ -366,7 +358,7 @@ function StepSyncing({
                         )}
                     </Alert>
 
-                    <Button variant="primary" onClick={back}>
+                    <Button variant="primary" onPress={back}>
                         {t.BackButtonLabel}
                     </Button>
                 </>

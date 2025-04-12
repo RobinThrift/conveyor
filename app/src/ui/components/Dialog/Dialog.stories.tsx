@@ -35,10 +35,10 @@ export const Overview: Story = {
                     ))}
 
                 <Dialog.Buttons>
-                    <Button variant="success" onClick={action("ok")}>
+                    <Button variant="success" onPress={action("ok")}>
                         Ok
                     </Button>
-                    <Dialog.CloseButton onClick={action("close")}>
+                    <Dialog.CloseButton onPress={action("close")}>
                         Close
                     </Dialog.CloseButton>
                 </Dialog.Buttons>

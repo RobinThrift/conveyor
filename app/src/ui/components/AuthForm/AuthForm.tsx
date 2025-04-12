@@ -89,7 +89,7 @@ export function AuthForm(props: AuthFormProps) {
                     <Button
                         variant="primary"
                         type="submit"
-                        disabled={isLoading}
+                        isDisabled={isLoading}
                     >
                         {t.AuthenticateButtonLabel}
                     </Button>

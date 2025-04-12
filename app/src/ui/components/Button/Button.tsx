@@ -4,6 +4,7 @@ import {
     Button as AriaButton,
     type ButtonProps as AriaButtonProps,
 } from "react-aria-components"
+export type { PressEvent } from "react-aria"
 
 export interface ButtonProps extends AriaButtonProps {
     className?: string
