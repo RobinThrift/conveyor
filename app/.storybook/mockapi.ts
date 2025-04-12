@@ -1,9 +1,10 @@
 import { http, type HttpHandler, HttpResponse, delay } from "msw"
-import { addHours, parseJSON } from "date-fns"
 
 import { generateMockAPITokens } from "../src/lib/testhelper/apitokens"
 import type { APIToken, APITokenList } from "../src/domain/APIToken"
 import type { CreateAPITokenRequest } from "../src/control/APITokenController"
+import { currentDateTime } from "../src/lib/i18n/datetime"
+import { parseJSONDate } from "../src/lib/json"
 
 interface MockData {
     apitokens: (APIToken & { id: number })[]
@@ -33,8 +34,12 @@ export const mockAPI: HttpHandler[] = [
             return HttpResponse.json(
                 {
                     accessToken: "VALID_ACCESS_TOKEN",
-                    expiresAt: addHours(new Date(), 1),
-                    refreshExpiresAt: addHours(new Date(), 5),
+                    expiresAt: currentDateTime()
+                        .add({ hours: 1 })
+                        .toDate("utc"),
+                    refreshExpiresAt: currentDateTime()
+                        .add({ hours: 5 })
+                        .toDate("utc"),
                     refreshToken: "VALID_REFRESH_TOKEN",
                 },
                 {
@@ -66,8 +71,12 @@ export const mockAPI: HttpHandler[] = [
             return HttpResponse.json(
                 {
                     accessToken: "VALID_ACCESS_TOKEN",
-                    expiresAt: addHours(new Date(), 1),
-                    refreshExpiresAt: addHours(new Date(), 5),
+                    expiresAt: currentDateTime()
+                        .add({ hours: 1 })
+                        .toDate("utc"),
+                    refreshExpiresAt: currentDateTime()
+                        .add({ hours: 5 })
+                        .toDate("utc"),
                     refreshToken: "VALID_REFRESH_TOKEN",
                 },
                 {
@@ -240,7 +249,7 @@ export const mockAPI: HttpHandler[] = [
             let token: APIToken = {
                 name: body.name,
                 createdAt: now,
-                expiresAt: parseJSON(body.expiresAt as any),
+                expiresAt: parseJSONDate(body.expiresAt as any),
             }
 
             mockData.apitokens = [
