@@ -1,18 +1,21 @@
-import * as RadixDropdownMenu from "@radix-ui/react-dropdown-menu"
 import clsx from "clsx"
 import React from "react"
+import {
+    Menu as AriaMenu,
+    MenuItem as AriaMenuItem,
+    MenuTrigger as AriaMenuTrigger,
+    type MenuTriggerProps as AriaMenuTriggerProps,
+    Popover as AriaPopover,
+    Text as AriaText,
+} from "react-aria-components"
 
 import { Button, type ButtonProps } from "@/ui/components//Button"
 import { CaretDownIcon } from "@/ui/components/Icons"
 
-export interface DropdownMenuProps {
-    children: React.ReactNode | React.ReactNode[]
-
-    className?: string
-}
+export type DropdownMenuProps = AriaMenuTriggerProps
 
 export function DropdownMenu(props: DropdownMenuProps) {
-    return <RadixDropdownMenu.Root>{props.children}</RadixDropdownMenu.Root>
+    return <AriaMenuTrigger {...props} />
 }
 
 DropdownMenu.Trigger = DropdownMenuTrigger
@@ -21,17 +24,15 @@ DropdownMenu.Item = DropdownMenuItem
 DropdownMenu.ItemLabel = DropdownMenuItemLabel
 DropdownMenu.ItemDescription = DropdownMenuItemDescription
 
-export interface DropdownMenuTriggerProps extends ButtonProps {}
+export type DropdownMenuTriggerProps = ButtonProps
 
 export function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
     return (
-        <RadixDropdownMenu.Trigger asChild disabled={props.isDisabled}>
-            <Button
-                {...props}
-                className={clsx("dropdown-menu-btn", props.className)}
-                iconRight={props.iconRight ?? <CaretDownIcon />}
-            />
-        </RadixDropdownMenu.Trigger>
+        <Button
+            {...props}
+            className={clsx("dropdown-menu-btn", props.className)}
+            iconRight={props.iconRight ?? <CaretDownIcon />}
+        />
     )
 }
 
@@ -43,18 +44,17 @@ export interface DropdownMenuItemsProps {
 
 export function DropdownMenuItems(props: DropdownMenuItemsProps) {
     return (
-        <RadixDropdownMenu.Portal>
-            <RadixDropdownMenu.Content
+        <AriaPopover>
+            <AriaMenu
                 className={clsx(
                     "dropdown-menu-list",
                     props.size,
                     props.className,
                 )}
-                align="start"
             >
                 {props.children}
-            </RadixDropdownMenu.Content>
-        </RadixDropdownMenu.Portal>
+            </AriaMenu>
+        </AriaPopover>
     )
 }
 
@@ -63,24 +63,24 @@ export interface DropdownMenuItemProps {
     className?: string
 
     destructive?: boolean
-    disabled?: boolean
+    isDisabled?: boolean
 
     action: () => void
 }
 
 export function DropdownMenuItem(props: DropdownMenuItemProps) {
     return (
-        <RadixDropdownMenu.Item
-            onSelect={props.action}
+        <AriaMenuItem
+            onAction={props.action}
             className={clsx(
                 "dropdown-menu-item",
                 { destructive: props.destructive },
                 props.className,
             )}
-            disabled={props.disabled}
+            isDisabled={props.isDisabled}
         >
             {props.children}
-        </RadixDropdownMenu.Item>
+        </AriaMenuItem>
     )
 }
 
@@ -92,10 +92,10 @@ export interface DropdownMenuItemLabelProps {
 
 export function DropdownMenuItemLabel(props: DropdownMenuItemLabelProps) {
     return (
-        <div className="dropdown-menu-item-label">
+        <AriaText slot="label" className="dropdown-menu-item-label">
             {props.icon && props.icon}
             {props.children}
-        </div>
+        </AriaText>
     )
 }
 
@@ -108,8 +108,11 @@ export function DropdownMenuItemDescription(
     props: DropdownMenuItemDescriptionProps,
 ) {
     return (
-        <div className={clsx("description", props.className)}>
+        <AriaText
+            slot="description"
+            className={clsx("description", props.className)}
+        >
             {props.children}
-        </div>
+        </AriaText>
     )
 }

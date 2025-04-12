@@ -1,4 +1,3 @@
-import * as RadixDropdownMenu from "@radix-ui/react-dropdown-menu"
 import { action } from "@storybook/addon-actions"
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
@@ -47,7 +46,7 @@ export const Basic: Story = {
                     </DropdownMenuItemDescription>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem action={action("disabled")} disabled>
+                <DropdownMenuItem action={action("disabled")} isDisabled>
                     <DropdownMenuItemLabel icon={<UserIcon />}>
                         Disabled
                     </DropdownMenuItemLabel>
@@ -69,7 +68,7 @@ export const Basic: Story = {
                 <DropdownMenuItem
                     action={action("delete")}
                     destructive
-                    disabled
+                    isDisabled
                 >
                     <DropdownMenuItemLabel icon={<BinIcon />}>
                         Delete (Disabled)
@@ -85,10 +84,7 @@ export const Basic: Story = {
     render: (args) => {
         return (
             <div className="flex gap-3">
-                <DropdownMenu {...args} />
-                <RadixDropdownMenu.Root modal={false} open={true}>
-                    {args.children}
-                </RadixDropdownMenu.Root>
+                <DropdownMenu {...args} defaultOpen={true} />
             </div>
         )
     },
@@ -107,7 +103,7 @@ export const Variants: Story = {
                     </DropdownMenuItemDescription>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem action={action("disabled")} disabled>
+                <DropdownMenuItem action={action("disabled")} isDisabled>
                     <DropdownMenuItemLabel icon={<UserIcon />}>
                         Disabled
                     </DropdownMenuItemLabel>
@@ -129,7 +125,7 @@ export const Variants: Story = {
                 <DropdownMenuItem
                     action={action("delete")}
                     destructive
-                    disabled
+                    isDisabled
                 >
                     <DropdownMenuItemLabel icon={<BinIcon />}>
                         Delete (Disabled)
