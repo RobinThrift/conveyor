@@ -3,11 +3,11 @@ import React, { useCallback, useRef, useState, useEffect, useMemo } from "react"
 import {
     Calendar as AriaCalendar,
     CalendarGrid as AriaCalendarGrid,
+    CalendarGridBody as AriaCalendarGridBody,
     CalendarGridHeader as AriaCalendarGridHeader,
     CalendarHeaderCell as AriaCalendarHeaderCell,
-    CalendarGridBody as AriaCalendarGridBody,
     Heading as AriaHeading,
-    DateValue,
+    type DateValue,
 } from "react-aria-components"
 
 import { type CalendarDate, currentDateTime, isSameDay } from "@/lib/i18n"

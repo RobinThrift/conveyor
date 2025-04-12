@@ -1,13 +1,13 @@
+import { DateFormatter } from "@internationalized/date"
 import clsx from "clsx"
 import React, { useCallback, useMemo, useState } from "react"
-import { DateFormatter } from "@internationalized/date"
 import {
     Calendar as AriaCalendar,
     CalendarGrid as AriaCalendarGrid,
+    CalendarGridBody as AriaCalendarGridBody,
     CalendarGridHeader as AriaCalendarGridHeader,
     CalendarHeaderCell as AriaCalendarHeaderCell,
-    CalendarGridBody as AriaCalendarGridBody,
-    DateValue,
+    type DateValue,
 } from "react-aria-components"
 
 import {
