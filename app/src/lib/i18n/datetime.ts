@@ -1,7 +1,3 @@
-import { enGB } from "date-fns/locale"
-import type { Locale } from "date-fns/locale"
-import { type Region, supportedRegions } from "./regions"
-
 export {
     CalendarDate,
     CalendarDateTime,
@@ -25,28 +21,6 @@ import {
     toCalendarDateTime,
 } from "@internationalized/date"
 
-export type DateTimeLocale = Locale
-
-const datetimeLocales = import.meta.glob<
-    boolean,
-    Region,
-    { default: DateTimeLocale }
->("../../../translations/datetime/*.ts")
-
-export const fallbackDateTimeLocale = enGB
-
-export async function loadDateTimeLocale(
-    region: Region,
-): Promise<DateTimeLocale> {
-    if (!supportedRegions.includes(region)) {
-        return Promise.resolve(fallbackDateTimeLocale)
-    }
-
-    let mod =
-        await datetimeLocales[`../../../translations/datetime/${region}.ts`]()
-    return mod.default
-}
-
 export function currentDateTime() {
     return toCalendarDateTime(_currentDateTime(getLocalTimeZone()))
 }
@@ -64,4 +38,30 @@ export function calendarDateTimeFromDate(date: Date): CalendarDateTime {
         return date as unknown as CalendarDateTime
     }
     return toCalendarDateTime(fromDate(date, getLocalTimeZone()))
+}
+
+export function isAfter(
+    a: Date | CalendarDateTime | CalendarDate,
+    b: CalendarDateTime | CalendarDate,
+) {
+    let first = a instanceof Date ? calendarDateTimeFromDate(a) : a
+    return first.compare(b) < 0
+}
+
+export function differenceInCalendarDays(
+    a: Date | CalendarDateTime | CalendarDate,
+    b: CalendarDateTime | CalendarDate,
+) {
+    let first = a instanceof Date ? calendarDateTimeFromDate(a) : a
+    return Math.abs(
+        first.calendar.toJulianDay(first) - b.calendar.toJulianDay(b),
+    )
+}
+
+export function roundToNearestMinutes(d: CalendarDateTime) {
+    if (d.second >= 30) {
+        return d.set({ second: 0 }).cycle("minute", 1)
+    }
+
+    return d.set({ second: 0 })
 }

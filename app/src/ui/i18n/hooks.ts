@@ -16,13 +16,5 @@ export function useT<K extends keyof Translation>(
 
 export function useFormat() {
     let ctx = useContext(i18nContext)
-    return useMemo(
-        () => format(ctx.region, ctx.datetime),
-        [ctx.region, ctx.datetime],
-    )
-}
-
-export function useDateTimeLocale() {
-    let ctx = useContext(i18nContext)
-    return ctx.datetime
+    return useMemo(() => format(ctx.region), [ctx.region])
 }

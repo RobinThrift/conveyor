@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from "react"
 
-import { differenceInCalendarDays } from "@/lib/date"
+import {
+    type CalendarDate,
+    type CalendarDateTime,
+    currentDateTime,
+} from "@/lib/i18n"
 import { Tooltip } from "@/ui/components/Tooltip"
 import { useFormat, useT } from "@/ui/i18n"
 
@@ -13,7 +17,7 @@ export interface DateTimeProps
         "datetime"
     > {
     className?: string
-    date: Date
+    date: Date | CalendarDate | CalendarDateTime
     relative?: boolean
     opts?: Intl.DateTimeFormatOptions
     ref?: React.Ref<HTMLTimeElement>
@@ -27,18 +31,21 @@ export function DateTime({
     ...intrinsics
 }: DateTimeProps) {
     let t = useT("components/DateTime")
-    let { time } = useFormat()
+    let { formatDateTime } = useFormat()
 
     let formatted = useMemo(() => {
         try {
-            return time(date, opts ?? { dateStyle: "long", timeStyle: "short" })
+            return formatDateTime(
+                date,
+                opts ?? { dateStyle: "long", timeStyle: "short" },
+            )
         } catch (err) {
             return t.invalidTime({
                 date: date?.toString(),
                 error: (err as Error).message,
             })
         }
-    }, [date, time, opts, t.invalidTime])
+    }, [date, formatDateTime, opts, t.invalidTime])
 
     if (relative) {
         return (
@@ -67,7 +74,7 @@ function RelativeDateTime({
     ...intrinsics
 }: Omit<DateTimeProps, "relative"> & { absolute: string }) {
     let t = useT("components/DateTime")
-    let { time, formatDistance } = useFormat()
+    let { formatRelative } = useFormat()
 
     let [showAbsolute, setShowAbsolute] = useState(false)
 
@@ -76,18 +83,7 @@ function RelativeDateTime({
             return absolute
         }
         try {
-            let now = new Date()
-            let diff = differenceInCalendarDays(date, now)
-            if (Math.abs(diff) <= 3) {
-                return t.datetime({
-                    date: formatDistance(date, now, {
-                        addSuffix: true,
-                    }),
-                    time: time(date, { timeStyle: "short" }),
-                })
-            }
-
-            return time(date, opts ?? { dateStyle: "long", timeStyle: "short" })
+            return t.datetime(formatRelative(currentDateTime(), date, opts))
         } catch (err) {
             return t.invalidTime({
                 date: date?.toString(),
@@ -98,8 +94,7 @@ function RelativeDateTime({
         date,
         absolute,
         showAbsolute,
-        time,
-        formatDistance,
+        formatRelative,
         opts,
         t.datetime,
         t.invalidTime,
