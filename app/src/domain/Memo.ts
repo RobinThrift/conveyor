@@ -1,8 +1,4 @@
-import {
-    type CalendarDate,
-    type CalendarDateTime,
-    parseDateISO8601,
-} from "@/lib/i18n"
+import { type CalendarDate, parseDateISO8601 } from "@/lib/i18n"
 
 export type MemoID = string
 
@@ -11,13 +7,13 @@ export interface Memo {
     content: string
     isArchived: boolean
     isDeleted: boolean
-    createdAt: CalendarDateTime
-    updatedAt: CalendarDateTime
+    createdAt: Date
+    updatedAt: Date
 }
 
 export interface MemoList {
     items: Memo[]
-    next?: CalendarDateTime
+    next?: Date
 }
 
 export interface ListMemosQuery {

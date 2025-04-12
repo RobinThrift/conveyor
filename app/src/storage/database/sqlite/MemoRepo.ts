@@ -12,13 +12,12 @@ import {
     mapResult,
     match,
 } from "@/lib/result"
-import { UTCDateMini } from "@date-fns/utc"
-import { transpose } from "date-fns"
 
 import { newID } from "@/domain/ID"
 import { decodeText, encodeText } from "@/lib/textencoding"
+
 import * as queries from "./gen/memos_sql"
-import { dateToSQLite } from "./types/datetime"
+import { calendarDateTimeToSQLite } from "./types/calendardatetime"
 import { prepareFTSQueryString } from "./types/ftsquery"
 
 export interface CreateMemoRequest {
@@ -106,12 +105,12 @@ export class MemoRepo {
 
             withCreatedAt: typeof filter?.exactDate !== "undefined",
             createdAt: filter?.exactDate
-                ? dateToSQLite(transpose(filter.exactDate, UTCDateMini))
+                ? calendarDateTimeToSQLite(filter.exactDate)
                 : undefined,
 
             withCreatedAtOrOlder: typeof filter?.startDate !== "undefined",
             createdAtOrOlder: filter?.startDate
-                ? dateToSQLite(transpose(filter.startDate, UTCDateMini))
+                ? calendarDateTimeToSQLite(filter.startDate)
                 : undefined,
 
             withIsArchived: typeof filter?.isArchived !== "undefined",

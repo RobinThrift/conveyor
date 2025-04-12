@@ -1,11 +1,4 @@
-import {
-    addDays,
-    addHours,
-    isAfter,
-    subHours,
-    subMinutes,
-    transpose,
-} from "date-fns"
+import { addDays, addHours, isAfter, subHours, subMinutes } from "date-fns"
 import {
     assert,
     type OnTestFinishedHandler,
@@ -28,8 +21,8 @@ import { encodeText } from "@/lib/textencoding"
 import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
-import { UTCDateMini } from "@date-fns/utc"
 
+import { CalendarDateTime, toCalendarDate } from "@/lib/i18n"
 import { toPromise } from "@/lib/result"
 import { AttachmentController } from "./AttachmentController"
 import { ChangelogController } from "./ChangelogController"
@@ -39,7 +32,7 @@ suite("control/MemoController", () => {
     suite.sequential("Querying", async () => {
         let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup()
 
-        let now = transpose(new Date(2024, 2, 15, 12, 0, 0, 0), UTCDateMini)
+        let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0)
         let numMemos = 500
 
         let createdMemosIDs: MemoID[] = []
@@ -50,7 +43,7 @@ suite("control/MemoController", () => {
             for (let i = 0; i < numMemos * 1.5; i++) {
                 let res = await memoCtrl.createMemo(ctx, {
                     content: `# Test Memo ${i}\n With some more content for memo ${i}\n #tag-${i}d #parent/tag-${i + 1} #mod-two-is-${i % 2}`,
-                    createdAt: subHours(now, i),
+                    createdAt: now.subtract({ hours: i }).toDate("utc"),
                 })
                 if (!res.ok) {
                     throw res.err
@@ -93,6 +86,9 @@ suite("control/MemoController", () => {
                     }),
                 )
 
+                console.log("total", total)
+                console.log("firstMemoDate", list.items.at(0)?.createdAt)
+                console.log("lastMemoDate", list.items.at(-1)?.createdAt)
                 assert.equal(list.items.length, 25, `i = ${i}`)
                 assert.notEqual(lastMemoID, list.items[0].id, `i = ${i}`)
 
@@ -107,7 +103,7 @@ suite("control/MemoController", () => {
         test("Filter by exactDate", async () => {
             let list = await assertOkResult(
                 memoCtrl.listMemos(ctx, {
-                    filter: { exactDate: now },
+                    filter: { exactDate: toCalendarDate(now) },
                     pagination: { pageSize: numMemos },
                 }),
             )
@@ -116,10 +112,10 @@ suite("control/MemoController", () => {
         })
 
         test("Filter by startDate", async () => {
-            let startDate = subHours(now, 24)
+            let startDate = now.subtract({ hours: 24 })
             let list = await assertOkResult(
                 memoCtrl.listMemos(ctx, {
-                    filter: { startDate },
+                    filter: { startDate: toCalendarDate(startDate) },
                     pagination: { pageSize: numMemos },
                 }),
             )
@@ -153,10 +149,13 @@ suite("control/MemoController", () => {
 
         test("Filter by Multiple", async () => {
             let query = "# Test Memo 1*"
-            let startDate = subHours(now, 24)
+            let startDate = now.subtract({ hours: 24 })
             let list = await assertOkResult(
                 memoCtrl.listMemos(ctx, {
-                    filter: { query, startDate },
+                    filter: {
+                        query,
+                        startDate: toCalendarDate(startDate),
+                    },
                     pagination: { pageSize: numMemos },
                 }),
             )
