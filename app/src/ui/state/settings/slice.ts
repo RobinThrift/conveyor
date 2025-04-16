@@ -54,15 +54,22 @@ export const slice = createSlice({
         isLoaded: (state) => state.isLoaded,
         error: (state) => state.error,
         mode: (state) => {
-            if (state.values.theme.mode === "auto") {
+            if (state.values.ui.colourScheme.mode === "auto") {
                 return window.matchMedia("(prefers-color-scheme: dark)").matches
                     ? "dark"
                     : "light"
             }
-            return state.values.theme.mode
+            return state.values.ui.colourScheme.mode
         },
         colourScheme: (state) => {
-            return state.values.theme.colourScheme
+            let mode: "light" | "dark" = "light"
+            if (state.values.ui.colourScheme.mode === "auto") {
+                mode = window.matchMedia("(prefers-color-scheme: dark)").matches
+                    ? "dark"
+                    : "light"
+            }
+
+            return state.values.ui.colourScheme[mode]
         },
     },
 })

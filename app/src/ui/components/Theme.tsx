@@ -1,14 +1,14 @@
 import React, { useEffect } from "react"
 
-import type { Settings } from "@/domain/Settings"
+import type { ColourSchemeMode, ColourSchemeNames } from "@/domain/Settings"
 
 export function Theme({
     colourScheme,
     mode,
     children,
 }: React.PropsWithChildren<{
-    colourScheme: Settings["theme"]["colourScheme"]
-    mode: Settings["theme"]["mode"]
+    colourScheme: ColourSchemeNames
+    mode: ColourSchemeMode
 }>) {
     useEffect(() => {
         let current = document.documentElement.dataset.colourScheme ?? ""

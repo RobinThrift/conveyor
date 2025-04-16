@@ -10,7 +10,7 @@ export interface GreetingProps {
 
 export function Greeting(props: GreetingProps) {
     let t = useT("components/Greeting")
-    let [displayName] = useSetting("theme.displayName")
+    let [displayName] = useSetting("account.displayName")
     let now = new Date()
     let greeting = t.Evening
 

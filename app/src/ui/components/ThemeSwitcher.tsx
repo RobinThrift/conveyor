@@ -11,12 +11,16 @@ export function SelectColourScheme({
     className?: string
 }) {
     let t = useT("components/ThemeSwitcher")
-    let [colourScheme, setColourScheme] = useSetting("theme.colourScheme")
+    let [lightColourScheme, setLightColourScheme] = useSetting(
+        "ui.colourScheme.light",
+    )
+    let [_, setDarkColourScheme] = useSetting("ui.colourScheme.light")
     let onChange = useCallback(
-        (v: typeof colourScheme) => {
-            setColourScheme(v)
+        (v: typeof lightColourScheme) => {
+            setLightColourScheme(v)
+            setDarkColourScheme(v)
         },
-        [setColourScheme],
+        [setLightColourScheme, setDarkColourScheme],
     )
 
     return (
@@ -25,7 +29,7 @@ export function SelectColourScheme({
             name="theme.colourScheme"
             ariaLabel={t.SelectColourSchemeAriaLabel}
             onChange={onChange}
-            value={colourScheme}
+            value={lightColourScheme}
         >
             <Select.Option value="default">{t.ColoursDefault}</Select.Option>
             <Select.Option value="warm">{t.ColoursWarm}</Select.Option>
@@ -40,7 +44,7 @@ export function SelectMode({
     className?: string
 }) {
     let t = useT("components/ThemeSwitcher")
-    let [mode, setMode] = useSetting("theme.mode")
+    let [mode, setMode] = useSetting("ui.colourScheme.mode")
     let onChange = useCallback(
         (v: typeof mode) => {
             setMode(v)
