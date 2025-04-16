@@ -1,5 +1,6 @@
-import React from "react"
+import React, { startTransition, useCallback } from "react"
 
+import type { MemoListLayouts } from "@/domain/Settings"
 import { ListIcon, TableIcon } from "@/ui/components/Icons"
 import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
@@ -10,6 +11,15 @@ export function LayoutSelect() {
 
     let [listLayout, setListLayout] = useSetting("ui.memoList.layout")
 
+    let onChange = useCallback(
+        (value: MemoListLayouts) => {
+            startTransition(() => {
+                setListLayout(value)
+            })
+        },
+        [setListLayout],
+    )
+
     return (
         <div className="memo-list-layout-select-positioner">
             <Select
@@ -17,7 +27,7 @@ export function LayoutSelect() {
                 label={t.Label}
                 labelClassName="sr-only"
                 value={listLayout}
-                onChange={setListLayout}
+                onChange={onChange}
                 className="memo-list-layout-select"
             >
                 <Select.Option value="masonry">

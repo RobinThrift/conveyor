@@ -3,7 +3,7 @@ import type { Language, Region } from "@/lib/i18n"
 export type ColourSchemeNames = "default" | "warm" | "rosepine"
 export type ColourSchemeMode = "auto" | "light" | "dark"
 
-type MemoListLayouts = "masonry" | "single" | "ultra-compact"
+export type MemoListLayouts = "masonry" | "single" | "ultra-compact"
 
 export type Settings = {
     locale: {
