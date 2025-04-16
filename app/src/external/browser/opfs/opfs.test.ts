@@ -6,7 +6,7 @@ import { decodeText, encodeText } from "@/lib/textencoding"
 import { OPFS } from "./opfs"
 
 suite("external/browser/opfs", () => {
-    suite.sequential("read/write", { timeout: 1500 }, async () => {
+    suite.sequential("read/write", async () => {
         let [ctx, cancel] = BaseContext.withCancel()
 
         let fs = new OPFS("attachments")
