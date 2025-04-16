@@ -23,7 +23,7 @@ export interface DateTimeProps
     ref?: React.Ref<HTMLTimeElement>
 }
 
-export function DateTime({
+export const DateTime = React.memo(function DateTime({
     relative,
     date,
     opts,
@@ -64,9 +64,9 @@ export function DateTime({
             {formatted}
         </time>
     )
-}
+})
 
-function RelativeDateTime({
+const RelativeDateTime = React.memo(function RelativeDateTime({
     date,
     opts,
     absolute,
@@ -125,4 +125,4 @@ function RelativeDateTime({
             </button>
         </Tooltip>
     )
-}
+})
