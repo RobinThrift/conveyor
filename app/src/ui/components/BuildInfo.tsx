@@ -2,7 +2,9 @@ import { BUILD_INFO } from "@/domain/BuildInfo"
 import clsx from "clsx"
 import React from "react"
 
-export function BuildInfo({ className }: { className?: string }) {
+export const BuildInfo = React.memo(function BuildInfo({
+    className,
+}: { className?: string }) {
     return (
         <div
             className={clsx(
@@ -21,4 +23,4 @@ export function BuildInfo({ className }: { className?: string }) {
             ({BUILD_INFO.commitDate})
         </div>
     )
-}
+})
