@@ -1,16 +1,28 @@
-import * as RadixSelect from "@radix-ui/react-select"
 import clsx from "clsx"
 import React, { useCallback } from "react"
+import {
+    Button as AriaButton,
+    Header as AriaHeader,
+    Label as AriaLabel,
+    ListBox as AriaListBox,
+    ListBoxItem as AriaListBoxItem,
+    ListBoxSection as AriaListBoxSection,
+    Popover as AriaPopover,
+    Select as AriaSelect,
+    SelectValue as AriaSelectValue,
+    type Key,
+} from "react-aria-components"
 
-import { CaretDownIcon, CaretUpIcon, CheckIcon } from "@/ui/components/Icons"
+import { CaretDownIcon } from "@/ui/components/Icons"
 
 export interface SelectProps<T extends string = string> {
     className?: string
-    ariaLabel: string
+    labelClassName?: string
+    label?: string
     name: string
     value?: T
     placeholder?: string
-    disabled?: boolean
+    isDisabled?: boolean
     children:
         | React.ReactElement<SelectOptionProps>
         | React.ReactElement<SelectOptionProps>[]
@@ -18,51 +30,47 @@ export interface SelectProps<T extends string = string> {
 }
 
 export function Select<T extends string = string>(props: SelectProps<T>) {
-    let onValueChange = useCallback(
-        (value: T) => {
+    let onSelectionChange = useCallback(
+        (value: Key) => {
             props.onChange(value as T)
         },
         [props.onChange],
     )
 
     return (
-        <RadixSelect.Root
+        <AriaSelect
             name={props.name}
-            onValueChange={onValueChange}
-            value={props.value}
-            disabled={props.disabled}
+            onSelectionChange={onSelectionChange}
+            defaultSelectedKey={props.value}
+            isDisabled={props.isDisabled}
+            placeholder={props.placeholder}
+            className={props.className}
         >
-            <RadixSelect.Trigger
-                className={clsx(
-                    "input flex items-center gap-2 justify-between px-2 py-1 text-sm bg-surface text-body-contrast",
-                    props.className,
-                )}
-                aria-label={props.ariaLabel}
-            >
-                <RadixSelect.Value placeholder={props.placeholder} />
+            {props.label && (
+                <AriaLabel
+                    className={clsx("select-label", props.labelClassName)}
+                >
+                    {props.label}
+                </AriaLabel>
+            )}
+            <AriaButton className="input select-input">
+                <AriaSelectValue />
                 <span aria-hidden="true">
                     <CaretDownIcon />
                 </span>
-            </RadixSelect.Trigger>
+            </AriaButton>
 
-            <RadixSelect.Portal>
-                <RadixSelect.Content className="select-list">
-                    <RadixSelect.ScrollUpButton className="flex py-2 cursor-default items-center justify-center bg-surface text-primary">
-                        <CaretUpIcon />
-                    </RadixSelect.ScrollUpButton>
-
-                    <RadixSelect.Viewport className="select-list-viewport">
-                        {props.children}
-                    </RadixSelect.Viewport>
-
-                    <RadixSelect.ScrollDownButton className="flex py-2 cursor-default items-center justify-center bg-surface text-primary">
-                        <CaretDownIcon />
-                    </RadixSelect.ScrollDownButton>
-                </RadixSelect.Content>
-            </RadixSelect.Portal>
-        </RadixSelect.Root>
+            <AriaPopover>
+                <AriaListBox className="select-list">
+                    {props.children}
+                </AriaListBox>
+            </AriaPopover>
+        </AriaSelect>
     )
 }
+
+Select.Group = OptionGroup
+Select.Option = Option
 
 export interface SelectOptionGroupProps {
     children: React.ReactNode | React.ReactNode[]
@@ -71,42 +79,29 @@ export interface SelectOptionGroupProps {
 
 export function OptionGroup(props: SelectOptionGroupProps) {
     return (
-        <RadixSelect.Group className="select-group">
-            <RadixSelect.Label>{props.label}</RadixSelect.Label>
-
+        <AriaListBoxSection className="select-group">
+            <AriaHeader>{props.label}</AriaHeader>
             {props.children}
-        </RadixSelect.Group>
+        </AriaListBoxSection>
     )
 }
 
 export interface SelectOptionProps<T extends string = string> {
-    ref?: React.Ref<HTMLDivElement>
-    children: React.ReactNode | React.ReactNode[]
+    className?: string
     value: T
-    disabled?: boolean
-    useCheckbox?: boolean
+    isDisabled?: boolean
+    children: React.ReactNode | React.ReactNode[]
 }
 
 export function Option(props: SelectOptionProps) {
     return (
-        <RadixSelect.SelectItem
-            className={clsx("select-item", {
-                nocheckbox: !props.useCheckbox,
-                "checkbox-item": props.useCheckbox,
-            })}
-            value={props.value}
-            disabled={props.disabled}
-            ref={props.ref}
+        <AriaListBoxItem
+            id={props.value}
+            className={clsx("select-item", props.className)}
+            textValue={props.value}
+            isDisabled={props.isDisabled}
         >
-            <RadixSelect.ItemText>{props.children}</RadixSelect.ItemText>
-            {props.useCheckbox && (
-                <RadixSelect.ItemIndicator className="absolute left-1 mt-0.5 inline-flex items-center justify-center text-primary">
-                    <CheckIcon weight="bold" size={14} />
-                </RadixSelect.ItemIndicator>
-            )}
-        </RadixSelect.SelectItem>
+            {props.children}
+        </AriaListBoxItem>
     )
 }
-
-Select.Group = OptionGroup
-Select.Option = Option

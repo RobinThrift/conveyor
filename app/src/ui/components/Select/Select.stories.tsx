@@ -20,24 +20,26 @@ export const Basic: Story = {
     },
     args: {
         placeholder: "Please select a value",
-        ariaLabel: "Value picker",
+        label: "Value picker",
         name: "select-story",
         children: [
-            <Select.Option key={"Value A"} value="Value A" useCheckbox>
+            <Select.Option key="value-a" value="value-a">
                 Value A
             </Select.Option>,
-            <Select.Option key={"Value B"} value="Value B" useCheckbox>
+            <Select.Option key="value-b" value="value-b">
                 Value B
             </Select.Option>,
-            <Select.Option key={"Value C"} value="Value C" useCheckbox>
+            <Select.Option key="value-c" value="value-c">
                 Value C
             </Select.Option>,
-            <Select.Option key={"Value D"} value="Value D" disabled>
-                Value D
-            </Select.Option>,
-            <Select.Option key={"Value E"} value="Value E">
-                Value E
-            </Select.Option>,
+            <Select.Group label="Group 2" key={"group"}>
+                <Select.Option key="value-D" value="value-d" isDisabled>
+                    Value D
+                </Select.Option>
+                <Select.Option key="value-e" value="value-e">
+                    Value E
+                </Select.Option>
+            </Select.Group>,
         ],
     },
 }

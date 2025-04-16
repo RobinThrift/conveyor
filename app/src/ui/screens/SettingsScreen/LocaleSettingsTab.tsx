@@ -69,7 +69,6 @@ export function LocaleSettingsTab({
                     <Select
                         className="col-span-5"
                         name="language"
-                        ariaLabel={t.LabelSelectLanguage}
                         onChange={onChangeLanguage}
                         value={lang}
                     >
@@ -87,7 +86,6 @@ export function LocaleSettingsTab({
                     <Select
                         className="col-span-5"
                         name="region"
-                        ariaLabel={t.LabelSelectRegion}
                         onChange={onChangeRegion}
                         value={region}
                     >

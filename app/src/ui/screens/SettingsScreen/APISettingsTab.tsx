@@ -143,11 +143,10 @@ function CreateNewAPIToken({
                     </label>
                     <Select
                         name="api_token_expires_in"
-                        ariaLabel={t.FieldExpiresInLabel}
                         className="col-span-4 py-2!"
                         value={expiresIn()}
                         onChange={setExpiresIn}
-                        disabled={isLoading}
+                        isDisabled={isLoading}
                     >
                         <Select.Option value="1d">
                             {t.FieldExpiresInValueDays(1)}

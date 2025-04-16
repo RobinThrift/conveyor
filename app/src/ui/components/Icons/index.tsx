@@ -8,7 +8,6 @@ export { ArrowsCounterClockwise as ArrowsCounterClockwiseIcon } from "@phosphor-
 export { CaretDown as CaretDownIcon } from "@phosphor-icons/react/CaretDown"
 export { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/CaretLeft"
 export { CaretRight as CaretRightIcon } from "@phosphor-icons/react/CaretRight"
-export { CaretUp as CaretUpIcon } from "@phosphor-icons/react/CaretUp"
 export { Check as CheckIcon } from "@phosphor-icons/react/Check"
 export { CloudArrowDown as CloudArrowDownIcon } from "@phosphor-icons/react/CloudArrowDown"
 export { CloudArrowUp as CloudArrowUpIcon } from "@phosphor-icons/react/CloudArrowUp"

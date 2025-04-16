@@ -1,10 +1,17 @@
+.select-input {
+    @apply flex items-center gap-2 justify-between px-2 py-1 bg-surface text-body-contrast min-w-fit;
+}
+
+.select-label {
+    @apply flex mb-2 text-sm font-medium;
+}
+
 .select-list {
-    @apply p-1 overflow-auto rounded-md bg-surface shadow-lg;
+    @apply p-1 overflow-auto rounded-md bg-surface shadow-lg space-y-1;
     @apply ring-1 ring-black/50;
     @apply dark:border dark:border-subtle-extra-dark;
 
-    min-width: var(--radix-select-trigger-width);
-    max-height: var(--radix-select-content-available-height);
+    min-width: var(--trigger-width);
     z-index: 9999;
 
     &[data-state="open"] {
@@ -16,12 +23,12 @@
     }
 }
 
-.select-list-viewport {
-    @apply space-y-1;
+.select-group {
+    @apply mt-2;
 }
 
 .select-item {
-    @apply w-full rounded-md px-2 py-1 box-border outline-hidden text-sm;
+    @apply w-full rounded-md px-2 py-1 box-border outline-hidden;
     @apply cursor-pointer;
 
     min-width: max-content;
@@ -46,13 +53,5 @@
         &:active {
             @apply text-text bg-transparent;
         }
-    }
-
-    &.nocheckbox[data-state="checked"] {
-        @apply bg-primary text-primary-contrast;
-    }
-
-    &.checkbox-item {
-        @apply pl-6;
     }
 }

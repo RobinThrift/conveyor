@@ -27,7 +27,8 @@ export function SelectColourScheme({
         <Select
             className={className}
             name="theme.colourScheme"
-            ariaLabel={t.SelectColourSchemeAriaLabel}
+            label={t.SelectColourSchemeAriaLabel}
+            labelClassName="sr-only"
             onChange={onChange}
             value={lightColourScheme}
         >
@@ -56,7 +57,8 @@ export function SelectMode({
         <Select
             name="theme.mode"
             className={className}
-            ariaLabel={t.SelectModeAriaLabel}
+            label={t.SelectModeAriaLabel}
+            labelClassName="sr-only"
             onChange={onChange}
             value={mode}
         >

@@ -14,7 +14,8 @@ export function LayoutSelect() {
         <div className="memo-list-layout-select-positioner">
             <Select
                 name="select-layout"
-                ariaLabel={t.Label}
+                label={t.Label}
+                labelClassName="sr-only"
                 value={listLayout}
                 onChange={setListLayout}
                 className="memo-list-layout-select"

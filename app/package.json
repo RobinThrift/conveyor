@@ -59,7 +59,6 @@
         "@radix-ui/react-form": "^0.1.2",
         "@radix-ui/react-hover-card": "^1.1.6",
         "@radix-ui/react-popover": "^1.1.6",
-        "@radix-ui/react-select": "^2.1.6",
         "@radix-ui/react-toast": "^1.2.6",
         "@radix-ui/react-toolbar": "^1.1.2",
         "@reduxjs/toolkit": "^2.6.1",
