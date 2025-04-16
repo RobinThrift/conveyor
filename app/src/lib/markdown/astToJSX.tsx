@@ -308,7 +308,7 @@ function autoTagLinkToJSX(doc: Document, node: AutoTagLink): ReactNode {
     let Link = doc.componentMap.Link ?? "a"
     return (
         <Link
-            href={`/memos?filter[tag]=${node.tag}`}
+            href={`?filter[tag]=${node.tag}`}
             key={nodeKey(node)}
             className="tag-link"
             rel="tag"
