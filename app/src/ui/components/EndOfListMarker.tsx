@@ -6,7 +6,11 @@ export function EndOfListMarker({ onReached }: { onReached: () => void }) {
     let ref = useRef<HTMLDivElement>(null)
     useOnIntersection(
         (isVisible) => {
-            if (isVisible) {
+            if (
+                isVisible ||
+                (ref.current?.getBoundingClientRect().top ?? 0) <
+                    (window.visualViewport?.pageTop ?? 0)
+            ) {
                 onReached()
             }
         },

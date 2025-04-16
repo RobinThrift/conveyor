@@ -1,4 +1,4 @@
-import { type RefObject, useEffect, useState } from "react"
+import { type RefObject, startTransition, useEffect, useState } from "react"
 
 export function useOnVisible(
     ref: RefObject<HTMLElement | null>,
@@ -27,8 +27,10 @@ export function useOnVisible(
             observer.observe(ref.current)
 
             return () => {
+                startTransition(() => {
+                    setIsVisble(false)
+                })
                 observer.disconnect()
-                setIsVisble(false)
             }
         }
     }, [
