@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
 
-import { BinIcon, GearIcon, PlusIcon, UserIcon } from "@/ui/components/Icons"
+import { BinIcon, PlusIcon, SlidersIcon, UserIcon } from "@/ui/components/Icons"
 import "@/ui/styles/index.css"
 
 import { Button } from "./Button"
@@ -107,7 +107,7 @@ export const Icons: Story = {
                     <Button
                         {...args}
                         iconRight={<PlusIcon />}
-                        iconLeft={<GearIcon />}
+                        iconLeft={<SlidersIcon />}
                     >
                         Icon left and right
                     </Button>
@@ -130,7 +130,7 @@ export const Icons: Story = {
                     <Button
                         {...args}
                         iconRight={<PlusIcon />}
-                        iconLeft={<GearIcon />}
+                        iconLeft={<SlidersIcon />}
                         size="sm"
                     >
                         Icon left and right
@@ -155,7 +155,7 @@ export const Icons: Story = {
                     <Button
                         {...args}
                         iconRight={<PlusIcon />}
-                        iconLeft={<GearIcon />}
+                        iconLeft={<SlidersIcon />}
                         size="lg"
                     >
                         Icon left and right
