@@ -22,11 +22,13 @@ export function CalendarCell({
     let buttonRef = useRef<HTMLDivElement>(null)
     let { cellProps, buttonProps, ...states } = useCalendarCell(
         { date },
+        // biome-ignore lint/style/noNonNullAssertion: state should never be null
         state!,
         buttonRef,
     )
 
     let isDisabled = states.isDisabled
+    // biome-ignore lint/style/noNonNullAssertion: state should never be null
     let isOutsideMonth = !isSameMonth(state!.focusedDate, date)
     if (state?.maxValue) {
         isDisabled = date.compare(state.maxValue) > 0
