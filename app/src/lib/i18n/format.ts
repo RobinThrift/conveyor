@@ -78,7 +78,7 @@ function formatDistanceDateTime(
     code: string,
     opts?: Intl.DateTimeFormatOptions,
 ): { date: string; time: string } {
-    let date = laterDate?.toDate(getLocalTimeZone())
+    let date = earlierDate.toDate(getLocalTimeZone())
 
     let diffDays =
         laterDate.calendar.toJulianDay(laterDate) -
