@@ -53,7 +53,8 @@ func render(w http.ResponseWriter, data pageData) error {
 	data.ServerData.BuildInfo.CommitHash = buildInfo.Hash
 	data.ServerData.BuildInfo.CommitDate = buildInfo.Date.Format(time.RFC3339)
 	data.ServerData.BuildInfo.GoVersion = buildInfo.GoVersion
-	if len(buildInfo.Hash) > 16 {
+
+	if len(buildInfo.Hash) > 16 { //nolint:mnd // Non-issue, it's just shortened to be easier to read
 		tmpldata.CommitHash = buildInfo.Hash[:16]
 	} else {
 		tmpldata.CommitHash = "dev"
