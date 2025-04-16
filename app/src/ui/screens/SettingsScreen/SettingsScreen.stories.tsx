@@ -8,10 +8,6 @@ import { SettingsScreen } from "./SettingsScreen"
 const meta: Meta<typeof SettingsScreen> = {
     title: "Screens/Settings",
     component: SettingsScreen,
-    args: {
-        tab: "interface",
-    },
-
     decorators: [decorator],
 }
 

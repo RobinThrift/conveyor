@@ -16,28 +16,21 @@ export const slice = createSlice({
     name: "tags",
     initialState,
     reducers: {
-        loadTags: (state) => {
-            return {
-                ...state,
-                isLoadingTags: true,
-                error: undefined,
-            }
+        loadTags: (_) => {},
+
+        setTags: (state, { payload }: PayloadAction<{ items: Tag[] }>) => {
+            state.isLoading = false
+            state.error = undefined
+            state.tags = payload.items
         },
 
-        setTags: (state, { payload }: PayloadAction<{ items: Tag[] }>) =>
-            ({
-                ...state,
-                isLoading: false,
-                error: undefined,
-                tags: payload.items,
-            }) satisfies TagsState,
-
-        setError: (state, { payload }: PayloadAction<{ error: Error }>) =>
-            ({
-                ...state,
-                isLoading: false,
-                error: payload.error,
-            }) satisfies TagsState,
+        setState: (
+            state,
+            { payload }: PayloadAction<{ isLoading: boolean; error?: Error }>,
+        ) => {
+            state.isLoading = payload.isLoading
+            state.error = payload.error
+        },
     },
 
     selectors: {

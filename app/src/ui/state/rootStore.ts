@@ -8,6 +8,7 @@ import type { APITokenController } from "@/control/APITokenController"
 import type { AttachmentController } from "@/control/AttachmentController"
 import type { AuthController } from "@/control/AuthController"
 import type { MemoController } from "@/control/MemoController"
+import type { NavigationController } from "@/control/NavigationController"
 import type { SettingsController } from "@/control/SettingsController"
 import type { SetupController } from "@/control/SetupController"
 import type { SyncController } from "@/control/SyncController"
@@ -19,8 +20,8 @@ import * as auth from "./auth"
 import { registerEffects as registerErrorEffects } from "./errors"
 import * as i18n from "./global/i18n"
 import * as notifications from "./global/notifications"
-import * as router from "./global/router"
 import * as memos from "./memos"
+import * as navigation from "./navigation"
 import * as settings from "./settings"
 import * as setup from "./setup"
 import * as sync from "./sync"
@@ -34,12 +35,8 @@ let startListening = listenerMiddleware.startListening.withTypes<
     AppDispatch
 >()
 
-export function configureRootStore(initState: {
-    baseURL?: string
-    router?: { href: string }
-}) {
+export function configureRootStore() {
     let rootReducer = combineSlices(
-        router.slice,
         notifications.slice,
         i18n.slice,
 
@@ -52,6 +49,7 @@ export function configureRootStore(initState: {
         setup.slice,
         unlock.slice,
         apitokens.slice,
+        navigation.slice,
     )
 
     const store = configureStore({
@@ -71,7 +69,6 @@ export function configureRootStore(initState: {
                         "payload.content",
                         "payload.next",
                         "payload.translations",
-                        "payload.dateFns",
                         "payload.data",
                         "payload.params",
                         "payload.pagination.after",
@@ -79,13 +76,11 @@ export function configureRootStore(initState: {
                         /.*\.buttons/,
                     ],
                     ignoredPaths: [
-                        "global.router.routes",
                         /.*\.(createdAt|updatedAt|expiresAt|exactDate)/,
                         /.*\.error/,
                         "memos.list.nextPage",
                         "global.i18n.translations",
                         "global.i18n.baseTranslations",
-                        "global.i18n.dateFns",
                         "setup.selectedOptions.candidatePrivateCryptoKey",
                         /.*\.buttons/,
                         "sync.info.lastSyncedAt",
@@ -98,18 +93,8 @@ export function configureRootStore(initState: {
         import.meta.hot.accept(() => store.replaceReducer(rootReducer))
     }
 
-    router.registerEffects(startListening)
     i18n.registerEffects(startListening)
     registerErrorEffects(startListening)
-
-    if (initState.router?.href) {
-        store.dispatch(
-            router.slice.actions.init({
-                href: initState.router?.href,
-                baseURL: initState.baseURL,
-            }),
-        )
-    }
 
     return store
 }
@@ -131,6 +116,7 @@ export function configureEffects({
     setupCtrl,
     unlockCtrl,
     apiTokenCtrl,
+    navCtrl,
 }: {
     memoCtrl: MemoController
     attachmentCtrl: AttachmentController
@@ -140,6 +126,7 @@ export function configureEffects({
     setupCtrl: SetupController
     unlockCtrl: UnlockController
     apiTokenCtrl: APITokenController
+    navCtrl: NavigationController
 }) {
     memos.registerEffects(startListening, {
         memoCtrl,
@@ -167,6 +154,7 @@ export function configureEffects({
 
     setup.registerEffects(startListening, {
         setupCtrl,
+        navCtrl,
     })
 
     unlock.registerEffects(startListening, {

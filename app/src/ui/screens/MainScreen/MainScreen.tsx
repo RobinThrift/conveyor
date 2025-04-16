@@ -1,73 +1,45 @@
-import React from "react"
+import clsx from "clsx"
+import React, { Suspense } from "react"
 
-import { EndOfListMarker } from "@/ui/components/EndOfListMarker"
-import { Loader } from "@/ui/components/Loader"
-import { MemoList, MemoListHeader } from "@/ui/components/MemoList"
-import { MemoListFilter } from "@/ui/components/MemoListFilter"
-import { useSetting } from "@/ui/settings"
+import type { Screens } from "@/control/NavigationController"
+import { ErrorBoundary } from "@/ui/components/ErrorBoundary"
+import { EditMemoScreen } from "@/ui/screens/EditMemoScreen"
+import { MemoListScreen } from "@/ui/screens/MemoListScreen"
+import { SingleMemoScreen } from "@/ui/screens/SingleMemoScreen"
 
-import { NewMemoEditor } from "./NewMemoEditor"
-import { type Filter, useMainScreenState } from "./useMainScreenState"
-
-export interface MainScreenProps {
-    filter: Filter
-    onChangeFilter?: (filter: Filter) => void
+export interface MainScreenProps<S extends keyof Screens> {
+    activeScreen: S
 }
 
-export function MainScreen(props: MainScreenProps) {
-    let {
-        memos,
-        isLoading,
-        filter,
-        tags,
-        setFilter,
-        onEOLReached,
-        memoActions,
-        createMemo,
-        isCreatingMemo,
-    } = useMainScreenState(props)
-    let [doubleClickToEdit] = useSetting("controls.doubleClickToEdit")
-
-    let showEditor = Object.keys(props.filter).length === 0
+export function MainScreen<S extends keyof Screens>(props: MainScreenProps<S>) {
+    let subscreen: React.ReactNode | null = null
+    switch (props.activeScreen) {
+        case "memo.view":
+            subscreen = <SingleMemoScreen className="is-subscreen" />
+            break
+        case "memo.edit":
+            subscreen = <EditMemoScreen className="is-subscreen" />
+            break
+        case "memo.new":
+            subscreen = <EditMemoScreen className="is-subscreen" />
+            break
+    }
 
     return (
-        <div className="main-screen memos-archive-page">
-            <MemoListFilter
-                tags={tags}
-                filter={filter}
-                onChangeFilter={setFilter}
-            />
-
-            <div className="main-screen-content">
-                <MemoListHeader
-                    className="main-screen-content-container"
-                    filter={filter}
-                />
-
-                {showEditor && (
-                    <NewMemoEditor
-                        className="main-screen-content-container"
-                        createMemo={createMemo}
-                        tags={tags}
-                        inProgress={isCreatingMemo}
-                    />
-                )}
-
-                <MemoList
-                    className="main-screen-content-container"
-                    memos={memos}
-                    doubleClickToEdit={doubleClickToEdit}
-                    actions={memoActions}
-                />
-
-                {!isLoading && <EndOfListMarker onReached={onEOLReached} />}
-
-                {isLoading && (
-                    <div className="flex justify-center items-center min-h-[200px]">
-                        <Loader />
+        <div
+            className={clsx("main-screen", {
+                "has-subscreen": subscreen !== null,
+            })}
+        >
+            {subscreen && (
+                <ErrorBoundary resetOn={[props.activeScreen]}>
+                    <div className="subscreen">
+                        <Suspense>{subscreen}</Suspense>
                     </div>
-                )}
-            </div>
+                </ErrorBoundary>
+            )}
+
+            <MemoListScreen className="is-subscreen" />
         </div>
     )
 }

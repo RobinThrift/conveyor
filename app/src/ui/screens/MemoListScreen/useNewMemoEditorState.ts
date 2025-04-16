@@ -1,16 +1,20 @@
 import { useCallback, useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 
 import { newID } from "@/domain/ID"
 import { useAttachmentTransferer } from "@/ui/attachments"
+import { actions, selectors } from "@/ui/state"
 import type { CreateMemoRequest } from "@/ui/state/actions"
 
 export type { CreateMemoRequest } from "@/ui/state/actions"
 
-export function useNewMemoEditorState(props: {
-    createMemo: (memo: CreateMemoRequest) => void
-    inProgress: boolean
-}) {
+export function useNewMemoEditorState() {
+    let dispatch = useDispatch()
+
     let transferAttachment = useAttachmentTransferer()
+
+    let isCreatingMemo = useSelector(selectors.memos.isCreatingMemo)
+    let tags = useSelector(selectors.tags.tags)
 
     let createMemo = useCallback(
         (memo: CreateMemoRequest) => {
@@ -19,9 +23,9 @@ export function useNewMemoEditorState(props: {
                 return
             }
 
-            props.createMemo(memo)
+            dispatch(actions.memos.create({ memo }))
         },
-        [props.createMemo],
+        [dispatch],
     )
 
     let [newMemo, setNewMemo] = useState({
@@ -35,7 +39,7 @@ export function useNewMemoEditorState(props: {
     })
 
     useEffect(() => {
-        if (!props.inProgress) {
+        if (!isCreatingMemo) {
             setNewMemo({
                 id: newID(),
                 name: "",
@@ -46,9 +50,10 @@ export function useNewMemoEditorState(props: {
                 updatedAt: new Date(),
             })
         }
-    }, [props.inProgress])
+    }, [isCreatingMemo])
 
     return {
+        tags,
         createMemo,
         newMemo,
         transferAttachment,

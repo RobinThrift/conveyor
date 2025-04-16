@@ -2,10 +2,9 @@ import { createSelector } from "@reduxjs/toolkit"
 import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
-import type { MemoID } from "@/domain/Memo"
 import { useAttachmentTransferer } from "@/ui/attachments"
+import { useNavigation } from "@/ui/navigation"
 import { type UpdateMemoRequest, actions, selectors } from "@/ui/state"
-import { useGoBack } from "@/ui/state/global/router"
 
 export type { UpdateMemoRequest } from "@/ui/state"
 
@@ -14,7 +13,7 @@ const settingsSelector = createSelector(
     (vimModeEnabled) => ({ vimModeEnabled }),
 )
 
-export function useEditMemoScreenState(props: { memoID: MemoID }) {
+export function useEditMemoScreenState() {
     let transferAttachment = useAttachmentTransferer()
 
     let tags = useSelector(selectors.tags.tags)
@@ -29,15 +28,11 @@ export function useEditMemoScreenState(props: { memoID: MemoID }) {
 
     let settings = useSelector(settingsSelector)
 
-    let goBack = useGoBack()
+    let nav = useNavigation()
 
     let [startedRequest, setStartedRequest] = useState(false)
 
     let dispatch = useDispatch()
-
-    useEffect(() => {
-        dispatch(actions.memos.setCurrentSingleMemoID({ id: props.memoID }))
-    }, [dispatch, props.memoID])
 
     useEffect(() => {
         dispatch(actions.tags.loadTags())
@@ -52,8 +47,8 @@ export function useEditMemoScreenState(props: { memoID: MemoID }) {
     )
 
     let cancelEdit = useCallback(() => {
-        goBack({ viewTransition: true, fallback: "/" })
-    }, [goBack])
+        nav.pop()
+    }, [nav.pop])
 
     useEffect(() => {
         if (!startedRequest || isLoading) {
@@ -65,8 +60,10 @@ export function useEditMemoScreenState(props: { memoID: MemoID }) {
             return
         }
 
-        goBack({ viewTransition: true, fallback: "/" })
-    }, [isLoading, error, startedRequest, goBack])
+        nav.pop()
+    }, [isLoading, error, startedRequest, nav.pop])
+
+    let currentPageParams = useSelector(selectors.navigation.currentParams)
 
     return {
         memo,
@@ -74,6 +71,10 @@ export function useEditMemoScreenState(props: { memoID: MemoID }) {
         isLoading,
         error,
         settings,
+        placeCursorAt:
+            "editPosition" in currentPageParams
+                ? currentPageParams.editPosition
+                : undefined,
         updateMemo,
         cancelEdit,
         transferAttachment,

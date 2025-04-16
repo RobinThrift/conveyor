@@ -2,19 +2,19 @@ import React, { useCallback, Suspense } from "react"
 
 import type { AttachmentID } from "@/domain/Attachment"
 import type { MemoContentChanges } from "@/domain/Changelog"
-import type { Memo, MemoID } from "@/domain/Memo"
+import type { Memo } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
 import { Editor } from "@/ui/components/Editor"
 import { Loader } from "@/ui/components/Loader"
 
+import clsx from "clsx"
 import {
     type UpdateMemoRequest,
     useEditMemoScreenState,
 } from "./useEditMemoScreenState"
 
 export interface EditMemoScreenProps {
-    memoID: MemoID
-    position?: { x: number; y: number; snippet?: string }
+    className?: string
 }
 
 export function EditMemoScreen(props: EditMemoScreenProps) {
@@ -26,22 +26,18 @@ export function EditMemoScreen(props: EditMemoScreenProps) {
         cancelEdit,
         transferAttachment,
         settings,
-    } = useEditMemoScreenState(props)
+        placeCursorAt,
+    } = useEditMemoScreenState()
 
     return (
-        <div
-            className="edit-memo-screen"
-            style={{
-                viewTransitionName: `memo-${props.memoID}`,
-            }}
-        >
+        <div className={clsx("edit-memo-screen", props.className)}>
             <Suspense>
                 {memo && (
                     <MemoEditor
                         memo={memo}
                         tags={tags}
                         settings={settings}
-                        placeCursorAt={props.position}
+                        placeCursorAt={placeCursorAt}
                         updateMemo={updateMemo}
                         onCancel={cancelEdit}
                         transferAttachment={transferAttachment}

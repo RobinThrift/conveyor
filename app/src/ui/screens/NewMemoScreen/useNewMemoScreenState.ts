@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux"
 
 import { newID } from "@/domain/ID"
 import { useAttachmentTransferer } from "@/ui/attachments"
+import { useNavigation } from "@/ui/navigation"
 import { type CreateMemoRequest, actions, selectors } from "@/ui/state"
-import { useGoBack } from "@/ui/state/global/router"
 
 export type { CreateMemoRequest } from "@/ui/state/actions"
 
@@ -15,9 +15,8 @@ export function useNewMemoScreenState() {
     let error = useSelector(selectors.memos.createMemoError)
     let isLoading = useSelector(selectors.memos.isCreatingMemo)
 
-    let goBack = useGoBack()
-
     let dispatch = useDispatch()
+    let nav = useNavigation()
 
     let [startedRequest, setStartedRequest] = useState(false)
 
@@ -34,8 +33,8 @@ export function useNewMemoScreenState() {
     )
 
     let cancelNew = useCallback(() => {
-        goBack({ viewTransition: true, fallback: "/" })
-    }, [goBack])
+        nav.pop()
+    }, [nav.pop])
 
     let newMemo = useMemo(
         () => ({
@@ -60,8 +59,8 @@ export function useNewMemoScreenState() {
             return
         }
 
-        goBack({ viewTransition: true, fallback: "/" })
-    }, [isLoading, error, startedRequest, goBack])
+        nav.pop()
+    }, [isLoading, error, startedRequest, nav.pop])
 
     return {
         tags,

@@ -124,7 +124,7 @@ suite.concurrent("control/SyncController", async () => {
                 source: "local",
                 revision: 1,
                 targetType: "settings",
-                targetID: "theme.mode",
+                targetID: "ui.colourScheme.mode",
                 value: { value: "light" },
                 isSynced: false,
                 isApplied: true,
@@ -160,7 +160,7 @@ suite.concurrent("control/SyncController", async () => {
                 source: "remote",
                 revision: 1,
                 targetType: "settings",
-                targetID: "theme.mode",
+                targetID: "ui.colourScheme.mode",
                 value: { value: "dark" },
                 isSynced: false,
                 isApplied: true,
@@ -257,7 +257,7 @@ suite.concurrent("control/SyncController", async () => {
         let settings = await assertOkResult(settingsCtrl.loadSettings(ctx))
 
         assert.equal(settings.controls.vim, false)
-        assert.equal(settings.theme.mode, "dark")
+        assert.equal(settings.ui.colourScheme.mode, "dark")
     })
 })
 

@@ -26,7 +26,6 @@ export const Basic: Story = {
         doubleClickToEdit: true,
         actions: {
             edit: action("edit"),
-            link: "/memo/10-1",
             archive: action("archive"),
             delete: action("delete"),
         },

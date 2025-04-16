@@ -1,9 +1,7 @@
 import React, { useCallback } from "react"
 
 import { Checkbox } from "@/ui/components/Input/Checkbox"
-import { Select } from "@/ui/components/Select"
 import { SelectColourScheme, SelectMode } from "@/ui/components/ThemeSwitcher"
-import { useBaseURL } from "@/ui/hooks/useBaseURL"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
 
@@ -12,11 +10,7 @@ export function InterfaceSettingsTab({
 }: { ref?: React.Ref<HTMLDivElement> }) {
     let t = useT("screens/Settings/InterfaceSettings")
 
-    let baseURL = useBaseURL()
-
     let [controls, setControls] = useSetting("controls")
-
-    let [icon, setIcon] = useSetting("theme.icon")
 
     let onChangeControlVim = useCallback(
         (v: boolean | "indeterminate") => {
@@ -55,32 +49,6 @@ export function InterfaceSettingsTab({
                         {t.LabelModeOverride}
                     </label>
                     <SelectMode className="col-span-5" />
-                </div>
-
-                <div className="md:grid grid-cols-6 space-y-1">
-                    <label
-                        htmlFor="mode"
-                        className="flex items-center mt-4 sm:mt-0 font-semibold text-sm"
-                    >
-                        {t.LabelIcon}
-                    </label>
-                    <Select
-                        className="col-span-5"
-                        name="icon"
-                        ariaLabel={t.LabelIcon}
-                        onChange={setIcon}
-                        value={icon}
-                    >
-                        <Select.Option value="default">
-                            <div className="icon-select-option">
-                                <img
-                                    src={`${baseURL}/assets/icons/default/pwa-192x192.png`}
-                                    alt="default"
-                                />
-                                <span>(Default)</span>
-                            </div>
-                        </Select.Option>
-                    </Select>
                 </div>
             </div>
 

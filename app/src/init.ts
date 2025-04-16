@@ -11,14 +11,20 @@ import { ChangelogController } from "@/control/ChangelogController"
 import { CryptoController } from "@/control/CryptoController"
 import { JobController } from "@/control/JobController"
 import { MemoController } from "@/control/MemoController"
+import {
+    NavigationController,
+    type Params,
+    type Restore,
+    type Screens,
+} from "@/control/NavigationController"
 import { SettingsController } from "@/control/SettingsController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
 import { UnlockController } from "@/control/UnlockController"
 import type { SyncInfo } from "@/domain/SyncInfo"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
+import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
-import { history } from "@/external/browser/history"
 import { EventJobTrigger, ScheduleJobTrigger } from "@/jobs"
 import { SyncJob } from "@/jobs/SyncJob"
 import { EncryptedKVStore, SingleItemKVStore } from "@/lib/KVStore"
@@ -69,14 +75,21 @@ export async function init() {
 
     initEventBus(rootStore)
 
+    initNavgation({ rootStore, navCtrl: controller.navCtrl })
+
     await tryAutoUnlock(BaseContext, {
         rootStore,
         unlockCtrl: controller.unlockCtrl,
+        navCtrl: controller.navCtrl,
     })
 
     initJobs({ jobCtrl: controller.jobCtrl, rootStore: rootStore })
 
-    return { rootStore, attachmentCtrl: controller.attachmentCtrl }
+    return {
+        rootStore,
+        attachmentCtrl: controller.attachmentCtrl,
+        navCtrl: controller.navCtrl,
+    }
 }
 
 async function initController(platform: PlatformDependencies) {
@@ -185,6 +198,14 @@ async function initController(platform: PlatformDependencies) {
         }),
     })
 
+    let navCtrl = new NavigationController({
+        backend: new HistoryNavigationBackend<Screens, Params, Restore>({
+            fromURLParams: NavigationController.fromURLParams,
+            toURLParams: NavigationController.toURLParams,
+            screenToURLMapping: NavigationController.screenToURLMapping,
+        }),
+    })
+
     let jobCtrl = new JobController()
 
     return {
@@ -194,6 +215,7 @@ async function initController(platform: PlatformDependencies) {
         cryptoCtrl,
         jobCtrl,
         memoCtrl,
+        navCtrl,
         settingsCtrl,
         setupCtrl,
         syncCtrl,
@@ -227,15 +249,9 @@ function initRootStore(controller: {
     setupCtrl: SetupController
     unlockCtrl: UnlockController
     apiTokenCtrl: APITokenController
+    navCtrl: NavigationController
 }) {
-    let rootStore = configureRootStore({
-        baseURL:
-            globalThis.document
-                ?.querySelector("meta[name=base-url]")
-                ?.getAttribute("content")
-                ?.replace(/\/$/, "") ?? "",
-        router: { href: history.current },
-    })
+    let rootStore = configureRootStore()
 
     configureEffects(controller)
 
@@ -253,9 +269,11 @@ async function tryAutoUnlock(
     {
         rootStore,
         unlockCtrl,
+        navCtrl,
     }: {
         rootStore: ReturnType<typeof configureRootStore>
         unlockCtrl: UnlockController
+        navCtrl: NavigationController
     },
 ) {
     let tryUnlock = Promise.withResolvers<void>()
@@ -283,15 +301,79 @@ async function tryAutoUnlock(
 
         if (state.setup.isSetup) {
             unsub()
-            rootStore.dispatch(actions.router.goto({ path: "/unlock" }))
+            navCtrl.push({
+                screen: { name: "unlock", params: {} },
+                restore: { scrollOffsetTop: 0 },
+            })
             tryUnlock.resolve()
             return
         }
 
         if (state.setup.step === "initial-setup") {
             unsub()
-            rootStore.dispatch(actions.router.goto({ path: "/setup" }))
+            navCtrl.push({
+                screen: { name: "setup", params: {} },
+                restore: { scrollOffsetTop: 0 },
+            })
             tryUnlock.resolve()
         }
+    })
+}
+
+function initNavgation({
+    rootStore,
+    navCtrl,
+}: {
+    rootStore: ReturnType<typeof configureRootStore>
+    navCtrl: NavigationController
+}) {
+    let init = navCtrl.init()
+
+    rootStore.dispatch(
+        actions.navigation.setPage({
+            name: init.screen.name,
+            params: init.screen.params,
+            restore: init.restore,
+        }),
+    )
+
+    navCtrl.addEventListener("pop", (current) => {
+        rootStore.dispatch(
+            actions.navigation.setPage({
+                name: current.screen.name,
+                params: current.screen.params,
+                restore: current.restore,
+            }),
+        )
+
+        document.documentElement.style.setProperty(
+            "min-height",
+            current.restore.scrollOffsetTop
+                ? `${Math.ceil(current.restore.scrollOffsetTop)}px`
+                : "initial",
+        )
+        requestAnimationFrame(() => {
+            window.scrollTo(0, Math.ceil(current.restore.scrollOffsetTop ?? 0))
+        })
+    })
+
+    navCtrl.addEventListener("push", (current) => {
+        rootStore.dispatch(
+            actions.navigation.setPage({
+                name: current.screen.name,
+                params: current.screen.params,
+                restore: current.restore,
+            }),
+        )
+
+        document.documentElement.style.setProperty(
+            "min-height",
+            current.restore.scrollOffsetTop
+                ? `${Math.ceil(current.restore.scrollOffsetTop)}px`
+                : "initial",
+        )
+        requestAnimationFrame(() => {
+            window.scrollTo(0, Math.ceil(current.restore.scrollOffsetTop ?? 0))
+        })
     })
 }

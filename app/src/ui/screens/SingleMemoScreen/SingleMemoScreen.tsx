@@ -6,25 +6,24 @@ import { Loader } from "@/ui/components/Loader"
 import { Memo } from "@/ui/components/Memo"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
-import { useGoBack } from "@/ui/state/global/router"
 
+import { useNavigation } from "@/ui/navigation"
+import clsx from "clsx"
 import { useSingleMemoScreenState } from "./useSingleMemoScreenState"
 
 export interface SingleMemoScreenProps {
-    memoID: string
+    className?: string
 }
 
 export function SingleMemoScreen(props: SingleMemoScreenProps) {
     let t = useT("screens/SingleMemoScreen")
     let [doubleClickToEdit] = useSetting("controls.doubleClickToEdit")
-    let goBack = useGoBack()
+    let nav = useNavigation()
 
-    let { memo, isLoading, memoActions } = useSingleMemoScreenState({
-        memoID: props.memoID,
-    })
+    let { memo, isLoading, memoActions } = useSingleMemoScreenState()
 
     return (
-        <div className="single-memo-screen">
+        <div className={clsx("single-memo-screen", props.className)}>
             {isLoading && (
                 <div className="memo animate-in slide-in-from-bottom fade-in">
                     <div className="flex justify-center items-center min-h-[200px]">
@@ -38,7 +37,7 @@ export function SingleMemoScreen(props: SingleMemoScreenProps) {
                 ariaLabel={t.Back}
                 iconRight={<ArrowLeftIcon />}
                 className="back-btn"
-                onClick={() => goBack({ viewTransition: true, fallback: "/" })}
+                onPress={() => nav.pop()}
             />
 
             {memo && (

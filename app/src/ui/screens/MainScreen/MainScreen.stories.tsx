@@ -14,10 +14,6 @@ const meta: Meta<typeof MainScreen> = {
         layout: "fullscreen",
     },
 
-    args: {
-        filter: {},
-    },
-
     decorators: [
         decoratorWithMockData,
         (Story) => (

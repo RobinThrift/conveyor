@@ -7,7 +7,8 @@ import * as list from "./list"
 import * as single from "./single"
 import * as update from "./update"
 
-import { actions } from "."
+import { isEqual } from "@/lib/isEqual"
+import { actions as navigation } from "../navigation"
 import { selectors } from "./selectors"
 
 const pageSize = 25
@@ -154,7 +155,20 @@ export const registerEffects = (
 
             cancelActiveListeners()
 
-            dispatch(actions.startLoadingSingleMemo())
+            let foundInList = list.slice.selectors.getMemo(
+                state.memos,
+                payload.id,
+            )
+            if (foundInList) {
+                dispatch(
+                    single.slice.actions.setCurrentSingleMemo({
+                        memo: foundInList,
+                    }),
+                )
+                return
+            }
+
+            dispatch(single.slice.actions.startLoadingSingleMemo())
 
             let ctx = BaseContext.withSignal(signal)
 
@@ -263,6 +277,43 @@ export const registerEffects = (
 
             dispatch(update.slice.actions.setDone())
             dispatch(list.slice.actions.setMemo({ memo: memo.value }))
+        },
+    })
+
+    startListening({
+        actionCreator: navigation.setPage,
+        effect: async (
+            { payload },
+            { cancelActiveListeners, dispatch, getState },
+        ) => {
+            cancelActiveListeners()
+            let state = getState()
+
+            if ("filter" in payload.params) {
+                let filter = list.slice.selectors.filter(state.memos)
+                let paramFilter = payload.params?.filter ?? {}
+                if (!isEqual(filter, paramFilter)) {
+                    dispatch(
+                        list.slice.actions.setFilter({
+                            filter,
+                            source: "navigation",
+                        }),
+                    )
+                }
+            }
+
+            if ("memoID" in payload.params) {
+                if (
+                    single.slice.selectors.currentMemoID(state.memos) !==
+                    payload.params.memoID
+                ) {
+                    dispatch(
+                        single.slice.actions.setCurrentSingleMemoID({
+                            id: payload.params.memoID as string,
+                        }),
+                    )
+                }
+            }
         },
     })
 }

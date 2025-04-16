@@ -1,5 +1,5 @@
 import * as Accordion from "@radix-ui/react-accordion"
-import React from "react"
+import React, { useCallback } from "react"
 
 import {
     CloudCheckIcon,
@@ -9,8 +9,10 @@ import {
     PaletteIcon,
 } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
+import { useCurrentPage, useNavigation } from "@/ui/navigation"
 
 import { selectors } from "@/ui/state"
+import clsx from "clsx"
 import { useSelector } from "react-redux"
 import { APISettingsTab } from "./APISettingsTab"
 import { InterfaceSettingsTab } from "./InterfaceSettingsTab"
@@ -18,14 +20,7 @@ import { LocaleSettingsTab } from "./LocaleSettingsTab"
 import { SyncSettingsTab } from "./SyncSettingsTab"
 
 export interface SettingsScreenProps {
-    tab: string
-    onChangeTab: (tab: string) => void
-    validationErrors?: {
-        display_name?: string
-        current_password?: string
-        new_password?: string
-        repeat_new_password?: string
-    }
+    className?: string
 }
 
 export function SettingsScreen(props: SettingsScreenProps) {
@@ -37,15 +32,33 @@ export function SettingsScreen(props: SettingsScreenProps) {
 
     let isSyncEnabled = useSelector(selectors.sync.isEnabled)
 
+    let nav = useNavigation()
+    let currentPage = useCurrentPage()
+    let tab = "tab" in currentPage.params ? currentPage.params.tab : "interface"
+    let onChangeTab = useCallback(
+        (tab: string) => {
+            nav.push(
+                "settings",
+                { tab },
+                {
+                    scrollOffsetTop: Math.ceil(
+                        window.visualViewport?.pageTop ?? window.scrollY,
+                    ),
+                },
+            )
+        },
+        [nav.push],
+    )
+
     return (
-        <div className="settings-screen">
+        <div className={clsx("settings-screen", props.className)}>
             <h1>{t.Title}</h1>
 
             <Accordion.Root
                 className="flex flex-col gap-2 justify-center"
                 type="single"
-                defaultValue={props.tab}
-                onValueChange={props.onChangeTab}
+                value={tab}
+                onValueChange={onChangeTab}
             >
                 <Accordion.Item
                     value="interface"

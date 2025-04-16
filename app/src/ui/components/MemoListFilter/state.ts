@@ -233,7 +233,7 @@ function useTagTreeState({
                 manuallyExpandedSetter.set(expanded as Set<string>)
             })
         },
-        [manuallyExpandedSetter.add],
+        [manuallyExpandedSetter.set],
     )
 
     return {

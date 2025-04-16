@@ -1,11 +1,10 @@
 import type { ListMemosQuery } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
-import { CaretDown, Hash } from "@phosphor-icons/react"
 import clsx from "clsx"
 import React from "react"
 
 import { Button } from "@/ui/components/Button"
-import { GearIcon } from "@/ui/components/Icons"
+import { CaretDownIcon, HashIcon, SlidersIcon } from "@/ui/components/Icons"
 import { LinkButton } from "@/ui/components/Link"
 import { OffCanvas } from "@/ui/components/OffCanvas"
 import { useT } from "@/ui/i18n"
@@ -41,7 +40,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
             <div className="flex gap-1 px-2 py-2">
                 <OffCanvas aria-lable={t.OffScreenDescription}>
                     <Button
-                        iconRight=<Hash />
+                        iconRight=<HashIcon />
                         plain
                         className="filter-offcanvas-trigger"
                     >
@@ -58,8 +57,8 @@ export function MemoListFilter(props: MemoListFilterProps) {
 
                         <nav>
                             <LinkButton
-                                href="/settings/interface"
-                                iconLeft={<GearIcon />}
+                                screen="settings"
+                                iconLeft={<SlidersIcon />}
                                 plain
                                 size="sm"
                             >
@@ -88,7 +87,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
 
                 <Button
                     iconRight={
-                        <CaretDown
+                        <CaretDownIcon
                             className={clsx({
                                 "rotate-180": datepicker.expanded,
                             })}

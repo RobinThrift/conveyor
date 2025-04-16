@@ -1,10 +1,10 @@
+import type { NavigationController } from "@/control/NavigationController"
 import type { SetupController } from "@/control/SetupController"
 import { BUILD_INFO } from "@/domain/BuildInfo"
 import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
 import * as auth from "../auth"
-import { slice as router } from "../global/router"
 import * as settings from "../settings"
 import * as sync from "../sync"
 import { slice } from "./slice"
@@ -13,8 +13,10 @@ export const registerEffects = (
     startListening: StartListening,
     {
         setupCtrl,
+        navCtrl,
     }: {
         setupCtrl: SetupController
+        navCtrl: NavigationController
     },
 ) => {
     startListening({
@@ -187,7 +189,13 @@ export const registerEffects = (
             dispatch(settings.actions.loadStart())
             dispatch(sync.actions.loadSyncInfo())
 
-            dispatch(router.actions.goto({ path: "/" }))
+            navCtrl.push({
+                screen: {
+                    name: "root",
+                    params: {},
+                },
+                restore: {},
+            })
         },
     })
 }

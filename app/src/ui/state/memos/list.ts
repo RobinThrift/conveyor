@@ -43,7 +43,12 @@ export const slice = createSlice({
             state.isLoading = true
         },
 
-        setFilter: (state, { payload }: PayloadAction<Filter>) => {
+        setFilter: (
+            state,
+            {
+                payload,
+            }: PayloadAction<{ filter: Filter; source: "user" | "navigation" }>,
+        ) => {
             if (isEqual(state.filter, payload)) {
                 return state
             }
@@ -53,7 +58,7 @@ export const slice = createSlice({
                 isLoading: true,
                 error: undefined,
                 memos: [],
-                filter: payload,
+                filter: payload.filter,
                 nextPage: undefined,
                 hasNextPage: true,
             } satisfies MemosListState
@@ -69,25 +74,17 @@ export const slice = createSlice({
         },
 
         prependMemo: (state, { payload }: PayloadAction<{ memo: Memo }>) => {
-            return {
-                ...state,
-                isLoading: false,
-                error: undefined,
-                memos: [payload.memo, ...state.memos],
-            } satisfies MemosListState
+            state.isLoading = false
+            state.error = undefined
+            state.memos = [payload.memo, ...state.memos]
         },
 
         appendMemos: (state, { payload }: PayloadAction<MemoList>) => {
-            let hasNextPage = typeof payload.next !== "undefined"
-
-            return {
-                ...state,
-                isLoading: false,
-                error: undefined,
-                memos: [...state.memos, ...payload.items],
-                nextPage: payload.next,
-                hasNextPage,
-            } satisfies MemosListState
+            state.hasNextPage = typeof payload.next !== "undefined"
+            state.isLoading = false
+            state.error = undefined
+            state.memos = [...state.memos, ...payload.items]
+            state.nextPage = payload.next
         },
 
         removeMemo: (state, { payload }: PayloadAction<{ id: MemoID }>) => {
@@ -99,14 +96,12 @@ export const slice = createSlice({
             state.memos.splice(index, 1)
         },
 
-        setError: (state, { payload }: PayloadAction<{ error: Error }>) =>
-            ({
-                ...state,
-                isLoading: false,
-                error: payload.error,
-                nextPage: undefined,
-                hasNextPage: false,
-            }) satisfies MemosListState,
+        setError: (state, { payload }: PayloadAction<{ error: Error }>) => {
+            state.isLoading = false
+            state.error = payload.error
+            state.nextPage = undefined
+            state.hasNextPage = false
+        },
     },
 
     selectors: {
@@ -116,5 +111,6 @@ export const slice = createSlice({
         error: (state) => state.error,
         nextPage: (state) => state.nextPage,
         hasNextPage: (state) => state.hasNextPage,
+        getMemo: (state, id: MemoID) => state.memos.find((m) => m.id === id),
     },
 })

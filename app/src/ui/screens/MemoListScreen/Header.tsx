@@ -1,12 +1,12 @@
+import clsx from "clsx"
 import React from "react"
 
 import type { ListMemosQuery as Filter } from "@/domain/Memo"
 import { DateTime } from "@/ui/components/DateTime"
 import { Greeting } from "@/ui/components/Greeting"
 import { useT } from "@/ui/i18n"
-import clsx from "clsx"
 
-export function MemoListHeader({
+export function Header({
     className,
     filter,
 }: { className?: string; filter: Filter }) {

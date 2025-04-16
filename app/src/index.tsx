@@ -15,11 +15,12 @@ import "@/ui/styles/index.css"
 
 import { Env } from "./env"
 import { init } from "./init"
+import { NavigationProvider } from "./ui/navigation"
 
 main()
 
 async function main() {
-    let { rootStore, attachmentCtrl } = await init()
+    let { rootStore, attachmentCtrl, navCtrl } = await init()
 
     document.body.classList.add(`platform-${Env.platform}`)
 
@@ -29,13 +30,15 @@ async function main() {
     ).render(
         <React.StrictMode>
             <Provider store={rootStore}>
-                <AttachmentProvider
-                    value={attachmentContextFromController(attachmentCtrl)}
-                >
-                    <SettingsLoader>
-                        <App {...serverData} />
-                    </SettingsLoader>
-                </AttachmentProvider>
+                <NavigationProvider value={navCtrl}>
+                    <AttachmentProvider
+                        value={attachmentContextFromController(attachmentCtrl)}
+                    >
+                        <SettingsLoader>
+                            <App {...serverData} />
+                        </SettingsLoader>
+                    </AttachmentProvider>
+                </NavigationProvider>
             </Provider>
         </React.StrictMode>,
     )

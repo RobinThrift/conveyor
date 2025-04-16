@@ -1,9 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import React, { useEffect } from "react"
+import { useDispatch } from "react-redux"
 
 import { decoratorWithMockData } from "@/lib/testhelper/rootStore"
+import { actions } from "@/ui/state"
 import "@/ui/styles/index.css"
 
-import { SingleMemoScreen } from "./SingleMemoScreen"
+import {
+    SingleMemoScreen,
+    type SingleMemoScreenProps,
+} from "./SingleMemoScreen"
 
 const meta: Meta<typeof SingleMemoScreen> = {
     title: "Screens/Memos/Single",
@@ -13,10 +19,22 @@ const meta: Meta<typeof SingleMemoScreen> = {
 }
 
 export default meta
-type Story = StoryObj<typeof SingleMemoScreen>
+type Story = StoryObj<SingleMemoScreenProps & { memoID: string }>
 
 export const Single: Story = {
     args: {
         memoID: "10-1",
     },
+    decorators: [
+        (Story, { args }) => {
+            let dispatch = useDispatch()
+            useEffect(() => {
+                dispatch(
+                    actions.memos.setCurrentSingleMemoID({ id: args.memoID }),
+                )
+            }, [dispatch, args.memoID])
+
+            return <Story />
+        },
+    ],
 }

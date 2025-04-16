@@ -4,7 +4,6 @@ import { ErrorScreen } from "@/ui/screens/ErrorScreen"
 
 import { AppShell } from "./AppShell"
 import type { ServerData } from "./ServerData"
-import { Router } from "./router"
 
 export type AppProps = Pick<ServerData, "error">
 
@@ -17,9 +16,5 @@ export function App(props: AppProps) {
         )
     }
 
-    return (
-        <Router>
-            <AppShell />
-        </Router>
-    )
+    return <AppShell />
 }

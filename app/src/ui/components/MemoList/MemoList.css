@@ -6,17 +6,6 @@
     }
 }
 
-.memo-list-header {
-    @apply text-xl tablet:text-2xl lg:text-3xl text-subtle-extra-dark;
-
-    pointer-events: none;
-
-    em {
-        @apply block text-primary font-serif -mt-1 not-italic text-balance font-semibold;
-        @apply text-5xl lg:text-6xl;
-    }
-}
-
 .memo-list-day {
     @apply sticky py-1 px-2 w-fit rounded-lg top-2;
     @apply text-subtle-dark;

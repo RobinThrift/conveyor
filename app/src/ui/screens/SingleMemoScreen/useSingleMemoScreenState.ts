@@ -1,40 +1,37 @@
-import { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import type { MemoID } from "@/domain/Memo"
+import { useNavigation } from "@/ui/navigation"
 import { actions, selectors } from "@/ui/state"
-import { useGoto } from "@/ui/state/global/router"
 
-export function useSingleMemoScreenState(props: { memoID: MemoID }) {
+export function useSingleMemoScreenState() {
     let isLoading = useSelector(selectors.memos.isLoadingSingleMemo)
     let error = useSelector(selectors.memos.singleMemoError)
     let memo = useSelector(selectors.memos.currentMemo)
 
     let dispatch = useDispatch()
 
-    useEffect(() => {
-        dispatch(actions.memos.setCurrentSingleMemoID({ id: props.memoID }))
-    }, [dispatch, props.memoID])
-
-    let goto = useGoto()
+    let nav = useNavigation()
     let memoActions = useMemo(
         () => ({
             edit: (
                 memoID: MemoID,
                 position?: { x: number; y: number; snippet?: string },
             ) => {
-                let url = `/memos/${memoID}/edit`
-                let params: URLSearchParams | undefined
-                if (position) {
-                    params = new URLSearchParams({
-                        x: position.x.toString(),
-                        y: position.y.toString(),
-                    })
-                    if (position.snippet) {
-                        params.set("snippet", position.snippet)
-                    }
-                }
-                goto(url, params)
+                nav.push(
+                    "memo.edit",
+                    {
+                        memoID,
+                        isEditing: true,
+                        editPosition: position,
+                    },
+                    {
+                        scrollOffsetTop: Math.ceil(
+                            window.visualViewport?.pageTop ?? window.scrollY,
+                        ),
+                    },
+                )
             },
             archive: (memoID: MemoID, isArchived: boolean) => {
                 dispatch(
@@ -51,7 +48,7 @@ export function useSingleMemoScreenState(props: { memoID: MemoID }) {
                 )
             },
         }),
-        [dispatch, goto],
+        [dispatch, nav.push],
     )
 
     return {

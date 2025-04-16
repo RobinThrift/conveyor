@@ -2,8 +2,8 @@ import { actions as apitokens } from "./apitokens"
 import { actions as attachments } from "./attachments"
 import { actions as auth } from "./auth"
 import { slice as notifications } from "./global/notifications"
-import { slice as router } from "./global/router"
 import { actions as memos } from "./memos"
+import { actions as navigation } from "./navigation"
 import { actions as settings } from "./settings"
 import { actions as setup } from "./setup"
 import { actions as sync } from "./sync"
@@ -15,16 +15,16 @@ export type { UpdateMemoRequest, Filter, CreateMemoRequest } from "./memos"
 export type { CreateAPITokenRequest } from "./apitokens"
 
 export const actions = {
+    apitokens,
     attachments,
     auth,
+    navigation,
     memos,
     settings,
     setup,
     sync,
     tags,
     unlock,
-    apitokens,
-    router: router.actions,
 
     global: {
         notifications: {

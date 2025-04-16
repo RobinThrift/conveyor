@@ -1,5 +1,5 @@
 .memo-list-filter {
-    @apply tablet:pe-4 md:pe-4 overscroll-none flex flex-col;
+    @apply overscroll-none flex flex-col;
 
     .search {
         @apply flex-1;

@@ -1,0 +1,75 @@
+.memo-list-screen {
+    @apply flex flex-row gap-4 justify-center w-full;
+
+    .memo-list {
+        view-transition-name: main-screen-memo-list;
+
+        .memo:has(h1 a:active) {
+            view-transition-name: main-screen-active-memo;
+        }
+    }
+
+    .memo-list-container {
+        @apply flex-1;
+    }
+}
+
+.memo-list-header {
+    @apply text-xl tablet:text-2xl lg:text-3xl text-subtle-extra-dark tablet:py-2;
+
+    pointer-events: none;
+
+    em {
+        @apply block text-primary font-serif -mt-1 not-italic text-balance font-semibold;
+        @apply text-5xl lg:text-6xl;
+    }
+}
+
+.new-memo-editor {
+    @apply hidden tablet:block mb-6 relative py-0;
+
+    .editor {
+        min-height: 100px;
+    }
+
+    .text-editor-toolbar {
+        @apply p-0 top-1 -mt-8 h-8 w-full justify-end bg-transparent overflow-hidden;
+        order: 0;
+
+        .toolbar-btn-grp {
+            @apply bg-surface rounded-t-lg px-2 mr-2;
+            transition: transform 150ms;
+            transform: translate(0, 100%);
+        }
+    }
+
+    &:focus-within,
+    &:has(.editor.is-changed) {
+        .editor-buttons {
+            @apply opacity-100;
+        }
+
+        .toolbar-btn-grp {
+            transform: translate(0, 0);
+        }
+    }
+
+    .editor-buttons {
+        @apply opacity-0 p-0;
+        transition: opacity 150ms;
+        order: 2;
+    }
+
+    .text-editor {
+        order: 1;
+    }
+}
+
+.new-memo-editor-fab {
+    @apply fixed right-4 rounded-full border-0 size-14 z-20 shadow-lg p-0 tablet:hidden;
+    top: calc(100dvh - 4.5rem);
+
+    & > svg {
+        @apply size-6;
+    }
+}

@@ -4,10 +4,16 @@ import React from "react"
 import { AttachmentController } from "@/control/AttachmentController"
 import { ChangelogController } from "@/control/ChangelogController"
 import { MemoController } from "@/control/MemoController"
+import {
+    NavigationController,
+    type Params,
+    type Restore,
+    type Screens,
+} from "@/control/NavigationController"
 import { SettingsController } from "@/control/SettingsController"
 import type { SyncInfo } from "@/domain/SyncInfo"
+import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
-import { history } from "@/external/browser/history"
 import { BaseContext } from "@/lib/context"
 import { toPromise } from "@/lib/result"
 import { generateMockMemos } from "@/lib/testhelper/memos"
@@ -23,8 +29,12 @@ import {
 import { Alert } from "@/ui/components/Alert"
 import { usePromise } from "@/ui/hooks/usePromise"
 import { SettingsLoader } from "@/ui/settings"
-import { configureEffects, configureRootStore } from "@/ui/state"
-import { Provider } from "@/ui/state"
+import {
+    Provider,
+    actions,
+    configureEffects,
+    configureRootStore,
+} from "@/ui/state"
 
 import { AuthV1APIClient } from "@/api/authv1"
 import { APITokensV1APIClient } from "@/api/authv1/APITokensV1APIClient"
@@ -42,6 +52,7 @@ import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { SingleItemKVStore } from "@/lib/KVStore"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 
+import { NavigationProvider } from "@/ui/navigation"
 import { TestInMemKVStore } from "./TestInMemKVStore"
 import { MockFS } from "./mockfs"
 
@@ -64,9 +75,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             crypto,
         })
 
-        let rootStore = configureRootStore({
-            router: { href: history.current },
-        })
+        let rootStore = configureRootStore()
 
         let changelogCtrl = new ChangelogController({
             sourceName: "storybook",
@@ -156,25 +165,34 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             }),
         })
 
+        let navCtrl = new NavigationController({
+            backend: new HistoryNavigationBackend<Screens, Params, Restore>({
+                fromURLParams: NavigationController.fromURLParams,
+                toURLParams: NavigationController.toURLParams,
+                screenToURLMapping: NavigationController.screenToURLMapping,
+            }),
+        })
+
         if (props.generateMockData) {
             await insertMockData({ memoCtrl })
         }
 
         configureEffects({
-            memoCtrl,
-            attachmentCtrl,
-            settingsCtrl,
-            syncCtrl,
-            authCtrl,
-            setupCtrl,
-            unlockCtrl,
             apiTokenCtrl,
+            attachmentCtrl,
+            authCtrl,
+            memoCtrl,
+            settingsCtrl,
+            setupCtrl,
+            syncCtrl,
+            unlockCtrl,
+            navCtrl,
         })
 
         // @ts-expect-error: this is for debugging
         globalThis.__CONVEYOR_DB__ = db
 
-        return { rootStore, attachmentCtrl }
+        return { rootStore, attachmentCtrl, navCtrl }
     }, [])
 
     if (!setup.resolved) {
@@ -185,15 +203,19 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         return <Alert variant="danger">{setup.error.message}</Alert>
     }
 
-    let { rootStore, attachmentCtrl } = setup.result
+    let { rootStore, attachmentCtrl, navCtrl } = setup.result
+
+    initNavgation({ rootStore, navCtrl })
 
     return (
         <Provider store={rootStore}>
-            <AttachmentProvider
-                value={attachmentContextFromController(attachmentCtrl)}
-            >
-                <SettingsLoader>{props.children}</SettingsLoader>
-            </AttachmentProvider>
+            <NavigationProvider value={navCtrl}>
+                <AttachmentProvider
+                    value={attachmentContextFromController(attachmentCtrl)}
+                >
+                    <SettingsLoader>{props.children}</SettingsLoader>
+                </AttachmentProvider>
+            </NavigationProvider>
         </Provider>
     )
 }
@@ -219,4 +241,62 @@ async function insertMockData({
     for (let memo of memos) {
         await toPromise(memoCtrl.createMemo(BaseContext, memo))
     }
+}
+
+function initNavgation({
+    rootStore,
+    navCtrl,
+}: {
+    rootStore: ReturnType<typeof configureRootStore>
+    navCtrl: NavigationController
+}) {
+    let init = navCtrl.init()
+
+    rootStore.dispatch(
+        actions.navigation.setPage({
+            name: init.screen.name,
+            params: init.screen.params,
+            restore: init.restore,
+        }),
+    )
+
+    navCtrl.addEventListener("pop", (current) => {
+        rootStore.dispatch(
+            actions.navigation.setPage({
+                name: current.screen.name,
+                params: current.screen.params,
+                restore: current.restore,
+            }),
+        )
+
+        document.documentElement.style.setProperty(
+            "min-height",
+            current.restore.scrollOffsetTop
+                ? `${Math.ceil(current.restore.scrollOffsetTop)}px`
+                : "initial",
+        )
+        requestAnimationFrame(() => {
+            window.scrollTo(0, Math.ceil(current.restore.scrollOffsetTop ?? 0))
+        })
+    })
+
+    navCtrl.addEventListener("push", (current) => {
+        rootStore.dispatch(
+            actions.navigation.setPage({
+                name: current.screen.name,
+                params: current.screen.params,
+                restore: current.restore,
+            }),
+        )
+
+        document.documentElement.style.setProperty(
+            "min-height",
+            current.restore.scrollOffsetTop
+                ? `${Math.ceil(current.restore.scrollOffsetTop)}px`
+                : "initial",
+        )
+        requestAnimationFrame(() => {
+            window.scrollTo(0, Math.ceil(current.restore.scrollOffsetTop ?? 0))
+        })
+    })
 }

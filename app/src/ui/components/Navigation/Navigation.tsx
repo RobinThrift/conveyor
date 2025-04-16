@@ -2,11 +2,10 @@ import clsx from "clsx"
 import React from "react"
 
 import { Button } from "@/ui/components/Button"
-import { ArrowLeftIcon, GearIcon } from "@/ui/components/Icons"
+import { ArrowLeftIcon, SlidersIcon } from "@/ui/components/Icons"
 import { LinkButton } from "@/ui/components/Link"
-import { SelectColourScheme, SelectMode } from "@/ui/components/ThemeSwitcher"
 import { useT } from "@/ui/i18n"
-import { useGoBack } from "@/ui/state/global/router"
+import { useNavigation } from "@/ui/navigation"
 
 export interface NavigationProps {
     className?: string
@@ -22,7 +21,7 @@ export interface NavigationItem {
 
 export function Navigation(props: NavigationProps) {
     let t = useT("components/Navigation")
-    let goBack = useGoBack()
+    let nav = useNavigation()
 
     return (
         <nav
@@ -35,26 +34,20 @@ export function Navigation(props: NavigationProps) {
                     iconLeft={<ArrowLeftIcon />}
                     plain
                     size="lg"
-                    onClick={() =>
-                        goBack({ viewTransition: true, fallback: "/" })
-                    }
+                    onPress={() => nav.pop()}
                 >
                     <span className="sr-only">{t.Back}</span>
                 </Button>
             ) : (
                 <LinkButton
-                    href="/settings/interface"
-                    iconLeft={<GearIcon />}
+                    screen="settings"
+                    iconLeft={<SlidersIcon />}
                     plain
                     size="lg"
                 >
                     <span className="sr-only">{t.Settings}</span>
                 </LinkButton>
             )}
-            <div className="navigation-theme-selector">
-                <SelectColourScheme className="w-max" />
-                <SelectMode className="w-max" />
-            </div>
         </nav>
     )
 }

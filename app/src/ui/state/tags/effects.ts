@@ -2,7 +2,7 @@ import type { MemoController } from "@/control/MemoController"
 import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
-import * as tags from "./slice"
+import { slice as tags } from "./slice"
 
 // @TODO: use real pagination
 const tagPageSize = 1000
@@ -16,9 +16,23 @@ export const registerEffects = (
     },
 ) => {
     startListening({
-        actionCreator: tags.slice.actions.loadTags,
-        effect: async (_, { cancelActiveListeners, dispatch, signal }) => {
+        actionCreator: tags.actions.loadTags,
+        effect: async (
+            _,
+            { cancelActiveListeners, getState, dispatch, signal },
+        ) => {
+            let isLoading = tags.selectors.isLoading(getState())
+            if (isLoading) {
+                return
+            }
+
             cancelActiveListeners()
+
+            dispatch(
+                tags.actions.setState({
+                    isLoading: true,
+                }),
+            )
 
             let list = await memoCtrl.listTags(BaseContext.withSignal(signal), {
                 pagination: { pageSize: tagPageSize },
@@ -26,8 +40,9 @@ export const registerEffects = (
 
             if (!list.ok) {
                 dispatch(
-                    tags.slice.actions.setError({
+                    tags.actions.setState({
                         error: list.err,
+                        isLoading: false,
                     }),
                 )
                 return
@@ -37,7 +52,7 @@ export const registerEffects = (
                 return
             }
 
-            dispatch(tags.slice.actions.setTags(list.value))
+            dispatch(tags.actions.setTags(list.value))
         },
     })
 }

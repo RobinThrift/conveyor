@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react"
 import React, { useEffect } from "react"
 
 import { decorator } from "@/lib/testhelper/rootStore"
+import { useNavigation } from "@/ui/navigation"
 import { actions, selectors } from "@/ui/state"
-import { slice as router } from "@/ui/state/global/router"
 import { useDispatch, useSelector } from "react-redux"
 import "@/ui/styles/index.css"
 
@@ -26,11 +26,12 @@ export const InitSetup: Story = {
 
     render: () => {
         let status = useSelector(selectors.setup.step)
+        let nav = useNavigation()
         let dispatch = useDispatch()
 
         useEffect(() => {
-            dispatch(router.actions.goto({ path: "/setup" }))
-        }, [dispatch])
+            nav.push("setup", {}, { scrollOffsetTop: 0 })
+        }, [nav.push])
 
         useEffect(() => {
             if (status === "unknown") {

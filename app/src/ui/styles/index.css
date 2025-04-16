@@ -38,6 +38,7 @@
 @import "../screens/ErrorScreen/ErrorScreen.css";
 @import "../screens/InitSetupScreen/InitSetupScreen.css";
 @import "../screens/MainScreen/MainScreen.css";
+@import "../screens/MemoListScreen/MemoListScreen.css";
 @import "../screens/NewMemoScreen/NewMemoScreen.css";
 @import "../screens/SettingsScreen/SettingsScreen.css";
 @import "../screens/SingleMemoScreen/SingleMemoScreen.css";
@@ -77,8 +78,4 @@
 
 .tree-leaf-list-item:only-of-type .tree-node::before {
     display: none;
-}
-
-:root {
-    view-transition-name: none;
 }

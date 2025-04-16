@@ -1,52 +1,26 @@
-import React, { Suspense, useCallback } from "react"
+import React, { Suspense } from "react"
 
-import {
-    type ListMemosQuery as Filter,
-    filterFromQuery,
-    filterToSearchParams,
-} from "@/domain/Memo"
 import { BuildInfo } from "@/ui/components/BuildInfo"
 import { Navigation } from "@/ui/components/Navigation"
 import { Notifications } from "@/ui/components/Notifications"
 import { Theme } from "@/ui/components/Theme"
-import { useBaseURL } from "@/ui/hooks/useBaseURL"
-import { EditMemoScreen } from "@/ui/screens/EditMemoScreen"
+import { useCurrentPage } from "@/ui/navigation"
 import { ErrorScreen } from "@/ui/screens/ErrorScreen"
 import { InitSetupScreen } from "@/ui/screens/InitSetupScreen/InitSetupScreen"
 import { MainScreen } from "@/ui/screens/MainScreen"
-import { NewMemoScreen } from "@/ui/screens/NewMemoScreen"
 import { SettingsScreen } from "@/ui/screens/SettingsScreen"
-import { SingleMemoScreen } from "@/ui/screens/SingleMemoScreen"
 import { UnlockScreen } from "@/ui/screens/UnlockScreen/UnlockScreen"
 import { useTheme } from "@/ui/settings"
-import { useCurrentPage, useGoto } from "@/ui/state/global/router"
+import { NewMemoScreen } from "../screens/NewMemoScreen"
 
 export function AppShell() {
-    let page = useCurrentPage()
-    let goto = useGoto()
+    let currentPage = useCurrentPage()
 
-    let baseURL = useBaseURL()
     let { colourScheme, mode } = useTheme()
 
     let pageComp: React.ReactNode
 
-    let onChangeFilter = useCallback(
-        (filter: Filter) => {
-            goto("/", filterToSearchParams(filter))
-        },
-        [goto],
-    )
-
-    let onChangeSettingsTab = useCallback(
-        (tab: string) => {
-            goto(`${baseURL}/settings/${tab}`, undefined, {
-                viewTransition: true,
-            })
-        },
-        [baseURL, goto],
-    )
-
-    if (!page) {
+    if (!currentPage) {
         return (
             <Theme colourScheme={colourScheme} mode={mode}>
                 <Suspense>
@@ -60,7 +34,7 @@ export function AppShell() {
         )
     }
 
-    switch (page?.route) {
+    switch (currentPage?.name) {
         case "unlock":
             return (
                 <Theme colourScheme={colourScheme} mode={mode}>
@@ -77,43 +51,18 @@ export function AppShell() {
                     </Suspense>
                 </Theme>
             )
-        case "main":
+        case "root":
+        case "memo.view":
+        case "memo.edit":
             pageComp = (
-                <MainScreen
-                    filter={filterFromQuery(page.search)}
-                    onChangeFilter={onChangeFilter}
-                />
+                <MainScreen key="main-screen" activeScreen={currentPage.name} />
             )
             break
-        case "memos.single":
-            pageComp = <SingleMemoScreen memoID={page.params.id} />
-            break
-        case "memos.edit":
-            pageComp = (
-                <EditMemoScreen
-                    memoID={page.params.id}
-                    position={
-                        page.search.x && page.search.y
-                            ? {
-                                  x: Number.parseInt(page.search.x, 10),
-                                  y: Number.parseInt(page.search.y, 10),
-                                  snippet: page.search.snippet,
-                              }
-                            : undefined
-                    }
-                />
-            )
-            break
-        case "memos.new":
-            pageComp = <NewMemoScreen />
+        case "memo.new":
+            pageComp = <NewMemoScreen key="main-screen" />
             break
         case "settings":
-            pageComp = (
-                <SettingsScreen
-                    tab={page.params.tab}
-                    onChangeTab={onChangeSettingsTab}
-                />
-            )
+            pageComp = <SettingsScreen />
             break
     }
 
@@ -131,9 +80,9 @@ export function AppShell() {
 
     return (
         <Theme colourScheme={colourScheme} mode={mode}>
-            <Navigation active={page?.route ?? "memos.list"} />
+            <Navigation active={currentPage.name ?? "root"} />
             <main className="main">
-                <Suspense>{pageComp}</Suspense>
+                {pageComp}
                 <footer className="app-footer">
                     <BuildInfo />
                 </footer>

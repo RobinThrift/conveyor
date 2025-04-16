@@ -13,7 +13,7 @@ suite("ui/components/Markdown", () => {
         let raw = `# Markdown Test\n #tag-1 #tag-2\n${generateRealisticBody()}`
 
         let rendered = render(
-            <Provider store={configureRootStore({})}>
+            <Provider store={configureRootStore()}>
                 <Markdown id="test-memo-id">{raw}</Markdown>
             </Provider>,
         )
@@ -24,10 +24,10 @@ suite("ui/components/Markdown", () => {
 
         await expect
             .element(rendered.getByText("tag-1"))
-            .toHaveAttribute("href", "/memos?filter[tag]=tag-1")
+            .toHaveAttribute("href", "?filter[tag]=tag-1")
 
         await expect
             .element(rendered.getByText("tag-2"))
-            .toHaveAttribute("href", "/memos?filter[tag]=tag-2")
+            .toHaveAttribute("href", "?filter[tag]=tag-2")
     })
 })
