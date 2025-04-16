@@ -1,15 +1,14 @@
 import clsx from "clsx"
 import React, { useMemo } from "react"
 
-import { astToJSX } from "@/lib/markdown"
+import { astToJSX, parse } from "@/lib/markdown"
 import { Alert } from "@/ui/components/Alert"
+import { Figure } from "@/ui/components/Figure"
 import { ArrowUDownLeftIcon } from "@/ui/components/Icons"
-import { Image } from "@/ui/components/Image"
 import { Link } from "@/ui/components/Link"
 
 import { Code } from "./Code"
 import { directives } from "./directives"
-import { useMarkdownWorker } from "./useMarkdownWorker"
 
 export interface MarkdownProps {
     ref?: React.Ref<HTMLDivElement>
@@ -20,22 +19,32 @@ export interface MarkdownProps {
 }
 
 export function Markdown(props: MarkdownProps) {
-    let ast = useMarkdownWorker(props.children)
-
     let parsed = useMemo(() => {
-        if (ast) {
-            return astToJSX(ast, props.id, {
-                componentMap: {
-                    Alert,
-                    Link,
-                    Code,
-                    Image,
-                    FootnoteReturnIcon: ArrowUDownLeftIcon,
-                },
-                directives,
-            })
+        let ast = parse(props.children)
+        if (!ast.ok) {
+            return (
+                <Alert variant="danger">
+                    {ast.err.name}: {ast.err.message}
+                    {ast.err.stack && (
+                        <pre>
+                            <code>{ast.err.stack}</code>
+                        </pre>
+                    )}
+                </Alert>
+            )
         }
-    }, [ast, props.id])
+
+        return astToJSX(ast.value, props.id, {
+            componentMap: {
+                Alert,
+                Link,
+                Code,
+                Image: Figure,
+                FootnoteReturnIcon: ArrowUDownLeftIcon,
+            },
+            directives,
+        })
+    }, [props.children, props.id])
 
     return (
         <div
