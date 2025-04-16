@@ -49,10 +49,10 @@
     }
 
     &:has(.offcanvas-backdrop) main {
-        transform: perspective(100px) translateZ(-5px);
+        transform: perspective(1000px) translateZ(-5px);
     }
 
     &:has(.offcanvas-backdrop[data-exiting]) main {
-        transform: perspective(100px) translateZ(0px);
+        transform: perspective(1000px) translateZ(0px);
     }
 }
