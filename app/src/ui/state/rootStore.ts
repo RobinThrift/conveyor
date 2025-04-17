@@ -28,6 +28,8 @@ import * as sync from "./sync"
 import * as tags from "./tags"
 import * as unlock from "./unlock"
 
+import { DevTools } from "./DevTools"
+
 const listenerMiddleware = createListenerMiddleware()
 
 let startListening = listenerMiddleware.startListening.withTypes<
@@ -54,6 +56,17 @@ export function configureRootStore() {
 
     const store = configureStore({
         reducer: rootReducer,
+
+        devTools: false,
+
+        enhancers:
+            // biome-ignore lint/nursery/noProcessEnv: only used for development
+            process.env.NODE_ENV === "development"
+                ? (getDefaultEnhancers) =>
+                      getDefaultEnhancers().concat(
+                          DevTools.instrument({ trace: true }),
+                      )
+                : undefined,
 
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({

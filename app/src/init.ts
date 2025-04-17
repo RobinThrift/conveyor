@@ -93,6 +93,16 @@ export async function init() {
 }
 
 async function initController(platform: PlatformDependencies) {
+    let db: typeof platform.db
+    // biome-ignore lint/nursery/noProcessEnv: only used for development
+    if (process.env.NODE_ENV === "development") {
+        db = await import("@/lib/testhelper/DBLogger").then(
+            ({ DBLogger }) => new DBLogger(platform.db, window.__SQLLOG__LOG__),
+        )
+    } else {
+        db = platform.db
+    }
+
     let crypto = new AgeCrypto()
 
     let cryptoCtrl = new CryptoController({
@@ -124,19 +134,19 @@ async function initController(platform: PlatformDependencies) {
 
     let changelogCtrl = new ChangelogController({
         sourceName: "web",
-        transactioner: platform.db,
-        repo: new ChangelogRepo(platform.db),
+        transactioner: db,
+        repo: new ChangelogRepo(db),
     })
 
     let settingsCtrl = new SettingsController({
-        transactioner: platform.db,
-        repo: new SettingsRepo(platform.db),
+        transactioner: db,
+        repo: new SettingsRepo(db),
         changelog: changelogCtrl,
     })
 
     let attachmentCtrl = new AttachmentController({
-        transactioner: platform.db,
-        repo: new AttachmentRepo(platform.db),
+        transactioner: db,
+        repo: new AttachmentRepo(db),
         fs: encryptedFS,
         hasher: new WebCryptoSha256Hasher(),
         remote: new EncryptedRemoteAttachmentFetcher({
@@ -147,8 +157,8 @@ async function initController(platform: PlatformDependencies) {
     })
 
     let memoCtrl = new MemoController({
-        transactioner: platform.db,
-        repo: new MemoRepo(platform.db),
+        transactioner: db,
+        repo: new MemoRepo(db),
         attachments: attachmentCtrl,
         changelog: changelogCtrl,
     })
@@ -164,7 +174,7 @@ async function initController(platform: PlatformDependencies) {
             }),
         ),
         dbPath: "conveyor.db",
-        transactioner: platform.db,
+        transactioner: db,
         syncAPIClient,
         cryptoRemoteAPI: new AccountKeysV1APIClient({
             baseURL: globalThis.location.href,
@@ -187,7 +197,7 @@ async function initController(platform: PlatformDependencies) {
 
     let unlockCtrl = new UnlockController({
         storage: platform.kvContainers.ephemeral.getKVStore("unlock"),
-        db: platform.db,
+        db: db,
         crypto: cryptoCtrl,
     })
 

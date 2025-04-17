@@ -1,4 +1,4 @@
-:root.rosepine {
+.rosepine {
     --text-color: 87 82 121;
     --body-bg: 250 244 237;
     --surface-bg: 255 250 243;
@@ -67,7 +67,7 @@
     --btn-danger-color: var(--color-danger-contrast);
 }
 
-:root.rosepine.dark {
+.rosepine.dark {
     --text-color: 224 222 244;
     --body-bg: 25 23 36;
     --surface-bg: 31 29 46;
@@ -137,7 +137,7 @@
 }
 
 /* Code */
-:root.rosepine {
+.rosepine {
     --code-foreground: #575279;
     --code-background: #faf4ed;
 
@@ -178,7 +178,7 @@
     --code-invalid: #d7827e;
 }
 
-:root.rosepine.dark {
+.rosepine.dark {
     --code-foreground: #e0def4;
     --code-background: #191724;
 

@@ -71,7 +71,7 @@
     --btn-danger-color: var(--color-danger-contrast);
 }
 
-:root.dark {
+.dark {
     --text-color: 209 201 197;
     --body-bg: 26 25 26;
     --body-bg-contrast: 209 201 197;
@@ -182,7 +182,7 @@
     --code-invalid: #cd3131;
 }
 
-:root.dark {
+.dark {
     --code-foreground: #787c99;
     --code-background: rgb(var(--surface-bg));
 

@@ -1,4 +1,4 @@
-:root.warm {
+.warm {
     --text-color: 43 27 54;
     --body-bg: 242 238 236;
     --body-bg-contrast: 43 27 54;
@@ -72,7 +72,7 @@
     }
 }
 
-:root.warm.dark {
+.warm.dark {
     --text-color: 211 214 207;
     --body-bg: 36 53 56;
     --body-bg-contrast: 211 214 207;
@@ -143,7 +143,7 @@
 }
 
 /* Code */
-:root.warm {
+.warm {
     --code-foreground: #333333;
     --code-background: rgb(var(--surface-bg));
 
@@ -182,7 +182,7 @@
     --code-invalid: #dc252e;
 }
 
-:root.warm.dark {
+.warm.dark {
     --code-foreground: #787c99;
     --code-background: rgb(var(--surface-bg));
 

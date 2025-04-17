@@ -16,6 +16,7 @@ import "@/ui/styles/index.css"
 import { Env } from "./env"
 import { init } from "./init"
 import { NavigationProvider } from "./ui/navigation"
+import { DevTools } from "./ui/state/DevTools"
 
 main()
 
@@ -24,12 +25,18 @@ async function main() {
 
     document.body.classList.add(`platform-${Env.platform}`)
 
+    let devTools: React.ReactNode | null = null
+    // biome-ignore lint/nursery/noProcessEnv: only used for development
+    if (process.env.NODE_ENV === "development") {
+        devTools = <DevTools />
+    }
+
     ReactDOM.createRoot(
         // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
         document.getElementById("__CONVEYOR_UI_ROOT__")!,
     ).render(
-        <React.StrictMode>
-            <Provider store={rootStore}>
+        <Provider store={rootStore}>
+            <React.StrictMode>
                 <NavigationProvider value={navCtrl}>
                     <AttachmentProvider
                         value={attachmentContextFromController(attachmentCtrl)}
@@ -39,7 +46,8 @@ async function main() {
                         </SettingsLoader>
                     </AttachmentProvider>
                 </NavigationProvider>
-            </Provider>
-        </React.StrictMode>,
+            </React.StrictMode>
+            {devTools}
+        </Provider>,
     )
 }

@@ -1,7 +1,7 @@
 import type { Context } from "@/lib/context"
 import type { AsyncResult } from "@/lib/result"
 
-declare type DBValue =
+export type DBValue =
     | string
     | number
     | boolean

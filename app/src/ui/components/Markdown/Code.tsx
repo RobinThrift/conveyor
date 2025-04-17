@@ -9,10 +9,11 @@ import { usePromise } from "@/ui/hooks/usePromise"
 import { useNotificationDispatcher } from "@/ui/state/global/notifications"
 
 export function Code({
+    className,
     children,
     lang,
     meta,
-}: { children: string; lang?: string; meta?: string }) {
+}: { className?: string; children: string; lang?: string; meta?: string }) {
     let ref = useRef(null)
     let isVisible = useOnVisible(ref, { ratio: 0 })
 
@@ -31,6 +32,7 @@ export function Code({
                 backgroundColor: "var(--code-background)",
                 color: "var(--code-foreground)",
             }}
+            className={className}
         >
             {highlighted}
         </pre>
