@@ -318,6 +318,8 @@ async function tryAutoUnlock(
             tryUnlock.resolve()
         }
     })
+
+    return tryUnlock.promise
 }
 
 function initNavgation({
