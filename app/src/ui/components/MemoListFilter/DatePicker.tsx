@@ -43,7 +43,7 @@ export function DatePicker({ className, ...props }: DatePickerProps) {
 
     let onChange = useCallback(
         (value: DateValue) => {
-            props.onSelect(value as CalendarDate)
+            props.onSelect((value as CalendarDate) || undefined)
         },
         [props.onSelect],
     )

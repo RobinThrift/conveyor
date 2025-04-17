@@ -32,7 +32,7 @@ export function ShortDayPicker(props: ShortDayPickerProps) {
 
     let onChange = useCallback(
         (value: DateValue) => {
-            props.onSelect(value as CalendarDate)
+            props.onSelect((value as CalendarDate) || undefined)
         },
         [props.onSelect],
     )
