@@ -295,7 +295,7 @@ export const registerEffects = (
                 if (!isEqual(filter, paramFilter)) {
                     dispatch(
                         list.slice.actions.setFilter({
-                            filter,
+                            filter: paramFilter,
                             source: "navigation",
                         }),
                     )

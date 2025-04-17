@@ -50,7 +50,8 @@ interface ComponentMap {
     }>
     Link?: React.ComponentType<
         React.AnchorHTMLAttributes<any> & {
-            href: string
+            screen: string
+            params: any
         }
     >
     Image?: React.ComponentType<{
@@ -308,7 +309,12 @@ function autoTagLinkToJSX(doc: Document, node: AutoTagLink): ReactNode {
     let Link = doc.componentMap.Link ?? "a"
     return (
         <Link
-            href={`?filter[tag]=${node.tag}`}
+            screen="root"
+            params={{
+                filter: {
+                    tag: node.tag,
+                },
+            }}
             key={nodeKey(node)}
             className="tag-link"
             rel="tag"
