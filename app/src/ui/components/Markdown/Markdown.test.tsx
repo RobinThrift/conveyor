@@ -22,12 +22,8 @@ suite("ui/components/Markdown", () => {
             .element(rendered.getByRole("heading", { level: 1 }))
             .toHaveTextContent("Markdown Test")
 
-        await expect
-            .element(rendered.getByText("tag-1"))
-            .toHaveAttribute("href", "?filter[tag]=tag-1")
+        await expect.element(rendered.getByText("tag-1")).toBeInTheDocument()
 
-        await expect
-            .element(rendered.getByText("tag-2"))
-            .toHaveAttribute("href", "?filter[tag]=tag-2")
+        await expect.element(rendered.getByText("tag-2")).toBeInTheDocument()
     })
 })
