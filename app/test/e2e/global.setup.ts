@@ -58,7 +58,9 @@ setup("setup", async ({ page }) => {
 
     await page.getByRole("textbox", { name: "Password" }).click()
     await page.getByRole("textbox", { name: "Password" }).fill("e2e-tests")
-    await page.getByRole("button", { name: "Authenticate" }).click()
+    await page
+        .getByRole("button", { name: "Authenticate", exact: true })
+        .click()
 
     await page.waitForURL("http://localhost:8081/")
 })

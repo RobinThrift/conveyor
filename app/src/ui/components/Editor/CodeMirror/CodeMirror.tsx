@@ -42,5 +42,7 @@ export function CodeMirror(props: CodeMirrorProps) {
         ...props,
     })
 
-    return <div ref={ref} className={props.className} />
+    return (
+        <div ref={ref} className={props.className} data-testid="texteditor" />
+    )
 }

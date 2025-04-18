@@ -24,7 +24,10 @@ test("setup/new/local-only", async ({ page }) => {
 
     await page.locator(".text-editor").click()
     await page.getByLabel("Text formatting").isVisible()
-    await page.getByRole("textbox").fill("# Test Memo\n\nWith Some Content")
+    await page
+        .getByTestId("texteditor")
+        .getByRole("textbox")
+        .fill("# Test Memo\n\nWith Some Content")
     await page.getByRole("button", { name: "Save" }).click()
 
     await expect(page.getByText(/^Test Memo/)).toBeInViewport({
