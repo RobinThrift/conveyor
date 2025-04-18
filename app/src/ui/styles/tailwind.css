@@ -24,50 +24,46 @@
     --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
         Consolas, "Liberation Mono", "Courier New", monospace;
 
-    --color-primary-extra-light: rgba(var(--color-primary-extra-light));
-    --color-primary-light: rgba(var(--color-primary-light));
-    --color-primary: rgba(var(--color-primary));
-    --color-primary-dark: rgba(var(--color-primary-dark));
-    --color-primary-extra-dark: rgba(var(--color-primary-extra-dark));
-    --color-primary-contrast: rgba(var(--color-primary-contrast));
+    --color-primary-extra-light: var(--color-primary-extra-light);
+    --color-primary-light: var(--color-primary-light);
+    --color-primary: var(--color-primary);
+    --color-primary-dark: var(--color-primary-dark);
+    --color-primary-extra-dark: var(--color-primary-extra-dark);
+    --color-primary-contrast: var(--color-primary-contrast);
 
-    --color-info-extra-light: rgba(var(--color-info-extra-light));
-    --color-info-light: rgba(var(--color-info-light));
-    --color-info: rgba(var(--color-info));
-    --color-info-dark: rgba(var(--color-info-dark));
-    --color-info-extra-dark: rgba(var(--color-info-extra-dark));
-    --color-info-contrast: rgba(var(--color-info-contrast));
+    --color-info-extra-light: var(--color-info-extra-light);
+    --color-info-light: var(--color-info-light);
+    --color-info: var(--color-info);
+    --color-info-dark: var(--color-info-dark);
+    --color-info-extra-dark: var(--color-info-extra-dark);
+    --color-info-contrast: var(--color-info-contrast);
 
-    --color-success-extra-light: rgba(var(--color-success-extra-light));
-    --color-success-light: rgba(var(--color-success-light));
-    --color-success: rgba(var(--color-success));
-    --color-success-dark: rgba(var(--color-success-dark));
-    --color-success-extra-dark: rgba(var(--color-success-extra-dark));
-    --color-success-contrast: rgba(var(--color-success-contrast));
+    --color-success-extra-light: var(--color-success-extra-light);
+    --color-success-light: var(--color-success-light);
+    --color-success: var(--color-success);
+    --color-success-dark: var(--color-success-dark);
+    --color-success-extra-dark: var(--color-success-extra-dark);
+    --color-success-contrast: var(--color-success-contrast);
 
-    --color-danger-extra-light: rgba(var(--color-danger-extra-light));
-    --color-danger-light: rgba(var(--color-danger-light));
-    --color-danger: rgba(var(--color-danger));
-    --color-danger-dark: rgba(var(--color-danger-dark));
-    --color-danger-extra-dark: rgba(var(--color-danger-extra-dark));
-    --color-danger-contrast: rgba(var(--color-danger-contrast));
+    --color-danger-extra-light: var(--color-danger-extra-light);
+    --color-danger-light: var(--color-danger-light);
+    --color-danger: var(--color-danger);
+    --color-danger-dark: var(--color-danger-dark);
+    --color-danger-extra-dark: var(--color-danger-extra-dark);
+    --color-danger-contrast: var(--color-danger-contrast);
 
-    --color-subtle-extra-light: rgba(var(--color-subtle-extra-light));
-    --color-subtle-light: rgba(var(--color-subtle-light));
-    --color-subtle: rgba(var(--color-subtle));
-    --color-subtle-dark: rgba(var(--color-subtle-dark));
-    --color-subtle-extra-dark: rgba(var(--color-subtle-extra-dark));
-    --color-subtle-contrast: rgba(var(--color-subtle-contrast));
+    --color-subtle-extra-light: var(--color-subtle-extra-light);
+    --color-subtle-light: var(--color-subtle-light);
+    --color-subtle: var(--color-subtle);
+    --color-subtle-dark: var(--color-subtle-dark);
+    --color-subtle-extra-dark: var(--color-subtle-extra-dark);
+    --color-subtle-contrast: var(--color-subtle-contrast);
 
-    --color-text: rgba(var(--text-color));
+    --color-text: var(--color-text);
 
-    --color-body: rgba(var(--body-bg));
-    --color-body-contrast: rgba(var(--body-bg-contrast));
+    --color-body: var(--color-body-bg);
+    --color-body-contrast: var(--color-body-bg-contrast);
 
-    --color-surface: rgba(var(--surface-bg));
-
-    --color-sidebar: rgba(var(--sidebar-bg));
-
-    --color-navigation-bg: rgba(var(--navigation-bg));
-    --color-navigation-fg: rgba(var(--navigation-fg));
+    --color-surface-level-1: var(--color-surface-level-1);
+    --color-surface-level-2: var(--color-surface-level-2);
 }

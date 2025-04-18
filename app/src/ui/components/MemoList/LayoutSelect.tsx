@@ -29,6 +29,7 @@ export function LayoutSelect() {
                 value={listLayout}
                 onChange={onChange}
                 className="memo-list-layout-select"
+                buttonClassName="btn px-3!"
             >
                 <Select.Option value="masonry">
                     <div className="flex gap-1 items-center">

@@ -1,10 +1,6 @@
 .memo {
     @apply overflow-x-auto flex flex-col;
 
-    &.is-editing {
-        @apply p-0;
-    }
-
     .show-more-btn {
         @apply hidden;
     }
@@ -63,9 +59,4 @@
 
 .show-more-btn {
     @apply absolute bottom-0 left-0 right-0 h-16 pb-1 flex justify-center items-end text-2xl;
-    background: linear-gradient(
-        180deg,
-        rgba(var(--surface-bg) / 0),
-        rgba(var(--surface-bg) / 1) 80%
-    );
 }

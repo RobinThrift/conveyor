@@ -18,6 +18,7 @@ import { CaretDownIcon } from "@/ui/components/Icons"
 export interface SelectProps<T extends string = string> {
     className?: string
     labelClassName?: string
+    buttonClassName?: string
     label?: string
     name: string
     value?: T
@@ -53,7 +54,12 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
                     {props.label}
                 </AriaLabel>
             )}
-            <AriaButton className="input select-input">
+            <AriaButton
+                className={clsx(
+                    "select-input",
+                    props.buttonClassName ?? "input",
+                )}
+            >
                 <AriaSelectValue />
                 <span aria-hidden="true">
                     <CaretDownIcon />

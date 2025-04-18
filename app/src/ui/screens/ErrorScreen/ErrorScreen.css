@@ -11,14 +11,14 @@
         h1 {
             @apply text-5xl md:text-7xl mb-2 font-semibold;
 
-            color: rgb(var(--body-bg));
+            color: var(--color-body-bg);
             text-shadow:
-                2px 2px 0 rgb(var(--body-bg-contrast)),
-                -1px -1px 0 rgb(var(--body-bg-contrast)),
-                1px -1px 0 rgb(var(--body-bg-contrast)),
-                -1px 1px 0 rgb(var(--body-bg-contrast)),
-                1px 1px 0 rgb(var(--body-bg-contrast)),
-                4px 4px 0px rgb(var(--body-bg));
+                2px 2px 0 var(--color-body-bg-contrast),
+                -1px -1px 0 var(--color-body-bg-contrast),
+                1px -1px 0 var(--color-body-bg-contrast),
+                -1px 1px 0 var(--color-body-bg-contrast),
+                1px 1px 0 var(--color-body-bg-contrast),
+                4px 4px 0px var(--color-body-bg);
         }
 
         p {

@@ -5,7 +5,7 @@ div[data-floating-ui-portal]:has(.tooltip) div[role="presentation"] {
 .tooltip {
     @apply py-1 px-3 select-none;
     @apply rounded-lg shadow-lg;
-    @apply bg-surface;
+    @apply bg-surface-level-1;
     @apply text-center text-sm text-text select-none;
     @apply outline outline-subtle-light;
 

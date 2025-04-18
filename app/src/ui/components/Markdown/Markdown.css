@@ -95,7 +95,7 @@
     }
 
     :where(code):not(pre > code) {
-        @apply bg-surface;
+        @apply bg-surface-level-1;
     }
 
     :where(code):not(

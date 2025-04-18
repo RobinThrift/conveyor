@@ -39,7 +39,7 @@
     }
 
     &.info {
-        @apply border-subtle bg-surface;
+        @apply border-subtle bg-surface-level-1;
     }
 
     &.error {

@@ -4,10 +4,16 @@
 
     @apply w-full h-full flex flex-col gap-2;
 
+        padding: env(safe-area-inset-top, 0) calc(var(--spacing) * 2)
+            env(safe-area-inset-bottom, 0) calc(var(--spacing) * 2);
+
     @media (min-width: 1024px) {
         --sidebar-width: 300px;
         --sidebar-height: calc(100dvh - var(--spacing) * 4);
         @apply flex-row;
+
+        padding: env(safe-area-inset-top, 0) calc(var(--spacing) * 4)
+            env(safe-area-inset-bottom, 0) calc(var(--spacing) * 4);
     }
 
     @media (min-width: 1680px) {
@@ -18,8 +24,6 @@
         --sidebar-width: 380px;
     }
 
-    padding: env(safe-area-inset-top, 0) calc(var(--spacing) * 4)
-        env(safe-area-inset-bottom, 0) calc(var(--spacing) * 4);
 
     .subscreen {
         @apply flex-1;
@@ -66,8 +70,6 @@
         /* md */
         @media (min-width: 1680px) {
             position: fixed;
-            top: env(safe-area-inset-top, 0);
-            right: 0;
         }
     }
 
@@ -115,6 +117,14 @@
         }
 
         .memo-list {
+            @media (min-width: 1024px) {
+                .memo-list-day-group:nth-of-type(2) {
+                    .memo-list-day {
+                        margin-top: var(--navigation-height);
+                    }
+                }
+            }
+
             .memo-list-layout-select-positioner {
                 display: none;
             }
@@ -151,6 +161,14 @@
                 float: none;
                 max-width: 100%;
             }
+        }
+    }
+}
+
+.main-screen.has-subscreen {
+    .single-memo-screen {
+        @media (min-width: 1024px) {
+            margin-top: calc(-1 * var(--navigation-height));
         }
     }
 }

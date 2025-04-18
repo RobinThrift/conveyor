@@ -15,7 +15,7 @@
     @apply fixed inset-0 pointer-events-none;
     isolation: isolate;
     z-index: -1;
-    background-color: rgb(var(--body-bg));
+    background-color: var(--color-body-bg);
 
     .noise {
         @apply fixed inset-0;
@@ -38,8 +38,8 @@
     .spot-1 {
         background-image: radial-gradient(
             circle,
-            rgba(var(--color-primary) / 1),
-            rgba(var(--color-primary) / 0) 30%
+            var(--color-primary),
+            transparent 30%
         );
 
         top: -40%;
@@ -47,8 +47,8 @@
         @media (min-width: 768px) {
             background-image: radial-gradient(
                 circle,
-                rgba(var(--color-primary) / 1),
-                rgba(var(--color-primary) / 0) 70%
+                var(--color-primary) 1,
+                transparent 70%
             );
             top: -18%;
             left: -2%;
@@ -58,8 +58,8 @@
     .spot-2 {
         background-image: radial-gradient(
             circle,
-            rgba(var(--color-danger) / 1),
-            rgba(var(--color-danger) / 0) 40%
+            var(--color-danger),
+            transparent 40%
         );
         width: 100vh;
 
@@ -68,8 +68,8 @@
         @media (min-width: 768px) {
             background-image: radial-gradient(
                 circle,
-                rgba(var(--color-danger) / 1),
-                rgba(var(--color-danger) / 0) 60%
+                var(--color-danger),
+                transparent 60%
             );
             top: -5%;
             left: -16%;
@@ -80,8 +80,8 @@
         height: 100vh;
         background-image: radial-gradient(
             circle,
-            rgba(var(--color-success) / 1),
-            rgba(var(--color-success) / 0) 30%
+            var(--color-success),
+            transparent 30%
         );
 
         top: -45%;
@@ -89,8 +89,8 @@
         @media (min-width: 768px) {
             background-image: radial-gradient(
                 circle,
-                rgba(var(--color-success) / 1),
-                rgba(var(--color-success) / 0) 60%
+                var(--color-success),
+                transparent 60%
             );
             top: -35%;
             left: 5%;

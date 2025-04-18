@@ -72,7 +72,7 @@ export function SQLLogDevTool() {
             </header>
             <ul className="divide-y divide-subtle">
                 {events.map(({ id, event, args = [] }) => (
-                    <li key={id} className="p-4 hover:bg-surface">
+                    <li key={id} className="p-4 hover:bg-surface-level-1">
                         <h3 className="text-subtle-light font-mono">{event}</h3>
                         {args[0] && (
                             <Code

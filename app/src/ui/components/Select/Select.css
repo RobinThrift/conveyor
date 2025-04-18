@@ -1,5 +1,5 @@
 .select-input {
-    @apply flex items-center gap-2 justify-between px-2 py-1 bg-surface text-body-contrast min-w-fit;
+    @apply flex items-center gap-2 justify-between px-2 py-1 bg-surface-level-1 text-body-contrast min-w-fit;
 }
 
 .select-label {
@@ -7,7 +7,7 @@
 }
 
 .select-list {
-    @apply p-1 overflow-auto rounded-md bg-surface shadow-lg space-y-1;
+    @apply p-1 overflow-auto rounded-md bg-surface-level-1 shadow-lg space-y-1;
     @apply ring-1 ring-black/50;
     @apply dark:border dark:border-subtle-extra-dark;
 
@@ -36,7 +36,7 @@
     &:hover,
     &:focus,
     &[data-focused] {
-        @apply bg-subtle text-text;
+        @apply bg-surface-level-2 text-text;
     }
 
     &:active {

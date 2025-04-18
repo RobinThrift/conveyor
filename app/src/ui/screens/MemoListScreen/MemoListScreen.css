@@ -37,7 +37,7 @@
         order: 0;
 
         .toolbar-btn-grp {
-            @apply bg-surface rounded-t-lg px-2 mr-2;
+            @apply bg-surface-level-1 rounded-t-lg px-2 mr-2;
             transition: transform 150ms;
             transform: translate(0, 100%);
         }

@@ -9,13 +9,13 @@
 
     @apply fixed inset-0 flex flex-col items-center justify-center text-center font-semibold;
     @apply pointer-events-none select-none;
-    color: rgb(var(--body-bg));
+    color: var(--color-body-bg);
     text-shadow:
-        3px 3px 0 rgb(var(--body-bg-contrast)),
-        -1px -1px 0 rgb(var(--body-bg-contrast)),
-        1px -1px 0 rgb(var(--body-bg-contrast)),
-        -1px 1px 0 rgb(var(--body-bg-contrast)),
-        1px 1px 0 rgb(var(--body-bg-contrast));
+        3px 3px 0 var(--color-body-bg-contrast),
+        -1px -1px 0 var(--color-body-bg-contrast),
+        1px -1px 0 var(--color-body-bg-contrast),
+        -1px 1px 0 var(--color-body-bg-contrast),
+        1px 1px 0 var(--color-body-bg-contrast);
 
     animation: conveyor-belt-text-in 0.5s;
     animation-timing-function: ease-out;

@@ -1,9 +1,5 @@
 .memo-list {
     @apply gap-2 w-full;
-
-    .memo {
-        @apply bg-surface rounded p-2 lg:p-4;
-    }
 }
 
 .memo-list-day {
@@ -50,8 +46,7 @@
     @apply relative h-8 max-w-3xl tablet:max-w-6xl lg:max-w-none;
 
     .memo-list-layout-select button {
-        @apply absolute right-0 top-0 h-8;
-        @apply max-w-fit rounded-lg text-body bg-body-contrast;
+        @apply absolute right-0 top-0 h-8 max-w-fit;
 
         .option-label {
             @apply sr-only;

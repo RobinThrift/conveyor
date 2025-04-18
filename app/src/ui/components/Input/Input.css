@@ -7,11 +7,6 @@
 }
 
 .input {
-    @apply appearance-none bg-surface border border-subtle rounded-sm ring ring-transparent text-subtle-contrast;
-    @apply hover:border-subtle-dark;
-    @apply focus:ring-1 focus:outline-none focus:ring-primary-light;
-    @apply dark:border-subtle-extra-dark;
-
     width: 100%;
 
     &[data-invalid] {
@@ -32,7 +27,7 @@
 }
 
 .field-message {
-    @apply block px-3 py-2 border border-danger-dark bg-danger text-danger-contrast rounded-sm;
+    @apply block border border-danger-dark bg-danger text-danger-contrast;
 }
 
 .checkbox-field {
@@ -44,7 +39,7 @@
 }
 
 .checkbox {
-    @apply flex size-7 appearance-none items-center justify-center rounded-sm bg-surface border-2 border-subtle outline-hidden;
+    @apply flex size-7 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border-2 border-subtle outline-hidden;
     @apply hover:border-primary;
     @apply focus:outline-primary focus:outline-offset-0;
 }

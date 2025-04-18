@@ -16,7 +16,7 @@
         @apply @sm:absolute bottom-0 left-0 right-0;
         @apply flex flex-col @sm:flex-row gap-2 items-center justify-between;
         @apply py-2 px-4;
-        @apply bg-surface @sm:bg-transparent;
+        @apply bg-surface-level-1 @sm:bg-transparent;
 
         @container (min-width: 24rem) {
             /* sm container size */
@@ -35,7 +35,7 @@
     }
 
     .arrow {
-        @apply text-lg p-3 bg-surface items-center justify-center rounded-full text-text shadow-sm;
+        @apply text-lg p-3 bg-surface-level-1 items-center justify-center rounded-full text-text shadow-sm;
         @apply hidden @md:flex;
 
         &:hover {
@@ -49,7 +49,7 @@
 }
 
 .link-preview-hover-card {
-    @apply rounded-lg bg-surface p-4 w-fit max-w-[300px];
+    @apply rounded-lg bg-surface-level-1 p-4 w-fit max-w-[300px];
     filter: drop-shadow(1px 1px 10px rgb(0 0 0 / 0.1));
 
     &[data-state="open"] {
@@ -62,5 +62,5 @@
 }
 
 .link-preview-hover-card-arrow {
-    @apply fill-surface h-2 w-4;
+    @apply fill-surface-level-1 h-2 w-4;
 }

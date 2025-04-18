@@ -43,6 +43,8 @@ export function Theme({
         document
             .querySelector("meta[name=theme-color]")
             ?.setAttribute("content", `rgb(${bgColour})`)
+
+        document.documentElement.dataset.design = "default"
     }, [mode])
 
     return children

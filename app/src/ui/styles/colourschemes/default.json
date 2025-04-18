@@ -1,0 +1,26 @@
+{
+    "light": {
+        "body-bg": "#f7f9fb",
+        "body-bg-contrast": "#000000",
+        "surface-level-1": "#ffffff",
+        "surface-level-2": "#f7f9fb",
+        "modal-overlay-bg": "#292d2c",
+        "text": "#000000",
+        "primary": "#23ade4",
+        "success": "#41be7c",
+        "danger": "#d8969a",
+        "subtle": "#949699"
+    },
+    "dark": {
+        "body-bg": "#1a191a",
+        "body-bg-contrast": "#d1c9c5",
+        "surface-level-1": "#201f20",
+        "surface-level-2": "#272527",
+        "modal-overlay-bg": "#6b7280",
+        "text": "#d1c9c5",
+        "primary": "#3975a3",
+        "success": "#4a895c",
+        "danger": "#b22f1b",
+        "subtle": "#838383"
+    }
+}

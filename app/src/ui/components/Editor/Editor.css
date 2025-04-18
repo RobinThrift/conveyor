@@ -1,5 +1,5 @@
 .editor {
-    @apply flex flex-col bg-surface;
+    @apply flex flex-col bg-surface-level-1;
     @apply dark:border-subtle-extra-dark;
 }
 
@@ -10,7 +10,7 @@
 }
 
 .editor-buttons {
-    @apply p-2 flex items-center justify-between gap-2 bg-surface;
+    @apply p-2 flex items-center justify-between gap-2 bg-surface-level-1;
     height: 3rem;
 
     &:has(button:only-child) {
@@ -23,7 +23,7 @@
 }
 
 .text-editor-toolbar {
-    @apply bg-surface p-2 flex gap-1 items-center rounded-t overflow-x-auto;
+    @apply bg-surface-level-1 p-2 flex gap-1 items-center rounded-t overflow-x-auto;
     position: absolute;
     height: 3rem;
     left: 0;

@@ -1,9 +1,9 @@
 .btn {
-    @apply gap-2 rounded py-1 px-4;
+    @apply gap-2 cursor-pointer;
 
-    background-color: rgb(var(--btn-bg));
-    color: rgb(var(--btn-color));
-    border: 1px solid rgb(var(--btn-border-color));
+    background-color: var(--btn-bg);
+    color: var(--btn-color);
+    border: 1px solid var(--btn-border-color);
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -14,24 +14,24 @@
     }
 
     &:hover {
-        background-color: rgb(var(--btn-bg-hover));
+        background-color: var(--btn-bg-hover);
     }
 
     &:focus,
     &:focus-visible {
         outline-style: solid;
-        outline-color: rgb(var(--btn-bg-active));
+        outline-color: var(--btn-bg-active);
         outline-width: 1px;
     }
 
     &:active {
-        background-color: rgb(var(--btn-bg-active));
+        background-color: var(--btn-bg-active);
     }
 
     &:disabled {
-        background-color: rgba(var(--btn-bg) / 0.8);
-        color: rgba(var(--btn-color) / 0.5);
-        border-color: rgba(var(--btn-border-color) / 0.7);
+        background-color: color-mix(in srgb, var(--btn-bg) 80%, transparent);
+        color: color-mix(in srgb, var(--btn-color) 80%, transparent);
+        border-color: color-mix(in srgb, var(--btn-border-color) 70%, transparent);
     }
 }
 
@@ -91,29 +91,29 @@
 
 .btn.outline-btn {
     background-color: transparent;
-    color: rgb(var(--btn-bg));
-    border: 1px solid rgb(var(--btn-border-color));
+    color: var(--btn-bg);
+    border: 1px solid var(--btn-border-color);
 
     &:hover {
-        background-color: rgb(var(--btn-bg));
-        color: rgb(var(--btn-color));
-        border-color: rgb(var(--btn-border-color));
+        background-color: var(--btn-bg);
+        color: var(--btn-color);
+        border-color: var(--btn-border-color);
     }
 
     &:active {
-        background-color: rgb(var(--btn-bg-active));
+        background-color: var(--btn-bg-active);
     }
 
     &:disabled {
         background-color: transparent !important;
-        color: rgba(var(--btn-border-color) / 0.5);
-        border-color: rgb(var(--btn-border-color) / 0.3);
+        color: color-mix(in srgb, var(--btn-border-color) 50%, transparent);
+        border-color: color-mix(in srgb, var(--btn-border-color) 30%, transparent);
     }
 }
 
 .dark .btn.regular.outline-btn {
-    --btn-border-color: var(--text-color);
-    --btn-bg: var(--text-color);
+    --btn-border-color: var(--color-text);
+    --btn-bg: var(--color-text);
 
     &:hover {
         --btn-bg: var(--btn-regular-bg);
@@ -122,19 +122,19 @@
 
 .btn.plain {
     --btn-bg-hover: var(--color-subtle);
-    --btn-color: var(--text-color);
+    --btn-color: var(--color-text);
     --btn-bg-active: var(--color-subtle-dark);
     background-color: transparent;
     border-color: transparent;
     color: inherit;
 
     &:hover {
-        background-color: rgb(var(--btn-bg-hover));
-        color: rgb(var(--btn-color));
+        background-color: var(--btn-bg-hover);
+        color: var(--btn-regular-color);
     }
 
     &:active {
-        background-color: rgb(var(--btn-bg-active));
+        background-color: var(--btn-bg-active);
     }
 
     &:disabled {
@@ -169,34 +169,5 @@
 
     &.icon-only {
         min-height: 2.2rem;
-    }
-}
-
-.btn.cover-text {
-    @apply pe-10;
-    position: relative;
-    transition: background-color 0.2s;
-
-    .btn-cover-text-icon {
-        @apply px-2 flex items-center justify-center;
-        position: absolute;
-        background-color: rgb(var(--btn-bg-active));
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 2rem;
-        transition: width 0.2s;
-    }
-
-    &:hover {
-        background-color: rgb(var(--btn-bg-active));
-
-        .btn-cover-text-icon {
-            width: 100%;
-        }
-
-        svg {
-            transform: scale(1.1);
-        }
     }
 }

@@ -179,18 +179,6 @@ export const Icons: Story = {
                         variant="danger"
                     />
                 </div>
-
-                <h3>Cover</h3>
-                <div className="flex items-start gap-2">
-                    <Button
-                        {...args}
-                        iconRight={<BinIcon weight="duotone" />}
-                        variant="danger"
-                        coverText={true}
-                    >
-                        Icon Right
-                    </Button>
-                </div>
             </div>
         )
     },

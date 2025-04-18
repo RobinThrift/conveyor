@@ -19,6 +19,9 @@ build: _build-sqlite install
 
 generate: _gen-sql
 
+generate-colourscheme file:
+    @NODE_NO_WARNINGS=1 node ./src/ui/styles/colourschemes/generate-colourscheme.ts {{ file }}
+
 watch mode="development": 
     {{ local_bin }}/vite build --mode {{ mode }} --watch
 

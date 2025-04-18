@@ -3,7 +3,7 @@
 }
 
 .navigation {
-    @apply hidden tablet:flex w-full items-center p-2;
+    @apply hidden tablet:flex w-full items-center p-2 relative z-10;
 
     -webkit-app-region: drag;
     min-height: env(titlebar-area-height);

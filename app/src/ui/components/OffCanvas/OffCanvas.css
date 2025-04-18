@@ -10,7 +10,7 @@
 }
 
 .offcanvas {
-    @apply h-full rounded-r-lg bg-surface p-2 overflow-auto shadow-md;
+    @apply h-full rounded-r-lg bg-surface-level-1 p-2 overflow-auto shadow-md;
     @apply focus:outline-hidden;
     @apply fixed left-0 top-0 bottom-0 right-0;
 
@@ -19,7 +19,7 @@
 
 .offcanvas-drag-handle {
     position: absolute;
-    right: 0;
+    right: 10%;
     top: 0;
     width: 20%;
     height: 100%;
@@ -28,7 +28,8 @@
 }
 
 .offcanvas-backdrop {
-    @apply fixed inset-0 bg-black/60;
+    @apply fixed inset-0;
+    background-color: color-mix(in srgb, var(--color-modal-overlay-bg) 80%, transparent);
     z-index: 9999;
     transition: opacity 250ms;
     opacity: 1;

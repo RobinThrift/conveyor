@@ -1,5 +1,5 @@
 .alert {
-    @apply p-3 border-2 rounded-lg my-2 flex gap-2 items-start;
+    @apply border-2 my-2 flex gap-2 items-start;
 
     & > svg {
         @apply size-8;

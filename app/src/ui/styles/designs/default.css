@@ -1,0 +1,64 @@
+[data-design="default"] {
+    body {
+        @apply bg-body;
+    }
+
+    .alert {
+        @apply p-3 rounded-3xl;
+    }
+
+    .btn {
+        @apply rounded-3xl py-1 px-4;
+    }
+
+    .input-field .input {
+        @apply appearance-none bg-surface-level-2 border border-subtle rounded-2xl ring ring-transparent;
+        @apply hover:border-subtle-dark;
+        @apply focus:ring-1 focus:outline-none focus:ring-primary-light;
+        @apply dark:border-subtle-extra-dark;
+    }
+
+    .field-message {
+        @apply rounded-2xl px-3 py-2;
+    }
+
+    .dialog {
+        @apply rounded-3xl p-4;
+    }
+
+    .new-memo-editor .memo {
+        @apply bg-surface-level-1 rounded-3xl p-2;
+    }
+
+    .memo {
+        @apply bg-surface-level-1 rounded-3xl p-4;
+
+        .show-more-btn {
+            background: linear-gradient(
+                180deg,
+                color-mix(in srgb, var(--surface-level-1) 0%, transparent),
+                color-mix(in srgb, var(--surface-level-1) 100%, transparent) 80%
+            );
+        }
+    }
+
+    .memo-list-filter {
+        @apply bg-surface-level-1 space-y-2 rounded-b-3xl px-2;
+        @apply tablet:pt-2 tablet:rounded-3xl;
+
+        .search {
+            @apply py-2;
+            .input {
+                @apply bg-surface-level-1;
+            }
+        }
+
+        @media (min-width: 1680px) {
+            @apply top-2 right-2;
+        }
+
+        &>* {
+            @apply tablet:bg-surface-level-2 tablet:rounded-3xl tablet:p-2;
+        }
+    }
+}

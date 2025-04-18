@@ -1,3 +1,6 @@
+@layer properties;
+@layer theme, base, components, utilities, designs;
+
 @import "tailwindcss";
 
 @import "./tailwind.css";
@@ -6,9 +9,11 @@
 @import "@fontsource-variable/inter";
 @import "@fontsource/ibm-plex-mono";
 
-@import "./themes/default.css" layer(base);
-@import "./themes/warm.css" layer(base);
-@import "./themes/rosepine.css" layer(base);
+@import "./colourschemes/default.css" layer(base);
+@import "./colourschemes/warm.css" layer(base);
+@import "./colourschemes/rosepine.css" layer(base);
+
+@import "./designs/default.css" layer(designs);
 
 @import "../components/Alert/Alert.css";
 @import "../components/AlertDialog/AlertDialog.css";
@@ -46,8 +51,8 @@
 
 @layer base {
     body {
-        color: rgb(var(--text-color));
-        background-color: rgb(var(--body-bg));
+        color: var(--color-text);
+        background-color: var(--color-body-bg);
     }
 }
 

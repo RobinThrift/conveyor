@@ -1,5 +1,5 @@
 .dropdown-menu-list {
-    @apply p-1 overflow-auto rounded-md bg-surface shadow-lg;
+    @apply p-1 overflow-auto rounded-md bg-surface-level-1 shadow-lg;
     @apply ring-1 ring-black/50;
     @apply dark:border dark:border-subtle-extra-dark;
     z-index: 9999;
@@ -24,7 +24,7 @@
     &:hover,
     &:focus,
     &[data-focused] {
-        @apply bg-subtle text-text;
+        @apply bg-surface-level-2 text-text;
     }
 
     &:active {
@@ -35,7 +35,7 @@
         @apply opacity-40 cursor-default;
 
         &:hover {
-            @apply bg-transparent;
+            @apply bg-transparent text-text;
         }
 
         &:active {
@@ -49,7 +49,17 @@
 }
 
 .dropdown-menu-item.destructive {
-    @apply text-danger;
+    @apply text-danger-extra-dark;
+    @apply dark:text-danger;
+
+    &:hover {
+        @apply bg-danger text-danger-contrast;
+        @apply dark:bg-danger-extra-light;
+
+        .description {
+            @apply text-danger-contrast;
+        }
+    }
 
     &:active {
         @apply bg-danger text-white;
@@ -60,11 +70,17 @@
     }
 
     &[data-disabled] {
-        @apply opacity-30;
+        @apply opacity-30 hover:bg-transparent hover:text-danger-extra-dark;
+
+        .description {
+            @apply text-danger-dark;
+            @apply dark:text-danger-extra-light;
+        }
     }
 
     .description {
-        @apply text-danger;
+        @apply text-danger-dark;
+        @apply dark:text-danger-extra-light;
     }
 }
 

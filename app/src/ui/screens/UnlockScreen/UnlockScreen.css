@@ -6,7 +6,7 @@
     @apply fixed inset-0 pointer-events-none;
     isolation: isolate;
     z-index: -1;
-    background-color: rgb(var(--body-bg));
+    background-color: var(--color-body-bg);
 
     .noise {
         @apply fixed inset-0;
@@ -29,8 +29,8 @@
     .spot-1 {
         background-image: radial-gradient(
             circle,
-            rgba(var(--color-primary) / 1),
-            rgba(var(--color-primary) / 0) 30%
+            var(--color-primary),
+            transparent 30%
         );
 
         top: -40%;
@@ -38,8 +38,8 @@
         @media (min-width: 768px) {
             background-image: radial-gradient(
                 circle,
-                rgba(var(--color-primary) / 1),
-                rgba(var(--color-primary) / 0) 70%
+                var(--color-primary),
+                transparent 70%
             );
             top: -18%;
             left: -2%;
@@ -49,8 +49,8 @@
     .spot-2 {
         background-image: radial-gradient(
             circle,
-            rgba(var(--color-danger) / 1),
-            rgba(var(--color-danger) / 0) 40%
+            var(--color-danger),
+            transparent 40%
         );
         width: 100vh;
 
@@ -59,8 +59,8 @@
         @media (min-width: 768px) {
             background-image: radial-gradient(
                 circle,
-                rgba(var(--color-danger) / 1),
-                rgba(var(--color-danger) / 0) 60%
+                var(--color-danger),
+                transparent 60%
             );
             top: -5%;
             left: -16%;
@@ -71,8 +71,8 @@
         height: 100vh;
         background-image: radial-gradient(
             circle,
-            rgba(var(--color-success) / 1),
-            rgba(var(--color-success) / 0) 30%
+            var(--color-success),
+            transparent 30%
         );
 
         top: -45%;
@@ -80,8 +80,8 @@
         @media (min-width: 768px) {
             background-image: radial-gradient(
                 circle,
-                rgba(var(--color-success) / 1),
-                rgba(var(--color-success) / 0) 60%
+                var(--color-success),
+                transparent 60%
             );
             top: -35%;
             left: 5%;
@@ -143,18 +143,18 @@
     h1 {
         @apply ps-4 text-7xl mb-4 font-serif font-semibold;
 
-        color: rgb(var(--body-bg));
+        color: var(--color-body-bg);
         text-shadow:
-            2px 2px 0 rgb(var(--body-bg-contrast)),
-            -1px -1px 0 rgb(var(--body-bg-contrast)),
-            1px -1px 0 rgb(var(--body-bg-contrast)),
-            -1px 1px 0 rgb(var(--body-bg-contrast)),
-            1px 1px 0 rgb(var(--body-bg-contrast)),
-            4px 4px 0px rgb(var(--body-bg));
+            2px 2px 0 var(--color-body-bg-contrast),
+            -1px -1px 0 var(--color-body-bg-contrast),
+            1px -1px 0 var(--color-body-bg-contrast),
+            -1px 1px 0 var(--color-body-bg-contrast),
+            1px 1px 0 var(--color-body-bg-contrast),
+            4px 4px 0px var(--color-body-bg);
     }
 
     .btn.primary {
-        --btn-border-color: var(--body-bg-contrast);
+        --btn-border-color: var(--color-body-bg-contrast);
         @apply border-2;
     }
 
@@ -167,23 +167,23 @@
 
 :root.dark {
     .logo {
-        color: rgb(var(--body-bg-contrast));
+        color: var(--color-body-bg-contrast);
         text-shadow:
-            3px 3px 0 rgb(var(--body-bg)),
-            -1px -1px 0 rgb(var(--body-bg)),
-            1px -1px 0 rgb(var(--body-bg)),
-            -1px 1px 0 rgb(var(--body-bg)),
-            1px 1px 0 rgb(var(--body-bg));
+            3px 3px 0 var(--color-body-bg),
+            -1px -1px 0 var(--color-body-bg),
+            1px -1px 0 var(--color-body-bg),
+            -1px 1px 0 var(--color-body-bg),
+            1px 1px 0 var(--color-body-bg);
     }
 
     .unlock-window h1 {
-        color: rgb(var(--body-bg-contrast));
+        color: var(--color-body-bg-contrast);
         text-shadow:
-            3px 3px 0 rgb(var(--body-bg)),
-            -1px -1px 0 rgb(var(--body-bg)),
-            1px -1px 0 rgb(var(--body-bg)),
-            -1px 1px 0 rgb(var(--body-bg)),
-            1px 1px 0 rgb(var(--body-bg));
+            3px 3px 0 var(--color-body-bg),
+            -1px -1px 0 var(--color-body-bg),
+            1px -1px 0 var(--color-body-bg),
+            -1px 1px 0 var(--color-body-bg),
+            1px 1px 0 var(--color-body-bg);
     }
 }
 
