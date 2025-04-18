@@ -34,6 +34,8 @@ import type {
     TextDirective,
 } from "mdast-util-directive"
 
+import type { Screens } from "@/control/NavigationController"
+
 interface Document {
     id: string
     footnotes: React.ReactNode[]
@@ -50,8 +52,8 @@ interface ComponentMap {
     }>
     Link?: React.ComponentType<
         React.AnchorHTMLAttributes<any> & {
-            screen: string
-            params: any
+            screen?: keyof Screens
+            params?: Screens[keyof Screens]
         }
     >
     Image?: React.ComponentType<{
