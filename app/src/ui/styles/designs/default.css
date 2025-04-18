@@ -57,7 +57,7 @@
             @apply top-2 right-2;
         }
 
-        &>* {
+        & > * {
             @apply tablet:bg-surface-level-2 tablet:rounded-3xl tablet:p-2;
         }
     }

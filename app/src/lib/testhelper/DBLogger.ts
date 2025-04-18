@@ -1,5 +1,5 @@
-import type { Database, DBExec, DBValue } from "@/lib/database"
 import type { Context } from "@/lib/context"
+import type { DBExec, DBValue, Database } from "@/lib/database"
 import type { AsyncResult } from "@/lib/result"
 
 export class DBLogger implements Database {

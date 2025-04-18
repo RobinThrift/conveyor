@@ -8,8 +8,8 @@ import React, {
 } from "react"
 
 import { newID } from "@/domain/ID"
-import { Code } from "@/ui/components/Markdown/Code"
 import { CaretDownIcon } from "@/ui/components/Icons"
+import { Code } from "@/ui/components/Markdown/Code"
 
 export function SQLLogDevTool() {
     let ref = useRef<HTMLDivElement | null>(null)

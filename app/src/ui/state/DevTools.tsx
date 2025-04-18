@@ -1,9 +1,9 @@
-import React from "react"
 import { createDevTools } from "@redux-devtools/core"
 import { DockMonitor } from "@redux-devtools/dock-monitor"
 import { InspectorMonitor, type Tab } from "@redux-devtools/inspector-monitor"
-import type { Action } from "redux"
 import { TraceTab } from "@redux-devtools/inspector-monitor-trace-tab"
+import React from "react"
+import type { Action } from "redux"
 
 import { SQLLogDevTool } from "@/lib/testhelper/SQLLogDevTool"
 

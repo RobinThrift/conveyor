@@ -31,7 +31,11 @@
     &:disabled {
         background-color: color-mix(in srgb, var(--btn-bg) 80%, transparent);
         color: color-mix(in srgb, var(--btn-color) 80%, transparent);
-        border-color: color-mix(in srgb, var(--btn-border-color) 70%, transparent);
+        border-color: color-mix(
+            in srgb,
+            var(--btn-border-color) 70%,
+            transparent
+        );
     }
 }
 
@@ -107,7 +111,11 @@
     &:disabled {
         background-color: transparent !important;
         color: color-mix(in srgb, var(--btn-border-color) 50%, transparent);
-        border-color: color-mix(in srgb, var(--btn-border-color) 30%, transparent);
+        border-color: color-mix(
+            in srgb,
+            var(--btn-border-color) 30%,
+            transparent
+        );
     }
 }
 

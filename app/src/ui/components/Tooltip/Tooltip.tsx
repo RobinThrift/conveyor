@@ -1,10 +1,10 @@
+import clsx from "clsx"
+import React from "react"
 import {
     OverlayArrow as AriaOverlayArrow,
     Tooltip as AriaTooltip,
     TooltipTrigger as AriaTooltipTrigger,
 } from "react-aria-components"
-import clsx from "clsx"
-import React from "react"
 
 export interface TooltipProps {
     className?: string

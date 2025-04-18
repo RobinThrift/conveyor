@@ -29,7 +29,11 @@
 
 .offcanvas-backdrop {
     @apply fixed inset-0;
-    background-color: color-mix(in srgb, var(--color-modal-overlay-bg) 80%, transparent);
+    background-color: color-mix(
+        in srgb,
+        var(--color-modal-overlay-bg) 80%,
+        transparent
+    );
     z-index: 9999;
     transition: opacity 250ms;
     opacity: 1;

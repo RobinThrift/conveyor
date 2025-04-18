@@ -1,6 +1,6 @@
-import { formatCss, converter, type Hsl } from "culori"
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
+import { type Hsl, converter, formatCss } from "culori"
 
 const variants = [
     "DEFAULT",
