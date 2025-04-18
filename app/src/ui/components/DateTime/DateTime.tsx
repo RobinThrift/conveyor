@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react"
+import { ToggleButton as AriaButton } from "react-aria-components"
 
 import {
     type CalendarDate,
@@ -108,21 +109,20 @@ const RelativeDateTime = React.memo(function RelativeDateTime({
                     : t.ShowAbsoluteDateTooltip
             }
         >
-            <button
+            <AriaButton
                 type="button"
-                tabIndex={0}
-                onClick={() => setShowAbsolute(!showAbsolute)}
+                onChange={() => setShowAbsolute(!showAbsolute)}
                 aria-label={
                     showAbsolute
                         ? t.ShowRelativeDateTooltip
                         : t.ShowAbsoluteDateTooltip
                 }
-                aria-pressed={showAbsolute}
+                isSelected={showAbsolute}
             >
                 <time {...intrinsics} dateTime={JSON.stringify(date)} ref={ref}>
                     {formatted}
                 </time>
-            </button>
+            </AriaButton>
         </Tooltip>
     )
 })

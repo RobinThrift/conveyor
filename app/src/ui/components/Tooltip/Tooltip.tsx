@@ -1,4 +1,8 @@
-import { Tooltip as BaseUITooltip } from "@base-ui-components/react/tooltip"
+import {
+    OverlayArrow as AriaOverlayArrow,
+    Tooltip as AriaTooltip,
+    TooltipTrigger as AriaTooltipTrigger,
+} from "react-aria-components"
 import clsx from "clsx"
 import React from "react"
 
@@ -9,44 +13,25 @@ export interface TooltipProps {
     content: React.ReactNode | React.ReactNode[]
 
     placement?: "top" | "bottom" | "right" | "left"
-    sideOffset?: number
 
-    disabled?: boolean
-    open?: boolean
+    isDisabled?: boolean
 }
 
 export function Tooltip(props: TooltipProps) {
-    let sideOffset = props.sideOffset ?? 10
     return (
-        <BaseUITooltip.Provider>
-            <BaseUITooltip.Root open={props.open}>
-                <BaseUITooltip.Trigger
-                    render={(triggerProps: any) =>
-                        React.Children.map(props.children, (c) => {
-                            return React.cloneElement(c as any, {
-                                ...triggerProps,
-                                ...(c as any).props,
-                            })
-                        }) as any
-                    }
-                />
-                <BaseUITooltip.Portal>
-                    <BaseUITooltip.Positioner
-                        side={props.placement ?? "bottom"}
-                        sideOffset={sideOffset}
-                    >
-                        <BaseUITooltip.Popup
-                            className={clsx("tooltip", props.className)}
-                        >
-                            {props.content}
-                            <BaseUITooltip.Arrow className="tooltip-arrow">
-                                <Arrow />
-                            </BaseUITooltip.Arrow>
-                        </BaseUITooltip.Popup>
-                    </BaseUITooltip.Positioner>
-                </BaseUITooltip.Portal>
-            </BaseUITooltip.Root>
-        </BaseUITooltip.Provider>
+        <AriaTooltipTrigger isDisabled={props.isDisabled} delay={500}>
+            {props.children}
+            <AriaTooltip
+                className={clsx("tooltip", props.className)}
+                placement={props.placement}
+                offset={10}
+            >
+                <AriaOverlayArrow className="tooltip-arrow">
+                    <Arrow />
+                </AriaOverlayArrow>
+                {props.content}
+            </AriaTooltip>
+        </AriaTooltipTrigger>
     )
 }
 

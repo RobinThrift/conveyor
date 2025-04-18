@@ -29,21 +29,17 @@ div[data-floating-ui-portal]:has(.tooltip) div[role="presentation"] {
 }
 
 .tooltip-arrow {
-    @apply fill-surface;
+    @apply fill-surface-level-1;
 
-    &[data-side="bottom"] {
-        @apply top-[1px] -translate-y-full;
+    &[data-placement="top"] {
+        @apply rotate-180 -translate-x-full;
     }
 
-    &[data-side="top"] {
-        @apply bottom-0 translate-y-full rotate-180;
+    &[data-placement="left"] {
+        @apply right-[5px] translate-y-[-15px] translate-x-full rotate-90;
     }
 
-    &[data-side="left"] {
-        @apply right-[6px] translate-x-full rotate-90;
-    }
-
-    &[data-side="right"] {
-        @apply left-[6px] -translate-x-full -rotate-90;
+    &[data-placement="right"] {
+        @apply left-[2px] -translate-x-full -rotate-90 translate-y-[5px];
     }
 }
