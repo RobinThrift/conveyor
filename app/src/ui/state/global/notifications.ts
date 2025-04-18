@@ -25,10 +25,7 @@ export const slice = createSlice({
                 notification: Notification
             }>,
         ) => {
-            return {
-                ...state,
-                notifications: [...state.notifications, payload.notification],
-            }
+            state.notifications = [...state.notifications, payload.notification]
         },
         remove: (state, { payload }: PayloadAction<{ index: number }>) => {
             let notifications = [...state.notifications]

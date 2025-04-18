@@ -4,7 +4,7 @@ export interface Notification {
     type: "info" | "error"
     title: string
     message?: string
-    buttons?: (ButtonProps & { ariaLabel: string })[]
+    buttons?: Omit<ButtonProps, "ref">[]
     durationMs?: number
     requiresAction?: boolean
 }
