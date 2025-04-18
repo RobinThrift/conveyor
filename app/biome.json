@@ -71,7 +71,8 @@
                 "src/domain/ID.ts",
                 "src/i18n/translations/*",
                 "src/storage/database/sqlite/gen/*",
-                "src/storage/database/sqlite/sqlc-plugin/proto/*"
+                "src/storage/database/sqlite/sqlc-plugin/proto/*",
+                "src/ui/styles/colourschemes/generate-colourscheme.ts"
             ],
             "linter": {
                 "rules": {
