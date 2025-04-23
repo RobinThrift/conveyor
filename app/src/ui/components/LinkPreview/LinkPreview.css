@@ -23,7 +23,7 @@
             .description {
                 @apply p-1 rounded-sm;
                 color: white;
-                text-shadow: 1px 1px 5px rgb(0 0 0 / 0.8);
+                text-shadow: 1px 1px 5px rgba(0 0 0 / 0.8);
                 mix-blend-mode: lighten;
                 backdrop-filter: contrast(0.7) brightness(0.95);
             }
@@ -50,7 +50,7 @@
 
 .link-preview-hover-card {
     @apply rounded-lg bg-surface-level-1 p-4 w-fit max-w-[300px];
-    filter: drop-shadow(1px 1px 10px rgb(0 0 0 / 0.1));
+    filter: drop-shadow(1px 1px 10px rgba(0 0 0 / 0.1));
 
     &[data-state="open"] {
         @apply animate-in fade-in-80 slide-in-from-bottom-2;

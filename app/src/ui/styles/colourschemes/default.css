@@ -182,10 +182,10 @@
 /* Code */
 :root {
     --code-foreground: #333333;
-    --code-background: rgb(var(--surface-bg));
+    --code-background: var(--color-surface-level-1);
 
     --code-selection-background: #4b69c6;
-    --code-selection-foreground: rgb(var(--surface-bg));
+    --code-selection-foreground: var(--color-surface-level-1);
 
     --code-keyword: #4b69c6;
     --code-url: var(--code-keyword);
@@ -222,10 +222,10 @@
 
 .dark {
     --code-foreground: #787c99;
-    --code-background: rgb(var(--surface-bg));
+    --code-background: var(--color-surface-level-1);
 
     --code-selection-background: #787c99;
-    --code-selection-foreground: rgb(var(--surface-bg));
+    --code-selection-foreground: var(--color-surface-level-1);
 
     --code-name: #c0caf5;
     --code-keyword: #bb9af7;

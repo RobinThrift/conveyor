@@ -233,10 +233,10 @@
 /* Code */
 .warm {
     --code-foreground: #333333;
-    --code-background: rgb(var(--surface-bg));
+    --code-background: var(--surface-level-1);
 
     --code-selection-background: #333333;
-    --code-selection-foreground: rgb(var(--surface-bg));
+    --code-selection-foreground: var(--color-surface-level-1);
 
     --code-keyword: #b25153;
     --code-url: var(--code-keyword);
@@ -272,10 +272,10 @@
 
 .warm.dark {
     --code-foreground: #787c99;
-    --code-background: rgb(var(--surface-bg));
+    --code-background: var(--color-surface-level-1);
 
     --code-selection-background: #787c99;
-    --code-selection-foreground: rgb(var(--surface-bg));
+    --code-selection-foreground: var(--color-surface-level-1);
 
     --code-name: #c0caf5;
     --code-keyword: var(--color-primary);
