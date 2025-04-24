@@ -7,5 +7,5 @@
 }
 
 .image-zoom [data-rmiz-modal-overlay="visible"] {
-    @apply bg-black/50 backdrop-blur;
+    @apply bg-black/50! backdrop-blur;
 }
