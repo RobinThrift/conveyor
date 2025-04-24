@@ -4,7 +4,7 @@ import { classHighlighter, highlightCode } from "@lezer/highlight"
 import React, { useMemo, useRef } from "react"
 
 import { useIdleCallback } from "@/ui/hooks/useIdleCallback"
-import { useOnVisible } from "@/ui/hooks/useLoadOnVisible"
+import { useOnVisible } from "@/ui/hooks/useOnVisible"
 import { usePromise } from "@/ui/hooks/usePromise"
 import { useNotificationDispatcher } from "@/ui/state/global/notifications"
 
@@ -15,7 +15,7 @@ export function Code({
     meta,
 }: { className?: string; children: string; lang?: string; meta?: string }) {
     let ref = useRef(null)
-    let isVisible = useOnVisible(ref, { ratio: 0 })
+    let isVisible = useOnVisible(ref, { ratio: 0.1 })
 
     let highlighted: React.ReactNode | undefined = useMemo(() => {
         if (isVisible) {

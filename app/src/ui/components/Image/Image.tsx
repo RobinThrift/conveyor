@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useRef } from "react"
 import "react-medium-image-zoom/dist/styles.css"
 
 import { thumbhashToDataURL } from "@/external/thumbhash"
@@ -12,8 +12,9 @@ export interface ImageProps {
 }
 
 export function Image(props: ImageProps) {
+    let ref = useRef<HTMLImageElement | null>(null)
     let attachment = useMemo(() => parseImgURL(props.src), [props.src])
-    let attachmentData = useAttachment({ id: attachment?.attachmentID })
+    let attachmentData = useAttachment({ id: attachment?.attachmentID, ref })
     let hash = attachment?.thumbhash
 
     let attachmentURL = useMemo(() => {
@@ -34,6 +35,7 @@ export function Image(props: ImageProps) {
 
     return (
         <img
+            ref={ref}
             src={src}
             alt={props.alt}
             loading="lazy"

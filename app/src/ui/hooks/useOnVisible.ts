@@ -11,7 +11,7 @@ export function useOnVisible(
             let observer = new IntersectionObserver(
                 (entries: IntersectionObserverEntry[]) => {
                     let intersected =
-                        (entries[0].intersectionRatio ?? 0) > options.ratio
+                        (entries[0].intersectionRatio ?? 0) >= options.ratio
                     if (intersected) {
                         setIsVisble(intersected)
                         observer.disconnect()
@@ -41,9 +41,9 @@ export function useOnVisible(
         options.ratio,
     ])
 
-    if (!isVisible && ref.current && visualViewport) {
+    if (!isVisible && ref.current && window.visualViewport) {
         let boundingClientRect = ref.current.getBoundingClientRect()
-        if (boundingClientRect.top < visualViewport.height) {
+        if (boundingClientRect.top < window.visualViewport.height) {
             return true
         }
     }

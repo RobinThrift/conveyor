@@ -67,7 +67,10 @@ export function MemoListFilter(props: MemoListFilterProps) {
                         </nav>
                     </OffCanvas.Content>
                 </OffCanvas>
-                <SearchBar onChange={onChangeSearch} query={props.filter.query} />
+                <SearchBar
+                    onChange={onChangeSearch}
+                    query={props.filter.query}
+                />
             </div>
 
             <div

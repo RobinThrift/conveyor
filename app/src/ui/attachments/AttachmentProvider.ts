@@ -1,9 +1,17 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import {
+    createContext,
+    RefObject,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react"
 
 import type { AttachmentController } from "@/control/AttachmentController"
 import type { Attachment, AttachmentID } from "@/domain/Attachment"
 import { BaseContext } from "@/lib/context"
 import { type AsyncResult, Err } from "@/lib/result"
+import { useOnVisible } from "../hooks/useOnVisible"
 
 export interface AttachmentContext {
     getAttachmentDataByID(
@@ -32,7 +40,15 @@ export function attachmentContextFromController(
     }
 }
 
-export function useAttachment({ id }: { id?: AttachmentID }) {
+export function useAttachment({
+    id,
+    ref,
+    loadOnVisible = ref !== undefined,
+}: {
+    id?: AttachmentID
+    loadOnVisible?: boolean
+    ref?: RefObject<HTMLElement | null>
+}) {
     let attachmentProvider = useAttachmentProvider()
     let [state, setState] = useState<
         | {
@@ -43,8 +59,17 @@ export function useAttachment({ id }: { id?: AttachmentID }) {
           }
         | undefined
     >(undefined)
+    let fbRef = useRef(null)
+
+    let isVisible = useOnVisible(ref || fbRef, {
+        ratio: 0.2,
+    })
 
     useEffect(() => {
+        if (loadOnVisible && !isVisible) {
+            return
+        }
+
         if (!id || id === state?.id) {
             return
         }
@@ -67,7 +92,13 @@ export function useAttachment({ id }: { id?: AttachmentID }) {
                 return { id, data: load.value.data, isLoading: false }
             })
         })
-    }, [id, state?.id, attachmentProvider.getAttachmentDataByID])
+    }, [
+        loadOnVisible,
+        isVisible,
+        id,
+        state?.id,
+        attachmentProvider.getAttachmentDataByID,
+    ])
 
     return state
 }
