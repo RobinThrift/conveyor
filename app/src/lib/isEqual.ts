@@ -1,19 +1,8 @@
+import { CalendarDate } from "@internationalized/date"
 import { isPlainObject } from "./isPlainObject"
 import { isPrimitive } from "./isPrimitive"
 
 export function isEqual(a: any, b: any): boolean {
-    // Each type corresponds to a particular comparison algorithm
-    let getType = (value: any) => {
-        if (isPrimitive(value)) return "primitive"
-        if (Array.isArray(value)) return "array"
-        if (value instanceof Map) return "map"
-        if (value instanceof Date) return "date"
-        if (isPlainObject(value)) return "plainObject"
-        throw new Error(
-            `deeply comparing an instance of type ${a.constructor?.name} is not supported.`,
-        )
-    }
-
     let type = getType(a)
     if (type !== getType(b)) {
         return false
@@ -31,8 +20,7 @@ export function isEqual(a: any, b: any): boolean {
     }
 
     if (type === "map") {
-        // In this particular implementation, map keys are not
-        // being deeply compared, only map values.
+        // keys are not deeply compared, only values
         return (
             a.size === b.size &&
             [...a].every(([iterKey, iterValue]) => {
@@ -59,5 +47,21 @@ export function isEqual(a: any, b: any): boolean {
         )
     }
 
+    if (type === "CalendarDate") {
+        return a.compare(b) === 0
+    }
+
     throw new Error("Unreachable")
+}
+
+function getType(value: any) {
+    if (isPrimitive(value)) return "primitive"
+    if (Array.isArray(value)) return "array"
+    if (value instanceof Map) return "map"
+    if (value instanceof Date) return "date"
+    if (isPlainObject(value)) return "plainObject"
+    if (value instanceof CalendarDate) return "CalendarDate"
+    throw new Error(
+        `deeply comparing an instance of type ${value.constructor?.name} is not supported.`,
+    )
 }
