@@ -1,6 +1,6 @@
 import {
+    type RefObject,
     createContext,
-    RefObject,
     useContext,
     useEffect,
     useRef,

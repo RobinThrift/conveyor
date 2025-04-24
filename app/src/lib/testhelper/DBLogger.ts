@@ -1,8 +1,8 @@
-import type { Context } from "@/lib/context"
 import { newID } from "@/domain/ID"
-import type { DBExec, DBValue, Database } from "@/lib/database"
-import { fromPromise, type AsyncResult } from "@/lib/result"
 import { Lock } from "@/lib/Lock"
+import type { Context } from "@/lib/context"
+import type { DBExec, DBValue, Database } from "@/lib/database"
+import { type AsyncResult, fromPromise } from "@/lib/result"
 
 export class DBLogger implements Database {
     private _lock: Lock
