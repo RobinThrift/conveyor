@@ -1,14 +1,20 @@
 import type { Context } from "@/lib/context"
+import { newID } from "@/domain/ID"
 import type { DBExec, DBValue, Database } from "@/lib/database"
-import type { AsyncResult } from "@/lib/result"
+import { fromPromise, type AsyncResult } from "@/lib/result"
+import { Lock } from "@/lib/Lock"
 
 export class DBLogger implements Database {
+    private _lock: Lock
     private _db: Database
     private _log: (event: string, args?: any) => void
 
     constructor(db: Database, log: (event: string, args?: any) => void) {
         this._db = db
+        this._lock = new Lock(`dblogger_${newID()}}`)
         this._log = log
+        // @ts-expect-error: this is for debugging
+        globalThis.__CONVEYOR_DB__ = this
     }
 
     open(
@@ -26,14 +32,6 @@ export class DBLogger implements Database {
     close(): Promise<void> {
         this._log("close")
         return this._db.close()
-    }
-
-    inTransaction<R>(
-        ctx: Context<{ db?: DBExec }>,
-        fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
-    ): AsyncResult<R> {
-        this._log("inTransaction")
-        return this._db.inTransaction(ctx, fn)
     }
 
     exec(sql: string, args?: DBValue[], abort?: AbortSignal): Promise<number> {
@@ -57,5 +55,39 @@ export class DBLogger implements Database {
     ): Promise<R | undefined> {
         this._log("queryOne", [sql, args])
         return this._db.queryOne(sql, args, abort)
+    }
+
+    inTransaction<R>(
+        ctx: Context<{ db?: DBExec }>,
+        fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
+    ): AsyncResult<R> {
+        this._log("inTransaction")
+
+        let tx = ctx.getData("db")
+        if (tx) {
+            return fn(ctx.withData("db", tx))
+        }
+
+        return this._lock.run(ctx, async (ctx: Context) => {
+            let begin = await fromPromise(
+                this.exec("BEGIN DEFERRED TRANSACTION"),
+            )
+            if (!begin.ok) {
+                return begin
+            }
+
+            let res = await fn(ctx.withData("db", this))
+            if (!res.ok) {
+                await this.exec("ROLLBACK TRANSACTION")
+                return res
+            }
+
+            let commit = await fromPromise(this.exec("COMMIT TRANSACTION"))
+            if (!commit.ok) {
+                return commit
+            }
+
+            return res
+        })
     }
 }
