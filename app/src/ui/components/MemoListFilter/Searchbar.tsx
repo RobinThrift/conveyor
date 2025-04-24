@@ -7,6 +7,7 @@ import { useDebounce } from "@/ui/hooks/useDebounce"
 
 export function SearchBar(props: {
     onChange: (v: string) => void
+    query?: string
 }) {
     let onChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,6 +34,7 @@ export function SearchBar(props: {
                 type="search"
                 icon={<MagnifyingGlassIcon weight="duotone" />}
                 onChange={onChangeDebounced}
+                defaultValue={props.query}
             />
         </Form>
     )
