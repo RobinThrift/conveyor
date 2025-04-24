@@ -21,8 +21,9 @@ export function useMemoState(props: {
         ) => void
     }
 }) {
+    let forceRender = props.forceRender ?? false
     let ref = useRef<HTMLDivElement | null>(null)
-    let isVisible = useOnVisible(ref, { ratio: 0.01 })
+    let isVisible = useOnVisible(ref, { ratio: 0.1 })
     let { title, body } = splitContent(props.memo.content)
     let [isExpanded, setIsExpanded] = useState(!props.collapsible)
     let [needsCollapsing, setNeedsCollapsing] = useState(
@@ -76,11 +77,7 @@ export function useMemoState(props: {
         }
     }, [props.memo.id, props.doubleClickToEdit, props.actions?.edit])
 
-    let shouldRender =
-        isVisible ||
-        props.forceRender ||
-        (ref.current?.getBoundingClientRect().top ?? 0) <
-            (window.visualViewport?.pageTop ?? 0)
+    let shouldRender = isVisible || forceRender
 
     return {
         ref,
