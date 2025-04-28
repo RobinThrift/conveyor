@@ -29,7 +29,10 @@ cd ext/wasm;
 
 git apply /patches/GNUmakefile.patch
 
-make release
+make -j2 -e "emcc_opt=-Oz" \
+    jswasm/sqlite3-bundler-friendly.mjs \
+    jswasm/sqlite3-opfs-async-proxy.js \
+    jswasm/sqlite3.mjs
 
 if [ ! -d "$OUTDIR" ]; then
     mkdir -p "$OUTDIR"

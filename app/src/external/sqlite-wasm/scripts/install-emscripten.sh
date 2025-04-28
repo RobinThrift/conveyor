@@ -8,6 +8,7 @@ EMSDK_CACHE_DIR="/.cache/emsdk"
 if [ -d "${EMSDK_CACHE_DIR}" ]; then
     cp -r "${EMSDK_CACHE_DIR}" /emsdk;
     cd /emsdk;
+    git checkout HEAD -- .
     git pull;
 else
     git clone https://github.com/emscripten-core/emsdk.git /emsdk;
