@@ -2,6 +2,7 @@ import type { UnlockController } from "@/control/UnlockController"
 import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
+import * as nav from "../navigation"
 import * as settings from "../settings"
 import * as setup from "../setup"
 import * as sync from "../sync"
@@ -42,23 +43,29 @@ export const registerEffects = (
 
             if (!unlocked.ok) {
                 dispatch(
-                    slice.actions.setIsUnlocked({
+                    slice.actions.setUnlockState({
                         error: unlocked.err,
-                        isUnlocked: false,
+                        state: "locked",
                     }),
                 )
                 return
             }
 
             dispatch(
-                slice.actions.setIsUnlocked({
-                    isUnlocked: true,
+                slice.actions.setUnlockState({
+                    state: "unlocked",
                 }),
             )
 
             dispatch(settings.actions.loadStart())
-            dispatch(sync.actions.loadSyncInfo())
-            dispatch(sync.actions.syncStart())
+            dispatch(sync.actions.loadSyncInfo({ syncOnLoad: true }))
+            dispatch(
+                nav.actions.setPage({
+                    name: "root",
+                    params: {},
+                    restore: { scrollOffsetTop: 0 },
+                }),
+            )
         },
     })
 
@@ -93,8 +100,8 @@ export const registerEffects = (
             }
 
             dispatch(
-                slice.actions.setIsUnlocked({
-                    isUnlocked: true,
+                slice.actions.setUnlockState({
+                    state: "unlocked",
                 }),
             )
 

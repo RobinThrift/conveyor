@@ -35,7 +35,14 @@ export function SettingsLoader({ children }: React.PropsWithChildren) {
     }
 
     if (isLoading) {
-        return <Loader />
+        return (
+            <>
+                <div className="absolute z-30 inset-0 bg-primary flex items-center justify-center">
+                    <Loader className="[--loader-color:var(--color-primary-contrast)]" />
+                </div>
+                {children}
+            </>
+        )
     }
 
     return children

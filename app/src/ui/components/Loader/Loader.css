@@ -2,8 +2,13 @@
     --loader-color: var(--color-text);
     width: 90px;
     height: 14px;
-    box-shadow: 0 3px 0 var(--color-text);
-    background: repeating-linear-gradient(90deg, var(--loader-color) 0 14px, #0000 0 100%) 0 0 / calc(100% / 4) 100%;
+    box-shadow: 0 3px 0 var(--loader-color);
+    background: repeating-linear-gradient(
+            90deg,
+            var(--loader-color) 0 14px,
+            #0000 0 100%
+        )
+        0 0 / calc(100% / 4) 100%;
     animation: loading 1s infinite linear;
 }
 

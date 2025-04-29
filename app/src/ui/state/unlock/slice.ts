@@ -3,12 +3,12 @@ import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 
 export interface UnlockState {
-    isUnlocked?: boolean
+    state: "locked" | "unlocking" | "unlocked"
     error?: Error
 }
 
 const initialState: UnlockState = {
-    isUnlocked: false,
+    state: "locked",
 }
 
 export const slice = createSlice({
@@ -27,18 +27,22 @@ export const slice = createSlice({
             }>,
         ) => {
             state.error = undefined
+            state.state = "unlocking"
         },
-        setIsUnlocked: (
+        setUnlockState: (
             state,
-            { payload }: PayloadAction<{ isUnlocked: boolean; error?: Error }>,
+            {
+                payload,
+            }: PayloadAction<{ state: UnlockState["state"]; error?: Error }>,
         ) => {
-            state.isUnlocked = payload.isUnlocked
+            state.state = payload.state
             state.error = payload.error
         },
     },
 
     selectors: {
-        isUnlocked: (state) => state.isUnlocked,
+        isUnlocked: (state) => state.state === "unlocked",
+        state: (state) => state.state,
         error: (state) => state.error,
     },
 })

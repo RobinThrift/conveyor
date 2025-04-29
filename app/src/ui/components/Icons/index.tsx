@@ -42,3 +42,9 @@ export const HashIcon = lazy(() =>
         default: Hash,
     })),
 )
+
+export const LockIcon = lazy(() =>
+    import("./LockIcon").then(({ LockIcon }) => ({
+        default: LockIcon,
+    })),
+)

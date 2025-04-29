@@ -42,6 +42,7 @@ import {
     actions,
     configureEffects,
     configureRootStore,
+    selectors,
 } from "@/ui/state"
 
 import type { InitPlatform, PlatformDependencies } from "./init.platform"
@@ -303,7 +304,7 @@ async function tryAutoUnlock(
     let unsub = rootStore.subscribe(() => {
         let state = rootStore.getState()
 
-        if (state.unlock.isUnlocked) {
+        if (selectors.unlock.isUnlocked(state)) {
             unsub()
             tryUnlock.resolve()
             return

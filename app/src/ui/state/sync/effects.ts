@@ -159,7 +159,10 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.loadSyncInfo,
-        effect: async (_, { cancelActiveListeners, dispatch, signal }) => {
+        effect: async (
+            { payload },
+            { cancelActiveListeners, dispatch, signal },
+        ) => {
             cancelActiveListeners()
 
             let loaded = await syncCtrl.load(BaseContext.withSignal(signal))
@@ -181,7 +184,12 @@ export const registerEffects = (
                         ...loaded.value,
                     }),
                 )
-                dispatch(slice.actions.setStatus({ status: "ready" }))
+                dispatch(
+                    slice.actions.setStatus({
+                        status: "ready",
+                        isSyncRequested: payload?.syncOnLoad,
+                    }),
+                )
             }
         },
     })

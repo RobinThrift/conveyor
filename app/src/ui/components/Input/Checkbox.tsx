@@ -12,6 +12,7 @@ export interface CheckboxProps {
     name: string
     defaultChecked?: boolean
     value?: boolean
+    isDisabled?: boolean
     onChange?: (checked: boolean | "indeterminate") => void
 }
 
@@ -26,6 +27,7 @@ export function Checkbox(props: CheckboxProps) {
                 defaultChecked={props.defaultChecked}
                 onCheckedChange={props.onChange}
                 checked={props.value}
+                disabled={props.isDisabled}
             >
                 <RadixCheckbox.Indicator className="text-primary">
                     <Check weight="bold" />
