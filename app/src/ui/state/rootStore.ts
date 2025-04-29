@@ -172,6 +172,7 @@ export function configureEffects({
 
     unlock.registerEffects(startListening, {
         unlockCtrl,
+        navCtrl,
     })
 
     apitokens.registerEffects(startListening, {

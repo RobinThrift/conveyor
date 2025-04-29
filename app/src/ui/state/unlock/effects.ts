@@ -1,8 +1,8 @@
+import type { NavigationController } from "@/control/NavigationController"
 import type { UnlockController } from "@/control/UnlockController"
 import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
-import * as nav from "../navigation"
 import * as settings from "../settings"
 import * as setup from "../setup"
 import * as sync from "../sync"
@@ -12,8 +12,10 @@ export const registerEffects = (
     startListening: StartListening,
     {
         unlockCtrl,
+        navCtrl,
     }: {
         unlockCtrl: UnlockController
+        navCtrl: NavigationController
     },
 ) => {
     startListening({
@@ -59,13 +61,13 @@ export const registerEffects = (
 
             dispatch(settings.actions.loadStart())
             dispatch(sync.actions.loadSyncInfo({ syncOnLoad: true }))
-            dispatch(
-                nav.actions.setPage({
+            navCtrl.push({
+                screen: {
                     name: "root",
                     params: {},
-                    restore: { scrollOffsetTop: 0 },
-                }),
-            )
+                },
+                restore: { scrollOffsetTop: 0 },
+            })
         },
     })
 
