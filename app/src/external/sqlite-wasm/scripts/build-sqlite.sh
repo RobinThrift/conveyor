@@ -40,4 +40,4 @@ fi
 
 rm -rf "${OUTDIR}/*"
 
-cp -r /sqlite/ext/wasm/jswasm/{sqlite3-bundler-friendly.mjs,sqlite3.wasm,sqlite3-opfs-async-proxy.js,sqlite3-node.mjs} "${OUTDIR}"
+cp -r /sqlite/ext/wasm/jswasm/{sqlite3-bundler-friendly.mjs,sqlite3.wasm,sqlite3-opfs-async-proxy.js} "${OUTDIR}"
