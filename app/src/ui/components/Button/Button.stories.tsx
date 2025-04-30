@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import React from "react"
 
-import { BinIcon, PlusIcon, SlidersIcon, UserIcon } from "@/ui/components/Icons"
+import {
+    ArrowUpRightIcon,
+    BinIcon,
+    PlusIcon,
+    SlidersIcon,
+    UserIcon,
+} from "@/ui/components/Icons"
 import "@/ui/styles/index.css"
 
 import { Button } from "./Button"
@@ -101,13 +107,14 @@ export const Icons: Story = {
                     <Button {...args} iconLeft={<UserIcon />}>
                         Icon Left
                     </Button>
-                    <Button {...args} iconRight={<BinIcon />}>
+                    <Button {...args} iconRight={<BinIcon />} variant="primary">
                         Icon Right
                     </Button>
                     <Button
                         {...args}
                         iconRight={<PlusIcon />}
                         iconLeft={<SlidersIcon />}
+                        variant="danger"
                     >
                         Icon left and right
                     </Button>
@@ -116,6 +123,7 @@ export const Icons: Story = {
                         {...args}
                         iconRight={<PlusIcon />}
                         aria-label="Icon Only"
+                        variant="success"
                     />
                 </div>
 
@@ -176,8 +184,70 @@ export const Icons: Story = {
                         iconRight={<BinIcon />}
                         aria-label="Icon Only"
                         plain={true}
+                    />
+                    <Button
+                        {...args}
+                        iconRight={<BinIcon />}
+                        aria-label="Icon Only"
+                        plain={true}
+                        variant="primary"
+                    />
+                    <Button
+                        {...args}
+                        iconRight={<BinIcon />}
+                        aria-label="Icon Only"
+                        plain={true}
                         variant="danger"
                     />
+                    <Button
+                        {...args}
+                        iconRight={<BinIcon />}
+                        aria-label="Icon Only"
+                        plain={true}
+                        variant="success"
+                    />
+                </div>
+
+                <h3>Outline</h3>
+                <div className="flex items-start gap-2">
+                    <Button
+                        {...args}
+                        iconRight={<ArrowUpRightIcon />}
+                        aria-label="Icon Only"
+                        outline
+                    >
+                        Goto Link
+                    </Button>
+
+                    <Button
+                        {...args}
+                        iconRight={<ArrowUpRightIcon />}
+                        aria-label="Icon Only"
+                        outline
+                        variant="primary"
+                    >
+                        Goto Link
+                    </Button>
+
+                    <Button
+                        {...args}
+                        iconRight={<ArrowUpRightIcon />}
+                        aria-label="Icon Only"
+                        outline
+                        variant="danger"
+                    >
+                        Goto Link
+                    </Button>
+
+                    <Button
+                        {...args}
+                        iconRight={<ArrowUpRightIcon />}
+                        aria-label="Icon Only"
+                        outline
+                        variant="success"
+                    >
+                        Goto Link
+                    </Button>
                 </div>
             </div>
         )

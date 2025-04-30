@@ -15,7 +15,6 @@ export interface ButtonProps extends AriaButtonProps {
     variant?: "regular" | "primary" | "success" | "danger"
     outline?: boolean
     plain?: boolean
-    coverText?: boolean
     ariaLabel?: string
     ref?: React.Ref<HTMLButtonElement>
 }
@@ -30,7 +29,6 @@ export function Button(props: ButtonProps) {
         variant,
         outline,
         plain,
-        coverText,
         ariaLabel,
         ...intrinsics
     } = props
@@ -48,19 +46,14 @@ export function Button(props: ButtonProps) {
                     lg: size === "lg",
                     "icon-only": !children,
                     "outline-btn": outline,
-                    "cover-text": coverText,
                     plain: plain,
                 },
                 className,
             )}
         >
-            {iconLeft && iconLeft}
+            {iconLeft ? <span className="icon">{iconLeft}</span> : null}
             {children}
-            {coverText && iconRight ? (
-                <div className="btn-cover-text-icon">{iconRight}</div>
-            ) : (
-                iconRight && iconRight
-            )}
+            {iconRight ? <span className="icon">{iconRight}</span> : null}
         </AriaButton>
     )
 }

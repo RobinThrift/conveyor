@@ -9,8 +9,8 @@
     align-items: center;
     text-align: center;
 
-    & > svg {
-        @apply size-4;
+    .icon {
+        @apply size-4 flex items-center;
     }
 
     &:hover {
@@ -98,10 +98,27 @@
     color: var(--btn-bg);
     border: 1px solid var(--btn-border-color);
 
+    &:has(svg) {
+        @apply ps-2! pe-1! gap-1;
+    }
+
+    .icon {
+        @apply rounded-full p-1 size-6;
+        border: 1px solid var(--btn-border-color);
+    }
+
     &:hover {
         background-color: var(--btn-bg);
         color: var(--btn-color);
         border-color: var(--btn-border-color);
+
+        .icon {
+            background-color: var(--btn-color);
+            color: var(--btn-bg);
+            svg {
+                @apply animate-in slide-in-from-left;
+            }
+        }
     }
 
     &:active {
