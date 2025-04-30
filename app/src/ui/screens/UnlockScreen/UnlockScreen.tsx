@@ -7,10 +7,10 @@ import { Button } from "@/ui/components/Button"
 import { Form } from "@/ui/components/Form"
 import { PasswordIcon } from "@/ui/components/Icons"
 import { Input } from "@/ui/components/Input"
-import { Checkbox } from "@/ui/components/Input/Checkbox"
 import { useT } from "@/ui/i18n"
 
 import { Lock } from "./Lock"
+import { StoreUnlockKeyCheckbox } from "./StoreUnlockKeyCheckbox"
 import { useUnlockScreenState } from "./useUnlockScreenState"
 
 export function UnlockScreen() {
@@ -58,11 +58,7 @@ export function UnlockScreen() {
                         disabled={isDisabled}
                     />
 
-                    <Checkbox
-                        name="store_key"
-                        label={t.StoreKeyLabel}
-                        isDisabled={isDisabled}
-                    />
+                    <StoreUnlockKeyCheckbox isDisabled={isDisabled} />
 
                     {error && (
                         <Alert variant="danger">

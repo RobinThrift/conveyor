@@ -20,7 +20,10 @@ import {
 import { SettingsController } from "@/control/SettingsController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
-import { UnlockController } from "@/control/UnlockController"
+import {
+    UnlockController,
+    type Storage as UnlockControllerStorage,
+} from "@/control/UnlockController"
 import type { SyncInfo } from "@/domain/SyncInfo"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
@@ -45,6 +48,7 @@ import {
     selectors,
 } from "@/ui/state"
 
+import { Env } from "./env"
 import type { InitPlatform, PlatformDependencies } from "./init.platform"
 
 declare const __PLATFORM__: "TAURI" | "WEB"
@@ -196,8 +200,18 @@ async function initController(platform: PlatformDependencies) {
         ),
     })
 
+    let unlockControllerStorage: UnlockControllerStorage
+    if (Env.isDeviceSecureStorageAvailable) {
+        unlockControllerStorage = platform.deviceSecureStorage
+    } else {
+        unlockControllerStorage =
+            platform.kvContainers.ephemeral.getKVStore<Record<string, string>>(
+                "unlock",
+            )
+    }
+
     let unlockCtrl = new UnlockController({
-        storage: platform.kvContainers.ephemeral.getKVStore("unlock"),
+        storage: unlockControllerStorage,
         db: db,
         crypto: cryptoCtrl,
     })

@@ -1,6 +1,5 @@
 import type { CryptoController } from "@/control/CryptoController"
 import { AgePrivateCryptoKey, type Identity } from "@/external/age/AgeCrypto"
-import type { KVStore } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 import type { Database } from "@/lib/database"
@@ -41,7 +40,15 @@ export class UnlockController {
             return Ok(undefined)
         }
 
-        return this._storage.getItem(ctx, _plaintextPrivateKeyStorageKey)
+        let key = await this._storage.getItem(
+            ctx,
+            _plaintextPrivateKeyStorageKey,
+        )
+        if (!key.ok) {
+            return key
+        }
+
+        return Ok(key.value as PlaintextPrivateKey | undefined)
     }
 
     public async unlock(
@@ -104,6 +111,8 @@ export class UnlockController {
     }
 }
 
-type Storage = KVStore<{
-    [_plaintextPrivateKeyStorageKey]: PlaintextPrivateKey
-}>
+export interface Storage {
+    setItem(ctx: Context, key: string, value: string): AsyncResult<void>
+    getItem(ctx: Context, key: string): AsyncResult<string | undefined>
+    removeItem(ctx: Context, key: string): AsyncResult<void>
+}

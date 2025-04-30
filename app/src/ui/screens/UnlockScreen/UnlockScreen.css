@@ -1,5 +1,9 @@
 .unlock-screen {
     @apply relative h-[100dvh] px-2 sm:px-4 flex flex-col items-center tablet:justify-center;
+
+    .checkbox-field {
+        @apply flex-row-reverse;
+    }
 }
 
 .unlock-screen .lock {

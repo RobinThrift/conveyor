@@ -1,6 +1,6 @@
 import { BaseContext, type Context } from "@/lib/context"
 import { type FS, join } from "@/lib/fs"
-import type { AsyncResult } from "@/lib/result"
+import { type AsyncResult, Ok } from "@/lib/result"
 
 import { OPFSWorker } from "./opfs.worker"
 
@@ -85,6 +85,10 @@ export class OPFS implements FS {
     }
 
     public async mkdirp(ctx: Context, dirpath: string): AsyncResult<void> {
+        if (dirpath === ".") {
+            return Ok(undefined)
+        }
+
         let ready = await this._ready
         if (!ready.ok) {
             return ready

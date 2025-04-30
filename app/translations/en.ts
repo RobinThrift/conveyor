@@ -168,9 +168,24 @@ export const translations = {
     "screens/Unlock": {
         Title: "Unlock",
         PrivateKeyLabel: "Private Key",
-        StoreKeyLabel: "Store Key for this session",
         UnlockButton: "Unlock",
         "Invalid/Empty": params("{name} must not be empty"),
+    },
+
+    "screens/Unlock/StoreUnlockKeyCheckbox": {
+        LabelWebSession: "Store Key for this session",
+        LabelDeviceSecureStorageWeb:
+            "Store Key in encrypted in local browser storage",
+        LabelDeviceSecureStorageNative: "Store key in device's secure storage",
+
+        ExplainerPopupLabel: "Explanation",
+
+        ExplainerWebSession:
+            "Your plain text private key will be saved in the browsers session storage, which should be deleted everytime you close the browser.",
+        ExplainerDeviceSecureStorageWeb:
+            "You private key will be encrypted using a separate cryptographic key that will be saved in the browser and marked as non-exrtractable.",
+        ExplainerDeviceSecureStorageNative:
+            "Your private key will be saved in your device's harware-backed secure storage element.",
     },
 
     "screens/SingleMemoScreen": {

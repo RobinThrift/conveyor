@@ -2,8 +2,13 @@ import { setEnv } from "@/env"
 import { IndexedDBKVStoreContainer } from "@/external/browser/IndexDBKVStore"
 import { LocalStorageKVStoreContainer } from "@/external/browser/LocalStorageKVStore"
 import { SessionStorageKVStoreContainer } from "@/external/browser/SessionStorageKVStore"
+import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
 import { OPFS } from "@/external/browser/opfs"
 import { SQLite } from "@/external/browser/sqlite"
+import {
+    type DeviceSecureStorage,
+    NoopDeviceSecureStorage,
+} from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
 import { toPromise } from "@/lib/result"
 
@@ -21,9 +26,13 @@ export async function init({
 
     let sqlite = new SQLite(db)
 
+    let deviceSecureStorage: DeviceSecureStorage =
+        new WebCryptoDeviceSecureStorage()
+
     setEnv({
         platform: isStandalone() ? "pwa" : "web",
         lang: navigator.languages ? navigator.languages : [navigator.language],
+        isDeviceSecureStorageAvailable: await deviceSecureStorage.isAvailable(),
     })
 
     let indexedDBKVStoreContainer = await toPromise(
@@ -40,6 +49,12 @@ export async function init({
         indexedDBKVStoreContainer.close()
     })
 
+    let deviceSecureStorageInit = await deviceSecureStorage.init(ctx)
+    if (!deviceSecureStorageInit.ok) {
+        console.error(deviceSecureStorageInit.err)
+        deviceSecureStorage = new NoopDeviceSecureStorage()
+    }
+
     cancel()
 
     return {
@@ -50,6 +65,7 @@ export async function init({
             permanent: indexedDBKVStoreContainer,
             ephemeral: new SessionStorageKVStoreContainer(),
         },
+        deviceSecureStorage,
     }
 }
 

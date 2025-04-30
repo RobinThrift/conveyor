@@ -83,6 +83,10 @@ export const OPFSWorker = createWorker({
         { dirpath }: { dirpath: string },
     ): AsyncResult<void> => {
         let curr = await _rootDir
+        if (dirpath === ".") {
+            return Ok(undefined)
+        }
+
         let dirs = dirpath.split("/")
 
         for (let dir of dirs) {

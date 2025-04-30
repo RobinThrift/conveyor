@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core"
 
 import { newID } from "@/domain/ID"
 import { Lock } from "@/lib/Lock"
+import { awaitWithAbort } from "@/lib/awaitWithAbort"
 import type { Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import { type AsyncResult, fromPromise } from "@/lib/result"
@@ -248,20 +249,4 @@ class Transaction {
 
         return rows[0]
     }
-}
-
-function awaitWithAbort<R>(
-    other: Promise<R>,
-    signal?: AbortSignal,
-): Promise<R> {
-    if (!signal) {
-        return other
-    }
-
-    return Promise.race([
-        other,
-        new Promise<R>((_, reject) => {
-            signal.addEventListener("abort", reject, { once: true })
-        }),
-    ])
 }

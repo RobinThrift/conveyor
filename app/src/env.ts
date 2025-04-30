@@ -1,11 +1,13 @@
 interface _Env {
     platform: "web" | "pwa" | "macos" | "tauri-generic"
     lang: readonly string[]
+    isDeviceSecureStorageAvailable: boolean
 }
 
 export const Env: _Env = {
     platform: "web",
     lang: [],
+    isDeviceSecureStorageAvailable: false,
 }
 
 export function setEnv(env: Partial<_Env>) {

@@ -88,11 +88,16 @@ export function createWorker<
         }
 
         if (!result.ok) {
-            postMessage({
-                type: "error",
-                id: evt.data.id,
-                error: result.err,
-            } satisfies WorkerErrorResponseMessage)
+            try {
+                postMessage({
+                    type: "error",
+                    id: evt.data.id,
+                    error: result.err,
+                } satisfies WorkerErrorResponseMessage)
+            } catch (e) {
+                console.error(result.err)
+                console.error(e)
+            }
             return
         }
 
