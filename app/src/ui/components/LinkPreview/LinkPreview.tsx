@@ -1,6 +1,6 @@
 import * as HoverCard from "@radix-ui/react-hover-card"
 import clsx from "clsx"
-import React from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
 import { ArrowUpRightIcon } from "@/ui/components/Icons"
 import { Image } from "@/ui/components/Image"
@@ -14,7 +14,19 @@ export interface LinkPreviewProps {
     alt?: string
 }
 
-export function LinkPreview(props: LinkPreviewProps) {
+export const LinkPreview = React.memo(function LinkPreview(
+    props: LinkPreviewProps,
+) {
+    let [imgHasError, setImgHasError] = useState(false)
+    let onImgError = useCallback(() => {
+        setImgHasError(true)
+    }, [])
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional extra dependency
+    useEffect(() => {
+        setImgHasError(false)
+    }, [props.img])
+
     if (!props.img && !props.description) {
         return (
             <a
@@ -28,7 +40,7 @@ export function LinkPreview(props: LinkPreviewProps) {
         )
     }
 
-    if (!props.img) {
+    if (!props.img || imgHasError) {
         return (
             <HoverCard.Root>
                 <HoverCard.Trigger asChild>
@@ -62,22 +74,27 @@ export function LinkPreview(props: LinkPreviewProps) {
                 className="preview-img"
                 rel="noreferrer noopener"
             >
-                <Image src={props.img} alt={props.alt || props.title} />
+                <Image
+                    src={props.img}
+                    alt={props.alt || props.title}
+                    onError={onImgError}
+                />
             </a>
             <div className="description-container">
                 <div className="description content">
                     {props.title && <h4>{props.title}</h4>}
                     <p>{props.description}</p>
                 </div>
-                <a
-                    href={props.children}
-                    target={props.title}
-                    rel="noreferrer noopener"
-                    className="arrow"
-                >
-                    <ArrowUpRightIcon weight="bold" />
-                </a>
             </div>
+
+            <a
+                href={props.children}
+                target={props.title}
+                rel="noreferrer noopener"
+                className="arrow"
+            >
+                <ArrowUpRightIcon weight="bold" />
+            </a>
         </div>
     )
-}
+})

@@ -1,11 +1,33 @@
 .link-preview {
-    @apply relative rounded-lg overflow-hidden shadow-sm top-0 left-0;
-    @apply w-full my-2 @md:max-w-[50%] @md:float-left @md:clear-left @md:mr-2 @md:mt-0;
-    @apply sm:hover:shadow-lg sm:hover:-top-0.5 sm:hover:-left-0.5;
-    transition: top 0.2s, left 0.2s, box-shadow 0.1s;
+    @apply relative rounded-lg overflow-hidden top-0 left-0 drop-shadow-md;
+    @apply w-full h-min my-2;
+    transition: top 200ms, left 200ms, filter 200ms;
+
+    &:hover {
+        @apply sm:-top-0.5 sm:-left-0.5 sm:drop-shadow-xl;
+
+        .arrow {
+            @apply bg-primary text-primary-contrast;
+        }
+    }
+
+    &:has(.preview-img) {
+        @apply  min-h-16;
+    }
 
     .preview-img {
         @apply block relative;
+
+        --r: calc(var(--spacing) * 6); /* radius */
+        --s: calc(var(--spacing) * 12); /* size of the inner curve */
+        --_m:/calc(2*var(--r)) calc(2*var(--r)) radial-gradient(#000 70%,#0000 72%) no-repeat;
+        mask:
+            right 0 bottom calc(var(--s) + var(--r)) var(--_m),
+            right calc(var(--s) + var(--r)) bottom 0 var(--_m),
+            radial-gradient(var(--s) at 100% 100%,#0000 99%,#000 calc(100% + 1px)) 
+            calc(-1*var(--r)) calc(-1*var(--r)) no-repeat,
+            conic-gradient(from 90deg at calc(100% - var(--s) - 2*var(--r)) calc(100% - var(--s) - 2*var(--r)),
+            #0000 25%,#000 0);
 
         img {
             @apply w-full min-h-[2lh];
@@ -13,21 +35,10 @@
     }
 
     .description-container {
-        @apply @sm:absolute bottom-0 left-0 right-0;
-        @apply flex flex-col @sm:flex-row gap-2 items-center justify-between;
-        @apply py-2 px-4;
-        @apply bg-surface-level-1 @sm:bg-transparent;
-
-        @container (min-width: 24rem) {
-            /* sm container size */
-            .description {
-                @apply p-1 rounded-sm;
-                color: white;
-                text-shadow: 1px 1px 5px rgba(0 0 0 / 0.8);
-                mix-blend-mode: lighten;
-                backdrop-filter: contrast(0.7) brightness(0.95);
-            }
-        }
+        @apply absolute bottom-0 left-0 right-0 rounded-xl h-min;
+        @apply py-2 px-4 mr-24 ml-2 mb-2;
+        @apply bg-surface-level-1/50;
+        backdrop-filter: blur(4px);
     }
 
     h4 {
@@ -35,8 +46,9 @@
     }
 
     .arrow {
-        @apply text-lg p-3 bg-surface-level-1 items-center justify-center rounded-full text-text shadow-sm;
-        @apply hidden @md:flex;
+        @apply text-lg p-4 bg-surface-level-1 items-center justify-center rounded-full text-text shadow-sm;
+        @apply absolute right-2 bottom-2;
+        @apply flex;
 
         &:hover {
             @apply bg-primary text-primary-contrast;

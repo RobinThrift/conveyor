@@ -9,9 +9,10 @@ export interface ImageProps {
     className?: string
     src: string
     alt: string
+    onError?: () => void
 }
 
-export function Image(props: ImageProps) {
+export const Image = React.memo(function Image(props: ImageProps) {
     let ref = useRef<HTMLImageElement | null>(null)
     let attachment = useMemo(() => parseImgURL(props.src), [props.src])
     let attachmentData = useAttachment({ id: attachment?.attachmentID, ref })
@@ -39,6 +40,7 @@ export function Image(props: ImageProps) {
             src={src}
             alt={props.alt}
             loading="lazy"
+            onError={props.onError}
             className={clsx(
                 {
                     "animate-pulse": isLoading,
@@ -50,7 +52,7 @@ export function Image(props: ImageProps) {
             }}
         />
     )
-}
+})
 
 function parseImgURL(
     src: string,
