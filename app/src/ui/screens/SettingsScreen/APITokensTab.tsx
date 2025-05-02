@@ -1,4 +1,8 @@
 import React, { useCallback } from "react"
+import {
+    GridList as AriaGridList,
+    GridListItem as AriaGridListItem,
+} from "react-aria-components"
 
 import type { APIToken } from "@/domain/APIToken"
 import { Alert } from "@/ui/components/Alert"
@@ -16,7 +20,8 @@ import { useT } from "@/ui/i18n"
 import { currentDateTime } from "@/lib/i18n"
 import { useAPITokensTabState } from "./useAPITokensTabState"
 
-export function APISettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
+export function APITokensTab() {
+    let t = useT("screens/Settings/APITokens")
     let {
         apiTokens,
         hasNextPage,
@@ -31,8 +36,15 @@ export function APISettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
     } = useAPITokensTabState()
 
     return (
-        <div ref={ref} className="settings-section-content relative">
-            <div className="settings-sub-section relative mt-4">
+        <>
+            <header>
+                <h2>{t.Title}</h2>
+                <small className="settings-tab-description">
+                    {t.Description}
+                </small>
+            </header>
+
+            <div className="settings-section relative mt-4">
                 {error && <Alert variant="danger">{error.message}</Alert>}
 
                 {lastCreatedValue && (
@@ -45,7 +57,7 @@ export function APISettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
                 />
             </div>
 
-            <div className="settings-sub-section relative mt-4">
+            <div className="settings-section relative mt-4">
                 <APITokensList
                     tokens={apiTokens}
                     hasPreviousPage={hasPreviousPage}
@@ -57,11 +69,11 @@ export function APISettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
             </div>
 
             {isLoading && (
-                <div className="absolute inset-0 flex justify-center items-centerbg-body-contrast/80 rounded-lg z-20">
+                <div className="absolute inset-0 flex items-center justify-center bg-surface-level-1/80 z-10">
                     <Loader />
                 </div>
             )}
-        </div>
+        </>
     )
 }
 
@@ -166,7 +178,7 @@ function CreateNewAPIToken({
                     </Select>
                 </div>
 
-                <Button type="submit" isDisabled={isLoading}>
+                <Button type="submit" variant="primary" isDisabled={isLoading}>
                     {t.ButtonLabel}
                 </Button>
             </div>
@@ -182,11 +194,13 @@ function LastCreatedAPIToken({ value }: { value: string }) {
     }, [])
 
     return (
-        <div className="bg-success border-success-dark p-4 rounded-sm">
-            <h4 className="text-success-contrast">{t.Title}</h4>
-            <p className="text-success-contrast my-2">{t.Notice}</p>
+        <div className="bg-success border-success-dark p-4 rounded-sm my-8 shadow-md">
+            <h4 className="text-success-contrast text-lg">{t.Title}</h4>
+            <p className="text-success-contrast my-2 font-semibold">
+                {t.Notice}
+            </p>
             <input
-                className="input px-2 py-1 bg-success-light border-success-light focus:border-success-dark focus:outline-hidden focus:ring-0"
+                className="input rounded-lg px-2 py-1.5 bg-success-light text-success-contrast border-success-light focus:border-success-dark focus:outline-hidden focus:ring-0"
                 readOnly
                 value={value}
                 onFocus={onFocus}
@@ -214,43 +228,47 @@ function APITokensList({
 
     return (
         <div className="api-tokens-section">
-            <ul className="api-tokens-list">
+            <AriaGridList className="api-tokens-list">
                 {tokens.map((token) => (
-                    <li key={token.name} className="api-token">
-                        <dl>
-                            <dt className="sr-only">{t.LabelName}</dt>
-                            <dd className="api-token-name">{token.name}</dd>
-
-                            <div className="api-token-expires-at">
-                                <dt>{t.LabelExpires}</dt>
-                                <dd>
-                                    <DateTime date={token.expiresAt} />
-                                </dd>
-                            </div>
-
-                            <div className="api-token-created-at">
-                                <dt>{t.LabelCreated}</dt>
-                                <dd>
-                                    <DateTime
-                                        date={token.createdAt}
-                                        relative={true}
-                                    />
-                                </dd>
-                            </div>
-                        </dl>
-
-                        <div className="flex tablet:justify-end mt-2 tablet:-mt-8">
-                            <Button
-                                variant="danger"
-                                size="sm"
-                                onPress={() => onDelete(token.name)}
+                    <AriaGridListItem key={token.name} className="api-token">
+                        <div className="api-token-info">
+                            <span
+                                className="api-token-name"
+                                aria-label={t.LabelName}
                             >
-                                {t.DeleteButton}
-                            </Button>
+                                {token.name}
+                            </span>
+                            <span className="api-token-expires-at">
+                                <span id={`${token.name}-expires-at`}>
+                                    {t.LabelExpires}:
+                                </span>
+                                <DateTime
+                                    aria-labelledby={`${token.name}-expires-at`}
+                                    date={token.expiresAt}
+                                />
+                            </span>
+                            <span className="api-token-created-at">
+                                <span id={`${token.name}-created-at`}>
+                                    {t.LabelCreated}:
+                                </span>
+                                <DateTime
+                                    aria-labelledby={`${token.name}-created-at`}
+                                    date={token.createdAt}
+                                    relative={true}
+                                />
+                            </span>
                         </div>
-                    </li>
+
+                        <Button
+                            variant="danger"
+                            size="sm"
+                            onPress={() => onDelete(token.name)}
+                        >
+                            {t.DeleteButton}
+                        </Button>
+                    </AriaGridListItem>
                 ))}
-            </ul>
+            </AriaGridList>
 
             <div className="flex gap-2 mt-2 justify-end">
                 <Tooltip content={t.PrevPage}>

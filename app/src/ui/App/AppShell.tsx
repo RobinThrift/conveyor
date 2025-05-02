@@ -1,4 +1,4 @@
-import React, { Suspense } from "react"
+import React, { Suspense, useEffect, useState } from "react"
 
 import { BuildInfo } from "@/ui/components/BuildInfo"
 import { Navigation } from "@/ui/components/Navigation"
@@ -8,63 +8,69 @@ import { useCurrentPage } from "@/ui/navigation"
 import { ErrorScreen } from "@/ui/screens/ErrorScreen"
 import { InitSetupScreen } from "@/ui/screens/InitSetupScreen/InitSetupScreen"
 import { MainScreen } from "@/ui/screens/MainScreen"
+import { NewMemoScreen } from "@/ui/screens/NewMemoScreen"
 import { SettingsScreen } from "@/ui/screens/SettingsScreen"
 import { UnlockScreen } from "@/ui/screens/UnlockScreen/UnlockScreen"
 import { useTheme } from "@/ui/settings"
-import { NewMemoScreen } from "../screens/NewMemoScreen"
 
-export function AppShell() {
+function useAppShellState() {
     let currentPage = useCurrentPage()
-
     let { colourScheme, mode } = useTheme()
 
-    let pageComp: React.ReactNode
-
-    if (!currentPage) {
-        return (
-            <Theme colourScheme={colourScheme} mode={mode}>
-                <Suspense>
-                    <ErrorScreen
-                        title="Page Not Found"
-                        code={404}
-                        detail="The requested page could not be found"
-                    />
-                </Suspense>
-            </Theme>
-        )
+    return {
+        currentPage,
+        colourScheme,
+        mode,
     }
+}
 
-    switch (currentPage?.name) {
-        case "unlock":
-            return (
-                <Theme colourScheme={colourScheme} mode={mode}>
-                    <Suspense>
-                        <UnlockScreen />
-                    </Suspense>
-                </Theme>
-            )
-        case "setup":
-            return (
-                <Theme colourScheme={colourScheme} mode={mode}>
-                    <Suspense>
-                        <InitSetupScreen />
-                    </Suspense>
-                </Theme>
-            )
-        case "root":
-        case "memo.view":
-        case "memo.edit":
-            pageComp = (
-                <MainScreen key="main-screen" activeScreen={currentPage.name} />
-            )
-            break
-        case "memo.new":
-            pageComp = <NewMemoScreen key="main-screen" />
-            break
-        case "settings":
-            pageComp = <SettingsScreen />
-            break
-    }
+export function AppShell() {
+    let { currentPage, colourScheme, mode } = useAppShellState()
+
+    let [pageComp, setPageComp] = useState<React.ReactNode[] | undefined>()
+
+    useEffect(() => {
+        setPageComp((prevPageComp) => {
+            switch (currentPage?.name) {
+                case "unlock":
+                    return [
+                        <Suspense key="main-screen-suspense">
+                            <UnlockScreen key="main-screen" />
+                        </Suspense>,
+                    ]
+                case "setup":
+                    return [
+                        <Suspense key="main-screen-suspense">
+                            <InitSetupScreen key="main-screen" />
+                        </Suspense>,
+                    ]
+                case "root":
+                case "memo.view":
+                case "memo.edit":
+                    return [
+                        <Suspense key="main-screen-suspense">
+                            <MainScreen
+                                key="main-screen"
+                                activeScreen={currentPage.name}
+                            />
+                        </Suspense>,
+                    ]
+                case "memo.new":
+                    return [
+                        <Suspense key="main-screen-suspense">
+                            <NewMemoScreen key="main-screen" />
+                        </Suspense>,
+                    ]
+                case "settings":
+                    return [
+                        ...(prevPageComp ?? []),
+                        <Suspense key="settings-screen-overlay-suspense">
+                            <SettingsScreen key="settings-screen-overlay" />,
+                        </Suspense>,
+                    ]
+            }
+        })
+    }, [currentPage?.name])
 
     if (!pageComp) {
         return (

@@ -44,6 +44,7 @@ export function Navigation(props: NavigationProps) {
                     iconLeft={<SlidersIcon />}
                     plain
                     size="lg"
+                    openInNewStack
                 >
                     <span className="sr-only">{t.Settings}</span>
                 </LinkButton>

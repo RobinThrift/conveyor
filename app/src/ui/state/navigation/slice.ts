@@ -3,13 +3,22 @@ import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 import type { Params, Restore, Screens } from "@/control/NavigationController"
 import type { NavgationState } from "@/lib/navigation"
 
-const initialState: NavgationState<Screens, keyof Screens, Restore> = {
-    screen: {
-        name: "root",
-        params: {},
-    },
-    restore: {
-        scrollOffsetTop: 0,
+interface NavigationSlice {
+    current: NavgationState<Screens, keyof Screens, Restore>
+    prev?: NavgationState<Screens, keyof Screens, Restore>
+}
+
+const initialState: NavigationSlice = {
+    current: {
+        screen: {
+            name: "root",
+            params: {},
+        },
+        stack: 0,
+        index: 0,
+        restore: {
+            scrollOffsetTop: 0,
+        },
     },
 }
 
@@ -25,19 +34,27 @@ export const slice = createSlice({
                 name: keyof Screens
                 params: Params
                 restore: Partial<Restore>
+                stack?: number
+                index?: number
             }>,
         ) => {
-            state.screen = {
+            state.prev = { ...state.current }
+            state.current.screen = {
                 name: payload.name,
                 params: payload.params,
             }
-            state.restore = payload.restore
+            state.current.index = payload.index ?? state.current.index
+            state.current.stack = payload.stack ?? state.current.stack
+            state.current.restore = payload.restore
         },
     },
 
     selectors: {
-        currentName: (state) => state.screen.name,
-        currentParams: (state) => state.screen.params,
-        currentRestore: (state) => state.restore,
+        currentName: (state) => state.current.screen.name,
+        currentParams: (state) => state.current.screen.params,
+        currentRestore: (state) => state.current.restore,
+        prevName: (state) => state.prev?.screen.name,
+        prevParams: (state) => state.prev?.screen.params,
+        prevRestore: (state) => state.prev?.restore,
     },
 })

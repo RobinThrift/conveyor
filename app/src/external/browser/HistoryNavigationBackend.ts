@@ -48,7 +48,7 @@ export class HistoryNavigationBackend<
             if (!e.state) {
                 return
             }
-            let { screen, restore } = e.state as NavgationState<
+            let { screen, index, stack, restore } = e.state as NavgationState<
                 S,
                 keyof S,
                 Restore
@@ -58,9 +58,9 @@ export class HistoryNavigationBackend<
             this._currLength = window.history.length
             requestAnimationFrame(() => {
                 if (lastLength > window.history.length) {
-                    this._onPush?.({ screen, restore })
+                    this._onPush?.({ screen, index, stack, restore })
                 } else {
-                    this._onPop?.({ screen, restore })
+                    this._onPop?.({ screen, index, stack, restore })
                 }
             })
         })
@@ -151,10 +151,14 @@ export class HistoryNavigationBackend<
         return nextScreen
     }
 
-    public pop(): Promise<NavgationState<S, keyof S, Restore>> {
+    public pop(n?: number): Promise<NavgationState<S, keyof S, Restore>> {
         let { promise, resolve } =
             Promise.withResolvers<NavgationState<S, keyof S, Restore>>()
-        window.history.back()
+        if (n) {
+            window.history.go(-n)
+        } else {
+            window.history.back()
+        }
 
         requestAnimationFrame(() => {
             this._currLength = window.history.length
@@ -193,12 +197,9 @@ export class HistoryNavigationBackend<
                     if (!e.state) {
                         return
                     }
-                    let { screen, restore } = e.state as NavgationState<
-                        S,
-                        keyof S,
-                        Restore
-                    >
-                    handler({ screen, restore })
+                    let { screen, index, stack, restore } =
+                        e.state as NavgationState<S, keyof S, Restore>
+                    handler({ screen, index, stack, restore })
                 }
                 window.addEventListener("popstate", onPopState)
                 return () => window.removeEventListener("popstate", onPopState)

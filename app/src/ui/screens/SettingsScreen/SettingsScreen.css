@@ -1,124 +1,193 @@
+.settings-modal-overlay {
+    @apply fixed left-0 top-0 bottom-0 right-0 flex items-end xs:items-center justify-center;
+    background-color: color-mix(
+        in srgb,
+        var(--color-modal-overlay-bg) 80%,
+        transparent
+    );
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+    transition: background-color 200ms, backdrop-filter 200ms;
+
+    &[data-entering] {
+        background-color: transparent;
+        backdrop-filter: blur(0px);
+    }
+}
+
+.settings-modal {
+    @apply animate-in slide-in-from-bottom ease-linear duration-200;
+    @apply xs:fade-in xs:slide-in-from-bottom-0;
+    @apply relative rounded-lg bg-surface-level-1 border border-subtle-extra-light shadow-lg xs:max-w-[95dvw] md:max-w-6xl w-full;
+
+    height: 95dvh;
+
+    @media (min-width: 1024px) {
+        height: 80dvh;
+    }
+
+    &[data-exiting] {
+        @apply animate-out slide-out-to-bottom ease-linear duration-200;
+        @apply xs:fade-out;
+    }
+}
+
+.settings-modal-drag-handle {
+    @apply xs:hidden text-3xl;
+    position: absolute;
+    left: 0;
+    top: 5dvh;
+    width: 100%;
+    height: 2lh;
+    z-index: 10000;
+    touch-action: none;
+}
+
+.settings-dialog {
+    @apply h-full focus:outline-hidden;
+}
+
+.settings-dialog-close-btn {
+    @apply absolute top-3 right-2 size-10;
+}
+
 .settings-screen {
-    @apply container mx-auto max-w-4xl px-2 tablet:px-4;
-
+    @apply h-full flex flex-col;
     h1 {
-        @apply text-4xl mb-4 px-2 font-serif;
+        @apply w-full text-3xl font-serif p-3 xs:p-5 xs:py-4 relative;
     }
 }
 
-.settings-section {
-    @apply rounded-lg shadow-lg overflow-hidden relative z-10;
-    @apply pb-4 -mb-8;
-
-    &:last-child {
-        @apply mb-0;
-    }
-
-    &[data-state="open"] .settings-heading h2 {
-        @apply font-semibold;
-    }
+.settings-tabs {
+    @apply flex flex-col xs:flex-row flex-1 border-t border-subtle-extra-light max-h-full overflow-hidden;
 }
 
-.settings-heading {
-    @apply w-full text-left p-4 -outline-offset-4 outline-primary relative;
+.settings-tab-list {
+    @apply w-fit p-2 flex items-center space-x-2 overflow-auto max-w-full xs:max-w-none;
+    @apply xs:border-r xs:border-subtle-extra-light xs:block xs:flex-col xs:space-y-2;
+}
 
-    &:focus-visible {
-        outline-style: solid;
-        outline-width: 2px;
-    }
+.settings-tab-list-item {
+    @apply flex items-center gap-2 cursor-pointer py-1 px-1 rounded border-b-3 border-transparent min-w-fit;
+    @apply xs:px-3 xs:border-0 xs:rounded-lg;
 
-    h2 {
-        @apply text-xl;
+    &:hover {
+        @apply border-b-3 border-primary-light text-primary;
+        @apply xs:bg-primary-light xs:text-primary-contrast xs:border-0;
+
+        .icon {
+            @apply text-primary;
+            @apply xs:text-primary-contrast;
+        }
     }
 
     .icon {
-        @apply absolute right-4 top-4 size-12 opacity-30;
+        @apply text-subtle;
+    }
+
+    &[data-selected] {
+        @apply border-b-3 border-primary text-primary font-semibold;
+        @apply xs:bg-primary-light xs:text-primary-contrast xs:border-0;
+        .icon {
+            @apply text-primary;
+            @apply xs:text-primary-contrast;
+        }
     }
 }
 
-.settings-section-content {
-    @apply p-4 pb-8;
+.settings-tab {
+    @apply pt-2 pb-12 px-2 xs:px-4 space-y-4 flex-1 relative overflow-auto flex-1;
+
+    h2 {
+        @apply flex gap-2 items-center w-full text-2xl font-serif font-bold;
+    }
+
+    .select-input {
+        @apply bg-surface-level-2;
+
+        &[data-pressed] {
+            background-color: color-mix(
+                in srgb,
+                var(--color-surface-level-2) 97%,
+                black
+            );
+        }
+    }
 
     .checkbox-field {
-        @apply flex flex-row-reverse justify-between items-center p-2 gap-2 rounded-lg shadow-lg h-fit;
-        @apply bg-surface-level-1 text-text border border-transparent;
+        @apply flex justify-between items-center p-2 gap-2 rounded-lg shadow h-fit;
+        @apply bg-surface-level-1 text-text border w-full border-subtle-extra-light;
 
         label {
             @apply flex-1;
         }
 
         &:hover {
-            @apply shadow-xl;
+            @apply shadow-lg border-primary;
         }
 
         .checkbox {
             @apply rounded-full;
         }
 
-        &:has([data-state="checked"]) {
-            @apply border-primary;
+        &[data-selected] {
+            @apply border-primary-dark bg-primary text-primary-contrast;
+
+            .checkbox {
+                @apply border-primary-dark;
+            }
         }
     }
+}
 
-    h2,
-    h3,
-    h4 {
-        @apply font-semibold mb-2;
-    }
+.settings-section-header {
+    @apply flex gap-2 items-center w-full text-xl font-serif font-semibold mb-2.5;
+}
 
-    h2 {
-        @apply text-xl;
-    }
+.settings-disclosure-group-item {
+    h3 button {
+        @apply flex items-center gap-2 cursor-pointer;
 
-    h3 {
-        @apply text-lg;
-    }
+        .icon {
+            transition: transform 200ms;
+        }
 
-    h3:has(+ small) {
-        @apply mb-0;
+        &[aria-expanded="false"] {
+            .icon {
+                transform: rotate(-90deg);
+            }
+        }
     }
 }
 
 .api-tokens-list {
-    @apply space-y-2;
-
-    .api-token-name {
-        @apply text-lg font-semibold w-full;
-    }
+    @apply border border-subtle-extra-light rounded bg-surface-level-2 divide-y divide-subtle-extra-light;
 
     .api-token {
-        @apply p-2 border border-subtle-dark rounded-sm shadow-md;
+        @apply p-2 flex items-center justify-between;
     }
 
-    dt {
+    .api-token-info {
+        @apply flex-1;
+    }
+
+    .api-token-name {
         @apply block;
     }
 
-    .api-token-expires-at {
-        @apply flex gap-2 text-sm;
+    .api-token-expires-at,
+    .api-token-created-at {
+        @apply text-sm text-subtle;
+        span:first-child {
+            @apply me-1;
+        }
     }
 
     .api-token-created-at {
-        @apply flex gap-2 text-xs;
-    }
-}
-
-.settings-sub-section {
-    @apply mt-8 pb-8 border-b border-b-current;
-
-    &:first-child {
-        @apply mt-0 pb-4;
-    }
-
-    &:last-child {
-        @apply border-none pb-0;
-    }
-}
-
-.icon-select-option {
-    @apply flex gap-2 items-center;
-
-    img {
-        @apply size-6;
+        &::before {
+            @apply mx-1;
+            display: inline;
+            content: "•";
+        }
     }
 }

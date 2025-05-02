@@ -31,17 +31,40 @@
 }
 
 .checkbox-field {
-    @apply flex items-center gap-2;
-
-    label {
-        @apply cursor-pointer;
-    }
-}
-
-.checkbox {
-    @apply flex size-7 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border-2 border-subtle outline-hidden;
-    @apply hover:border-primary;
+    @apply flex items-center gap-2 cursor-pointer w-fit text-sm font-medium;
     @apply focus:outline-primary focus:outline-offset-0;
+
+    &[data-selected] {
+        .checkbox {
+            svg path {
+                stroke-dashoffset: 0;
+            }
+        }
+    }
+
+    &[data-focused],
+    &:focus,
+    &:focus-visible {
+        @apply outline outline-primary outline-offset-2 rounded-sm;
+    }
+
+    &:hover {
+        .checkbox {
+            @apply border-primary;
+        }
+    }
+
+    .checkbox {
+        @apply flex size-6 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border-2 border-subtle outline-hidden text-primary;
+        svg path {
+            stroke: currentColor;
+            fill: transparent;
+            stroke-width: 25px;
+            stroke-dasharray: 590;
+            stroke-dashoffset: 590;
+            transition: all .2s;
+        }
+    }
 }
 
 .radio-group {

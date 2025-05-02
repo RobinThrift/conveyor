@@ -174,7 +174,12 @@
     },
 
     "screens/Settings": {
-        "Title": "Settings"
+        "Title": "Einstellungen",
+        "TabListLabel": "Einstellungen Reiter",
+        "TabLabelInterface": "Benutzeroberfläche",
+        "TabLabelLangLocale": "Sprache & Region",
+        "TabLabelSync": "Sync",
+        "TabLabelAPITokens": "API Tokens"
     },
 
     "screens/Settings/InterfaceSettings": {
@@ -213,7 +218,7 @@
     },
 
     "screens/Settings/SyncSettings/Setup": {
-        "Title": "Setup",
+        "Title": "Einloggen",
         "FieldServerLabel": "Server",
         "FieldUsernameLabel": "Benutername",
         "FieldPasswordLabel": "Passwort",

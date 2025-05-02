@@ -1,6 +1,26 @@
-.react-aria-ModalOverlay {
-    @apply fixed left-0 top-0 bottom-0 right-0;
+.offcanvas-modal-overlay {
+    @apply fixed left-0 top-0 bottom-0 right-0 flex items-center justify-center;
+    background-color: color-mix(
+        in srgb,
+        var(--color-modal-overlay-bg) 80%,
+        transparent
+    );
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+    transition: background-color 200ms, backdrop-filter 200ms;
+
+    &[data-entering] {
+        background-color: transparent;
+        backdrop-filter: blur(0px);
+    }
+}
+
+.offcanvas-modal {
     @apply animate-in slide-in-from-left ease-linear duration-200;
+    @apply h-full rounded-r-lg bg-surface-level-1 p-2 overflow-auto shadow-md;
+    @apply fixed left-0 top-0 bottom-0 right-0;
+
+    width: 90dvw;
 
     z-index: 10000;
 
@@ -10,16 +30,12 @@
 }
 
 .offcanvas {
-    @apply h-full rounded-r-lg bg-surface-level-1 p-2 overflow-auto shadow-md;
     @apply focus:outline-hidden;
-    @apply fixed left-0 top-0 bottom-0 right-0;
-
-    width: 90dvw;
 }
 
 .offcanvas-drag-handle {
     position: absolute;
-    right: 10%;
+    right: 0;
     top: 0;
     width: 20%;
     height: 100%;

@@ -43,7 +43,7 @@ export function OffCanvasContent({
         ;(e.target as HTMLDivElement).setPointerCapture(e.pointerId)
 
         if (animRef.current) {
-            animRef.current.style.transition = ""
+            animRef.current.style.transition = "none"
         }
     }, [])
 
@@ -68,6 +68,7 @@ export function OffCanvasContent({
             } else {
                 animRef.current.style.transition = "transform 250ms"
                 animRef.current.style.transform = "translateX(0px)"
+                animRef.current.style.animationDuration = "200ms"
             }
         },
         [],
@@ -85,33 +86,31 @@ export function OffCanvasContent({
         let translateBy = Math.min(e.clientX - boundingRect.width, 0)
 
         animRef.current.style.transform = `translateX(${translateBy}px)`
+        animRef.current.style.animationDuration = "0"
     }, [])
 
     return (
-        <AriaModal
-            className="offcanvas-modal"
+        <AriaModalOverlay
+            className="offcanvas-modal-overlay"
             isDismissable={isDismissable ?? true}
             isKeyboardDismissDisabled={isKeyboardDismissDisabled ?? false}
         >
-            <AriaModalOverlay className="offcanvas-backdrop" />
-            <AriaDialog
-                ref={animRef}
-                className={clsx("offcanvas", className)}
-                {...props}
-            >
-                {({ close }) => {
-                    closeFn.current = close
-                    return <>{props.children as React.ReactNode}</>
-                }}
-            </AriaDialog>
-            <div
-                className="offcanvas-drag-handle"
-                onPointerDown={onPointerDown}
-                onPointerUp={onPointerCancel}
-                onPointerMove={onPointerMove}
-                onPointerCancel={onPointerCancel}
-            />
-        </AriaModal>
+            <AriaModal className="offcanvas-modal" ref={animRef}>
+                <AriaDialog className={clsx("offcanvas", className)} {...props}>
+                    {({ close }) => {
+                        closeFn.current = close
+                        return <>{props.children as React.ReactNode}</>
+                    }}
+                </AriaDialog>
+                <div
+                    className="offcanvas-drag-handle"
+                    onPointerDown={onPointerDown}
+                    onPointerUp={onPointerCancel}
+                    onPointerMove={onPointerMove}
+                    onPointerCancel={onPointerCancel}
+                />
+            </AriaModal>
+        </AriaModalOverlay>
     )
 }
 

@@ -9,6 +9,8 @@ export type NavgationState<
         name: Name
         params: S[Name]
     }
+    index: number
+    stack: number
     restore: Partial<Restore>
 }
 
@@ -43,7 +45,7 @@ export interface NavigationBackend<
     push(
         next: NavgationState<S, keyof S, Restore>,
     ): NavgationState<S, keyof S, Restore>
-    pop(): Promise<NavgationState<S, keyof S, Restore>>
+    pop(n?: number): Promise<NavgationState<S, keyof S, Restore>>
 
     addEventListener(
         event: "push",

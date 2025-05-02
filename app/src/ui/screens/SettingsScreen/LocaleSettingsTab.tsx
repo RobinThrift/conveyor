@@ -10,9 +10,7 @@ import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
 
-export function LocaleSettingsTab({
-    ref,
-}: { ref?: React.Ref<HTMLDivElement> }) {
+export function LocaleSettingsTab() {
     let t = useT("screens/Settings/LocaleSettings")
 
     let [lang, setLang] = useSetting("locale.language")
@@ -57,8 +55,15 @@ export function LocaleSettingsTab({
     )
 
     return (
-        <div ref={ref} className="settings-section-content">
-            <div className="settings-sub-section">
+        <>
+            <header>
+                <h2>{t.Title}</h2>
+                <small className="settings-tab-description">
+                    {t.Description}
+                </small>
+            </header>
+
+            <div className="settings-section">
                 <div className="sm:mb-0 md:grid grid-cols-6 space-y-1">
                     <label
                         htmlFor="language"
@@ -93,6 +98,6 @@ export function LocaleSettingsTab({
                     </Select>
                 </div>
             </div>
-        </div>
+        </>
     )
 }

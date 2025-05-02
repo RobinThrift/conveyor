@@ -25,20 +25,15 @@ export function UnlockScreen() {
             e.stopPropagation()
 
             let target = e.target as HTMLFormElement
+            let formData = new FormData(target)
 
-            let plaintextPrivateKey = target.querySelector(
-                "#password",
-            ) as HTMLInputElement
+            let plaintextPrivateKey = formData.get("password")
 
-            let storeKey = target.querySelector(
-                "#store_key",
-            ) as HTMLInputElement
-
-            if (plaintextPrivateKey.value) {
+            if (plaintextPrivateKey) {
                 unlock({
                     plaintextKeyData:
-                        plaintextPrivateKey.value as PlaintextPrivateKey,
-                    storeKey: storeKey.dataset.state === "checked",
+                        plaintextPrivateKey as PlaintextPrivateKey,
+                    storeKey: formData.get("store_key") === "on",
                 })
             }
         },

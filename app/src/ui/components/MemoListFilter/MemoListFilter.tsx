@@ -61,6 +61,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
                                 iconLeft={<SlidersIcon />}
                                 plain
                                 size="sm"
+                                openInNewStack
                             >
                                 {tNav.Settings}
                             </LinkButton>

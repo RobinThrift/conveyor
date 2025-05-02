@@ -1,4 +1,11 @@
 import React from "react"
+import {
+    Button as AriaButton,
+    Disclosure as AriaDisclosure,
+    DisclosureGroup as AriaDisclosureGroup,
+    DisclosurePanel as AriaDisclosurePanel,
+    Heading as AriaHeading,
+} from "react-aria-components"
 
 import type { SyncInfo } from "@/domain/SyncInfo"
 import { Alert } from "@/ui/components/Alert"
@@ -12,6 +19,7 @@ import { Button } from "@/ui/components/Button"
 import { DateTime } from "@/ui/components/DateTime"
 import {
     ArrowsCounterClockwiseIcon,
+    CaretDownIcon,
     CloudArrowDownIcon,
     CloudArrowUpIcon,
     WarningIcon,
@@ -26,8 +34,11 @@ import {
     useSyncSettingsTabState,
 } from "./useSyncSettingsTabState"
 
-export function SyncSettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
-    let t = useT("screens/Settings/SyncSettings/Info")
+export function SyncSettingsTab() {
+    let t = useT("screens/Settings/SyncSettings")
+    let tInfo = useT("screens/Settings/SyncSettings/Info")
+    let tSetup = useT("screens/Settings/SyncSettings/Setup")
+    let tChangePassword = useT("screens/Settings/SyncSettings/ChangePassword")
     let {
         status,
         info,
@@ -45,10 +56,17 @@ export function SyncSettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
     } = useSyncSettingsTabState()
 
     return (
-        <div ref={ref} className="settings-section-content relative">
-            <div className="settings-sub-section">
+        <>
+            <header>
+                <h2>{t.Title}</h2>
+                <small className="settings-tab-description">
+                    {t.Description}
+                </small>
+            </header>
+
+            <div className="settings-section">
                 <Checkbox
-                    label={t.IsEnabled}
+                    label={tInfo.IsEnabled}
                     name="is_enabled"
                     value={showSetup}
                     onChange={(checked) => setShowSetup(checked as boolean)}
@@ -67,21 +85,52 @@ export function SyncSettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
             )}
 
             {showSetup && (
-                <SectionSetupSync
-                    setup={setup}
-                    authStatus={authStatus}
-                    authError={authError}
-                    changePassword={changePassword}
-                />
-            )}
+                <AriaDisclosureGroup
+                    className="settings-disclosure-group"
+                    defaultExpandedKeys={!info.isEnabled ? ["setup"] : []}
+                >
+                    <AriaDisclosure
+                        id="setup"
+                        className="settings-disclosure-group-item"
+                    >
+                        <AriaHeading className="settings-section-header">
+                            <AriaButton slot="trigger">
+                                <CaretDownIcon className="icon" />
+                                {tSetup.Title}
+                            </AriaButton>
+                        </AriaHeading>
+                        <AriaDisclosurePanel>
+                            <SectionSetupSync
+                                setup={setup}
+                                authStatus={authStatus}
+                                authError={authError}
+                                changePassword={changePassword}
+                            />
+                        </AriaDisclosurePanel>
+                    </AriaDisclosure>
 
-            {showPasswordChange && info.isEnabled && (
-                <SectionChangePassword
-                    status={authStatus}
-                    error={authError}
-                    username={info.username}
-                    changePassword={changePassword}
-                />
+                    {showPasswordChange && info.isEnabled && (
+                        <AriaDisclosure
+                            id="change-password"
+                            className="settings-disclosure-group-item"
+                        >
+                            <AriaHeading className="settings-section-header">
+                                <AriaButton slot="trigger">
+                                    <CaretDownIcon className="icon" />
+                                    {tChangePassword.Title}
+                                </AriaButton>
+                            </AriaHeading>
+                            <AriaDisclosurePanel>
+                                <SectionChangePassword
+                                    status={authStatus}
+                                    error={authError}
+                                    username={info.username}
+                                    changePassword={changePassword}
+                                />
+                            </AriaDisclosurePanel>
+                        </AriaDisclosure>
+                    )}
+                </AriaDisclosureGroup>
             )}
 
             {!info.isEnabled && status === "error" && error ? (
@@ -100,7 +149,7 @@ export function SyncSettingsTab({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
                     <Loader />
                 </div>
             )}
-        </div>
+        </>
     )
 }
 
@@ -121,9 +170,9 @@ function SectionSyncInfo({
 }) {
     let t = useT("screens/Settings/SyncSettings/Info")
     return (
-        <div className="settings-sub-section space-y-4 relative">
+        <div className="settings-section space-y-4">
             {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/40 z-10">
+                <div className="absolute inset-0 flex items-center justify-center bg-surface-level-1/50 z-10">
                     <Loader />
                 </div>
             )}
@@ -141,10 +190,10 @@ function SectionSyncInfo({
 
             {info.isEnabled && (
                 <>
-                    <dl className="grid grid-cols-2">
-                        <dt>{t.ClientID}</dt>
+                    <dl className="tablet:grid grid-cols-2 text-sm tablet:text-md">
+                        <dt className="font-semibold">{t.ClientID}</dt>
                         <dd>{info.clientID}</dd>
-                        <dt>{t.LastSyncAt}</dt>
+                        <dt className="font-semibold">{t.LastSyncAt}</dt>
                         <dd>
                             {info.lastSyncedAt ? (
                                 <DateTime relative date={info.lastSyncedAt} />
@@ -154,7 +203,7 @@ function SectionSyncInfo({
                         </dd>
                     </dl>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col tablet:flex-col gap-2">
                         <Button
                             variant="primary"
                             isDisabled={isLoading}
@@ -254,7 +303,7 @@ function SectionSetupSync({
 }) {
     return (
         <AuthForm
-            className="settings-sub-section"
+            className="settings-section"
             login={setup}
             changePassword={changePassword}
             status={authStatus}
@@ -276,7 +325,7 @@ function SectionChangePassword({
 }) {
     return (
         <ChangePasswordForm
-            className="settings-sub-section"
+            className="settings-section"
             username={username}
             status={status}
             error={error}

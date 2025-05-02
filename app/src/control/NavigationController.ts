@@ -50,6 +50,8 @@ export class NavigationController {
             name: "root",
             params: {},
         },
+        stack: 0,
+        index: 0,
         restore: { scrollOffsetTop: 0 },
     }
 
@@ -92,12 +94,24 @@ export class NavigationController {
         })
     }
 
-    public push(next: NavgationState<Screens, keyof Screens, Restore>) {
+    public push(
+        next: Omit<
+            NavgationState<Screens, keyof Screens, Restore>,
+            "stack" | "index"
+        >,
+        onNewStack?: boolean,
+    ) {
         if (isEqual(next.screen, this._currentState.screen)) {
             return
         }
 
-        let nextState = this._backend.push(next)
+        let nextState = this._backend.push({
+            ...next,
+            index: onNewStack ? 0 : this._currentState.index + 1,
+            stack: onNewStack
+                ? this._currentState.stack + 1
+                : this._currentState.stack,
+        })
         let current = this._currentState
         requestAnimationFrame(() => {
             this._onPush?.(nextState, current)
@@ -109,6 +123,15 @@ export class NavigationController {
     public async pop(): Promise<void> {
         this._lastState = this._currentState
         let next = await this._backend.pop()
+        this._currentState = { ...next }
+    }
+
+    public async popStack(): Promise<void> {
+        if (this._currentState.stack <= 0) {
+            return
+        }
+        this._lastState = this._currentState
+        let next = await this._backend.pop(this._currentState.index + 1)
         this._currentState = { ...next }
     }
 

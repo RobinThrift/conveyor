@@ -1,5 +1,21 @@
 .select-input {
-    @apply flex items-center gap-2 justify-between px-2 py-1 bg-surface-level-1 text-body-contrast min-w-fit;
+    @apply flex items-center gap-2 justify-between px-2 py-1 bg-surface-level-1 text-body-contrast min-w-fit rounded-lg cursor-pointer;
+
+    &:hover {
+        @apply ring-1 ring-subtle-light;
+    }
+
+    &[data-pressed] {
+        background-color: color-mix(
+            in srgb,
+            var(--color-surface-level-1) 99%,
+            black
+        );
+    }
+
+    &[aria-expanded="true"] {
+        @apply ring-1 ring-primary-light;
+    }
 }
 
 .select-label {
@@ -8,7 +24,7 @@
 
 .select-list {
     @apply p-1 overflow-auto rounded-md bg-surface-level-1 shadow-lg space-y-1;
-    @apply ring-1 ring-black/50;
+    @apply ring-1 ring-subtle-light;
     @apply dark:border dark:border-subtle-extra-dark;
 
     min-width: var(--trigger-width);

@@ -179,6 +179,11 @@ export const translations = {
 
     "screens/Settings": {
         Title: "Settings",
+        TabListLabel: "Setting Sections",
+        TabLabelInterface: "Interface",
+        TabLabelLangLocale: "Language & Locale",
+        TabLabelSync: "Sync",
+        TabLabelAPITokens: "API Tokens",
     },
 
     "screens/Settings/InterfaceSettings": {
@@ -219,7 +224,7 @@ export const translations = {
     },
 
     "screens/Settings/SyncSettings/Setup": {
-        Title: "Setup",
+        Title: "Login In",
         FieldServerLabel: "Server",
         FieldUsernameLabel: "Username",
         FieldPasswordLabel: "Password",

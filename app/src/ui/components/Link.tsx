@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { useCallback } from "react"
+import React, { startTransition, useCallback } from "react"
 
 import type { Screens } from "@/control/NavigationController"
 import { useNavigation } from "@/ui/navigation"
@@ -45,6 +45,7 @@ export interface LinkButtonProps<S extends keyof Screens>
     href?: string
     screen?: S
     params?: Screens[S]
+    openInNewStack?: boolean
 }
 
 export function LinkButton<S extends keyof Screens>({
@@ -54,6 +55,7 @@ export function LinkButton<S extends keyof Screens>({
     variant = "regular",
     screen,
     params,
+    openInNewStack,
     ...props
 }: LinkButtonProps<S>) {
     let { push } = useNavigation()
@@ -61,14 +63,22 @@ export function LinkButton<S extends keyof Screens>({
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             if (screen) {
                 e.preventDefault()
-                push(screen, params || {}, {
-                    scrollOffsetTop: Math.ceil(
-                        window.visualViewport?.pageTop ?? window.scrollY,
-                    ),
+                startTransition(() => {
+                    push(
+                        screen,
+                        params || {},
+                        {
+                            scrollOffsetTop: Math.ceil(
+                                window.visualViewport?.pageTop ??
+                                    window.scrollY,
+                            ),
+                        },
+                        openInNewStack,
+                    )
                 })
             }
         },
-        [screen, params, push],
+        [screen, params, push, openInNewStack],
     )
 
     let { outline, plain, children, ...aProps } = props

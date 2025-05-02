@@ -6,7 +6,7 @@ import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
 
-export function LayoutSelect() {
+export const LayoutSelect = React.memo(function LayoutSelect() {
     let t = useT("components/MemoList/LayoutSelect")
 
     let [listLayout, setListLayout] = useSetting("ui.memoList.layout")
@@ -54,4 +54,4 @@ export function LayoutSelect() {
             </Select>
         </div>
     )
-}
+})

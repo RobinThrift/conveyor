@@ -43,6 +43,12 @@ export const HashIcon = lazy(() =>
     })),
 )
 
+export const KeyboardIcon = lazy(() =>
+    import("@phosphor-icons/react/Keyboard").then(({ Keyboard }) => ({
+        default: Keyboard,
+    })),
+)
+
 export const LockIcon = lazy(() =>
     import("./LockIcon").then(({ LockIcon }) => ({
         default: LockIcon,

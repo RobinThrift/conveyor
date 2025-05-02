@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import React from "react"
 
 import "@/ui/styles/index.css"
 import { decorator } from "@/lib/testhelper/rootStore"
@@ -14,4 +15,6 @@ const meta: Meta<typeof SettingsScreen> = {
 export default meta
 type Story = StoryObj<typeof SettingsScreen>
 
-export const Settings: Story = {}
+export const Settings: Story = {
+    render: () => <SettingsScreen />,
+}

@@ -1,5 +1,15 @@
-import * as Accordion from "@radix-ui/react-accordion"
-import React, { useCallback } from "react"
+import React, { type Key, useCallback } from "react"
+import {
+    Dialog as AriaDialog,
+    Heading as AriaHeading,
+    Modal as AriaModal,
+    ModalOverlay as AriaModalOverlay,
+    Tab as AriaTab,
+    TabList as AriaTabList,
+    TabPanel as AriaTabPanel,
+    Tabs as AriaTabs,
+} from "react-aria-components"
+import { useSelector } from "react-redux"
 
 import {
     CloudCheckIcon,
@@ -7,136 +17,131 @@ import {
     GlobeIcon,
     KeyIcon,
     PaletteIcon,
+    XIcon,
 } from "@/ui/components/Icons"
+import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
 import { useCurrentPage, useNavigation } from "@/ui/navigation"
-
 import { selectors } from "@/ui/state"
-import clsx from "clsx"
-import { useSelector } from "react-redux"
-import { APISettingsTab } from "./APISettingsTab"
+
+import { Button } from "@/ui/components/Button"
+import { APITokensTab } from "./APITokensTab"
 import { InterfaceSettingsTab } from "./InterfaceSettingsTab"
 import { LocaleSettingsTab } from "./LocaleSettingsTab"
 import { SyncSettingsTab } from "./SyncSettingsTab"
+import { useSettingsModalState } from "./useSettingsModalState"
 
-export interface SettingsScreenProps {
-    className?: string
+export function SettingsScreen() {
+    let { animRef, onPointerDown, onPointerCancel, onPointerMove, close } =
+        useSettingsModalState()
+
+    return (
+        <AriaModalOverlay
+            className="settings-modal-overlay"
+            isOpen={true}
+            isDismissable={false}
+            isKeyboardDismissDisabled={false}
+        >
+            <AriaModal className="settings-modal" ref={animRef}>
+                <AriaDialog className="settings-dialog">
+                    <SettingsScreenContent close={close} />
+                </AriaDialog>
+            </AriaModal>
+            <div
+                className="settings-modal-drag-handle"
+                onPointerDown={onPointerDown}
+                onPointerUp={onPointerCancel}
+                onPointerMove={onPointerMove}
+                onPointerCancel={onPointerCancel}
+            />
+        </AriaModalOverlay>
+    )
 }
 
-export function SettingsScreen(props: SettingsScreenProps) {
+function SettingsScreenContent({ close }: { close?: () => void }) {
     let t = useT("screens/Settings")
-    let tInterface = useT("screens/Settings/InterfaceSettings")
-    let tLocale = useT("screens/Settings/LocaleSettings")
-    let tSync = useT("screens/Settings/SyncSettings")
-    let tAPITokens = useT("screens/Settings/APITokens")
-
     let isSyncEnabled = useSelector(selectors.sync.isEnabled)
+
+    let isMobile = useIsMobile()
 
     let nav = useNavigation()
     let currentPage = useCurrentPage()
     let tab = "tab" in currentPage.params ? currentPage.params.tab : "interface"
+
     let onChangeTab = useCallback(
-        (tab: string) => {
-            nav.push(
-                "settings",
-                { tab },
-                {
-                    scrollOffsetTop: Math.ceil(
-                        window.visualViewport?.pageTop ?? window.scrollY,
-                    ),
-                },
-            )
+        (tab: Key) => {
+            nav.updateParams({ tab: tab as string })
         },
-        [nav.push],
+        [nav.updateParams],
     )
 
     return (
-        <div className={clsx("settings-screen", props.className)}>
-            <h1>{t.Title}</h1>
+        <div className="settings-screen">
+            <AriaHeading level={1} slot="title">
+                {t.Title}
+            </AriaHeading>
+            <Button
+                plain
+                iconRight={<XIcon />}
+                aria-label="Close"
+                className="settings-dialog-close-btn"
+                onPress={close}
+            />
 
-            <Accordion.Root
-                className="flex flex-col gap-2 justify-center"
-                type="single"
-                value={tab}
-                onValueChange={onChangeTab}
+            <AriaTabs
+                selectedKey={tab}
+                onSelectionChange={onChangeTab}
+                className="settings-tabs"
+                orientation={isMobile ? "horizontal" : "vertical"}
             >
-                <Accordion.Item
-                    value="interface"
-                    className="settings-section bg-primary text-primary-contrast"
+                <AriaTabList
+                    aria-label={t.TabListLabel}
+                    className="settings-tab-list"
                 >
-                    <Accordion.Trigger
-                        value="interface"
-                        className="settings-heading outline-primary-extra-dark"
-                    >
-                        <h2>{tInterface.Title}</h2>
-                        <small>{tInterface.Description}</small>
+                    <AriaTab id="interface" className="settings-tab-list-item">
                         <PaletteIcon weight="fill" className="icon" />
-                    </Accordion.Trigger>
-
-                    <Accordion.Content asChild>
-                        <InterfaceSettingsTab />
-                    </Accordion.Content>
-                </Accordion.Item>
-
-                <Accordion.Item
-                    value="locale"
-                    className="settings-section bg-success text-success-contrast"
-                >
-                    <Accordion.Trigger
-                        value="locale"
-                        className="settings-heading"
+                        {t.TabLabelInterface}
+                    </AriaTab>
+                    <AriaTab
+                        id="lang-locale"
+                        className="settings-tab-list-item"
                     >
-                        <h2>{tLocale.Title}</h2>
-                        <small>{tLocale.Description}</small>
                         <GlobeIcon weight="fill" className="icon" />
-                    </Accordion.Trigger>
-
-                    <Accordion.Content asChild>
-                        <LocaleSettingsTab />
-                    </Accordion.Content>
-                </Accordion.Item>
-
-                <Accordion.Item
-                    value="sync"
-                    className="settings-section bg-subtle text-subtle-contrast"
-                >
-                    <Accordion.Trigger
-                        value="sync"
-                        className="settings-heading"
-                    >
-                        <h2>{tSync.Title}</h2>
+                        {t.TabLabelLangLocale}
+                    </AriaTab>
+                    <AriaTab id="sync" className="settings-tab-list-item">
                         {isSyncEnabled ? (
                             <CloudCheckIcon weight="fill" className="icon" />
                         ) : (
                             <CloudSlashIcon weight="fill" className="icon" />
                         )}
-                    </Accordion.Trigger>
-
-                    <Accordion.Content asChild>
-                        <SyncSettingsTab />
-                    </Accordion.Content>
-                </Accordion.Item>
-
-                {isSyncEnabled && (
-                    <Accordion.Item
-                        value="apitokens"
-                        className="settings-section bg-success text-success-contrast"
-                    >
-                        <Accordion.Trigger
-                            value="apitokens"
-                            className="settings-heading"
+                        {t.TabLabelSync}
+                    </AriaTab>
+                    {isSyncEnabled && (
+                        <AriaTab
+                            id="apitokens"
+                            className="settings-tab-list-item"
                         >
-                            <h2>{tAPITokens.Title}</h2>
-                            <small>{tAPITokens.Description}</small>
                             <KeyIcon weight="fill" className="icon" />
-                        </Accordion.Trigger>
-
-                        <Accordion.Content asChild>
-                            <APISettingsTab />
-                        </Accordion.Content>
-                    </Accordion.Item>
+                            {t.TabLabelAPITokens}
+                        </AriaTab>
+                    )}
+                </AriaTabList>
+                <AriaTabPanel id="interface" className="settings-tab">
+                    <InterfaceSettingsTab />
+                </AriaTabPanel>
+                <AriaTabPanel id="lang-locale" className="settings-tab">
+                    <LocaleSettingsTab />
+                </AriaTabPanel>
+                <AriaTabPanel id="sync" className="settings-tab">
+                    <SyncSettingsTab />
+                </AriaTabPanel>
+                {isSyncEnabled && (
+                    <AriaTabPanel id="apitokens" className="settings-tab">
+                        <APITokensTab />
+                    </AriaTabPanel>
                 )}
-            </Accordion.Root>
+            </AriaTabs>
         </div>
     )
 }

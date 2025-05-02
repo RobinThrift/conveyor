@@ -1,13 +1,13 @@
 import React, { useCallback } from "react"
 
+import { KeyboardIcon, PaletteIcon } from "@/ui/components/Icons"
+
 import { Checkbox } from "@/ui/components/Input/Checkbox"
 import { SelectColourScheme, SelectMode } from "@/ui/components/ThemeSwitcher"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
 
-export function InterfaceSettingsTab({
-    ref,
-}: { ref?: React.Ref<HTMLDivElement> }) {
+export function InterfaceSettingsTab() {
     let t = useT("screens/Settings/InterfaceSettings")
 
     let [controls, setControls] = useSetting("controls")
@@ -27,9 +27,19 @@ export function InterfaceSettingsTab({
     )
 
     return (
-        <div ref={ref} className="settings-section-content">
-            <div className="settings-sub-section">
-                <h3>{t.SectionTheme}</h3>
+        <>
+            <header>
+                <h2>{t.Title}</h2>
+                <small className="settings-tab-description">
+                    {t.Description}
+                </small>
+            </header>
+
+            <div className="settings-section">
+                <h3 className="settings-section-header">
+                    <PaletteIcon className="icon" />
+                    {t.SectionTheme}
+                </h3>
 
                 <div className="sm:mb-0 md:grid grid-cols-6 space-y-1">
                     <label
@@ -52,8 +62,11 @@ export function InterfaceSettingsTab({
                 </div>
             </div>
 
-            <div className="settings-sub-section">
-                <h3>{t.SectionControls}</h3>
+            <div className="settings-section">
+                <h3 className="settings-section-header">
+                    <KeyboardIcon className="icon" />
+                    {t.SectionControls}
+                </h3>
 
                 <div className="grid xs:grid-cols-2 gap-2 tablet:gap-4">
                     <Checkbox
@@ -70,6 +83,6 @@ export function InterfaceSettingsTab({
                     />
                 </div>
             </div>
-        </div>
+        </>
     )
 }

@@ -20,7 +20,9 @@ export interface ShortDayPickerProps {
     onSelect: (date?: CalendarDate) => void
 }
 
-export function ShortDayPicker(props: ShortDayPickerProps) {
+export const ShortDayPicker = React.memo(function ShortDayPicker(
+    props: ShortDayPickerProps,
+) {
     let scrollToRef = useRef<HTMLTableCellElement | null>(null)
     let [focusedDate, setFocusedDate] = useState<CalendarDate>(
         props.selected ?? currentDate(),
@@ -89,4 +91,4 @@ export function ShortDayPicker(props: ShortDayPickerProps) {
             </AriaCalendarGrid>
         </AriaCalendar>
     )
-}
+})
