@@ -37,11 +37,11 @@ export function MemoListFilter(props: MemoListFilterProps) {
 
     return (
         <div className="memo-list-filter">
-            <div className="flex gap-1 px-2 py-2">
+            <div className="flex items-center gap-4 py-1">
                 <OffCanvas aria-lable={t.OffScreenDescription}>
                     <Button
                         iconRight=<HashIcon />
-                        plain
+                        outline
                         className="filter-offcanvas-trigger"
                     >
                         <span className="sr-only">{t.TriggerLabel}</span>

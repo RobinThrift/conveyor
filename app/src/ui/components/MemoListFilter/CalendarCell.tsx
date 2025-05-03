@@ -95,7 +95,7 @@ export function CalendarCell({
                 )}
                 ref={buttonRef}
             >
-                {states.formattedDate}
+                <span>{states.formattedDate}</span>
             </div>
         </td>
     )

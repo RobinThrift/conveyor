@@ -5,7 +5,7 @@
         @apply flex-1;
         @media (max-width: 1024px) {
             input {
-                @apply py-1.5 pe-1 ps-7;
+                @apply py-1.5 pe-1 ps-7 border-subtle-extra-light!;
                 font-size: 1rem;
             }
         }
@@ -39,32 +39,33 @@
         }
 
         .calendar-grid-body .calendar-grid-cell {
-            @apply cursor-pointer;
+            @apply flex items-center justify-center text-base p-0 w-full h-full;
 
-            padding: 0;
+            span {
+                @apply size-10 rounded-full flex items-center justify-center cursor-pointer;
+            }
 
             &[data-outside-month] {
                 @apply text-subtle;
             }
 
-            &.today {
+            &.today span {
                 @apply text-primary-dark dark:text-primary-light;
             }
 
-            &[data-selected] {
-                @apply bg-primary text-primary-contrast;
+            &[data-selected] span{
+                @apply text-primary-extra-dark bg-primary-extra-light border border-primary rounded-full;
             }
 
-            @apply flex items-center justify-center py-2 text-base rounded-lg;
-            width: 100%;
-
-            &:hover {
-                @apply bg-subtle text-subtle-contrast;
+            &:hover span {
+                @apply bg-subtle-extra-light;
             }
 
             &[data-disabled] {
-                @apply text-subtle cursor-default;
-                &:hover {
+                span {
+                    @apply text-subtle cursor-default;
+                }
+                &:hover span {
                     @apply bg-transparent text-subtle;
                 }
             }
@@ -88,6 +89,10 @@
             tr {
                 @apply w-full grid grid-cols-7;
             }
+
+            th {
+                @apply font-light;
+            }
         }
 
         .calendar-grid-body {
@@ -100,26 +105,29 @@
                 flex-shrink: 0;
                 scroll-snap-align: center;
             }
+
+            .calendar-grid-cell {
+                @apply border border-subtle-extra-light rounded-full;
+            }
         }
 
         .calendar-grid-cell {
-            @apply flex items-center justify-center py-2 text-sm cursor-pointer;
-            width: 100%;
+            @apply flex items-center justify-center py-2 text-sm cursor-pointer size-10 p-0;
 
             &[data-outside-month] {
-                @apply text-subtle;
+                @apply text-subtle bg-subtle-extra-light/20 border-subtle-extra-light/20;
             }
 
             &[data-disabled] {
-                @apply text-subtle cursor-default;
+                @apply text-subtle-extra-light cursor-default bg-subtle-extra-light/10 border-subtle-extra-light/10;
             }
 
             &.today {
-                @apply text-primary-dark dark:text-primary-light;
+                @apply text-primary-dark dark:text-primary-light font-semibold;
             }
 
             &[data-selected] {
-                @apply bg-primary-extra-light border-t border-t-primary;
+                @apply bg-primary-extra-light border border-primary;
             }
         }
     }
@@ -197,10 +205,29 @@
 }
 
 .filter-offcanvas-trigger {
-    @apply tablet:hidden px-2.5 -ms-1;
+    --btn-border-color: var(--color-subtle-extra-light);
+    --btn-bg: var(--color-text);
+    --btn-bg-active: var(--color-subtle-light);
+    @apply tablet:hidden -ms-1 size-10 ps-0! pe-0! focus:outline-0 focus-visible:outline-0;
+
+    .icon {
+        @apply border-0! bg-transparent! items-center! p-0! justify-center -ml-1;
+    }
+
+    &:hover {
+        --btn-bg: var(--color-subtle-extra-light);
+        --btn-border-color: var(--color-subtle-light);
+    }
+
+    &:hover .icon svg {
+        animation: none !important;
+        color: var(--color-text) !important;
+    }
 }
 
 .filter-offcanvas {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+
     & > nav {
         @apply w-full flex justify-center;
     }

@@ -32,7 +32,7 @@ export function SearchBar(props: {
             <Input
                 name="q"
                 type="search"
-                icon={<MagnifyingGlassIcon weight="duotone" />}
+                icon={<MagnifyingGlassIcon />}
                 onChange={onChangeDebounced}
                 defaultValue={props.query}
             />
