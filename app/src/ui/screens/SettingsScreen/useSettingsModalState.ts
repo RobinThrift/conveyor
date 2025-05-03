@@ -23,8 +23,9 @@ export function useSettingsModalState() {
         ;(e.target as HTMLDivElement).setPointerCapture(e.pointerId)
 
         if (animRef.current) {
+            let boundingRect = animRef.current.getBoundingClientRect()
             startingTopOffset.current =
-                animRef.current.getBoundingClientRect().top
+                boundingRect.top + e.clientY - boundingRect.top
             animRef.current.style.transition = "none"
         }
     }, [])
