@@ -53,7 +53,7 @@
                 @apply text-primary-dark dark:text-primary-light;
             }
 
-            &[data-selected] span{
+            &[data-selected] span {
                 @apply text-primary-extra-dark bg-primary-extra-light border border-primary rounded-full;
             }
 

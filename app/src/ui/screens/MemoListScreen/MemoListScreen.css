@@ -66,7 +66,7 @@
 }
 
 .new-memo-editor-fab {
-    @apply fixed right-4 rounded-full! border-0 size-14 z-20 shadow-lg p-0 tablet:hidden ;
+    @apply fixed right-4 rounded-full! border-0 size-14 z-20 shadow-lg p-0 tablet:hidden;
     top: calc(100dvh - 4.5rem);
 
     & > svg {
