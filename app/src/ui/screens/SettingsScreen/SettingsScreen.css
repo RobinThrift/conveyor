@@ -49,6 +49,7 @@
 
 .settings-dialog-close-btn {
     @apply absolute top-3 right-2 size-10;
+    z-index: 11000;
 }
 
 .settings-screen {
