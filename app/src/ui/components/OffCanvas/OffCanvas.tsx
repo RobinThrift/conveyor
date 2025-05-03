@@ -33,6 +33,7 @@ export function OffCanvasContent({
 }: OffCanvasContentProps) {
     let animRef = useRef<HTMLDivElement | null>(null)
     let isDragging = useRef(false)
+    let offsetX = useRef(0)
     let lastPointerX = useRef(-1)
     let velocity = useRef(0)
     let closeFn = useRef<(() => void) | undefined>(undefined)
@@ -43,6 +44,8 @@ export function OffCanvasContent({
         ;(e.target as HTMLDivElement).setPointerCapture(e.pointerId)
 
         if (animRef.current) {
+            let boundingRect = animRef.current.getBoundingClientRect()
+            offsetX.current = e.clientX - boundingRect.right
             animRef.current.style.transition = "none"
         }
     }, [])
@@ -57,7 +60,10 @@ export function OffCanvasContent({
             ;(e.target as HTMLDivElement).releasePointerCapture(e.pointerId)
 
             let boundingRect = animRef.current.getBoundingClientRect()
-            let translateBy = Math.min(e.clientX - boundingRect.width, 0)
+            let translateBy = Math.min(
+                e.clientX - offsetX.current - boundingRect.width,
+                0,
+            )
 
             if (
                 (Math.abs(translateBy) > boundingRect.width * 0.5 &&
@@ -83,7 +89,10 @@ export function OffCanvasContent({
         lastPointerX.current = e.clientX
 
         let boundingRect = animRef.current.getBoundingClientRect()
-        let translateBy = Math.min(e.clientX - boundingRect.width, 0)
+        let translateBy = Math.min(
+            e.clientX - offsetX.current - boundingRect.width,
+            0,
+        )
 
         animRef.current.style.transform = `translateX(${translateBy}px)`
         animRef.current.style.animationDuration = "0"

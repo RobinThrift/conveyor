@@ -17,7 +17,7 @@
 
 .offcanvas-modal {
     @apply animate-in slide-in-from-left ease-linear duration-200;
-    @apply h-full rounded-r-lg bg-surface-level-1 p-2 overflow-auto shadow-md;
+    @apply h-full rounded-r-lg bg-surface-level-1 shadow-md;
     @apply fixed left-0 top-0 bottom-0 right-0;
 
     width: 90dvw;
@@ -30,7 +30,7 @@
 }
 
 .offcanvas {
-    @apply focus:outline-hidden;
+    @apply focus:outline-hidden overflow-auto h-full p-2;
 }
 
 .offcanvas-drag-handle {

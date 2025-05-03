@@ -22,7 +22,7 @@ const meta: Meta<typeof OffCanvas> = {
                     <Story />
                     <h2 className="mt-2 py-2">More Content</h2>
                     {faker.lorem
-                        .sentences({ min: 10, max: 15 })
+                        .sentences({ min: 20, max: 35 })
                         .split(".")
                         .filter((sentence) => sentence.length !== 0)
                         .map((sentence) => (
@@ -46,7 +46,7 @@ export const Overview: Story = {
                 <OffCanvas.Title>OffCanvas Story</OffCanvas.Title>
 
                 {faker.lorem
-                    .sentences({ min: 5, max: 10 })
+                    .sentences({ min: 20, max: 35 })
                     .split(".")
                     .filter((sentence) => sentence.length !== 0)
                     .map((sentence) => (
