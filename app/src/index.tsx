@@ -2,26 +2,45 @@ import "vite/modulepreload-polyfill"
 import React from "react"
 import ReactDOM from "react-dom/client"
 
+import { Env } from "@/env"
+import { init } from "@/init"
+import { fromPromise } from "@/lib/result"
 import { App } from "@/ui/App"
 import { serverData } from "@/ui/App/ServerData"
 import {
     AttachmentProvider,
     attachmentContextFromController,
 } from "@/ui/attachments"
+import { Alert } from "@/ui/components/Alert"
+import { NavigationProvider } from "@/ui/navigation"
 import { SettingsLoader } from "@/ui/settings"
 import { Provider } from "@/ui/state"
+import { DevTools } from "@/ui/state/DevTools"
 
 import "@/ui/styles/index.css"
-
-import { Env } from "./env"
-import { init } from "./init"
-import { NavigationProvider } from "./ui/navigation"
-import { DevTools } from "./ui/state/DevTools"
 
 main()
 
 async function main() {
-    let { rootStore, attachmentCtrl, navCtrl } = await init()
+    let initResult = await fromPromise(init())
+    if (!initResult.ok) {
+        ReactDOM.createRoot(
+            // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
+            document.getElementById("__CONVEYOR_UI_ROOT__")!,
+        ).render(
+            <Alert variant="danger">
+                {initResult.err.name}: {initResult.err.message}
+                {initResult.err.stack && (
+                    <pre>
+                        <code>{initResult.err.stack}</code>
+                    </pre>
+                )}
+            </Alert>,
+        )
+        return
+    }
+
+    let { rootStore, attachmentCtrl, navCtrl } = initResult.value
 
     document.body.classList.add(`platform-${Env.platform}`)
 
