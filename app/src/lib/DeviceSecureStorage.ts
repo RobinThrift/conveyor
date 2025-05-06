@@ -1,5 +1,6 @@
 import type { Context } from "@/lib/context"
 import { type AsyncResult, Err } from "@/lib/result"
+import type { ErrorCode } from "./errors"
 
 /**
  * A DeviceSecureStorage is a secure storage container for a specific device that may or may not
@@ -14,9 +15,16 @@ export interface DeviceSecureStorage {
     removeItem(ctx: Context, key: string): AsyncResult<void>
 }
 
-const NoopDeviceSecureStorageError = new Error(
-    "no device secure storage available",
-)
+export class NoopDeviceSecureStorageError extends Error {
+    static ERR_CODE = "NOOP_DEVICE_SECURE_STORAGE_ERROR" as ErrorCode
+    constructor(additionalInfo?: string, options?: ErrorOptions) {
+        let msg = "no device secure storage available"
+        if (additionalInfo) {
+            msg = `${msg}: ${additionalInfo}`
+        }
+        super(`[${NoopDeviceSecureStorageError.ERR_CODE}] ${msg}`, options)
+    }
+}
 
 export class NoopDeviceSecureStorage implements DeviceSecureStorage {
     public async isAvailable(): Promise<boolean> {
@@ -24,26 +32,26 @@ export class NoopDeviceSecureStorage implements DeviceSecureStorage {
     }
 
     public async init(_ctx: Context): AsyncResult<void> {
-        return Err(NoopDeviceSecureStorageError)
+        return Err(new NoopDeviceSecureStorageError("init"))
     }
 
     public async reset(_ctx: Context): AsyncResult<void> {
-        return Err(NoopDeviceSecureStorageError)
+        return Err(new NoopDeviceSecureStorageError("reset"))
     }
 
-    public async getItem(_ctx: Context, _key: string): AsyncResult<string> {
-        return Err(NoopDeviceSecureStorageError)
+    public async getItem(_ctx: Context, key: string): AsyncResult<string> {
+        return Err(new NoopDeviceSecureStorageError(`getItem: ${key}`))
     }
 
     public async setItem(
         _ctx: Context,
-        _key: string,
+        key: string,
         _value: string,
     ): AsyncResult<void> {
-        return Err(NoopDeviceSecureStorageError)
+        return Err(new NoopDeviceSecureStorageError(`setItem: ${key}`))
     }
 
-    public async removeItem(_ctx: Context, _key: string): AsyncResult<void> {
-        return Err(NoopDeviceSecureStorageError)
+    public async removeItem(_ctx: Context, key: string): AsyncResult<void> {
+        return Err(new NoopDeviceSecureStorageError(`removeItem: ${key}`))
     }
 }

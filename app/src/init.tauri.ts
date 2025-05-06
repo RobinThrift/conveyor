@@ -25,6 +25,12 @@ export async function init({
     let deviceSecureStorage: DeviceSecureStorage =
         new WebCryptoDeviceSecureStorage()
 
+    let deviceSecureStorageInit = await deviceSecureStorage.init(ctx)
+    if (!deviceSecureStorageInit.ok) {
+        console.error(deviceSecureStorageInit.err)
+        deviceSecureStorage = new NoopDeviceSecureStorage()
+    }
+
     setEnv({
         platform: platform() === "macos" ? "macos" : "tauri-generic",
         lang: locale ? [locale] : [],
@@ -37,12 +43,6 @@ export async function init({
     }
 
     let kvContainer = new TauriKVStoreContainer()
-
-    let deviceSecureStorageInit = await deviceSecureStorage.init(ctx)
-    if (!deviceSecureStorageInit.ok) {
-        console.error(deviceSecureStorageInit.err)
-        deviceSecureStorage = new NoopDeviceSecureStorage()
-    }
 
     cancel()
 

@@ -29,6 +29,12 @@ export async function init({
     let deviceSecureStorage: DeviceSecureStorage =
         new WebCryptoDeviceSecureStorage()
 
+    let deviceSecureStorageInit = await deviceSecureStorage.init(ctx)
+    if (!deviceSecureStorageInit.ok) {
+        console.error(deviceSecureStorageInit.err)
+        deviceSecureStorage = new NoopDeviceSecureStorage()
+    }
+
     setEnv({
         platform: isStandalone() ? "pwa" : "web",
         lang: navigator.languages ? navigator.languages : [navigator.language],
@@ -48,12 +54,6 @@ export async function init({
         await sqlite.close()
         indexedDBKVStoreContainer.close()
     })
-
-    let deviceSecureStorageInit = await deviceSecureStorage.init(ctx)
-    if (!deviceSecureStorageInit.ok) {
-        console.error(deviceSecureStorageInit.err)
-        deviceSecureStorage = new NoopDeviceSecureStorage()
-    }
 
     cancel()
 
