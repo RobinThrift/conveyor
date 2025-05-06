@@ -1,7 +1,14 @@
 import { awaitWithAbort } from "@/lib/awaitWithAbort"
 import { BaseContext, type Context } from "@/lib/context"
 import { Second } from "@/lib/duration"
-import { type AsyncResult, Ok, fromPromise } from "@/lib/result"
+import {
+    type AsyncResult,
+    Err,
+    Ok,
+    type ResultErr,
+    fmtErr,
+    fromPromise,
+} from "@/lib/result"
 import { decodeText, encodeText } from "@/lib/textencoding"
 import { createWorker, isWorkerContext } from "@/lib/worker"
 import { IndexedDB } from "./indexedDB/IndexedDB"
@@ -56,13 +63,13 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
 
         generateLocalCryptoKey()
 
-        let genretedKey = await fromPromise(localCryptoKey.promise)
-        if (!genretedKey.ok) {
-            return genretedKey
+        let generatedKey = await fromPromise(localCryptoKey.promise)
+        if (!generatedKey.ok) {
+            return generatedKey
         }
 
         return db.insertOrUpdate(ctx, "keys", [
-            { name: "local-key-v1", key: genretedKey.value },
+            { name: "local-key-v1", key: generatedKey.value },
         ])
     },
 
@@ -123,7 +130,7 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
             decryptData(cryptoKey.value, item.value.data),
         )
         if (!plaintext.ok) {
-            return plaintext
+            return fmtErr("error decrypting data: %w", plaintext)
         }
 
         return Ok(decodeText(plaintext.value))
@@ -148,7 +155,7 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
         )
         if (!ciphertext.ok) {
             cancel()
-            return ciphertext
+            return fmtErr("error encrypting data: %w", ciphertext)
         }
 
         let insterted = await db.insertOrUpdate(ctx, "items", [
@@ -171,6 +178,26 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
 WebCryptoDeviceSecureStorageWorker.runIfWorker()
 
 async function generateLocalCryptoKey() {
+    let cryptoKey = await generateX25519LocalCryptoKey()
+
+    if (!cryptoKey.ok) {
+        if (
+            cryptoKey.err.name === "NotSupportedError" ||
+            (cryptoKey.err.cause as Error)?.name === "NotSupportedError"
+        ) {
+            cryptoKey = await generateECDHLocalCryptoKey()
+        }
+    }
+
+    if (!cryptoKey.ok) {
+        localCryptoKey.reject((cryptoKey as ResultErr).err)
+        return
+    }
+
+    localCryptoKey.resolve(cryptoKey.value)
+}
+
+async function generateX25519LocalCryptoKey(): AsyncResult<CryptoKeyPair> {
     let cryptoKey = await fromPromise(
         globalThis.crypto.subtle.generateKey({ name: "X25519" }, false, [
             "deriveKey",
@@ -178,12 +205,39 @@ async function generateLocalCryptoKey() {
     )
 
     if (!cryptoKey.ok) {
-        localCryptoKey.reject(cryptoKey.err)
-        return
+        return Err(
+            Error(`error generating X25519 key: ${cryptoKey.err}}`, {
+                cause: cryptoKey.err,
+            }),
+        )
     }
 
-    localCryptoKey.resolve(cryptoKey.value)
+    return cryptoKey
 }
+
+async function generateECDHLocalCryptoKey(): AsyncResult<CryptoKeyPair> {
+    let cryptoKey = await fromPromise(
+        globalThis.crypto.subtle.generateKey(
+            { name: "ECDH", namedCurve: "P-384" },
+            false,
+            ["deriveKey"],
+        ) as Promise<CryptoKeyPair>,
+    )
+
+    if (!cryptoKey.ok) {
+        return Err(
+            new Error(
+                `error generating ECDH key using P-384: ${cryptoKey.err}}`,
+                {
+                    cause: cryptoKey.err,
+                },
+            ),
+        )
+    }
+
+    return cryptoKey
+}
+
 const IV_LEN = 12
 
 async function encryptData(
@@ -237,7 +291,7 @@ function generateIV() {
 function deriveKey(keyPair: CryptoKeyPair) {
     return globalThis.crypto.subtle.deriveKey(
         {
-            name: "X25519",
+            name: keyPair.privateKey.algorithm.name,
             public: keyPair.publicKey,
         },
         keyPair.privateKey,
