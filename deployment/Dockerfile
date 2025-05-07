@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/.cache \
     /sqlite-wasm/build-in-docker.sh
 
 
-FROM --platform=$BUILDPLATFORM node:23-alpine3.21 AS frontend
+FROM --platform=$BUILDPLATFORM node:24-alpine3.21 AS frontend
 
 RUN apk update && apk upgrade && apk add --no-cache curl git && \
     curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
