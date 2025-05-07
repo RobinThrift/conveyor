@@ -1,14 +1,7 @@
 import { awaitWithAbort } from "@/lib/awaitWithAbort"
 import { BaseContext, type Context } from "@/lib/context"
 import { Second } from "@/lib/duration"
-import {
-    type AsyncResult,
-    Err,
-    Ok,
-    type ResultErr,
-    fmtErr,
-    fromPromise,
-} from "@/lib/result"
+import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
 import { decodeText, encodeText } from "@/lib/textencoding"
 import { createWorker, isWorkerContext } from "@/lib/worker"
 import { IndexedDB } from "./indexedDB/IndexedDB"
@@ -17,6 +10,8 @@ type Tables = {
     keys: { name: string; key: globalThis.CryptoKeyPair }
     items: { key: string; data: ArrayBuffer }
 }
+
+const LOCAL_KEY_V1_NAME = "local-key-v1"
 
 const _db: Promise<IndexedDB<Tables>> = (async () => {
     if (!isWorkerContext()) {
@@ -51,7 +46,7 @@ const localCryptoKey = Promise.withResolvers<globalThis.CryptoKeyPair>()
 export const WebCryptoDeviceSecureStorageWorker = createWorker({
     init: async (ctx: Context): AsyncResult<void> => {
         let db = await _db
-        let cryptoKey = await db.get(ctx, "keys", "local-key-v1")
+        let cryptoKey = await db.get(ctx, "keys", LOCAL_KEY_V1_NAME)
         if (!cryptoKey.ok) {
             return cryptoKey
         }
@@ -61,16 +56,38 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
             return Ok(undefined)
         }
 
-        generateLocalCryptoKey()
-
-        let generatedKey = await fromPromise(localCryptoKey.promise)
+        let generatedKey = await generateLocalCryptoKey()
         if (!generatedKey.ok) {
             return generatedKey
         }
 
-        return db.insertOrUpdate(ctx, "keys", [
-            { name: "local-key-v1", key: generatedKey.value },
+        let inserted = await db.insertOrUpdate(ctx, "keys", [
+            { name: LOCAL_KEY_V1_NAME, key: generatedKey.value },
         ])
+
+        if (!inserted.ok) {
+            if (
+                inserted.err.name === "DataError" ||
+                (inserted.err.cause as Error)?.name === "DataErro"
+            ) {
+                generatedKey = await generateECDHLocalCryptoKey()
+                if (!generatedKey.ok) {
+                    return generatedKey
+                }
+                inserted = await db.insertOrUpdate(ctx, "keys", [
+                    { name: LOCAL_KEY_V1_NAME, key: generatedKey.value },
+                ])
+            }
+        }
+
+        if (!inserted.ok) {
+            localCryptoKey.reject(inserted.err)
+            return inserted
+        }
+
+        localCryptoKey.resolve(generatedKey.value)
+
+        return Ok(undefined)
     },
 
     reset: async (ctx: Context): AsyncResult<void> => {
@@ -189,12 +206,7 @@ async function generateLocalCryptoKey() {
         }
     }
 
-    if (!cryptoKey.ok) {
-        localCryptoKey.reject((cryptoKey as ResultErr).err)
-        return
-    }
-
-    localCryptoKey.resolve(cryptoKey.value)
+    return cryptoKey
 }
 
 async function generateX25519LocalCryptoKey(): AsyncResult<CryptoKeyPair> {
