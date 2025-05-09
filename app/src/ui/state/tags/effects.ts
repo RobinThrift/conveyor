@@ -3,6 +3,7 @@ import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
 import { slice as tags } from "./slice"
+import * as memos from "../memos"
 
 // @TODO: use real pagination
 const tagPageSize = 1000
@@ -21,8 +22,10 @@ export const registerEffects = (
             _,
             { cancelActiveListeners, getState, dispatch, signal },
         ) => {
-            let isLoading = tags.selectors.isLoading(getState())
-            if (isLoading) {
+            let state = getState()
+            let requiresReload = tags.selectors.requiresReload(state)
+            let isLoading = tags.selectors.isLoading(state)
+            if (isLoading || !requiresReload) {
                 return
             }
 
@@ -53,6 +56,15 @@ export const registerEffects = (
             }
 
             dispatch(tags.actions.setTags(list.value))
+        },
+    })
+
+    startListening({
+        actionCreator: memos.actions.update,
+        effect: (_, { cancelActiveListeners, dispatch }) => {
+            cancelActiveListeners()
+
+            dispatch(tags.actions.setRequiresReload())
         },
     })
 }

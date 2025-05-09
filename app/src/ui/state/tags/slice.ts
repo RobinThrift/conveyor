@@ -5,11 +5,13 @@ export interface TagsState {
     tags: Tag[]
     error?: Error
     isLoading: boolean
+    requiresReload: boolean
 }
 
 const initialState: TagsState = {
     tags: [],
     isLoading: false,
+    requiresReload: true,
 }
 
 export const slice = createSlice({
@@ -22,6 +24,11 @@ export const slice = createSlice({
             state.isLoading = false
             state.error = undefined
             state.tags = payload.items
+            state.requiresReload = false
+        },
+
+        setRequiresReload: (state) => {
+            state.requiresReload = true
         },
 
         setState: (
@@ -30,11 +37,13 @@ export const slice = createSlice({
         ) => {
             state.isLoading = payload.isLoading
             state.error = payload.error
+            state.requiresReload = false
         },
     },
 
     selectors: {
         tags: (state) => state.tags,
         isLoading: (state) => state.isLoading,
+        requiresReload: (state) => state.requiresReload,
     },
 })
