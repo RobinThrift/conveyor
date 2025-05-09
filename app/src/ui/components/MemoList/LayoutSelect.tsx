@@ -33,7 +33,7 @@ export const LayoutSelect = React.memo(function LayoutSelect() {
             >
                 <Select.Option value="masonry">
                     <div className="flex gap-1 items-center">
-                        <ListIcon />
+                        <ListIcon aria-hidden={true} />
                         <span className="option-label">{t.LayoutMasonry}</span>
                     </div>
                 </Select.Option>

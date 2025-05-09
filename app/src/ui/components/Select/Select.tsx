@@ -28,6 +28,7 @@ export interface SelectProps<T extends string = string> {
         | React.ReactElement<SelectOptionProps>
         | React.ReactElement<SelectOptionProps>[]
     onChange: (value: T) => void
+    "aria-labeledby"?: string
 }
 
 export function Select<T extends string = string>(props: SelectProps<T>) {
@@ -46,6 +47,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
             isDisabled={props.isDisabled}
             placeholder={props.placeholder}
             className={props.className}
+            aria-labelledby={props["aria-labeledby"] ?? `${props.name}-value`}
         >
             {props.label && (
                 <AriaLabel
@@ -60,7 +62,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
                     props.buttonClassName ?? "input",
                 )}
             >
-                <AriaSelectValue />
+                <AriaSelectValue id={`${props.name}-value`} />
                 <span aria-hidden="true">
                     <CaretDownIcon />
                 </span>
