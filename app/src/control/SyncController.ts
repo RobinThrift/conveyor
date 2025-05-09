@@ -29,7 +29,7 @@ export class SyncController {
     private _storage: Storage
     private _syncAPIClient: SyncAPIClient
     private _cryptoRemoteAPI: CryptoRemoteAPI
-    private _memos: Memo
+    private _memos: Memos
     private _attachments: Attachments
     private _settings: Settings
     private _changelog: Changelog
@@ -55,7 +55,7 @@ export class SyncController {
         transactioner: Transactioner
         storage: Storage
         syncAPIClient: SyncAPIClient
-        memos: Memo
+        memos: Memos
         attachments: Attachments
         settings: Settings
         changelog: Changelog
@@ -524,7 +524,7 @@ interface SyncAPIClient {
 
 type Storage = SingleItemKVStore<typeof SyncController.storageKey, SyncInfo>
 
-interface Memo {
+interface Memos {
     applyChangelogEntries(
         ctx: Context<{ db?: DBExec }>,
         entries: MemoChangelogEntry[],
