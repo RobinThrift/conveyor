@@ -22,6 +22,12 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             "import.meta.vitest": "undefined",
 
             "process.env.NODE_ENV": JSON.stringify(config.mode),
+
+            __ENABLE_DB_LOGGING__:
+                config.mode === "development" ? "true" : "false",
+            __ENABLE_DEVTOOLS__:
+                config.mode === "development" ? "true" : "false",
+
             __PLATFORM__: JSON.stringify(isTauri ? "TAURI" : "WEB"),
             __LOG_LEVEL__: JSON.stringify("error"),
             __VERSION__: JSON.stringify(
@@ -56,7 +62,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         plugins: [tailwindcss(), react()],
 
         optimizeDeps: {
-            exclude: ["@sqlite.org/sqlite-wasm"],
+            exclude: ["@sqlite.org/sqlite-wasm", "bippy"],
         },
 
         server: {

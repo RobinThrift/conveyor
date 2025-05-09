@@ -7,17 +7,13 @@ import { type AsyncResult, fromPromise } from "@/lib/result"
 export class DBLogger implements Database {
     private _lock: Lock
     private _db: Database
-    private _log: (event: string, args?: any) => void
 
-    constructor(db: Database, log: (event: string, args?: any) => void) {
+    constructor(db: Database) {
         this._db = db
         this._lock = new Lock(`dblogger_${newID()}}`)
-        this._log = log
-        // @ts-expect-error: this is for debugging
-        globalThis.__CONVEYOR_DB__ = this
     }
 
-    open(
+    async open(
         ctx: Context,
         params: {
             file: string
@@ -25,44 +21,56 @@ export class DBLogger implements Database {
             enableTracing: boolean
         },
     ): Promise<void> {
-        this._log("open", params)
-        return this._db.open(ctx, params)
+        performance.mark("sql:open:start", { detail: { args: [params] } })
+        let res = await this._db.open(ctx, params)
+        performance.mark("sql:open:end")
+        return res
     }
 
-    close(): Promise<void> {
-        this._log("close")
-        return this._db.close()
+    async close(): Promise<void> {
+        performance.mark("sql:clsoe:start")
+        let res = await this._db.close()
+        performance.mark("sql:close:end")
+        return res
     }
 
-    exec(sql: string, args?: DBValue[], abort?: AbortSignal): Promise<number> {
-        this._log("exec", [sql, args])
-        return this._db.exec(sql, args, abort)
+    async exec(
+        sql: string,
+        args?: DBValue[],
+        abort?: AbortSignal,
+    ): Promise<number> {
+        performance.mark("sql:exec:start", { detail: { sql, args } })
+        let res = await this._db.exec(sql, args, abort)
+        performance.mark("sql:exec:end")
+        return res
     }
 
-    query<R extends Record<string, DBValue>>(
+    async query<R extends Record<string, DBValue>>(
         sql: string,
         args?: DBValue[],
         abort?: AbortSignal,
     ): Promise<R[]> {
-        this._log("query", [sql, args])
-        return this._db.query(sql, args, abort)
+        performance.mark("sql:query:start", { detail: { sql, args } })
+        let res = await this._db.query<R>(sql, args, abort)
+        performance.mark("sql:query:end")
+        return res
     }
 
-    queryOne<R extends Record<string, DBValue>>(
+    async queryOne<R extends Record<string, DBValue>>(
         sql: string,
         args?: DBValue[],
         abort?: AbortSignal,
     ): Promise<R | undefined> {
-        this._log("queryOne", [sql, args])
-        return this._db.queryOne(sql, args, abort)
+        performance.mark("sql:query-one:start", { detail: { sql, args } })
+        let res = await this._db.queryOne<R>(sql, args, abort)
+        performance.mark("sql:query-one:end")
+        return res
     }
 
     inTransaction<R>(
         ctx: Context<{ db?: DBExec }>,
         fn: (ctx: Context<{ db: DBExec }>) => AsyncResult<R>,
     ): AsyncResult<R> {
-        this._log("inTransaction")
-
         let tx = ctx.getData("db")
         if (tx) {
             return fn(ctx.withData("db", tx))

@@ -11,15 +11,20 @@ const migrations = import.meta.glob<boolean, string, string>(
 )
 
 export async function migrate(ctx: Context, db: DBExec & Transactioner) {
+    performance.mark("migrate:start")
     console.log("running migrations")
 
     let tx: typeof db = ctx.getData("db") ?? db
 
     await createMigrationTable(tx)
 
+    performance.mark("migrate:get-last-applied-migration:start")
     let lastAppliedMigration = await tx.queryOne<{ version: string }>(
         "SELECT version FROM migrations ORDER BY id DESC LIMIT 1",
     )
+    performance.mark("migrate:get-last-applied-migration:end", {
+        detail: { lastAppliedMigration },
+    })
 
     if (lastAppliedMigration?.version) {
         console.log(`newest migration is ${lastAppliedMigration?.version}`)
@@ -38,6 +43,9 @@ export async function migrate(ctx: Context, db: DBExec & Transactioner) {
 
         if (versions.length === 0) {
             console.log("no new migrations to apply")
+            performance.mark("migrate:end", {
+                detail: "no new migrations to apply",
+            })
             return
         }
     }
@@ -49,6 +57,9 @@ export async function migrate(ctx: Context, db: DBExec & Transactioner) {
             .replace("./migrations/", "")
             .replace(".sql", "")
         console.log(`applying migration ${version}`)
+        performance.mark("migrate:migrate-apply:start", {
+            detail: `version: ${version}`,
+        })
 
         try {
             let sql = await migrations[versionFile]()
@@ -63,11 +74,15 @@ export async function migrate(ctx: Context, db: DBExec & Transactioner) {
                     )
                 })
             })
+            performance.mark("migrate:migrate-apply:end")
         } catch (e) {
+            performance.mark("migrate:migrate-apply:end")
+            performance.mark("migrate:end")
             throw new Error(`error applying migration ${version}: ${e}`)
         }
     }
 
+    performance.mark("migrate:end")
     console.log("database fully migrated")
 }
 

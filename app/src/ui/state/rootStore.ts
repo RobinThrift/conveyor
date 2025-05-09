@@ -28,7 +28,7 @@ import * as sync from "./sync"
 import * as tags from "./tags"
 import * as unlock from "./unlock"
 
-import { DevTools } from "./DevTools"
+import { ReduxDevTools } from "../devtools/ReduxDevTools"
 
 const listenerMiddleware = createListenerMiddleware()
 
@@ -64,7 +64,7 @@ export function configureRootStore() {
             process.env.NODE_ENV === "development"
                 ? (getDefaultEnhancers) =>
                       getDefaultEnhancers().concat(
-                          DevTools.instrument({ trace: true }),
+                          ReduxDevTools.instrument({ trace: true }),
                       )
                 : undefined,
 
