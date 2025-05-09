@@ -1,4 +1,4 @@
-import React, { type Key, type ReactNode } from "react"
+import React, { Suspense, type Key, type ReactNode } from "react"
 
 import clsx from "clsx"
 import type {
@@ -35,6 +35,7 @@ import type {
 } from "mdast-util-directive"
 
 import type { Screens } from "@/control/NavigationController"
+import { Loader } from "@/ui/components/Loader"
 
 interface Document {
     id: string
@@ -332,13 +333,14 @@ function imageToJSX(doc: Document, node: Image): ReactNode {
     let id = `${doc.id}-${idFromText(node.title || node.alt || node.url)}`
 
     return (
-        <Img
-            key={nodeKey(node)}
-            id={id}
-            src={node.url}
-            alt={node.alt ?? node.url}
-            caption={node.title ?? undefined}
-        />
+        <Suspense key={nodeKey(node)} fallback={<Loader />}>
+            <Img
+                id={id}
+                src={node.url}
+                alt={node.alt ?? node.url}
+                caption={node.title ?? undefined}
+            />
+        </Suspense>
     )
 }
 
