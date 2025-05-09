@@ -5,9 +5,9 @@ export function useOnVisible(
     ref: RefObject<HTMLElement | null>,
     { ratio }: { ratio: number },
 ) {
-    let [isVisible, setIsVisble] = useState(() => {
-        return isVisibleInViewPort(ref.current)
-    })
+    let [isVisible, setIsVisble] = useState(() =>
+        isVisibleInViewPort(ref.current),
+    )
 
     useEffect(() => {
         if (ref.current) {
