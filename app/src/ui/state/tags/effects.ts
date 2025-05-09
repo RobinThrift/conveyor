@@ -2,8 +2,8 @@ import type { MemoController } from "@/control/MemoController"
 import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
-import { slice as tags } from "./slice"
 import * as memos from "../memos"
+import { slice as tags } from "./slice"
 
 // @TODO: use real pagination
 const tagPageSize = 1000

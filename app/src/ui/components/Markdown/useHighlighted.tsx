@@ -1,8 +1,8 @@
 import { LanguageDescription } from "@codemirror/language"
 import { languages } from "@codemirror/language-data"
-import { classHighlighter, highlightCode } from "@lezer/highlight"
 import type { Parser } from "@lezer/common"
-import React, { startTransition, useEffect, useMemo, useState } from "react"
+import { classHighlighter, highlightCode } from "@lezer/highlight"
+import React, { startTransition, useEffect, useState } from "react"
 
 import { useNotificationDispatcher } from "@/ui/state/global/notifications"
 

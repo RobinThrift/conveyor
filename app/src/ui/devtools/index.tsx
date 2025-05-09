@@ -1,11 +1,11 @@
 import React, { startTransition, Suspense, useEffect, useState } from "react"
 
-import { ReduxDevTools } from "./ReduxDevTools"
-import { SQLLogDevTool } from "./SQLLogDevTool"
 import { Loader } from "../components/Loader"
+import { FPSMeter } from "./FPSMeter"
 import { PerformanceDevTool } from "./Performance"
 import { ReactDevTools } from "./ReactDevTools"
-import { FPSMeter } from "./FPSMeter"
+import { ReduxDevTools } from "./ReduxDevTools"
+import { SQLLogDevTool } from "./SQLLogDevTool"
 
 let tabs = {
     Redux: <ReduxDevTools />,

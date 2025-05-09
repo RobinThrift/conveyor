@@ -1,18 +1,18 @@
 import { newID } from "@/domain/ID"
 import {
-    traverseRenderedFibers,
-    getNearestHostFiber,
-    onCommitFiberRoot,
-    isCompositeFiber,
-    getDisplayName,
-    traverseProps,
-    traverseContexts,
-    traverseState,
-    getTimings,
-    getFiberStack,
-    setFiberId,
-    getFiberId,
     type FiberRoot,
+    getDisplayName,
+    getFiberId,
+    getFiberStack,
+    getNearestHostFiber,
+    getTimings,
+    isCompositeFiber,
+    onCommitFiberRoot,
+    setFiberId,
+    traverseContexts,
+    traverseProps,
+    traverseRenderedFibers,
+    traverseState,
 } from "bippy"
 
 import React, { useMemo, useState, useSyncExternalStore } from "react"

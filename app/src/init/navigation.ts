@@ -1,5 +1,5 @@
 import type { NavigationController } from "@/control/NavigationController"
-import { actions, type RootStore } from "@/ui/state"
+import { type RootStore, actions } from "@/ui/state"
 
 export function initNavgation({
     rootStore,

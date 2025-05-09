@@ -1,4 +1,5 @@
 import { setEnv } from "@/env"
+import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { IndexedDBKVStoreContainer } from "@/external/browser/IndexDBKVStore"
 import { LocalStorageKVStoreContainer } from "@/external/browser/LocalStorageKVStore"
 import { SessionStorageKVStoreContainer } from "@/external/browser/SessionStorageKVStore"
@@ -10,7 +11,6 @@ import {
     NoopDeviceSecureStorage,
 } from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
-import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { toPromise } from "@/lib/result"
 
 import type {

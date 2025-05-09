@@ -1,8 +1,8 @@
 import { appConfigDir } from "@tauri-apps/api/path"
 import { locale as loadLocale, platform } from "@tauri-apps/plugin-os"
 
-import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { setEnv } from "@/env"
+import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { SessionStorageKVStoreContainer } from "@/external/browser/SessionStorageKVStore"
 import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
 import { TauriFS } from "@/external/tauri/TauriFS"

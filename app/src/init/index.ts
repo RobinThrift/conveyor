@@ -1,11 +1,11 @@
 import { BaseContext } from "@/lib/context"
 
-import type { InitPlatform } from "./platform"
-import { initController } from "./controller"
-import { initRootStore } from "./store"
-import { initNavgation } from "./navigation"
 import { tryAutoUnlock } from "./autounlock"
+import { initController } from "./controller"
 import { initJobs } from "./jobs"
+import { initNavgation } from "./navigation"
+import type { InitPlatform } from "./platform"
+import { initRootStore } from "./store"
 
 declare const __PLATFORM__: "TAURI" | "WEB"
 
