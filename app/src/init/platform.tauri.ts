@@ -1,6 +1,7 @@
 import { appConfigDir } from "@tauri-apps/api/path"
 import { locale as loadLocale, platform } from "@tauri-apps/plugin-os"
 
+import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { setEnv } from "@/env"
 import { SessionStorageKVStoreContainer } from "@/external/browser/SessionStorageKVStore"
 import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
@@ -13,7 +14,7 @@ import {
 } from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
 
-import type { PlatformDependencies, PlatformInitArgs } from "./init.platform"
+import type { PlatformDependencies, PlatformInitArgs } from "./platform"
 
 export async function init({
     fs,
@@ -49,6 +50,7 @@ export async function init({
     return {
         db: new TauriSQLite(),
         fs: new TauriFS(fs.baseDir),
+        crypto: new AgeCrypto(),
         kvContainers: {
             fast: kvContainer,
             permanent: kvContainer,

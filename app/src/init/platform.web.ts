@@ -10,13 +10,14 @@ import {
     NoopDeviceSecureStorage,
 } from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
+import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { toPromise } from "@/lib/result"
 
 import type {
     KVStores,
     PlatformDependencies,
     PlatformInitArgs,
-} from "./init.platform"
+} from "./platform"
 
 export async function init({
     fs,
@@ -60,6 +61,7 @@ export async function init({
     return {
         db: sqlite,
         fs: new OPFS(fs.baseDir, fs),
+        crypto: new AgeCrypto(),
         kvContainers: {
             fast: new LocalStorageKVStoreContainer(),
             permanent: indexedDBKVStoreContainer,
