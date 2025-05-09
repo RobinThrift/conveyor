@@ -1,5 +1,3 @@
-import { lazy } from "react"
-
 export { Archive as ArchiveIcon } from "@phosphor-icons/react/Archive"
 export { ArrowLeft as ArrowLeftIcon } from "@phosphor-icons/react/ArrowLeft"
 export { ArrowUDownLeft as ArrowUDownLeftIcon } from "@phosphor-icons/react/ArrowUDownLeft"
@@ -15,7 +13,6 @@ export { CloudCheck as CloudCheckIcon } from "@phosphor-icons/react/CloudCheck"
 export { CloudSlash as CloudSlashIcon } from "@phosphor-icons/react/CloudSlash"
 export { Code as CodeIcon } from "@phosphor-icons/react/Code"
 export { DotsThreeVertical as DotsThreeVerticalIcon } from "@phosphor-icons/react/DotsThreeVertical"
-export { Sliders as SlidersIcon } from "@phosphor-icons/react/Sliders"
 export { Globe as GlobeIcon } from "@phosphor-icons/react/Globe"
 export { Info as InfoIcon } from "@phosphor-icons/react/Info"
 export { Key as KeyIcon } from "@phosphor-icons/react/Key"
@@ -27,6 +24,7 @@ export { Palette as PaletteIcon } from "@phosphor-icons/react/Palette"
 export { Password as PasswordIcon } from "@phosphor-icons/react/Password"
 export { Pencil as PencilIcon } from "@phosphor-icons/react/Pencil"
 export { Plus as PlusIcon } from "@phosphor-icons/react/Plus"
+export { Sliders as SlidersIcon } from "@phosphor-icons/react/Sliders"
 export { Sun as SunIcon } from "@phosphor-icons/react/Sun"
 export { SunHorizon as SunHorizonIcon } from "@phosphor-icons/react/SunHorizon"
 export { Table as TableIcon } from "@phosphor-icons/react/Table"
@@ -36,21 +34,6 @@ export { TrashSimple as BinIcon } from "@phosphor-icons/react/TrashSimple"
 export { User as UserIcon } from "@phosphor-icons/react/User"
 export { Warning as WarningIcon } from "@phosphor-icons/react/Warning"
 export { X as XIcon } from "@phosphor-icons/react/X"
-
-export const HashIcon = lazy(() =>
-    import("@phosphor-icons/react/Hash").then(({ Hash }) => ({
-        default: Hash,
-    })),
-)
-
-export const KeyboardIcon = lazy(() =>
-    import("@phosphor-icons/react/Keyboard").then(({ Keyboard }) => ({
-        default: Keyboard,
-    })),
-)
-
-export const LockIcon = lazy(() =>
-    import("./LockIcon").then(({ LockIcon }) => ({
-        default: LockIcon,
-    })),
-)
+export { Hash as HashIcon } from "@phosphor-icons/react/Hash"
+export { Keyboard as KeyboardIcon } from "@phosphor-icons/react/Keyboard"
+export { LockIcon } from "./LockIcon"
