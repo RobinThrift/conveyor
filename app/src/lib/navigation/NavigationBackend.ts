@@ -1,18 +1,4 @@
-export type Screens = Record<string, Record<string, unknown>>
-
-export type NavgationState<
-    S extends Screens,
-    Name extends keyof S,
-    Restore extends Record<string, unknown>,
-> = {
-    screen: {
-        name: Name
-        params: S[Name]
-    }
-    index: number
-    stack: number
-    restore: Partial<Restore>
-}
+import type { NavgationState, Screens } from "./NavigationState"
 
 export type OnPush<
     S extends Screens,
@@ -50,10 +36,10 @@ export interface NavigationBackend<
     addEventListener(
         event: "push",
         handler: (next: NavgationState<S, keyof S, Restore>) => void,
-    ): void
+    ): () => void
 
     addEventListener(
         event: "pop",
         handler: (next: NavgationState<S, keyof S, Restore>) => void,
-    ): void
+    ): () => void
 }

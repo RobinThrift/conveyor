@@ -44,7 +44,7 @@ export async function migrate(ctx: Context, db: DBExec & Transactioner) {
         if (versions.length === 0) {
             console.log("no new migrations to apply")
             performance.mark("migrate:end", {
-                detail: "no new migrations to apply",
+                detail: { info: "no new migrations to apply" },
             })
             return
         }

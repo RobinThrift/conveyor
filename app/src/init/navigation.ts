@@ -1,17 +1,26 @@
-import type { NavigationController } from "@/control/NavigationController"
+import {
+    NavigationController,
+    type Restore,
+    type Screens,
+} from "@/control/NavigationController"
+import type { NavigationBackend } from "@/lib/navigation"
 import { type RootStore, actions } from "@/ui/state"
 
 export function initNavgation({
     rootStore,
-    navCtrl,
+    navigationBackend,
 }: {
     rootStore: RootStore
-    navCtrl: NavigationController
+    navigationBackend: NavigationBackend<Screens, Restore>
 }) {
+    let navCtrl = new NavigationController({
+        backend: navigationBackend,
+    })
+
     let init = navCtrl.init()
 
     rootStore.dispatch(
-        actions.navigation.setPage({
+        actions.navigation.init({
             name: init.screen.name,
             params: init.screen.params,
             restore: init.restore,
@@ -57,4 +66,6 @@ export function initNavgation({
             window.scrollTo(0, Math.ceil(current.restore.scrollOffsetTop ?? 0))
         })
     })
+
+    return navCtrl
 }

@@ -1,8 +1,6 @@
 import { setEnv } from "@/env"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { IndexedDBKVStoreContainer } from "@/external/browser/IndexDBKVStore"
-import { LocalStorageKVStoreContainer } from "@/external/browser/LocalStorageKVStore"
-import { SessionStorageKVStoreContainer } from "@/external/browser/SessionStorageKVStore"
 import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
 import { OPFS } from "@/external/browser/opfs"
 import { SQLite } from "@/external/browser/sqlite"
@@ -11,6 +9,7 @@ import {
     NoopDeviceSecureStorage,
 } from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
+import { RemoteNavigationBackend } from "@/lib/navigation"
 import { toPromise } from "@/lib/result"
 
 import type {
@@ -46,15 +45,10 @@ export async function init({
         (IndexedDBKVStoreContainer<KVStores>).open(
             ctx,
             "conveyor",
-            ["auth", "sync"],
-            1,
+            ["setup", "auth", "sync", "setup"],
+            2,
         ),
     )
-
-    window.addEventListener("unload", async () => {
-        await sqlite.close()
-        indexedDBKVStoreContainer.close()
-    })
 
     cancel()
 
@@ -62,12 +56,11 @@ export async function init({
         db: sqlite,
         fs: new OPFS(fs.baseDir, fs),
         crypto: new AgeCrypto(),
-        kvContainers: {
-            fast: new LocalStorageKVStoreContainer(),
-            permanent: indexedDBKVStoreContainer,
-            ephemeral: new SessionStorageKVStoreContainer(),
-        },
+        keyValueContainer: indexedDBKVStoreContainer,
         deviceSecureStorage,
+        navigationBackend: new RemoteNavigationBackend(
+            self.postMessage.bind(self),
+        ),
     }
 }
 

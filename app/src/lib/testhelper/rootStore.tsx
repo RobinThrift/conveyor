@@ -22,19 +22,12 @@ import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
 import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
-import {
-    AttachmentProvider,
-    attachmentContextFromController,
-} from "@/ui/attachments"
+import { type AttachmentContext, AttachmentProvider } from "@/ui/attachments"
 import { Alert } from "@/ui/components/Alert"
 import { usePromise } from "@/ui/hooks/usePromise"
 import { SettingsLoader } from "@/ui/settings"
-import {
-    Provider,
-    actions,
-    configureEffects,
-    configureRootStore,
-} from "@/ui/state"
+import { actions, configureEffects, configureRootStore } from "@/ui/state"
+import { Provider } from "@/ui/state/Provider"
 
 import { AuthV1APIClient } from "@/api/authv1"
 import { APITokensV1APIClient } from "@/api/authv1/APITokensV1APIClient"
@@ -299,4 +292,13 @@ function initNavgation({
             window.scrollTo(0, Math.ceil(current.restore.scrollOffsetTop ?? 0))
         })
     })
+}
+
+function attachmentContextFromController(
+    ctrl: AttachmentController,
+): AttachmentContext {
+    return {
+        getAttachmentDataByID: (id) =>
+            ctrl.getAttachmentDataByID(BaseContext, id),
+    }
 }

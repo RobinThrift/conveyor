@@ -29,7 +29,9 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                 config.mode === "development" ? "true" : "false",
 
             __PLATFORM__: JSON.stringify(isTauri ? "TAURI" : "WEB"),
-            __LOG_LEVEL__: JSON.stringify("error"),
+            __LOG_LEVEL__: JSON.stringify(
+                config.mode === "development" ? "debug" : "error",
+            ),
             __VERSION__: JSON.stringify(
                 vcsInfo.numCommits
                     ? `${vcsInfo.version}-${vcsInfo.numCommits}`
@@ -95,6 +97,10 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             watch: {
                 ignored: ["**/src-tauri/**"],
             },
+        },
+
+        worker: {
+            format: "es",
         },
 
         build: {

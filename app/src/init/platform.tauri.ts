@@ -3,7 +3,6 @@ import { locale as loadLocale, platform } from "@tauri-apps/plugin-os"
 
 import { setEnv } from "@/env"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
-import { SessionStorageKVStoreContainer } from "@/external/browser/SessionStorageKVStore"
 import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
 import { TauriFS } from "@/external/tauri/TauriFS"
 import { TauriKVStoreContainer } from "@/external/tauri/TauriKVStore"
@@ -13,8 +12,11 @@ import {
     NoopDeviceSecureStorage,
 } from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
+import { RemoteNavigationBackend } from "@/lib/navigation"
 
 import type { PlatformDependencies, PlatformInitArgs } from "./platform"
+
+declare const __LOG_LEVEL__: string
 
 export async function init({
     fs,
@@ -38,9 +40,8 @@ export async function init({
         isDeviceSecureStorageAvailable: await deviceSecureStorage.isAvailable(),
     })
 
-    // biome-ignore lint/nursery/noProcessEnv: only used for development
-    if (process.env.NODE_ENV === "development") {
-        console.log("Tauri AppConfigDir: ", await appConfigDir())
+    if (__LOG_LEVEL__ === "debug") {
+        console.debug("Tauri AppConfigDir: ", await appConfigDir())
     }
 
     let kvContainer = new TauriKVStoreContainer()
@@ -51,11 +52,10 @@ export async function init({
         db: new TauriSQLite(),
         fs: new TauriFS(fs.baseDir),
         crypto: new AgeCrypto(),
-        kvContainers: {
-            fast: kvContainer,
-            permanent: kvContainer,
-            ephemeral: new SessionStorageKVStoreContainer(),
-        },
+        keyValueContainer: kvContainer,
         deviceSecureStorage,
+        navigationBackend: new RemoteNavigationBackend(
+            self.postMessage.bind(self),
+        ),
     }
 }

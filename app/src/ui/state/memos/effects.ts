@@ -316,4 +316,41 @@ export const registerEffects = (
             }
         },
     })
+
+    startListening({
+        actionCreator: navigation.init,
+        effect: async (
+            { payload },
+            { cancelActiveListeners, dispatch, getState },
+        ) => {
+            cancelActiveListeners()
+            let state = getState()
+
+            if ("filter" in payload.params) {
+                let filter = list.slice.selectors.filter(state.memos)
+                let paramFilter = payload.params?.filter ?? {}
+                if (!isEqual(filter, paramFilter)) {
+                    dispatch(
+                        list.slice.actions.setFilter({
+                            filter: paramFilter,
+                            source: "navigation",
+                        }),
+                    )
+                }
+            }
+
+            if ("memoID" in payload.params) {
+                if (
+                    single.slice.selectors.currentMemoID(state.memos) !==
+                    payload.params.memoID
+                ) {
+                    dispatch(
+                        single.slice.actions.setCurrentSingleMemoID({
+                            id: payload.params.memoID as string,
+                        }),
+                    )
+                }
+            }
+        },
+    })
 }

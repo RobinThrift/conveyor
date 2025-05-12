@@ -7,7 +7,7 @@ import type { DBExec, Database } from "@/lib/database"
 import { type AsyncResult, fromPromise, toPromise } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
 
-import { SQLiteWorker } from "./sqlite.worker"
+import { SQLiteWorker } from "./SQLiteWorker"
 
 export class SQLite implements Database {
     private _baseCtx: Context

@@ -4,6 +4,21 @@ interface _Env {
     isDeviceSecureStorageAvailable: boolean
 }
 
+const _channel = new BroadcastChannel("env")
+
+type SetEnvMessag = { type: "env:set"; data: Partial<_Env> }
+
+_channel.addEventListener("message", (evt: MessageEvent<SetEnvMessag>) => {
+    let msg = evt.data
+    if (msg?.type !== "env:set") {
+        return
+    }
+
+    evt.stopImmediatePropagation()
+
+    setEnv(msg.data)
+})
+
 export const Env: _Env = {
     platform: "web",
     lang: [],
@@ -17,4 +32,9 @@ export function setEnv(env: Partial<_Env>) {
             ;(Env[k] as _Env[typeof k]) = env[k]
         }
     }
+
+    _channel.postMessage({
+        type: "env:set",
+        data: env,
+    } satisfies SetEnvMessag)
 }

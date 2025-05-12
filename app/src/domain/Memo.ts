@@ -1,4 +1,8 @@
-import { type CalendarDate, parseDateISO8601 } from "@/lib/i18n"
+import {
+    type CalendarDate,
+    calendarDateToISO8601String,
+    parseDateISO8601,
+} from "@/lib/i18n"
 
 export type MemoID = string
 
@@ -91,16 +95,20 @@ export function filterFromSearchParams(query: URLSearchParams): ListMemosQuery {
         filter.isArchived = true
     }
 
-    let createdAtFilter = query.get("filter[created_at]")
-    if (!createdAtFilter) {
-        return filter
-    }
+    try {
+        let createdAtFilter = query.get("filter[created_at]")
+        if (!createdAtFilter) {
+            return filter
+        }
 
-    let opCreatedAt = query.get("op[created_at]")
-    if (opCreatedAt && opCreatedAt === "<=") {
-        filter.startDate = parseDateISO8601(createdAtFilter)
-    } else {
-        filter.exactDate = parseDateISO8601(createdAtFilter)
+        let opCreatedAt = query.get("op[created_at]")
+        if (opCreatedAt && opCreatedAt === "<=") {
+            filter.startDate = parseDateISO8601(createdAtFilter)
+        } else {
+            filter.exactDate = parseDateISO8601(createdAtFilter)
+        }
+    } catch (e) {
+        console.error(e)
     }
 
     return filter
@@ -125,11 +133,17 @@ function addFilterToSearchParams(
     }
 
     if (filter.exactDate) {
-        searchParams.set("filter[created_at]", filter.exactDate.toString()) // ISO8601: yyyy-MM-dd
+        searchParams.set(
+            "filter[created_at]",
+            calendarDateToISO8601String(filter.exactDate),
+        )
     }
 
     if (filter.startDate) {
-        searchParams.set("filter[created_at]", filter.startDate.toString()) // ISO8601: yyyy-MM-dd
+        searchParams.set(
+            "filter[created_at]",
+            calendarDateToISO8601String(filter.startDate),
+        )
         searchParams.set("op[created_at]", "<=")
     }
 

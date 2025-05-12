@@ -1,6 +1,7 @@
 import { BaseContext, type Context } from "@/lib/context"
 import { randomID } from "@/lib/randomID"
 import { type AsyncResult, Err, type Result, fromPromise } from "@/lib/result"
+import { getThreadName } from "../thread"
 
 export function isWorkerContext() {
     return (
@@ -79,7 +80,9 @@ export function createWorker<
         }>,
     ) => {
         let result: Result<any> = Err(
-            new Error(`unknown request type ${evt.data.type as string}`),
+            new Error(
+                `[${getThreadName()}] unknown request type ${evt.data.type as string}`,
+            ),
         )
 
         let handler = handlers[evt.data.type]
@@ -117,7 +120,7 @@ export function createWorker<
 
     let runIfWorker = () => {
         if (isWorkerContext()) {
-            globalThis.onmessage = run
+            globalThis.addEventListener("message", run)
         }
     }
 
@@ -181,9 +184,11 @@ class WorkerWrapper {
             ) => {
                 switch (evt.data.type) {
                     case "success":
+                        evt.stopImmediatePropagation()
                         this._handleSuccess(evt.data)
                         break
                     case "error":
+                        evt.stopImmediatePropagation()
                         this._handleError(evt.data)
                         break
                     default:

@@ -1,56 +1,44 @@
-import { BaseContext } from "@/lib/context"
+import {
+    NavigationController,
+    type Params,
+    type Restore,
+    type Screens,
+} from "@/control/NavigationController"
+import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
+import type { RemoteNavigationPushMessage } from "@/lib/navigation"
 
-import { tryAutoUnlock } from "./autounlock"
-import { initController } from "./controller"
-import { initJobs } from "./jobs"
+import { initBackend } from "./backend"
 import { initNavgation } from "./navigation"
-import type { InitPlatform } from "./platform"
-import { initRootStore } from "./store"
-
-declare const __PLATFORM__: "TAURI" | "WEB"
 
 export async function init() {
-    let platform = await initPlatform()
+    let { rootStore, onNavigationEvent, attachmentLoader } = await initBackend()
 
-    let controller = await initController(platform)
-    let rootStore = initRootStore(controller)
-
-    initNavgation({ rootStore, navCtrl: controller.navCtrl })
-
-    await tryAutoUnlock(BaseContext, {
+    let navCtrl = initNavgation({
         rootStore,
-        unlockCtrl: controller.unlockCtrl,
-        navCtrl: controller.navCtrl,
+        navigationBackend: new HistoryNavigationBackend<
+            Screens,
+            Params,
+            Restore
+        >({
+            fromURLParams: NavigationController.fromURLParams,
+            toURLParams: NavigationController.toURLParams,
+            screenToURLMapping: NavigationController.screenToURLMapping,
+        }),
     })
 
-    initJobs({ jobCtrl: controller.jobCtrl, rootStore: rootStore })
+    onNavigationEvent(
+        (evt: MessageEvent<RemoteNavigationPushMessage<Screens, Restore>>) => {
+            let msg = evt.data
+            if (msg?.type === "navigation:push") {
+                evt.stopImmediatePropagation()
+                navCtrl.push(evt.data.next)
+            }
+        },
+    )
 
     return {
         rootStore,
-        attachmentCtrl: controller.attachmentCtrl,
-        navCtrl: controller.navCtrl,
+        attachmentLoader,
+        navCtrl,
     }
-}
-
-async function initPlatform() {
-    let platformInit: InitPlatform
-    if (__PLATFORM__ === "TAURI") {
-        platformInit = (await import("./platform.tauri")).init
-    } else {
-        platformInit = (await import("./platform.web")).init
-    }
-
-    return platformInit({
-        db: {
-            onError: (err) => {
-                console.error(err)
-            },
-        },
-        fs: {
-            baseDir: "",
-            onError: (err) => {
-                console.error(err)
-            },
-        },
-    })
 }

@@ -4,7 +4,8 @@ import { expect, suite, test } from "vitest"
 import { render } from "vitest-browser-react"
 
 import { generateRealisticBody } from "@/lib/testhelper/memos"
-import { Provider, configureRootStore } from "@/ui/state"
+import { configureRootStore } from "@/ui/state"
+import { Provider } from "@/ui/state/Provider"
 
 import { Markdown } from "./Markdown"
 

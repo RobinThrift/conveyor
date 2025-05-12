@@ -8,7 +8,7 @@ import { type AsyncResult, Ok, fromPromise } from "@/lib/result"
 const _plaintextPrivateKeyStorageKey = "private-key"
 
 export class UnlockController {
-    private _storage: Storage
+    private _storage?: Storage
     private _crypto: CryptoController
     private _db: Database
 
@@ -19,7 +19,7 @@ export class UnlockController {
         crypto,
         db,
     }: {
-        storage: Storage
+        storage?: Storage
         crypto: CryptoController
         db: Database
     }) {
@@ -30,13 +30,20 @@ export class UnlockController {
 
     public async reset(ctx: Context): AsyncResult<void> {
         this.isUnlocked = false
-        return this._storage.removeItem(ctx, _plaintextPrivateKeyStorageKey)
+        return (
+            this._storage?.removeItem(ctx, _plaintextPrivateKeyStorageKey) ??
+            Ok(undefined)
+        )
     }
 
     public async tryGetPlaintextPrivateKey(
         ctx: Context,
     ): AsyncResult<PlaintextPrivateKey | undefined> {
         if (this.isUnlocked) {
+            return Ok(undefined)
+        }
+
+        if (!this._storage) {
             return Ok(undefined)
         }
 
@@ -99,7 +106,7 @@ export class UnlockController {
 
         this.isUnlocked = true
 
-        if (storeKey) {
+        if (storeKey && this._storage) {
             return this._storage.setItem(
                 ctx,
                 _plaintextPrivateKeyStorageKey,

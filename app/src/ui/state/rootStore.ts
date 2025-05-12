@@ -18,7 +18,6 @@ import * as apitokens from "./apitokens"
 import * as attachments from "./attachments"
 import * as auth from "./auth"
 import { registerEffects as registerErrorEffects } from "./errors"
-import * as i18n from "./global/i18n"
 import * as notifications from "./global/notifications"
 import * as memos from "./memos"
 import * as navigation from "./navigation"
@@ -28,19 +27,16 @@ import * as sync from "./sync"
 import * as tags from "./tags"
 import * as unlock from "./unlock"
 
-import { ReduxDevTools } from "../devtools/ReduxDevTools"
-
 const listenerMiddleware = createListenerMiddleware()
 
-let startListening = listenerMiddleware.startListening.withTypes<
+export const startListening = listenerMiddleware.startListening.withTypes<
     RootState,
     AppDispatch
 >()
 
-export function configureRootStore() {
+export function configureRootStore(preloadedState?: any) {
     let rootReducer = combineSlices(
         notifications.slice,
-        i18n.slice,
 
         settings.slice,
         memos.slice,
@@ -59,46 +55,15 @@ export function configureRootStore() {
 
         devTools: false,
 
-        enhancers:
-            // biome-ignore lint/nursery/noProcessEnv: only used for development
-            process.env.NODE_ENV === "development"
-                ? (getDefaultEnhancers) =>
-                      getDefaultEnhancers().concat(
-                          ReduxDevTools.instrument({ trace: true }),
-                      )
-                : undefined,
+        preloadedState,
+
+        enhancers: (getDefaultEnhancers) =>
+            getDefaultEnhancers({ autoBatch: false }),
 
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 thunk: false,
-                serializableCheck: {
-                    ignoredActions: [
-                        "setup/setupCandidatePrivateCryptoKey",
-                        "settings/setError",
-                    ],
-                    ignoredActionPaths: [
-                        /.*\.(createdAt|updatedAt|expiresAt|exactDate)/,
-                        /.*\.error/,
-                        "payload.content",
-                        "payload.next",
-                        "payload.translations",
-                        "payload.data",
-                        "payload.params",
-                        "payload.pagination.after",
-                        "payload.lastSyncedAt",
-                        /.*\.buttons/,
-                    ],
-                    ignoredPaths: [
-                        /.*\.(createdAt|updatedAt|expiresAt|exactDate)/,
-                        /.*\.error/,
-                        "memos.list.nextPage",
-                        "global.i18n.translations",
-                        "global.i18n.baseTranslations",
-                        "setup.selectedOptions.candidatePrivateCryptoKey",
-                        /.*\.buttons/,
-                        "sync.info.lastSyncedAt",
-                    ],
-                },
+                serializableCheck: false,
             }).prepend(listenerMiddleware.middleware),
     })
 
@@ -106,7 +71,6 @@ export function configureRootStore() {
         import.meta.hot.accept(() => store.replaceReducer(rootReducer))
     }
 
-    i18n.registerEffects(startListening)
     registerErrorEffects(startListening)
 
     return store

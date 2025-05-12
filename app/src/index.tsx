@@ -8,14 +8,12 @@ import { init } from "@/init"
 import { fromPromise } from "@/lib/result"
 import { App } from "@/ui/App"
 import { serverData } from "@/ui/App/ServerData"
-import {
-    AttachmentProvider,
-    attachmentContextFromController,
-} from "@/ui/attachments"
+import { AttachmentProvider } from "@/ui/attachments"
 import { Alert } from "@/ui/components/Alert"
 import { NavigationProvider } from "@/ui/navigation"
 import { SettingsLoader } from "@/ui/settings"
-import { Provider, type RootStore } from "@/ui/state"
+import type { RootStore } from "@/ui/state"
+import { Provider } from "@/ui/state/Provider"
 
 import "@/ui/styles/index.css"
 
@@ -63,7 +61,7 @@ async function main() {
         return
     }
 
-    let { rootStore, attachmentCtrl, navCtrl } = initResult.value
+    let { rootStore, attachmentLoader, navCtrl } = initResult.value
 
     document.body.classList.add(`platform-${Env.platform}`)
 
@@ -73,9 +71,7 @@ async function main() {
         <Provider store={rootStore}>
             <React.StrictMode>
                 <NavigationProvider value={navCtrl}>
-                    <AttachmentProvider
-                        value={attachmentContextFromController(attachmentCtrl)}
-                    >
+                    <AttachmentProvider value={attachmentLoader}>
                         <SettingsLoader>
                             <App {...serverData} />
                         </SettingsLoader>

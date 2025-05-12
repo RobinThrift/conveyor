@@ -1,9 +1,11 @@
+import type { Restore, Screens } from "@/control/NavigationController"
+import type { DeviceSecureStorage } from "@/lib/DeviceSecureStorage"
 import type { KVStoreContainer } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
 import type { Crypto } from "@/lib/crypto"
 import type { Database } from "@/lib/database"
 import type { FS } from "@/lib/fs"
-import type { DeviceSecureStorage } from "../lib/DeviceSecureStorage"
+import type { NavigationBackend } from "@/lib/navigation"
 
 export interface PlatformInitArgs {
     db: {
@@ -16,18 +18,15 @@ export interface PlatformInitArgs {
     }
 }
 
-export type KVStores = "auth" | "sync" | "setup" | "unlock"
+export type KVStores = "auth" | "sync" | "setup"
 
 export interface PlatformDependencies {
     db: Database
     fs: FS
     crypto: Crypto
-    kvContainers: {
-        fast: KVStoreContainer<KVStores>
-        permanent: KVStoreContainer<KVStores>
-        ephemeral: KVStoreContainer<KVStores>
-    }
+    keyValueContainer: KVStoreContainer<KVStores>
     deviceSecureStorage: DeviceSecureStorage
+    navigationBackend: NavigationBackend<Screens, Restore>
 }
 
 export type InitPlatform = (

@@ -26,6 +26,26 @@ export const slice = createSlice({
     name: "navigation",
     initialState,
     reducers: {
+        init: (
+            state,
+            {
+                payload,
+            }: PayloadAction<{
+                name: keyof Screens
+                params: Params
+                restore: Partial<Restore>
+                stack?: number
+                index?: number
+            }>,
+        ) => {
+            state.current.screen = {
+                name: payload.name,
+                params: payload.params,
+            }
+            state.current.index = payload.index ?? state.current.index
+            state.current.stack = payload.stack ?? state.current.stack
+            state.current.restore = payload.restore ?? state.current.restore
+        },
         setPage: (
             state,
             {

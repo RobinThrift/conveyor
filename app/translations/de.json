@@ -169,13 +169,11 @@
     },
 
     "screens/Unlock/StoreUnlockKeyCheckbox": {
-        "LabelWebSession": "Schlüssel für diese Sitzung speichern",
         "LabelDeviceSecureStorageWeb": "Schüssel lokal verschlüsselt im Browser speichern",
         "LabelDeviceSecureStorageNative": "Schüssel im sicheren Speicherbereich des Gerätes speichern",
 
         "ExplainerPopupLabel": "Erläuterung",
 
-        "ExplainerWebSession": "Der Schlüssel wird in Klartext im Sitzungsspeicher des Browsers hinterlegt. Dieser sollte beim Schließen des Browsers gelöscht werden.",
         "ExplainerDeviceSecureStorageWeb": "Der Schlüssel wird mit einem zweiten kryptographischem Schlüssel verschlüsselt, welcher vom Browser verwaltet wird und nicht auslesbar ist, und im lokalen permanenten Speicher des Browsers hinterlegt.",
         "ExplainerDeviceSecureStorageNative": "Der Schlüssel wird im sicheren Hardwareelement des Gerätes hinterlegt."
     },

@@ -11,7 +11,7 @@ export {
 } from "@internationalized/date"
 
 import {
-    type CalendarDate,
+    CalendarDate,
     type CalendarDateTime,
     today as _currentDate,
     now as _currentDateTime,
@@ -65,4 +65,10 @@ export function roundToNearestMinutes(d: CalendarDateTime) {
     }
 
     return d.set({ second: 0, millisecond: 0 })
+}
+
+// ISO8601: yyyy-MM-dd
+export function calendarDateToISO8601String(c: CalendarDate): string {
+    let fixed = new CalendarDate(c.year, c.month, c.day)
+    return fixed.toString()
 }

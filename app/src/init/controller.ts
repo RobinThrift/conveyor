@@ -11,12 +11,7 @@ import { ChangelogController } from "@/control/ChangelogController"
 import { CryptoController } from "@/control/CryptoController"
 import { JobController } from "@/control/JobController"
 import { MemoController } from "@/control/MemoController"
-import {
-    NavigationController,
-    type Params,
-    type Restore,
-    type Screens,
-} from "@/control/NavigationController"
+import { NavigationController } from "@/control/NavigationController"
 import { SettingsController } from "@/control/SettingsController"
 import { SetupController } from "@/control/SetupController"
 import { SyncController } from "@/control/SyncController"
@@ -25,7 +20,6 @@ import {
     type Storage as UnlockControllerStorage,
 } from "@/control/UnlockController"
 import type { SyncInfo } from "@/domain/SyncInfo"
-import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
 import { EncryptedKVStore, SingleItemKVStore } from "@/lib/KVStore"
 import { BaseContext } from "@/lib/context"
@@ -65,7 +59,7 @@ export async function initController(platform: PlatformDependencies) {
         storage: new EncryptedKVStore<{
             [key: string]: AuthToken
         }>({
-            kv: platform.kvContainers.permanent.getKVStore("auth"),
+            kv: platform.keyValueContainer.getKVStore("auth"),
             crypto: platform.crypto,
             deseerialize: authTokenFromJSON,
         }),
@@ -116,7 +110,7 @@ export async function initController(platform: PlatformDependencies) {
             new EncryptedKVStore<
                 Record<typeof SyncController.storageKey, SyncInfo>
             >({
-                kv: platform.kvContainers.permanent.getKVStore("sync"),
+                kv: platform.keyValueContainer.getKVStore("sync"),
                 crypto: platform.crypto,
             }),
         ),
@@ -138,18 +132,13 @@ export async function initController(platform: PlatformDependencies) {
     let setupCtrl = new SetupController({
         storage: new SingleItemKVStore(
             SetupController.storageKey,
-            platform.kvContainers.fast.getKVStore("setup"),
+            platform.keyValueContainer.getKVStore("setup"),
         ),
     })
 
-    let unlockControllerStorage: UnlockControllerStorage
+    let unlockControllerStorage: UnlockControllerStorage | undefined
     if (Env.isDeviceSecureStorageAvailable) {
         unlockControllerStorage = platform.deviceSecureStorage
-    } else {
-        unlockControllerStorage =
-            platform.kvContainers.ephemeral.getKVStore<Record<string, string>>(
-                "unlock",
-            )
     }
 
     let unlockCtrl = new UnlockController({
@@ -166,11 +155,7 @@ export async function initController(platform: PlatformDependencies) {
     })
 
     let navCtrl = new NavigationController({
-        backend: new HistoryNavigationBackend<Screens, Params, Restore>({
-            fromURLParams: NavigationController.fromURLParams,
-            toURLParams: NavigationController.toURLParams,
-            screenToURLMapping: NavigationController.screenToURLMapping,
-        }),
+        backend: platform.navigationBackend,
     })
 
     let jobCtrl = new JobController()

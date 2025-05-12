@@ -13,38 +13,27 @@ export const StoreUnlockKeyCheckbox = React.memo(
     }) {
         let t = useT("screens/Unlock/StoreUnlockKeyCheckbox")
 
+        if (!Env.isDeviceSecureStorageAvailable) {
+            return null
+        }
+
         let checkbox: React.ReactNode | null = null
         let text: string | null = null
         if (Env.platform === "web" || Env.platform === "pwa") {
-            if (Env.isDeviceSecureStorageAvailable) {
-                checkbox = (
-                    <Checkbox
-                        key="store_key_checkbox"
-                        name="store_key"
-                        label={t.LabelDeviceSecureStorageWeb}
-                        isDisabled={isDisabled}
-                    />
-                )
-                text = t.ExplainerDeviceSecureStorageWeb
-            } else {
-                checkbox = (
-                    <Checkbox
-                        key="store_key_checkbox"
-                        name="store_key"
-                        label={t.LabelWebSession}
-                        isDisabled={isDisabled}
-                    />
-                )
-                text = t.ExplainerWebSession
-            }
-        } else if (
-            Env.isDeviceSecureStorageAvailable &&
-            Env.platform === "macos"
-        ) {
             checkbox = (
                 <Checkbox
-                    name="store_key"
                     key="store_key_checkbox"
+                    name="store_key"
+                    label={t.LabelDeviceSecureStorageWeb}
+                    isDisabled={isDisabled}
+                />
+            )
+            text = t.ExplainerDeviceSecureStorageWeb
+        } else if (Env.platform === "macos") {
+            checkbox = (
+                <Checkbox
+                    key="store_key_checkbox"
+                    name="store_key"
                     label={t.LabelDeviceSecureStorageNative}
                     isDisabled={isDisabled}
                 />

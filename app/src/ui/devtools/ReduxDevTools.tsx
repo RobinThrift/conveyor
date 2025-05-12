@@ -40,3 +40,16 @@ const rosepineTheme = {
 export const ReduxDevTools = createDevTools(
     <InspectorMonitor tabs={tabs} invertTheme={false} theme={rosepineTheme} />,
 )
+
+export const instrument = ReduxDevTools.instrument({
+    trace: (a: Action) => {
+        if ("trace" in a && a.trace) {
+            return a.trace as string
+        }
+
+        let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
+        Error.captureStackTrace(trace)
+
+        return trace.stack
+    },
+})

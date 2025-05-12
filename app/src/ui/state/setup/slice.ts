@@ -36,7 +36,7 @@ export interface SetupState {
 const initialState: SetupState = {
     isSetup: false,
 
-    step: "unknown",
+    step: "initial-setup",
 
     selectedOptions: {
         isNew: false,

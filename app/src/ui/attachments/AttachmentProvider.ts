@@ -7,9 +7,7 @@ import {
     useState,
 } from "react"
 
-import type { AttachmentController } from "@/control/AttachmentController"
 import type { Attachment, AttachmentID } from "@/domain/Attachment"
-import { BaseContext } from "@/lib/context"
 import { type AsyncResult, Err } from "@/lib/result"
 import { useOnVisible } from "../hooks/useOnVisible"
 
@@ -29,15 +27,6 @@ export const AttachmentProvider = attachmentContext.Provider
 
 function useAttachmentProvider() {
     return useContext(attachmentContext)
-}
-
-export function attachmentContextFromController(
-    ctrl: AttachmentController,
-): AttachmentContext {
-    return {
-        getAttachmentDataByID: (id) =>
-            ctrl.getAttachmentDataByID(BaseContext, id),
-    }
 }
 
 export function useAttachment({
