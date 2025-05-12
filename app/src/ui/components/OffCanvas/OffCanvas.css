@@ -13,6 +13,11 @@
         background-color: transparent;
         backdrop-filter: blur(0px);
     }
+
+    &[data-exiting] {
+        background-color: transparent;
+        backdrop-filter: blur(0px);
+    }
 }
 
 .offcanvas-modal {
