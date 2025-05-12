@@ -1,17 +1,51 @@
 import React, { useEffect, useState } from "react"
 export function FPSMeter() {
+    let [history, setHistory] = useState<{ ts: number; value: number }[]>([
+        { ts: performance.now(), value: 0 },
+    ])
+    let [maxFPS, setMaxFPS] = useState<number>(0)
     let [fps, setFps] = useState<number>(0)
 
     useEffect(() => {
         let intervalID = setInterval(() => {
-            setFps(currFPS())
+            let fps = currFPS()
+            setHistory((history) => {
+                if (history.length >= 10) {
+                    history.shift()
+                }
+
+                return [...history, { ts: performance.now(), value: fps }]
+            })
+
+            setMaxFPS((maxFPS) => {
+                if (fps > maxFPS) {
+                    return fps
+                }
+                return maxFPS
+            })
+
+            setFps(fps)
         }, 200)
 
         return () => clearInterval(intervalID)
     }, [])
 
     return (
-        <div className="bg-[var(--btn-bg)]/70 backdrop-blur-xs text-sm py-1! px-2! h-fit rounded-full text-[var(--btn-color)] select-none pointer-events-none">
+        <div
+            className="bg-[var(--btn-bg)]/70 backdrop-blur-xs text-sm py-1! px-2! h-fit rounded-full text-[var(--btn-color)] select-none pointer-events-none flex items-center gap-2"
+            title={`MaxFPS: ${maxFPS}`}
+        >
+            <div className="flex justify-end items-end h-[1lh] w-10">
+                {history.map(({ ts, value }) => (
+                    <div
+                        key={ts}
+                        className="w-1 bg-white first:rounded-l last:rounded-r"
+                        style={{
+                            height: `${(value / maxFPS) * 100}%`,
+                        }}
+                    />
+                ))}
+            </div>
             <FPSDisplay fps={fps} />
         </div>
     )
@@ -27,7 +61,7 @@ function FPSDisplay({ fps }: { fps: number }) {
     }
 
     return (
-        <span>
+        <span className="font-mono">
             <span style={{ color }}>{fps}</span>
             {" FPS"}
         </span>
