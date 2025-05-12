@@ -1,7 +1,8 @@
-import { Asterisk } from "@phosphor-icons/react"
 import * as Form from "@radix-ui/react-form"
 import clsx from "clsx"
 import React from "react"
+
+import { AsteriskIcon } from "@/ui/components/Icons"
 
 export interface InputProps {
     className?: string
@@ -53,7 +54,9 @@ export function Input(props: InputProps) {
                     className={props.labelClassName}
                 >
                     {props.label}
-                    {props.required && <Asterisk className="required-icon" />}
+                    {props.required && (
+                        <AsteriskIcon className="required-icon" />
+                    )}
                 </Form.Label>
             )}
             <div className={clsx("relative", props.inputWrapperClassName)}>

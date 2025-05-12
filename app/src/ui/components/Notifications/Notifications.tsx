@@ -1,9 +1,9 @@
-import { Info, Warning, X } from "@phosphor-icons/react"
 import * as Toast from "@radix-ui/react-toast"
 import clsx from "clsx"
 import React, { useMemo } from "react"
 
 import { Button } from "@/ui/components/Button"
+import { InfoIcon, WarningIcon, XIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 import type { Notification as NotificationT } from "@/ui/notifications"
 import { useNotifications } from "@/ui/state/global/notifications"
@@ -76,7 +76,7 @@ function Notification({
         >
             <Toast.Title className="notification-title">
                 <div className="icon">
-                    {n.type === "info" ? <Info /> : <Warning />}
+                    {n.type === "info" ? <InfoIcon /> : <WarningIcon />}
                 </div>
                 {n.title}
             </Toast.Title>
@@ -84,7 +84,7 @@ function Notification({
                 className="notification-close"
                 aria-label={ariaLabelCloseBtn}
             >
-                <X aria-hidden />
+                <XIcon aria-hidden />
             </Toast.Close>
             <Toast.Description className="notification-message">
                 {n.message}
@@ -118,7 +118,7 @@ function PermanentNotification({
         <div className={clsx("notification pointer-events-auto", n.type)}>
             <div className="notification-title">
                 <div className="icon">
-                    {n.type === "info" ? <Info /> : <Warning />}
+                    {n.type === "info" ? <InfoIcon /> : <WarningIcon />}
                 </div>
                 {n.title}
             </div>
@@ -128,7 +128,7 @@ function PermanentNotification({
                 aria-label={ariaLabelCloseBtn}
                 onClick={() => onOpenChange(false)}
             >
-                <X />
+                <XIcon />
             </button>
             <div className="notification-message">{n.message}</div>
 

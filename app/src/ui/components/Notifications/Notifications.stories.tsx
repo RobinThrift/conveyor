@@ -1,11 +1,12 @@
 import { faker } from "@faker-js/faker"
-import { Info, Warning, X } from "@phosphor-icons/react"
 import type { Meta, StoryObj } from "@storybook/react"
 import React, { useCallback, useState } from "react"
 
 import { decorator } from "@/lib/testhelper/rootStore"
 import { Button } from "@/ui/components/Button"
+import { InfoIcon, WarningIcon, XIcon } from "@/ui/components/Icons"
 import { useNotificationDispatcher } from "@/ui/state/global/notifications"
+
 import "@/ui/styles/index.css"
 
 import { Notifications } from "./Notifications"
@@ -96,7 +97,7 @@ export const Overview: Story = {
                     <div className="notification info">
                         <div className="notification-title">
                             <div className="icon">
-                                <Info />
+                                <InfoIcon />
                             </div>
                             Example Info Notification
                         </div>
@@ -106,7 +107,7 @@ export const Overview: Story = {
                             aria-label="Dismiss"
                             data-radix-toast-announce-exclude
                         >
-                            <X />
+                            <XIcon />
                         </button>
                         <div className="notification-message">
                             {faker.lorem.sentence()}
@@ -120,7 +121,7 @@ export const Overview: Story = {
                     <div className="notification error">
                         <div className="notification-title">
                             <div className="icon">
-                                <Warning />
+                                <WarningIcon />
                             </div>
                             Error Info Notification
                         </div>
@@ -130,7 +131,7 @@ export const Overview: Story = {
                             aria-label="Dismiss"
                             data-radix-toast-announce-exclude
                         >
-                            <X />
+                            <XIcon />
                         </button>
                         <div className="notification-message">
                             {faker.lorem.sentence()}
@@ -144,7 +145,7 @@ export const Overview: Story = {
                     <div className="notification info">
                         <div className="notification-title">
                             <div className="icon">
-                                <Info />
+                                <InfoIcon />
                             </div>
                             Example Notification with very, mutliline text and
                             multiple sentences of message.
@@ -155,7 +156,7 @@ export const Overview: Story = {
                             aria-label="Dismiss"
                             data-radix-toast-announce-exclude
                         >
-                            <X />
+                            <XIcon />
                         </button>
                         <div className="notification-message">
                             {faker.lorem.sentences(4)}
