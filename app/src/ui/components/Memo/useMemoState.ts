@@ -30,6 +30,7 @@ export function useMemoState(props: {
         props.collapsible ?? false,
     )
     let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
+    let [shouldRender, setShouldRender] = useState(forceRender || isVisible)
 
     useEffect(() => {
         if (isExpanded) {
@@ -77,7 +78,9 @@ export function useMemoState(props: {
         }
     }, [props.memo.id, props.doubleClickToEdit, props.actions?.edit])
 
-    let shouldRender = isVisible || forceRender
+    if ((!shouldRender && isVisible) || forceRender) {
+        setShouldRender(true)
+    }
 
     return {
         ref,

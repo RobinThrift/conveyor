@@ -48,7 +48,7 @@ export function Memo(props: MemoProps) {
             )
         }
 
-        return body
+        return null
     }, [shouldRender, body, props.memo.id, onDoubleClick])
 
     return (
