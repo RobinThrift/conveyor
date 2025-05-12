@@ -11,10 +11,15 @@ import "@/ui/styles/index.css"
 import { Second } from "@/lib/duration"
 import { delay } from "@/lib/testhelper/delay"
 import { actions } from "@/ui/state"
+import { setEnv } from "@/env"
 import * as unlock from "@/ui/state/unlock"
 
 import { Button } from "@/ui/components/Button"
 import { UnlockScreen } from "./UnlockScreen"
+
+setEnv({
+    isDeviceSecureStorageAvailable: true,
+})
 
 const unlockScreenRootStore = (() => {
     const listenerMiddleware = createListenerMiddleware()
