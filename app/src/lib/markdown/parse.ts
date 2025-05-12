@@ -19,20 +19,20 @@ export function parse(markdown: string): Result<Root> {
     return fromThrowing(() => {
         let ast = fromMarkdown(markdown, "utf-8", {
             extensions: [
-                gfmAutolinkLiteral(),
                 gfmFootnote(),
                 gfmStrikethrough(),
                 gfmTable(),
                 directive(),
                 autoTagLinks(),
+                gfmAutolinkLiteral(),
             ],
             mdastExtensions: [
-                gfmAutolinkLiteralFromMarkdown(),
                 gfmFootnoteFromMarkdown(),
                 gfmStrikethroughFromMarkdown(),
                 gfmTableFromMarkdown(),
                 directiveFromMarkdown(),
                 mdastAutoTagLinks(),
+                gfmAutolinkLiteralFromMarkdown(),
             ],
         })
 
