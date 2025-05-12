@@ -8,10 +8,10 @@ import React from "react"
 import { Provider as ReduxProvider, useDispatch } from "react-redux"
 
 import "@/ui/styles/index.css"
+import { setEnv } from "@/env"
 import { Second } from "@/lib/duration"
 import { delay } from "@/lib/testhelper/delay"
 import { actions } from "@/ui/state"
-import { setEnv } from "@/env"
 import * as unlock from "@/ui/state/unlock"
 
 import { Button } from "@/ui/components/Button"

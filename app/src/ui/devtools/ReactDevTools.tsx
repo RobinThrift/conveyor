@@ -2,6 +2,8 @@ import { newID } from "@/domain/ID"
 import {
     type FiberRoot,
     getDisplayName,
+    getFiberFromHostInstance,
+    getLatestFiber,
     getNearestHostFiber,
     getTimings,
     isCompositeFiber,
@@ -10,8 +12,6 @@ import {
     traverseProps,
     traverseRenderedFibers,
     traverseState,
-    getLatestFiber,
-    getFiberFromHostInstance,
 } from "bippy"
 
 import React, { useMemo, useState, useSyncExternalStore } from "react"
@@ -258,7 +258,6 @@ function highlightElement(el: HTMLElement, name: string) {
 if (__ENABLE_DEVTOOLS__) {
     // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
     const rootElement = document.getElementById("__CONVEYOR_UI_ROOT__")!
-    console.log("rootElement", rootElement)
 
     window.__REACT_DEV_TOOLS_ENABLED__ = false
 
