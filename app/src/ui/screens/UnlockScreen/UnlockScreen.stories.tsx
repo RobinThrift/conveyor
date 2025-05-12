@@ -44,7 +44,7 @@ const unlockScreenRootStore = (() => {
     return store
 })()
 
-export const decorator: Decorator = (Story) => (
+const decorator: Decorator = (Story) => (
     <ReduxProvider store={unlockScreenRootStore}>
         <Story />
         <ResetButton />
