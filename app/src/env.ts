@@ -4,20 +4,7 @@ interface _Env {
     isDeviceSecureStorageAvailable: boolean
 }
 
-const _channel = new BroadcastChannel("env")
-
 type SetEnvMessag = { type: "env:set"; data: Partial<_Env> }
-
-_channel.addEventListener("message", (evt: MessageEvent<SetEnvMessag>) => {
-    let msg = evt.data
-    if (msg?.type !== "env:set") {
-        return
-    }
-
-    evt.stopImmediatePropagation()
-
-    setEnv(msg.data)
-})
 
 export const Env: _Env = {
     platform: "web",
@@ -33,8 +20,30 @@ export function setEnv(env: Partial<_Env>) {
         }
     }
 
-    _channel.postMessage({
+    globalThis.__CONVEYOR_ENV_CHANNEL__?.postMessage({
         type: "env:set",
         data: env,
     } satisfies SetEnvMessag)
+}
+
+declare global {
+    var __CONVEYOR_ENV_CHANNEL__: BroadcastChannel
+}
+
+if (!("__CONVEYOR_ENV_CHANNEL__" in globalThis)) {
+    globalThis.__CONVEYOR_ENV_CHANNEL__ = new BroadcastChannel("env")
+
+    globalThis.__CONVEYOR_ENV_CHANNEL__.addEventListener(
+        "message",
+        (evt: MessageEvent<SetEnvMessag>) => {
+            let msg = evt.data
+            if (msg?.type !== "env:set") {
+                return
+            }
+
+            evt.stopImmediatePropagation()
+
+            setEnv(msg.data)
+        },
+    )
 }

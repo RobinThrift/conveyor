@@ -12,7 +12,14 @@ import { initRootStore } from "./store"
 declare const __PLATFORM__: "TAURI" | "WEB"
 declare const __ENABLE_DEVTOOLS__: boolean
 
-run().catch((err) => console.error(err))
+declare global {
+    var __IS_RUNNING__: boolean
+}
+
+if (!("__IS_RUNNING__" in globalThis)) {
+    globalThis.__IS_RUNNING__ = true
+    run().catch((err) => console.error(err))
+}
 
 async function run() {
     if (__ENABLE_DEVTOOLS__) {
