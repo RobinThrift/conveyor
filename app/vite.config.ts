@@ -111,6 +111,8 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             minify: config.mode !== "development",
             cssMinify: "lightningcss",
 
+            reportCompressedSize: false,
+
             rollupOptions: {
                 input: {
                     index: "./src/index.tsx",
