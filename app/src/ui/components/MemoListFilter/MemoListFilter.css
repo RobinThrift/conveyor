@@ -226,7 +226,8 @@
 }
 
 .filter-offcanvas {
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-top: env(safe-area-inset-top, calc(var(--spacing) * 2)) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, calc(var(--spacing) * 2)*2)) !important;
 
     & > nav {
         @apply w-full flex justify-center;

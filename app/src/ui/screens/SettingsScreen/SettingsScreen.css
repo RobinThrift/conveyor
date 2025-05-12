@@ -25,10 +25,10 @@
     @apply xs:fade-in xs:slide-in-from-bottom-0;
     @apply relative rounded-lg bg-surface-level-1 border border-subtle-extra-light shadow-lg xs:max-w-[95dvw] md:max-w-6xl w-full;
 
-    height: 95dvh;
+    height: 95svh;
 
     @media (min-width: 1024px) {
-        height: 80dvh;
+        height: 80svh;
     }
 
     &[data-exiting] {
@@ -41,11 +41,15 @@
     @apply xs:hidden text-3xl;
     position: absolute;
     left: 0;
-    top: 5dvh;
+    top: calc(5svh + env(safe-area-inset-top, 0));
     width: 100%;
     height: 2lh;
     z-index: 10000;
     touch-action: none;
+
+    @media (min-width: 1024px) {
+        top: 20svh;
+    }
 }
 
 .settings-dialog {

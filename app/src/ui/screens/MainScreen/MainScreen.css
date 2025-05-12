@@ -4,7 +4,9 @@
 
     @apply w-full h-full flex flex-col gap-2;
 
-    padding: env(safe-area-inset-top, 0) calc(var(--spacing) * 2)
+    min-height: 100svh;
+
+    padding: 0 calc(var(--spacing) * 2)
         env(safe-area-inset-bottom, 0) calc(var(--spacing) * 2);
 
     @media (min-width: 1024px) {
@@ -57,7 +59,7 @@
 
 .main-screen {
     .memo-list-filter {
-        margin-top: env(safe-area-inset-top, 2rem);
+        padding-top: env(safe-area-inset-top, 2rem);
         max-width: var(--sidebar-width);
         width: var(--sidebar-width);
         height: var(--sidebar-height);
