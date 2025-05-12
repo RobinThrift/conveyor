@@ -15,7 +15,7 @@ export async function initBackend() {
         new URL("./backend.worker?worker&url", import.meta.url),
         {
             type: "module",
-            name: "Backend",
+            name: `Backend-${newID()}`,
         },
     )
 

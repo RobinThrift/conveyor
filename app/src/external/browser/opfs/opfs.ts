@@ -3,6 +3,7 @@ import { type FS, join } from "@/lib/fs"
 import { type AsyncResult, Ok } from "@/lib/result"
 
 import { OPFSWorker } from "./OPFSWorker"
+import { newID } from "@/domain/ID"
 
 export class OPFS implements FS {
     private _baseDir: string
@@ -17,7 +18,7 @@ export class OPFS implements FS {
         this._worker = OPFSWorker.createClient(
             new Worker(new URL("./opfs.worker?worker&url", import.meta.url), {
                 type: "module",
-                name: "OPFSWorker",
+                name: `OPFSWorker-${newID()}`,
             }),
         )
 

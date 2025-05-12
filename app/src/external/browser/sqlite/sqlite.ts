@@ -25,7 +25,7 @@ export class SQLite implements Database {
         this._worker = SQLiteWorker.createClient(
             new Worker(new URL("./sqlite.worker?worker&url", import.meta.url), {
                 type: "module",
-                name: "SQLiteWorker",
+                name: `SQLiteWorker-${newID()}`,
             }),
         )
 

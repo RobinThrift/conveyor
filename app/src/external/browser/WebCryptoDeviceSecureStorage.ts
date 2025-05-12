@@ -3,6 +3,7 @@ import type { Context } from "@/lib/context"
 import type { AsyncResult } from "@/lib/result"
 
 import { WebCryptoDeviceSecureStorageWorker } from "./WebCryptoDeviceSecureStorageWorker"
+import { newID } from "@/domain/ID"
 
 export class WebCryptoDeviceSecureStorage implements DeviceSecureStorage {
     private _worker: ReturnType<
@@ -18,7 +19,7 @@ export class WebCryptoDeviceSecureStorage implements DeviceSecureStorage {
                 ),
                 {
                     type: "module",
-                    name: "WebCryptoDeviceSecureStorageWorker",
+                    name: `WebCryptoDeviceSecureStorageWorker-${newID()}`,
                 },
             ),
         )
