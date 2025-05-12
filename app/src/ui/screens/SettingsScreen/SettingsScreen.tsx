@@ -32,13 +32,19 @@ import { SyncSettingsTab } from "./SyncSettingsTab"
 import { useSettingsModalState } from "./useSettingsModalState"
 
 export function SettingsScreen() {
-    let { animRef, onPointerDown, onPointerCancel, onPointerMove, close } =
-        useSettingsModalState()
+    let {
+        isOpen,
+        animRef,
+        onPointerDown,
+        onPointerCancel,
+        onPointerMove,
+        close,
+    } = useSettingsModalState()
 
     return (
         <AriaModalOverlay
             className="settings-modal-overlay"
-            isOpen={true}
+            isOpen={isOpen}
             isDismissable={false}
             isKeyboardDismissDisabled={false}
         >
