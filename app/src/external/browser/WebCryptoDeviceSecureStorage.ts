@@ -2,8 +2,8 @@ import type { DeviceSecureStorage } from "@/lib/DeviceSecureStorage"
 import type { Context } from "@/lib/context"
 import type { AsyncResult } from "@/lib/result"
 
-import { WebCryptoDeviceSecureStorageWorker } from "./WebCryptoDeviceSecureStorageWorker"
 import { newID } from "@/domain/ID"
+import { WebCryptoDeviceSecureStorageWorker } from "./WebCryptoDeviceSecureStorageWorker"
 
 export class WebCryptoDeviceSecureStorage implements DeviceSecureStorage {
     private _worker: ReturnType<

@@ -2,8 +2,8 @@ import { BaseContext, type Context } from "@/lib/context"
 import { type FS, join } from "@/lib/fs"
 import { type AsyncResult, Ok } from "@/lib/result"
 
-import { OPFSWorker } from "./OPFSWorker"
 import { newID } from "@/domain/ID"
+import { OPFSWorker } from "./OPFSWorker"
 
 export class OPFS implements FS {
     private _baseDir: string
