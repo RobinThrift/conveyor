@@ -2,17 +2,16 @@ import { newID } from "@/domain/ID"
 import {
     type FiberRoot,
     getDisplayName,
-    getFiberId,
-    getFiberStack,
     getNearestHostFiber,
     getTimings,
     isCompositeFiber,
     onCommitFiberRoot,
-    setFiberId,
     traverseContexts,
     traverseProps,
     traverseRenderedFibers,
     traverseState,
+    getLatestFiber,
+    getFiberFromHostInstance,
 } from "bippy"
 
 import React, { useMemo, useState, useSyncExternalStore } from "react"
@@ -257,6 +256,10 @@ function highlightElement(el: HTMLElement, name: string) {
 }
 
 if (__ENABLE_DEVTOOLS__) {
+    // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
+    const rootElement = document.getElementById("__CONVEYOR_UI_ROOT__")!
+    console.log("rootElement", rootElement)
+
     window.__REACT_DEV_TOOLS_ENABLED__ = false
 
     const limit = 20
@@ -268,33 +271,28 @@ if (__ENABLE_DEVTOOLS__) {
 
         let c = 0
 
-        traverseRenderedFibers(root.current, (fiber) => {
+        let hostFiber = getFiberFromHostInstance(rootElement)
+        let latestFiber = hostFiber ? getLatestFiber(hostFiber) : root.current
+
+        traverseRenderedFibers(latestFiber, (fiber) => {
             c++
             if (c > limit) {
                 return
             }
 
             let displayName = getDisplayName(fiber)
-
-            if (
-                fiber.key?.startsWith("DevTools") ||
-                displayName === "DevTools"
-            ) {
-                setFiberId(fiber, -1010)
-                return
-            }
-
-            let stack = getFiberStack(fiber)
-            if (stack.find((f) => getFiberId(f) === -1010)) {
-                return
-            }
-
             let hostFiber = getNearestHostFiber(fiber)
+            let isChildOfRoot = rootElement.contains(hostFiber?.stateNode)
+
+            if (!isChildOfRoot) {
+                return
+            }
+
             requestAnimationFrame(() => {
                 try {
-                    if (hostFiber?.stateNode instanceof HTMLElement) {
+                    if (stateNode instanceof HTMLElement) {
                         highlightElement(
-                            hostFiber.stateNode,
+                            stateNode,
                             displayName ?? fiber.key ?? "",
                         )
                     }
