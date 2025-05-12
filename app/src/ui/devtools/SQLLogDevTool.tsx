@@ -1,4 +1,9 @@
-import React, { useMemo, useState, useSyncExternalStore } from "react"
+import React, {
+    useCallback,
+    useMemo,
+    useState,
+    useSyncExternalStore,
+} from "react"
 
 import { newID } from "@/domain/ID"
 import { Code } from "@/ui/components/Markdown/Code"
@@ -9,6 +14,10 @@ let formatter = new Intl.DateTimeFormat("en-gb", {
 
 export function SQLLogDevTool() {
     let events = useSyncExternalStore(_sqlllog_subscribe, _sqlllog_getSnapshot)
+
+    let onClickClear = useCallback(() => {
+        _snapshot = []
+    }, [])
 
     let items = useMemo(() => {
         let els: React.ReactNode[] = []
@@ -40,6 +49,13 @@ export function SQLLogDevTool() {
         <div className="min-h-full w-full relative overscroll-contain">
             <header className="sticky top-0 left-0 right-0 p-2 text-xl font-mono text-text backdrop-blur-sm flex justify-between items-center rounded">
                 SQL Log
+                <button
+                    type="button"
+                    className="text-sm cursor-pointer"
+                    onClick={onClickClear}
+                >
+                    [clear]
+                </button>
             </header>
             <ul className="divide-y divide-subtle">{items}</ul>
         </div>
