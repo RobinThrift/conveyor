@@ -1,4 +1,5 @@
 import { type AccountKey, PrimaryAccountKeyName } from "@/domain/AccountKey"
+import { ATTACHMENT_BASE_DIR } from "@/domain/Attachment"
 import type {
     AttachmentChangelogEntry,
     ChangelogEntry,
@@ -14,12 +15,12 @@ import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
+import { Second } from "@/lib/duration"
 import { type FS, join } from "@/lib/fs"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, Err, Ok, all, fmtErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
 
-import { ATTACHMENT_BASE_DIR } from "@/domain/Attachment"
 import type { CryptoController } from "./CryptoController"
 
 export class SyncController {
@@ -350,48 +351,54 @@ export class SyncController {
         }
 
         let clientID = this._info.clientID
+        let [ctxWithCancel, cancel] = ctx.withTimeout(Second * 120)
 
-        return this._transactioner.inTransaction(ctx, async (ctx) => {
-            let marked = await this._changelog.markChangelogEntriesAsSynced(
-                ctx,
-                entries,
-            )
-            if (!marked.ok) {
-                return marked
-            }
+        let result = await this._transactioner.inTransaction(
+            ctxWithCancel,
+            async (ctx) => {
+                let marked = await this._changelog.markChangelogEntriesAsSynced(
+                    ctx,
+                    entries,
+                )
+                if (!marked.ok) {
+                    return marked
+                }
 
-            let encryped = await this._encryptChangeLogEntries(
-                clientID,
-                entries,
-            )
-            if (!encryped.ok) {
-                return encryped
-            }
+                let encryped = await this._encryptChangeLogEntries(
+                    clientID,
+                    entries,
+                )
+                if (!encryped.ok) {
+                    return encryped
+                }
 
-            let uploaded = await this._syncAPIClient.uploadChangelogEntries(
-                ctx,
-                encryped.value,
-            )
-            if (!uploaded.ok) {
-                return uploaded
-            }
+                let uploaded = await this._syncAPIClient.uploadChangelogEntries(
+                    ctx,
+                    encryped.value,
+                )
+                if (!uploaded.ok) {
+                    return uploaded
+                }
 
-            let attachmentsUploaded = await all(
-                entries
-                    .filter((e) => e.targetType === "attachments")
-                    .map((e) =>
-                        this._uploadAttachment(
-                            ctx,
-                            e as AttachmentChangelogEntry,
+                let attachmentsUploaded = await all(
+                    entries
+                        .filter((e) => e.targetType === "attachments")
+                        .map((e) =>
+                            this._uploadAttachment(
+                                ctx,
+                                e as AttachmentChangelogEntry,
+                            ),
                         ),
-                    ),
-            )
-            if (!attachmentsUploaded.ok) {
-                return attachmentsUploaded
-            }
+                )
+                if (!attachmentsUploaded.ok) {
+                    return attachmentsUploaded
+                }
 
-            return Ok(undefined)
-        })
+                return Ok(undefined)
+            },
+        )
+        cancel()
+        return result
     }
 
     private async _encryptChangeLogEntries(
