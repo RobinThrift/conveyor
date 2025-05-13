@@ -6,8 +6,8 @@
 
     min-height: 100svh;
 
-    padding: 0 calc(var(--spacing) * 2)
-        env(safe-area-inset-bottom, 0) calc(var(--spacing) * 2);
+    padding: 0 calc(var(--spacing) * 2) env(safe-area-inset-bottom, 0)
+        calc(var(--spacing) * 2);
 
     @media (min-width: 1024px) {
         --sidebar-width: 300px;
