@@ -65,12 +65,14 @@ class context<D extends Record<string, unknown> = Record<string, any>> {
         this._data = (data ?? {}) as D
         this._parent = parent
 
-        let onabort = () => {
-            this._isCancelled = true
-            this._err = this.signal?.reason
-            this.signal?.removeEventListener("abort", onabort)
-        }
-        this.signal?.addEventListener("abort", onabort)
+        this.signal?.addEventListener(
+            "abort",
+            () => {
+                this._isCancelled = true
+                this._err = this.signal?.reason
+            },
+            { once: true },
+        )
     }
 
     withSignal(signal?: AbortSignal): Context<D> {
