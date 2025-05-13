@@ -485,7 +485,7 @@ export class SyncController {
         )
         if (!data.ok) {
             return fmtErr(
-                "error uploading attachment: error reading data: %w",
+                `error uploading attachment ${entry.targetID}: ${entry.value.created.filepath}: error reading data: %w`,
                 data,
             )
         }
