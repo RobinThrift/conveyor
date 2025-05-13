@@ -10,7 +10,7 @@
 }
 
 .editor-buttons {
-    @apply p-2 flex items-center justify-between gap-2 bg-surface-level-1;
+    @apply p-1 flex items-center justify-between gap-2 bg-surface-level-1;
     height: 3rem;
 
     &:has(button:only-child) {
