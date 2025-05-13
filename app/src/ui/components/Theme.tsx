@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useSyncExternalStore } from "react"
 
 import type { ColourSchemeMode, ColourSchemeNames } from "@/domain/Settings"
 
@@ -7,27 +7,26 @@ export function Theme({
     mode,
     children,
 }: React.PropsWithChildren<{
-    colourScheme: ColourSchemeNames
+    colourScheme: Record<"light" | "dark", ColourSchemeNames>
     mode: ColourSchemeMode
 }>) {
+    let prefersDark = useSyncExternalStore(subscribe, getSnapshot)
+    let effectiveMode: ColourSchemeMode =
+        (mode === "auto" && prefersDark) || mode === "dark" ? "dark" : "light"
+
     useEffect(() => {
         let current = document.documentElement.dataset.colourScheme ?? ""
         if (current) {
             document.documentElement.classList.remove(current)
         }
 
-        document.documentElement.classList.add(colourScheme)
-        document.documentElement.dataset.colourScheme = colourScheme
-    }, [colourScheme])
+        document.documentElement.classList.add(colourScheme[effectiveMode])
+        document.documentElement.dataset.colourScheme =
+            colourScheme[effectiveMode]
+    }, [colourScheme, effectiveMode])
 
     useEffect(() => {
-        switch (mode) {
-            case "auto":
-                document.documentElement.classList.toggle(
-                    "dark",
-                    window.matchMedia("(prefers-color-scheme: dark)").matches,
-                )
-                break
+        switch (effectiveMode) {
             case "light":
                 document.documentElement.classList.remove("dark")
                 break
@@ -45,7 +44,20 @@ export function Theme({
             ?.setAttribute("content", `rgb(${bgColour})`)
 
         document.documentElement.dataset.design = "default"
-    }, [mode])
+    }, [effectiveMode])
 
     return children
+}
+
+function getSnapshot() {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+}
+
+function subscribe(callback: () => void) {
+    let mql = window.matchMedia("(prefers-color-scheme: dark)")
+    let onChange = () => {
+        callback()
+    }
+    mql.addEventListener("change", onChange)
+    return () => mql.removeEventListener("change", onChange)
 }

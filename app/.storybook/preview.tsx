@@ -102,7 +102,10 @@ const preview: Preview = {
             }
 
             return (
-                <Theme colourScheme={themeColours} mode={themeMode}>
+                <Theme
+                    colourScheme={{ light: themeColours, dark: themeColours }}
+                    mode={themeMode}
+                >
                     <Story />
                 </Theme>
             )

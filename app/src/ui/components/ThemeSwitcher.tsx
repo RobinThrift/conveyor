@@ -14,7 +14,7 @@ export function SelectColourScheme({
     let [lightColourScheme, setLightColourScheme] = useSetting(
         "ui.colourScheme.light",
     )
-    let [_, setDarkColourScheme] = useSetting("ui.colourScheme.light")
+    let [_, setDarkColourScheme] = useSetting("ui.colourScheme.dark")
     let onChange = useCallback(
         (v: typeof lightColourScheme) => {
             setLightColourScheme(v)
