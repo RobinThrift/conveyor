@@ -51,6 +51,30 @@ This is some test content for an attachment`
             assert.equal(readbackContent, content)
         })
 
+        test("simultaneous read", async () => {
+            let readResults = await Promise.all([
+                fs.read(ctx, "file.txt"),
+                fs.read(ctx, "file.txt"),
+            ])
+
+            for (let readResult of readResults) {
+                if (!readResult.ok) {
+                    assert.fail(
+                        `${readResult.err.message}: ${readResult.err.stack}`,
+                    )
+                }
+
+                let readCopy = new Uint8Array(
+                    new ArrayBuffer(readResult.value.byteLength),
+                )
+                readCopy.set(new Uint8Array(readResult.value), 0)
+
+                let readbackContent = decodeText(readCopy)
+
+                assert.equal(readbackContent, content)
+            }
+        })
+
         test("remove", async () => {
             let removeResult = await fs.remove(ctx, "file.txt")
             if (!removeResult.ok) {

@@ -1,3 +1,4 @@
+import { Lock } from "@/lib/Lock"
 import type { Context } from "@/lib/context"
 import { FSNotFoundError } from "@/lib/fs"
 import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
@@ -13,7 +14,7 @@ const _rootDir = (async () => {
 
 export const OPFSWorker = createWorker({
     read: async (
-        _: Context,
+        ctx: Context,
         { filepath }: { filepath: string },
     ): AsyncResult<ArrayBufferLike> => {
         let file = await fromPromise(openFile(await _rootDir, filepath))
@@ -27,41 +28,49 @@ export const OPFSWorker = createWorker({
             return file
         }
 
-        let fh = await fromPromise(file.value.createSyncAccessHandle())
-        if (!fh.ok) {
-            return fh
-        }
+        let lock = new Lock(`opfs:${filepath}`)
 
-        let data = new Uint8Array(fh.value.getSize())
-        fh.value.read(data)
-        fh.value.close()
+        return lock.run(ctx, async () => {
+            let fh = await fromPromise(file.value.createSyncAccessHandle())
+            if (!fh.ok) {
+                return fh
+            }
 
-        return Ok(data.buffer)
+            let data = new Uint8Array(fh.value.getSize())
+            fh.value.read(data)
+            fh.value.close()
+
+            return Ok(data.buffer)
+        })
     },
 
     write: async (
-        _: Context,
+        ctx: Context,
         { filepath, content }: { filepath: string; content: ArrayBufferLike },
     ): AsyncResult<number> => {
         let file = await openFile(await _rootDir, filepath, true)
 
-        let fh = await file.createSyncAccessHandle()
+        let lock = new Lock(`opfs:${filepath}`)
 
-        let written = fh.write(new Uint8Array(content))
+        return lock.run(ctx, async () => {
+            let fh = await file.createSyncAccessHandle()
 
-        fh.close()
+            let written = fh.write(new Uint8Array(content))
 
-        if (written !== content.byteLength) {
-            throw new Error(
-                `number of bytes written is not the same as the data: written ${written} bytes, buffer size ${content.byteLength} bytes: ${filepath}`,
-            )
-        }
+            fh.close()
 
-        return Ok(written)
+            if (written !== content.byteLength) {
+                throw new Error(
+                    `number of bytes written is not the same as the data: written ${written} bytes, buffer size ${content.byteLength} bytes: ${filepath}`,
+                )
+            }
+
+            return Ok(written)
+        })
     },
 
     remove: async (
-        _: Context,
+        ctx: Context,
         { filepath }: { filepath: string },
     ): AsyncResult<void> => {
         let { dir: dirname, filename } = splitFilepath(filepath)
@@ -70,12 +79,16 @@ export const OPFSWorker = createWorker({
             return dir
         }
 
-        let removed = await fromPromise(dir.value.removeEntry(filename))
-        if (!removed) {
-            return fmtErr(`%w: ${filepath}`, removed)
-        }
+        let lock = new Lock(`opfs:${filepath}`)
 
-        return removed
+        return lock.run(ctx, async () => {
+            let removed = await fromPromise(dir.value.removeEntry(filename))
+            if (!removed) {
+                return fmtErr(`%w: ${filepath}`, removed)
+            }
+
+            return removed
+        })
     },
 
     mkdirp: async (
