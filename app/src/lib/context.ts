@@ -94,7 +94,7 @@ class context<D extends Record<string, unknown> = Record<string, any>> {
 
         return [
             this.withSignal(abortCntrl.signal),
-            (reason?: Error) => {
+            (reason: Error = new Error("context was cancelled")) => {
                 abortCntrl.abort(reason)
             },
         ]
@@ -110,7 +110,7 @@ class context<D extends Record<string, unknown> = Record<string, any>> {
                     AbortSignal.timeout(timeout),
                 ]),
             ),
-            (reason?: Error) => {
+            (reason: Error = new Error("context was cancelled")) => {
                 abortCntrl.abort(reason)
             },
         ]
