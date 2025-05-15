@@ -58,6 +58,11 @@
         "LayoutUltraCompact": "Ultra Kompakt"
     },
 
+    "components/MemoList/ReloadButton": {
+        "Label": "Neu Laden",
+        "Description": "Es sind neue Memos verfügbar"
+    },
+
     "components/Editor": {
         "Cancel": "Abbrechen",
         "Save": "Speichern",

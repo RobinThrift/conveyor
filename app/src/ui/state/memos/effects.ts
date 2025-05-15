@@ -1,6 +1,6 @@
 import type { MemoController } from "@/control/MemoController"
 import { BaseContext } from "@/lib/context"
-import type { StartListening } from "@/ui/state/rootStore"
+import type { RootStore, StartListening } from "@/ui/state/rootStore"
 
 import * as create from "./create"
 import * as list from "./list"
@@ -17,10 +17,22 @@ export const registerEffects = (
     startListening: StartListening,
     {
         memoCtrl,
+        rootStore,
     }: {
         memoCtrl: MemoController
+        rootStore: RootStore
     },
 ) => {
+    memoCtrl.addEventListener("onMemoChange", ({ memo }) => {
+        rootStore.dispatch(list.slice.actions.setMemo({ memo }))
+    })
+
+    memoCtrl.addEventListener("onMemoCreated", () => {
+        rootStore.dispatch(
+            list.slice.actions.setIsListOutdated({ isListOutdated: true }),
+        )
+    })
+
     startListening({
         actionCreator: list.slice.actions.nextPage,
         effect: async (_, { cancelActiveListeners, dispatch, getState }) => {
@@ -45,6 +57,14 @@ export const registerEffects = (
                     },
                 }),
             )
+        },
+    })
+
+    startListening({
+        actionCreator: list.slice.actions.reload,
+        effect: async (_, { cancelActiveListeners, dispatch }) => {
+            cancelActiveListeners()
+            dispatch(list.slice.actions.nextPage())
         },
     })
 

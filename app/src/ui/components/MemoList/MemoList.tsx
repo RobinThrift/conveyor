@@ -7,6 +7,7 @@ import { Memo } from "@/ui/components/Memo"
 
 import { DayHeader } from "./DayHeader"
 import { LayoutSelect } from "./LayoutSelect"
+import { ReloadButton } from "./ReloadButton"
 import { useMemoListState } from "./useMemoListState"
 
 export interface MemoListProps {
@@ -21,6 +22,8 @@ export function MemoList(props: MemoListProps) {
         memoActions,
         focusedMemoID,
         layout,
+        reload,
+        isListOutdated,
         doubleClickToEdit,
     } = useMemoListState()
 
@@ -72,7 +75,10 @@ export function MemoList(props: MemoListProps) {
             )}
             ref={ref}
         >
+            {isListOutdated ? <ReloadButton reload={reload} /> : null}
+
             <LayoutSelect />
+
             {memoComponents}
 
             {!isLoading && <EndOfListMarker onReached={onEOLReached} />}

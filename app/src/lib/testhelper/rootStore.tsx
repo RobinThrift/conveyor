@@ -170,7 +170,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             await insertMockData({ memoCtrl })
         }
 
-        configureEffects({
+        configureEffects(rootStore, {
             apiTokenCtrl,
             attachmentCtrl,
             authCtrl,

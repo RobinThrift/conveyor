@@ -20,6 +20,7 @@ export function useMemoListState() {
     let isLoading = useSelector(selectors.memos.isLoading)
     let error = useSelector(selectors.memos.error)
     let hasNextPage = useSelector(selectors.memos.hasNextPage)
+    let isListOutdated = useSelector(selectors.memos.isListOutdated)
     let currentPageParams = useSelector(selectors.navigation.currentParams)
 
     let [layout] = useSetting("ui.memoList.layout")
@@ -70,12 +71,20 @@ export function useMemoListState() {
         }
     }, [isLoading, dispatch])
 
+    let reload = useCallback(() => {
+        if (!isLoading) {
+            dispatch(actions.memos.reload())
+        }
+    }, [isLoading, dispatch])
+
     return {
         memos,
         isLoading,
         error,
         onEOLReached,
         hasNextPage,
+        isListOutdated,
+        reload,
         memoActions,
         layout,
         doubleClickToEdit,

@@ -61,6 +61,11 @@ export const translations = {
         LayoutUltraCompact: "Ultra Compact",
     },
 
+    "components/MemoList/ReloadButton": {
+        Label: "Reload",
+        Description: "There are new Memos available",
+    },
+
     "components/Editor": {
         Cancel: "Cancel",
         Save: "Save",

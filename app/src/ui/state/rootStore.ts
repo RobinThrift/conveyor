@@ -84,29 +84,33 @@ export type RootState = ReturnType<
 export type AppDispatch = ReturnType<typeof configureRootStore>["dispatch"]
 export type StartListening = typeof startListening
 
-export function configureEffects({
-    memoCtrl,
-    attachmentCtrl,
-    settingsCtrl,
-    syncCtrl,
-    authCtrl,
-    setupCtrl,
-    unlockCtrl,
-    apiTokenCtrl,
-    navCtrl,
-}: {
-    memoCtrl: MemoController
-    attachmentCtrl: AttachmentController
-    settingsCtrl: SettingsController
-    syncCtrl: SyncController
-    authCtrl: AuthController
-    setupCtrl: SetupController
-    unlockCtrl: UnlockController
-    apiTokenCtrl: APITokenController
-    navCtrl: NavigationController
-}) {
+export function configureEffects(
+    rootStore: RootStore,
+    {
+        memoCtrl,
+        attachmentCtrl,
+        settingsCtrl,
+        syncCtrl,
+        authCtrl,
+        setupCtrl,
+        unlockCtrl,
+        apiTokenCtrl,
+        navCtrl,
+    }: {
+        memoCtrl: MemoController
+        attachmentCtrl: AttachmentController
+        settingsCtrl: SettingsController
+        syncCtrl: SyncController
+        authCtrl: AuthController
+        setupCtrl: SetupController
+        unlockCtrl: UnlockController
+        apiTokenCtrl: APITokenController
+        navCtrl: NavigationController
+    },
+) {
     memos.registerEffects(startListening, {
         memoCtrl,
+        rootStore,
     })
 
     tags.registerEffects(startListening, {

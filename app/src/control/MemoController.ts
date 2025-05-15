@@ -9,15 +9,24 @@ import type { TagList } from "@/domain/Tag"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
 import { mergeChanges, resolveChanges } from "@/lib/diff"
+import { queueTask } from "@/lib/microtask"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 export type Filter = ListMemosQuery
+
+type OnMemoChangeHandler = (data: { memo: Memo }) => void
+type OnMemoCreatedHandler = (data: { memo: Memo }) => void
 
 export class MemoController {
     private _transactioner: Transactioner
     private _repo: Repo
     private _attachments: Attachments
     private _changelog: Changelog
+
+    private _events = {
+        onMemoCreated: [] as OnMemoCreatedHandler[],
+        onMemoChange: [] as OnMemoChangeHandler[],
+    }
 
     constructor({
         transactioner,
@@ -34,6 +43,24 @@ export class MemoController {
         this._repo = repo
         this._attachments = attachments
         this._changelog = changelog
+    }
+
+    public addEventListener(
+        event: "onMemoCreated",
+        cb: OnMemoCreatedHandler,
+    ): () => void
+    public addEventListener(
+        event: "onMemoChange",
+        cb: OnMemoChangeHandler,
+    ): () => void
+    public addEventListener(
+        event: "onMemoChange" | "onMemoCreated",
+        cb: OnMemoChangeHandler | OnMemoCreatedHandler,
+    ): () => void {
+        this._events[event].push(cb)
+        return () => {
+            this._events[event] = this._events[event].filter((i) => cb !== i)
+        }
     }
 
     public async getMemo(ctx: Context, memoID: MemoID): AsyncResult<Memo> {
@@ -235,6 +262,15 @@ export class MemoController {
                 return res
             }
 
+            if (res.ok) {
+                this._triggerEvent("onMemoCreated", {
+                    memo: {
+                        ...entry.value.created,
+                        id: entry.targetID,
+                    },
+                })
+            }
+
             return Ok(undefined)
         }
 
@@ -292,7 +328,7 @@ export class MemoController {
 
         let content = resolveChanges(changes)
 
-        return this._transactioner.inTransaction(ctx, async (ctx) => {
+        let res = await this._transactioner.inTransaction(ctx, async (ctx) => {
             let updated = await this._repo.updateMemoContent(ctx, {
                 id: memo.id,
                 content,
@@ -313,6 +349,17 @@ export class MemoController {
 
             return Ok(undefined)
         })
+
+        if (res.ok) {
+            this._triggerEvent("onMemoChange", {
+                memo: {
+                    ...memo,
+                    content,
+                },
+            })
+        }
+
+        return res
     }
 
     public async listTags(
@@ -328,6 +375,17 @@ export class MemoController {
 
     public async cleanupDeletedMemos(ctx: Context): AsyncResult<unknown> {
         return this._repo.cleanupDeletedMemos(ctx)
+    }
+
+    private _triggerEvent(event: "onMemoCreated", data: { memo: Memo }): void
+    private _triggerEvent(event: "onMemoChange", data: { memo: Memo }): void
+    private _triggerEvent(
+        event: "onMemoChange" | "onMemoCreated",
+        data: { memo: Memo },
+    ): void {
+        this._events[event].forEach((cb) => {
+            queueTask(() => cb(data))
+        })
     }
 }
 

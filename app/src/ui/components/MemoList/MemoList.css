@@ -212,3 +212,23 @@
         }
     }
 }
+
+.memo-list-reload-btn {
+    @apply sticky flex flex-col gap-1 justify-center items-center w-fit;
+    top: calc(
+        env(safe-area-inset-top, calc(var(--spacing) * 2)) +
+        calc(var(--spacing))
+    );
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+
+    .description {
+        @apply text-xs rounded-3xl py-1 px-2 select-none cursor-default shadow-md backdrop-blur;
+        background-color: color-mix(
+            in srgb,
+            var(--color-surface-level-1) 50%,
+            transparent
+        );
+    }
+}

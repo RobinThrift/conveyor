@@ -26,7 +26,7 @@ export function initRootStore(
 ) {
     let rootStore = configureRootStore(initState)
 
-    configureEffects(controller)
+    configureEffects(rootStore, controller)
 
     runStoreInWorker(rootStore)
 

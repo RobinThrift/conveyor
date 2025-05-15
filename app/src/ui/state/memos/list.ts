@@ -17,6 +17,8 @@ interface MemosListState {
 
     nextPage: Date | undefined
     hasNextPage: boolean
+
+    isListOutdated: boolean
 }
 
 const initialState: MemosListState = {
@@ -25,6 +27,8 @@ const initialState: MemosListState = {
     isLoading: false,
     nextPage: undefined,
     hasNextPage: true,
+
+    isListOutdated: false,
 }
 
 export const slice = createSlice({
@@ -40,6 +44,14 @@ export const slice = createSlice({
                 filter?: MemoCtrl.Filter
             }>,
         ) => {
+            state.isLoading = true
+        },
+
+        reload: (state) => {
+            state.memos = []
+            state.nextPage = undefined
+            state.hasNextPage = true
+            state.isListOutdated = false
             state.isLoading = true
         },
 
@@ -61,6 +73,7 @@ export const slice = createSlice({
                 filter: payload.filter,
                 nextPage: undefined,
                 hasNextPage: true,
+                isListOutdated: false,
             } satisfies MemosListState
         },
 
@@ -71,6 +84,13 @@ export const slice = createSlice({
             }
 
             state.memos[index] = payload.memo
+        },
+
+        setIsListOutdated: (
+            state,
+            { payload }: PayloadAction<{ isListOutdated: boolean }>,
+        ) => {
+            state.isListOutdated = payload.isListOutdated
         },
 
         prependMemo: (state, { payload }: PayloadAction<{ memo: Memo }>) => {
@@ -112,5 +132,6 @@ export const slice = createSlice({
         nextPage: (state) => state.nextPage,
         hasNextPage: (state) => state.hasNextPage,
         getMemo: (state, id: MemoID) => state.memos.find((m) => m.id === id),
+        isListOutdated: (state) => state.isListOutdated,
     },
 })
