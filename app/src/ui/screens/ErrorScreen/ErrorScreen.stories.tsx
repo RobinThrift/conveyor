@@ -6,6 +6,10 @@ import "@/ui/styles/index.css"
 const meta: Meta<typeof ErrorScreen> = {
     title: "Screens/Error",
     component: ErrorScreen,
+
+    parameters: {
+        layout: "fullscreen",
+    },
 }
 
 export default meta

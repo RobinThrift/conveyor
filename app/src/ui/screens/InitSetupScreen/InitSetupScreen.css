@@ -1,31 +1,27 @@
+.main:has(.init-setup-screen) {
+    position: relative;
+    width: 100svw;
+    height: 100svh;
+    overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-top: env(safe-area-inset-top, 0);
+}
+
+.init-setup-screen {
+    @apply flex flex-1 xs:items-center xs:justify-center w-full h-full;
+    @apply px-4 xs:px-0;
+}
+
 .setup-window {
-    @apply fixed bottom-10 left-2 right-2;
-
-    @media (min-width: 768px) {
-        @apply right-2;
-        left: unset;
-    }
-
-    @media (min-width: 2100px) {
-        @apply right-0 left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center;
-    }
+    @apply pt-10 tablet:pt-0 w-full xs:max-w-[500px] tablet:min-w-[500px];
 }
 
 .setup-window-content {
-    @apply flex-col w-full max-w-[500px] tablet:min-w-[500px];
+    @apply flex flex-col w-full gap-18 xs:gap-0;
     @apply animate-in fade-in-50 duration-500 slide-in-from-bottom-32;
 
     h1 {
         @apply text-7xl mb-10 font-serif font-semibold;
-
-        color: var(--color-body-bg);
-        text-shadow:
-            2px 2px 0 var(--color-body-bg-contrast),
-            -1px -1px 0 var(--color-body-bg-contrast),
-            1px -1px 0 var(--color-body-bg-contrast),
-            -1px 1px 0 var(--color-body-bg-contrast),
-            1px 1px 0 var(--color-body-bg-contrast),
-            4px 4px 0px var(--color-body-bg);
     }
 
     .btn.primary {

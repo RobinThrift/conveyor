@@ -39,6 +39,10 @@ export const InitSetup: Story = {
             }
         }, [status, dispatch])
 
-        return <InitSetupScreen />
+        return (
+            <main className="main">
+                <InitSetupScreen />
+            </main>
+        )
     },
 }

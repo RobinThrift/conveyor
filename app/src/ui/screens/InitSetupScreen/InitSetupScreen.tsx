@@ -88,20 +88,9 @@ export function InitSetupScreen() {
 
     return (
         <div className="init-setup-screen">
-            <div className="unlock-page-bg" aria-hidden>
-                <div className="spot-3" />
-                <div className="spot-2" />
-                <div className="spot-1" />
-                <div className="noise" />
-            </div>
-
-            <ConveyorBeltText
-                className="logo"
-                start="Co"
-                middle="n"
-                end="veyor"
-                aria-hidden
-            />
+            <ConveyorBeltText className="pointer-events-none" aria-hidden>
+                Conveyor
+            </ConveyorBeltText>
 
             <div className="setup-window">
                 <div className="setup-window-content">

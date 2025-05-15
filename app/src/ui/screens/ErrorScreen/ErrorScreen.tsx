@@ -36,12 +36,7 @@ export function ErrorScreen(props: ErrorScreenProps) {
                 <div className="noise" />
             </div>
 
-            <ConveyorBeltText
-                className="error-code"
-                start={code[0]}
-                middle={code[1]}
-                end={code[2]}
-            />
+            <ConveyorBeltText>{code}</ConveyorBeltText>
 
             <div className="message">
                 <h1>{title}</h1>

@@ -1,14 +1,10 @@
-.conveyor-belt-text {
-    --conveyor-belt-text-lowercase-line-height: 0.57em;
-    --conveyor-belt-text-uppercase-line-height: 0.74em;
-    --conveyor-belt-text-line-height: var(
-        --conveyor-belt-text-lowercase-line-height
-    );
-    --conveyor-belt-text-font-size: 5.5rem;
-    --conveyor-belt-middle-width: var(--conveyor-belt-text-font-size);
+.conveyor-belt-text-wrapper {
+    @apply absolute left-0 right-0 bottom-0;
+    --conveyor-belt-text-animation-duration: 30s;
+}
 
-    @apply fixed inset-0 flex flex-col items-center justify-center text-center font-semibold;
-    @apply pointer-events-none select-none;
+.conveyor-belt-text {
+    @apply font-semibold pointer-events-none select-none w-fit;
     color: var(--color-body-bg);
     text-shadow:
         3px 3px 0 var(--color-body-bg-contrast),
@@ -17,19 +13,8 @@
         -1px 1px 0 var(--color-body-bg-contrast),
         1px 1px 0 var(--color-body-bg-contrast);
 
-    animation: conveyor-belt-text-in 0.5s;
-    animation-timing-function: ease-out;
-    transform: skew(20deg, -10deg);
-    opacity: 1;
-
     font-size: var(--conveyor-belt-text-font-size, 15rem);
-    @media (min-width: 768px) {
-        --conveyor-belt-text-font-size: 10rem;
-    }
-
-    @media (min-width: 1024px) {
-        --conveyor-belt-text-font-size: 15rem;
-    }
+    height: var(--conveyor-belt-text-font-size);
 
     @media (min-width: 1440px) {
         --conveyor-belt-text-font-size: 19rem;
@@ -43,52 +28,16 @@
         --conveyor-belt-text-font-size: 30rem;
     }
 
-    em {
-        visibility: hidden;
-        font-style: normal;
-        color: red;
-    }
-
-    .conveyor-belt-text-middle {
-        --conveyor-belt-text-middle-top-start: calc(
-            var(--conveyor-belt-text-line-height) *
-            -1
-        );
-        --conveyor-belt-text-middle-top-end: calc(
-            var(--conveyor-belt-text-line-height) *
-            -2
-        );
-
-        display: block;
-        position: absolute;
-        width: var(--conveyor-belt-middle-width);
-        word-wrap: break-word;
-        line-height: var(--conveyor-belt-text-line-height);
-
-        left: calc(var(--conveyor-belt-text-middle-offset, 50%));
-
-        top: var(--conveyor-belt-text-middle-top-start);
-        animation: conveyor-belt-text-middle infinite 30s linear;
-        animation-delay: 0.2s;
-    }
+    animation: conveyor-belt-text infinite
+        var(--conveyor-belt-text-animation-duration) linear;
 }
 
-@keyframes conveyor-belt-text-in {
+@keyframes conveyor-belt-text {
     from {
-        opacity: 0;
+        transform: translateX(0%);
     }
 
     to {
-        opacity: 1;
-    }
-}
-
-@keyframes conveyor-belt-text-middle {
-    from {
-        top: var(--conveyor-belt-text-middle-top-start);
-    }
-
-    to {
-        top: var(--conveyor-belt-text-middle-top-end);
+        transform: translateX(-50%);
     }
 }

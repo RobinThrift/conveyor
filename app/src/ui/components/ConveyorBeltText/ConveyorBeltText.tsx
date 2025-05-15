@@ -3,95 +3,59 @@ import React, { useEffect, useRef, useState } from "react"
 
 export interface ConveyorBeltTextProps {
     className?: string
-    start: string
-    middle: string
-    end: string
+    children: string
+    "aria-hidden"?: boolean
 }
 
-const isUpperCaseOrNumberPattern = /\p{Lu}|\d/u
-
 export function ConveyorBeltText(props: ConveyorBeltTextProps) {
+    let ref = useRef<HTMLDivElement>(null)
     let [cssVars, setCSSVars] = useState<React.CSSProperties>(() => {
-        if (isUpperCaseOrNumberPattern.test(props.middle)) {
-            return {
-                "--conveyor-belt-text-line-height":
-                    "var(--conveyor-belt-text-uppercase-line-height)",
-            } as React.CSSProperties
-        }
-
         return {
-            "--conveyor-belt-text-line-height":
-                "var(--conveyor-belt-text-lowercase-line-height)",
+            "--conveyor-belt-text-animation-duration": "30s",
         } as React.CSSProperties
     })
-    let ref = useRef<HTMLDivElement>(null)
-    let startRef = useRef<HTMLSpanElement>(null)
-    let middleRef = useRef<HTMLSpanElement>(null)
+    let [text, setText] = useState(props.children)
 
     useEffect(() => {
-        if (!ref.current) {
+        let current = ref.current
+        if (!current) {
             return
         }
 
-        let cb = () => {
-            let cssVars: Record<string, string> = {
-                "--conveyor-belt-text-line-height":
-                    "var(--conveyor-belt-text-lowercase-line-height)",
-            }
-            if (isUpperCaseOrNumberPattern.test(props.middle)) {
-                cssVars = {
-                    "--conveyor-belt-text-line-height":
-                        "var(--conveyor-belt-text-uppercase-line-height)",
-                }
-            }
+        let onResize = () => {
+            let parentWidth =
+                current.parentElement?.getBoundingClientRect().width ??
+                current.getBoundingClientRect().width
+            let textWidth =
+                current.children[0]?.getBoundingClientRect().width ?? 1
 
-            if (middleRef.current) {
-                let skewYDegrees = 20
-                let yRadians = (skewYDegrees * Math.PI) / 180
-                let newHeight =
-                    middleRef.current.offsetWidth * Math.tan(yRadians)
-                let calculatedHeight =
-                    middleRef.current.offsetHeight + newHeight
+            let ratio = parentWidth / textWidth
 
-                let skewXDegrees = -10
-                let xRadians = (skewXDegrees * Math.PI) / 180
-                let newWidth = calculatedHeight * Math.tan(xRadians)
-                let calculatedWidth = middleRef.current.offsetWidth + newWidth
+            let repeatCount = Math.ceil(ratio) * 2
 
-                cssVars["--conveyor-belt-text-middle-offset"] =
-                    `${middleRef.current.offsetLeft}px`
+            setText(props.children.repeat(repeatCount))
 
-                cssVars["--conveyor-belt-middle-width"] = `${calculatedWidth}px`
-            }
-
-            setCSSVars(cssVars as React.CSSProperties)
+            setCSSVars({
+                "--conveyor-belt-text-animation-duration": `${ratio * 120}s`,
+            } as React.CSSProperties)
         }
 
-        let observer = new ResizeObserver(cb)
-        observer.observe(ref.current)
-        ref.current.addEventListener("animationstart", cb)
+        let observer = new ResizeObserver(onResize)
+        observer.observe(current)
 
         return () => {
-            ref.current?.removeEventListener("animationstart", cb)
             observer.disconnect()
         }
-    }, [props.middle])
+    }, [props.children])
 
     return (
         <div
-            className={clsx("conveyor-belt-text", props.className)}
-            aria-valuetext={`${props.start}${props.middle}${props.end}`}
-            style={cssVars}
+            className={clsx("conveyor-belt-text-wrapper", props.className)}
             ref={ref}
+            style={cssVars}
+            aria-hidden={props["aria-hidden"]}
         >
-            <span className="conveyor-belt-text-middle">
-                {props.middle.repeat(21)}
-            </span>
-            <span>
-                <span ref={startRef}>{props.start}</span>
-                <em ref={middleRef}>{props.middle}</em>
-                {props.end}
-            </span>
+            <div className="conveyor-belt-text">{text}</div>
         </div>
     )
 }
