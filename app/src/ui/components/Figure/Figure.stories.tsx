@@ -28,9 +28,20 @@ export const Overview: Story = {
     },
 
     args: {
-        className: "max-w-[200px]",
+        className: "max-w-[500px]",
+        src: faker.image.url({ width: 1600, height: 1400 }),
         alt: faker.lorem.words(5),
-        caption: faker.lorem.words(10),
+        caption: faker.lorem.sentences({ min: 2, max: 5 }),
+    },
+}
+
+export const InArticle: Story = {
+    parameters: {
+        layout: "centered",
+    },
+
+    args: {
+        className: "max-w-[200px]",
     },
 
     render: (args) => {
@@ -40,18 +51,42 @@ export const Overview: Story = {
                 <p>{faker.lorem.paragraph()}</p>
                 <Figure
                     {...args}
-                    src={faker.image.url({ width: 1600, height: 1400 })}
+                    src={
+                        args.src ??
+                        faker.image.url({ width: 1600, height: 1400 })
+                    }
+                    alt={args.alt ?? faker.lorem.words(5)}
+                    caption={
+                        args.caption ??
+                        faker.lorem.sentences({ min: 2, max: 5 })
+                    }
                 />
                 <p>{faker.lorem.paragraph()}</p>
                 <p>{faker.lorem.paragraph()}</p>
                 <Figure
                     {...args}
-                    src={faker.image.url({ width: 2000, height: 2000 })}
+                    src={
+                        args.src ??
+                        faker.image.url({ width: 2000, height: 2000 })
+                    }
+                    alt={args.alt ?? faker.lorem.words(5)}
+                    caption={
+                        args.caption ??
+                        faker.lorem.sentences({ min: 2, max: 5 })
+                    }
                 />
                 <p>{faker.lorem.paragraph()}</p>
                 <Figure
                     {...args}
-                    src={faker.image.url({ width: 1400, height: 1600 })}
+                    src={
+                        args.src ??
+                        faker.image.url({ width: 1400, height: 1600 })
+                    }
+                    alt={args.alt ?? faker.lorem.words(5)}
+                    caption={
+                        args.caption ??
+                        faker.lorem.sentences({ min: 2, max: 5 })
+                    }
                 />
                 <p>{faker.lorem.paragraph()}</p>
             </article>

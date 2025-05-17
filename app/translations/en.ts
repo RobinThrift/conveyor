@@ -146,6 +146,11 @@ export const translations = {
         CancelButtonLabel: "Cancel",
     },
 
+    "components/Figure": {
+        ZoomButtonLabel: "Zoom Image",
+        CloseButtonLabel: "Close",
+    },
+
     "screens/Errors/NotFound": {
         Title: "Not Found",
         Detail: "The requested page could not be found",

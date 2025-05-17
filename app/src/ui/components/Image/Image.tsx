@@ -1,5 +1,4 @@
 import React, { useMemo, useRef } from "react"
-import "react-medium-image-zoom/dist/styles.css"
 
 import { thumbhashToDataURL } from "@/external/thumbhash"
 import { useAttachment } from "@/ui/attachments"

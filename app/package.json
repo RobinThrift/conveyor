@@ -93,7 +93,6 @@
         "quill-delta": "^5.1.0",
         "react-aria": "^3.38.1",
         "react-aria-components": "^1.7.1",
-        "react-medium-image-zoom": "^5.2.14",
         "react-redux": "^9.2.0",
         "redux": "^5.0.1"
     },
