@@ -1,12 +1,7 @@
-import React, {
-    startTransition,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from "react"
+import React, { startTransition, useMemo, useRef, useState } from "react"
 
 import type { Memo, MemoID } from "@/domain/Memo"
+import { useOnResize } from "@/ui/hooks/useOnResize"
 import { useOnVisible } from "@/ui/hooks/useOnVisible"
 
 export function useMemoState(props: {
@@ -26,36 +21,13 @@ export function useMemoState(props: {
     let isVisible = useOnVisible(ref, { ratio: 0.1 })
     let { title, body } = splitContent(props.memo.content)
     let [isExpanded, setIsExpanded] = useState(!props.collapsible)
-    let [needsCollapsing, setNeedsCollapsing] = useState(
-        props.collapsible ?? false,
-    )
-    let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
     let [shouldRender, setShouldRender] = useState(forceRender || isVisible)
+    let { clientHeight, scrollHeight } = useOnResize(ref)
 
-    useEffect(() => {
-        if (isExpanded) {
-            return
-        }
-
-        let el = ref.current
-        if (!el) {
-            return
-        }
-
-        let observer = new ResizeObserver((entries) => {
-            for (let entry of entries) {
-                setNeedsCollapsing(
-                    entry.target.clientHeight < entry.target.scrollHeight,
-                )
-            }
-        })
-
-        observer.observe(el)
-
-        return () => {
-            observer.disconnect()
-        }
-    }, [isExpanded])
+    let needsCollapsing = props.collapsible
+        ? clientHeight < scrollHeight
+        : false
+    let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
 
     let onDoubleClick = useMemo(() => {
         if (!props.actions?.edit || !props.doubleClickToEdit) {
