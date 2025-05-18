@@ -3,18 +3,38 @@ import type {
     Extension as MDASTExtension,
     Token,
 } from "mdast-util-from-markdown"
+import { markdownLineEndingOrSpace } from "micromark-util-character"
 import { codes } from "micromark-util-symbol"
-import type { Code, Effects, Extension, State } from "micromark-util-types"
+import type {
+    Code,
+    Effects,
+    Extension,
+    State,
+    TokenizeContext,
+} from "micromark-util-types"
 
 export function autoTagLinks(): Extension {
     return {
         text: {
             [codes.numberSign]: {
                 name: "tag",
+                concrete: true,
                 tokenize: tokenizeTag,
+                previous: prev,
             },
         },
     }
+}
+
+function prev(this: TokenizeContext, code: Code) {
+    if (!code) {
+        return true
+    }
+
+    if (this.currentConstruct?.name === "labelStartLink") {
+        return false
+    }
+    return markdownLineEndingOrSpace(code)
 }
 
 function tokenizeTag(effects: Effects, ok: State, nok: State) {
