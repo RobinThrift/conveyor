@@ -29,7 +29,7 @@ export const Overview: Story = {
     args: {
         className: "max-w-[800px]",
         alt: faker.lorem.words(5),
-        src: faker.image.url({ width: 1600, height: 1400 }),
+        src: faker.image.urlPicsumPhotos({ width: 1600, height: 1400 }),
     },
 }
 

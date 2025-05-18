@@ -7,7 +7,7 @@
         "@base-ui-components/react": "^1.0.0-alpha.7",
         "@biomejs/biome": "1.9.4",
         "@bufbuild/protobuf": "^2.2.5",
-        "@faker-js/faker": "^9.6.0",
+        "@faker-js/faker": "^9.8.0",
         "@playwright/test": "^1.51.1",
         "@redux-devtools/core": "^4.1.1",
         "@redux-devtools/inspector-monitor": "^6.1.1",

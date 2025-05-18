@@ -107,7 +107,7 @@ This text will be \`monospaced\`... hopefully. ~~Scratch this.~~
 ###### Heading 6
 This is a [link](${faker.internet.url()}), an auto link (http://example.com) and an image will follow:
 
-![image caption](${faker.image.url({ height: 1500, width: 1800 })})
+![image caption](${faker.image.urlPicsumPhotos({ height: 1500, width: 1800 })})
 
 ***
 
@@ -202,7 +202,7 @@ ${faker.lorem.paragraphs({ min: 1, max: 4 })}
 }
 
 export function generateOpenGraphDirective(): string {
-    return `::link-preview[https://github.com/RobinThrift/conveyor]{img="${faker.image.url({ width: 1200, height: 600 })}" title="${faker.lorem.sentences(1)}" description="${faker.lorem.sentences({ min: 1, max: 3 })}"}`
+    return `::link-preview[https://github.com/RobinThrift/conveyor]{img="${faker.image.urlPicsumPhotos({ width: 1200, height: 600 })}" title="${faker.lorem.sentences(1)}" description="${faker.lorem.sentences({ min: 1, max: 3 })}"}`
 }
 
 export function generateTable(rows = 3): string {

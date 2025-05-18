@@ -29,7 +29,7 @@ export const Overview: Story = {
 
     args: {
         className: "max-w-[500px]",
-        src: faker.image.url({ width: 1600, height: 1400 }),
+        src: faker.image.urlPicsumPhotos({ width: 1600, height: 1400 }),
         alt: faker.lorem.words(5),
         caption: faker.lorem.sentences({ min: 2, max: 5 }),
     },
@@ -53,7 +53,10 @@ export const InArticle: Story = {
                     {...args}
                     src={
                         args.src ??
-                        faker.image.url({ width: 1600, height: 1400 })
+                        faker.image.urlPicsumPhotos({
+                            width: 1600,
+                            height: 1400,
+                        })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
                     caption={
@@ -67,7 +70,10 @@ export const InArticle: Story = {
                     {...args}
                     src={
                         args.src ??
-                        faker.image.url({ width: 2000, height: 2000 })
+                        faker.image.urlPicsumPhotos({
+                            width: 2000,
+                            height: 2000,
+                        })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
                     caption={
@@ -80,7 +86,10 @@ export const InArticle: Story = {
                     {...args}
                     src={
                         args.src ??
-                        faker.image.url({ width: 1400, height: 1600 })
+                        faker.image.urlPicsumPhotos({
+                            width: 1400,
+                            height: 1600,
+                        })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
                     caption={

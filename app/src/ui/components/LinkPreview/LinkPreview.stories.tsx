@@ -50,7 +50,7 @@ const exampleImages = [
 export const Overview: Story = {
     args: {
         children: faker.internet.url(),
-        img: faker.image.url({ width: 1200, height: 600 }),
+        img: faker.image.urlPicsumPhotos({ width: 1200, height: 600 }),
         title: generateTitle(),
         description: faker.lorem.sentences({ min: 1, max: 3 }),
     },
