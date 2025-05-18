@@ -74,6 +74,7 @@ export function astToJSX(
     documentID: string,
     opts: { componentMap?: ComponentMap; directives?: Directives } = {},
 ): ReactNode[] {
+    performance.mark("markdown:astToJSX:start")
     let doc: Document = {
         id: documentID,
         footnotes: [],
@@ -97,6 +98,9 @@ export function astToJSX(
         )
     }
 
+    performance.mark("markdown:astToJSX:end", {
+        detail: { numberOfRootNodes: nodes.length },
+    })
     return nodes
 }
 

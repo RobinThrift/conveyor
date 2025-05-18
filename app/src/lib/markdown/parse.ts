@@ -17,6 +17,7 @@ import { autoTagLinks, mdastAutoTagLinks } from "./extensions/tags"
 
 export function parse(markdown: string): Result<Root> {
     return fromThrowing(() => {
+        performance.mark("markdown:parse:start")
         let ast = fromMarkdown(markdown, "utf-8", {
             extensions: [
                 gfmFootnote(),
@@ -34,6 +35,9 @@ export function parse(markdown: string): Result<Root> {
                 mdastAutoTagLinks(),
                 gfmAutolinkLiteralFromMarkdown(),
             ],
+        })
+        performance.mark("markdown:parse:end", {
+            detail: { numberOfChildren: ast.children.length },
         })
 
         return ast
