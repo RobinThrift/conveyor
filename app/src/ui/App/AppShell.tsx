@@ -12,6 +12,7 @@ import { NewMemoScreen } from "@/ui/screens/NewMemoScreen"
 import { SettingsScreen } from "@/ui/screens/SettingsScreen"
 import { UnlockScreen } from "@/ui/screens/UnlockScreen/UnlockScreen"
 import { useTheme } from "@/ui/settings"
+import { I18nProvider } from "../i18n"
 
 function useAppShellState() {
     let currentPage = useCurrentPage()
@@ -86,15 +87,17 @@ export function AppShell() {
 
     return (
         <Theme colourScheme={colourScheme} mode={mode}>
-            <Navigation active={currentPage.name ?? "root"} />
-            <main className="main">
-                {pageComp}
-                <footer className="app-footer">
-                    <BuildInfo />
-                </footer>
-            </main>
+            <I18nProvider>
+                <Navigation active={currentPage.name ?? "root"} />
+                <main className="main">
+                    {pageComp}
+                    <footer className="app-footer">
+                        <BuildInfo />
+                    </footer>
+                </main>
 
-            <Notifications />
+                <Notifications />
+            </I18nProvider>
         </Theme>
     )
 }
