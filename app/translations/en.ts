@@ -206,6 +206,7 @@ export const translations = {
         TabLabelLangLocale: "Language & Locale",
         TabLabelSync: "Sync",
         TabLabelAPITokens: "API Tokens",
+        TabLabelAbout: "About",
     },
 
     "screens/Settings/InterfaceSettings": {
@@ -303,5 +304,14 @@ export const translations = {
         DeleteButton: "Delete",
         PrevPage: "Previous Page",
         NextPage: "Next Page",
+    },
+
+    "screens/Settings/About": {
+        Title: "Conveyor",
+        VersionLabel: "Version:",
+        PublishDateLabel: "Published on:",
+        ServerVersionLabel: "Server Version:",
+        ServerPublishDateLabel: "Server Published on:",
+        ServerGoVersionLabel: "Go Version:",
     },
 } satisfies Components

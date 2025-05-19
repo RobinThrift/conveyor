@@ -15,6 +15,7 @@ import {
     CloudCheckIcon,
     CloudSlashIcon,
     GlobeIcon,
+    InfoIcon,
     KeyIcon,
     PaletteIcon,
     XIcon,
@@ -26,6 +27,7 @@ import { selectors } from "@/ui/state"
 
 import { Button } from "@/ui/components/Button"
 import { APITokensTab } from "./APITokensTab"
+import { AboutTab } from "./AboutTab"
 import { InterfaceSettingsTab } from "./InterfaceSettingsTab"
 import { LocaleSettingsTab } from "./LocaleSettingsTab"
 import { SyncSettingsTab } from "./SyncSettingsTab"
@@ -132,6 +134,10 @@ function SettingsScreenContent({ close }: { close?: () => void }) {
                             {t.TabLabelAPITokens}
                         </AriaTab>
                     )}
+                    <AriaTab id="about" className="settings-tab-list-item">
+                        <InfoIcon weight="fill" className="icon" />
+                        {t.TabLabelAbout}
+                    </AriaTab>
                 </AriaTabList>
                 <AriaTabPanel id="interface" className="settings-tab">
                     <InterfaceSettingsTab />
@@ -147,6 +153,9 @@ function SettingsScreenContent({ close }: { close?: () => void }) {
                         <APITokensTab />
                     </AriaTabPanel>
                 )}
+                <AriaTabPanel id="about" className="settings-tab">
+                    <AboutTab />
+                </AriaTabPanel>
             </AriaTabs>
         </div>
     )

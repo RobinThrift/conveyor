@@ -198,7 +198,8 @@
         "TabLabelInterface": "Benutzeroberfläche",
         "TabLabelLangLocale": "Sprache & Region",
         "TabLabelSync": "Sync",
-        "TabLabelAPITokens": "API Tokens"
+        "TabLabelAPITokens": "API Tokens",
+        "TabLabelAbout": "Info"
     },
 
     "screens/Settings/InterfaceSettings": {
@@ -294,5 +295,14 @@
         "DeleteButton": "Löschen",
         "PrevPage": "Vorherige Seite",
         "NextPage": "Nächste Seite"
+    },
+
+    "screens/Settings/About": {
+        "Title": "Info",
+        "VersionLabel": "Version:",
+        "PublishDateLabel": "Veröffentlicht am:",
+        "ServerVersionLabel": "Server Version:",
+        "ServerPublishDateLabel": "Server Veröffentlicht on:",
+        "ServerGoVersionLabel": "Go Version:"
     }
 }

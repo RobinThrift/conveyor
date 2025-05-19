@@ -3,9 +3,14 @@ import React, { Suspense } from "react"
 import { ErrorScreen } from "@/ui/screens/ErrorScreen"
 
 import { AppShell } from "./AppShell"
-import type { ServerData } from "./ServerData"
 
-export type AppProps = Pick<ServerData, "error">
+export interface AppProps {
+    error?: {
+        code: number
+        title: string
+        detail: string
+    }
+}
 
 export function App(props: AppProps) {
     if (props.error) {

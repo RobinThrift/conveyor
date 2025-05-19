@@ -7,7 +7,6 @@ import { Env } from "@/env"
 import { init } from "@/init"
 import { fromPromise } from "@/lib/result"
 import { App } from "@/ui/App"
-import { serverData } from "@/ui/App/ServerData"
 import { AttachmentProvider } from "@/ui/attachments"
 import { Alert } from "@/ui/components/Alert"
 import { NavigationProvider } from "@/ui/navigation"
@@ -21,6 +20,11 @@ declare const __ENABLE_DEVTOOLS__: boolean
 
 // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
 const rootElement = document.getElementById("__CONVEYOR_UI_ROOT__")!
+
+const serverError = JSON.parse(
+    // biome-ignore lint/style/noNonNullAssertion: if this is null all is lost anyway
+    document.getElementById("__conveyor_ui_data__")!.innerHTML,
+)?.error
 
 main()
 
@@ -73,7 +77,7 @@ async function main() {
                 <NavigationProvider value={navCtrl}>
                     <AttachmentProvider value={attachmentLoader}>
                         <SettingsLoader>
-                            <App {...serverData} />
+                            <App error={serverError?.error} />
                         </SettingsLoader>
                     </AttachmentProvider>
                 </NavigationProvider>

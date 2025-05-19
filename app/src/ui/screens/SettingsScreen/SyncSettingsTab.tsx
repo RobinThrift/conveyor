@@ -169,6 +169,7 @@ function SectionSyncInfo({
     error?: Error
 }) {
     let t = useT("screens/Settings/SyncSettings/Info")
+
     return (
         <div className="settings-section space-y-4">
             {isLoading && (

@@ -1,6 +1,6 @@
+import { BUILD_INFO } from "@/buildInfo"
 import type { NavigationController } from "@/control/NavigationController"
 import type { SetupController } from "@/control/SetupController"
-import { BUILD_INFO } from "@/domain/BuildInfo"
 import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 

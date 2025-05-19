@@ -10,6 +10,15 @@ initialize({
     onUnhandledRequest: "bypass",
 })
 
+const serverData = {
+    buildInfo: {
+        version: "storybook",
+        commitHash: "0000000000000000000000000000000000000000",
+        commitDate: new Date().toString(),
+        goVersion: "go1.24.3 darwin/arm64",
+    },
+}
+
 const preview: Preview = {
     parameters: {
         actions: { argTypesRegex: "^on[A-Z].*" },
@@ -74,7 +83,7 @@ const preview: Preview = {
     loaders: [mswLoader],
 
     decorators: [
-        (Story, { globals: { themeMode, themeColours, serverData } }) => {
+        (Story, { globals: { themeMode, themeColours } }) => {
             useEffect(() => {
                 localStorage.setItem(
                     "belt.settings.theme.colourScheme",
@@ -86,10 +95,10 @@ const preview: Preview = {
                 localStorage.setItem("belt.settings.theme.mode", themeMode)
             }, [themeMode])
 
-            if (!document.getElementById("__belt_ui_data__")) {
+            if (!document.getElementById("__conveyor_ui_data__")) {
                 let uiElement = document.createElement("script")
                 uiElement.type = "belt_ui/data"
-                uiElement.id = "__belt_ui_data__"
+                uiElement.id = "__conveyor_ui_data__"
                 uiElement.innerHTML = JSON.stringify(serverData)
                 document.body.prepend(uiElement)
             }
