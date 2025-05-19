@@ -123,6 +123,7 @@ export function configureEffects(
 
     settings.registerEffects(startListening, {
         settingsCtrl,
+        rootStore,
     })
 
     sync.registerEffects(startListening, {

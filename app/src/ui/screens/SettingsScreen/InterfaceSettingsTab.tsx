@@ -2,12 +2,12 @@ import React, { useActionState, useCallback } from "react"
 
 import { KeyboardIcon, PaletteIcon } from "@/ui/components/Icons"
 
+import { Button } from "@/ui/components/Button"
+import { Form } from "@/ui/components/Form"
 import { Checkbox } from "@/ui/components/Input/Checkbox"
 import { SelectColourScheme, SelectMode } from "@/ui/components/ThemeSwitcher"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
-import { Form } from "@/ui/components/Form"
-import { Button } from "@/ui/components/Button"
 
 export function InterfaceSettingsTab() {
     let t = useT("screens/Settings/InterfaceSettings")

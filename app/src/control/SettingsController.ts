@@ -3,12 +3,24 @@ import type { Settings } from "@/domain/Settings"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
 import type { KeyPaths, ValueAt } from "@/lib/getset"
+import { queueTask } from "@/lib/microtask"
 import { type AsyncResult, Ok } from "@/lib/result"
+
+type OnSettingChangedHandler = <K extends KeyPaths<Settings>>(data: {
+    setting: {
+        key: K
+        value: ValueAt<Settings, K>
+    }
+}) => void
 
 export class SettingsController {
     private _transactioner: Transactioner
     private _repo: Repo
     private _changelog: Changelog
+
+    private _events = {
+        onSettingChanged: [] as OnSettingChangedHandler[],
+    }
 
     constructor({
         transactioner,
@@ -22,6 +34,16 @@ export class SettingsController {
         this._transactioner = transactioner
         this._repo = repo
         this._changelog = changelog
+    }
+
+    public addEventListener(
+        event: "onSettingChanged",
+        cb: OnSettingChangedHandler,
+    ): () => void {
+        this._events[event].push(cb)
+        return () => {
+            this._events[event] = this._events[event].filter((i) => cb !== i)
+        }
     }
 
     public async loadSettings(ctx: Context): AsyncResult<Settings> {
@@ -71,9 +93,30 @@ export class SettingsController {
             if (!applied.ok) {
                 return applied
             }
+
+            this._triggerEvent("onSettingChanged", {
+                setting: {
+                    key: entry.targetID,
+                    value: entry.value.value,
+                },
+            })
         }
 
         return Ok(undefined)
+    }
+
+    private _triggerEvent<K extends KeyPaths<Settings>>(
+        event: "onSettingChanged",
+        data: {
+            setting: {
+                key: K
+                value: ValueAt<Settings, K>
+            }
+        },
+    ): void {
+        this._events[event].forEach((cb) => {
+            queueTask(() => cb(data))
+        })
     }
 }
 

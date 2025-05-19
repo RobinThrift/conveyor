@@ -1,6 +1,6 @@
 import type { SettingsController } from "@/control/SettingsController"
 import { BaseContext } from "@/lib/context"
-import type { StartListening } from "@/ui/state/rootStore"
+import type { RootStore, StartListening } from "@/ui/state/rootStore"
 
 import { Second } from "@/lib/duration"
 import { slice } from "./slice"
@@ -9,10 +9,21 @@ export const registerEffects = (
     startListening: StartListening,
     {
         settingsCtrl,
+        rootStore,
     }: {
         settingsCtrl: SettingsController
+        rootStore: RootStore
     },
 ) => {
+    settingsCtrl.addEventListener("onSettingChanged", ({ setting }) => {
+        rootStore.dispatch(
+            slice.actions.setExternal({
+                key: setting.key,
+                value: setting.value as any,
+            }),
+        )
+    })
+
     startListening({
         actionCreator: slice.actions.loadStart,
         effect: async (
@@ -50,12 +61,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.set,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, signal },
-        ) => {
-            cancelActiveListeners()
-
+        effect: async ({ payload }, { dispatch, signal }) => {
             let updated = await settingsCtrl.updateSetting(
                 BaseContext.withSignal(signal),
                 {

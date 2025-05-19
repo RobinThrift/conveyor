@@ -43,6 +43,14 @@ export const slice = createSlice({
             isLoading: false,
             error: payload,
         }),
+
+        setExternal: <K extends KeyPaths<Settings>>(
+            state: SettingsState,
+            { payload }: PayloadAction<{ key: K; value: ValueAt<Settings, K> }>,
+        ) => ({
+            ...state,
+            values: setPath(state.values, payload.key, payload.value),
+        }),
     },
 
     selectors: {
