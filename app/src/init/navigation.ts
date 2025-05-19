@@ -6,7 +6,7 @@ import {
 import type { NavigationBackend } from "@/lib/navigation"
 import { type RootStore, actions } from "@/ui/state"
 
-export function initNavgation({
+export function initNavigation({
     rootStore,
     navigationBackend,
 }: {

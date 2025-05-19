@@ -198,7 +198,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
 
     let { rootStore, attachmentCtrl, navCtrl } = setup.result
 
-    initNavgation({ rootStore, navCtrl })
+    initNavigation({ rootStore, navCtrl })
 
     return (
         <Provider store={rootStore}>
@@ -236,7 +236,7 @@ async function insertMockData({
     }
 }
 
-function initNavgation({
+function initNavigation({
     rootStore,
     navCtrl,
 }: {

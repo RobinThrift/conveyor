@@ -8,12 +8,12 @@ import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBa
 import type { RemoteNavigationPushMessage } from "@/lib/navigation"
 
 import { initBackend } from "./backend"
-import { initNavgation } from "./navigation"
+import { initNavigation } from "./navigation"
 
 export async function init() {
     let { rootStore, onNavigationEvent, attachmentLoader } = await initBackend()
 
-    let navCtrl = initNavgation({
+    let navCtrl = initNavigation({
         rootStore,
         navigationBackend: new HistoryNavigationBackend<
             Screens,
