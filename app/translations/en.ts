@@ -215,6 +215,8 @@ export const translations = {
         SectionTheme: "Theme",
         LabelColourScheme: "Colour Scheme",
         LabelModeOverride: "Light/Dark Mode Override",
+        NameInputLabel: "Display Name",
+        NameInputSaveLabel: "Save",
         SectionControls: "Controls",
         LabelEnableVimKeybindings: "Enable Vim keybindings",
         LabelEnableDoubleClickToEdit: "Enable double click to edit memos",

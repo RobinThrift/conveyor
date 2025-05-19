@@ -208,6 +208,8 @@
         "SectionTheme": "Farben und Modus",
         "LabelColourScheme": "Farbschema",
         "LabelModeOverride": "Hell/Dunkl-Modus erzwingen",
+        "NameInputLabel": "Anzeigename",
+        "NameInputSaveLabel": "Speichern",
         "SectionControls": "Controls",
         "LabelEnableVimKeybindings": "Aktiviere Vim keybindings",
         "LabelEnableDoubleClickToEdit": "Doppelklick auf Memos aktiviert den Editor"

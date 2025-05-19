@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useActionState, useCallback } from "react"
 
 import { KeyboardIcon, PaletteIcon } from "@/ui/components/Icons"
 
@@ -6,11 +6,15 @@ import { Checkbox } from "@/ui/components/Input/Checkbox"
 import { SelectColourScheme, SelectMode } from "@/ui/components/ThemeSwitcher"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
+import { Form } from "@/ui/components/Form"
+import { Button } from "@/ui/components/Button"
 
 export function InterfaceSettingsTab() {
     let t = useT("screens/Settings/InterfaceSettings")
 
     let [controls, setControls] = useSetting("controls")
+
+    let [displayName, setDisplayName] = useSetting("account.displayName")
 
     let onChangeControlVim = useCallback(
         (v: boolean | "indeterminate") => {
@@ -26,6 +30,15 @@ export function InterfaceSettingsTab() {
         [controls, setControls],
     )
 
+    let [_, displayNameFormAction] = useActionState(
+        (_: unknown, formData: FormData) => {
+            setDisplayName(
+                formData.get("account.name")?.toString() ?? displayName,
+            )
+        },
+        null,
+    )
+
     return (
         <>
             <header>
@@ -34,6 +47,34 @@ export function InterfaceSettingsTab() {
                     {t.Description}
                 </small>
             </header>
+
+            <div className="settings-section">
+                <Form
+                    className="input-field sm:mb-0 md:grid grid-cols-6 space-y-1 sm:space-y-0 lg:gap-2"
+                    action={displayNameFormAction}
+                >
+                    <label
+                        htmlFor="account.name"
+                        className="flex items-center mt-4 sm:mt-0 font-semibold text-sm"
+                    >
+                        {t.NameInputLabel}
+                    </label>
+                    <input
+                        type="text"
+                        name="account.name"
+                        className="input py-1.5 px-1.5 col-span-5 lg:col-span-4"
+                        defaultValue={displayName}
+                        required
+                    />
+                    <Button
+                        variant="primary"
+                        type="submit"
+                        className="mt-1 col-start-6 lg:py-1 lg:mt-0"
+                    >
+                        {t.NameInputSaveLabel}
+                    </Button>
+                </Form>
+            </div>
 
             <div className="settings-section">
                 <h3 className="settings-section-header">
