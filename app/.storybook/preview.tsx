@@ -1,8 +1,16 @@
 import type { Preview } from "@storybook/react"
 import { initialize, mswLoader } from "msw-storybook-addon"
-import React, { useEffect } from "react"
+import React, { useEffect, useState, useTransition } from "react"
 
 import { Theme } from "../src/ui/components/Theme"
+import { i18nContext, type I18nContext } from "../src/ui/i18n/context"
+import {
+    fallback,
+    getLocalTimeZone,
+    loadTranslation,
+    resolveTranslation,
+} from "../src/lib/i18n"
+
 import { mockAPI } from "./mockapi"
 
 // Initialize MSW
@@ -83,18 +91,8 @@ const preview: Preview = {
     loaders: [mswLoader],
 
     decorators: [
-        (Story, { globals: { themeMode, themeColours } }) => {
-            useEffect(() => {
-                localStorage.setItem(
-                    "belt.settings.theme.colourScheme",
-                    themeColours,
-                )
-            }, [themeColours])
-
-            useEffect(() => {
-                localStorage.setItem("belt.settings.theme.mode", themeMode)
-            }, [themeMode])
-
+        (Story, { globals: { themeMode, themeColours, language, region } }) => {
+            console.log("language", language)
             if (!document.getElementById("__conveyor_ui_data__")) {
                 let uiElement = document.createElement("script")
                 uiElement.type = "belt_ui/data"
@@ -110,13 +108,56 @@ const preview: Preview = {
                 document.head.prepend(metaThemeEl)
             }
 
+            let [isPending, startTransition] = useTransition()
+            let [i18nCtx, setI18nCtx] = useState<I18nContext>({
+                language,
+                region,
+                translations: fallback,
+                timeZone: getLocalTimeZone(),
+            })
+
+            useEffect(() => {
+                if (
+                    i18nCtx.language !== language ||
+                    i18nCtx.region !== region
+                ) {
+                    startTransition(async () => {
+                        let translationJSON = await loadTranslation(
+                            `${language}-${region}`,
+                        )
+
+                        let translations:
+                            | ReturnType<typeof resolveTranslation>
+                            | undefined
+                        if (translationJSON) {
+                            translations = resolveTranslation(
+                                `${language}-${region}`,
+                                translationJSON,
+                            )
+                        }
+
+                        setI18nCtx((i18nCtx) => ({
+                            ...i18nCtx,
+                            language,
+                            region,
+                            translations: translations ?? i18nCtx.translations,
+                        }))
+                    })
+                }
+            }, [i18nCtx.language, i18nCtx.region, language, region])
+
             return (
-                <Theme
-                    colourScheme={{ light: themeColours, dark: themeColours }}
-                    mode={themeMode}
-                >
-                    <Story />
-                </Theme>
+                <i18nContext.Provider value={i18nCtx}>
+                    <Theme
+                        colourScheme={{
+                            light: themeColours,
+                            dark: themeColours,
+                        }}
+                        mode={themeMode}
+                    >
+                        {!isPending && <Story />}
+                    </Theme>
+                </i18nContext.Provider>
             )
         },
     ],
@@ -124,9 +165,7 @@ const preview: Preview = {
     globalTypes: {
         themeColours: {
             description: "Colour Scheme",
-            defaultValue:
-                localStorage.getItem("belt.settings.theme.colourScheme") ??
-                "default",
+            defaultValue: "default",
             toolbar: {
                 title: "Default",
                 icon: "contrast",
@@ -140,8 +179,7 @@ const preview: Preview = {
         },
         themeMode: {
             description: "Mode",
-            defaultValue:
-                localStorage.getItem("belt.settings.theme.mode") ?? "auto",
+            defaultValue: "auto",
             toolbar: {
                 title: "Auto",
                 icon: "lightning",
@@ -149,6 +187,31 @@ const preview: Preview = {
                     { value: "auto", title: "Auto" },
                     { value: "dark", title: "Dark" },
                     { value: "light", title: "Light" },
+                ],
+                dynamicTitle: true,
+            },
+        },
+        language: {
+            description: "Language",
+            defaultValue: "en",
+            toolbar: {
+                title: "English",
+                items: [
+                    { value: "en", title: "English" },
+                    { value: "de", title: "Deutsch" },
+                ],
+                dynamicTitle: true,
+            },
+        },
+        region: {
+            description: "Region",
+            defaultValue: "gb",
+            toolbar: {
+                title: "GB",
+                items: [
+                    { value: "gb", title: "GB" },
+                    { value: "us", title: "USA" },
+                    { value: "de", title: "Deutschland" },
                 ],
                 dynamicTitle: true,
             },
