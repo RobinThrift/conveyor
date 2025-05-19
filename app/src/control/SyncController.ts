@@ -112,6 +112,13 @@ export class SyncController {
 
         this._info = info.value ?? this._info
 
+        if (
+            this._info?.isEnabled &&
+            typeof this._info.lastSyncedAt === "string"
+        ) {
+            this._info.lastSyncedAt = new Date(this._info.lastSyncedAt)
+        }
+
         return Ok(info.value)
     }
 
