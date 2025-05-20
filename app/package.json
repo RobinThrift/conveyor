@@ -41,7 +41,7 @@
         "typescript": "^5.8.2",
         "vite": "^6.2.3",
         "vitest": "^3.1.1",
-        "vitest-browser-react": "^0.1.1"
+        "vitest-browser-react": "^0.2.0"
     },
     "dependencies": {
         "@codemirror/autocomplete": "^6.18.6",
