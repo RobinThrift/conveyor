@@ -17,7 +17,6 @@
         background-color: var(--btn-bg-hover);
     }
 
-    &:focus,
     &:focus-visible {
         outline-style: solid;
         outline-color: var(--btn-bg-active);
