@@ -59,7 +59,6 @@
 
 .main-screen {
     .memo-list-filter {
-        padding-top: env(safe-area-inset-top, 2rem);
         max-width: var(--sidebar-width);
         width: var(--sidebar-width);
         height: var(--sidebar-height);
