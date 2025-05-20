@@ -1,0 +1,21 @@
+:root {
+    --appbar-height: calc(var(--spacing) * 15);
+}
+
+.appheader {
+    @apply flex items-baseline gap-2 p-2;
+
+    padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
+
+    -webkit-app-region: drag;
+    min-height: max(env(titlebar-area-height), var(--appbar-height));
+    width: env(titlebar-area-width, 100%);
+}
+
+body.platform-macos .appheader {
+    @apply pe-4;
+
+    & > .btn:first-child {
+        @apply mt-6;
+    }
+}

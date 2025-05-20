@@ -3,24 +3,20 @@ import type { Meta, StoryObj } from "@storybook/react"
 import "@/ui/styles/index.css"
 import { decorator } from "@/lib/testhelper/rootStore"
 
-import { Navigation } from "./Navigation"
+import { AppHeader } from "./AppHeader"
 
-const meta: Meta<typeof Navigation> = {
-    title: "Components/Navigation",
-    component: Navigation,
+const meta: Meta<typeof AppHeader> = {
+    title: "Components/AppHeader",
+    component: AppHeader,
     decorators: [decorator],
 }
 
 export default meta
-type Story = StoryObj<typeof Navigation>
+type Story = StoryObj<typeof AppHeader>
 
 export const Basic: Story = {
-    name: "Navigation",
+    name: "AppHeader",
     parameters: {
         layout: "fullscreen",
-    },
-
-    args: {
-        active: "memos.list",
     },
 }

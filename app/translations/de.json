@@ -1,4 +1,8 @@
 {
+    "components/AppHeader": {
+        "Settings": "Einstellungen"
+    },
+
     "components/AuthForm": {
         "FieldServerLabel": "Server",
         "FieldUsernameLabel": "Benutername",
@@ -22,11 +26,6 @@
         "EmptyRepeateNewPassword": "Bitte gib das neue Passwort nochmal ein",
         "NewPasswordsDoNotMatch": "Das neue Passwort stimmt nicht mit der Wiederholung überein",
         "NewPasswordIsOldPassword": "Das neue Password darf nicht das aktuelle sein"
-    },
-
-    "components/Navigation": {
-        "Settings": "Einstellungen",
-        "Back": "Zurück"
     },
 
     "components/Memo": {

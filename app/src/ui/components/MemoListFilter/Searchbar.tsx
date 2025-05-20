@@ -4,10 +4,12 @@ import React, { useCallback } from "react"
 import { MagnifyingGlassIcon } from "@/ui/components/Icons"
 import { Input } from "@/ui/components/Input"
 import { useDebounce } from "@/ui/hooks/useDebounce"
+import clsx from "clsx"
 
 export function SearchBar(props: {
     onChange: (v: string) => void
     query?: string
+    className?: string
 }) {
     let onChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +30,10 @@ export function SearchBar(props: {
     }, [])
 
     return (
-        <Form className="search" onSubmit={onSubmit}>
+        <Form
+            onSubmit={onSubmit}
+            className={clsx("memo-list-filter-search", props.className)}
+        >
             <Input
                 name="q"
                 type="search"

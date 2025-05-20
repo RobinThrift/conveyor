@@ -121,7 +121,7 @@
             @media (min-width: 1024px) {
                 .memo-list-day-group:nth-of-type(2) {
                     .memo-list-day {
-                        margin-top: var(--navigation-height);
+                        margin-top: var(--appbar-height);
                     }
                 }
             }
@@ -169,7 +169,7 @@
 .main-screen.has-subscreen {
     .single-memo-screen {
         @media (min-width: 1024px) {
-            margin-top: calc(-1 * var(--navigation-height));
+            margin-top: calc(-1 * var(--appbar-height));
         }
     }
 }

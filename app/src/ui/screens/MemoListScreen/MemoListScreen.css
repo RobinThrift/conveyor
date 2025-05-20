@@ -15,13 +15,12 @@
 }
 
 .memo-list-header {
-    @apply text-xl tablet:text-2xl lg:text-3xl text-subtle-extra-dark tablet:py-2;
+    @apply text-lg tablet:text-lg lg:text-xl text-subtle-extra-dark tablet:py-2;
 
     pointer-events: none;
 
     em {
-        @apply block text-primary font-serif -mt-1 not-italic text-balance font-semibold;
-        @apply text-5xl lg:text-6xl;
+        @apply text-primary font-serif italic text-balance font-semibold;
     }
 }
 

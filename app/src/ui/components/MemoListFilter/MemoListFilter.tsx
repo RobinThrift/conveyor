@@ -9,6 +9,7 @@ import { LinkButton } from "@/ui/components/Link"
 import { OffCanvas } from "@/ui/components/OffCanvas"
 import { useT } from "@/ui/i18n"
 
+import { AppHeader } from "../AppHeader"
 import { DatePicker } from "./DatePicker"
 import { SearchBar } from "./Searchbar"
 import { ShortDayPicker } from "./ShortDayPicker"
@@ -33,46 +34,54 @@ export function MemoListFilter(props: MemoListFilterProps) {
         onSelectStateFilter,
     } = useMemoListFilterState(props)
     let t = useT("components/MemoListFilter")
-    let tNav = useT("components/Navigation")
+    let tAppHeader = useT("components/AppHeader")
 
     return (
         <div className="memo-list-filter">
-            <div className="flex items-center gap-4 py-1">
-                <OffCanvas aria-lable={t.OffScreenDescription}>
-                    <Button
-                        iconRight=<HashIcon />
-                        outline
-                        className="filter-offcanvas-trigger"
-                    >
-                        <span className="sr-only">{t.TriggerLabel}</span>
-                    </Button>
-                    <OffCanvas.Content className="filter-offcanvas">
-                        <OffCanvas.Title>{t.OffScreenTitle}</OffCanvas.Title>
-                        <TagTree {...tagTreeState} tags={props.tags} />
+            <AppHeader position="left" id="memo-list-filter-tag-tree">
+                <div className="flex items-center">
+                    <OffCanvas aria-lable={t.OffScreenDescription}>
+                        <Button
+                            iconRight=<HashIcon />
+                            outline
+                            className="filter-offcanvas-trigger"
+                        >
+                            <span className="sr-only">{t.TriggerLabel}</span>
+                        </Button>
+                        <OffCanvas.Content className="filter-offcanvas">
+                            <OffCanvas.Title>
+                                {t.OffScreenTitle}
+                            </OffCanvas.Title>
+                            <TagTree {...tagTreeState} tags={props.tags} />
 
-                        <StateFilter
-                            onSelect={onSelectStateFilter}
-                            selected={props.filter}
-                        />
+                            <StateFilter
+                                onSelect={onSelectStateFilter}
+                                selected={props.filter}
+                            />
 
-                        <nav>
-                            <LinkButton
-                                screen="settings"
-                                iconLeft={<SlidersIcon />}
-                                plain
-                                size="sm"
-                                openInNewStack
-                            >
-                                {tNav.Settings}
-                            </LinkButton>
-                        </nav>
-                    </OffCanvas.Content>
-                </OffCanvas>
+                            <nav>
+                                <LinkButton
+                                    screen="settings"
+                                    iconLeft={<SlidersIcon />}
+                                    plain
+                                    size="sm"
+                                    openInNewStack
+                                >
+                                    {tAppHeader.Settings}
+                                </LinkButton>
+                            </nav>
+                        </OffCanvas.Content>
+                    </OffCanvas>
+                </div>
+            </AppHeader>
+
+            <AppHeader position="right" id="memo-list-filter-search">
                 <SearchBar
+                    className="collapsible"
                     onChange={onChangeSearch}
                     query={props.filter.query}
                 />
-            </div>
+            </AppHeader>
 
             <div
                 className={clsx("collapsibile-date-picker", {
@@ -101,6 +110,13 @@ export function MemoListFilter(props: MemoListFilterProps) {
                     plain
                     size="sm"
                     onPress={() => datepicker.setExpanded(!datepicker.expanded)}
+                />
+            </div>
+
+            <div className="hidden tablet:block">
+                <SearchBar
+                    onChange={onChangeSearch}
+                    query={props.filter.query}
                 />
             </div>
 

@@ -1,15 +1,12 @@
-import clsx from "clsx"
 import React from "react"
 
 import type { ListMemosQuery as Filter } from "@/domain/Memo"
+import { AppHeader } from "@/ui/components/AppHeader"
 import { DateTime } from "@/ui/components/DateTime"
 import { Greeting } from "@/ui/components/Greeting"
 import { useT } from "@/ui/i18n"
 
-export function Header({
-    className,
-    filter,
-}: { className?: string; filter: Filter }) {
+export function Header({ filter }: { filter: Filter }) {
     let t = useT("components/MemoListHeader")
 
     if (!filter) {
@@ -23,15 +20,15 @@ export function Header({
     let children: React.ReactNode[] = []
 
     if (filter.isDeleted) {
-        children.push(t.Deleted, <br key="br-is-deleted" />)
+        children.push(t.Deleted)
     }
 
     if (filter.isArchived) {
-        children.push(t.Archived, <br key="br-is-archived" />)
+        children.push(t.Archived)
     }
 
     if (filter.tag) {
-        children.push(t.MemosForTag, <em key="tag">{`#${filter.tag}`}</em>)
+        children.push(t.MemosForTag, " ", <em key="tag">{`#${filter.tag}`}</em>)
     }
 
     if (filter.exactDate) {
@@ -39,6 +36,7 @@ export function Header({
             children.length === 0
                 ? t.MemosForExactDateStandalone
                 : t.MemosForExactDate,
+            " ",
             <em key="exactDate">
                 <DateTime
                     date={filter.exactDate}
@@ -51,6 +49,7 @@ export function Header({
     if (filter.query) {
         children.push(
             children.length === 0 ? t.MemosForQueryStandalone : t.MemosForQuery,
+            " ",
             <em key="query">{`"${filter.query}"`}</em>,
         )
     }
@@ -60,8 +59,10 @@ export function Header({
     }
 
     return (
-        <header className={clsx("memo-list-header", className)}>
-            {children}
-        </header>
+        <AppHeader position="centre" id="memo-list-header">
+            <div className="memo-list-header">
+                <div>{children}</div>
+            </div>
+        </AppHeader>
     )
 }

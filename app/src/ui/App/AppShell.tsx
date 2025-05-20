@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useState } from "react"
 
+import { AppHeaderProvider } from "@/ui/components/AppHeader"
 import { BuildInfo } from "@/ui/components/BuildInfo"
-import { Navigation } from "@/ui/components/Navigation"
 import { Notifications } from "@/ui/components/Notifications"
 import { Theme } from "@/ui/components/Theme"
 import { useCurrentPage } from "@/ui/navigation"
@@ -88,7 +88,7 @@ export function AppShell() {
     return (
         <Theme colourScheme={colourScheme} mode={mode}>
             <I18nProvider>
-                <Navigation active={currentPage.name ?? "root"} />
+                <AppHeaderProvider />
                 <main className="main">
                     {pageComp}
                     <footer className="app-footer">

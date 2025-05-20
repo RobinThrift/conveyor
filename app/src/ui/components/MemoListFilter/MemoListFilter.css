@@ -1,16 +1,6 @@
 .memo-list-filter {
     @apply overscroll-none flex flex-col;
 
-    .search {
-        @apply flex-1;
-        @media (max-width: 1024px) {
-            input {
-                @apply py-1.5 pe-1 ps-7 border-subtle-extra-light!;
-                font-size: 1rem;
-            }
-        }
-    }
-
     .date-picker {
         @apply px-2 w-full;
 
@@ -226,10 +216,8 @@
 }
 
 .filter-offcanvas {
-    padding-top: env(safe-area-inset-top, calc(var(--spacing) * 2)) !important;
-    padding-bottom: calc(
-        env(safe-area-inset-bottom, calc(var(--spacing) * 2) * 2)
-    ) !important;
+    padding-top: max(env(safe-area-inset-top), calc(var(--spacing) * 4)) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0) + var(--spacing) * 4) !important;
 
     & > nav {
         @apply w-full flex justify-center;
@@ -278,4 +266,56 @@
 
 .tag-tree-item-expand-toggle-btn {
     transition: rotate 0.25s;
+}
+
+.memo-list-filter-search {
+    @apply flex-1;
+    @media (max-width: 1024px) {
+        input {
+            @apply py-1.5 pe-1 ps-7 border-subtle-extra-light!;
+            font-size: 1rem;
+        }
+    }
+
+    &.collapsible {
+        @apply tablet:hidden;
+
+        .icon {
+            @apply pointer-events-none size-10 justify-center p-0!;
+        }
+
+        .input-field {
+            @apply flex justify-end flex-1;
+        }
+
+        .input-field .input {
+            @apply size-10 rounded-full! text-surface-level-1;
+            padding: 0 !important;
+            padding-inline: 0 !important;
+            padding-block: 0 !important;
+        }
+
+        &:has(*:focus) {
+            .input-field {
+                & > div {
+                    @apply flex-1;
+                }
+            }
+
+            .input-field .input {
+                @apply pl-8! py-1! px-1! text-text;
+                width: 100%;
+            }
+
+            .icon {
+                @apply p-0.5 pl-2;
+            }
+        }
+    }
+}
+
+.appheader:has(.memo-list-filter-search.collapsible input:focus) {
+    .memo-list-header {
+        display: none;
+    }
 }

@@ -27,9 +27,8 @@ export const translations = {
         NewPasswordIsOldPassword: "New password can't be old password",
     },
 
-    "components/Navigation": {
+    "components/AppHeader": {
         Settings: "Settings",
-        Back: "Back",
     },
 
     "components/Memo": {
