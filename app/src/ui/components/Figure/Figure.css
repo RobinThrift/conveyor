@@ -51,6 +51,7 @@
         position: relative;
         max-height: 100dvh;
         max-width: 100dvw;
+        touch-action: none;
 
         &[data-is-dragging] figcaption {
             opacity: 0;
@@ -71,13 +72,19 @@
             overflow: auto;
         }
     }
+
+    &:has([data-is-closing]) .zoomed-img-close-btn {
+        @apply animate-out fade-out duration-200;
+    }
 }
 
 .zoomed-img-close-btn {
-    @apply absolute flex items-center justify-center right-4 top-4;
+    @apply absolute flex items-center justify-center;
     @apply p-2 rounded-full bg-surface-level-1/50 text-xl cursor-pointer;
     @apply hover:bg-surface-level-1 hover:text-primary;
     backdrop-filter: blur(4px);
+    top: max(calc(var(--spacing) * 4), env(safe-area-inset-top, 0));
+    right: max(calc(var(--spacing) * 4), env(safe-area-inset-right, 0));
 }
 
 html:has(dialog.zoomed-img[open]) {
