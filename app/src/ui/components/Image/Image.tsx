@@ -1,44 +1,30 @@
-import React, { useMemo, useRef } from "react"
+import React, { useRef } from "react"
 
-import { thumbhashToDataURL } from "@/external/thumbhash"
-import { useAttachment } from "@/ui/attachments"
 import clsx from "clsx"
+import { useImageState } from "./useImageState"
 
 export interface ImageProps {
     className?: string
     src: string
     alt: string
+    loading?: "lazy" | "eager"
     onError?: () => void
+    style?: React.CSSProperties
 }
 
 export const Image = React.memo(function Image(props: ImageProps) {
     let ref = useRef<HTMLImageElement | null>(null)
-    let attachment = useMemo(() => parseImgURL(props.src), [props.src])
-    let attachmentData = useAttachment({ id: attachment?.attachmentID, ref })
-    let hash = attachment?.thumbhash
-
-    let attachmentURL = useMemo(() => {
-        if (!attachmentData || !attachmentData?.data) {
-            return undefined
-        }
-
-        return URL.createObjectURL(
-            new Blob([new Uint8Array(attachmentData?.data)]),
-        )
-    }, [attachmentData])
-
-    let src = attachment ? (attachmentURL ?? hash) : props.src
-
-    let isLoading =
-        typeof attachment !== "undefined" &&
-        typeof attachmentURL === "undefined"
+    let { src, isLoading, style } = useImageState({
+        ref,
+        ...props,
+    })
 
     return (
         <img
             ref={ref}
             src={src}
             alt={props.alt}
-            loading="lazy"
+            loading={props.loading ?? "lazy"}
             onError={props.onError}
             className={clsx(
                 {
@@ -46,31 +32,7 @@ export const Image = React.memo(function Image(props: ImageProps) {
                 },
                 props.className,
             )}
-            style={{
-                minWidth: hash && !attachmentURL ? "200px" : undefined,
-            }}
+            style={style}
         />
     )
 })
-
-function parseImgURL(
-    src: string,
-): { attachmentID: string; thumbhash?: string } | undefined {
-    let u: URL
-    try {
-        u = new URL(src)
-    } catch {
-        return
-    }
-
-    if (u.protocol !== "attachment:") {
-        return
-    }
-
-    let th = u.searchParams.get("thumbhash")
-
-    return {
-        attachmentID: u.hostname || u.pathname,
-        thumbhash: th ? thumbhashToDataURL(th) : undefined,
-    }
-}

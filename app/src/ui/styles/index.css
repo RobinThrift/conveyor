@@ -85,3 +85,11 @@
 .tree-leaf-list-item:only-of-type .tree-node::before {
     display: none;
 }
+
+:root::view-transition-old(*) {
+    display: none;
+}
+
+:root::view-transition-old(*), :root::view-transition-new(*) {
+    animation: none;
+}

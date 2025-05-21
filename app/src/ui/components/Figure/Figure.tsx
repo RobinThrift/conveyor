@@ -16,6 +16,7 @@ export interface FigureProps {
 export function Figure(props: FigureProps) {
     let t = useT("components/Figure")
     let dialogRef = useRef<HTMLDialogElement | null>(null)
+    let ref = useRef<HTMLElement | null>(null)
     let zoomedFigRef = useRef<HTMLElement | null>(null)
     let [isZoomed, setIsZoomed] = useState(false)
     let srcRect = useRef<
@@ -76,6 +77,9 @@ export function Figure(props: FigureProps) {
                 return
             }
 
+            if (ref.current) {
+                ref.current.style.viewTransitionName = "figure-zoomed"
+            }
             setIsZoomed(true)
 
             let rect = e.currentTarget.getBoundingClientRect()
@@ -91,7 +95,12 @@ export function Figure(props: FigureProps) {
                 setIsZoomed(false)
             })
 
-            dialog.showModal()
+            document.startViewTransition(() => {
+                if (ref.current) {
+                    ref.current.style.viewTransitionName = ""
+                }
+                dialog.showModal()
+            })
         },
         [],
     )
@@ -100,6 +109,7 @@ export function Figure(props: FigureProps) {
         <>
             <figure
                 id={props.id}
+                ref={ref}
                 className={clsx(
                     "figure",
                     { "is-zoomed": isZoomed },
@@ -270,6 +280,9 @@ const DraggableFigure = React.memo(function DraggableFigure({
                 onPointerMove={onPointerMove}
                 onPointerCancel={onPointerCancel}
                 ref={ref}
+                style={{
+                    viewTransitionName: "figure-zoomed",
+                }}
             >
                 <Image src={props.src} alt={props.alt} />
                 {props.caption && <figcaption>{props.caption}</figcaption>}

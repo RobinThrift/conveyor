@@ -6,6 +6,7 @@
 
 .figure .zoom-btn {
     @apply cursor-zoom-in rounded-lg;
+
     &:focus {
         @apply outline-none;
     }
@@ -34,7 +35,6 @@
 
     &[open] {
         @apply flex;
-        @apply animate-in fade-in duration-250;
 
         &::backdrop {
             @apply bg-black/50! backdrop-blur;
@@ -89,4 +89,13 @@
 
 html:has(dialog.zoomed-img[open]) {
     overflow: hidden;
+}
+
+:root::view-transition-old(figure-zoomed) {
+    display: none;
+}
+
+:root::view-transition-new(figure-zoomed) {
+    animation: none;
+    mix-blend-mode: normal;
 }

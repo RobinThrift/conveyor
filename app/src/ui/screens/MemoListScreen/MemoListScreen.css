@@ -1,14 +1,6 @@
 .memo-list-screen {
     @apply flex flex-row gap-4 justify-center w-full;
 
-    .memo-list {
-        view-transition-name: main-screen-memo-list;
-
-        .memo:has(h1 a:active) {
-            view-transition-name: main-screen-active-memo;
-        }
-    }
-
     .memo-list-container {
         @apply flex-1;
     }
