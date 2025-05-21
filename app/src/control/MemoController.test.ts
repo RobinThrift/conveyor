@@ -34,7 +34,7 @@ import { ChangelogController } from "./ChangelogController"
 import { MemoController } from "./MemoController"
 
 suite("control/MemoController", () => {
-    suite.sequential("Querying", async () => {
+    suite("Querying", async () => {
         let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup()
 
         let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0)
@@ -249,7 +249,7 @@ suite("control/MemoController", () => {
         })
     })
 
-    suite.concurrent(
+    suite(
         "CRUD",
         async () => {
             let insertMemos = async (
@@ -408,67 +408,64 @@ suite("control/MemoController", () => {
                 assert.include(error.message, "not found")
             })
 
-            test.sequential(
-                "updateMemoArchiveStatus",
-                async ({ onTestFinished }) => {
-                    let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
-                        onTestFinished,
-                    })
-                    await setup()
-                    let createdMemosIDs = await insertMemos(ctx, memoCtrl)
+            test("updateMemoArchiveStatus", async ({ onTestFinished }) => {
+                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                    onTestFinished,
+                })
+                await setup()
+                let createdMemosIDs = await insertMemos(ctx, memoCtrl)
 
-                    let memo = await assertOkResult(
-                        memoCtrl.getMemo(ctx, createdMemosIDs[5]),
-                    )
+                let memo = await assertOkResult(
+                    memoCtrl.getMemo(ctx, createdMemosIDs[5]),
+                )
 
-                    vi.useFakeTimers()
-                    vi.setSystemTime(
-                        calendarDateTimeFromDate(memo.updatedAt)
-                            .add({ hours: 1 })
-                            .toDate("utc"),
-                    )
-                    await assertOkResult(
-                        memoCtrl.updateMemoArchiveStatus(ctx, {
-                            id: memo.id,
-                            isArchived: true,
-                        }),
-                    )
-                    vi.useRealTimers()
+                vi.useFakeTimers()
+                vi.setSystemTime(
+                    calendarDateTimeFromDate(memo.updatedAt)
+                        .add({ hours: 1 })
+                        .toDate("utc"),
+                )
+                await assertOkResult(
+                    memoCtrl.updateMemoArchiveStatus(ctx, {
+                        id: memo.id,
+                        isArchived: true,
+                    }),
+                )
+                vi.useRealTimers()
 
-                    let updated = await assertOkResult(
-                        memoCtrl.getMemo(ctx, memo.id),
-                    )
+                let updated = await assertOkResult(
+                    memoCtrl.getMemo(ctx, memo.id),
+                )
 
-                    assert.isTrue(updated.isArchived)
-                    assert.isTrue(
-                        isAfter(updated.updatedAt, memo.updatedAt),
-                        `updated.updatedAt: ${updated.updatedAt} memo.updatedAt: ${memo.updatedAt}`,
-                    )
+                assert.isTrue(updated.isArchived)
+                assert.isTrue(
+                    isAfter(updated.updatedAt, memo.updatedAt),
+                    `updated.updatedAt: ${updated.updatedAt} memo.updatedAt: ${memo.updatedAt}`,
+                )
 
-                    vi.useFakeTimers()
-                    vi.setSystemTime(
-                        calendarDateTimeFromDate(memo.updatedAt)
-                            .add({ hours: 1 })
-                            .toDate("utc"),
-                    )
-                    await assertOkResult(
-                        memoCtrl.updateMemoArchiveStatus(ctx, {
-                            id: memo.id,
-                            isArchived: false,
-                        }),
-                    )
-                    vi.useRealTimers()
+                vi.useFakeTimers()
+                vi.setSystemTime(
+                    calendarDateTimeFromDate(memo.updatedAt)
+                        .add({ hours: 1 })
+                        .toDate("utc"),
+                )
+                await assertOkResult(
+                    memoCtrl.updateMemoArchiveStatus(ctx, {
+                        id: memo.id,
+                        isArchived: false,
+                    }),
+                )
+                vi.useRealTimers()
 
-                    let noLongerArchived = await assertOkResult(
-                        memoCtrl.getMemo(ctx, memo.id),
-                    )
+                let noLongerArchived = await assertOkResult(
+                    memoCtrl.getMemo(ctx, memo.id),
+                )
 
-                    assert.isFalse(noLongerArchived.isArchived)
-                    assert.isTrue(
-                        isAfter(noLongerArchived.updatedAt, memo.updatedAt),
-                    )
-                },
-            )
+                assert.isFalse(noLongerArchived.isArchived)
+                assert.isTrue(
+                    isAfter(noLongerArchived.updatedAt, memo.updatedAt),
+                )
+            })
 
             test("updateMemoArchiveStatus/Not Found", async ({
                 onTestFinished,
@@ -580,7 +577,7 @@ suite("control/MemoController", () => {
         30000,
     )
 
-    suite.concurrent("Tags", async () => {
+    suite("Tags", async () => {
         let insertMemos = async (
             ctx: Context,
             memoCtrl: MemoController,
@@ -634,94 +631,92 @@ suite("control/MemoController", () => {
             }
         })
 
-        test.sequential(
-            "Tag count doesn't change after Memo update if no tags were added or removed",
-            async ({ onTestFinished }) => {
-                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
-                    onTestFinished,
-                })
-                await setup()
+        test("Tag count doesn't change after Memo update if no tags were added or removed", async ({
+            onTestFinished,
+        }) => {
+            let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                onTestFinished,
+            })
+            await setup()
 
-                let numMemos = 10
-                let createdMemosIDs = await insertMemos(ctx, memoCtrl, numMemos)
+            let numMemos = 10
+            let createdMemosIDs = await insertMemos(ctx, memoCtrl, numMemos)
 
-                for (let i = 0; i < numMemos; i++) {
-                    await assertOkResult(
-                        memoCtrl.updateMemoContent(ctx, {
-                            id: createdMemosIDs[i],
-                            content: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
-                            changes: {
-                                version: "1",
-                                changes: [
-                                    {
-                                        insert: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
-                                    },
-                                ],
-                            },
-                        }),
-                    )
-                }
-
-                let tags = await assertOkResult(
-                    memoCtrl.listTags(ctx, {
-                        pagination: { pageSize: numMemos * 2 },
-                    }),
-                )
-
-                assert.equal(
-                    tags.items.length,
-                    numMemos + 1,
-                    "one for each unique memo tag and one extra for the shared tag",
-                )
-
-                for (let tag of tags.items) {
-                    if (tag.tag === "shared-tag") {
-                        assert.equal(tag.count, numMemos)
-                    } else {
-                        assert.equal(tag.count, 1)
-                    }
-                }
-            },
-        )
-
-        test.sequential(
-            "Tags are removed when count reaches 0",
-            async ({ onTestFinished }) => {
-                let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
-                    onTestFinished,
-                })
-                await setup()
-
-                let numMemos = 10
-                let createdMemosIDs = await insertMemos(ctx, memoCtrl, numMemos)
-
-                // Update Memos, removing unique tags tags
-                for (let i = 0; i < numMemos; i++) {
-                    await memoCtrl.updateMemoContent(ctx, {
+            for (let i = 0; i < numMemos; i++) {
+                await assertOkResult(
+                    memoCtrl.updateMemoContent(ctx, {
                         id: createdMemosIDs[i],
-                        content: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
+                        content: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
                         changes: {
                             version: "1",
                             changes: [
                                 {
-                                    insert: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
+                                    insert: `# Test Memo ${i}\n Updated content for memo ${i} #tag-${i} #shared-tag`,
                                 },
                             ],
                         },
-                    })
-                }
-
-                let tags = await assertOkResult(
-                    memoCtrl.listTags(ctx, {
-                        pagination: { pageSize: numMemos * 2 },
                     }),
                 )
+            }
 
-                assert.equal(tags.items.length, 1)
+            let tags = await assertOkResult(
+                memoCtrl.listTags(ctx, {
+                    pagination: { pageSize: numMemos * 2 },
+                }),
+            )
 
-                assert.equal(tags.items[0].count, numMemos)
-            },
-        )
+            assert.equal(
+                tags.items.length,
+                numMemos + 1,
+                "one for each unique memo tag and one extra for the shared tag",
+            )
+
+            for (let tag of tags.items) {
+                if (tag.tag === "shared-tag") {
+                    assert.equal(tag.count, numMemos)
+                } else {
+                    assert.equal(tag.count, 1)
+                }
+            }
+        })
+
+        test("Tags are removed when count reaches 0", async ({
+            onTestFinished,
+        }) => {
+            let { memoCtrl, ctx, setup } = await memoCtrlTestSetup({
+                onTestFinished,
+            })
+            await setup()
+
+            let numMemos = 10
+            let createdMemosIDs = await insertMemos(ctx, memoCtrl, numMemos)
+
+            // Update Memos, removing unique tags tags
+            for (let i = 0; i < numMemos; i++) {
+                await memoCtrl.updateMemoContent(ctx, {
+                    id: createdMemosIDs[i],
+                    content: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
+                    changes: {
+                        version: "1",
+                        changes: [
+                            {
+                                insert: `# Test Memo ${i}\n Updated content for memo ${i} #shared-tag`,
+                            },
+                        ],
+                    },
+                })
+            }
+
+            let tags = await assertOkResult(
+                memoCtrl.listTags(ctx, {
+                    pagination: { pageSize: numMemos * 2 },
+                }),
+            )
+
+            assert.equal(tags.items.length, 1)
+
+            assert.equal(tags.items[0].count, numMemos)
+        })
 
         test("Tag count is reduced when Memos are deleted", async ({
             onTestFinished,
@@ -761,7 +756,7 @@ suite("control/MemoController", () => {
         })
     })
 
-    suite.sequential("Attachments", async () => {
+    suite("Attachments", async () => {
         let { memoCtrl, attachmentCtrl, ctx, setup, cleanup } =
             await memoCtrlTestSetup()
 
@@ -819,7 +814,7 @@ suite("control/MemoController", () => {
         })
     })
 
-    suite.concurrent("applyChangelogEntries", async () => {
+    suite("applyChangelogEntries", async () => {
         let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
 
         test("exisitng Memo", async ({ onTestFinished }) => {

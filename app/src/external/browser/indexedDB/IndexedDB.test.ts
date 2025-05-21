@@ -7,7 +7,7 @@ import { encodeText } from "@/lib/textencoding"
 
 import { IndexedDB } from "./IndexedDB"
 
-suite.concurrent("external/browser/IndexedDB", { timeout: 5000 }, () => {
+suite("external/browser/IndexedDB", { timeout: 5000 }, () => {
     let [ctx, cancel] = BaseContext.withCancel()
     afterAll(() => cancel())
 

@@ -31,7 +31,7 @@ const attachmentTestContent = Object.freeze({
     })(),
 })
 
-suite.concurrent("control/AttachmentController", () => {
+suite("control/AttachmentController", () => {
     test("read/write", async ({ onTestFinished }) => {
         let { attachmentCtrl, changelogCtrl, fs, ctx, setup, cleanup } =
             await attachmentCtrlTestSetup()
@@ -78,7 +78,7 @@ suite.concurrent("control/AttachmentController", () => {
         )
     })
 
-    suite.concurrent("Remote Fallback", async () => {
+    suite("Remote Fallback", async () => {
         test("found", async ({ onTestFinished }) => {
             let { attachmentCtrl, fs, ctx, setup, cleanup } =
                 await attachmentCtrlTestSetup({

@@ -4,7 +4,7 @@ import { BaseContext } from "./context"
 import { Second } from "./duration"
 import { delay } from "./testhelper/delay"
 
-suite.concurrent("lib/context", () => {
+suite("lib/context", () => {
     test("withCancel", () => {
         let parentCtx = BaseContext
 

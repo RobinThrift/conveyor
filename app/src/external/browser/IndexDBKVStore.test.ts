@@ -6,7 +6,7 @@ import { encodeText } from "@/lib/textencoding"
 
 import { IndexedDBKVStoreContainer } from "./IndexDBKVStore"
 
-suite.concurrent("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
+suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
     let [ctx, cancel] = BaseContext.withCancel()
     afterAll(() => cancel())
 
@@ -272,7 +272,7 @@ suite.concurrent("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
     })
 })
 
-suite.concurrent(
+suite(
     "external/browser/IndexDBKVStore/IndexedDBKVStoreContainer",
     { timeout: 5000 },
     () => {

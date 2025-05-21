@@ -36,7 +36,7 @@ import { MemoController } from "./MemoController"
 import { SettingsController } from "./SettingsController"
 import { SyncController } from "./SyncController"
 
-suite.concurrent("control/SyncController", async () => {
+suite("control/SyncController", async () => {
     test("fetchFullDB", async ({ onTestFinished }) => {
         let dbPath = "syncCtrl_fetchFullDB_test.db"
         let content = "THIS IS TOTALLY A DATABASE"

@@ -9,7 +9,7 @@ import { assertOkResult } from "@/lib/testhelper/assertions"
 import { encodeText } from "../textencoding"
 import { EncryptedKVStore } from "./EncryptedKVStore"
 
-suite.concurrent("lib/KVStore/EncryptedKVStore", () => {
+suite("lib/KVStore/EncryptedKVStore", () => {
     let [ctx, cancel] = BaseContext.withCancel()
     afterAll(() => cancel())
 

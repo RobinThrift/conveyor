@@ -5,7 +5,7 @@ import { Ok } from "@/lib/result"
 import { Second } from "@/lib/duration"
 import { ScheduleJobTrigger } from "./ScheduleJobTrigger"
 
-suite.sequential("jobs/ScheduleJobTrigger", () => {
+suite("jobs/ScheduleJobTrigger", () => {
     beforeEach(() => {
         vi.useFakeTimers()
     })

@@ -13,7 +13,7 @@ import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 
 import { AuthV1APIClient } from "./AuthV1APIClient"
 
-suite.sequential("api/syncv1/AuthV1APIClient", async () => {
+suite("api/syncv1/AuthV1APIClient", async () => {
     test("getTokenUsingCredentials/valid", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, authV1APIClient } =
             await setupAuthV1APIClientTest()

@@ -9,7 +9,7 @@ import { decodeText, encodeText } from "@/lib/textencoding"
 
 import { SyncV1APIClient } from "./SyncV1APIClient"
 
-suite.sequential("api/syncv1/SyncV1APIClient", async () => {
+suite("api/syncv1/SyncV1APIClient", async () => {
     test("getFullSync", async ({ onTestFinished }) => {
         let { ctx, setup, cleanup, useMocks, syncV1APIClient } =
             await setupSyncV1APIClientTest()

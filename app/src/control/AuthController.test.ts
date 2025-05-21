@@ -15,8 +15,8 @@ import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 import { currentDateTime } from "@/lib/i18n"
 import { AuthController } from "./AuthController"
 
-suite.concurrent("control/AuthController", async () => {
-    suite.concurrent("getInitialToken", async () => {
+suite("control/AuthController", async () => {
+    suite("getInitialToken", async () => {
         let validUsername = "test_getInitialToken_USERNAME"
         let validPassword = "test_getInitialToken_PASSWORD"
         let { ctx, cleanup, authCtrl } = await setupAuthControllerTest({
@@ -66,7 +66,7 @@ suite.concurrent("control/AuthController", async () => {
         })
     })
 
-    suite.concurrent("getToken", async () => {
+    suite("getToken", async () => {
         let now = currentDateTime()
         let validAccessToken = "VALID_ACCESS_TOKEN"
         let validRefreshToken = "VALID_REFRESH_TOKEN"

@@ -12,7 +12,7 @@ import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
 import { ChangelogController } from "./ChangelogController"
 import { SettingsController } from "./SettingsController"
 
-suite.concurrent("control/SettingsController", async () => {
+suite("control/SettingsController", async () => {
     test("loadSettings (defaults)", async ({ onTestFinished }) => {
         let { settingsCtrl, ctx, setup, cleanup } =
             await settingsCtrlTestSetup()

@@ -4,7 +4,7 @@ import { Ok } from "@/lib/result"
 
 import { EventJobTrigger } from "./EventJobTrigger"
 
-suite.concurrent("jobs/EventJobTrigger", () => {
+suite("jobs/EventJobTrigger", () => {
     test("EventJobTrigger", async ({ expect, onTestFinished }) => {
         let spy = vi.fn(() => {})
         let run = Promise.withResolvers<void>()

@@ -9,7 +9,7 @@ import { toPromise } from "../result"
 import { EncryptedFS } from "./EncryptedFS"
 
 suite("lib/fs/EncryptedFS", () => {
-    suite.sequential("read/write", { timeout: 1000 }, async () => {
+    suite("read/write", { timeout: 1000 }, async () => {
         let [ctx, cancel] = BaseContext.withCancel()
 
         let mockfs = new MockFS()
