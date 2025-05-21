@@ -64,7 +64,7 @@
         "@reduxjs/toolkit": "^2.6.1",
         "@replit/codemirror-vim": "^6.3.0",
         "@sqlite.org/sqlite-wasm": "^3.48.0-build4",
-        "@tauri-apps/plugin-fs": "^2.2.0",
+        "@tauri-apps/plugin-fs": "^2.3.0",
         "@tauri-apps/plugin-os": "^2.2.1",
         "@tauri-apps/plugin-store": "^2.2.0",
         "@types/mdast": "^4.0.4",
