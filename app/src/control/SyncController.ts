@@ -134,7 +134,10 @@ export class SyncController {
         }
 
         return this._transactioner.inTransaction(ctx, async (ctx) => {
-            let serverChanges = await this._fetchChangelogEntries(ctx)
+            let serverChanges = await this._fetchChangelogEntries(
+                ctx,
+                info.lastSyncedAt,
+            )
             if (!serverChanges.ok) {
                 return serverChanges
             }
