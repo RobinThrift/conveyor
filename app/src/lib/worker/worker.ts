@@ -119,6 +119,9 @@ export function createWorker<
     }
 
     let runIfWorker = () => {
+        if ("_setup" in handlers && typeof handlers._setup === "function") {
+            handlers._setup(BaseContext, {})
+        }
         if (isWorkerContext()) {
             globalThis.addEventListener("message", run)
         }

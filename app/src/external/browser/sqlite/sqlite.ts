@@ -5,7 +5,10 @@ import { Lock } from "@/lib/Lock"
 import { BaseContext, type Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import { type AsyncResult, fromPromise, toPromise } from "@/lib/result"
-import { migrate } from "@/storage/database/sqlite/migrator"
+import {
+    migrate,
+    migrateDBEncryption,
+} from "@/storage/database/sqlite/migrator"
 
 import { SQLiteWorker } from "./SQLiteWorker"
 
@@ -64,18 +67,22 @@ export class SQLite implements Database {
             enableTracing?: boolean
         },
     ) {
+        performance.mark("sql:open:start", { detail: { args: [params] } })
         await toPromise(this._worker.open(ctx, params))
         await toPromise(
             this._worker.exec(ctx, { sql: "PRAGMA foreign_keys = true;" }),
         )
         this._ready.resolve()
+        performance.mark("sql:open:end")
         await migrate(ctx, this)
+
+        await migrateDBEncryption(ctx, { db: this, enckey: params.enckey })
     }
 
     public async close() {
+        performance.mark("sql:close:start")
         await this._worker.close()
-        this._worker.terminate()
-        this._worker = undefined as any
+        performance.mark("sql:close:end")
     }
 
     public async exec(
@@ -83,13 +90,16 @@ export class SQLite implements Database {
         args?: (SqlValue | boolean)[],
         abort?: AbortSignal,
     ): Promise<number> {
+        performance.mark("sql:exec:start", { detail: { sql, args } })
         await this._ready.promise
-        return toPromise(
+        let res = await toPromise(
             this._worker.exec(this._baseCtx.withSignal(abort), {
                 sql,
                 args,
             }),
         )
+        performance.mark("sql:exec:end")
+        return res
     }
 
     public async query<R extends Record<string, SqlValue | boolean>>(
@@ -97,13 +107,16 @@ export class SQLite implements Database {
         args?: (SqlValue | boolean)[],
         abort?: AbortSignal,
     ): Promise<R[]> {
+        performance.mark("sql:query:start", { detail: { sql, args } })
         await this._ready.promise
-        return toPromise(
+        let res = await toPromise(
             this._worker.query<R>(this._baseCtx.withSignal(abort), {
                 sql,
                 args,
             }),
         )
+        performance.mark("sql:query:end")
+        return res
     }
 
     public async queryOne<R extends Record<string, SqlValue | boolean>>(
@@ -111,13 +124,16 @@ export class SQLite implements Database {
         args?: (SqlValue | boolean)[],
         abort?: AbortSignal,
     ): Promise<R | undefined> {
+        performance.mark("sql:query-one:start", { detail: { sql, args } })
         await this._ready.promise
-        return toPromise(
+        let res = await toPromise(
             this._worker.queryOne<R>(this._baseCtx.withSignal(abort), {
                 sql,
                 args,
             }),
         )
+        performance.mark("sql:query-one:end")
+        return res
     }
 
     public async inTransaction<R>(

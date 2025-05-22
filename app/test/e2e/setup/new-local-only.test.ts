@@ -12,15 +12,7 @@ test("setup/new/local-only", async ({ page }) => {
     await page.getByRole("button", { name: "Next" }).click()
     await page.getByRole("button", { name: "Next" }).click()
 
-    await Promise.all([
-        page.waitForURL("http://localhost:8081/"),
-        page.waitForEvent("console", {
-            predicate: (msg) => {
-                return msg.text().includes("database fully migrated")
-            },
-            timeout: 10_000,
-        }),
-    ])
+    await page.waitForURL("http://localhost:8081/")
 
     await page.locator(".text-editor").click()
     await page.getByLabel("Text formatting").isVisible()

@@ -6,13 +6,36 @@ import sqlite3InitModule, {
 } from "@sqlite.org/sqlite-wasm"
 
 import type { Context } from "@/lib/context"
-import { type AsyncResult, fromPromise, fromThrowing } from "@/lib/result"
+import { type AsyncResult, Ok, fromPromise, fromThrowing } from "@/lib/result"
 import { createWorker } from "@/lib/worker"
+import { privateKeyToDBKey } from "./privateKeyToDBKey"
 
 let sqlite3: Sqlite3Static | undefined = undefined
+let sqlite3Init: Promise<Sqlite3Static>
 let db: Database | undefined = undefined
 
 export const SQLiteWorker = createWorker({
+    _setup: async (_ctx: Context, _params: any): AsyncResult<void> => {
+        sqlite3Init = (async () => {
+            performance.mark("sqlite-worker:init:start")
+            let s = await sqlite3InitModule({
+                print: (msg) => console.log(msg),
+                printErr: (err) => console.error(err),
+                locateFile: () => {
+                    return "/assets/sqlite3/sqlite3.wasm"
+                },
+                setStatus: (_: string) => {
+                    // this NEEDs to be set, otherwise the initialization WILL fail
+                },
+            } as InitOptions)
+            performance.mark("sqlite-worker:init:end")
+
+            return s
+        })()
+
+        return Ok(undefined)
+    },
+
     open: async (
         _,
         {
@@ -25,19 +48,7 @@ export const SQLiteWorker = createWorker({
             enableTracing?: boolean
         },
     ): AsyncResult<void> => {
-        let sqlite3InitRes = await fromPromise(
-            sqlite3InitModule({
-                print: (msg) => console.log(msg),
-                printErr: (err) => console.error(err),
-                locateFile: () => {
-                    return "/assets/sqlite3/sqlite3.wasm"
-                },
-                setStatus: (_: string) => {
-                    // this NEEDs to be set, otherwise the initialization WILL fail
-                },
-            } as InitOptions),
-        )
-
+        let sqlite3InitRes = await fromPromise(sqlite3Init)
         if (!sqlite3InitRes.ok) {
             return sqlite3InitRes
         }
@@ -69,12 +80,22 @@ export const SQLiteWorker = createWorker({
             )
 
             db.exec({
-                sql: `PRAGMA key = '${enckey}'`, // @TODO: add escpaing
+                sql: `PRAGMA key = "x'${privateKeyToDBKey(enckey)}'";`,
             })
+
+            try {
+                db.selectValue("PRAGMA user_version")
+            } catch {
+                db.exec({
+                    sql: `PRAGMA key = '${enckey}'`,
+                })
+            }
 
             if (enableTracing) {
                 db.exec([
                     "PRAGMA cipher_settings;",
+                    "PRAGMA cipher_profile;",
+                    "PRAGMA cipher_log_level =  DEBUG;",
                     "PRAGMA cipher_log = stdout;",
                 ])
             }
@@ -123,5 +144,3 @@ export const SQLiteWorker = createWorker({
         })
     },
 })
-
-SQLiteWorker.runIfWorker()

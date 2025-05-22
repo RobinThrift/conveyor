@@ -32,19 +32,8 @@ import { SettingsRepo } from "@/storage/database/sqlite/SettingsRepo"
 import { Env } from "../env"
 import type { PlatformDependencies } from "./platform"
 
-declare const __ENABLE_DB_LOGGING__: boolean
-
 export async function initController(platform: PlatformDependencies) {
-    let db: typeof platform.db
-    if (__ENABLE_DB_LOGGING__) {
-        db = await import("@/lib/testhelper/DBLogger").then(
-            ({ DBLogger }) => new DBLogger(platform.db),
-        )
-        // @ts-expect-error: this is for debugging
-        globalThis.__CONVEYOR_DB__ = db
-    } else {
-        db = platform.db
-    }
+    let db = platform.db
 
     let cryptoCtrl = new CryptoController({
         crypto: platform.crypto,

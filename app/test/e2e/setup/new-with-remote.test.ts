@@ -18,15 +18,7 @@ test("setup/new/with-remote", async ({ page }) => {
     await page.getByRole("textbox", { name: "Password" }).fill("e2e-tests")
     await page.getByRole("button", { name: "Authenticate" }).click()
 
-    await Promise.all([
-        page.waitForURL("http://localhost:8081/"),
-        page.waitForEvent("console", {
-            predicate: (msg) => {
-                return msg.text().includes("database fully migrated")
-            },
-            timeout: 10_000,
-        }),
-    ])
+    await page.waitForURL("http://localhost:8081/")
 
     await page.locator(".text-editor").click()
     await page.getByLabel("Text formatting").isVisible()

@@ -23,8 +23,6 @@ export default defineConfig(async (config): Promise<UserConfig> => {
 
             "process.env.NODE_ENV": JSON.stringify(config.mode),
 
-            __ENABLE_DB_LOGGING__:
-                config.mode === "development" ? "true" : "false",
             __ENABLE_DEVTOOLS__:
                 config.mode === "development" ? "true" : "false",
 
