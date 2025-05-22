@@ -228,12 +228,17 @@ function APITokensList({
 
     return (
         <div className="api-tokens-section">
-            <AriaGridList className="api-tokens-list">
+            <AriaGridList className="api-tokens-list" aria-label={t.Title}>
                 {tokens.map((token) => (
-                    <AriaGridListItem key={token.name} className="api-token">
+                    <AriaGridListItem
+                        key={token.name}
+                        className="api-token"
+                        textValue={token.name}
+                    >
                         <div className="api-token-info">
                             <span
                                 className="api-token-name"
+                                id={`api-token-label-${token.name}`}
                                 aria-label={t.LabelName}
                             >
                                 {token.name}

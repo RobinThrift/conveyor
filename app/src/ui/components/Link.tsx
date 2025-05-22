@@ -3,6 +3,7 @@ import React, { startTransition, useCallback } from "react"
 
 import type { Screens } from "@/control/NavigationController"
 import { useNavigation } from "@/ui/navigation"
+import type { ButtonProps } from "@/ui/components/Button"
 
 export function Link<S extends keyof Screens>({
     screen,
@@ -39,7 +40,7 @@ export interface LinkButtonProps<S extends keyof Screens>
     iconLeft?: React.ReactNode
     iconRight?: React.ReactNode
     size?: "sm" | "md" | "lg"
-    variant?: "regular" | "primary" | "success" | "danger" | "subtle"
+    variant?: ButtonProps["variant"]
     outline?: boolean
     plain?: boolean
     href?: string

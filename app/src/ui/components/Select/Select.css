@@ -1,5 +1,5 @@
 .select-input {
-    @apply flex items-center gap-2 justify-between px-2 py-1 bg-surface-level-1 text-body-contrast min-w-fit rounded-lg cursor-pointer;
+    @apply flex items-center gap-2 justify-between px-2 py-1 bg-surface-level-1 text-body-contrast min-w-fit cursor-pointer;
 
     &:hover {
         @apply ring-1 ring-subtle-light;

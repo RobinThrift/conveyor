@@ -13,9 +13,8 @@ export function AppHeaderProvider() {
             <LinkButton
                 screen="settings"
                 iconLeft={<SlidersIcon />}
-                className="hidden tablet:flex relative top-1.5 z-[1000]"
-                plain
-                size="lg"
+                className="settings-nav-button icon-only"
+                outline
                 openInNewStack
             >
                 <span className="sr-only">{t.Settings}</span>

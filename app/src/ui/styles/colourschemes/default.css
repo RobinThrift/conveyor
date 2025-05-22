@@ -2,40 +2,78 @@
     --font-monospace: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
     --editor-font-size: 16px;
 
-    --color-body-bg: oklch(0.98 0.0034 247.86);
-    --color-body-bg-contrast: oklch(0 0 0);
-    --color-surface-level-1: oklch(1 0 0);
-    --color-surface-level-2: oklch(0.98 0.0034 247.86);
-    --color-modal-overlay-bg: oklch(29.28% 0.006 179.28);
-    --color-text: oklch(0 0 0);
+    --color-body-bg: oklch(0.9761387842948419 0 none);
+    --color-body-bg-contrast: oklch(0 0 none);
+    --color-surface-level-1: oklch(0.999999993473546 0 none);
+    --color-surface-level-2: oklch(0.961151360371199 0 none);
+    --color-text: oklch(0.34845965208664015 0 none);
+    --color-modal-overlay-bg: oklch(
+        0.2928143429602204 0.005930584112051397 179.27885355118448
+    );
 
-    --color-primary-extra-light: oklch(84.75% 0.075 224.9);
-    --color-primary-light: oklch(78.22% 0.106 226.2);
-    --color-primary: oklch(70.33% 0.135 231.62);
-    --color-primary-dark: oklch(65.48% 0.128 232.07);
-    --color-primary-extra-dark: oklch(60.19% 0.117 231.67);
-    --color-primary-contrast: oklch(97.92% 0.01 219.59);
+    --color-primary-contrast: oklch(
+        0.9616725983076184 0.017428967377245995 257.55599175047604
+    );
+    --color-primary-extra-light: oklch(
+        0.7732938836745298 0.11056004195387698 257.6075498752157
+    );
+    --color-primary-light: oklch(
+        0.6933264582515163 0.1539645362696255 257.73836505336976
+    );
+    --color-primary: oklch(
+        0.6294090738475931 0.19004081609256498 258.29042409539835
+    );
+    --color-primary-dark: oklch(
+        0.5395435721241071 0.21631893655131343 260.0924879504833
+    );
+    --color-primary-extra-dark: oklch(
+        0.44586172794220386 0.17481228354294656 259.81435677905796
+    );
 
-    --color-success-extra-light: oklch(84.94% 0.078 160.9);
-    --color-success-light: oklch(79.31% 0.108 159.5);
-    --color-success: oklch(71.6% 0.147 156.23);
-    --color-success-dark: oklch(66.25% 0.135 156);
-    --color-success-extra-dark: oklch(60.78% 0.123 156.31);
-    --color-success-contrast: oklch(97.6% 0.013 159.92);
+    --color-success-contrast: oklch(
+        0.975908875122149 0.01999850381500076 143.6340507315686
+    );
+    --color-success-extra-light: oklch(
+        0.8566986625493912 0.12548753788116196 142.9225212140331
+    );
+    --color-success-light: oklch(
+        0.8157261844660273 0.16303472679158026 142.62086522620504
+    );
+    --color-success: oklch(
+        0.7745130240713127 0.19880594557088946 142.32941307690265
+    );
+    --color-success-dark: oklch(
+        0.7070975002137594 0.21253497638847124 142.1765385819106
+    );
+    --color-success-extra-dark: oklch(
+        0.5697865904944875 0.1687345782935452 142.1857237659929
+    );
 
-    --color-danger-extra-light: oklch(86.03% 0.04 12.11);
-    --color-danger-light: oklch(80.54% 0.057 14.31);
-    --color-danger: oklch(73.87% 0.08 15.19);
-    --color-danger-dark: oklch(68.75% 0.098 15.85);
-    --color-danger-extra-dark: oklch(62.58% 0.121 17.22);
-    --color-danger-contrast: oklch(98.22% 0.004 17.23);
+    --color-danger-contrast: oklch(
+        0.9480432387998161 0.022017608998527494 18.63244388180365
+    );
+    --color-danger-extra-light: oklch(
+        0.700526677002785 0.15471403575878953 22.76552165535717
+    );
+    --color-danger-light: oklch(
+        0.6242292640187389 0.20635015653050723 26.218585472583374
+    );
+    --color-danger: oklch(
+        0.5679788484183015 0.22075698205714822 28.509758312491687
+    );
+    --color-danger-dark: oklch(
+        0.4813789538802233 0.18532251426169685 28.35890660508392
+    );
+    --color-danger-extra-dark: oklch(
+        0.3966580944219981 0.15032315027701923 28.11260867913107
+    );
 
-    --color-subtle-extra-light: oklch(89.09% 0.002 247.84);
-    --color-subtle-light: oklch(78.79% 0.004 247.87);
-    --color-subtle: oklch(67.24% 0.005 258.33);
-    --color-subtle-dark: oklch(55.39% 0.006 247.93);
-    --color-subtle-extra-dark: oklch(43.38% 0.004 247.92);
-    --color-subtle-contrast: oklch(94.64% 0.001 286.37);
+    --color-subtle-contrast: oklch(0.9924098401205567 0 none);
+    --color-subtle-extra-light: oklch(0.946557528140201 0 none);
+    --color-subtle-light: oklch(0.9311504985576057 0 none);
+    --color-subtle: oklch(0.9125774398053257 0 none);
+    --color-subtle-dark: oklch(0.7732629065963612 0 none);
+    --color-subtle-extra-dark: oklch(0.6239111145008467 0 none);
 
     --btn-regular-bg: var(--color-body-bg-contrast);
     --btn-regular-bg-hover: color-mix(in srgb, var(--btn-regular-bg) 90%, white);

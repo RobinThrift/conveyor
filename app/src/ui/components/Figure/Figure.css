@@ -80,8 +80,10 @@
 
 .zoomed-img-close-btn {
     @apply absolute flex items-center justify-center;
-    @apply p-2 rounded-full bg-surface-level-1/50 text-xl cursor-pointer;
+    @apply p-2 rounded-full text-xl cursor-pointer;
+    @apply bg-surface-level-1/50 dark:bg-body-contrast/50;
     @apply hover:bg-surface-level-1 hover:text-primary;
+    @apply dark:hover:bg-body-contrast dark:hover:text-primary-dark;
     backdrop-filter: blur(4px);
     top: max(calc(var(--spacing) * 4), env(safe-area-inset-top, 0));
     right: max(calc(var(--spacing) * 4), env(safe-area-inset-right, 0));

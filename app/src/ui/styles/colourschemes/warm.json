@@ -4,9 +4,9 @@
         "body-bg-contrast": "#2b1b36",
         "surface-level-1": "#fcfbf8",
         "surface-level-2": "#f5f1f0",
-        "modal-overlay-bg": "#2b1b36",
+        "modal-overlay-bg": "#253c54",
         "text": "#2b1b36",
-        "primary": "#634e6e",
+        "primary": "#243c55",
         "success": "#8EAA57",
         "danger": "#dc252e",
         "subtle": "#e5dfdf"

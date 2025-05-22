@@ -23,7 +23,8 @@
 .settings-modal {
     @apply animate-in slide-in-from-bottom ease-linear duration-200;
     @apply xs:fade-in xs:slide-in-from-bottom-0;
-    @apply relative rounded-lg bg-surface-level-1 border border-subtle-extra-light shadow-lg xs:max-w-[95dvw] md:max-w-6xl w-full;
+    @apply relative rounded-lg bg-surface-level-1 border shadow-lg xs:max-w-[95dvw] md:max-w-6xl w-full;
+    @apply border-subtle-extra-light dark:border-subtle-extra-dark;
 
     height: 95svh;
 
@@ -69,12 +70,14 @@
 }
 
 .settings-tabs {
-    @apply flex flex-col xs:flex-row flex-1 border-t border-subtle-extra-light max-h-full overflow-hidden;
+    @apply flex flex-col xs:flex-row flex-1 border-t max-h-full overflow-hidden;
+    @apply border-subtle-extra-light dark:border-subtle-extra-dark;
 }
 
 .settings-tab-list {
     @apply w-fit p-2 flex items-center space-x-2 overflow-auto max-w-full xs:max-w-none;
-    @apply xs:border-r xs:border-subtle-extra-light xs:block xs:flex-col xs:space-y-2;
+    @apply xs:border-r xs:block xs:flex-col xs:space-y-2;
+    @apply border-subtle-extra-light dark:border-subtle-extra-dark;
 }
 
 .settings-tab-list-item {
@@ -126,7 +129,8 @@
 
     .checkbox-field {
         @apply flex justify-between items-center p-2 gap-2 rounded-lg shadow h-fit;
-        @apply bg-surface-level-1 text-text border w-full border-subtle-extra-light;
+        @apply bg-surface-level-1 text-text border w-full;
+        @apply border-subtle-extra-light dark:border-subtle-extra-dark;
 
         label {
             @apply flex-1;
@@ -187,7 +191,7 @@
 
     .api-token-expires-at,
     .api-token-created-at {
-        @apply text-sm text-subtle;
+        @apply text-sm text-subtle-dark;
         span:first-child {
             @apply me-1;
         }
