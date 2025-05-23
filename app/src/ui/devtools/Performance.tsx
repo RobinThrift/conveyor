@@ -79,24 +79,6 @@ function Entry({ perfEntry }: { perfEntry: PerformanceEntry; id: string }) {
         )
     }
 
-    if (perfEntry.entryType === "resource") {
-        let entry = perfEntry as PerformanceResourceTiming
-        return (
-            <Resource
-                name={entry.name}
-                duration={entry.duration}
-                startTime={entry.startTime}
-                initiatorType={entry.initiatorType}
-                renderBlockingStatus={
-                    "renderBlockingStatus" in entry
-                        ? (entry.renderBlockingStatus as string)
-                        : "unknown"
-                }
-                decodedBodySize={entry.decodedBodySize}
-            />
-        )
-    }
-
     if (perfEntry.entryType === "event") {
         let entry = perfEntry as PerformanceEventTiming
         return (
@@ -161,49 +143,6 @@ const Measurement = React.memo(function Measurment({
     )
 })
 
-const Resource = React.memo(function Resource({
-    name,
-    duration,
-    startTime,
-    initiatorType,
-    renderBlockingStatus,
-    decodedBodySize,
-}: {
-    name: string
-    duration: number
-    startTime: number
-    initiatorType: string
-    renderBlockingStatus: string
-    decodedBodySize: number
-}) {
-    return (
-        <AriaListBoxItem textValue={name} className="p-4">
-            <div className="flex items-center justify-between w-full text-subtle-light font-mono text-sm">
-                <span>
-                    <AriaText slot="label">
-                        {name.replace(window.location.href, "")}:{" "}
-                        {duration.toFixed(2)}ms
-                        {` - ${(decodedBodySize / 1000).toFixed(2)}kB`}
-                    </AriaText>
-                </span>
-
-                <time>
-                    [
-                    {formatter.format(
-                        performance.timeOrigin + startTime.valueOf(),
-                    )}
-                    ]
-                </time>
-            </div>
-
-            <div className="flex items-center justify-between w-full text-subtle-light font-mono text-sm">
-                <span>Initiator: {initiatorType}</span>
-                <span>[{renderBlockingStatus}]</span>
-            </div>
-        </AriaListBoxItem>
-    )
-})
-
 const PerfEvent = React.memo(function PerfEvent({
     name,
     duration,
@@ -257,7 +196,7 @@ const PerfEvent = React.memo(function PerfEvent({
     )
 })
 
-const Navigation = React.memo(function Resource({
+const Navigation = React.memo(function Navigation({
     name,
     duration,
     startTime,
@@ -348,17 +287,12 @@ if (import.meta.hot) {
     })
 }
 
-const _entryTypes = ["mark", "navigation", "event", "resource"]
+const _entryTypes = ["mark", "navigation", "event"]
 
 observer.observe({
     type: "event",
     durationThreshold: 16,
 } as PerformanceObserverInit)
-
-observer.observe({
-    type: "resource",
-    buffered: true,
-})
 
 observer.observe({
     type: "navigation",
