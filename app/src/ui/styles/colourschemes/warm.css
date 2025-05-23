@@ -313,7 +313,7 @@
 
 /* Fixes */
 .warm.dark {
-    .memo-list-header  {
+    .memo-list-header {
         color: var(--color-subtle) !important;
     }
 

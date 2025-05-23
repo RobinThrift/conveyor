@@ -60,23 +60,21 @@
         }
     }
 
-
-.memo-list-filter-search {
-    &.collapsible {
-        .input-field .input {
-            @apply rounded-full! text-surface-level-1 border-subtle-dark bg-surface-level-1;
-        }
-
-        &:has(*:focus) {
+    .memo-list-filter-search {
+        &.collapsible {
             .input-field .input {
-                @apply text-text;
+                @apply rounded-full! text-surface-level-1 border-subtle-dark bg-surface-level-1;
+            }
+
+            &:has(*:focus) {
+                .input-field .input {
+                    @apply text-text;
+                }
             }
         }
     }
-}
 
-
-.select-input {
-    @apply rounded-xl;
+    .select-input {
+        @apply rounded-xl;
     }
 }

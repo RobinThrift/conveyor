@@ -2,8 +2,8 @@ import clsx from "clsx"
 import React, { startTransition, useCallback } from "react"
 
 import type { Screens } from "@/control/NavigationController"
-import { useNavigation } from "@/ui/navigation"
 import type { ButtonProps } from "@/ui/components/Button"
+import { useNavigation } from "@/ui/navigation"
 
 export function Link<S extends keyof Screens>({
     screen,

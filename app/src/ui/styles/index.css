@@ -90,6 +90,7 @@
     display: none;
 }
 
-:root::view-transition-old(*), :root::view-transition-new(*) {
+:root::view-transition-old(*),
+:root::view-transition-new(*) {
     animation: none;
 }
