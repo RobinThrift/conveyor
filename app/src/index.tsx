@@ -31,6 +31,7 @@ main()
 const mountDevTools = __ENABLE_DEVTOOLS__
     ? async ({ rootStore }: { rootStore: RootStore }) => {
           let mountPoint = document.createElement("div")
+          mountPoint.id = "__CONVEYOR_DEVTOOLS__"
           document.body?.appendChild(mountPoint)
 
           let DevTools = React.lazy(() =>
