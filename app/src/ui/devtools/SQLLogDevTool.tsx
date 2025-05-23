@@ -278,7 +278,7 @@ function marksToEvent({
     start,
     end,
 }: { start: PerformanceMark; end: PerformanceMark }): SQLLogEvent | undefined {
-    let detail = start.detail as { sql?: string; args?: any[] }
+    let detail = (start.detail ?? {}) as { sql?: string; args?: any[] }
 
     if (detail.sql?.startsWith("BEGIN DEFERRED TRANSACTION")) {
         _currentTransaction = {
