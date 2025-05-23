@@ -320,4 +320,8 @@
     .memo-list-filter .date-picker .calendar-grid-header .calendar-grid-cell {
         color: var(--color-subtle-dark) !important;
     }
+
+    .state-filter .state-filter-item {
+        color: var(--color-text) !important;
+    }
 }
