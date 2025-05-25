@@ -20,11 +20,13 @@ export const toolbarPositionFix = ViewPlugin.fromClass(
                         visualViewportHeight - view.defaultLineHeight * 3
                     ) {
                         requestAnimationFrame(() => {
-                            document.documentElement.scrollTo(
-                                document.documentElement.scrollLeft,
-                                document.documentElement.scrollTop +
-                                    view.defaultLineHeight * 2,
-                            )
+                            document.documentElement.scrollTo({
+                                left: document.documentElement.scrollLeft,
+                                top:
+                                    document.documentElement.scrollTop +
+                                    view.defaultLineHeight * 4,
+                                behavior: "smooth",
+                            })
                         })
                     } else {
                         setTimeout(() => {
@@ -42,11 +44,13 @@ export const toolbarPositionFix = ViewPlugin.fromClass(
                                 visualViewportHeight -
                                     view.defaultLineHeight * 3
                             ) {
-                                document.documentElement.scrollTo(
-                                    document.documentElement.scrollLeft,
-                                    document.documentElement.scrollTop +
-                                        view.defaultLineHeight * 2,
-                                )
+                                document.documentElement.scrollTo({
+                                    left: document.documentElement.scrollLeft,
+                                    top:
+                                        document.documentElement.scrollTop +
+                                        view.defaultLineHeight * 4,
+                                    behavior: "smooth",
+                                })
                             }
                         }, 350)
                     }

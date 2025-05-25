@@ -69,7 +69,7 @@ export function useTextEditorState(opts: {
 
     let cmds = useMemo(
         () => ({
-            toggleBoldCmd: () => cmView.current && toggleBold(cmView.current),
+            toggleBold: () => cmView.current && toggleBold(cmView.current),
             toggleItalics: () =>
                 cmView.current && toggleItalics(cmView.current),
             toggleMonospace: () =>

@@ -60,7 +60,7 @@ export const Overview: Story = {
         })(),
     },
     render: (args) => (
-        <div className="tablet:container mx-auto h-screen tablet:p-8 tablet:max-w-[80rem]">
+        <div className="tablet:container mx-auto min-h-screen tablet:p-8 tablet:max-w-[80rem]">
             <Editor {...args} />
         </div>
     ),
@@ -95,7 +95,7 @@ export const Placeholder: Story = {
         })(),
     },
     render: (args) => (
-        <div className="tablet:container mx-auto h-screen tablet:p-8 tablet:max-w-[80rem]">
+        <div className="tablet:container mx-auto min-h-screen tablet:p-8 tablet:max-w-[80rem]">
             <Editor {...args} />
         </div>
     ),
@@ -131,7 +131,7 @@ export const WithContent: Story = {
         })(),
     },
     render: (args) => (
-        <div className="tablet:container mx-auto h-[100dvh] tablet:p-8 tablet:max-w-[80rem]">
+        <div className="tablet:container mx-auto min-h-[100dvh] tablet:p-8 tablet:max-w-[80rem]">
             <Editor {...args} />
         </div>
     ),

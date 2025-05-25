@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { useEffect, useRef } from "react"
+import React from "react"
 
 import type { AttachmentID } from "@/domain/Attachment"
 import type { MemoContentChanges } from "@/domain/Changelog"
@@ -11,6 +11,7 @@ import { ArrowLeftIcon, CheckIcon, XIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 
 import { TextEditor } from "./TextEditor"
+import { Toolbar } from "./Toolbar"
 import { useEditorState } from "./useEditorState"
 
 export interface EditorProps {
@@ -40,50 +41,6 @@ export function Editor(props: EditorProps) {
     let t = useT("components/Editor")
     let { confirmationDialog, onSave, onCancel, onChange, isChanged, content } =
         useEditorState(props)
-
-    let isScrolling = useRef<
-        ReturnType<typeof requestAnimationFrame> | undefined
-    >(undefined)
-
-    useEffect(() => {
-        document.documentElement.style.setProperty(
-            "--visualviewport-height",
-            `${window.visualViewport?.height}px`,
-        )
-
-        document.documentElement.style.setProperty(
-            "--visualviewport-offset-top",
-            `${window.visualViewport?.offsetTop}px`,
-        )
-
-        let onresize = () => {
-            document.documentElement.style.setProperty(
-                "--visualviewport-height",
-                `${Math.ceil(window.visualViewport?.height ?? 0)}px`,
-            )
-        }
-
-        let onscroll = () => {
-            if (isScrolling.current) {
-                cancelAnimationFrame(isScrolling.current)
-            }
-
-            isScrolling.current = requestAnimationFrame(() => {
-                document.documentElement.style.setProperty(
-                    "--visualviewport-offset-top",
-                    `${document.documentElement.scrollTop}px`,
-                )
-            })
-        }
-
-        window.visualViewport?.addEventListener("resize", onresize)
-        window.visualViewport?.addEventListener("scroll", onscroll)
-
-        return () => {
-            window.visualViewport?.removeEventListener("resize", onresize)
-            window.visualViewport?.removeEventListener("scrollend", onscroll)
-        }
-    }, [])
 
     return (
         <article className="@container memo is-editing">
@@ -140,7 +97,9 @@ export function Editor(props: EditorProps) {
                     onCancel={onCancel}
                     onSave={onSave}
                     transferAttachment={props.transferAttachment}
-                />
+                >
+                    {(cmds) => <Toolbar {...cmds} />}
+                </TextEditor>
 
                 <AlertDialog
                     open={confirmationDialog.isOpen}
@@ -172,48 +131,3 @@ export function Editor(props: EditorProps) {
         </article>
     )
 }
-
-// {
-//     "showing-placeholder": !showEditor,
-// },
-
-// <button
-//     onClick={() => startTransition(() => setShowEditor(true))}
-//     onFocus={() => startTransition(() => setShowEditor(true))}
-//     type="button"
-//     className="placeholder-btn"
-// >
-//     {props.placeholder}
-// </button>
-
-// useEffect(() => {
-//     document.documentElement.style.setProperty(
-//         "--vvp-h",
-//         `${window.visualViewport?.height}px`,
-//     )
-//
-//     let onresize = () => {
-//         console.log(
-//             "window.visualViewport.height",
-//             window.visualViewport?.height,
-//         )
-//         console.log("window.innerHeight", window.innerHeight)
-//         console.log(
-//             "document.documentElement.clientHeight",
-//             document.documentElement.clientHeight,
-//         )
-//         console.log(
-//             "document.body.clientHeight",
-//             document.body.clientHeight,
-//         )
-//         document.documentElement.style.setProperty(
-//             "--vvp-h",
-//             `${Math.ceil(window.visualViewport?.height ?? 0)}px`,
-//         )
-//     }
-//
-//     window.visualViewport?.addEventListener("resize", onresize)
-//
-//     return () =>
-//         window.visualViewport?.removeEventListener("resize", onresize)
-// })

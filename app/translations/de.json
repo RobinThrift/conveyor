@@ -71,7 +71,8 @@
     },
 
     "components/Editor/Toolbar": {
-        "TextFormatting": "Textformatierung",
+        "Label": "Editor Toolbar",
+        "GroupTextFormatting": "Textformatierung",
         "TextFormattingBold": "Fettgedruckt",
         "TextFormattingItalic": "Kursiv",
         "TextFormattingMonospace": "Monospace",

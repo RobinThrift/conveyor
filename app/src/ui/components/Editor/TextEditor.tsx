@@ -1,19 +1,12 @@
-import * as RadixToolbar from "@radix-ui/react-toolbar"
 import clsx from "clsx"
-import React, { useCallback } from "react"
+import React from "react"
 
 import type { AttachmentID } from "@/domain/Attachment"
 import type { Tag } from "@/domain/Tag"
-import {
-    CodeIcon,
-    LinkIcon,
-    TextBolderIcon,
-    TextItalicIcon,
-} from "@/ui/components/Icons"
-import { useT } from "@/ui/i18n"
 import type { ChangeSet } from "@codemirror/state"
 
 import { CodeMirror } from "./CodeMirror"
+import type { Commands } from "./Commands"
 import { useTextEditorState } from "./useTextEditorState"
 
 export interface TextEditorProps {
@@ -37,6 +30,8 @@ export interface TextEditorProps {
         filename: string
         content: ArrayBufferLike
     }): Promise<void>
+
+    children: (cmds: Commands) => React.ReactNode
 }
 
 export function TextEditor(props: TextEditorProps) {
@@ -57,67 +52,7 @@ export function TextEditor(props: TextEditorProps) {
                 placeholder={props.placeholder}
                 transferAttachment={props.transferAttachment}
             />
-            <EditorToolbar {...cmds} />
+            {props.children(cmds)}
         </>
-    )
-}
-
-function EditorToolbar({
-    toggleBoldCmd,
-    toggleItalics,
-    toggleMonospace,
-    insertLink,
-}: {
-    toggleBoldCmd: () => void
-    toggleItalics: () => void
-    toggleMonospace: () => void
-    insertLink: () => void
-}) {
-    let t = useT("components/Editor/Toolbar")
-
-    let onMouseDown = useCallback((e: React.MouseEvent) => {
-        e.preventDefault()
-    }, [])
-
-    return (
-        <RadixToolbar.Root className="text-editor-toolbar">
-            <div className="toolbar-btn-grp" aria-label={t.TextFormatting}>
-                <RadixToolbar.Button
-                    className="btn plain toolbar-btn"
-                    aria-label={t.TextFormattingBold}
-                    onClick={toggleBoldCmd}
-                    onMouseDown={onMouseDown}
-                >
-                    <TextBolderIcon />
-                </RadixToolbar.Button>
-
-                <RadixToolbar.Button
-                    className="btn plain toolbar-btn"
-                    aria-label={t.TextFormattingItalic}
-                    onClick={toggleItalics}
-                    onMouseDown={onMouseDown}
-                >
-                    <TextItalicIcon />
-                </RadixToolbar.Button>
-
-                <RadixToolbar.Button
-                    className="btn plain toolbar-btn"
-                    aria-label={t.TextFormattingMonospace}
-                    onClick={toggleMonospace}
-                    onMouseDown={onMouseDown}
-                >
-                    <CodeIcon />
-                </RadixToolbar.Button>
-
-                <RadixToolbar.Button
-                    className="btn plain toolbar-btn"
-                    aria-label={t.InsertLink}
-                    onClick={insertLink}
-                    onMouseDown={onMouseDown}
-                >
-                    <LinkIcon />
-                </RadixToolbar.Button>
-            </div>
-        </RadixToolbar.Root>
     )
 }

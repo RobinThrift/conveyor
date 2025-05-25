@@ -75,7 +75,8 @@ export const translations = {
     },
 
     "components/Editor/Toolbar": {
-        TextFormatting: "Text formatting",
+        Label: "Editor Toolbar",
+        GroupTextFormatting: "Text Formatting",
         TextFormattingBold: "Bold",
         TextFormattingItalic: "Italic",
         TextFormattingMonospace: "Monospace",
