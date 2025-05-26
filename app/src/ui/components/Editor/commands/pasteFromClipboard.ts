@@ -2,6 +2,7 @@ import { EditorSelection } from "@codemirror/state"
 import type { EditorView } from "@codemirror/view"
 
 import { newID } from "@/domain/ID"
+import { html2md } from "@/lib/html2md"
 import { extensionForMimeType } from "@/lib/mimeTypes"
 import { insertAttachment } from "./attachments"
 import { insertLink } from "./links"
@@ -35,6 +36,15 @@ export async function pasteFromClipboard(view: EditorView, items: PasteItem[]) {
         if (item.type === "uri") {
             insertLink(view, {
                 uri: item.data,
+                from: view.state.selection.main.from,
+                to: view.state.selection.main.to,
+            })
+            return
+        }
+
+        if (item.mime === "text/html") {
+            pastePlainText(view, {
+                text: html2md(await item.data().then((b) => b.text())),
                 from: view.state.selection.main.from,
                 to: view.state.selection.main.to,
             })
