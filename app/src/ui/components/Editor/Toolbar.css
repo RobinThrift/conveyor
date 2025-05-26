@@ -3,39 +3,52 @@
 }
 
 .editor-toolbar {
-    @apply bg-surface-level-1 p-2 flex gap-1 items-center rounded-t overflow-x-auto;
+    @apply bg-surface-level-1 flex gap-1 items-center rounded-t overflow-x-auto;
     @apply fixed left-0 right-0 h-[2lh] bottom-0;
     box-shadow: -1px -2px 4px -2px rgba(0 0 0 / 0.1);
 
     transform: translateY(var(--toolbar-offset, 0));
 
     .toolbar-btn-grp {
-        @apply flex items-center gap-3;
+        @apply flex items-center gap-1 p-1 h-full;
+    }
+
+    .toolbar-separator {
+        @apply bg-subtle;
+        height: 85%;
+        width: 0.1rem;
     }
 
     .toolbar-btn {
-        @apply px-1.5 py-1.5;
+        @apply px-1.5 py-1.5 h-full;
 
         &[data-state="on"] {
             background-color: var(--btn-bg-active);
         }
     }
 
-    @media (width > 768px) {
-        @apply top-0 w-fit left-1/2 justify-center -translate-x-1/2 shadow-none;
+    .dropdown-menu-btn {
+        @apply px-1.5 py-1.5 h-full;
+        min-height: auto;
     }
 
-    @media (min-width: 1024px) {
-        @apply top-2 absolute;
-    }
-
-    @media (min-width: 2100px) {
-        @apply top-4;
+    @media (min-width: 768px) {
+        @apply sticky top-3 bottom-auto w-fit rounded-lg border border-subtle;
+        height: 1.5lh;
+        order: 1;
+        margin-bottom: -1.25lh;
+        box-shadow: 1px 2px 4px -2px rgba(0 0 0 / 0.1);
+        left: 50%;
+        transform: translateX(-50%);
     }
 }
 
 .cm-editor.cm-focused {
     animation: hacky_safari_scroll_on_input_fix 0.01s;
+    @media (min-width: 768px) {
+        /* tablet */
+        animation: none;
+    }
 }
 
 @keyframes hacky_safari_scroll_on_input_fix {

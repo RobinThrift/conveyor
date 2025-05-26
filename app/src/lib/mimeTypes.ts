@@ -87,3 +87,12 @@ export function mimeTypeForFilename(filename: string): string {
         "application/octet-stream"
     )
 }
+
+export function extensionForMimeType(mime: string): string {
+    for (let [ext, candidate] of Object.entries(mimeTypesByExtension)) {
+        if (candidate === mime) {
+            return ext
+        }
+    }
+    return ".bin"
+}

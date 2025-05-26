@@ -51,6 +51,7 @@ export function DropdownMenuItems(props: DropdownMenuItemsProps) {
                     props.size,
                     props.className,
                 )}
+                selectionMode="none"
             >
                 {props.children}
             </AriaMenu>

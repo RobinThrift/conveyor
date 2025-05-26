@@ -3,6 +3,22 @@
 .editor {
     @apply flex flex-col bg-surface-level-1;
     @apply dark:border-subtle-extra-dark;
+
+    @media (min-width: 768px) {
+        position: relative;
+
+        .editor-toolbar {
+            order: 1;
+        }
+
+        .editor-buttons {
+            order: 2;
+        }
+
+        .text-editor {
+            order: 3;
+        }
+    }
 }
 
 .placeholder-btn {

@@ -26,6 +26,7 @@ import {
 import type { AttachmentID } from "@/domain/Attachment"
 import type { Tag } from "@/domain/Tag"
 
+import { attachments } from "./attachments"
 import { fileDropHandler } from "./fileDropHandler"
 import { tagAutoComplete } from "./tagAutoComplete"
 import { theme } from "./theme"
@@ -68,7 +69,8 @@ export const extensions = ({
         history(),
         theme,
         EditorView.lineWrapping,
-        fileDropHandler({ transferAttachment }),
+        attachments({ transferAttachment }),
+        fileDropHandler(),
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         toolbarPositionFix,
     ]

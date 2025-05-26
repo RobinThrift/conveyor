@@ -1,13 +1,13 @@
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import * as ThumbHash from "./thumbhash"
 
-export async function thumbhashFromFile(file: File): Promise<string> {
+export async function thumbhashFromFile(data: File | Blob): Promise<string> {
     let { promise, resolve, reject } = Promise.withResolvers()
 
     let img = new Image()
     img.onload = resolve
     img.onerror = (err) => reject(err)
-    img.src = URL.createObjectURL(file)
+    img.src = URL.createObjectURL(data)
 
     await promise
 

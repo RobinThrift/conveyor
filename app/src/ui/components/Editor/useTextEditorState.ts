@@ -5,12 +5,16 @@ import { useCallback, useEffect, useMemo, useRef } from "react"
 import type { Tag } from "@/domain/Tag"
 import * as eventbus from "@/ui/eventbus"
 
+import type { ToolbarCommands } from "./TextEditor"
 import {
-    insertLink,
+    type PasteItem,
+    copyToClipboard,
+    pasteFromClipboard,
     toggleBold,
     toggleItalics,
     toggleMonospace,
-} from "./textEditorCommands"
+    wrapAsLink,
+} from "./commands"
 
 export function useTextEditorState(opts: {
     id: string
@@ -68,20 +72,37 @@ export function useTextEditorState(opts: {
     )
 
     let cmds = useMemo(
-        () => ({
-            toggleBold: () => cmView.current && toggleBold(cmView.current),
-            toggleItalics: () =>
-                cmView.current && toggleItalics(cmView.current),
-            toggleMonospace: () =>
-                cmView.current && toggleMonospace(cmView.current),
-            insertLink: () => {
-                if (!cmView.current) {
-                    return
-                }
-                insertLink(cmView.current)
-                cmView.current.focus()
-            },
-        }),
+        () =>
+            ({
+                toggleBold: () => cmView.current && toggleBold(cmView.current),
+                toggleItalics: () =>
+                    cmView.current && toggleItalics(cmView.current),
+                toggleMonospace: () =>
+                    cmView.current && toggleMonospace(cmView.current),
+                insertLink: () => {
+                    if (!cmView.current) {
+                        return
+                    }
+                    wrapAsLink(cmView.current)
+                    cmView.current.focus()
+                },
+                copyToClipboard: () => {
+                    if (!cmView.current) {
+                        return
+                    }
+
+                    copyToClipboard(cmView.current)
+                    cmView.current.focus()
+                },
+                pasteFromClipboard: (items: PasteItem[]) => {
+                    if (!cmView.current) {
+                        return
+                    }
+
+                    pasteFromClipboard(cmView.current, items)
+                    cmView.current.focus()
+                },
+            }) satisfies ToolbarCommands,
         [],
     )
 

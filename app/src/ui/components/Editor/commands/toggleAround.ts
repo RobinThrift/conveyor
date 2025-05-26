@@ -1,31 +1,6 @@
 import { EditorSelection } from "@codemirror/state"
 import type { EditorView } from "@codemirror/view"
 
-export const toggleBold = toggleAround("*")
-
-export const toggleItalics = toggleAround("_")
-
-export const toggleMonospace = toggleAround("`")
-
-export function insertLink(view: EditorView) {
-    let from = view.state.selection.main.from
-    let to = view.state.selection.main.to
-
-    if (from === to) {
-        let word = view.state.wordAt(from)
-        from = word?.from ?? from
-        to = word?.to ?? to
-    }
-
-    view.dispatch({
-        changes: [
-            { from: from, insert: "[" },
-            { from: to, insert: "]()" },
-        ],
-        selection: EditorSelection.cursor(to + 3),
-    })
-}
-
 export function toggleAround(char: string) {
     return (view: EditorView) => {
         view.dispatch(

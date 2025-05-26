@@ -6,8 +6,18 @@ import type { Tag } from "@/domain/Tag"
 import type { ChangeSet } from "@codemirror/state"
 
 import { CodeMirror } from "./CodeMirror"
-import type { Commands } from "./Commands"
+import type { PasteItem } from "./commands"
 import { useTextEditorState } from "./useTextEditorState"
+
+export type ToolbarCommands = {
+    toggleBold: () => void
+    toggleItalics: () => void
+    toggleMonospace: () => void
+    insertLink: () => void
+
+    copyToClipboard: () => void
+    pasteFromClipboard: (items: PasteItem[]) => void
+}
 
 export interface TextEditorProps {
     id: string
@@ -31,7 +41,7 @@ export interface TextEditorProps {
         content: ArrayBufferLike
     }): Promise<void>
 
-    children: (cmds: Commands) => React.ReactNode
+    children: (cmds: ToolbarCommands) => React.ReactNode
 }
 
 export function TextEditor(props: TextEditorProps) {
