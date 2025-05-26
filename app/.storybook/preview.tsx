@@ -92,7 +92,6 @@ const preview: Preview = {
 
     decorators: [
         (Story, { globals: { themeMode, themeColours, language, region } }) => {
-            console.log("language", language)
             if (!document.getElementById("__conveyor_ui_data__")) {
                 let uiElement = document.createElement("script")
                 uiElement.type = "belt_ui/data"
