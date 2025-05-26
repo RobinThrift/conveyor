@@ -4,6 +4,7 @@ import type { EditorView } from "@codemirror/view"
 import { newID } from "@/domain/ID"
 import { html2md } from "@/lib/html2md"
 import { extensionForMimeType } from "@/lib/mimeTypes"
+import { fromThrowing } from "@/lib/result"
 import { insertAttachment } from "./attachments"
 import { insertLink } from "./links"
 
@@ -25,6 +26,16 @@ export type PasteItem =
 export async function pasteFromClipboard(view: EditorView, items: PasteItem[]) {
     for (let item of items) {
         if (item.type === "text") {
+            let url = fromThrowing(() => new URL(item.data))
+            if (url.ok) {
+                insertLink(view, {
+                    uri: item.data,
+                    from: view.state.selection.main.from,
+                    to: view.state.selection.main.to,
+                })
+                return
+            }
+
             pastePlainText(view, {
                 text: item.data,
                 from: view.state.selection.main.from,

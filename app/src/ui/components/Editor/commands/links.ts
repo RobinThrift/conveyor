@@ -1,17 +1,14 @@
 import { EditorSelection } from "@codemirror/state"
 import type { EditorView } from "@codemirror/view"
 
+import { fetchOpenGraphData } from "@/lib/opengraph"
 import { fromThrowing } from "@/lib/result"
 
-export function insertLink(
+export async function insertLink(
     view: EditorView,
     { from, to, uri }: { from: number; to: number; uri: string },
 ) {
-    let link = `[Link](${uri})`
-    let url = fromThrowing(() => new URL(uri))
-    if (url.ok) {
-        link = `[${url.value.host}${url.value.pathname}](${uri})`
-    }
+    let link = await constructLink(uri)
 
     view.dispatch({
         changes: {
@@ -43,4 +40,22 @@ export function wrapAsLink(view: EditorView) {
         ],
         selection: EditorSelection.cursor(to + 3),
     })
+}
+
+async function constructLink(uri: string) {
+    let url = fromThrowing(() => new URL(uri))
+    if (!url.ok) {
+        return `[Link](${uri})`
+    }
+
+    let ogd = await fetchOpenGraphData(url.value)
+    if (!ogd.ok || !ogd.value) {
+        return `[${url.value.host}${url.value.pathname}](${uri})`
+    }
+
+    if (ogd.value?.imageURL) {
+        return `::link-preview[${uri}]{title="${ogd.value.title}" description="${ogd.value.description}" img="${ogd.value.imageURL}"}`
+    }
+
+    return `[${ogd.value?.title}](${uri})`
 }
