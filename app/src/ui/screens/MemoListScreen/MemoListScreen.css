@@ -23,15 +23,16 @@
         min-height: 100px;
     }
 
-    .text-editor-toolbar {
-        @apply p-0 top-1 -mt-8 h-8 w-full justify-end bg-transparent overflow-hidden;
-        order: 0;
+    .editor-toolbar {
+        @apply right-2 top-2 absolute;
+        left: initial;
+        transform: none;
+        opacity: 0;
+        transition: opacity 200ms;
+    }
 
-        .toolbar-btn-grp {
-            @apply bg-surface-level-1 rounded-t-lg px-2 mr-2;
-            transition: transform 150ms;
-            transform: translate(0, 100%);
-        }
+    .text-editor {
+        height: 100%;
     }
 
     &:focus-within,
@@ -40,19 +41,27 @@
             @apply opacity-100;
         }
 
-        .toolbar-btn-grp {
-            transform: translate(0, 0);
+        .editor-toolbar {
+            opacity: 1;
         }
+    }
+
+    .editor-toolbar {
+        order: 1;
+        z-index: 100;
     }
 
     .editor-buttons {
         @apply opacity-0 p-0;
+        position: absolute;
+        bottom: 0;
+        right: 0;
         transition: opacity 150ms;
-        order: 2;
+        order: 3;
     }
 
     .text-editor {
-        order: 1;
+        order: 2;
     }
 }
 

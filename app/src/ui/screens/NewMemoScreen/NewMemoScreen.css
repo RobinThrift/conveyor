@@ -1,10 +1,6 @@
 .new-memo-screen {
     @apply container mx-auto max-w-[80rem] h-full w-full tablet:p-4 relative;
 
-    .text-editor-toolbar {
-        @apply tablet:top-4;
-    }
-
     .memo {
         @apply p-0!;
     }

@@ -17,7 +17,7 @@ const meta: Meta<typeof MainScreen> = {
     decorators: [
         decoratorWithMockData,
         (Story) => (
-            <main className="main pt-0 mx-auto">
+            <main className="main pt-2 mx-auto">
                 <Story />
             </main>
         ),
