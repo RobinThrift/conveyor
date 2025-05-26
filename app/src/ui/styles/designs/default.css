@@ -35,11 +35,8 @@
         @apply border-subtle dark:border-subtle-extra-dark;
 
         .show-more-btn {
-            background: linear-gradient(
-                180deg,
-                color-mix(in srgb, var(--surface-level-1) 0%, transparent),
-                color-mix(in srgb, var(--surface-level-1) 100%, transparent) 80%
-            );
+            @apply backdrop-blur-sm;
+            mask-image: linear-gradient(to bottom, transparent -10%, black 80%);
         }
     }
 
