@@ -13,6 +13,7 @@ export function NewMemoScreen() {
         createMemo,
         cancelNew,
         transferAttachment,
+        settings,
     } = useNewMemoScreenState()
 
     return (
@@ -21,6 +22,7 @@ export function NewMemoScreen() {
                 memo={newMemo}
                 tags={tags}
                 autoFocus={true}
+                vimModeEnabled={settings.vimModeEnabled}
                 placeholder="Belt out a Memo..."
                 onSave={createMemo}
                 onCancel={cancelNew}

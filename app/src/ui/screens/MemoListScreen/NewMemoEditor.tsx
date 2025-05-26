@@ -12,7 +12,7 @@ export interface NewMemoEditorProps {
 }
 
 export function NewMemoEditor(props: NewMemoEditorProps) {
-    let { createMemo, newMemo, transferAttachment, tags } =
+    let { createMemo, newMemo, transferAttachment, tags, settings } =
         useNewMemoEditorState()
 
     return (
@@ -22,6 +22,7 @@ export function NewMemoEditor(props: NewMemoEditorProps) {
                     memo={newMemo}
                     tags={tags}
                     placeholder="Belt out a memo..."
+                    vimModeEnabled={settings.vimModeEnabled}
                     onSave={createMemo}
                     transferAttachment={transferAttachment}
                 />

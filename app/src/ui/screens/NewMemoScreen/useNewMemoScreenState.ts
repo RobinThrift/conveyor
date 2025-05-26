@@ -1,3 +1,4 @@
+import { createSelector } from "@reduxjs/toolkit"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -8,6 +9,11 @@ import { type CreateMemoRequest, actions, selectors } from "@/ui/state"
 
 export type { CreateMemoRequest } from "@/ui/state/actions"
 
+const settingsSelector = createSelector(
+    [(state) => selectors.settings.value(state, "controls.vim")],
+    (vimModeEnabled) => ({ vimModeEnabled }),
+)
+
 export function useNewMemoScreenState() {
     let transferAttachment = useAttachmentTransferer()
 
@@ -17,6 +23,8 @@ export function useNewMemoScreenState() {
 
     let dispatch = useDispatch()
     let nav = useNavigation()
+
+    let settings = useSelector(settingsSelector)
 
     let [startedRequest, setStartedRequest] = useState(false)
 
@@ -67,6 +75,7 @@ export function useNewMemoScreenState() {
         isLoading,
         error,
         newMemo,
+        settings,
         createMemo,
         cancelNew,
         transferAttachment,

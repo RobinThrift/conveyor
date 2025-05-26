@@ -1,3 +1,4 @@
+import { createSelector } from "@reduxjs/toolkit"
 import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -8,6 +9,11 @@ import type { CreateMemoRequest } from "@/ui/state/actions"
 
 export type { CreateMemoRequest } from "@/ui/state/actions"
 
+const settingsSelector = createSelector(
+    [(state) => selectors.settings.value(state, "controls.vim")],
+    (vimModeEnabled) => ({ vimModeEnabled }),
+)
+
 export function useNewMemoEditorState() {
     let dispatch = useDispatch()
 
@@ -15,6 +21,8 @@ export function useNewMemoEditorState() {
 
     let isCreatingMemo = useSelector(selectors.memos.isCreatingMemo)
     let tags = useSelector(selectors.tags.tags)
+
+    let settings = useSelector(settingsSelector)
 
     let createMemo = useCallback(
         (memo: CreateMemoRequest) => {
@@ -56,6 +64,7 @@ export function useNewMemoEditorState() {
         tags,
         createMemo,
         newMemo,
+        settings,
         transferAttachment,
     }
 }
