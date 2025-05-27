@@ -51,6 +51,7 @@ export function SettingsScreen() {
             isKeyboardDismissDisabled={false}
         >
             <AriaModal className="settings-modal" ref={animRef}>
+                <div className="sync-indicator" aria-hidden />
                 <AriaDialog className="settings-dialog">
                     <SettingsScreenContent close={close} />
                 </AriaDialog>

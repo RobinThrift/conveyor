@@ -33,6 +33,7 @@ import {
     type SetupArgs,
     useSyncSettingsTabState,
 } from "./useSyncSettingsTabState"
+import clsx from "clsx"
 
 export function SyncSettingsTab() {
     let t = useT("screens/Settings/SyncSettings")
@@ -171,7 +172,11 @@ function SectionSyncInfo({
     let t = useT("screens/Settings/SyncSettings/Info")
 
     return (
-        <div className="settings-section space-y-4">
+        <div
+            className={clsx("settings-section space-y-4", {
+                "is-syncing": isLoading,
+            })}
+        >
             {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-surface-level-1/50 z-10">
                     <Loader />
