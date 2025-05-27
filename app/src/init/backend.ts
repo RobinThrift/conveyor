@@ -3,7 +3,7 @@ import { newID } from "@/domain/ID"
 import type { AsyncResult, Result } from "@/lib/result"
 import { getThreadName } from "@/lib/thread"
 import { instrument } from "@/ui/devtools/ReduxDevTools"
-import type { RootStore } from "@/ui/state"
+import { actions, type RootStore } from "@/ui/state"
 import { connectoToWorkerStore } from "@/ui/state/worker"
 
 declare const __ENABLE_DEVTOOLS__: boolean
@@ -35,11 +35,21 @@ export async function initBackend() {
 
     let attachmentLoader = attachmentLoaderFromWorker(worker)
 
+    handleSyncEventTriggers(rootStore)
+
     return {
         rootStore,
         onNavigationEvent,
         attachmentLoader,
     }
+}
+
+function handleSyncEventTriggers(rootStore: RootStore) {
+    document.addEventListener("visibilitychange", () => {
+        if (navigator.onLine) {
+            rootStore.dispatch(actions.sync.syncStart())
+        }
+    })
 }
 
 function bufferNavigationEvents(worker: Worker) {
