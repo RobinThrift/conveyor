@@ -34,7 +34,7 @@
 
     &[data-exiting] {
         @apply animate-out slide-out-to-bottom ease-linear duration-200;
-        @apply xs:fade-out;
+        @apply xs:fade-out xs:slide-out-to-bottom-0;
     }
 }
 
