@@ -39,9 +39,9 @@
 }
 
 @property --sync-indicator-angle {
-	syntax: '<angle>';
-	initial-value: 0deg;
-	inherits: false
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
 }
 
 .sync-indicator {
@@ -53,10 +53,9 @@
     right: -1px;
     bottom: -1px;
 
-
     &::before {
         --sync-indicator-angle: 0deg;
-        content: '';
+        content: "";
         display: block;
         position: absolute;
         left: calc(var(--spacing) * -1);
@@ -64,17 +63,18 @@
         right: calc(var(--spacing) * -1);
         bottom: calc(var(--spacing) * -1);
         background: repeating-conic-gradient(
-            from var(--sync-indicator-angle),
-            transparent 0% 40%,
-            var(--color-primary-dark) 50%,
-            transparent 60%
-        ) border-box;
+                from var(--sync-indicator-angle),
+                transparent 0% 40%,
+                var(--color-primary-dark) 50%,
+                transparent 60%
+            )
+            border-box;
         animation: sync-rotate-border 5s linear infinite;
     }
 
     &::after {
         @apply rounded-lg bg-surface-level-1;
-        content: '';
+        content: "";
         display: block;
         position: absolute;
         left: var(--spacing);
@@ -85,19 +85,19 @@
 }
 
 .settings-modal:has(.is-syncing) {
-     .sync-indicator {
+    .sync-indicator {
         display: block;
     }
 }
 
 @keyframes sync-rotate-border {
-  from {
-    --sync-indicator-angle: 0deg;
-  }
+    from {
+        --sync-indicator-angle: 0deg;
+    }
 
-  to {
-    --sync-indicator-angle: 360deg;
-  }
+    to {
+        --sync-indicator-angle: 360deg;
+    }
 }
 
 .settings-modal-drag-handle {
