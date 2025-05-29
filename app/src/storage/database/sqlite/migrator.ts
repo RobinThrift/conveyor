@@ -129,7 +129,6 @@ async function migrateDBEncryptionToV1(
                 rootDir.removeEntry(`${originalFile}.bk`),
             ])
         } catch {
-            console.log("ignore")
             // ignore
         }
 
