@@ -20,10 +20,10 @@ export function SingleMemoScreen(props: SingleMemoScreenProps) {
     let [doubleClickToEdit] = useSetting("controls.doubleClickToEdit")
     let nav = useNavigation()
 
-    let { memo, isLoading, memoActions } = useSingleMemoScreenState()
+    let { ref, memo, isLoading, memoActions } = useSingleMemoScreenState()
 
     return (
-        <div className={clsx("single-memo-screen", props.className)}>
+        <div className={clsx("single-memo-screen", props.className)} ref={ref}>
             {isLoading && (
                 <div className="memo animate-in slide-in-from-bottom fade-in">
                     <div className="flex justify-center items-center min-h-[200px]">

@@ -30,6 +30,11 @@
         @apply flex-1;
         order: 2;
 
+        @media (max-width: 1023px) {
+            position: relative;
+            z-index: 20;
+        }
+
         @media (min-width: 1440px) {
             order: 1;
         }
@@ -83,23 +88,37 @@
 
 .main-screen.has-subscreen {
     .memo-list-screen {
-        display: none;
-        @media (min-width: 1024px) {
-            display: contents;
-        }
+        display: contents;
 
         .memo-list-filter {
             order: 3;
         }
 
+        .new-memo-editor-fab {
+            display: none;
+        }
+
         .memo-list-container {
             @apply flex-1;
             order: 2;
-            max-width: var(--sidebar-width);
-            height: var(--sidebar-height);
+            position: relative;
             overflow: auto;
-            position: sticky;
-            top: env(safe-area-inset-top, 0);
+
+            @media (max-width: 1023px) {
+                z-index: 10;
+                animation: mobile-parallax-memo-list-scroll 1.01s linear;
+                animation-play-state: paused;
+                animation-delay: calc(var(--memo-scroll-progress, 1) * -1.01s);
+                animation-fill-mode: forwards;
+            }
+
+            @media (min-width: 1024px) {
+                position: sticky;
+                top: env(safe-area-inset-top, 0);
+                max-width: var(--sidebar-width);
+                height: var(--sidebar-height);
+            }
+
             @media (min-width: 1680px) {
                 order: 1;
                 position: fixed;
@@ -120,7 +139,7 @@
             @media (min-width: 1024px) {
                 .memo-list-day-group:nth-of-type(2) {
                     .memo-list-day {
-                        margin-top: var(--appbar-height);
+                        margin-top: var(--appheader-height);
                     }
                 }
             }
@@ -168,7 +187,17 @@
 .main-screen.has-subscreen {
     .single-memo-screen {
         @media (min-width: 1024px) {
-            margin-top: calc(-1 * var(--appbar-height));
+            margin-top: calc(-1 * var(--appheader-height));
         }
+    }
+}
+
+@keyframes mobile-parallax-memo-list-scroll {
+    0% {
+        transform: translateY(-30dvh);
+    }
+
+    100% {
+        transform: translateY(4dvh);
     }
 }

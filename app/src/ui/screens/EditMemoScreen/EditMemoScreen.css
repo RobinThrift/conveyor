@@ -1,7 +1,26 @@
 .edit-memo-screen {
-    @apply container mx-auto max-w-[80rem] h-full w-full tablet:p-4 relative;
+    @apply container mx-auto max-w-[80rem] h-full w-full p-2 lg:p-4 relative;
+    min-height: 100dvh;
+
+    .memo {
+        @apply shadow-md;
+        min-height: calc(
+            100dvh -
+            (env(safe-area-inset-bottom, 0) + var(--spacing) * 4) -
+            2lh
+        );
+
+        @media (max-width: 768px) {
+            @apply rounded-none border-0 border-b;
+        }
+    }
 
     .memo .editor {
-        min-height: 100dvh;
+        min-height: 100%;
+    }
+
+    &.is-subscreen {
+        @apply p-0;
+        margin-top: calc(var(--appheader-height) * -1 + var(--spacing) * 2);
     }
 }

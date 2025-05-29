@@ -5,6 +5,7 @@ import { EndOfListMarker } from "@/ui/components/EndOfListMarker"
 import { Loader } from "@/ui/components/Loader"
 import { Memo } from "@/ui/components/Memo"
 
+import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { DayHeader } from "./DayHeader"
 import { LayoutSelect } from "./LayoutSelect"
 import { ReloadButton } from "./ReloadButton"
@@ -56,15 +57,21 @@ export function MemoList(props: MemoListProps) {
         [memos, layout, doubleClickToEdit, memoActions],
     )
 
+    let isMobile = useIsMobile()
+
     // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional
     useEffect(() => {
-        if (!ref.current || !focusedMemoID) {
+        if (!ref.current || !focusedMemoID || isMobile) {
             return
         }
 
         let el = ref.current.querySelector(`#memo-${focusedMemoID}`)
         el?.scrollIntoView({ behavior: "instant", block: "start" })
-    }, [ref.current?.querySelector(`#memo-${focusedMemoID}`), focusedMemoID])
+    }, [
+        ref.current?.querySelector(`#memo-${focusedMemoID}`),
+        focusedMemoID,
+        isMobile,
+    ])
 
     return (
         <div

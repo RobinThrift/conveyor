@@ -1,5 +1,5 @@
 :root {
-    --appbar-height: calc(var(--spacing) * 15);
+    --appheader-height: calc(var(--spacing) * 15);
 }
 
 .appheader {
@@ -8,7 +8,7 @@
     padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
 
     -webkit-app-region: drag;
-    min-height: max(env(titlebar-area-height), var(--appbar-height));
+    min-height: max(env(titlebar-area-height), var(--appheader-height));
     width: env(titlebar-area-width, 100%);
 }
 
