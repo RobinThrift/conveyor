@@ -50,7 +50,7 @@ export async function insertAttachment(
     view.dispatch({
         effects: [
             startTransferEffect.of({
-                id: newID(),
+                id,
                 filename,
                 mime,
                 data,
