@@ -91,6 +91,7 @@
         .calendar-grid-body {
             @apply w-full flex flex-row flex-nowrap justify-start items-center w-full overflow-x-auto overscroll-none;
             scroll-snap-type: x mandatory;
+            scrollbar-width: thin;
 
             tr {
                 @apply grid grid-cols-7;
