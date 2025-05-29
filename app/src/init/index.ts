@@ -3,6 +3,7 @@ import {
     type Params,
     type Restore,
     type Screens,
+    type Stacks,
 } from "@/control/NavigationController"
 import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
 import type { RemoteNavigationPushMessage } from "@/lib/navigation"
@@ -17,6 +18,7 @@ export async function init() {
         rootStore,
         navigationBackend: new HistoryNavigationBackend<
             Screens,
+            Stacks,
             Params,
             Restore
         >({
@@ -27,7 +29,11 @@ export async function init() {
     })
 
     onNavigationEvent(
-        (evt: MessageEvent<RemoteNavigationPushMessage<Screens, Restore>>) => {
+        (
+            evt: MessageEvent<
+                RemoteNavigationPushMessage<Screens, Stacks, Restore>
+            >,
+        ) => {
             let msg = evt.data
             if (msg?.type === "navigation:push") {
                 evt.stopImmediatePropagation()

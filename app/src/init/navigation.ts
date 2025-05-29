@@ -2,6 +2,7 @@ import {
     NavigationController,
     type Restore,
     type Screens,
+    type Stacks,
 } from "@/control/NavigationController"
 import type { NavigationBackend } from "@/lib/navigation"
 import { type RootStore, actions } from "@/ui/state"
@@ -11,7 +12,7 @@ export function initNavigation({
     navigationBackend,
 }: {
     rootStore: RootStore
-    navigationBackend: NavigationBackend<Screens, Restore>
+    navigationBackend: NavigationBackend<Screens, Stacks, Restore>
 }) {
     let navCtrl = new NavigationController({
         backend: navigationBackend,
@@ -43,7 +44,11 @@ export function initNavigation({
                 : "initial",
         )
         requestAnimationFrame(() => {
-            window.scrollTo(0, Math.ceil(current.restore.scrollOffsetTop ?? 0))
+            window.scrollTo({
+                left: 0,
+                top: Math.ceil(current.restore.scrollOffsetTop ?? 0),
+                behavior: "instant",
+            })
         })
     })
 
@@ -63,7 +68,11 @@ export function initNavigation({
                 : "initial",
         )
         requestAnimationFrame(() => {
-            window.scrollTo(0, Math.ceil(current.restore.scrollOffsetTop ?? 0))
+            window.scrollTo({
+                left: 0,
+                top: Math.ceil(current.restore.scrollOffsetTop ?? 0),
+                behavior: "instant",
+            })
         })
     })
 

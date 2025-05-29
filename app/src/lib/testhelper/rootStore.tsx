@@ -9,6 +9,7 @@ import {
     type Params,
     type Restore,
     type Screens,
+    type Stacks,
 } from "@/control/NavigationController"
 import { SettingsController } from "@/control/SettingsController"
 import type { SyncInfo } from "@/domain/SyncInfo"
@@ -159,7 +160,12 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         })
 
         let navCtrl = new NavigationController({
-            backend: new HistoryNavigationBackend<Screens, Params, Restore>({
+            backend: new HistoryNavigationBackend<
+                Screens,
+                Stacks,
+                Params,
+                Restore
+            >({
                 fromURLParams: NavigationController.fromURLParams,
                 toURLParams: NavigationController.toURLParams,
                 screenToURLMapping: NavigationController.screenToURLMapping,

@@ -1,11 +1,16 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 
-import type { Params, Restore, Screens } from "@/control/NavigationController"
+import type {
+    Params,
+    Restore,
+    Screens,
+    Stacks,
+} from "@/control/NavigationController"
 import type { NavgationState } from "@/lib/navigation"
 
 interface NavigationSlice {
-    current: NavgationState<Screens, keyof Screens, Restore>
-    prev?: NavgationState<Screens, keyof Screens, Restore>
+    current: NavgationState<Screens, Stacks, Restore>
+    prev?: NavgationState<Screens, Stacks, Restore>
 }
 
 const initialState: NavigationSlice = {
@@ -14,7 +19,7 @@ const initialState: NavigationSlice = {
             name: "root",
             params: {},
         },
-        stack: 0,
+        stack: "default",
         index: 0,
         restore: {
             scrollOffsetTop: 0,
@@ -34,7 +39,7 @@ export const slice = createSlice({
                 name: keyof Screens
                 params: Params
                 restore: Partial<Restore>
-                stack?: number
+                stack?: Stacks
                 index?: number
             }>,
         ) => {
@@ -54,7 +59,7 @@ export const slice = createSlice({
                 name: keyof Screens
                 params: Params
                 restore: Partial<Restore>
-                stack?: number
+                stack?: Stacks
                 index?: number
             }>,
         ) => {

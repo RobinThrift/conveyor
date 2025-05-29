@@ -6,6 +6,7 @@ import type {
     Params,
     Restore,
     Screens,
+    Stacks,
 } from "@/control/NavigationController"
 import { selectors } from "@/ui/state"
 import { createSelector } from "@reduxjs/toolkit"
@@ -19,10 +20,10 @@ export function useNavigation(): {
         name: keyof Screens,
         params: Params,
         restore: Restore,
-        onNewStack?: boolean,
+        stack?: Stacks,
     ) => void
     pop: () => void
-    popStack: () => void
+    popStack: () => Promise<void>
     updateParams: (params: Partial<Params>) => void
 } {
     let navCtrl = useContext(navContext)
@@ -32,14 +33,17 @@ export function useNavigation(): {
                 name: keyof Screens,
                 params: Params,
                 restore: Restore,
-                onNewStack?: boolean,
+                stack?: Stacks,
             ) => {
-                navCtrl?.push({ screen: { name, params }, restore }, onNewStack)
+                navCtrl?.push({ screen: { name, params }, stack, restore })
             },
             [navCtrl],
         ),
         pop: useCallback(() => navCtrl?.pop(), [navCtrl]),
-        popStack: useCallback(() => navCtrl?.popStack(), [navCtrl]),
+        popStack: useCallback(
+            () => navCtrl?.popStack() ?? Promise.resolve(),
+            [navCtrl],
+        ),
         updateParams: useCallback(
             (params: Partial<Params>) => {
                 navCtrl?.updateParams(params)

@@ -1,32 +1,39 @@
 import clsx from "clsx"
 import React, { startTransition, useCallback } from "react"
 
-import type { Screens } from "@/control/NavigationController"
+import type { Screens, Stacks } from "@/control/NavigationController"
 import type { ButtonProps } from "@/ui/components/Button"
 import { useNavigation } from "@/ui/navigation"
 
 export function Link<S extends keyof Screens>({
     screen,
     params,
+    stack,
     ...props
 }: React.AnchorHTMLAttributes<any> & {
     ref?: React.Ref<HTMLAnchorElement>
     screen?: S
     params?: Screens[S]
+    stack?: Stacks
 }) {
     let { push } = useNavigation()
     let onClick = useCallback(
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             if (screen) {
                 e.preventDefault()
-                push(screen, params || {}, {
-                    scrollOffsetTop: Math.ceil(
-                        window.visualViewport?.pageTop ?? window.scrollY,
-                    ),
-                })
+                push(
+                    screen,
+                    params || {},
+                    {
+                        scrollOffsetTop: Math.ceil(
+                            window.visualViewport?.pageTop ?? window.scrollY,
+                        ),
+                    },
+                    stack,
+                )
             }
         },
-        [screen, params, push],
+        [screen, params, stack, push],
     )
 
     return (
@@ -46,7 +53,7 @@ export interface LinkButtonProps<S extends keyof Screens>
     href?: string
     screen?: S
     params?: Screens[S]
-    openInNewStack?: boolean
+    stack?: Stacks
 }
 
 export function LinkButton<S extends keyof Screens>({
@@ -56,7 +63,7 @@ export function LinkButton<S extends keyof Screens>({
     variant = "regular",
     screen,
     params,
-    openInNewStack,
+    stack,
     ...props
 }: LinkButtonProps<S>) {
     let { push } = useNavigation()
@@ -74,12 +81,12 @@ export function LinkButton<S extends keyof Screens>({
                                     window.scrollY,
                             ),
                         },
-                        openInNewStack,
+                        stack,
                     )
                 })
             }
         },
-        [screen, params, push, openInNewStack],
+        [screen, params, push, stack],
     )
 
     let { outline, plain, children, ...aProps } = props

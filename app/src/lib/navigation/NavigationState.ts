@@ -2,14 +2,15 @@ export type Screens = Record<string, Record<string, unknown>>
 
 export type NavgationState<
     S extends Screens,
-    Name extends keyof S,
+    Stacks extends string,
     Restore extends Record<string, unknown>,
+    Name extends keyof S = keyof S,
 > = {
     screen: {
         name: Name
         params: S[Name]
     }
     index: number
-    stack: number
+    stack: Stacks
     restore: Partial<Restore>
 }

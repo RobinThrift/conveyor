@@ -7,7 +7,6 @@ import { useNavigation } from "@/ui/navigation"
 import { type UpdateMemoRequest, actions, selectors } from "@/ui/state"
 
 export type { UpdateMemoRequest } from "@/ui/state"
-
 const settingsSelector = createSelector(
     [(state) => selectors.settings.value(state, "controls.vim")],
     (vimModeEnabled) => ({ vimModeEnabled }),
@@ -47,8 +46,18 @@ export function useEditMemoScreenState() {
     )
 
     let cancelEdit = useCallback(() => {
-        nav.pop()
-    }, [nav.pop])
+        let memoID = memo?.id
+        nav.popStack().then(() => {
+            if (memoID) {
+                nav.push(
+                    "memo.view",
+                    { memoID },
+                    { scrollOffsetTop: 0 },
+                    "single-memo",
+                )
+            }
+        })
+    }, [nav.popStack, nav.push, memo?.id])
 
     useEffect(() => {
         if (!startedRequest || isLoading) {

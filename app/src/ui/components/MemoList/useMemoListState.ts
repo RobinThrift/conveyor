@@ -45,6 +45,7 @@ export function useMemoListState() {
                             window.visualViewport?.pageTop ?? window.scrollY,
                         ),
                     },
+                    "edit-memo",
                 )
             },
             archive: (memoID: MemoID, isArchived: boolean) => {

@@ -37,7 +37,7 @@ export function SingleMemoScreen(props: SingleMemoScreenProps) {
                 ariaLabel={t.Back}
                 iconRight={<ArrowLeftIcon />}
                 className="back-btn"
-                onPress={() => nav.pop()}
+                onPress={() => nav.popStack()}
             />
 
             {memo && (

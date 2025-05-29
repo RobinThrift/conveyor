@@ -15,7 +15,7 @@ export function AppHeaderProvider() {
                 iconLeft={<SlidersIcon />}
                 className="settings-nav-button icon-only"
                 outline
-                openInNewStack
+                stack="settings"
             >
                 <span className="sr-only">{t.Settings}</span>
             </LinkButton>

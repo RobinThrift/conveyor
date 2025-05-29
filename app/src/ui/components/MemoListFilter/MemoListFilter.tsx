@@ -65,7 +65,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
                                     iconLeft={<SlidersIcon />}
                                     plain
                                     size="sm"
-                                    openInNewStack
+                                    stack="settings"
                                 >
                                     {tAppHeader.Settings}
                                 </LinkButton>

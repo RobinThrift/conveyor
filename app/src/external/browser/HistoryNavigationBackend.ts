@@ -8,12 +8,13 @@ import type {
 
 export class HistoryNavigationBackend<
     S extends Screens,
+    Stacks extends string,
     Params extends Record<string, unknown>,
     Restore extends Record<string, unknown>,
-> implements NavigationBackend<S, Restore>
+> implements NavigationBackend<S, Stacks, Restore>
 {
-    private _onPush?: OnPush<S, Restore>
-    private _onPop?: OnPop<S, Restore>
+    private _onPush?: OnPush<S, Stacks, Restore>
+    private _onPop?: OnPop<S, Stacks, Restore>
     private _toURLParams?: (params: Params) => URLSearchParams
     private _fromURLParams?: (params: URLSearchParams) => Params
     private _screenToURLMapping: ScreenToURLMapping<S>
@@ -30,6 +31,8 @@ export class HistoryNavigationBackend<
         toURLParams?: (params: Params) => URLSearchParams
         fromURLParams?: (params: URLSearchParams) => Params
     }) {
+        history.scrollRestoration = "manual"
+
         this._screenToURLMapping = screenToURLMapping
         this._toURLParams = toURLParams
         this._fromURLParams = fromURLParams
@@ -50,7 +53,7 @@ export class HistoryNavigationBackend<
             }
             let { screen, index, stack, restore } = e.state as NavgationState<
                 S,
-                keyof S,
+                Stacks,
                 Restore
             >
 
@@ -67,14 +70,10 @@ export class HistoryNavigationBackend<
     }
 
     init(
-        state: NavgationState<S, keyof S, Restore>,
-    ): NavgationState<S, keyof S, Restore> {
+        state: NavgationState<S, Stacks, Restore>,
+    ): NavgationState<S, Stacks, Restore> {
         let next = state
-        let current = window.history.state as NavgationState<
-            S,
-            keyof S,
-            Restore
-        >
+        let current = window.history.state as NavgationState<S, Stacks, Restore>
         if (current) {
             next = { ...next, ...current }
         }
@@ -121,10 +120,10 @@ export class HistoryNavigationBackend<
     }
 
     public push(
-        next: NavgationState<S, keyof S, Restore>,
-    ): NavgationState<S, keyof S, Restore> {
+        next: NavgationState<S, Stacks, Restore>,
+    ): NavgationState<S, Stacks, Restore> {
         let current = window.history.state ?? {}
-        let nextScreen: NavgationState<S, keyof S, Restore> = {
+        let nextScreen: NavgationState<S, Stacks, Restore> = {
             ...next,
             restore: {},
         }
@@ -133,7 +132,7 @@ export class HistoryNavigationBackend<
             {
                 ...current,
                 restore: next.restore,
-            } satisfies NavgationState<S, keyof S, Restore>,
+            } satisfies NavgationState<S, Stacks, Restore>,
             "",
             window.location.href,
         )
@@ -151,9 +150,9 @@ export class HistoryNavigationBackend<
         return nextScreen
     }
 
-    public pop(n?: number): Promise<NavgationState<S, keyof S, Restore>> {
+    public pop(n?: number): Promise<NavgationState<S, Stacks, Restore>> {
         let { promise, resolve } =
-            Promise.withResolvers<NavgationState<S, keyof S, Restore>>()
+            Promise.withResolvers<NavgationState<S, Stacks, Restore>>()
         if (n) {
             window.history.go(-n)
         } else {
@@ -164,7 +163,7 @@ export class HistoryNavigationBackend<
             this._currLength = window.history.length
             let state = window.history.state as NavgationState<
                 S,
-                keyof S,
+                Stacks,
                 Restore
             >
             resolve(state)
@@ -175,20 +174,20 @@ export class HistoryNavigationBackend<
 
     addEventListener(
         event: "pop",
-        handler: (next: NavgationState<S, keyof S, Restore>) => void,
+        handler: (next: NavgationState<S, Stacks, Restore>) => void,
     ): () => void
     addEventListener(
         event: "push",
         handler: (
-            next: NavgationState<S, keyof S, Restore>,
-            prev?: NavgationState<S, keyof S, Restore>,
+            next: NavgationState<S, Stacks, Restore>,
+            prev?: NavgationState<S, Stacks, Restore>,
         ) => void,
     ): () => void
     addEventListener(
         event: "pop" | "push",
         handler: (
-            next: NavgationState<S, keyof S, Restore>,
-            prev?: NavgationState<S, keyof S, Restore>,
+            next: NavgationState<S, Stacks, Restore>,
+            prev?: NavgationState<S, Stacks, Restore>,
         ) => void,
     ): () => void {
         switch (event) {
@@ -198,7 +197,7 @@ export class HistoryNavigationBackend<
                         return
                     }
                     let { screen, index, stack, restore } =
-                        e.state as NavgationState<S, keyof S, Restore>
+                        e.state as NavgationState<S, Stacks, Restore>
                     handler({ screen, index, stack, restore })
                 }
                 window.addEventListener("popstate", onPopState)

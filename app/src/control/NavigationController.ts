@@ -36,32 +36,33 @@ export type Screens = {
 
 export type Params = Screens[keyof Screens]
 
+export type Stacks = "default" | "settings" | "single-memo" | "edit-memo"
+
 export type Restore = {
     scrollOffsetTop: number
 }
 
 export class NavigationController {
-    private _backend: NavigationBackend<Screens, Restore>
-    private _onPush?: OnPush<Screens, Restore>
-    private _onPop?: OnPop<Screens, Restore>
+    private _backend: NavigationBackend<Screens, Stacks, Restore>
+    private _onPush?: OnPush<Screens, Stacks, Restore>
+    private _onPop?: OnPop<Screens, Stacks, Restore>
 
-    private _currentState: NavgationState<Screens, keyof Screens, Restore> = {
+    private _currentState: NavgationState<Screens, Stacks, Restore> = {
         screen: {
             name: "root",
             params: {},
         },
-        stack: 0,
+        stack: "default",
         index: 0,
         restore: { scrollOffsetTop: 0 },
     }
 
-    private _lastState?: NavgationState<Screens, keyof Screens, Restore> =
-        undefined
+    private _lastState?: NavgationState<Screens, Stacks, Restore> = undefined
 
     constructor({
         backend,
     }: {
-        backend: NavigationBackend<Screens, Restore>
+        backend: NavigationBackend<Screens, Stacks, Restore>
     }) {
         this._backend = backend
 
@@ -76,7 +77,7 @@ export class NavigationController {
         })
     }
 
-    public init(): NavgationState<Screens, keyof Screens, Restore> {
+    public init(): NavgationState<Screens, Stacks, Restore> {
         this._currentState = this._backend.init(this._currentState)
         return this._currentState
     }
@@ -96,21 +97,23 @@ export class NavigationController {
 
     public push(
         next: Omit<
-            NavgationState<Screens, keyof Screens, Restore>,
+            NavgationState<Screens, Stacks, Restore>,
             "stack" | "index"
-        >,
-        onNewStack?: boolean,
+        > & { stack?: Stacks },
     ) {
         if (isEqual(next.screen, this._currentState.screen)) {
             return
         }
 
+        let stack = next.stack ?? this._currentState.stack
+
         let nextState = this._backend.push({
             ...next,
-            index: onNewStack ? 0 : this._currentState.index + 1,
-            stack: onNewStack
-                ? this._currentState.stack + 1
-                : this._currentState.stack,
+            index:
+                stack === this._currentState.stack
+                    ? this._currentState.index + 1
+                    : 0,
+            stack,
         })
         let current = this._currentState
         requestAnimationFrame(() => {
@@ -127,7 +130,7 @@ export class NavigationController {
     }
 
     public async popStack(): Promise<void> {
-        if (this._currentState.stack <= 0) {
+        if (this._currentState.stack === "default") {
             return
         }
         this._lastState = this._currentState
@@ -135,13 +138,19 @@ export class NavigationController {
         this._currentState = { ...next }
     }
 
-    addEventListener(event: "pop", handler: OnPop<Screens, Restore>): void
-    addEventListener(event: "push", handler: OnPush<Screens, Restore>): void
+    addEventListener(
+        event: "pop",
+        handler: OnPop<Screens, Stacks, Restore>,
+    ): void
+    addEventListener(
+        event: "push",
+        handler: OnPush<Screens, Stacks, Restore>,
+    ): void
     addEventListener(
         event: "pop" | "push",
         handler: (
-            next: NavgationState<Screens, keyof Screens, Restore>,
-            prev?: NavgationState<Screens, keyof Screens, Restore>,
+            next: NavgationState<Screens, Stacks, Restore>,
+            prev?: NavgationState<Screens, Stacks, Restore>,
         ) => void,
     ) {
         switch (event) {
