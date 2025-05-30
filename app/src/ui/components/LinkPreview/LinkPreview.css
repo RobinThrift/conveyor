@@ -1,18 +1,17 @@
 .link-preview {
     @apply relative rounded-lg overflow-hidden top-0 left-0 drop-shadow-md;
     @apply w-full h-min my-2;
-    transition: top 200ms, left 200ms, filter 200ms;
+    transition: transform 300ms ease-out;
 
-    &:hover {
-        @apply sm:-top-0.5 sm:-left-0.5 sm:drop-shadow-xl;
-
-        .arrow {
-            @apply bg-primary text-primary-contrast;
+    @media (hover: hover) {
+        &:hover {
+            @apply drop-shadow-xl;
+            transform: translateY(calc(var(--spacing) * -1));
         }
     }
 
     &:has(.preview-img) {
-        @apply min-h-16;
+        @apply min-h-16 @3xl:max-w-1/2;
     }
 
     .preview-img {

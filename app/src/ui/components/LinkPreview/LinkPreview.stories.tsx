@@ -18,7 +18,7 @@ const meta: Meta<typeof LinkPreview> = {
     component: LinkPreview,
     decorators: [
         (Story) => (
-            <div className="content @container">
+            <div className="content @container container mx-auto">
                 <Story />
             </div>
         ),
