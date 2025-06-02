@@ -15,6 +15,8 @@ export function useSingleMemoScreenState() {
     let dispatch = useDispatch()
 
     let isMobile = useIsMobile()
+    let lastScrollPos = useRef<number>(window.screenY)
+    let unchangedCounter = useRef<number>(0)
 
     useEffect(() => {
         if (!isMobile) {
@@ -23,24 +25,42 @@ export function useSingleMemoScreenState() {
 
         let raf: ReturnType<typeof requestAnimationFrame> | undefined
 
-        let onscroll = () => {
-            if (raf) {
-                cancelAnimationFrame(raf)
-            }
-
+        let updatePosition = () => {
             let height = ref.current?.getBoundingClientRect().height ?? 0
             let scrollPos = window.scrollY
-            raf = requestAnimationFrame(() => {
-                let progress = Math.max(
-                    Math.min(scrollPos / (height || 1), 1),
-                    0,
-                )
+            let progress = Math.max(Math.min(scrollPos / (height || 1), 1), 0)
 
-                document.documentElement.style.setProperty(
-                    "--memo-scroll-progress",
-                    progress.toPrecision(2),
-                )
+            document.documentElement.style.setProperty(
+                "--memo-scroll-progress",
+                progress.toPrecision(2),
+            )
+
+            if (lastScrollPos.current === scrollPos) {
+                unchangedCounter.current++
+            } else {
+                unchangedCounter.current = 0
+            }
+
+            if (progress >= 1 || unchangedCounter.current === 20) {
+                raf = undefined
+                return
+            }
+
+            lastScrollPos.current = scrollPos
+
+            raf = requestAnimationFrame(() => {
+                updatePosition()
             })
+        }
+
+        let onscroll = () => {
+            if (raf === undefined) {
+                let height = ref.current?.getBoundingClientRect().height ?? 0
+                let scrollPos = window.scrollY
+                if (scrollPos < height) {
+                    updatePosition()
+                }
+            }
         }
 
         window.addEventListener("scroll", onscroll, { passive: true })
