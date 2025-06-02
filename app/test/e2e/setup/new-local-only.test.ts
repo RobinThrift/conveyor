@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test"
+import { test } from "@playwright/test"
+import { createMemoFromMainScreen } from "../steps/create-memo-from-main-screen"
 
 test("setup/new/local-only", async ({ page }) => {
     await page.addInitScript(() => {
@@ -14,19 +15,9 @@ test("setup/new/local-only", async ({ page }) => {
 
     await page.waitForURL("http://localhost:8081/")
 
-    await page.locator(".text-editor").click()
-    await page.getByLabel("Text formatting").isVisible()
-    await page
-        .getByTestId("texteditor")
-        .getByRole("textbox")
-        .fill("# Test Memo\n\nWith Some Content")
-    await page.getByRole("button", { name: "Save" }).click()
-
-    await expect(page.getByText(/^Test Memo/)).toBeInViewport({
-        timeout: 10_000,
-    })
-
-    await expect(page.getByText(/^With Some Content/)).toBeInViewport({
-        timeout: 10_000,
+    await createMemoFromMainScreen({
+        content: "# Local Only Setup Test\n\nWith Some Content",
+        checks: [/^Local Only Setup Test/, /^With Some Content/],
+        page,
     })
 })
