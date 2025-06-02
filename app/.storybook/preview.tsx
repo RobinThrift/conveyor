@@ -1,6 +1,6 @@
 import type { Preview } from "@storybook/react"
 import { initialize, mswLoader } from "msw-storybook-addon"
-import React, { useEffect, useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 
 import { Theme } from "../src/ui/components/Theme"
 import { i18nContext, type I18nContext } from "../src/ui/i18n/context"
