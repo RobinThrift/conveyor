@@ -50,7 +50,7 @@ export async function initController(platform: PlatformDependencies) {
         }>({
             kv: platform.keyValueContainer.getKVStore("auth"),
             crypto: platform.crypto,
-            deseerialize: authTokenFromJSON,
+            deserialize: authTokenFromJSON,
         }),
         authPIClient: new AuthV1APIClient({
             baseURL: globalThis.location.href,
