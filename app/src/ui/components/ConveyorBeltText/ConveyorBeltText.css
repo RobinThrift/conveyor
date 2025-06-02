@@ -1,6 +1,7 @@
 .conveyor-belt-text-wrapper {
     @apply absolute left-0 right-0 bottom-0;
     --conveyor-belt-text-animation-duration: 30s;
+    z-index: -1;
 }
 
 .conveyor-belt-text {
