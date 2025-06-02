@@ -31,23 +31,23 @@ export const registerEffects = (
 
             cancelActiveListeners()
 
-            let loaded = await setupCtrl.loadSetupInfo(
+            let [setupInfo, loadSetupInfoErr] = await setupCtrl.loadSetupInfo(
                 BaseContext.withSignal(signal),
             )
-            if (!loaded.ok) {
+            if (loadSetupInfoErr) {
                 dispatch(
                     slice.actions.setStep({
                         step: "load-error",
-                        error: loaded.err,
+                        error: loadSetupInfoErr,
                     }),
                 )
                 return
             }
 
-            if (loaded.value?.isSetup) {
+            if (setupInfo?.isSetup) {
                 dispatch(
                     slice.actions.setIsSetup({
-                        isSetup: loaded.value?.isSetup ?? false,
+                        isSetup: setupInfo?.isSetup ?? false,
                     }),
                 )
                 return

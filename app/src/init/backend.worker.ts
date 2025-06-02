@@ -30,24 +30,24 @@ async function run() {
 
     let controller = await initController(platform)
 
-    let initState = await tryAutoUnlock(BaseContext, {
+    let [initState, initStateErr] = await tryAutoUnlock(BaseContext, {
         unlockCtrl: controller.unlockCtrl,
         settingsCtrl: controller.settingsCtrl,
         setupCtrl: controller.setupCtrl,
         syncCtrl: controller.syncCtrl,
     })
 
-    if (!initState.ok) {
-        throw initState.err
+    if (initStateErr) {
+        throw initStateErr
     }
 
     setupAttachmentLoader(controller.attachmentCtrl)
 
-    let rootStore = initRootStore(initState.value, controller)
+    let rootStore = initRootStore(initState, controller)
 
     initJobs({ jobCtrl: controller.jobCtrl, rootStore: rootStore })
 
-    if (!initState.value?.setup.isSetup) {
+    if (!initState?.setup.isSetup) {
         controller.navCtrl.push({
             screen: { name: "setup", params: {} },
             restore: { scrollOffsetTop: 0 },
@@ -55,7 +55,7 @@ async function run() {
         return
     }
 
-    if (initState.value?.unlock.state === "locked") {
+    if (initState?.unlock.state === "locked") {
         controller.navCtrl.push({
             screen: { name: "unlock", params: {} },
             restore: { scrollOffsetTop: 0 },
@@ -105,18 +105,18 @@ function setupAttachmentLoader(attachmentCtrl: AttachmentController) {
 
             attachmentCtrl
                 .getAttachmentDataByID(BaseContext, msg.data.id)
-                .then((result) => {
-                    if (!result.ok) {
-                        throw result.err
+                .then(([result, err]) => {
+                    if (err) {
+                        throw err
                     }
 
                     postMessage(
                         {
                             id: msg.id,
                             type: "attachment:getAttachmentDataByID:response",
-                            data: result,
+                            data: [result, undefined],
                         },
-                        { transfer: [result.value.data] },
+                        { transfer: [result.data] },
                     )
                 })
                 .catch((err) => {

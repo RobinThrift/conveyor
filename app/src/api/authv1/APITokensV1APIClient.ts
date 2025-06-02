@@ -1,9 +1,10 @@
 import type { Context } from "@/lib/context"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
+import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 import type { APIToken, APITokenList } from "@/domain/APIToken"
 import type { Pagination } from "@/domain/Pagination"
+import { createErrType } from "@/lib/errors"
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 
 export class APITokensV1APIClient {
@@ -25,6 +26,10 @@ export class APITokensV1APIClient {
         this._baseURL = baseURL
     }
 
+    public static ErrListAPITokens = createErrType(
+        "APITokensV1APIClient",
+        "error listing API tokens",
+    )
     public async listAPITokens(
         ctx: Context,
         {
@@ -39,40 +44,31 @@ export class APITokensV1APIClient {
             query.set("page[after]", pagination.after)
         }
 
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "GET",
             `/api/auth/v1/apitokens?${query.toString()}`,
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new APITokensV1APIClient.ErrListAPITokens()}: ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error listing API Tokens (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new APITokensV1APIClient.ErrListAPITokens()} (${this._baseURL}): ${err}`
         }
 
-        if (res.value.status === 401) {
-            return Err(
-                new UnauthorizedError(
-                    `error listing API Tokens (${this._baseURL})`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`${new APITokensV1APIClient.ErrListAPITokens()} (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        if (res.value.status !== 200) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(
-                err.withPrefix(`error listing API Tokens (${this._baseURL})`),
-            )
+        if (res.status !== 200) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new APITokensV1APIClient.ErrListAPITokens()} (${this._baseURL}): ${err}`
         }
 
-        return jsonDeserialize(
-            await res.value.text(),
+        let [tokens, deserializationErr] = jsonDeserialize<APITokenList, any>(
+            await res.text(),
             (raw: {
                 next?: string
                 items: {
@@ -83,104 +79,109 @@ export class APITokensV1APIClient {
             }) => {
                 let items: APIToken[] = []
                 for (let item of raw.items) {
-                    let createdAt = parseJSONDate(item.createdAt)
-                    if (!createdAt.ok) {
-                        return createdAt
+                    let [createdAt, createdAtParseErr] = parseJSONDate(
+                        item.createdAt,
+                    )
+                    if (createdAtParseErr) {
+                        return wrapErr`error parsing createdAt date: ${createdAtParseErr}`
                     }
-                    let expiresAt = parseJSONDate(item.expiresAt)
-                    if (!expiresAt.ok) {
-                        return expiresAt
+
+                    let [expiresAt, expiresAtParseErr] = parseJSONDate(
+                        item.expiresAt,
+                    )
+                    if (expiresAtParseErr) {
+                        return wrapErr`error parsing expiresAt date: ${expiresAtParseErr}`
                     }
 
                     items.push({
                         name: item.name,
-                        expiresAt: expiresAt.value,
-                        createdAt: createdAt.value,
+                        expiresAt: expiresAt,
+                        createdAt: createdAt,
                     })
                 }
+
                 return Ok({
                     items,
                     next: raw.next,
                 })
             },
         )
+
+        if (deserializationErr) {
+            return wrapErr`${new APITokensV1APIClient.ErrListAPITokens()} (${this._baseURL}): error deserilising data: ${deserializationErr}`
+        }
+
+        return Ok(tokens)
     }
 
+    public static ErrCreateAPIToken = createErrType(
+        "APITokensV1APIClient",
+        "error creating API token",
+    )
     public async createAPIToken(
         ctx: Context,
         apitoken: CreateAPITokenRequest,
     ): AsyncResult<{ token: string }> {
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
             "/api/auth/v1/apitokens",
             JSON.stringify(apitoken),
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()}: ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error creating API Token (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()} (${this._baseURL}): ${err}`
         }
 
-        if (res.value.status === 401) {
-            return Err(
-                new UnauthorizedError(
-                    `error creating API Token (${this._baseURL})`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()} (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        if (res.value.status !== 201) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(
-                err.withPrefix(`error creating API Token (${this._baseURL})`),
-            )
+        if (res.status !== 201) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()} (${this._baseURL}): ${err}`
         }
 
-        return jsonDeserialize(await res.value.text())
+        let [token, deserializationErr] = jsonDeserialize<{ token: string }>(
+            await res.text(),
+        )
+        if (deserializationErr) {
+            return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()} (${this._baseURL}): error deserilising data: ${deserializationErr}`
+        }
+
+        return Ok(token)
     }
 
+    public static ErrDeleteAPIToken = createErrType(
+        "APITokensV1APIClient",
+        "error creating API token",
+    )
     public async deleteAPIToken(ctx: Context, name: string): AsyncResult<void> {
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "DELETE",
             `/api/auth/v1/apitokens/${name}`,
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new APITokensV1APIClient.ErrDeleteAPIToken()}: ${createReqErr}`
         }
 
-        if (!req.ok) {
-            return req
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new APITokensV1APIClient.ErrDeleteAPIToken()} (${this._baseURL}): ${err}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error deleting API Token (${this._baseURL}): %w`,
-                res,
-            )
+        if (res.status === 401) {
+            return wrapErr`${new APITokensV1APIClient.ErrDeleteAPIToken()} (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        if (res.value.status === 401) {
-            return Err(
-                new UnauthorizedError(
-                    `error deleting API Token (${this._baseURL})`,
-                ),
-            )
-        }
-
-        if (res.value.status !== 204) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(
-                err.withPrefix(`error deleting API Tokens (${this._baseURL})`),
-            )
+        if (res.status !== 204) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new APITokensV1APIClient.ErrDeleteAPIToken()} (${this._baseURL}): ${err}`
         }
 
         return Ok(undefined)
@@ -192,21 +193,21 @@ export class APITokensV1APIClient {
         path: string,
         body?: BodyInit,
     ): AsyncResult<Request> {
-        let token = await this._tokenStorage.getToken(ctx)
-        if (!token.ok) {
-            return token
+        let [token, tokenErr] = await this._tokenStorage.getToken(ctx)
+        if (tokenErr) {
+            return wrapErr`error creating request: error getting token: ${tokenErr}`
         }
 
-        let req = new Request(new URL(path, this._baseURL), {
-            method,
-            redirect: "follow",
-            body,
-            headers: {
-                Authorization: `Bearer ${token.value}`,
-            },
-        })
-
-        return Ok(req)
+        return Ok(
+            new Request(new URL(path, this._baseURL), {
+                method,
+                redirect: "follow",
+                body,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }),
+        )
     }
 }
 

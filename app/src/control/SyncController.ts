@@ -18,9 +18,10 @@ import type { DBExec, Transactioner } from "@/lib/database"
 import { Second } from "@/lib/duration"
 import { type FS, join } from "@/lib/fs"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Err, Ok, all, fmtErr } from "@/lib/result"
+import { type AsyncResult, Err, Ok, all, wrapErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
 
+import { createErrType } from "@/lib/errors"
 import type { CryptoController } from "./CryptoController"
 
 export class SyncController {
@@ -78,6 +79,10 @@ export class SyncController {
         this._cryptoRemoteAPI = cryptoRemoteAPI
     }
 
+    public static ErrInit = createErrType(
+        "SyncController",
+        "error initialising",
+    )
     public async init(
         ctx: Context,
         info: { server: string; clientID: string; username: string },
@@ -85,32 +90,50 @@ export class SyncController {
         this._info = { ...info, isEnabled: true }
         this._syncAPIClient.setBaseURL(info.server)
 
-        let registered = await this._syncAPIClient.registerClient(ctx, {
-            clientID: info.clientID,
-        })
-        if (!registered.ok) {
-            return registered
+        let [_, registrationErr] = await this._syncAPIClient.registerClient(
+            ctx,
+            {
+                clientID: info.clientID,
+            },
+        )
+        if (registrationErr) {
+            return wrapErr`${new SyncController.ErrInit()}: ${registrationErr}`
         }
 
         return this._storage.setItem(ctx, SyncController.storageKey, this._info)
     }
 
+    public static ErrReset = createErrType("SyncController", "error resetting")
     public async reset(ctx: Context): AsyncResult<void> {
         this._info = { isEnabled: false }
-        return this._storage.removeItem(ctx, SyncController.storageKey)
+        let [_, err] = await this._storage.removeItem(
+            ctx,
+            SyncController.storageKey,
+        )
+        if (err) {
+            return wrapErr`${new SyncController.ErrReset()}: ${err}`
+        }
+        return Ok()
     }
 
+    public static ErrLoad = createErrType(
+        "SyncController",
+        "error loading sync info from storage",
+    )
     public async load(ctx: Context): AsyncResult<SyncInfo | undefined> {
-        let info = await this._storage.getItem(ctx, SyncController.storageKey)
-        if (!info.ok) {
-            return info
+        let [info, err] = await this._storage.getItem(
+            ctx,
+            SyncController.storageKey,
+        )
+        if (err) {
+            return wrapErr`${new SyncController.ErrLoad()}: ${err}`
         }
 
-        if (info.value?.isEnabled) {
-            this._syncAPIClient.setBaseURL(info.value.server)
+        if (info?.isEnabled) {
+            this._syncAPIClient.setBaseURL(info.server)
         }
 
-        this._info = info.value ?? this._info
+        this._info = info ?? this._info
 
         if (
             this._info?.isEnabled &&
@@ -119,39 +142,40 @@ export class SyncController {
             this._info.lastSyncedAt = new Date(this._info.lastSyncedAt)
         }
 
-        return Ok(info.value)
+        return Ok(info)
     }
 
+    public static ErrSync = createErrType("SyncController", "error syncing")
     public async sync(ctx: Context): AsyncResult<void> {
         let info = this._info
         if (!info.isEnabled) {
-            return Err(new Error("sync is not enabled"))
+            return wrapErr`${new SyncController.ErrSync()}: sync is not enabled`
         }
 
-        let accountKeyUpload = await this._uploadAccountKey(ctx)
-        if (!accountKeyUpload.ok) {
-            return accountKeyUpload
+        let [_, accountKeyUploadErr] = await this._uploadAccountKey(ctx)
+        if (accountKeyUploadErr) {
+            return wrapErr`${new SyncController.ErrSync()}: error uploading account key: ${accountKeyUploadErr}`
         }
 
         return this._transactioner.inTransaction(ctx, async (ctx) => {
-            let serverChanges = await this._fetchChangelogEntries(
+            let [_, fetchRemoteEntriesErr] = await this._fetchChangelogEntries(
                 ctx,
                 info.lastSyncedAt,
             )
-            if (!serverChanges.ok) {
-                return serverChanges
+            if (fetchRemoteEntriesErr) {
+                return Err(fetchRemoteEntriesErr)
             }
 
-            let [applyChanges, uploaded] = await Promise.all([
+            let [[_1, applyChangesErr], [_2, uploadErr]] = await Promise.all([
                 this._applyChangelogEntries(ctx),
                 this._uploadChangelogEntries(ctx),
             ])
-            if (!applyChanges.ok) {
-                return applyChanges
+            if (applyChangesErr) {
+                return Err(applyChangesErr)
             }
 
-            if (!uploaded.ok) {
-                return uploaded
+            if (uploadErr) {
+                return Err(uploadErr)
             }
 
             return this._storage.setItem(ctx, SyncController.storageKey, {
@@ -161,73 +185,82 @@ export class SyncController {
         })
     }
 
+    public static ErrFetchFullDB = createErrType(
+        "SyncController",
+        "error fetching full database",
+    )
     public async fetchFullDB(ctx: Context): AsyncResult<void> {
-        let data = await this._syncAPIClient.getFullSync(ctx)
-        if (!data.ok) {
-            return data
+        let [data, getFullSyncErr] = await this._syncAPIClient.getFullSync(ctx)
+        if (getFullSyncErr) {
+            return wrapErr`${new SyncController.ErrFetchFullDB()}: ${getFullSyncErr}`
         }
 
-        let decrypted = await this._crypto.decryptData(
-            new Uint8Array(data.value),
+        let [decrypted, decryptionErr] = await this._crypto.decryptData(
+            new Uint8Array(data),
         )
-        if (!decrypted.ok) {
-            return fmtErr(
-                "error fetching full DB from sync server: error decrypting data: %w",
-                decrypted,
-            )
+        if (decryptionErr) {
+            return wrapErr`${new SyncController.ErrFetchFullDB()}: error decrypting data: ${decryptionErr}`
         }
 
-        let written = await this._fs.write(ctx, this._dbPath, decrypted.value)
-        if (!written.ok) {
-            return fmtErr(
-                `error fetching full DB from sync server: error writing data: ${this._dbPath}: %w`,
-                written,
-            )
+        let [_, writeErr] = await this._fs.write(ctx, this._dbPath, decrypted)
+        if (writeErr) {
+            return wrapErr`${new SyncController.ErrFetchFullDB()}: error writing file: ${this._dbPath}: ${writeErr}`
         }
 
-        return Ok(undefined)
+        return Ok()
     }
 
+    public static ErrUploadFullDB = createErrType(
+        "SyncController",
+        "error uploading full database",
+    )
     public async uploadFullDB(ctx: Context): AsyncResult<void> {
-        let accountKeyUpload = await this._uploadAccountKey(ctx)
-        if (!accountKeyUpload.ok) {
-            return accountKeyUpload
+        let [_, accountKeyUploadErr] = await this._uploadAccountKey(ctx)
+        if (accountKeyUploadErr) {
+            return wrapErr`${new SyncController.ErrUploadFullDB()}: ${accountKeyUploadErr}`
         }
 
-        let data = await this._fs.read(ctx, this._dbPath)
-        if (!data.ok) {
-            return fmtErr(
-                `error uploading full DB to sync server: error reading data from file: ${this._dbPath}: %w`,
-                data,
-            )
+        let [data, readDataErr] = await this._fs.read(ctx, this._dbPath)
+        if (readDataErr) {
+            return wrapErr`${new SyncController.ErrUploadFullDB()}: error reading data from file: ${this._dbPath}: ${readDataErr}`
         }
 
-        let encrypted = await this._crypto.encryptData(
-            new Uint8Array(data.value),
+        let [encrypted, encryptionErr] = await this._crypto.encryptData(
+            new Uint8Array(data),
         )
-        if (!encrypted.ok) {
-            return fmtErr(
-                "error uploading full DB to sync server: error encrypting data: %w",
-                encrypted,
-            )
+        if (encryptionErr) {
+            return wrapErr`${new SyncController.ErrUploadFullDB()}: error encrypting data: ${encryptionErr}`
         }
 
-        return this._syncAPIClient.uploadFullSyncData(ctx, encrypted.value)
+        return this._syncAPIClient.uploadFullSyncData(ctx, encrypted)
     }
 
+    public static ErrUploadAccountKey = createErrType(
+        "SyncController",
+        "error uploading account key",
+    )
     private async _uploadAccountKey(ctx: Context): AsyncResult<void> {
-        let publicKey = this._crypto.publicKey
-        if (!publicKey.ok) {
-            return publicKey
+        let [publicKey, publicKeyErr] = this._crypto.publicKey
+        if (publicKeyErr) {
+            return wrapErr`${new SyncController.ErrUploadAccountKey()}: error error getting public key: ${publicKeyErr}`
         }
 
-        return this._cryptoRemoteAPI.uploadAccountKey(ctx, {
+        let [_, err] = await this._cryptoRemoteAPI.uploadAccountKey(ctx, {
             name: PrimaryAccountKeyName,
-            type: publicKey.value.type,
-            data: encodeText(publicKey.value.data).buffer as ArrayBuffer,
+            type: publicKey.type,
+            data: encodeText(publicKey.data).buffer as ArrayBuffer,
         })
+        if (err) {
+            return wrapErr`${new SyncController.ErrUploadAccountKey()}: ${err}`
+        }
+
+        return Ok()
     }
 
+    public static ErrApplyChangelogEntries = createErrType(
+        "SyncController",
+        "error applying changelog entries",
+    )
     private async _applyChangelogEntries(ctx: Context): AsyncResult<void> {
         let groupedByType: Partial<
             Record<ChangelogTargetType, ChangelogEntry[]>
@@ -238,118 +271,139 @@ export class SyncController {
         let hasNextPage = true
         let after: [number, Date] | undefined
         while (hasNextPage) {
-            let page = await this._changelog.listUnapplidChangelogEntries(ctx, {
-                pagination: {
-                    pageSize: 50,
-                    after,
-                },
-            })
-            if (!page.ok) {
-                return page
+            let [page, pageErr] =
+                await this._changelog.listUnapplidChangelogEntries(ctx, {
+                    pagination: {
+                        pageSize: 50,
+                        after,
+                    },
+                })
+            if (pageErr) {
+                return wrapErr`${new SyncController.ErrApplyChangelogEntries()}: error getting unapplied changelog entries: ${pageErr}`
             }
 
-            for (let entry of page.value.items) {
+            for (let entry of page.items) {
                 entryIDs.push(entry.id)
                 let entries = groupedByType[entry.targetType] ?? []
                 entries.push(entry)
                 groupedByType[entry.targetType] = entries
             }
 
-            after = page.value.next
-            hasNextPage = page.value.next !== undefined
+            after = page.next
+            hasNextPage = page.next !== undefined
         }
 
         return this._transactioner.inTransaction(ctx, async (ctx) => {
             if (groupedByType.attachments) {
-                let applied = await this._attachments.applyChangelogEntries(
-                    ctx,
-                    groupedByType.attachments as AttachmentChangelogEntry[],
-                )
-                if (!applied.ok) {
-                    return applied
+                let [_, entryApplicationErr] =
+                    await this._attachments.applyChangelogEntries(
+                        ctx,
+                        groupedByType.attachments as AttachmentChangelogEntry[],
+                    )
+                if (entryApplicationErr) {
+                    return wrapErr`${new SyncController.ErrApplyChangelogEntries()}: error applying attachment changes: ${entryApplicationErr}`
                 }
             }
 
             if (groupedByType.memos) {
-                let applied = await this._memos.applyChangelogEntries(
-                    ctx,
-                    groupedByType.memos as MemoChangelogEntry[],
-                )
-                if (!applied.ok) {
-                    return applied
+                let [_, entryApplicationErr] =
+                    await this._memos.applyChangelogEntries(
+                        ctx,
+                        groupedByType.memos as MemoChangelogEntry[],
+                    )
+                if (entryApplicationErr) {
+                    return wrapErr`${new SyncController.ErrApplyChangelogEntries()}: error applying memo changes: ${entryApplicationErr}`
                 }
             }
 
             if (groupedByType.settings) {
-                let applied = await this._settings.applyChangelogEntries(
-                    ctx,
-                    groupedByType.settings as SettingChangelogEntry[],
-                )
-                if (!applied.ok) {
-                    return applied
+                let [_, entryApplicationErr] =
+                    await this._settings.applyChangelogEntries(
+                        ctx,
+                        groupedByType.settings as SettingChangelogEntry[],
+                    )
+                if (entryApplicationErr) {
+                    return wrapErr`${new SyncController.ErrApplyChangelogEntries()}: error applying settings changes: ${entryApplicationErr}`
                 }
             }
 
-            return this._changelog.markChangelogEntriesAsApplied(ctx, entryIDs)
+            let [_, err] = await this._changelog.markChangelogEntriesAsApplied(
+                ctx,
+                entryIDs,
+            )
+            if (err) {
+                return wrapErr`${new SyncController.ErrApplyChangelogEntries()}: ${err}`
+            }
+
+            return Ok()
         })
     }
 
+    public static ErrFetchChangelogEntries = createErrType(
+        "SyncController",
+        "error fetching changelog entries from sync server",
+    )
     private async _fetchChangelogEntries(
         ctx: Context,
         since?: Date,
     ): AsyncResult<void> {
-        let encrytpedEntries = await this._syncAPIClient.listChangelogEntries(
-            ctx,
-            since,
-        )
-        if (!encrytpedEntries.ok) {
-            return encrytpedEntries
+        let [encrytpedEntries, fetchErr] =
+            await this._syncAPIClient.listChangelogEntries(ctx, since)
+        if (fetchErr) {
+            return wrapErr`${new SyncController.ErrFetchChangelogEntries()}: ${fetchErr}`
         }
 
-        let entries = await this._decryptChangeLogEntries(
-            encrytpedEntries.value,
-        )
-        if (!entries.ok) {
-            return entries
+        let [entries, decryptionErr] =
+            await this._decryptChangeLogEntries(encrytpedEntries)
+        if (decryptionErr) {
+            return wrapErr`${new SyncController.ErrFetchChangelogEntries()}: ${decryptionErr}`
         }
 
-        return this._changelog.insertExternalChangelogEntries(
-            ctx,
-            entries.value,
-        )
+        let [_, insertErr] =
+            await this._changelog.insertExternalChangelogEntries(ctx, entries)
+        if (insertErr) {
+            return wrapErr`${new SyncController.ErrFetchChangelogEntries()}: ${insertErr}`
+        }
+
+        return Ok()
     }
 
+    public static ErrUploadChangelogEntries = createErrType(
+        "SyncController",
+        "error uploading changelog entries to sync server",
+    )
     private async _uploadChangelogEntries(ctx: Context): AsyncResult<void> {
         let hasNextPage = true
         let after: [number, Date] | undefined
         while (hasNextPage) {
-            let page = await this._changelog.listUnsyncedChangelogEntries(ctx, {
-                pagination: {
-                    pageSize: 50,
-                    after,
-                },
-            })
-            if (!page.ok) {
-                return page
+            let [page, pageErr] =
+                await this._changelog.listUnsyncedChangelogEntries(ctx, {
+                    pagination: {
+                        pageSize: 50,
+                        after,
+                    },
+                })
+            if (pageErr) {
+                return wrapErr`${new SyncController.ErrUploadChangelogEntries()}: error getting unsynced changes: ${pageErr}`
             }
 
-            if (page.value.items.length === 0) {
+            if (page.items.length === 0) {
                 break
             }
 
-            let uploaded = await this._uploadChangelogEntriesPage(
+            let [_, uploadErr] = await this._uploadChangelogEntriesPage(
                 ctx,
-                page.value.items,
+                page.items,
             )
-            if (!uploaded.ok) {
-                return uploaded
+            if (uploadErr) {
+                return wrapErr`${new SyncController.ErrUploadChangelogEntries()}: ${uploadErr}`
             }
 
-            after = page.value.next
-            hasNextPage = page.value.next !== undefined
+            after = page.next
+            hasNextPage = page.next !== undefined
         }
 
-        return Ok(undefined)
+        return Ok()
     }
 
     private async _uploadChangelogEntriesPage(
@@ -366,31 +420,31 @@ export class SyncController {
         let result = await this._transactioner.inTransaction(
             ctxWithCancel,
             async (ctx) => {
-                let marked = await this._changelog.markChangelogEntriesAsSynced(
-                    ctx,
-                    entries,
-                )
-                if (!marked.ok) {
-                    return marked
+                let [_mark, markErr] =
+                    await this._changelog.markChangelogEntriesAsSynced(
+                        ctx,
+                        entries,
+                    )
+                if (markErr) {
+                    return wrapErr`error marking changelog entries as synced: ${markErr}`
                 }
 
-                let encryped = await this._encryptChangeLogEntries(
-                    clientID,
-                    entries,
-                )
-                if (!encryped.ok) {
-                    return encryped
+                let [encryped, encryptionErr] =
+                    await this._encryptChangeLogEntries(clientID, entries)
+                if (encryptionErr) {
+                    return Err(encryptionErr)
                 }
 
-                let uploaded = await this._syncAPIClient.uploadChangelogEntries(
-                    ctx,
-                    encryped.value,
-                )
-                if (!uploaded.ok) {
-                    return uploaded
+                let [_upload, uploadErr] =
+                    await this._syncAPIClient.uploadChangelogEntries(
+                        ctx,
+                        encryped,
+                    )
+                if (uploadErr) {
+                    return wrapErr`upload error: ${uploadErr}`
                 }
 
-                let attachmentsUploaded = await all(
+                let [_attachmentsUpload, attachmentsUploadErr] = await all(
                     entries
                         .filter((e) => e.targetType === "attachments")
                         .map((e) =>
@@ -400,11 +454,11 @@ export class SyncController {
                             ),
                         ),
                 )
-                if (!attachmentsUploaded.ok) {
-                    return attachmentsUploaded
+                if (attachmentsUploadErr) {
+                    return Err(attachmentsUploadErr)
                 }
 
-                return Ok(undefined)
+                return Ok()
             },
         )
         cancel()
@@ -418,16 +472,16 @@ export class SyncController {
         let encrytpedEntries: EncryptedChangelogEntry[] = []
 
         for (let entry of entries) {
-            let encrypted = await this._crypto.encryptData(
+            let [encrypted, encryptionErr] = await this._crypto.encryptData(
                 encodeText(JSON.stringify(entry)),
             )
-            if (!encrypted.ok) {
-                return fmtErr("error encrytping changelog entry: %w", encrypted)
+            if (encryptionErr) {
+                return wrapErr`error encrypting changelog entries: ${encryptionErr}`
             }
 
             encrytpedEntries.push({
                 syncClientID: clientID,
-                data: encodeToBase64(new Uint8Array(encrypted.value)),
+                data: encodeToBase64(new Uint8Array(encrypted)),
                 timestamp: entry.timestamp,
             })
         }
@@ -441,76 +495,78 @@ export class SyncController {
         let entries: ChangelogEntry[] = []
 
         for (let entry of encrytpedEntries) {
-            let decrypted = await this._crypto.decryptData(
+            let [decrypted, decryptionErr] = await this._crypto.decryptData(
                 dataFromBase64(entry.data),
             )
-            if (!decrypted.ok) {
-                return fmtErr("error decrytping changelog entry: %w", decrypted)
+            if (decryptionErr) {
+                return wrapErr`error decrytping changelog entry: ${decryptionErr}`
             }
 
-            let parsed = jsonDeserialize<ChangelogEntry, Record<string, any>>(
-                decrypted.value,
-                (obj) => {
-                    // let appliedAt = parseJSONDate(obj.appliedAt)
-                    // if (!appliedAt.ok) {
-                    //     return appliedAt
-                    // }
-                    let timestamp = parseJSONDate(obj.timestamp)
-                    if (!timestamp.ok) {
-                        return timestamp
-                    }
+            let [parsed, parseErr] = jsonDeserialize<
+                ChangelogEntry,
+                Record<string, any>
+            >(decrypted, (obj) => {
+                let [timestamp, parseErr] = parseJSONDate(obj.timestamp)
+                if (parseErr) {
+                    return wrapErr`error parsing timestamp: ${parseErr}`
+                }
 
-                    return Ok({
-                        id: obj.id,
-                        source: obj.source,
-                        revision: obj.revision,
-                        targetType: obj.targetType,
-                        targetID: obj.targetID,
-                        value: obj.value,
-                        isSynced: true,
-                        isApplied: false,
-                        timestamp: timestamp.value,
-                    })
-                },
-            )
+                return Ok({
+                    id: obj.id,
+                    source: obj.source,
+                    revision: obj.revision,
+                    targetType: obj.targetType,
+                    targetID: obj.targetID,
+                    value: obj.value,
+                    isSynced: true,
+                    isApplied: false,
+                    timestamp: timestamp,
+                })
+            })
 
-            if (!parsed.ok) {
-                return parsed
+            if (parseErr) {
+                return wrapErr`error deserializing changelog entry: ${parseErr}`
             }
 
-            entries.push(parsed.value)
+            entries.push(parsed)
         }
 
         return Ok(entries)
     }
 
+    public static ErrUploadAttachment = createErrType(
+        "SyncController",
+        "error uploading attachment to sync server",
+    )
     private async _uploadAttachment(
         ctx: Context,
         entry: AttachmentChangelogEntry,
     ): AsyncResult<void> {
         if (!this._info.isEnabled) {
-            return Err(new Error("sync is not enabled"))
+            return wrapErr`${new SyncController.ErrUploadAttachment()}: sync is not enabled`
         }
 
         if (!("created" in entry.value)) {
-            return Ok(undefined)
+            return Ok()
         }
 
-        let data = await this._fs.read(
+        let [data, readErr] = await this._fs.read(
             ctx,
             join(ATTACHMENT_BASE_DIR, entry.value.created.filepath),
         )
-        if (!data.ok) {
-            return fmtErr(
-                `error uploading attachment ${entry.targetID}: ${entry.value.created.filepath}: error reading data: %w`,
-                data,
-            )
+        if (readErr) {
+            return wrapErr`${new SyncController.ErrUploadAttachment()}: ${entry.targetID}: ${entry.value.created.filepath}: error reading data: ${readErr}`
         }
 
-        return this._syncAPIClient.uploadAttachment(ctx, {
+        let [_, err] = await this._syncAPIClient.uploadAttachment(ctx, {
             filepath: entry.value.created.filepath,
-            data: new Uint8Array(data.value),
+            data: new Uint8Array(data),
         })
+        if (err) {
+            return wrapErr`${new SyncController.ErrUploadAttachment()}: ${entry.targetID}: ${entry.value.created.filepath}: upload error: ${err}`
+        }
+
+        return Ok()
     }
 }
 

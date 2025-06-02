@@ -5,6 +5,7 @@ import {
     Ok,
     fromPromise,
     fromThrowing,
+    wrapErr,
 } from "@/lib/result"
 
 type IndexedDBMigration = (db: IDBDatabase) => AsyncResult<void>
@@ -60,18 +61,18 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
                     return
                 }
 
-                let res = await migration(req.result)
-                if (!res.ok) {
-                    reject(res.err)
+                let [_, err] = await migration(req.result)
+                if (err) {
+                    reject(err)
                     return
                 }
             }
 
             let tx = req.transaction
             if (tx) {
-                let txResult = await wrapIDBTransaction(tx)
-                if (!txResult.ok) {
-                    reject(tx.error)
+                let [_, txErr] = await wrapIDBTransaction(tx)
+                if (txErr) {
+                    reject(txErr)
                     return
                 }
             }
@@ -85,13 +86,13 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
             resolve(req.result)
         })
 
-        let db = await fromPromise(promise)
-        if (!db.ok) {
-            return db
+        let [db, err] = await fromPromise(promise)
+        if (err) {
+            return Err(err)
         }
 
         let indexedDB = new IndexedDB<Tables>()
-        indexedDB._db = db.value
+        indexedDB._db = db
 
         return Ok(indexedDB)
     }
@@ -102,22 +103,21 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         data: Tables[T][],
     ): AsyncResult<void> {
         return this._inTransaction(ctx, storeName, "readwrite", async (tx) => {
-            let maybeStore = fromThrowing(() =>
+            let [store, storeErr] = fromThrowing(() =>
                 tx.objectStore(storeName as string),
             )
-            if (!maybeStore.ok) {
-                return maybeStore
+            if (storeErr) {
+                return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
-            let store = maybeStore.value
 
             for (let d of data) {
                 if (ctx.isCancelled()) {
                     return Err(ctx.err() as Error)
                 }
 
-                let res = fromThrowing(() => store.put(d))
-                if (!res.ok) {
-                    return res
+                let [_, putErr] = fromThrowing(() => store.put(d))
+                if (putErr) {
+                    return wrapErr`error putting data into store: ${storeName}: ${putErr}`
                 }
             }
 
@@ -131,21 +131,19 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         key: IDBValidKey,
     ): AsyncResult<Tables[T] | undefined> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let maybeStore = fromThrowing(() =>
+            let [store, storeErr] = fromThrowing(() =>
                 tx.objectStore(storeName as string),
             )
-            if (!maybeStore.ok) {
-                return maybeStore
+            if (storeErr) {
+                return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
 
-            let store = maybeStore.value
-
-            let getReq = fromThrowing(() => store.get(key))
-            if (!getReq.ok) {
-                return getReq
+            let [item, err] = fromThrowing(() => store.get(key))
+            if (err) {
+                return wrapErr`error getting item from objectStore: ${storeName}: ${key}: ${err}`
             }
 
-            return wrapIDBRequest(getReq.value)
+            return wrapIDBRequest(item)
         })
     }
 
@@ -155,31 +153,29 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         predicate: (item: Tables[T]) => boolean,
     ): AsyncResult<Tables[T][]> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let maybeStore = fromThrowing(() =>
+            let [store, storeErr] = fromThrowing(() =>
                 tx.objectStore(storeName as string),
             )
-            if (!maybeStore.ok) {
-                return maybeStore
+            if (storeErr) {
+                return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
 
-            let store = maybeStore.value
-
-            let getAllReq = fromThrowing(() => store.getAll())
-            if (!getAllReq.ok) {
-                return getAllReq
+            let [all, err] = fromThrowing(() => store.getAll())
+            if (err) {
+                return wrapErr`error getting all items from objectStore: ${storeName}: ${err}`
             }
 
             let { resolve, reject, promise } =
                 Promise.withResolvers<Tables[T][]>()
 
-            getAllReq.value.addEventListener("error", () => {
-                reject(getAllReq.value.error)
+            all.addEventListener("error", () => {
+                reject(all.error)
             })
 
-            getAllReq.value.addEventListener("success", () => {
+            all.addEventListener("success", () => {
                 let items: Tables[T][] = []
 
-                for (let item of getAllReq.value.result) {
+                for (let item of all.result) {
                     if (predicate(item)) {
                         items.push(item)
                     }
@@ -197,33 +193,31 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         storeName: T,
     ): AsyncResult<IDBValidKey[]> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let maybeStore = fromThrowing(() =>
+            let [store, storeErr] = fromThrowing(() =>
                 tx.objectStore(storeName as string),
             )
-            if (!maybeStore.ok) {
-                return maybeStore
+            if (storeErr) {
+                return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
 
-            let store = maybeStore.value
-
-            let getKeysReq = fromThrowing(() => store.getAllKeys())
-            if (!getKeysReq.ok) {
-                return getKeysReq
+            let [keys, getAllKeysErr] = fromThrowing(() => store.getAllKeys())
+            if (getAllKeysErr) {
+                return wrapErr`error getting all keys for objectStore: ${storeName}: ${getAllKeysErr}`
             }
 
             let { resolve, reject, promise } =
                 Promise.withResolvers<IDBValidKey[]>()
 
-            getKeysReq.value.addEventListener("error", () => {
-                reject(getKeysReq.value.error)
+            keys.addEventListener("error", () => {
+                reject(keys.error)
             })
 
-            getKeysReq.value.addEventListener("success", () => {
+            keys.addEventListener("success", () => {
                 if (ctx.isCancelled()) {
                     reject(ctx.err())
                     return
                 }
-                resolve(getKeysReq.value.result)
+                resolve(keys.result)
             })
 
             return fromPromise(promise)
@@ -236,21 +230,19 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         key: IDBValidKey,
     ): AsyncResult<void> {
         return this._inTransaction(ctx, storeName, "readwrite", async (tx) => {
-            let maybeStore = fromThrowing(() =>
+            let [store, storeErr] = fromThrowing(() =>
                 tx.objectStore(storeName as string),
             )
-            if (!maybeStore.ok) {
-                return maybeStore
+            if (storeErr) {
+                return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
 
-            let store = maybeStore.value
-
-            let getReq = fromThrowing(() => store.delete(key))
-            if (!getReq.ok) {
-                return getReq
+            let [deleteRequest, err] = fromThrowing(() => store.delete(key))
+            if (err) {
+                return wrapErr`error deleting key from objectStore: ${storeName}: ${key}: ${err}`
             }
 
-            return wrapIDBRequest(getReq.value)
+            return wrapIDBRequest(deleteRequest)
         })
     }
 
@@ -267,16 +259,14 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         let abortErr: Error | undefined = undefined
         let result: R | undefined = undefined
 
-        let maybeTx = fromThrowing(() =>
+        let [tx, txErr] = fromThrowing(() =>
             this._db.transaction(storeName as string, mode),
         )
-        if (!maybeTx.ok) {
-            return maybeTx
+        if (txErr) {
+            return wrapErr`error starting transaction: ${txErr}`
         }
 
         let { resolve, reject, promise } = Promise.withResolvers<R>()
-
-        let tx = maybeTx.value
 
         tx.addEventListener("abort", () => {
             reject(abortErr ?? tx.error)
@@ -290,19 +280,19 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
             resolve(result as R)
         })
 
-        let maybeResult = await fn(tx)
-        if (!maybeResult.ok) {
-            abortErr = maybeResult.err
+        let [value, err] = await fn(tx)
+        if (err) {
+            abortErr = err
             tx.abort()
             return fromPromise(promise)
         }
 
-        result = maybeResult.value
+        result = value
 
-        let commit = fromThrowing(() => tx.commit())
-        if (!commit.ok) {
+        let [_, commitErr] = fromThrowing(() => tx.commit())
+        if (commitErr) {
             reject(tx.error)
-            return commit
+            return wrapErr`error comitting transacton: ${commitErr}}`
         }
 
         return fromPromise(promise)

@@ -26,8 +26,8 @@ export type PasteItem =
 export async function pasteFromClipboard(view: EditorView, items: PasteItem[]) {
     for (let item of items) {
         if (item.type === "text") {
-            let url = fromThrowing(() => new URL(item.data))
-            if (url.ok) {
+            let [_, urlErr] = fromThrowing(() => new URL(item.data))
+            if (!urlErr) {
                 insertLink(view, {
                     uri: item.data,
                     from: view.state.selection.main.from,

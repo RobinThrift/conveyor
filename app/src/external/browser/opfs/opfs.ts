@@ -1,6 +1,6 @@
 import { BaseContext, type Context } from "@/lib/context"
 import { type FS, join } from "@/lib/fs"
-import { type AsyncResult, Ok } from "@/lib/result"
+import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 import { newID } from "@/domain/ID"
 import { OPFSWorker } from "./OPFSWorker"
@@ -48,9 +48,9 @@ export class OPFS implements FS {
         ctx: Context,
         filepath: string,
     ): AsyncResult<ArrayBufferLike> {
-        let ready = await this._ready
-        if (!ready.ok) {
-            return ready
+        let [_ready, readyErr] = await this._ready
+        if (readyErr) {
+            return Err(readyErr)
         }
 
         return this._worker.read(ctx, {
@@ -63,9 +63,9 @@ export class OPFS implements FS {
         filepath: string,
         content: ArrayBufferLike,
     ): AsyncResult<number> {
-        let ready = await this._ready
-        if (!ready.ok) {
-            return ready
+        let [_ready, readyErr] = await this._ready
+        if (readyErr) {
+            return Err(readyErr)
         }
 
         return this._worker.write(ctx, {
@@ -75,9 +75,9 @@ export class OPFS implements FS {
     }
 
     public async remove(ctx: Context, filepath: string): AsyncResult<void> {
-        let ready = await this._ready
-        if (!ready.ok) {
-            return ready
+        let [_ready, readyErr] = await this._ready
+        if (readyErr) {
+            return Err(readyErr)
         }
 
         return this._worker.remove(ctx, {
@@ -90,9 +90,9 @@ export class OPFS implements FS {
             return Ok(undefined)
         }
 
-        let ready = await this._ready
-        if (!ready.ok) {
-            return ready
+        let [_ready, readyErr] = await this._ready
+        if (readyErr) {
+            return Err(readyErr)
         }
 
         return this._worker.mkdirp(ctx, {

@@ -43,19 +43,19 @@ export function wrapAsLink(view: EditorView) {
 }
 
 async function constructLink(uri: string) {
-    let url = fromThrowing(() => new URL(uri))
-    if (!url.ok) {
+    let [url, err] = fromThrowing(() => new URL(uri))
+    if (err) {
         return `[Link](${uri})`
     }
 
-    let ogd = await fetchOpenGraphData(url.value)
-    if (!ogd.ok || !ogd.value) {
-        return `[${url.value.host}${url.value.pathname}](${uri})`
+    let [ogd, ogdErr] = await fetchOpenGraphData(url)
+    if (ogdErr || !ogd) {
+        return `[${url.host}${url.pathname}](${uri})`
     }
 
-    if (ogd.value?.imageURL) {
-        return `::link-preview[${uri}]{title="${ogd.value.title}" description="${ogd.value.description}" img="${ogd.value.imageURL}"}`
+    if (ogd?.imageURL) {
+        return `::link-preview[${uri}]{title="${ogd.title}" description="${ogd.description}" img="${ogd.imageURL}"}`
     }
 
-    return `[${ogd.value?.title}](${uri})`
+    return `[${ogd?.title}](${uri})`
 }

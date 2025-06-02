@@ -1,4 +1,4 @@
-import { Ok, type Result, fmtErr, fromThrowing } from "@/lib/result"
+import { Err, Ok, type Result, fromThrowing, wrapErr } from "@/lib/result"
 import { decodeText } from "@/lib/textencoding"
 
 export function jsonDeserialize<R, V = unknown>(
@@ -14,20 +14,21 @@ export function jsonDeserialize<R, V = unknown>(
         str = decodeText(new Uint8Array(raw))
     }
 
-    let parsed = fromThrowing(() => JSON.parse(str))
-    if (typeof map === "function" && parsed.ok) {
-        return map(parsed.value)
+    let [parsed, err] = fromThrowing(() => JSON.parse(str))
+    if (typeof map === "function" && !err) {
+        return map(parsed)
     }
-    return parsed
+
+    return Ok(parsed)
 }
 
 export function parseJSONDate(raw: string): Result<Date> {
-    let res = fromThrowing(() => new Date(raw))
-    if (!res.ok) {
-        return fmtErr(`error parsing JSON date: '${raw}': %w`, res)
+    let [date, err] = fromThrowing(() => new Date(raw))
+    if (err) {
+        return wrapErr`error parsing JSON date: '${raw}': ${err}`
     }
 
-    return res
+    return Ok(date)
 }
 
 export function parseJSONDates<
@@ -44,12 +45,12 @@ export function parseJSONDates<
             if (obj[key]) {
                 continue
             }
-            let d = parseJSONDate(obj[key] as string)
-            if (!d.ok) {
-                return d
+            let [value, err] = parseJSONDate(obj[key] as string)
+            if (err) {
+                return Err(err)
             }
 
-            parsed[key] = d.value as (typeof parsed)[typeof key]
+            parsed[key] = value as (typeof parsed)[typeof key]
         }
 
         return Ok(parsed as R)

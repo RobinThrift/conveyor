@@ -3,15 +3,7 @@ import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
-import {
-    type AsyncResult,
-    Err,
-    Ok,
-    fmtErr,
-    fromPromise,
-    mapResult,
-    match,
-} from "@/lib/result"
+import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 import { newID } from "@/domain/ID"
 import { decodeText, encodeText } from "@/lib/textencoding"
@@ -47,28 +39,27 @@ export class MemoRepo {
         ctx: Context<{ db?: DBExec }>,
         memoID: MemoID,
     ): AsyncResult<Memo> {
-        return match(
-            fromPromise(
-                queries.getMemo(
-                    ctx.getData("db", this._db),
-                    { publicId: memoID },
-                    ctx.signal,
-                ),
+        let [row, err] = await fromPromise(
+            queries.getMemo(
+                ctx.getData("db", this._db),
+                { publicId: memoID },
+                ctx.signal,
             ),
-            async (row) => {
-                if (row === null) {
-                    return Err<Memo>(new Error(`memo not found: ${memoID}`))
-                }
-
-                return Ok<Memo>({
-                    ...row,
-                    id: row.publicId,
-                    content: decodeText(row.content),
-                })
-            },
-            async (err) =>
-                fmtErr<Memo>(`error getting memo ${memoID}: %w`, err),
         )
+
+        if (err) {
+            return wrapErr`error getting memo ${memoID}: ${err}`
+        }
+
+        if (row === null) {
+            return Err(new Error(`memo not found: ${memoID}`))
+        }
+
+        return Ok<Memo>({
+            ...row,
+            id: row.publicId,
+            content: decodeText(row.content),
+        })
     }
 
     public async listMemos(
@@ -149,25 +140,29 @@ export class MemoRepo {
                 )
         }
 
-        let rows = await fromPromise(
+        let [rows, err] = await fromPromise(
             listFn(ctx.getData("db", this._db), query, ctx.signal),
         )
 
-        return mapResult(rows, (memos) => ({
-            items: memos.map((m) => ({
+        if (err) {
+            return wrapErr`error listing memos: ${err}`
+        }
+
+        return Ok({
+            items: rows.map((m) => ({
                 ...m,
                 id: m.publicId,
                 content: decodeText(m.content),
             })),
-            next: memos.at(-1)?.createdAt,
-        }))
+            next: rows.at(-1)?.createdAt,
+        })
     }
 
     public async createMemo(
         ctx: Context<{ db: DBExec }>,
         memo: CreateMemoRequest,
     ): AsyncResult<Memo> {
-        let inserted = await fromPromise(
+        let [inserted, err] = await fromPromise(
             queries.createMemo(
                 ctx.getData("db", this._db),
                 {
@@ -178,36 +173,36 @@ export class MemoRepo {
                 ctx.signal,
             ),
         )
-        if (!inserted.ok) {
-            return inserted
+        if (err) {
+            return wrapErr`error creating memo: ${err}`
         }
 
-        if (inserted.value === null) {
+        if (inserted === null) {
             return Err(new Error("error creating Memo"))
         }
 
-        let createdRow = await fromPromise(
+        let [createdRow, getMemoErr] = await fromPromise(
             queries.getMemo(ctx.getData("db", this._db), {
-                publicId: inserted.value.publicId,
+                publicId: inserted.publicId,
             }),
         )
-        if (!createdRow.ok) {
-            return createdRow
+        if (getMemoErr) {
+            return wrapErr`error creating memo: error retrieving created memo: ${getMemoErr}`
         }
 
-        if (createdRow.value === null) {
+        if (createdRow === null) {
             return Err(new Error("error creating Memo"))
         }
 
         let created = {
-            ...createdRow.value,
-            id: createdRow.value.publicId,
-            content: decodeText(createdRow.value.content),
+            ...createdRow,
+            id: createdRow.publicId,
+            content: decodeText(createdRow.content),
         }
 
-        let updated = await this._updateTags(ctx, created)
-        if (!updated.ok) {
-            return updated
+        let [_, updateTagsErr] = await this._updateTags(ctx, created)
+        if (updateTagsErr) {
+            return wrapErr`error creating memo: ${err}`
         }
 
         return Ok(created)
@@ -217,7 +212,7 @@ export class MemoRepo {
         ctx: Context<{ db: DBExec }>,
         memo: UpdateMemoContentRequest,
     ): AsyncResult<void> {
-        let updated = await fromPromise(
+        let [updated, err] = await fromPromise(
             queries.updateMemoContent(
                 ctx.getData("db", this._db),
                 {
@@ -227,14 +222,15 @@ export class MemoRepo {
                 ctx.signal,
             ),
         )
-
-        if (!updated.ok) {
-            return updated
+        if (err) {
+            return wrapErr`error updating memo content: ${memo.id}: ${err}`
         }
 
-        if (updated.value === 0) {
+        if (updated === 0) {
             return Err(
-                new Error(`error updating Memo: Memo not found: ${memo.id}`),
+                new Error(
+                    `error updating memo content: memo not found: ${memo.id}`,
+                ),
             )
         }
 
@@ -247,7 +243,7 @@ export class MemoRepo {
         ctx: Context<{ db: DBExec }>,
         { id: memoID, isArchived }: { id: MemoID; isArchived: boolean },
     ): AsyncResult<void> {
-        let updated = await fromPromise(
+        let [updated, err] = await fromPromise(
             queries.seteMemoArchiveStatus(
                 ctx.getData("db", this._db),
                 {
@@ -257,14 +253,14 @@ export class MemoRepo {
                 ctx.signal,
             ),
         )
-        if (!updated.ok) {
-            return updated
+        if (err) {
+            return wrapErr`error updating memo archive status: ${memoID}: ${err}`
         }
 
-        if (updated.value === 0) {
+        if (updated === 0) {
             return Err(
                 new Error(
-                    `error updating Memo archive status: Memo not found: ${memoID}`,
+                    `error updating memo archive status: memo not found: ${memoID}`,
                 ),
             )
         }
@@ -276,7 +272,7 @@ export class MemoRepo {
         ctx: Context<{ db: DBExec }>,
         memoID: MemoID,
     ): AsyncResult<void> {
-        let updated = await fromPromise(
+        let [updated, err] = await fromPromise(
             queries.setMemoDeletionStatus(
                 ctx.getData("db", this._db),
                 {
@@ -286,33 +282,33 @@ export class MemoRepo {
                 ctx.signal,
             ),
         )
-        if (!updated.ok) {
-            return updated
+        if (err) {
+            return wrapErr`error marking memo as deleted: ${memoID}: ${err}`
         }
 
-        if (updated.value === 0) {
+        if (updated === 0) {
             return Err(
                 new Error(
-                    `error marking Memo as deleted: Memo not found: ${memoID}`,
+                    `error marking memo as deleted: memo not found: ${memoID}`,
                 ),
             )
         }
 
-        let deletedTags = await fromPromise(
+        let [deletedTags, deleteTagsErr] = await fromPromise(
             queries.deleteMemoTagConnections(
                 ctx.getData("db", this._db),
                 { memoId: memoID },
                 ctx.signal,
             ),
         )
-        if (!deletedTags.ok) {
-            return deletedTags
+        if (deleteTagsErr) {
+            return wrapErr`error marking memo as deleted: ${memoID}: error deleting tag connections: ${err}`
         }
 
         await queries.updateTagCount(
             ctx.getData("db", this._db),
             {
-                tags: [...deletedTags.value.map((r) => r.tag)],
+                tags: [...deletedTags.map((r) => r.tag)],
             },
             ctx.signal,
         )
@@ -326,7 +322,7 @@ export class MemoRepo {
         ctx: Context<{ db: DBExec }>,
         memoID: MemoID,
     ): AsyncResult<void> {
-        let updated = await fromPromise(
+        let [updated, err] = await fromPromise(
             queries.setMemoDeletionStatus(
                 ctx.getData("db", this._db),
                 {
@@ -336,26 +332,26 @@ export class MemoRepo {
                 ctx.signal,
             ),
         )
-        if (!updated.ok) {
-            return updated
+        if (err) {
+            return wrapErr`error removing memo being marked as deleted: ${memoID}: ${err}`
         }
 
-        if (updated.value === 0) {
+        if (updated === 0) {
             return Err(
                 new Error(
-                    `error removing Memo being marked as deleted: Memo not found: ${memoID}`,
+                    `error removing memo being marked as deleted: memo not found: ${memoID}`,
                 ),
             )
         }
 
-        let memo = await this.getMemo(ctx, memoID)
-        if (!memo.ok) {
-            return memo
+        let [memo, getMemoErr] = await this.getMemo(ctx, memoID)
+        if (getMemoErr) {
+            return wrapErr`error removing memo being marked as deleted: ${memoID}: error getting memo: ${getMemoErr}`
         }
 
-        let updateTagsResult = await this._updateTags(ctx, memo.value)
-        if (!updateTagsResult.ok) {
-            return updateTagsResult
+        let [_, updateTagsErr] = await this._updateTags(ctx, memo)
+        if (updateTagsErr) {
+            return wrapErr`error removing memo being marked as deleted: ${memoID}: error getting updating tags: ${updateTagsErr}`
         }
 
         return Ok(undefined)
@@ -365,7 +361,7 @@ export class MemoRepo {
         ctx: Context<{ db: DBExec }>,
         query: ListTagsQuery,
     ): AsyncResult<TagList> {
-        let result = await fromPromise(
+        let [tags, err] = await fromPromise(
             queries.listTags(
                 ctx.getData("db", this._db),
                 {
@@ -375,11 +371,14 @@ export class MemoRepo {
                 ctx.signal,
             ),
         )
+        if (err) {
+            return wrapErr`error listing tags: ${err}`
+        }
 
-        return mapResult(result, (tags) => ({
+        return Ok({
             items: tags,
             next: tags.at(-1)?.tag,
-        }))
+        })
     }
 
     public async cleanupDeletedMemos(
@@ -399,7 +398,7 @@ export class MemoRepo {
     ): AsyncResult<void> {
         let tags = extractTags(memo.content)
 
-        let deletedTags = await fromPromise(
+        let [deletedTags, err] = await fromPromise(
             queries.cleanupeMemoTagConnection(
                 ctx.getData("db", this._db),
                 {
@@ -409,8 +408,8 @@ export class MemoRepo {
                 ctx.signal,
             ),
         )
-        if (!deletedTags.ok) {
-            return deletedTags
+        if (err) {
+            return wrapErr`updating tags: ${err}`
         }
 
         for (let tag of tags) {
@@ -421,7 +420,7 @@ export class MemoRepo {
                     ctx.signal,
                 ),
             )
-            if (!createTagResult.ok) {
+            if (err) {
                 return createTagResult
             }
 
@@ -435,7 +434,7 @@ export class MemoRepo {
                     ctx.signal,
                 ),
             )
-            if (!createResult.ok) {
+            if (err) {
                 return createResult
             }
         }
@@ -444,12 +443,12 @@ export class MemoRepo {
             queries.updateTagCount(
                 ctx.getData("db", this._db),
                 {
-                    tags: [...deletedTags.value.map((r) => r.tag), ...tags],
+                    tags: [...deletedTags.map((r) => r.tag), ...tags],
                 },
                 ctx.signal,
             ),
         )
-        if (!updateResult.ok) {
+        if (err) {
             return updateResult
         }
 

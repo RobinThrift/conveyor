@@ -5,7 +5,7 @@ import type { SyncController } from "@/control/SyncController"
 import type { UnlockController } from "@/control/UnlockController"
 import { DEFAULT_SETTINGS } from "@/domain/Settings"
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Ok, toPromise } from "@/lib/result"
+import { type AsyncResult, Err, Ok, toPromise } from "@/lib/result"
 import { getThreadName } from "@/lib/thread"
 import { type RootStore, actions, selectors } from "@/ui/state"
 import type { SettingsState } from "@/ui/state/settings/slice"
@@ -35,38 +35,42 @@ export async function tryAutoUnlock(
     },
 ): AsyncResult<AutoUnlockResult | undefined> {
     performance.mark("autoUnlock:loadSetupInfo:start")
-    let loadSetupInfo = await setupCtrl.loadSetupInfo(ctx)
+    let [loadSetupInfo, loadSetupInfoErr] = await setupCtrl.loadSetupInfo(ctx)
     performance.mark("autoUnlock:loadSetupInfo:end", {
-        detail: { thread: getThreadName(), ok: loadSetupInfo.ok },
+        detail: { thread: getThreadName(), ok: loadSetupInfoErr === undefined },
     })
 
-    if (!loadSetupInfo.ok) {
-        return loadSetupInfo
+    if (loadSetupInfoErr) {
+        return Err(loadSetupInfoErr)
     }
 
-    if (!loadSetupInfo.value || !loadSetupInfo.value.isSetup) {
+    if (!loadSetupInfo || !loadSetupInfo.isSetup) {
         return Ok(undefined)
     }
 
     let isUnlocked = false
 
     performance.mark("autoUnlock:tryGetPlaintextPrivateKey:start")
-    let plaintextKeyData = await unlockCtrl.tryGetPlaintextPrivateKey(ctx)
+    let [plaintextKeyData, plaintextKeyDataErr] =
+        await unlockCtrl.tryGetPlaintextPrivateKey(ctx)
     performance.mark("autoUnlock:tryGetPlaintextPrivateKey:end", {
-        detail: { thread: getThreadName(), ok: plaintextKeyData.ok },
+        detail: {
+            thread: getThreadName(),
+            ok: plaintextKeyDataErr === undefined,
+        },
     })
 
-    if (plaintextKeyData.ok && plaintextKeyData.value) {
+    if (!plaintextKeyDataErr && plaintextKeyData) {
         performance.mark("autoUnlock:unlock:start")
-        let unlocked = await unlockCtrl.unlock(ctx, {
-            plaintextKeyData: plaintextKeyData.value,
+        let [_, unlockErr] = await unlockCtrl.unlock(ctx, {
+            plaintextKeyData: plaintextKeyData,
         })
         performance.mark("autoUnlock:unlock:end", {
-            detail: { thread: getThreadName(), ok: unlocked.ok },
+            detail: { thread: getThreadName(), ok: unlockErr === undefined },
         })
 
-        if (!unlocked.ok) {
-            throw unlocked
+        if (unlockErr) {
+            throw unlockErr
         }
         isUnlocked = true
     }
@@ -101,23 +105,23 @@ export async function tryAutoUnlock(
     }
 
     performance.mark("autoUnlock:loadSettings:start")
-    let loadSettings = await settingsCtrl.loadSettings(ctx)
+    let [settings, loadSettingsErr] = await settingsCtrl.loadSettings(ctx)
     performance.mark("autoUnlock:loadSettings:end", {
-        detail: { thread: getThreadName(), ok: loadSettings.ok },
+        detail: { thread: getThreadName(), ok: loadSettingsErr === undefined },
     })
 
-    if (!loadSettings.ok) {
-        return loadSettings
+    if (loadSettingsErr) {
+        return Err(loadSettingsErr)
     }
 
     performance.mark("autoUnlock:loadSyncInfo:start")
-    let loadSyncInfo = await syncCtrl.load(ctx)
+    let [syncInfo, loadSyncInfoErr] = await syncCtrl.load(ctx)
     performance.mark("autoUnlock:loadSyncInfo:end", {
-        detail: { thread: getThreadName(), ok: loadSyncInfo.ok },
+        detail: { thread: getThreadName(), ok: loadSyncInfoErr === undefined },
     })
 
-    if (!loadSyncInfo.ok) {
-        return loadSyncInfo
+    if (loadSyncInfoErr) {
+        return Err(loadSyncInfoErr)
     }
 
     return Ok({
@@ -126,9 +130,7 @@ export async function tryAutoUnlock(
             step: "done",
             selectedOptions: {
                 isNew: false,
-                syncMethod: loadSyncInfo.value?.isEnabled
-                    ? "remote-sync"
-                    : "local-only",
+                syncMethod: syncInfo?.isEnabled ? "remote-sync" : "local-only",
             },
         },
 
@@ -139,14 +141,14 @@ export async function tryAutoUnlock(
         settings: {
             isLoading: false,
             isLoaded: true,
-            values: loadSettings.value,
+            values: settings,
         },
 
-        sync: loadSyncInfo.value?.isEnabled
+        sync: syncInfo?.isEnabled
             ? {
                   status: "ready",
                   isSyncRequested: false,
-                  info: loadSyncInfo.value,
+                  info: syncInfo,
               }
             : {
                   status: "disabled",

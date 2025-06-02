@@ -6,13 +6,23 @@ import sqlite3InitModule, {
 } from "@sqlite.org/sqlite-wasm"
 
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Ok, fromPromise, fromThrowing } from "@/lib/result"
+import { createErrType } from "@/lib/errors"
+import {
+    type AsyncResult,
+    Ok,
+    fromPromise,
+    fromThrowing,
+    wrapErr,
+} from "@/lib/result"
 import { createWorker } from "@/lib/worker"
+
 import { privateKeyToDBKey } from "./privateKeyToDBKey"
 
 let sqlite3: Sqlite3Static | undefined = undefined
 let sqlite3Init: Promise<Sqlite3Static>
 let db: Database | undefined = undefined
+
+const ErrOpen = createErrType("SQLiteWorker", "error reading file")
 
 export const SQLiteWorker = createWorker({
     _setup: async (_ctx: Context, _params: any): AsyncResult<void> => {
@@ -48,12 +58,12 @@ export const SQLiteWorker = createWorker({
             enableTracing?: boolean
         },
     ): AsyncResult<void> => {
-        let sqlite3InitRes = await fromPromise(sqlite3Init)
-        if (!sqlite3InitRes.ok) {
-            return sqlite3InitRes
+        let [sqlite3InitValue, initErr] = await fromPromise(sqlite3Init)
+        if (initErr) {
+            return wrapErr`${ErrOpen}: ${initErr}`
         }
 
-        sqlite3 = sqlite3InitRes.value
+        sqlite3 = sqlite3InitValue
 
         console.debug(
             `Opening SQLite3 database (file: ${file}; version: ${sqlite3.version.libVersion})`,

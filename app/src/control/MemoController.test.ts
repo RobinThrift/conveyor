@@ -46,30 +46,33 @@ suite("control/MemoController", () => {
             await setup()
 
             for (let i = 0; i < numMemos * 1.5; i++) {
-                let res = await memoCtrl.createMemo(ctx, {
+                let [created, err] = await memoCtrl.createMemo(ctx, {
                     content: `# Test Memo ${i}\n With some more content for memo ${i}\n #tag-${i}d #parent/tag-${i + 1} #mod-two-is-${i % 2}`,
                     createdAt: now.subtract({ hours: i }).toDate("utc"),
                 })
-                if (!res.ok) {
-                    throw res.err
+                if (err) {
+                    throw err
                 }
-                createdMemosIDs.push(res.value.id)
+                createdMemosIDs.push(created.id)
             }
 
             for (let i = numMemos; i < numMemos * 1.25; i++) {
-                let res = await memoCtrl.updateMemoArchiveStatus(ctx, {
+                let [_, err] = await memoCtrl.updateMemoArchiveStatus(ctx, {
                     id: createdMemosIDs[i],
                     isArchived: true,
                 })
-                if (!res.ok) {
-                    throw res.err
+                if (err) {
+                    throw err
                 }
             }
 
             for (let i = numMemos * 1.25; i < numMemos * 1.5; i++) {
-                let res = await memoCtrl.deleteMemo(ctx, createdMemosIDs[i])
-                if (!res.ok) {
-                    throw res.err
+                let [_, err] = await memoCtrl.deleteMemo(
+                    ctx,
+                    createdMemosIDs[i],
+                )
+                if (err) {
+                    throw err
                 }
             }
         })
@@ -260,14 +263,14 @@ suite("control/MemoController", () => {
             ) => {
                 let createdMemosIDs: MemoID[] = []
                 for (let i = 0; i < numMemos; i++) {
-                    let res = await memoCtrl.createMemo(ctx, {
+                    let [created, err] = await memoCtrl.createMemo(ctx, {
                         content: `# Test Memo ${i}\n With some more content for memo ${i}`,
                         createdAt: now.subtract({ hours: i }).toDate("utc"),
                     })
-                    if (!res.ok) {
-                        throw res.err
+                    if (err) {
+                        throw err
                     }
-                    createdMemosIDs.push(res.value.id)
+                    createdMemosIDs.push(created.id)
                 }
 
                 return createdMemosIDs
@@ -586,14 +589,14 @@ suite("control/MemoController", () => {
         ) => {
             let createdMemosIDs: MemoID[] = []
             for (let i = 0; i < numMemos; i++) {
-                let res = await memoCtrl.createMemo(ctx, {
+                let [created, err] = await memoCtrl.createMemo(ctx, {
                     content: `# Test Memo ${i}\n With some more content for memo ${i} #tag-${i} #shared-tag`,
                     createdAt: now.subtract({ hours: i }).toDate("utc"),
                 })
-                if (!res.ok) {
-                    throw res.err
+                if (err) {
+                    throw err
                 }
-                createdMemosIDs.push(res.value.id)
+                createdMemosIDs.push(created.id)
             }
 
             return createdMemosIDs

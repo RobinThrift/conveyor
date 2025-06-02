@@ -41,7 +41,7 @@ suite("control/AuthController", async () => {
                         })
                     }
 
-                    return Err(new UnauthorizedError(""))
+                    return Err(new UnauthorizedError())
                 },
             },
         })
@@ -86,7 +86,7 @@ suite("control/AuthController", async () => {
                     })
                 }
 
-                return Err(new UnauthorizedError(""))
+                return Err(new UnauthorizedError())
             },
         }
 

@@ -6,7 +6,7 @@ import type {
 import { newID } from "@/domain/ID"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
-import { type AsyncResult, Ok } from "@/lib/result"
+import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 export class ChangelogController {
     private _sourceName: string
@@ -47,13 +47,13 @@ export class ChangelogController {
     ): AsyncResult<void> {
         return this._transactioner.inTransaction(ctx, async (ctx) => {
             for (let entry of entries) {
-                let res = await this._repo.createChangelogEntry(ctx, entry)
-                if (!res.ok) {
-                    return res
+                let [_, err] = await this._repo.createChangelogEntry(ctx, entry)
+                if (err) {
+                    return Err(err)
                 }
             }
 
-            return Ok(undefined)
+            return Ok()
         })
     }
 

@@ -3,6 +3,7 @@ import { BaseContext } from "@/lib/context"
 import type { StartListening } from "@/ui/state/rootStore"
 
 import { PasswordChangeRequiredError } from "@/auth"
+import { isErr } from "@/lib/errors"
 import { fromThrowing } from "@/lib/result"
 import { slice } from "./slice"
 
@@ -33,36 +34,36 @@ export const registerEffects = (
                 }),
             )
 
-            let serverURL = fromThrowing(() => new URL(payload.server))
-            if (!serverURL.ok) {
+            let [serverURL, err] = fromThrowing(() => new URL(payload.server))
+            if (err) {
                 dispatch(
                     slice.actions.setAuthStatus({
-                        error: serverURL.err,
+                        error: err,
                         status: "error",
                     }),
                 )
                 return
             }
 
-            authCtrl.setOrigin(serverURL.value.host)
-            let token = await authCtrl.getInitialToken(
+            authCtrl.setOrigin(serverURL.host)
+            let [_, getInitialTokenErr] = await authCtrl.getInitialToken(
                 BaseContext.withSignal(signal),
                 payload,
             )
 
-            if (!token.ok && token.err instanceof PasswordChangeRequiredError) {
+            if (isErr(getInitialTokenErr, PasswordChangeRequiredError)) {
                 dispatch(
                     slice.actions.setAuthStatus({
-                        error: token.err,
+                        error: getInitialTokenErr,
                         status: "password-change-required",
                     }),
                 )
             }
 
-            if (!token.ok) {
+            if (getInitialTokenErr) {
                 dispatch(
                     slice.actions.setAuthStatus({
-                        error: token.err,
+                        error: getInitialTokenErr,
                         status: "error",
                     }),
                 )
@@ -99,15 +100,15 @@ export const registerEffects = (
                 }),
             )
 
-            let changed = await authCtrl.changePassword(
+            let [_, err] = await authCtrl.changePassword(
                 BaseContext.withSignal(signal),
                 payload,
             )
 
-            if (!changed.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setAuthStatus({
-                        error: changed.err,
+                        error: err,
                         status: "password-change-error",
                     }),
                 )
@@ -124,12 +125,12 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.reset,
-        effect: async (_, { cancelActiveListeners, signal }) => {
+        effect: async (_action, { cancelActiveListeners, signal }) => {
             cancelActiveListeners()
 
-            let reset = await authCtrl.reset(BaseContext.withSignal(signal))
-            if (!reset.ok) {
-                console.error(reset.err)
+            let [_, err] = await authCtrl.reset(BaseContext.withSignal(signal))
+            if (err) {
+                console.error(err)
                 return
             }
         },

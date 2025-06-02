@@ -1,7 +1,8 @@
 import type { AccountKey } from "@/domain/AccountKey"
 import { encodeToBase64 } from "@/lib/base64"
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
+import { createErrType } from "@/lib/errors"
+import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 
@@ -24,11 +25,15 @@ export class AccountKeysV1APIClient {
         this._baseURL = baseURL
     }
 
+    public static ErrApplyChangelogEntries = createErrType(
+        "AccountKeysV1APIClient",
+        "error uploading account key",
+    )
     public async uploadAccountKey(
         ctx: Context,
         accountKey: AccountKey,
     ): AsyncResult<void> {
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
             "/api/auth/v1/keys",
@@ -38,25 +43,27 @@ export class AccountKeysV1APIClient {
                 data: encodeToBase64(accountKey.data),
             }),
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new AccountKeysV1APIClient.ErrApplyChangelogEntries()}: ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr("error uploading account key: %w", res)
+        let [res, uploadErr] = await fromPromise(
+            fetch(req, { signal: ctx.signal }),
+        )
+        if (uploadErr) {
+            return wrapErr`${new AccountKeysV1APIClient.ErrApplyChangelogEntries()}: error uploading account key: ${uploadErr}`
         }
 
-        if (res.value.status === 401) {
-            return Err(new UnauthorizedError("error uploading account key"))
+        if (res.status === 401) {
+            return wrapErr`error uploading account key ${new UnauthorizedError()}`
         }
 
-        if (res.value.status !== 201) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(err.withPrefix("error uploading account key"))
+        if (res.status !== 201) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new AccountKeysV1APIClient.ErrApplyChangelogEntries()}: error uploading account key: ${err}`
         }
 
-        return Ok(undefined)
+        return Ok()
     }
 
     private async _createBaseRequest(
@@ -65,21 +72,21 @@ export class AccountKeysV1APIClient {
         path: string,
         body?: BodyInit,
     ): AsyncResult<Request> {
-        let token = await this._tokenStorage.getToken(ctx)
-        if (!token.ok) {
-            return token
+        let [token, tokenErr] = await this._tokenStorage.getToken(ctx)
+        if (tokenErr) {
+            return wrapErr`error creating request: error getting token: ${tokenErr}`
         }
 
-        let req = new Request(new URL(path, this._baseURL), {
-            method,
-            redirect: "follow",
-            body,
-            headers: {
-                Authorization: `Bearer ${token.value}`,
-            },
-        })
-
-        return Ok(req)
+        return Ok(
+            new Request(new URL(path, this._baseURL), {
+                method,
+                redirect: "follow",
+                body,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }),
+        )
     }
 }
 

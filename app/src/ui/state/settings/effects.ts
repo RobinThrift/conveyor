@@ -46,23 +46,23 @@ export const registerEffects = (
                 Second * 5,
             )
 
-            let loaded = await settingsCtrl.loadSettings(ctx)
+            let [loaded, err] = await settingsCtrl.loadSettings(ctx)
 
-            if (!loaded.ok) {
-                dispatch(slice.actions.setError(loaded.err))
+            if (err) {
+                dispatch(slice.actions.setError(err))
                 cancel()
                 return
             }
 
             cancel()
-            dispatch(slice.actions.loadDone(loaded.value))
+            dispatch(slice.actions.loadDone(loaded))
         },
     })
 
     startListening({
         actionCreator: slice.actions.set,
         effect: async ({ payload }, { dispatch, signal }) => {
-            let updated = await settingsCtrl.updateSetting(
+            let [_, err] = await settingsCtrl.updateSetting(
                 BaseContext.withSignal(signal),
                 {
                     key: payload.key,
@@ -70,8 +70,8 @@ export const registerEffects = (
                 },
             )
 
-            if (!updated.ok) {
-                dispatch(slice.actions.setError(updated.err))
+            if (err) {
+                dispatch(slice.actions.setError(err))
             }
         },
     })

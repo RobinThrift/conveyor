@@ -22,16 +22,16 @@ export const registerEffects = (
 
             let ctx = BaseContext.withSignal(signal)
 
-            let created = await attachmentCtrl.createAttachment(ctx, {
+            let [created, err] = await attachmentCtrl.createAttachment(ctx, {
                 id: payload.id,
                 filename: payload.filename,
                 content: payload.content,
             })
-            if (!created.ok) {
+            if (err) {
                 dispatch(
                     transfer.slice.actions.setTransferError({
                         id: payload.id,
-                        error: created.err,
+                        error: err,
                     }),
                 )
                 return
@@ -39,7 +39,7 @@ export const registerEffects = (
 
             dispatch(
                 transfer.slice.actions.setTransferDone({
-                    id: created.value,
+                    id: created,
                 }),
             )
         },

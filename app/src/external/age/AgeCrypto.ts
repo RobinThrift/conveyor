@@ -5,7 +5,7 @@ import type {
     PrivateCryptoKey,
     PublicCryptoKey,
 } from "@/lib/crypto"
-import { type AsyncResult, Err, Ok, fromPromise } from "@/lib/result"
+import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 export type Identity = string & { readonly "": unique symbol }
 export type Recipient = string & { readonly "": unique symbol }
@@ -25,16 +25,16 @@ export class AgePrivateCryptoKey
             return Ok(this._public)
         }
 
-        let receipientFromIdent = await fromPromise(
+        let [receipientFromIdent, err] = await fromPromise(
             age.identityToRecipient(this.data),
         )
-        if (!receipientFromIdent.ok) {
-            return receipientFromIdent
+        if (err) {
+            return wrapErr`error constructing recipient from identity: ${err}`
         }
 
         this._public = {
             type: this.type,
-            data: receipientFromIdent.value as Recipient,
+            data: receipientFromIdent as Recipient,
         }
 
         return Ok(this._public)
@@ -44,22 +44,22 @@ export class AgePrivateCryptoKey
         return Ok(this.data as string as PlaintextPrivateKey)
     }
 
-    async exportPublicKey() {
-        let publicKey = await this.publicKey()
-        if (!publicKey.ok) {
-            return publicKey
+    async exportPublicKey(): AsyncResult<string> {
+        let [publicKey, err] = await this.publicKey()
+        if (err) {
+            return wrapErr`error exporting public key: ${err}`
         }
 
-        return Ok(publicKey.value.data as string)
+        return Ok(publicKey.data as string)
     }
 
     static async generate(): AsyncResult<AgePrivateCryptoKey> {
-        let identity = await fromPromise(age.generateIdentity())
-        if (!identity.ok) {
-            return identity
+        let [identity, err] = await fromPromise(age.generateIdentity())
+        if (err) {
+            return wrapErr`error generating key: ${err}`
         }
 
-        return Ok(new AgePrivateCryptoKey(identity.value as Identity))
+        return Ok(new AgePrivateCryptoKey(identity as Identity))
     }
 }
 
@@ -74,11 +74,11 @@ export class AgeCrypto {
     }
 
     async init(key: AgePrivateCryptoKey): AsyncResult<void> {
-        let publicKey = await key.publicKey()
-        if (!publicKey.ok) {
-            return publicKey
+        let [publicKey, err] = await key.publicKey()
+        if (err) {
+            return Err(err)
         }
-        this._encrypter.addRecipient(publicKey.value.data)
+        this._encrypter.addRecipient(publicKey.data)
         this._decrypter.addIdentity(key.data)
         this._initialised = true
         return Ok(undefined)
@@ -91,12 +91,12 @@ export class AgeCrypto {
             return Err(new Error("encryptData called before `init`"))
         }
 
-        let encrypted = await fromPromise(this._encrypter.encrypt(data))
-        if (!encrypted.ok) {
-            return encrypted
+        let [encrypted, err] = await fromPromise(this._encrypter.encrypt(data))
+        if (err) {
+            return wrapErr`error encrypting data: ${err}`
         }
 
-        return Ok(encrypted.value.buffer)
+        return Ok(encrypted.buffer)
     }
 
     async decryptData(
@@ -106,12 +106,12 @@ export class AgeCrypto {
             return Err(new Error("decryptData called before `init`"))
         }
 
-        let decryped = await fromPromise(this._decrypter.decrypt(data))
-        if (!decryped.ok) {
-            return decryped
+        let [decryped, err] = await fromPromise(this._decrypter.decrypt(data))
+        if (err) {
+            return wrapErr`error decrypting data: ${err}`
         }
 
-        return Ok(decryped.value.buffer)
+        return Ok(decryped.buffer)
     }
 
     async generatePrivateKey(): AsyncResult<AgePrivateCryptoKey> {

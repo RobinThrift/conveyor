@@ -101,7 +101,7 @@ export const registerEffects = (
         ) => {
             cancelActiveListeners()
 
-            let memos = await memoCtrl.listMemos(
+            let [memos, err] = await memoCtrl.listMemos(
                 BaseContext.withSignal(signal),
                 {
                     filter,
@@ -109,10 +109,10 @@ export const registerEffects = (
                 },
             )
 
-            if (!memos.ok) {
+            if (err) {
                 dispatch(
                     list.slice.actions.setError({
-                        error: memos.err,
+                        error: err,
                     }),
                 )
                 return
@@ -122,7 +122,7 @@ export const registerEffects = (
                 return
             }
 
-            dispatch(list.slice.actions.appendMemos(memos.value))
+            dispatch(list.slice.actions.appendMemos(memos))
         },
     })
 
@@ -134,15 +134,15 @@ export const registerEffects = (
         ) => {
             cancelActiveListeners()
 
-            let created = await memoCtrl.createMemo(
+            let [created, err] = await memoCtrl.createMemo(
                 BaseContext.withSignal(signal),
                 payload.memo,
             )
 
-            if (!created.ok) {
+            if (err) {
                 dispatch(
                     create.slice.actions.setError({
-                        error: created.err,
+                        error: err,
                     }),
                 )
                 return
@@ -150,11 +150,9 @@ export const registerEffects = (
 
             let state = getState()
 
-            dispatch(create.slice.actions.setDone({ memo: created.value }))
+            dispatch(create.slice.actions.setDone({ memo: created }))
             if (Object.keys(selectors.filter(state)).length === 0) {
-                dispatch(
-                    list.slice.actions.prependMemo({ memo: created.value }),
-                )
+                dispatch(list.slice.actions.prependMemo({ memo: created }))
             }
         },
     })
@@ -192,19 +190,17 @@ export const registerEffects = (
 
             let ctx = BaseContext.withSignal(signal)
 
-            let memo = await memoCtrl.getMemo(ctx, payload.id)
-            if (!memo.ok) {
+            let [memo, err] = await memoCtrl.getMemo(ctx, payload.id)
+            if (err) {
                 dispatch(
                     single.slice.actions.setError({
-                        error: memo.err,
+                        error: err,
                     }),
                 )
                 return
             }
 
-            dispatch(
-                single.slice.actions.setCurrentSingleMemo({ memo: memo.value }),
-            )
+            dispatch(single.slice.actions.setCurrentSingleMemo({ memo: memo }))
         },
     })
 
@@ -219,14 +215,14 @@ export const registerEffects = (
             let ctx = BaseContext.withSignal(signal)
 
             if (payload.memo.content) {
-                let updated = await memoCtrl.updateMemoContent(ctx, {
+                let [_, err] = await memoCtrl.updateMemoContent(ctx, {
                     id: payload.memo.id,
                     ...payload.memo.content,
                 })
-                if (!updated.ok) {
+                if (err) {
                     dispatch(
                         update.slice.actions.setError({
-                            error: updated.err,
+                            error: err,
                         }),
                     )
                     return
@@ -234,14 +230,14 @@ export const registerEffects = (
             }
 
             if (typeof payload.memo.isArchived !== "undefined") {
-                let updated = await memoCtrl.updateMemoArchiveStatus(ctx, {
+                let [_, err] = await memoCtrl.updateMemoArchiveStatus(ctx, {
                     id: payload.memo.id,
                     isArchived: payload.memo.isArchived,
                 })
-                if (!updated.ok) {
+                if (err) {
                     dispatch(
                         update.slice.actions.setError({
-                            error: updated.err,
+                            error: err,
                         }),
                     )
                     return
@@ -252,11 +248,11 @@ export const registerEffects = (
                 typeof payload.memo.isDeleted !== "undefined" &&
                 payload.memo.isDeleted
             ) {
-                let deleted = await memoCtrl.deleteMemo(ctx, payload.memo.id)
-                if (!deleted.ok) {
+                let [_, err] = await memoCtrl.deleteMemo(ctx, payload.memo.id)
+                if (err) {
                     dispatch(
                         update.slice.actions.setError({
-                            error: deleted.err,
+                            error: err,
                         }),
                     )
                     return
@@ -267,25 +263,22 @@ export const registerEffects = (
                 typeof payload.memo.isDeleted !== "undefined" &&
                 !payload.memo.isDeleted
             ) {
-                let undeleted = await memoCtrl.undeleteMemo(
-                    ctx,
-                    payload.memo.id,
-                )
-                if (!undeleted.ok) {
+                let [_, err] = await memoCtrl.undeleteMemo(ctx, payload.memo.id)
+                if (err) {
                     dispatch(
                         update.slice.actions.setError({
-                            error: undeleted.err,
+                            error: err,
                         }),
                     )
                     return
                 }
             }
 
-            let memo = await memoCtrl.getMemo(ctx, payload.memo.id)
-            if (!memo.ok) {
+            let [memo, err] = await memoCtrl.getMemo(ctx, payload.memo.id)
+            if (err) {
                 dispatch(
                     update.slice.actions.setError({
-                        error: memo.err,
+                        error: err,
                     }),
                 )
                 return
@@ -296,7 +289,7 @@ export const registerEffects = (
             }
 
             dispatch(update.slice.actions.setDone())
-            dispatch(list.slice.actions.setMemo({ memo: memo.value }))
+            dispatch(list.slice.actions.setMemo({ memo: memo }))
         },
     })
 

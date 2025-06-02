@@ -1,4 +1,5 @@
 import { PasswordChangeRequiredError, type PlaintextPassword } from "@/auth"
+import { isErr } from "@/lib/errors"
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 export type AuthStatus =
@@ -40,7 +41,7 @@ export const slice = createSlice({
             state.status = payload.status
             state.error = payload.error
 
-            if (payload.error instanceof PasswordChangeRequiredError) {
+            if (isErr(payload.error, PasswordChangeRequiredError)) {
                 state.status = "password-change-required"
             }
         },

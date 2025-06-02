@@ -239,13 +239,13 @@ function StepConfigureEncryption({
     )
 
     let generate = useCallback(() => {
-        generatePrivateCryptoKey().then((key) => {
-            if (!key.ok) {
-                setGnError(key.err)
+        generatePrivateCryptoKey().then(([key, err]) => {
+            if (err) {
+                setGnError(err)
                 return
             }
 
-            setValue(key.value)
+            setValue(key)
         })
     }, [generatePrivateCryptoKey, setValue])
 
@@ -253,9 +253,9 @@ function StepConfigureEncryption({
         (e: React.FormEvent) => {
             e.preventDefault()
 
-            let checked = checkPrivateCryptoKey(value())
-            if (!checked.ok) {
-                setGnError(checked.err)
+            let [_, err] = checkPrivateCryptoKey(value())
+            if (err) {
+                setGnError(err)
                 return
             }
 

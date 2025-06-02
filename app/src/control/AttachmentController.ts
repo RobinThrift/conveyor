@@ -12,7 +12,7 @@ import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
 import { type FS, FSNotFoundError, dirname, join } from "@/lib/fs"
 import { mimeTypeForFilename } from "@/lib/mimeTypes"
-import { type AsyncResult, Err, Ok, fmtErr } from "@/lib/result"
+import { type AsyncResult, Err, Ok, wrapErr } from "@/lib/result"
 
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import { isErr } from "@/lib/errors"
@@ -52,26 +52,26 @@ export class AttachmentController {
         ctx: Context<{ db?: DBExec }>,
         id: AttachmentID,
     ): AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }> {
-        let attachment = await this._repo.getAttachment(ctx, id)
+        let [attachment, err] = await this._repo.getAttachment(ctx, id)
 
-        if (!attachment.ok) {
-            return fmtErr(`error getting attachment: ${id}: %w`, attachment)
+        if (err) {
+            return wrapErr`error getting attachment: ${id}: ${err}`
         }
 
-        let read = await this._fs.read(
+        let [data, readErr] = await this._fs.read(
             ctx,
-            this._filepath(attachment.value.filepath),
+            this._filepath(attachment.filepath),
         )
-        if (!read.ok) {
-            if (this._remote && isErr(read.err, FSNotFoundError)) {
-                return this._getAttachmentDataFromRemote(ctx, attachment.value)
+        if (readErr) {
+            if (this._remote && isErr(readErr, FSNotFoundError)) {
+                return this._getAttachmentDataFromRemote(ctx, attachment)
             }
-            return fmtErr(`error getting attachment: ${id}: %w`, read)
+            return wrapErr`error getting attachment: ${id}: ${readErr}`
         }
 
         return Ok({
-            attachment: attachment.value,
-            data: read.value,
+            attachment,
+            data,
         })
     }
 
@@ -79,13 +79,13 @@ export class AttachmentController {
         ctx: Context<{ db?: DBExec }>,
         id: AttachmentID,
     ): AsyncResult<Attachment> {
-        let attachment = await this._repo.getAttachment(ctx, id)
+        let [attachment, err] = await this._repo.getAttachment(ctx, id)
 
-        if (!attachment.ok) {
-            return fmtErr(`error getting attachment: ${id}: %w`, attachment)
+        if (err) {
+            return wrapErr`error getting attachment: ${id}: ${err}`
         }
 
-        return attachment
+        return Ok(attachment)
     }
 
     private async _getAttachmentDataFromRemote(
@@ -96,34 +96,35 @@ export class AttachmentController {
             return Err(new Error("no remote fallback set"))
         }
 
-        let fetched = await this._remote.getAttachmentDataByFilepath(
-            ctx,
-            attachment.filepath,
-        )
-        if (!fetched.ok) {
-            return fmtErr("error getting attachment from remote: %w", fetched)
+        let [fetched, fetchErr] =
+            await this._remote.getAttachmentDataByFilepath(
+                ctx,
+                attachment.filepath,
+            )
+        if (fetchErr) {
+            return wrapErr`error getting attachment from remote: ${fetchErr}`
         }
 
-        let mkdirpResult = await this._fs.mkdirp(
+        let [_mkdirp, mkdirpErr] = await this._fs.mkdirp(
             ctx,
             this._filepath(dirname(attachment.filepath)),
         )
-        if (!mkdirpResult.ok) {
-            return mkdirpResult
+        if (mkdirpErr) {
+            return Err(mkdirpErr)
         }
 
-        let writeResult = await this._fs.write(
+        let [_write, writeErr] = await this._fs.write(
             ctx,
             this._filepath(attachment.filepath),
-            fetched.value,
+            fetched,
         )
-        if (!writeResult.ok) {
-            return writeResult
+        if (writeErr) {
+            return Err(writeErr)
         }
 
         return Ok({
-            attachment: attachment,
-            data: fetched.value,
+            attachment,
+            data: fetched,
         })
     }
 
@@ -152,44 +153,45 @@ export class AttachmentController {
             content: ArrayBufferLike
         },
     ): AsyncResult<AttachmentID> {
-        let writeResult = await this._writeAttachment(ctx, content)
-        if (!writeResult.ok) {
-            return writeResult
+        let [attachment, writeErr] = await this._writeAttachment(ctx, content)
+        if (writeErr) {
+            return Err(writeErr)
         }
 
-        let created = await this._repo.createAttachment(ctx, {
+        let [created, createErr] = await this._repo.createAttachment(ctx, {
             id,
             originalFilename: filename,
             contentType: mimeTypeForFilename(filename),
-            filepath: writeResult.value.filepath,
-            sha256: writeResult.value.sha256,
-            sizeBytes: writeResult.value.sizeBytes,
+            filepath: attachment.filepath,
+            sha256: attachment.sha256,
+            sizeBytes: attachment.sizeBytes,
         })
-        if (!created.ok) {
-            return created
+        if (createErr) {
+            return Err(createErr)
         }
 
-        let entryCreated = await this._changelog.createChangelogEntry(ctx, {
-            revision: 1,
-            targetType: "attachments",
-            targetID: created.value.id,
-            value: {
-                created: {
-                    originalFilename: filename,
-                    contentType: mimeTypeForFilename(filename),
-                    filepath: writeResult.value.filepath,
-                    sha256: encodeToBase64(writeResult.value.sha256),
-                    sizeBytes: writeResult.value.sizeBytes,
-                },
-            } satisfies AttachmentChangelogEntry["value"],
-            isSynced: false,
-            isApplied: true,
-        })
-        if (!entryCreated.ok) {
-            return entryCreated
+        let [_entryCreate, entryCreateErr] =
+            await this._changelog.createChangelogEntry(ctx, {
+                revision: 1,
+                targetType: "attachments",
+                targetID: created.id,
+                value: {
+                    created: {
+                        originalFilename: filename,
+                        contentType: mimeTypeForFilename(filename),
+                        filepath: attachment.filepath,
+                        sha256: encodeToBase64(attachment.sha256),
+                        sizeBytes: attachment.sizeBytes,
+                    },
+                } satisfies AttachmentChangelogEntry["value"],
+                isSynced: false,
+                isApplied: true,
+            })
+        if (entryCreateErr) {
+            return Err(entryCreateErr)
         }
 
-        return Ok(created.value.id)
+        return Ok(created.id)
     }
 
     public async updateMemoAttachments(
@@ -209,19 +211,14 @@ export class AttachmentController {
     ): AsyncResult<void> {
         let attachmentIDs = new Set(extractAttachmentIDs(content))
 
-        let existingAttachments = await this._repo.listAttachmentsForMemo(
-            ctx,
-            memoID,
-        )
-        if (!existingAttachments.ok) {
-            return fmtErr(
-                "error updating memo attachments: error getting attachments for memo: %w",
-                existingAttachments,
-            )
+        let [existingAttachments, listAttachmentsErr] =
+            await this._repo.listAttachmentsForMemo(ctx, memoID)
+        if (listAttachmentsErr) {
+            return wrapErr`error updating memo attachments: error getting attachments for memo: ${listAttachmentsErr}`
         }
 
         let removed: AttachmentID[] = []
-        for (let attachment of existingAttachments.value) {
+        for (let attachment of existingAttachments) {
             if (!attachmentIDs.has(attachment.id)) {
                 removed.push(attachment.id)
             } else {
@@ -230,34 +227,28 @@ export class AttachmentController {
         }
 
         if (removed.length !== 0) {
-            let deleted = await this._repo.deleteMemoAttachmentLinks(
+            let [_, err] = await this._repo.deleteMemoAttachmentLinks(
                 ctx,
                 memoID,
                 removed,
             )
-            if (!deleted.ok) {
-                return fmtErr(
-                    "error updating memo attachments: error deleting memo attachment links: %w",
-                    deleted,
-                )
+            if (err) {
+                return wrapErr`error updating memo attachments: error deleting memo attachment links: ${err}`
             }
         }
 
         for (let url of attachmentIDs) {
-            let created = await this._repo.createMemoAttachmentLink(
+            let [_, err] = await this._repo.createMemoAttachmentLink(
                 ctx,
                 memoID,
                 url,
             )
-            if (!created.ok) {
-                return fmtErr(
-                    "error updating memo attachments: error creating memo attachment link: %w",
-                    created,
-                )
+            if (err) {
+                return wrapErr`error updating memo attachments: error creating memo attachment link: ${err}`
             }
         }
 
-        return Ok(undefined)
+        return Ok()
     }
 
     public async listAttachmentsForMemo(
@@ -276,7 +267,7 @@ export class AttachmentController {
         for (let entry of entries) {
             if ("created" in entry.value) {
                 let attachment = entry.value.created
-                let created = await this._transactioner.inTransaction(
+                let [_, err] = await this._transactioner.inTransaction(
                     ctx,
                     (ctx) =>
                         this._repo.createAttachment(ctx, {
@@ -285,8 +276,8 @@ export class AttachmentController {
                             sha256: dataFromBase64(attachment.sha256),
                         }),
                 )
-                if (!created.ok) {
-                    return created
+                if (err) {
+                    return Err(err)
                 }
                 continue
             }
@@ -312,12 +303,12 @@ export class AttachmentController {
         let ab = new ArrayBuffer(content.byteLength)
         new Uint8Array(ab).set(new Uint8Array(content), 0)
 
-        let digest = await this._hasher.sum(ab)
-        if (!digest.ok) {
-            return digest
+        let [digest, digestErr] = await this._hasher.sum(ab)
+        if (digestErr) {
+            return Err(digestErr)
         }
 
-        let sha256 = new Uint8Array(digest.value)
+        let sha256 = new Uint8Array(digest)
 
         let filepath = ""
         for (let b of sha256) {
@@ -328,21 +319,21 @@ export class AttachmentController {
             filepath += `/${h}`
         }
 
-        let mkdirpResult = await this._fs.mkdirp(
+        let [_, mkdirpErr] = await this._fs.mkdirp(
             ctx,
             this._filepath(dirname(filepath)),
         )
-        if (!mkdirpResult.ok) {
-            return mkdirpResult
+        if (mkdirpErr) {
+            return Err(mkdirpErr)
         }
 
-        let writeResult = await this._fs.write(
+        let [_write, writeErr] = await this._fs.write(
             ctx,
             this._filepath(filepath),
             content,
         )
-        if (!writeResult.ok) {
-            return writeResult
+        if (writeErr) {
+            return Err(writeErr)
         }
 
         return Ok({

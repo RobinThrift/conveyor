@@ -20,21 +20,21 @@ export interface MarkdownProps {
 
 export function Markdown(props: MarkdownProps) {
     let parsed = useMemo(() => {
-        let ast = parse(props.children)
-        if (!ast.ok) {
+        let [ast, err] = parse(props.children)
+        if (err) {
             return (
                 <Alert variant="danger">
-                    {ast.err.name}: {ast.err.message}
-                    {ast.err.stack && (
+                    {err.name}: {err.message}
+                    {err.stack && (
                         <pre>
-                            <code>{ast.err.stack}</code>
+                            <code>{err.stack}</code>
                         </pre>
                     )}
                 </Alert>
             )
         }
 
-        return astToJSX(ast.value, props.id, {
+        return astToJSX(ast, props.id, {
             componentMap: {
                 Alert,
                 Link,

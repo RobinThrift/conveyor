@@ -1,42 +1,77 @@
 export type ErrorCode = string & { readonly "": unique symbol }
 
-export interface CheckeableError {
-    is(value: any): boolean
-}
+export function isErr<
+    ToCheck extends Error,
+    Target extends { new (...a: any[]): Error },
+>(value: ToCheck | null | undefined, target: Target): boolean {
+    if (!value) {
+        return false
+    }
 
-export interface JSONErrObj {
-    name: string
-    message: string
-    stack?: string
-}
-
-export interface FromJSONErrObj<E extends Error> {
-    fromJSONErrObj<O extends JSONErrObj>(obj: O): E
-    ERR_CODE: ErrorCode
-}
-
-export function isErr<E extends CheckeableError>(
-    value: any,
-    target: E,
-): boolean {
-    return target.is(value)
-}
-
-export function asErr<E extends Error, C extends FromJSONErrObj<E>>(
-    value: any,
-    target: C,
-): E | undefined {
-    if (typeof target === "function") {
-        if (value instanceof target) {
-            return value
-        }
+    if (value instanceof AggregateError) {
+        return value.errors.some((err) => isErr(err, target))
     }
 
     if (
-        typeof value === "object" &&
-        "message" in value &&
-        value.message.includes(`[${target.ERR_CODE}]`)
+        "__proto__" in value &&
+        typeof value.__proto__ === "function" &&
+        value.__proto__ === target
     ) {
-        return target.fromJSONErrObj(value)
+        return true
     }
+
+    let valueCode =
+        (CustomErrCode in value && (value[CustomErrCode] as string)) ||
+        ("__proto__" in value &&
+            typeof value.__proto__ === "function" &&
+            value.__proto__ &&
+            CustomErrCode in value.__proto__ &&
+            (value.__proto__[CustomErrCode] as string))
+
+    let targetCode =
+        CustomErrCode in target && (target[CustomErrCode] as string)
+
+    if (!targetCode) {
+        return false
+    }
+
+    if (valueCode === targetCode) {
+        return true
+    }
+
+    if (value.message.includes(targetCode)) {
+        return true
+    }
+
+    return false
+}
+
+export const CustomErrCode = Symbol("CustomErrType")
+
+export function createErrType(type: string, msg: string) {
+    return class extends Error {
+        public static [CustomErrCode] = type as ErrorCode
+
+        constructor(options?: ErrorOptions & { stack?: string }) {
+            super(`[${type}]: ${msg}`, options)
+            this.stack = options?.stack
+        }
+    }
+}
+
+export function isCustomErrType(e: Error): boolean {
+    if (CustomErrCode in e) {
+        return true
+    }
+
+    if (
+        "__proto__" in e &&
+        typeof e.__proto__ === "function" &&
+        e.__proto__ &&
+        CustomErrCode in e.__proto__
+    ) {
+        return true
+    }
+
+    return false
 }

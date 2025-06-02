@@ -8,7 +8,7 @@ import {
 
 import type { Context } from "@/lib/context"
 import { type FS, join } from "@/lib/fs"
-import { type AsyncResult, Ok, fromPromise } from "@/lib/result"
+import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 export class TauriFS implements FS {
     private _baseDir: string
@@ -28,21 +28,21 @@ export class TauriFS implements FS {
         _ctx: Context,
         filepath: string,
     ): AsyncResult<ArrayBufferLike> {
-        let ready = await this._ready
-        if (!ready.ok) {
-            return ready
+        let [_, readyErr] = await this._ready
+        if (readyErr) {
+            return Err(readyErr)
         }
 
-        let data = await fromPromise(
+        let [data, err] = await fromPromise(
             readFile(join(this._baseDir, filepath), {
                 baseDir: BaseDirectory.AppLocalData,
             }),
         )
-        if (!data.ok) {
-            return data
+        if (err) {
+            return wrapErr`error reading file: ${filepath}: ${err}`
         }
 
-        return Ok(data.value.buffer)
+        return Ok(data.buffer)
     }
 
     public async write(
@@ -50,27 +50,27 @@ export class TauriFS implements FS {
         filepath: string,
         content: ArrayBufferLike,
     ): AsyncResult<number> {
-        let ready = await this._ready
-        if (!ready.ok) {
-            return ready
+        let [_r, readyErr] = await this._ready
+        if (readyErr) {
+            return Err(readyErr)
         }
 
-        let res = await fromPromise(
+        let [_, err] = await fromPromise(
             writeFile(join(this._baseDir, filepath), new Uint8Array(content), {
                 baseDir: BaseDirectory.AppLocalData,
             }),
         )
-        if (!res.ok) {
-            return res
+        if (err) {
+            return wrapErr`error writing file: ${filepath}: ${err}`
         }
 
         return Ok(content.byteLength)
     }
 
     public async remove(_ctx: Context, filepath: string): AsyncResult<void> {
-        let ready = await this._ready
-        if (!ready.ok) {
-            return ready
+        let [_, readyErr] = await this._ready
+        if (readyErr) {
+            return Err(readyErr)
         }
 
         return fromPromise(
@@ -81,9 +81,9 @@ export class TauriFS implements FS {
     }
 
     public async mkdirp(_ctx: Context, dirpath: string): AsyncResult<void> {
-        let ready = await this._ready
-        if (!ready.ok) {
-            return ready
+        let [_, readyErr] = await this._ready
+        if (readyErr) {
+            return Err(readyErr)
         }
 
         return fromPromise(

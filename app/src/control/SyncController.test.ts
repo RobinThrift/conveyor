@@ -16,7 +16,7 @@ import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import { BaseContext, type Context } from "@/lib/context"
 import type { Decrypter, Encrypter } from "@/lib/crypto"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Err, Ok, fmtErr, toPromise } from "@/lib/result"
+import { type AsyncResult, Err, Ok, toPromise, wrapErr } from "@/lib/result"
 import { TestInMemKVStore } from "@/lib/testhelper/TestInMemKVStore"
 import { assertOkResult } from "@/lib/testhelper/assertions"
 import { MockFS } from "@/lib/testhelper/mockfs"
@@ -68,16 +68,16 @@ suite("control/SyncController", async () => {
                 dbPath,
                 syncAPI: {
                     uploadFullSyncData: async (_, data) => {
-                        let decrypted = await crypto.decryptData(
+                        let [decrypted, err] = await crypto.decryptData(
                             new Uint8Array(data),
                         )
 
-                        if (!decrypted.ok) {
-                            return decrypted
+                        if (err) {
+                            return Err(err)
                         }
 
                         assert.equal(
-                            decodeText(new Uint8Array(decrypted.value)),
+                            decodeText(new Uint8Array(decrypted)),
                             content,
                         )
 
@@ -190,14 +190,14 @@ suite("control/SyncController", async () => {
                 },
 
                 uploadChangelogEntries: async (_ctx, entries) => {
-                    let decrypted = await decryptChangeLogEntries(
+                    let [decrypted, err] = await decryptChangeLogEntries(
                         crypto,
                         entries,
                     )
-                    if (!decrypted.ok) {
-                        return decrypted
+                    if (err) {
+                        return Err(err)
                     }
-                    assert.deepEqual(decrypted.value, localChanges)
+                    assert.deepEqual(decrypted, localChanges)
                     return Ok(undefined)
                 },
 
@@ -413,16 +413,16 @@ async function encryptChangeLogEntries(
     let encrytpedEntries: EncryptedChangelogEntry[] = []
 
     for (let entry of entries) {
-        let encrypted = await encrypter.encryptData(
+        let [encrypted, err] = await encrypter.encryptData(
             encodeText(JSON.stringify(entry)),
         )
-        if (!encrypted.ok) {
-            return fmtErr("error encrytping changelog entry: %w", encrypted)
+        if (err) {
+            return wrapErr`error encrytping changelog entry: ${err}`
         }
 
         encrytpedEntries.push({
             syncClientID: clientID,
-            data: encodeToBase64(new Uint8Array(encrypted.value)),
+            data: encodeToBase64(new Uint8Array(encrypted)),
             timestamp: entry.timestamp,
         })
     }
@@ -437,37 +437,39 @@ async function decryptChangeLogEntries(
     let entries: ChangelogEntry[] = []
 
     for (let entry of encrytpedEntries) {
-        let decrypted = await decrypter.decryptData(dataFromBase64(entry.data))
-        if (!decrypted.ok) {
-            return fmtErr("error decrytping changelog entry: %w", decrypted)
-        }
-
-        let parsed = jsonDeserialize<ChangelogEntry, Record<string, any>>(
-            decrypted.value,
-            (obj) => {
-                let timestamp = parseJSONDate(obj.timestamp)
-                if (!timestamp.ok) {
-                    return timestamp
-                }
-
-                return Ok({
-                    id: obj.id,
-                    source: obj.source,
-                    revision: obj.revision,
-                    targetType: obj.targetType,
-                    targetID: obj.targetID,
-                    value: obj.value,
-                    isSynced: obj.isSynced,
-                    isApplied: obj.isApplied,
-                    timestamp: timestamp.value,
-                })
-            },
+        let [decrypted, err] = await decrypter.decryptData(
+            dataFromBase64(entry.data),
         )
-        if (!parsed.ok) {
-            return parsed
+        if (err) {
+            return wrapErr`error decrytping changelog entry: ${err}`
         }
 
-        entries.push(parsed.value)
+        let [parsed, parseErr] = jsonDeserialize<
+            ChangelogEntry,
+            Record<string, any>
+        >(decrypted, (obj) => {
+            let [timestamp, parseErr] = parseJSONDate(obj.timestamp)
+            if (parseErr) {
+                return Err(parseErr)
+            }
+
+            return Ok({
+                id: obj.id,
+                source: obj.source,
+                revision: obj.revision,
+                targetType: obj.targetType,
+                targetID: obj.targetID,
+                value: obj.value,
+                isSynced: obj.isSynced,
+                isApplied: obj.isApplied,
+                timestamp: timestamp,
+            })
+        })
+        if (parseErr) {
+            return Err(parseErr)
+        }
+
+        entries.push(parsed)
     }
 
     return Ok(entries)

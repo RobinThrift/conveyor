@@ -6,7 +6,7 @@ import type {
 } from "@/domain/Changelog"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
-import { type AsyncResult, fromPromise, mapResult } from "@/lib/result"
+import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 import * as queries from "./gen/changelog_sql"
 
@@ -53,32 +53,31 @@ export class ChangelogRepo {
             }
         },
     ): AsyncResult<ChangelogEntryList> {
-        return mapResult(
-            fromPromise(
-                queries.listUnsyncedChanges(
-                    ctx.getData("db", this._db),
-                    {
-                        pageSize: pagination.pageSize,
-                        chlgPageAfterDate: pagination.after
-                            ? pagination.after[1]
-                            : undefined,
-                        chlgPageAfterId: pagination.after
-                            ? pagination.after[0]
-                            : null,
-                    },
-                    ctx.signal,
-                ),
+        let [rows, err] = await fromPromise(
+            queries.listUnsyncedChanges(
+                ctx.getData("db", this._db),
+                {
+                    pageSize: pagination.pageSize,
+                    chlgPageAfterDate: pagination.after
+                        ? pagination.after[1]
+                        : undefined,
+                    chlgPageAfterId: pagination.after
+                        ? pagination.after[0]
+                        : null,
+                },
+                ctx.signal,
             ),
-            (rows) => {
-                let last = rows.at(-1)
-                return {
-                    items: rows.map((row) =>
-                        changelogEntryRowChangelogEntry(row),
-                    ),
-                    next: last ? [last.id, last.timestamp] : undefined,
-                }
-            },
         )
+
+        if (err) {
+            return wrapErr`error listing unsynced changelog entries: ${err}`
+        }
+
+        let last = rows.at(-1)
+        return Ok({
+            items: rows.map((row) => changelogEntryRowChangelogEntry(row)),
+            next: last ? [last.id, last.timestamp] : undefined,
+        })
     }
 
     public async listUnappliedChangelogEntries(
@@ -92,32 +91,31 @@ export class ChangelogRepo {
             }
         },
     ): AsyncResult<ChangelogEntryList> {
-        return mapResult(
-            fromPromise(
-                queries.listUnappliedChanges(
-                    ctx.getData("db", this._db),
-                    {
-                        pageSize: pagination.pageSize,
-                        chlgPageAfterDate: pagination.after
-                            ? pagination.after[1]
-                            : undefined,
-                        chlgPageAfterId: pagination.after
-                            ? pagination.after[0]
-                            : null,
-                    },
-                    ctx.signal,
-                ),
+        let [rows, err] = await fromPromise(
+            queries.listUnappliedChanges(
+                ctx.getData("db", this._db),
+                {
+                    pageSize: pagination.pageSize,
+                    chlgPageAfterDate: pagination.after
+                        ? pagination.after[1]
+                        : undefined,
+                    chlgPageAfterId: pagination.after
+                        ? pagination.after[0]
+                        : null,
+                },
+                ctx.signal,
             ),
-            (rows) => {
-                let last = rows.at(-1)
-                return {
-                    items: rows.map((row) =>
-                        changelogEntryRowChangelogEntry(row),
-                    ),
-                    next: last ? [last.id, last.timestamp] : undefined,
-                }
-            },
         )
+
+        if (err) {
+            return wrapErr`error listing unappleid chanelog entries: ${err}`
+        }
+
+        let last = rows.at(-1)
+        return Ok({
+            items: rows.map((row) => changelogEntryRowChangelogEntry(row)),
+            next: last ? [last.id, last.timestamp] : undefined,
+        })
     }
 
     public async markChangelogEntriesAsSynced(
@@ -150,17 +148,19 @@ export class ChangelogRepo {
         ctx: Context<{ db: DBExec }>,
         targetID: string,
     ): AsyncResult<C[]> {
-        return mapResult(
-            fromPromise(
-                queries.listChangelogEntriesForID(
-                    ctx.getData("db", this._db),
-                    { targetId: targetID },
-                    ctx.signal,
-                ),
+        let [rows, err] = await fromPromise(
+            queries.listChangelogEntriesForID(
+                ctx.getData("db", this._db),
+                { targetId: targetID },
+                ctx.signal,
             ),
-            (rows) =>
-                rows.map((row) => changelogEntryRowChangelogEntry(row) as C),
         )
+
+        if (err) {
+            return wrapErr`error listing changelog entries for ID: ${targetID}: ${err}`
+        }
+
+        return Ok(rows.map((row) => changelogEntryRowChangelogEntry(row) as C))
     }
 }
 

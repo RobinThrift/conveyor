@@ -1,5 +1,5 @@
 import type { Context } from "@/lib/context"
-import type { ErrorCode, JSONErrObj } from "@/lib/errors"
+import { CustomErrCode, type ErrorCode } from "@/lib/errors"
 import type { AsyncResult } from "@/lib/result"
 
 export interface FS {
@@ -17,32 +17,13 @@ export interface FS {
 }
 
 export class FSNotFoundError extends Error {
-    static ERR_CODE = "FS_NOT_FOUND_ERROR" as ErrorCode
+    public static [CustomErrCode] = "FS_NOT_FOUND_ERROR" as ErrorCode
 
     constructor(filepath: string, options?: ErrorOptions) {
         super(
-            `[${FSNotFoundError.ERR_CODE}] file not found: ${filepath}`,
+            `[${FSNotFoundError[CustomErrCode]}] file not found: ${filepath}`,
             options,
         )
-    }
-
-    static is(value: any): boolean {
-        if (value instanceof FSNotFoundError) {
-            return true
-        }
-
-        if (typeof value === "object" && "message" in value) {
-            return value.message.includes(`[${FSNotFoundError.ERR_CODE}]`)
-        }
-
-        return false
-    }
-
-    static fromJSONErrObj(obj: JSONErrObj): FSNotFoundError {
-        let err = new FSNotFoundError("")
-        err.message = obj.message
-        err.stack = obj.stack ?? err.stack
-        return err
     }
 }
 

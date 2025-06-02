@@ -1,5 +1,5 @@
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Ok } from "@/lib/result"
+import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 import type { KVStore } from "./KVStore"
 
@@ -18,12 +18,12 @@ export class SingleItemKVStore<Key extends string, Value>
         ctx: Context,
         _key: K,
     ): AsyncResult<Value | undefined> {
-        let item = await this._kv.getItem(ctx, this._key)
-        if (!item.ok) {
-            return item
+        let [item, err] = await this._kv.getItem(ctx, this._key)
+        if (err) {
+            return Err(err)
         }
 
-        return Ok(item.value)
+        return Ok(item)
     }
 
     public async setItem<K extends Key>(

@@ -1,7 +1,7 @@
 import { awaitWithAbort } from "@/lib/awaitWithAbort"
 import { BaseContext, type Context } from "@/lib/context"
 import { Second } from "@/lib/duration"
-import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
+import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
 import { decodeText, encodeText } from "@/lib/textencoding"
 import { createWorker, isWorkerContext } from "@/lib/worker"
 import { IndexedDB } from "./indexedDB/IndexedDB"
@@ -18,7 +18,7 @@ const _db: Promise<IndexedDB<Tables>> = (async () => {
         return undefined as any
     }
 
-    let db = await IndexedDB.open<Tables>(
+    let [db, err] = await IndexedDB.open<Tables>(
         BaseContext,
         "conveyor-secure-storage",
         [
@@ -34,11 +34,11 @@ const _db: Promise<IndexedDB<Tables>> = (async () => {
         ],
     )
 
-    if (!db.ok) {
-        throw db.err
+    if (err) {
+        throw err
     }
 
-    return db.value
+    return db
 })()
 
 const localCryptoKey = Promise.withResolvers<globalThis.CryptoKeyPair>()
@@ -46,46 +46,51 @@ const localCryptoKey = Promise.withResolvers<globalThis.CryptoKeyPair>()
 export const WebCryptoDeviceSecureStorageWorker = createWorker({
     init: async (ctx: Context): AsyncResult<void> => {
         let db = await _db
-        let cryptoKey = await db.get(ctx, "keys", LOCAL_KEY_V1_NAME)
-        if (!cryptoKey.ok) {
-            return cryptoKey
+        let [cryptoKey, cryptoKeyErr] = await db.get(
+            ctx,
+            "keys",
+            LOCAL_KEY_V1_NAME,
+        )
+        if (cryptoKeyErr) {
+            return wrapErr`error initialising: ${cryptoKey}`
         }
 
-        if (cryptoKey.value) {
-            localCryptoKey.resolve(cryptoKey.value.key)
+        if (cryptoKey) {
+            localCryptoKey.resolve(cryptoKey.key)
             return Ok(undefined)
         }
 
-        let generatedKey = await generateLocalCryptoKey()
-        if (!generatedKey.ok) {
-            return generatedKey
+        let [generatedKey, generatedKeyErr] = await generateLocalCryptoKey()
+        if (generatedKeyErr) {
+            return wrapErr`error generating key: ${generatedKeyErr}`
         }
 
-        let inserted = await db.insertOrUpdate(ctx, "keys", [
-            { name: LOCAL_KEY_V1_NAME, key: generatedKey.value },
+        let [_, insertedErr] = await db.insertOrUpdate(ctx, "keys", [
+            { name: LOCAL_KEY_V1_NAME, key: generatedKey },
         ])
 
-        if (!inserted.ok) {
+        if (insertedErr) {
             if (
-                inserted.err.name === "DataError" ||
-                (inserted.err.cause as Error)?.name === "DataErro"
+                insertedErr.name === "DataError" ||
+                (insertedErr.cause as Error)?.name === "DataErro"
             ) {
-                generatedKey = await generateECDHLocalCryptoKey()
-                if (!generatedKey.ok) {
-                    return generatedKey
+                ;[generatedKey, generatedKeyErr] =
+                    await generateECDHLocalCryptoKey()
+                if (generatedKeyErr) {
+                    return wrapErr`error generating key: ${generatedKeyErr}`
                 }
-                inserted = await db.insertOrUpdate(ctx, "keys", [
-                    { name: LOCAL_KEY_V1_NAME, key: generatedKey.value },
+                ;[_, insertedErr] = await db.insertOrUpdate(ctx, "keys", [
+                    { name: LOCAL_KEY_V1_NAME, key: generatedKey },
                 ])
             }
         }
 
-        if (!inserted.ok) {
-            localCryptoKey.reject(inserted.err)
-            return inserted
+        if (insertedErr) {
+            localCryptoKey.reject(insertedErr)
+            return wrapErr`error inserting key: ${insertedErr}`
         }
 
-        localCryptoKey.resolve(generatedKey.value)
+        localCryptoKey.resolve(generatedKey)
 
         return Ok(undefined)
     },
@@ -93,27 +98,27 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
     reset: async (ctx: Context): AsyncResult<void> => {
         let db = await _db
 
-        let keys = await db.listKeys(ctx, "keys")
-        if (!keys.ok) {
-            return keys
+        let [keys, keysErr] = await db.listKeys(ctx, "keys")
+        if (keysErr) {
+            return wrapErr`error resetting: error listing keys: ${keysErr}`
         }
 
-        for (let key of keys.value) {
-            let deleted = await db.delete(ctx, "keys", key)
-            if (!deleted.ok) {
-                return deleted
+        for (let key of keys) {
+            let [_, deletedErr] = await db.delete(ctx, "keys", key)
+            if (deletedErr) {
+                return wrapErr`error resetting: ${deletedErr}`
             }
         }
 
-        let items = await db.listKeys(ctx, "items")
-        if (!items.ok) {
-            return items
+        let [items, itemsErr] = await db.listKeys(ctx, "items")
+        if (itemsErr) {
+            return wrapErr`error resetting: error listing items: ${itemsErr}`
         }
 
-        for (let item of items.value) {
-            let deleted = await db.delete(ctx, "items", item)
-            if (!deleted.ok) {
-                return deleted
+        for (let item of items) {
+            let [_, deletedErr] = await db.delete(ctx, "items", item)
+            if (deletedErr) {
+                return wrapErr`error resetting: ${deletedErr}`
             }
         }
 
@@ -126,31 +131,32 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
     ): AsyncResult<string | undefined> => {
         let [ctx, cancel] = baseCtx.withTimeout(Second * 5)
         let db = await _db
-        let cryptoKey = await fromPromise(
+        let [cryptoKey, cryptoKeyErr] = await fromPromise(
             awaitWithAbort(localCryptoKey.promise, ctx.signal),
         )
-        if (!cryptoKey.ok) {
-            return cryptoKey
+        if (cryptoKeyErr) {
+            cancel()
+            return Err(cryptoKeyErr)
         }
 
-        let item = await db.get(ctx, "items", key)
+        let [item, err] = await db.get(ctx, "items", key)
         cancel()
-        if (!item.ok) {
-            return item
+        if (err) {
+            return wrapErr`error getting item from db: ${key}: ${err}`
         }
 
-        if (!item.value) {
+        if (!item) {
             return Ok(undefined)
         }
 
-        let plaintext = await fromPromise(
-            decryptData(cryptoKey.value, item.value.data),
+        let [plaintext, decryptErr] = await fromPromise(
+            decryptData(cryptoKey, item.data),
         )
-        if (!plaintext.ok) {
-            return fmtErr("error decrypting data: %w", plaintext)
+        if (decryptErr) {
+            return wrapErr`error decrypting data: ${key}: ${decryptErr}`
         }
 
-        return Ok(decodeText(plaintext.value))
+        return Ok(decodeText(plaintext))
     },
 
     setItem: async (
@@ -159,24 +165,24 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
     ): AsyncResult<void> => {
         let [ctx, cancel] = baseCtx.withTimeout(Second * 5)
         let db = await _db
-        let cryptoKey = await fromPromise(
+        let [cryptoKey, cryptoKeyErr] = await fromPromise(
             awaitWithAbort(localCryptoKey.promise, ctx.signal),
         )
-        if (!cryptoKey.ok) {
+        if (cryptoKeyErr) {
             cancel()
-            return cryptoKey
+            return Err(cryptoKeyErr)
         }
 
-        let ciphertext = await fromPromise(
-            encryptData(cryptoKey.value, encodeText(value)),
+        let [ciphertext, encryptErr] = await fromPromise(
+            encryptData(cryptoKey, encodeText(value)),
         )
-        if (!ciphertext.ok) {
+        if (encryptErr) {
             cancel()
-            return fmtErr("error encrypting data: %w", ciphertext)
+            return wrapErr`error encrypting data: ${encryptErr}`
         }
 
         let insterted = await db.insertOrUpdate(ctx, "items", [
-            { key, data: ciphertext.value },
+            { key, data: ciphertext },
         ])
         cancel()
         return insterted
@@ -192,41 +198,36 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
     },
 })
 
-async function generateLocalCryptoKey() {
-    let cryptoKey = await generateX25519LocalCryptoKey()
-
-    if (!cryptoKey.ok) {
+async function generateLocalCryptoKey(): AsyncResult<CryptoKeyPair> {
+    let [cryptoKey, err] = await generateX25519LocalCryptoKey()
+    if (err) {
         if (
-            cryptoKey.err.name === "NotSupportedError" ||
-            (cryptoKey.err.cause as Error)?.name === "NotSupportedError"
+            err.name === "NotSupportedError" ||
+            (err.cause as Error)?.name === "NotSupportedError"
         ) {
-            cryptoKey = await generateECDHLocalCryptoKey()
+            ;[cryptoKey, err] = await generateECDHLocalCryptoKey()
         }
     }
 
-    return cryptoKey
+    return Ok(cryptoKey)
 }
 
 async function generateX25519LocalCryptoKey(): AsyncResult<CryptoKeyPair> {
-    let cryptoKey = await fromPromise(
+    let [cryptoKey, err] = await fromPromise(
         globalThis.crypto.subtle.generateKey({ name: "X25519" }, false, [
             "deriveKey",
         ]) as Promise<CryptoKeyPair>,
     )
 
-    if (!cryptoKey.ok) {
-        return Err(
-            Error(`error generating X25519 key: ${cryptoKey.err}}`, {
-                cause: cryptoKey.err,
-            }),
-        )
+    if (err) {
+        return wrapErr`error generating X25519 key: ${err}`
     }
 
-    return cryptoKey
+    return [cryptoKey, err]
 }
 
 async function generateECDHLocalCryptoKey(): AsyncResult<CryptoKeyPair> {
-    let cryptoKey = await fromPromise(
+    let [cryptoKey, err] = await fromPromise(
         globalThis.crypto.subtle.generateKey(
             { name: "ECDH", namedCurve: "P-384" },
             false,
@@ -234,18 +235,11 @@ async function generateECDHLocalCryptoKey(): AsyncResult<CryptoKeyPair> {
         ) as Promise<CryptoKeyPair>,
     )
 
-    if (!cryptoKey.ok) {
-        return Err(
-            new Error(
-                `error generating ECDH key using P-384: ${cryptoKey.err}}`,
-                {
-                    cause: cryptoKey.err,
-                },
-            ),
-        )
+    if (err) {
+        return wrapErr`error generating ECDH key using P-384: ${err}`
     }
 
-    return cryptoKey
+    return [cryptoKey, err]
 }
 
 const IV_LEN = 12

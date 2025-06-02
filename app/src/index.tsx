@@ -51,14 +51,14 @@ const mountDevTools = __ENABLE_DEVTOOLS__
     : () => {}
 
 async function main() {
-    let initResult = await fromPromise(init())
-    if (!initResult.ok) {
+    let [initValue, initErr] = await fromPromise(init())
+    if (initErr) {
         ReactDOM.createRoot(rootElement).render(
             <Alert variant="danger">
-                {initResult.err.name}: {initResult.err.message}
-                {initResult.err.stack && (
+                {initErr.name}: {initErr.message}
+                {initErr.stack && (
                     <pre>
-                        <code>{initResult.err.stack}</code>
+                        <code>{initErr.stack}</code>
                     </pre>
                 )}
             </Alert>,
@@ -66,7 +66,7 @@ async function main() {
         return
     }
 
-    let { rootStore, attachmentLoader, navCtrl } = initResult.value
+    let { rootStore, attachmentLoader, navCtrl } = initValue
 
     document.body.classList.add(`platform-${Env.platform}`)
 

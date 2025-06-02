@@ -3,7 +3,8 @@ import { AgePrivateCryptoKey, type Identity } from "@/external/age/AgeCrypto"
 import type { Context } from "@/lib/context"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 import type { Database } from "@/lib/database"
-import { type AsyncResult, Ok, fromPromise } from "@/lib/result"
+import { createErrType } from "@/lib/errors"
+import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 const _plaintextPrivateKeyStorageKey = "private-key"
 
@@ -36,6 +37,10 @@ export class UnlockController {
         )
     }
 
+    public static ErrTryGetPlaintextPrivateKey = createErrType(
+        "UnlockController",
+        "error tryuing to get plaintext private key",
+    )
     public async tryGetPlaintextPrivateKey(
         ctx: Context,
     ): AsyncResult<PlaintextPrivateKey | undefined> {
@@ -47,17 +52,21 @@ export class UnlockController {
             return Ok(undefined)
         }
 
-        let key = await this._storage.getItem(
+        let [key, err] = await this._storage.getItem(
             ctx,
             _plaintextPrivateKeyStorageKey,
         )
-        if (!key.ok) {
-            return key
+        if (err) {
+            return wrapErr`${new UnlockController.ErrTryGetPlaintextPrivateKey()}: ${err}`
         }
 
-        return Ok(key.value as PlaintextPrivateKey | undefined)
+        return Ok(key as PlaintextPrivateKey | undefined)
     }
 
+    public static ErrUnlock = createErrType(
+        "UnlockController",
+        "error unlocking",
+    )
     public async unlock(
         ctx: Context,
         {
@@ -81,27 +90,28 @@ export class UnlockController {
             plaintextKeyData as string as Identity,
         )
 
-        let privateKeyStr = await key.exportPrivateKey()
-        if (!privateKeyStr.ok) {
-            return privateKeyStr
+        let [privateKeyStr, privateKeyErr] = await key.exportPrivateKey()
+        if (privateKeyErr) {
+            return wrapErr`${new UnlockController.ErrUnlock()}: ${privateKeyErr}`
         }
 
-        let [initRes, openRes] = await Promise.all([
-            this._crypto.init(ctx, { agePrivateCryptoKey: key }),
-            fromPromise(
-                this._db.open(ctx, {
-                    enckey: privateKeyStr.value,
-                    file: db?.file ?? "conveyor.db",
-                    enableTracing: db?.enableTracing ?? false,
-                }),
-            ),
-        ])
-        if (!initRes.ok) {
-            return initRes
+        let [[_cryptoInit, cryptoInitErr], [_dbOpen, dbOpenErr]] =
+            await Promise.all([
+                this._crypto.init(ctx, { agePrivateCryptoKey: key }),
+                fromPromise(
+                    this._db.open(ctx, {
+                        enckey: privateKeyStr,
+                        file: db?.file ?? "conveyor.db",
+                        enableTracing: db?.enableTracing ?? false,
+                    }),
+                ),
+            ])
+        if (cryptoInitErr) {
+            return wrapErr`${new UnlockController.ErrUnlock()}: error initializing crypto provider: ${cryptoInitErr}`
         }
 
-        if (!openRes.ok) {
-            return openRes
+        if (dbOpenErr) {
+            return wrapErr`${new UnlockController.ErrUnlock()}: error opening database: ${dbOpenErr}`
         }
 
         this.isUnlocked = true
@@ -114,7 +124,7 @@ export class UnlockController {
             )
         }
 
-        return Ok(undefined)
+        return Ok()
     }
 }
 

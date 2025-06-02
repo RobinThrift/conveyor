@@ -1,3 +1,5 @@
+import { CustomErrCode, type ErrorCode } from "@/lib/errors"
+
 export class APIError extends Error {
     public code: number
     public type: string
@@ -49,9 +51,10 @@ export class APIError extends Error {
 }
 
 export class UnauthorizedError extends Error {
-    constructor(prefix: string) {
-        let msg = `${prefix}: Unauthorized`
-        super(msg)
+    public static [CustomErrCode] = "Unauthorized" as ErrorCode
+
+    constructor(options?: ErrorOptions) {
+        super("Unauthorized", options)
         this.name = "Unauthorized"
     }
 }

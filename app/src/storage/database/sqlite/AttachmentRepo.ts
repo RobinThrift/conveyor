@@ -1,14 +1,7 @@
 import type { Attachment, AttachmentID } from "@/domain/Attachment"
 import type { MemoID } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
-import {
-    type AsyncResult,
-    Err,
-    ErrAsync,
-    Ok,
-    fromPromise,
-    mapResult,
-} from "@/lib/result"
+import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 import { newID } from "@/domain/ID"
 import type { DBExec } from "@/lib/database"
@@ -25,7 +18,7 @@ export class AttachmentRepo {
         ctx: Context<{ db?: DBExec }>,
         id: AttachmentID,
     ): AsyncResult<Attachment> {
-        let result = await fromPromise(
+        let [attachment, err] = await fromPromise(
             queries.getAttachment(
                 ctx.getData("db", this._db),
                 {
@@ -35,22 +28,22 @@ export class AttachmentRepo {
             ),
         )
 
-        if (!result.ok) {
-            return result
+        if (err) {
+            return wrapErr`error getting attachment: ${id}: ${err}`
         }
 
-        if (result.value === null) {
-            return Err(new Error(`error getting attachment: ${id}`))
+        if (attachment === null) {
+            return Err(new Error(`error getting attachment: ${id}: not found`))
         }
 
         return Ok({
-            id: result.value.publicId,
-            contentType: result.value.contentType,
-            filepath: result.value.filepath,
-            originalFilename: "test.txt",
-            sha256: result.value.sha256,
-            sizeBytes: result.value.sizeBytes,
-            createdAt: result.value.createdAt,
+            id: attachment.publicId,
+            contentType: attachment.contentType,
+            filepath: attachment.filepath,
+            originalFilename: attachment.originalFilename,
+            sha256: attachment.sha256,
+            sizeBytes: attachment.sizeBytes,
+            createdAt: attachment.createdAt,
         } satisfies Attachment)
     }
 
@@ -62,7 +55,7 @@ export class AttachmentRepo {
     ): AsyncResult<Attachment> {
         let createdAt = new Date()
 
-        let result = await fromPromise(
+        let [created, err] = await fromPromise(
             queries.createAttachment(
                 ctx.getData("db", this._db),
                 {
@@ -77,11 +70,11 @@ export class AttachmentRepo {
             ),
         )
 
-        if (!result.ok) {
-            return result
+        if (err) {
+            return wrapErr`error creating attachment: ${err}`
         }
 
-        if (result.value === null) {
+        if (created === null) {
             return Err(
                 new Error(
                     `error creating attachment: ${attachment.originalFilename}`,
@@ -92,7 +85,7 @@ export class AttachmentRepo {
         return Ok({
             ...attachment,
             createdAt,
-            id: result.value.publicId,
+            id: created.publicId,
         } satisfies Attachment)
     }
 
@@ -100,7 +93,7 @@ export class AttachmentRepo {
         ctx: Context<{ db?: DBExec }>,
         memoID: MemoID,
     ): AsyncResult<Attachment[]> {
-        let result = await fromPromise(
+        let [rows, err] = await fromPromise(
             queries.listAttachmentsForMemo(
                 ctx.getData("db", this._db),
                 {
@@ -109,8 +102,11 @@ export class AttachmentRepo {
                 ctx.signal,
             ),
         )
+        if (err) {
+            wrapErr`error listing attachments for memo: ${memoID}: ${err}`
+        }
 
-        return mapResult(result, (rows) =>
+        return Ok(
             rows.map((r) => ({
                 ...r,
                 id: r.id.toString(),
@@ -156,26 +152,26 @@ export class AttachmentRepo {
         ctx: Context<{ db?: DBExec }>,
         filepath: string,
     ): AsyncResult<Attachment> {
-        let res = await fromPromise(
+        let [attachment, err] = await fromPromise(
             queries.getAttachmentByFilepath(
                 ctx.getData("db", this._db),
                 { filepath },
                 ctx.signal,
             ),
         )
-        if (!res.ok) {
-            return res
+        if (err) {
+            return wrapErr`error getting attachment by filepath: ${filepath}: $err`
         }
 
-        if (res.value === null) {
-            return ErrAsync(
+        if (attachment === null) {
+            return Err(
                 new Error(`attachment not found for filepath: ${filepath}`),
             )
         }
 
         return Ok({
-            ...res.value,
-            id: res.value.id.toString(),
+            ...attachment,
+            id: attachment.id.toString(),
         })
     }
 }

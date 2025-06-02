@@ -2,7 +2,7 @@ import { AgeV1AccountKeyType } from "@/domain/AccountKey"
 import { AgePrivateCryptoKey, type Identity } from "@/external/age/AgeCrypto"
 import type { Context } from "@/lib/context"
 import type { Crypto, PlaintextPrivateKey, PublicCryptoKey } from "@/lib/crypto"
-import { type AsyncResult, Err, Ok, type Result } from "@/lib/result"
+import { type AsyncResult, Err, Ok, type Result, wrapErr } from "@/lib/result"
 
 export class CryptoController {
     private _crypto: Crypto
@@ -41,24 +41,24 @@ export class CryptoController {
             key = args.agePrivateCryptoKey
         }
 
-        let privateKeyStr = await key.exportPrivateKey()
-        if (!privateKeyStr.ok) {
-            return privateKeyStr
+        let [_privateKeyStr, privateKeyStrErr] = await key.exportPrivateKey()
+        if (privateKeyStrErr) {
+            return wrapErr`error getting private key: ${privateKeyStrErr}`
         }
 
-        let publicKey = await key.exportPublicKey()
-        if (!publicKey.ok) {
-            return publicKey
+        let [publicKey, publicKeyErr] = await key.exportPublicKey()
+        if (publicKeyErr) {
+            return wrapErr`error getting public key: ${publicKeyErr}`
         }
 
         this.publicKey = Ok({
             type: AgeV1AccountKeyType,
-            data: publicKey.value,
+            data: publicKey,
         })
 
-        let initRes = await this._crypto.init(key)
-        if (!initRes.ok) {
-            return initRes
+        let [_init, initErr] = await this._crypto.init(key)
+        if (initErr) {
+            return wrapErr`error initializing crypto provider: ${initErr}`
         }
 
         return Ok(undefined)

@@ -6,8 +6,9 @@ import {
 } from "@/auth"
 import type { KVStore } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
+import { createErrType, isErr } from "@/lib/errors"
 import { currentDateTime, isAfter } from "@/lib/i18n"
-import { type AsyncResult, Err, Ok } from "@/lib/result"
+import { type AsyncResult, Err, Ok, wrapErr } from "@/lib/result"
 
 export class AuthController {
     private _origin: string
@@ -39,35 +40,41 @@ export class AuthController {
         return this._storage.clear(ctx)
     }
 
+    public static ErrGetInitialToken = createErrType(
+        "AuthController",
+        "error getting initial token",
+    )
     public async getInitialToken(
         ctx: Context,
         creds: { username: string; password: PlaintextPassword },
     ): AsyncResult<void> {
-        let token = await this._authPIClient.getTokenUsingCredentials(
-            ctx,
-            creds,
-        )
-        if (!token.ok) {
-            return token
+        let [token, getTokenErr] =
+            await this._authPIClient.getTokenUsingCredentials(ctx, creds)
+        if (getTokenErr) {
+            return wrapErr`${new AuthController.ErrGetInitialToken()}: ${getTokenErr}`
         }
 
-        let saved = await this._storage.setItem(
+        let [_, storeErr] = await this._storage.setItem(
             ctx,
-            token.value.origin,
-            token.value,
+            token.origin,
+            token,
         )
-        if (!saved.ok) {
-            return saved
+        if (storeErr) {
+            return wrapErr`${new AuthController.ErrGetInitialToken()}: error storing item for origin "${token.origin}": ${storeErr}`
         }
 
-        this._current = token.value
+        this._current = token
         return Ok(undefined)
     }
 
+    public static ErrGetToken = createErrType(
+        "AuthController",
+        "error getting token",
+    )
     public async getToken(ctx: Context): AsyncResult<string> {
-        let current = await this._loadCurrentToken(ctx)
-        if (!current.ok) {
-            return current
+        let [_, loadErr] = await this._loadCurrentToken(ctx)
+        if (loadErr) {
+            return wrapErr`${new AuthController.ErrGetToken()}: ${loadErr}`
         }
 
         let now = currentDateTime()
@@ -85,7 +92,7 @@ export class AuthController {
             return this._refreshToken(ctx)
         }
 
-        return Err(new Error("no valid access token or refresh token"))
+        return wrapErr`${new AuthController.ErrGetToken()}: no valid access token or refresh token`
     }
 
     public async changePassword(
@@ -106,24 +113,25 @@ export class AuthController {
             return Err(new Error("no valid access token or refresh token"))
         }
 
-        let token = await this._authPIClient.getTokenUsingRefreshToken(ctx, {
-            refreshToken,
-        })
-        if (!token.ok) {
-            return token
+        let [token, getTokenErr] =
+            await this._authPIClient.getTokenUsingRefreshToken(ctx, {
+                refreshToken,
+            })
+        if (getTokenErr) {
+            return Err(getTokenErr)
         }
 
-        let saved = await this._storage.setItem(
+        let [_, storeErr] = await this._storage.setItem(
             ctx,
-            token.value.origin,
-            token.value,
+            token.origin,
+            token,
         )
-        if (!saved.ok) {
-            return saved
+        if (storeErr) {
+            return Err(storeErr)
         }
 
-        this._current = token.value
-        return Ok(token.value.accessToken)
+        this._current = token
+        return Ok(token.accessToken)
     }
 
     private async _loadCurrentToken(
@@ -133,17 +141,17 @@ export class AuthController {
             return Ok(this._current)
         }
 
-        let loaded = await this._storage.getItem(ctx, this._origin)
-        if (!loaded.ok) {
-            if (loaded.err instanceof AuthTokenNotFoundError) {
+        let [item, loadErr] = await this._storage.getItem(ctx, this._origin)
+        if (loadErr) {
+            if (isErr(loadErr, AuthTokenNotFoundError)) {
                 return Ok(undefined)
             }
-            return loaded
+            return Err(loadErr)
         }
 
-        this._current = loaded.value
+        this._current = item
 
-        return loaded
+        return Ok(item)
     }
 }
 

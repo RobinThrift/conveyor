@@ -30,7 +30,7 @@ export const registerEffects = (
 
             cancelActiveListeners()
 
-            let unlocked = await unlockCtrl.unlock(
+            let [_, err] = await unlockCtrl.unlock(
                 BaseContext.withSignal(signal),
                 {
                     plaintextKeyData: payload.plaintextKeyData,
@@ -43,10 +43,10 @@ export const registerEffects = (
                 return
             }
 
-            if (!unlocked.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setUnlockState({
-                        error: unlocked.err,
+                        error: err,
                         state: "locked",
                     }),
                 )
@@ -83,7 +83,7 @@ export const registerEffects = (
 
             await unlockCtrl.reset(ctx)
 
-            let unlocked = await unlockCtrl.unlock(ctx, {
+            let [_, err] = await unlockCtrl.unlock(ctx, {
                 plaintextKeyData: payload.plaintextKeyData,
             })
 
@@ -91,11 +91,11 @@ export const registerEffects = (
                 return
             }
 
-            if (!unlocked.ok) {
+            if (err) {
                 dispatch(
                     setup.actions.setStep({
                         step: "configure-encryption",
-                        error: unlocked.err,
+                        error: err,
                     }),
                 )
                 return

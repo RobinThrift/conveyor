@@ -1,7 +1,8 @@
 import { Lock } from "@/lib/Lock"
 import type { Context } from "@/lib/context"
+import { createErrType } from "@/lib/errors"
 import { FSNotFoundError } from "@/lib/fs"
-import { type AsyncResult, Err, Ok, fmtErr, fromPromise } from "@/lib/result"
+import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
 import { createWorker, isWorkerContext } from "@/lib/worker"
 
 const _rootDir = (async () => {
@@ -12,33 +13,36 @@ const _rootDir = (async () => {
     return undefined as any
 })()
 
+const ErrReadFile = createErrType("OPFSWorker", "error reading file")
+const ErrWriteFile = createErrType("OPFSWorker", "error writing file")
+const ErrRemoveFile = createErrType("OPFSWorker", "error removing file")
+const ErrMkdir = createErrType("OPFSWorker", "error making directory")
+
 export const OPFSWorker = createWorker({
     read: async (
         ctx: Context,
         { filepath }: { filepath: string },
     ): AsyncResult<ArrayBufferLike> => {
-        let file = await fromPromise(openFile(await _rootDir, filepath))
-        if (!file.ok) {
-            if (
-                file.err instanceof DOMException &&
-                file.err.name === "NotFoundError"
-            ) {
-                return Err(new FSNotFoundError(filepath, { cause: file.err }))
+        let [file, err] = await fromPromise(openFile(await _rootDir, filepath))
+        if (err) {
+            if (err instanceof DOMException && err.name === "NotFoundError") {
+                return wrapErr`${new ErrReadFile()}: ${new FSNotFoundError(filepath, { cause: err })}`
             }
-            return file
+
+            return wrapErr`${new ErrReadFile()}: ${err}`
         }
 
         let lock = new Lock(`opfs:${filepath}`)
 
         return lock.run(ctx, async () => {
-            let fh = await fromPromise(file.value.createSyncAccessHandle())
-            if (!fh.ok) {
-                return fh
+            let [fh, err] = await fromPromise(file.createSyncAccessHandle())
+            if (err) {
+                return wrapErr`${new ErrReadFile()}: error creating sync access handle: ${err}`
             }
 
-            let data = new Uint8Array(fh.value.getSize())
-            fh.value.read(data)
-            fh.value.close()
+            let data = new Uint8Array(fh.getSize())
+            fh.read(data)
+            fh.close()
 
             return Ok(data.buffer)
         })
@@ -53,16 +57,16 @@ export const OPFSWorker = createWorker({
         let lock = new Lock(`opfs:${filepath}`)
 
         return lock.run(ctx, async () => {
-            let fh = await file.createSyncAccessHandle()
+            let [fh, err] = await fromPromise(file.createSyncAccessHandle())
+            if (err) {
+                return wrapErr`${new ErrWriteFile()}: error creating sync access handle: ${err}`
+            }
 
             let written = fh.write(new Uint8Array(content))
-
             fh.close()
 
             if (written !== content.byteLength) {
-                throw new Error(
-                    `number of bytes written is not the same as the data: written ${written} bytes, buffer size ${content.byteLength} bytes: ${filepath}`,
-                )
+                return wrapErr`${new ErrWriteFile()}: number of bytes written is not the same as the data: written ${written} bytes, buffer size ${content.byteLength} bytes: ${filepath}`
             }
 
             return Ok(written)
@@ -74,20 +78,22 @@ export const OPFSWorker = createWorker({
         { filepath }: { filepath: string },
     ): AsyncResult<void> => {
         let { dir: dirname, filename } = splitFilepath(filepath)
-        let dir = await fromPromise(getDirHandle(await _rootDir, dirname))
-        if (!dir.ok) {
-            return dir
+        let [dir, err] = await fromPromise(
+            getDirHandle(await _rootDir, dirname),
+        )
+        if (err) {
+            return wrapErr`${new ErrRemoveFile()}: ${filepath}: error getting dir handle: ${err}`
         }
 
         let lock = new Lock(`opfs:${filepath}`)
 
         return lock.run(ctx, async () => {
-            let removed = await fromPromise(dir.value.removeEntry(filename))
-            if (!removed) {
-                return fmtErr(`%w: ${filepath}`, removed)
+            let [_, err] = await fromPromise(dir.removeEntry(filename))
+            if (err) {
+                return wrapErr`${new ErrRemoveFile()}: ${filepath}: ${err}`
             }
 
-            return removed
+            return Ok()
         })
     },
 
@@ -107,17 +113,17 @@ export const OPFSWorker = createWorker({
                 continue
             }
 
-            let result = await fromPromise(
+            let [result, err] = await fromPromise(
                 curr.getDirectoryHandle(dir, { create: true }),
             )
-            if (!result.ok) {
-                return fmtErr(`%w: ${dir}`, result)
+            if (err) {
+                return wrapErr`${new ErrMkdir()}: error getting directory handle: ${dir}: ${err}`
             }
 
-            curr = result.value
+            curr = result
         }
 
-        return Ok(undefined)
+        return Ok()
     },
 })
 

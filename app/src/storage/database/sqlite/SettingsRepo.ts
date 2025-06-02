@@ -2,7 +2,7 @@ import { DEFAULT_SETTINGS, type Settings } from "@/domain/Settings"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
 import { type KeyPaths, type ValueAt, setPath } from "@/lib/getset"
-import { type AsyncResult, fromPromise, mapResult } from "@/lib/result"
+import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 import * as queries from "./gen/settings_sql"
 
@@ -18,21 +18,22 @@ export class SettingsRepo {
     ): AsyncResult<Settings> {
         let settings = structuredClone(DEFAULT_SETTINGS)
 
-        let result = await fromPromise(
+        let [entries, err] = await fromPromise(
             queries.listSettings(ctx.getData("db", this._db), ctx.signal),
         )
+        if (err) {
+            return wrapErr`error loading settings: ${err}`
+        }
 
-        return mapResult(result, (entries) => {
-            for (let entry of entries) {
-                settings = setPath(
-                    settings,
-                    entry.key as KeyPaths<Settings>,
-                    entry.value,
-                )
-            }
+        for (let entry of entries) {
+            settings = setPath(
+                settings,
+                entry.key as KeyPaths<Settings>,
+                entry.value,
+            )
+        }
 
-            return settings
-        })
+        return Ok(settings)
     }
 
     public async updateSetting<K extends KeyPaths<Settings>>(

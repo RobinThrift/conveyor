@@ -5,15 +5,15 @@ import {
 } from "@/auth"
 import type { PlaintextPassword } from "@/auth/credentials"
 import type { Context } from "@/lib/context"
-import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import {
     type AsyncResult,
-    Err,
     Ok,
-    fmtErr,
     fromPromise,
     fromThrowing,
+    wrapErr,
 } from "@/lib/result"
+import { createErrType } from "@/lib/errors"
+import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 
@@ -32,6 +32,10 @@ export class AuthV1APIClient {
         this._baseURL = baseURL
     }
 
+    public static ErrGetTokenUsingCredentials = createErrType(
+        "AuthV1APIClient",
+        "error getting token using credentials",
+    )
     public async getTokenUsingCredentials(
         ctx: Context,
         {
@@ -48,33 +52,41 @@ export class AuthV1APIClient {
             }),
         })
 
-        let res = await fromPromise(fetch(req, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr("error getting token using credentials: %w", res)
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${err}`
         }
 
-        if (res.value.status === 401) {
-            return Err(new UnauthorizedError("invalid credentials"))
+        if (res.status === 401) {
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${new UnauthorizedError()}: "invalid credentials"`
         }
 
-        if (res.value.status === 404) {
-            return Err(new Error("invalid login url"))
+        if (res.status === 404) {
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: invalid login url`
         }
 
-        if (res.value.status === 204) {
-            return Err(new PasswordChangeRequiredError())
+        if (res.status === 204) {
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${new PasswordChangeRequiredError()}`
         }
 
-        if (res.value.status !== 201) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(err.withPrefix("error getting token using credentials"))
+        if (res.status !== 201) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${err}`
         }
 
-        let body = await res.value.text()
-
-        return this._authTokenFromJSON(body)
+        let [token, deserializationErr] = this._authTokenFromJSON(
+            await res.text(),
+        )
+        if (deserializationErr) {
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${deserializationErr}`
+        }
+        return Ok(token)
     }
 
+    public static ErrGetTokenUsingRefreshToken = createErrType(
+        "AuthV1APIClient",
+        "error getting token using refresh token",
+    )
     public async getTokenUsingRefreshToken(
         ctx: Context,
         { refreshToken }: { refreshToken: PlaintextAuthTokenValue },
@@ -87,27 +99,33 @@ export class AuthV1APIClient {
             }),
         })
 
-        let res = await fromPromise(fetch(req, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr("error getting token using refresh token: %w", res)
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingRefreshToken()}: ${err}`
         }
 
-        if (res.value.status === 401) {
-            return Err(new UnauthorizedError("invalid refresh token"))
+        if (res.status === 401) {
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${new UnauthorizedError()}: invalid refresh token`
         }
 
-        if (res.value.status !== 201) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(
-                err.withPrefix("error getting token using refresh token"),
-            )
+        if (res.status !== 201) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${err}`
         }
 
-        let body = await res.value.text()
-
-        return this._authTokenFromJSON(body)
+        let [token, deserializationErr] = this._authTokenFromJSON(
+            await res.text(),
+        )
+        if (deserializationErr) {
+            return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${deserializationErr}`
+        }
+        return Ok(token)
     }
 
+    public static ErrChangePassword = createErrType(
+        "AuthV1APIClient",
+        "error changing password",
+    )
     public async changePassword(
         ctx: Context,
         {
@@ -135,45 +153,52 @@ export class AuthV1APIClient {
             },
         )
 
-        let res = await fromPromise(fetch(req, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr("error changing password: %w", res)
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new AuthV1APIClient.ErrChangePassword()}: ${err}`
         }
 
-        if (res.value.status === 401) {
-            return Err(new UnauthorizedError("error changing password"))
+        if (res.status === 401) {
+            return wrapErr`${new AuthV1APIClient.ErrChangePassword()}: ${new UnauthorizedError()}`
         }
 
-        if (res.value.status !== 204) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(err.withPrefix("error changing password"))
+        if (res.status !== 204) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new AuthV1APIClient.ErrChangePassword()}: ${err}`
         }
 
-        return Ok(undefined)
+        return Ok()
     }
 
     private _authTokenFromJSON(raw: string) {
         return jsonDeserialize<AuthToken, Record<string, any>>(raw, (obj) => {
-            let expiresAt = parseJSONDate(obj.expiresAt)
-            if (!expiresAt.ok) {
-                return expiresAt
-            }
-            let refreshExpiresAt = parseJSONDate(obj.refreshExpiresAt)
-            if (!refreshExpiresAt.ok) {
-                return refreshExpiresAt
+            let [expiresAt, expiresAtParseErr] = parseJSONDate(
+                obj.expiresAt as string,
+            )
+            if (expiresAtParseErr) {
+                return wrapErr`error parsing expiresAt date: ${expiresAtParseErr}`
             }
 
-            let serverURL = fromThrowing(() => new URL(this._baseURL))
-            if (!serverURL.ok) {
-                return serverURL
+            let [refreshExpiresAt, refreshExpiresAtParseErr] = parseJSONDate(
+                obj.refreshExpiresAt as string,
+            )
+            if (refreshExpiresAtParseErr) {
+                return wrapErr`error parsing refreshExpiresAt date: ${refreshExpiresAtParseErr}`
+            }
+
+            let [serverURL, serverURLParseErr] = fromThrowing(
+                () => new URL(this._baseURL),
+            )
+            if (serverURLParseErr) {
+                return wrapErr`error parsing serverURL: ${serverURLParseErr}`
             }
 
             return Ok({
-                origin: serverURL.value.host,
+                origin: serverURL.host,
                 accessToken: obj.accessToken,
-                expiresAt: expiresAt.value,
+                expiresAt: expiresAt,
                 refreshToken: obj.refreshToken,
-                refreshExpiresAt: refreshExpiresAt.value,
+                refreshExpiresAt: refreshExpiresAt,
             })
         })
     }

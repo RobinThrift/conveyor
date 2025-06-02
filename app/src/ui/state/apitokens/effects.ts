@@ -31,7 +31,7 @@ export const registerEffects = (
 
             let currentPage = slice.selectors.currentPage(state)
 
-            let apitokens = await apiTokenCtrl.listAPITokens(
+            let [apitokens, err] = await apiTokenCtrl.listAPITokens(
                 BaseContext.withSignal(signal),
                 {
                     pagination: {
@@ -41,10 +41,10 @@ export const registerEffects = (
                 },
             )
 
-            if (!apitokens.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setError({
-                        error: apitokens.err,
+                        error: err,
                     }),
                 )
                 return
@@ -54,7 +54,7 @@ export const registerEffects = (
                 return
             }
 
-            dispatch(slice.actions.setAPITokens(apitokens.value))
+            dispatch(slice.actions.setAPITokens(apitokens))
             dispatch(slice.actions.setLoadingState({ isLoading: false }))
         },
     })
@@ -105,21 +105,21 @@ export const registerEffects = (
 
             dispatch(slice.actions.setLoadingState({ isLoading: true }))
 
-            let created = await apiTokenCtrl.createAPIToken(
+            let [created, err] = await apiTokenCtrl.createAPIToken(
                 BaseContext.withSignal(signal),
                 payload,
             )
 
-            if (!created.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setError({
-                        error: created.err,
+                        error: err,
                     }),
                 )
                 return
             }
 
-            dispatch(slice.actions.setLastCreatedValue(created.value.token))
+            dispatch(slice.actions.setLastCreatedValue(created.token))
             dispatch(slice.actions.setLoadingState({ isLoading: false }))
             dispatch(slice.actions.loadPage())
         },
@@ -140,15 +140,15 @@ export const registerEffects = (
 
             dispatch(slice.actions.setLoadingState({ isLoading: true }))
 
-            let created = await apiTokenCtrl.deleteAPIToken(
+            let [_, err] = await apiTokenCtrl.deleteAPIToken(
                 BaseContext.withSignal(signal),
                 payload.name,
             )
 
-            if (!created.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setError({
-                        error: created.err,
+                        error: err,
                     }),
                 )
                 return

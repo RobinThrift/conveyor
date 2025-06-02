@@ -10,7 +10,7 @@ import { Lock } from "@/lib/Lock"
 import type { Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import type { AsyncResult } from "@/lib/result"
-import { fromPromise } from "@/lib/result"
+import { Err, Ok, fromPromise } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
 
 export class SQLite implements Database {
@@ -90,25 +90,27 @@ export class SQLite implements Database {
         }
 
         return this._lock.run(ctx, async (ctx: Context) => {
-            let begin = await fromPromise(
+            let [_begin, beginErr] = await fromPromise(
                 this.exec("BEGIN DEFERRED TRANSACTION"),
             )
-            if (!begin.ok) {
-                return begin
+            if (beginErr) {
+                return Err(beginErr)
             }
 
-            let res = await fn(ctx.withData("db", this))
-            if (!res.ok) {
+            let [res, err] = await fn(ctx.withData("db", this))
+            if (err) {
                 await this.exec("ROLLBACK TRANSACTION")
-                return res
+                return Err(err)
             }
 
-            let commit = await fromPromise(this.exec("COMMIT TRANSACTION"))
-            if (!commit.ok) {
-                return commit
+            let [_commit, commitErr] = await fromPromise(
+                this.exec("COMMIT TRANSACTION"),
+            )
+            if (commitErr) {
+                return Err(commitErr)
             }
 
-            return res
+            return Ok(res)
         })
     }
 }

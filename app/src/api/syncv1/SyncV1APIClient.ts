@@ -1,14 +1,15 @@
 import type { EncryptedChangelogEntry } from "@/domain/Changelog"
 import type { Context } from "@/lib/context"
+import { createErrType } from "@/lib/errors"
 import { parseJSONDate } from "@/lib/json"
 import {
     type AsyncResult,
     Err,
     Ok,
     type Result,
-    fmtErr,
     fromPromise,
     fromThrowing,
+    wrapErr,
 } from "@/lib/result"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
@@ -32,127 +33,109 @@ export class SyncV1APIClient {
         this._baseURL = baseURL
     }
 
+    public static ErrRegisterClient = createErrType(
+        "SyncV1APIClient",
+        "error registering sync client",
+    )
     public async registerClient(
         ctx: Context,
         syncClient: { clientID: string },
     ): AsyncResult<void> {
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
             "/api/sync/v1/clients",
             JSON.stringify({ clientID: syncClient.clientID }),
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new SyncV1APIClient.ErrRegisterClient()}: ${syncClient.clientID}: ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error registering client (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new SyncV1APIClient.ErrRegisterClient()} (${this._baseURL}): ${err}`
         }
 
-        if (res.value.status === 401) {
-            return Err(
-                new UnauthorizedError(
-                    `error registering client (${this._baseURL})`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`${new SyncV1APIClient.ErrRegisterClient()} (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        if (res.value.status !== 201) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(
-                err.withPrefix(`error registering client (${this._baseURL})`),
-            )
+        if (res.status !== 201) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new SyncV1APIClient.ErrRegisterClient()} (${this._baseURL}): ${err}`
         }
 
         return Ok(undefined)
     }
 
+    public static ErrGetFullSync = createErrType(
+        "SyncV1APIClient",
+        "error fetching full DB from sync server",
+    )
     public async getFullSync(ctx: Context): AsyncResult<ArrayBufferLike> {
-        let req = await this._createBaseRequest(ctx, "GET", "/api/sync/v1/full")
-        if (!req.ok) {
-            return req
+        let [req, createReqErr] = await this._createBaseRequest(
+            ctx,
+            "GET",
+            "/api/sync/v1/full",
+        )
+        if (createReqErr) {
+            return wrapErr`${new SyncV1APIClient.ErrGetFullSync()}: ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error fetching full DB from sync server (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new SyncV1APIClient.ErrGetFullSync()} (${this._baseURL}): ${err}`
         }
 
-        if (res.value.status === 401) {
-            return Err(
-                new UnauthorizedError(
-                    `error fetching full DB from sync server (${this._baseURL})`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`${new SyncV1APIClient.ErrGetFullSync()} (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        if (res.value.status === 303) {
-            let locHeader = res.value.headers.get("location")
+        if (res.status === 303) {
+            let locHeader = res.headers.get("location")
             if (!locHeader) {
-                return Err(
-                    new Error(
-                        `error fetching full DB from sync server (${this._baseURL}): request returned status 303 but no Location header`,
-                    ),
-                )
+                return wrapErr`${new SyncV1APIClient.ErrGetFullSync()} (${this._baseURL}): error fetching full DB from sync server (${this._baseURL}): request returned status 303 but no Location header`
             }
             return this._downloadDBFromLocation(ctx, locHeader)
         }
 
-        if (res.value.status !== 200) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(
-                err.withPrefix(
-                    `error fetching full DB from sync server (${this._baseURL})`,
-                ),
-            )
+        if (res.status !== 200) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new SyncV1APIClient.ErrGetFullSync()} (${this._baseURL}): ${err}`
         }
 
-        let data = await fromPromise(res.value.arrayBuffer())
-        if (!data.ok) {
-            return fmtErr(
-                `error fetching full DB from sync server (${this._baseURL}): error reading data: %w`,
-                data,
-            )
+        let [data, receiveDataErr] = await fromPromise(res.arrayBuffer())
+        if (receiveDataErr) {
+            return wrapErr`${new SyncV1APIClient.ErrGetFullSync()} (${this._baseURL}): error reading data`
         }
 
-        return data
+        return Ok(data)
     }
 
     private async _downloadDBFromLocation(
         ctx: Context,
         location: string,
     ): AsyncResult<ArrayBufferLike> {
-        let req = await this._createBaseRequest(ctx, "GET", location)
-        if (!req.ok) {
-            return req
+        let [req, createReqErr] = await this._createBaseRequest(
+            ctx,
+            "GET",
+            location,
+        )
+        if (createReqErr) {
+            return Err(createReqErr)
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error fetching full DB from sync server (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return Err(err)
         }
 
-        if (res.value.status === 401) {
-            return Err(
-                new UnauthorizedError(
-                    `error fetching full DB from sync server (${this._baseURL})`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`error fetching full DB from sync server (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        if (res.value.status !== 200) {
-            let err = await APIError.fromHTTPResponse(res.value)
+        if (res.status !== 200) {
+            let err = await APIError.fromHTTPResponse(res)
             return Err(
                 err.withPrefix(
                     `error fetching full DB from sync server (${this._baseURL})`,
@@ -160,132 +143,127 @@ export class SyncV1APIClient {
             )
         }
 
-        let data = await fromPromise(res.value.arrayBuffer())
-        if (!data.ok) {
-            return fmtErr(
-                `error fetching full DB from sync server (${this._baseURL}): error reading data: %w`,
-                data,
-            )
+        let [data, receiveDataErr] = await fromPromise(res.arrayBuffer())
+        if (receiveDataErr) {
+            return wrapErr`error fetching full DB from sync server (${this._baseURL}): error reading data: ${receiveDataErr}`
         }
 
-        return data
+        return Ok(data)
     }
 
+    public static ErrUploadFullSyncData = createErrType(
+        "SyncV1APIClient",
+        "error uploading all data to sync server",
+    )
     public async uploadFullSyncData(
         ctx: Context,
         data: ArrayBufferLike,
     ): AsyncResult<void> {
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
             "/api/sync/v1/full",
             new Uint8Array(data),
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadFullSyncData()} (${this._baseURL}): ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error uploading full DB to sync server (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadFullSyncData()} (${this._baseURL}): ${err}`
         }
 
-        if (res.value.status === 401) {
-            return Err(
-                new UnauthorizedError(
-                    `error uploading full DB to sync server (${this._baseURL})`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadFullSyncData()} (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        if (res.value.status !== 201) {
-            let err = await APIError.fromHTTPResponse(res.value)
-            return Err(
-                err.withPrefix(
-                    `error uploading full DB to sync server (${this._baseURL})`,
-                ),
-            )
+        if (res.status !== 201) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new SyncV1APIClient.ErrUploadFullSyncData()} (${this._baseURL}): ${err}`
         }
 
-        return Ok(undefined)
+        return Ok()
     }
 
+    public static ErrListChangelogEntries = createErrType(
+        "SyncV1APIClient",
+        "error listing changelog entries",
+    )
     public async listChangelogEntries(
         ctx: Context,
         since?: Date,
     ): AsyncResult<EncryptedChangelogEntry[]> {
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "GET",
             `/api/sync/v1/changes?since=${JSON.parse(JSON.stringify(since ?? new Date(2000, 0, 1)))}`,
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new SyncV1APIClient.ErrListChangelogEntries()} (${this._baseURL}): ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error fetching changelog entries (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new SyncV1APIClient.ErrListChangelogEntries()} (${this._baseURL}): ${err}`
         }
 
-        if (res.value.status !== 200) {
-            return Err(
-                new Error(
-                    `error fetching changelog entries (${this._baseURL}): ${res.value.status} ${res.value.statusText}`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`${new SyncV1APIClient.ErrListChangelogEntries()} (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        let data = await fromPromise(res.value.text())
-        if (!data.ok) {
-            return fmtErr(
-                `error fetching changelog entries (${this._baseURL}): error reading data: %w`,
-                data,
-            )
+        if (res.status !== 200) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new SyncV1APIClient.ErrListChangelogEntries()} (${this._baseURL}): ${err}`
         }
 
-        return parseEncryptedChangelogEntryJSON(data.value)
+        let [data, receiveDataErr] = await fromPromise(res.text())
+        if (receiveDataErr) {
+            return wrapErr`${new SyncV1APIClient.ErrListChangelogEntries()} (${this._baseURL}): error reading data: ${receiveDataErr}`
+        }
+
+        return parseEncryptedChangelogEntryJSON(data)
     }
 
+    public static ErrUploadChangelogEntries = createErrType(
+        "SyncV1APIClient",
+        "error uploading changelog entries to sync server",
+    )
     public async uploadChangelogEntries(
         ctx: Context,
         entries: EncryptedChangelogEntry[],
     ): AsyncResult<void> {
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
             "/api/sync/v1/changes",
             JSON.stringify({ items: entries }),
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadChangelogEntries()} (${this._baseURL}): ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error uploading changelog entries (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadChangelogEntries()} (${this._baseURL}): ${err}`
         }
 
-        if (res.value.status !== 201) {
-            return Err(
-                new Error(
-                    `error uploading changelog entries (${this._baseURL}): ${res.value.status} ${res.value.statusText}`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadChangelogEntries()} (${this._baseURL}): ${new UnauthorizedError()}`
         }
 
-        return Ok(undefined)
+        if (res.status !== 201) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new SyncV1APIClient.ErrUploadChangelogEntries()} (${this._baseURL}): ${err}`
+        }
+
+        return Ok()
     }
 
+    public static ErrUploadAttachment = createErrType(
+        "SyncV1APIClient",
+        "error uploading attachment",
+    )
     public async uploadAttachment(
         ctx: Context,
         attachment: {
@@ -293,65 +271,69 @@ export class SyncV1APIClient {
             data: Uint8Array<ArrayBufferLike>
         },
     ): AsyncResult<void> {
-        let req = await this._createBaseRequest(
+        let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
             "/api/sync/v1/attachments",
             await compressData(attachment.data),
         )
-        if (!req.ok) {
-            return req
+        if (createReqErr) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadAttachment()} (${this._baseURL}): ${createReqErr}`
         }
 
-        req.value.headers.set("X-Filepath", attachment.filepath)
-        req.value.headers.set("Content-Type", "application/octet-stream")
-        req.value.headers.set("Content-Encoding", "gzip")
+        req.headers.set("X-Filepath", attachment.filepath)
+        req.headers.set("Content-Type", "application/octet-stream")
+        req.headers.set("Content-Encoding", "gzip")
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error uploading attachment (${this._baseURL}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadAttachment()} (${this._baseURL}): ${err}`
         }
 
-        if (res.value.status !== 201) {
-            return Err(
-                new Error(
-                    `error uploading attachment (${this._baseURL}): ${res.value.status} ${res.value.statusText}`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`${new SyncV1APIClient.ErrUploadChangelogEntries()} (${this._baseURL})${new UnauthorizedError()}`
         }
 
-        return Ok(undefined)
+        if (res.status !== 201) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new SyncV1APIClient.ErrUploadAttachment()} (${this._baseURL}): ${err}`
+        }
+
+        return Ok()
     }
 
+    public static ErrGetAttachmentDataByFilepath = createErrType(
+        "SyncV1APIClient",
+        "error getting attachment",
+    )
     public async getAttachmentDataByFilepath(
         ctx: Context,
         filepath: string,
     ): AsyncResult<ArrayBufferLike> {
-        let req = await this._createBaseRequest(ctx, "GET", `/blobs${filepath}`)
-        if (!req.ok) {
-            return req
+        let [req, createReqErr] = await this._createBaseRequest(
+            ctx,
+            "GET",
+            `/blobs${filepath}`,
+        )
+        if (createReqErr) {
+            return wrapErr`${new SyncV1APIClient.ErrGetAttachmentDataByFilepath()} (${this._baseURL}): ${filepath}: ${createReqErr}`
         }
 
-        let res = await fromPromise(fetch(req.value, { signal: ctx.signal }))
-        if (!res.ok) {
-            return fmtErr(
-                `error getting attachment (${req.value.url.toString()}): %w`,
-                res,
-            )
+        let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
+        if (err) {
+            return wrapErr`${new SyncV1APIClient.ErrGetAttachmentDataByFilepath()} (${this._baseURL}): ${filepath}: ${err}`
         }
 
-        if (res.value.status !== 200) {
-            return Err(
-                new Error(
-                    `error uploading attachment (${req.value.url.toString()}): ${res.value.status} ${res.value.statusText}`,
-                ),
-            )
+        if (res.status === 401) {
+            return wrapErr`$${new SyncV1APIClient.ErrGetAttachmentDataByFilepath()} (${this._baseURL}): ${filepath}: ${new UnauthorizedError()}`
         }
 
-        return fromPromise(res.value.arrayBuffer())
+        if (res.status !== 200) {
+            let err = await APIError.fromHTTPResponse(res)
+            return wrapErr`${new SyncV1APIClient.ErrGetAttachmentDataByFilepath()} (${this._baseURL}): ${filepath}: ${err}`
+        }
+
+        return fromPromise(res.arrayBuffer())
     }
 
     private async _createBaseRequest(
@@ -360,21 +342,21 @@ export class SyncV1APIClient {
         path: string,
         body?: BodyInit,
     ): AsyncResult<Request> {
-        let token = await this._tokenStorage.getToken(ctx)
-        if (!token.ok) {
-            return token
+        let [token, tokenErr] = await this._tokenStorage.getToken(ctx)
+        if (tokenErr) {
+            return wrapErr`error creating request: error getting token: ${tokenErr}`
         }
 
-        let req = new Request(new URL(path, this._baseURL), {
-            method,
-            redirect: "follow",
-            body,
-            headers: {
-                Authorization: `Bearer ${token.value}`,
-            },
-        })
-
-        return Ok(req)
+        return Ok(
+            new Request(new URL(path, this._baseURL), {
+                method,
+                redirect: "follow",
+                body,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }),
+        )
     }
 }
 
@@ -390,14 +372,14 @@ function parseEncryptedChangelogEntryJSON(
         let entries: EncryptedChangelogEntry[] = []
 
         for (let obj of objs.items) {
-            let timestamp = parseJSONDate(obj.timestamp)
-            if (!timestamp.ok) {
-                throw timestamp.err
+            let [timestamp, parseErr] = parseJSONDate(obj.timestamp)
+            if (parseErr) {
+                throw parseErr
             }
             entries.push({
                 syncClientID: obj.syncClientID,
                 data: obj.data,
-                timestamp: timestamp.value,
+                timestamp: timestamp,
             })
         }
 

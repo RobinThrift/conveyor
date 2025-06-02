@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 
 import { AgePrivateCryptoKey, type Identity } from "@/external/age/AgeCrypto"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
-import { type AsyncResult, fromThrowing } from "@/lib/result"
+import { type AsyncResult, Err, fromThrowing } from "@/lib/result"
 import type { ChangePasswordArgs, LoginArgs } from "@/ui/components/AuthForm"
 import { type SyncMethod, actions, selectors } from "@/ui/state"
 
@@ -41,12 +41,12 @@ export function useInitSetupScreenState() {
 
     let generatePrivateCryptoKey =
         useCallback(async (): AsyncResult<string> => {
-            let key = await AgePrivateCryptoKey.generate()
-            if (!key.ok) {
-                return key
+            let [key, err] = await AgePrivateCryptoKey.generate()
+            if (err) {
+                return Err(err)
             }
 
-            return await key.value.exportPrivateKey()
+            return await key.exportPrivateKey()
         }, [])
 
     let importPrivateCryptoKey = useCallback(

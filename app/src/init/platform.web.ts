@@ -29,9 +29,9 @@ export async function init({
     let deviceSecureStorage: DeviceSecureStorage =
         new WebCryptoDeviceSecureStorage()
 
-    let deviceSecureStorageInit = await deviceSecureStorage.init(ctx)
-    if (!deviceSecureStorageInit.ok) {
-        console.error(deviceSecureStorageInit.err)
+    let [_, deviceSecureStorageInitErr] = await deviceSecureStorage.init(ctx)
+    if (deviceSecureStorageInitErr) {
+        console.error(deviceSecureStorageInitErr)
         deviceSecureStorage = new NoopDeviceSecureStorage()
     }
 

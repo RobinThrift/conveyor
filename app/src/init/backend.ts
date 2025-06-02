@@ -120,8 +120,8 @@ function attachmentLoaderFromWorker(worker: Worker) {
                 return
             }
 
-            request.resolve(evt.data.data)
             requests.delete(msg.id)
+            request.resolve(evt.data.data)
         },
     )
 

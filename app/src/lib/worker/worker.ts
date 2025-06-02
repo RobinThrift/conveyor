@@ -90,15 +90,17 @@ export function createWorker<
             result = await handler(BaseContext, evt.data.params)
         }
 
-        if (!result.ok) {
+        let [value, err] = result
+
+        if (err) {
             try {
                 postMessage({
                     type: "error",
                     id: evt.data.id,
-                    error: result.err,
+                    error: err,
                 } satisfies WorkerErrorResponseMessage)
             } catch (e) {
-                console.error(result.err)
+                console.error(err)
                 console.error(e)
             }
             return
@@ -107,12 +109,12 @@ export function createWorker<
         let msg = {
             type: "success",
             id: evt.data.id,
-            data: result.value,
+            data: value,
         } satisfies WorkerSuccessResponseMessage
         let transferables: Transferable[] = []
 
-        if (result.value instanceof ArrayBuffer) {
-            transferables.push(result.value)
+        if (value instanceof ArrayBuffer) {
+            transferables.push(value)
         }
 
         postMessage(msg, transferables)

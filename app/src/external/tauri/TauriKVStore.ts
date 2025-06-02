@@ -8,6 +8,7 @@ import {
     Ok,
     type Result,
     fromPromise,
+    wrapErr,
 } from "@/lib/result"
 
 export class TauriKVStoreContainer<Names extends string>
@@ -75,19 +76,19 @@ export class TauriKVStore<
         _ctx: Context,
         key: K,
     ): AsyncResult<Items[K] | undefined> {
-        let item = await fromPromise(this._store.get(key as string))
-        if (!item.ok) {
-            return item
+        let [item, err] = await fromPromise(this._store.get(key as string))
+        if (err) {
+            return wrapErr`error getting item: ${key}: ${err}`
         }
 
-        if (!item.value && typeof this.NotFoundErr === "function") {
+        if (!item && typeof this.NotFoundErr === "function") {
             return Err(new this.NotFoundErr(key))
         }
-        if (!item.value) {
+        if (!item) {
             return Ok(undefined)
         }
 
-        return this._instantiate(item.value as any)
+        return this._instantiate(item as any)
     }
 
     public async setItem<K extends keyof Items>(
@@ -102,9 +103,9 @@ export class TauriKVStore<
         _ctx: Context,
         key: K,
     ): AsyncResult<void> {
-        let res = await fromPromise(this._store.delete(key as string))
-        if (!res.ok) {
-            return res
+        let [_, err] = await fromPromise(this._store.delete(key as string))
+        if (err) {
+            return wrapErr`error removing item: ${key}: ${err}`
         }
         return Ok(undefined)
     }

@@ -10,20 +10,20 @@ export function assertOkResult<T, E extends Error = Error>(
     r: Result<T, E> | AsyncResult<T, E>,
 ) {
     if (typeof r === "object" && "then" in r && typeof r.then === "function") {
-        return r.then((rr) => {
-            if (!rr.ok) {
-                assert.fail(`${rr.err.message}: ${rr.err.stack}`)
+        return r.then(([value, err]) => {
+            if (err) {
+                assert.fail(`${err.message}: ${err.stack}`)
             }
-            return rr.value
+            return value
         })
     }
 
-    let rr = r as Result<T, E>
-    if (!rr.ok) {
-        assert.fail(`${rr.err.message}: ${rr.err.stack}`)
+    let [value, err] = r as Result<T, E>
+    if (err) {
+        assert.fail(`${err.message}: ${err.stack}`)
     }
 
-    return rr.value
+    return value
 }
 
 export function assertErrResult<E extends Error = Error>(
@@ -34,22 +34,20 @@ export function assertErrResult<E extends Error = Error>(
     r: Result<unknown, E> | AsyncResult<unknown, E>,
 ) {
     if (typeof r === "object" && "then" in r && typeof r.then === "function") {
-        return r.then((rr) => {
-            if (rr.ok) {
+        return r.then(([value, err]) => {
+            if (!err) {
                 assert.fail(
-                    `expected error, but got value: ${JSON.stringify(rr.value)}`,
+                    `expected error, but got value: ${JSON.stringify(value)}`,
                 )
             }
-            return rr.err
+            return err
         })
     }
 
-    let rr = r as Result<unknown, E>
-    if (rr.ok) {
-        assert.fail(
-            `expected error, but got value: ${JSON.stringify(rr.value)}`,
-        )
+    let [value, err] = r as Result<unknown, E>
+    if (!err) {
+        assert.fail(`expected error, but got value: ${JSON.stringify(value)}`)
     }
 
-    return rr.err
+    return err
 }

@@ -6,7 +6,7 @@ import { Lock } from "@/lib/Lock"
 import { awaitWithAbort } from "@/lib/awaitWithAbort"
 import type { Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
-import { type AsyncResult, fromPromise } from "@/lib/result"
+import { type AsyncResult, Err, Ok, fromPromise } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
 
 export class TauriSQLite implements Database {
@@ -165,25 +165,25 @@ export class TauriSQLite implements Database {
         }
 
         return this._lock.run(ctx, async (ctx: Context) => {
-            let begin = await fromPromise(this._begin(ctx))
-            if (!begin.ok) {
-                return begin
+            let [_, beginErr] = await fromPromise(this._begin(ctx))
+            if (beginErr) {
+                return Err(beginErr)
             }
 
-            let res = await fn(
+            let [res, err] = await fn(
                 ctx.withData("db", new Transaction(this._handle)),
             )
-            if (!res.ok) {
+            if (err) {
                 await this._rollback(ctx)
-                return res
+                return Err(err)
             }
 
-            let commit = await fromPromise(this._commit(ctx))
-            if (!commit.ok) {
-                return commit
+            let [_commit, commitErr] = await fromPromise(this._commit(ctx))
+            if (commitErr) {
+                return Err(commitErr)
             }
 
-            return res
+            return Ok(res)
         })
     }
 }

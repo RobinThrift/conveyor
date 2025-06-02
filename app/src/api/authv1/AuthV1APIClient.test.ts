@@ -11,6 +11,8 @@ import { BaseContext } from "@/lib/context"
 import { currentDateTime, isAfter } from "@/lib/i18n"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 
+import { isErr } from "@/lib/errors"
+import { UnauthorizedError } from "../apiv1/APIError"
 import { AuthV1APIClient } from "./AuthV1APIClient"
 
 suite("api/syncv1/AuthV1APIClient", async () => {
@@ -90,13 +92,13 @@ suite("api/syncv1/AuthV1APIClient", async () => {
             ),
         )
 
-        let token = await assertErrResult(
+        let err = await assertErrResult(
             authV1APIClient.getTokenUsingCredentials(ctx, {
                 username,
                 password: password as PlaintextPassword,
             }),
         )
-        assert.include(token.message, "Unauthorized")
+        assert.isTrue(isErr(err, UnauthorizedError))
     })
 
     test("getTokenUsingCredentials/requiresChange", async ({
@@ -137,7 +139,7 @@ suite("api/syncv1/AuthV1APIClient", async () => {
             }),
         )
 
-        assert.instanceOf(err, PasswordChangeRequiredError)
+        assert.isTrue(isErr(err, PasswordChangeRequiredError))
     })
 
     test("getTokenUsingRefreshToken/valid", async ({ onTestFinished }) => {
@@ -213,12 +215,12 @@ suite("api/syncv1/AuthV1APIClient", async () => {
             }),
         )
 
-        let token = await assertErrResult(
+        let err = await assertErrResult(
             authV1APIClient.getTokenUsingRefreshToken(ctx, {
                 refreshToken: refreshToken as PlaintextAuthTokenValue,
             }),
         )
-        assert.include(token.message, "Unauthorized")
+        assert.isTrue(isErr(err, UnauthorizedError))
     })
 })
 

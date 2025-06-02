@@ -37,14 +37,17 @@ export const registerEffects = (
                 }),
             )
 
-            let list = await memoCtrl.listTags(BaseContext.withSignal(signal), {
-                pagination: { pageSize: tagPageSize },
-            })
+            let [list, err] = await memoCtrl.listTags(
+                BaseContext.withSignal(signal),
+                {
+                    pagination: { pageSize: tagPageSize },
+                },
+            )
 
-            if (!list.ok) {
+            if (err) {
                 dispatch(
                     tags.actions.setState({
-                        error: list.err,
+                        error: err,
                         isLoading: false,
                     }),
                 )
@@ -55,7 +58,7 @@ export const registerEffects = (
                 return
             }
 
-            dispatch(tags.actions.setTags(list.value))
+            dispatch(tags.actions.setTags(list))
         },
     })
 

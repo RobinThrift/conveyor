@@ -68,19 +68,21 @@ export function useAttachment({
             isLoading: true,
         })
 
-        attachmentProvider.getAttachmentDataByID(id).then((load) => {
-            setState((state) => {
-                if (state?.id !== id) {
-                    return state
-                }
+        attachmentProvider
+            .getAttachmentDataByID(id)
+            .then(([attachment, err]) => {
+                setState((state) => {
+                    if (state?.id !== id) {
+                        return state
+                    }
 
-                if (!load.ok) {
-                    return { id, error: load.err, isLoading: false }
-                }
+                    if (err) {
+                        return { id, error: err, isLoading: false }
+                    }
 
-                return { id, data: load.value.data, isLoading: false }
+                    return { id, data: attachment.data, isLoading: false }
+                })
             })
-        })
     }, [
         loadOnVisible,
         isVisible,

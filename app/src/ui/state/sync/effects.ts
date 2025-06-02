@@ -64,16 +64,16 @@ export const registerEffects = (
             let ctx = BaseContext.withSignal(signal)
             let clientID = randomID()
 
-            let initRes = await syncCtrl.init(ctx, {
+            let [_, err] = await syncCtrl.init(ctx, {
                 server,
                 username,
                 clientID,
             })
-            if (!initRes.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setStatus({
                         status: "error",
-                        error: initRes.err,
+                        error: err,
                         isSyncRequested: false,
                     }),
                 )
@@ -129,16 +129,16 @@ export const registerEffects = (
             let ctx = BaseContext.withSignal(signal)
             let clientID = randomID()
 
-            let initRes = await syncCtrl.init(ctx, {
+            let [_, err] = await syncCtrl.init(ctx, {
                 server: payload.server,
                 username: payload.username,
                 clientID,
             })
-            if (!initRes.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setStatus({
                         status: "error",
-                        error: initRes.err,
+                        error: err,
                         isSyncRequested: false,
                     }),
                 )
@@ -165,23 +165,24 @@ export const registerEffects = (
         ) => {
             cancelActiveListeners()
 
-            let loaded = await syncCtrl.load(BaseContext.withSignal(signal))
-
-            if (!loaded.ok) {
+            let [loaded, err] = await syncCtrl.load(
+                BaseContext.withSignal(signal),
+            )
+            if (err) {
                 dispatch(
                     slice.actions.setStatus({
                         status: "error",
-                        error: loaded.err,
+                        error: err,
                         isSyncRequested: false,
                     }),
                 )
                 return
             }
 
-            if (loaded.value?.isEnabled) {
+            if (loaded?.isEnabled) {
                 dispatch(
                     slice.actions.setSyncInfo({
-                        ...loaded.value,
+                        ...loaded,
                     }),
                 )
                 dispatch(
@@ -204,18 +205,21 @@ export const registerEffects = (
             )
         },
 
-        effect: async (_, { cancelActiveListeners, dispatch, signal }) => {
+        effect: async (
+            _action,
+            { cancelActiveListeners, dispatch, signal },
+        ) => {
             cancelActiveListeners()
 
             dispatch(slice.actions.setStatus({ status: "syncing" }))
 
-            let synced = await syncCtrl.sync(BaseContext.withSignal(signal))
+            let [_, err] = await syncCtrl.sync(BaseContext.withSignal(signal))
 
-            if (!synced.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setStatus({
                         status: "error",
-                        error: synced.err,
+                        error: err,
                         isSyncRequested: false,
                     }),
                 )
@@ -235,7 +239,7 @@ export const registerEffects = (
     startListening({
         actionCreator: slice.actions.syncStartUploadFull,
         effect: async (
-            _,
+            _action,
             { cancelActiveListeners, getState, dispatch, signal },
         ) => {
             let status = slice.selectors.status(getState())
@@ -247,15 +251,15 @@ export const registerEffects = (
 
             dispatch(slice.actions.setStatus({ status: "syncing" }))
 
-            let synced = await syncCtrl.uploadFullDB(
+            let [_, err] = await syncCtrl.uploadFullDB(
                 BaseContext.withSignal(signal),
             )
 
-            if (!synced.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setStatus({
                         status: "error",
-                        error: synced.err,
+                        error: err,
                         isSyncRequested: false,
                     }),
                 )
@@ -274,7 +278,7 @@ export const registerEffects = (
     startListening({
         actionCreator: slice.actions.syncStartDownloadFull,
         effect: async (
-            _,
+            _action,
             { cancelActiveListeners, getState, dispatch, signal },
         ) => {
             let status = slice.selectors.status(getState())
@@ -286,15 +290,14 @@ export const registerEffects = (
 
             dispatch(slice.actions.setStatus({ status: "syncing" }))
 
-            let synced = await syncCtrl.fetchFullDB(
+            let [_, err] = await syncCtrl.fetchFullDB(
                 BaseContext.withSignal(signal),
             )
-
-            if (!synced.ok) {
+            if (err) {
                 dispatch(
                     slice.actions.setStatus({
                         status: "error",
-                        error: synced.err,
+                        error: err,
                         isSyncRequested: false,
                     }),
                 )
@@ -312,12 +315,12 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.reset,
-        effect: async (_, { cancelActiveListeners, signal }) => {
+        effect: async (_action, { cancelActiveListeners, signal }) => {
             cancelActiveListeners()
 
-            let reset = await syncCtrl.reset(BaseContext.withSignal(signal))
-            if (!reset.ok) {
-                console.error(reset.err)
+            let [_, err] = await syncCtrl.reset(BaseContext.withSignal(signal))
+            if (err) {
+                console.error(err)
                 return
             }
         },

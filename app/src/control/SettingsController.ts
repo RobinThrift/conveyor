@@ -2,9 +2,10 @@ import type { ChangelogEntry, SettingChangelogEntry } from "@/domain/Changelog"
 import type { Settings } from "@/domain/Settings"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
+import { createErrType } from "@/lib/errors"
 import type { KeyPaths, ValueAt } from "@/lib/getset"
 import { queueTask } from "@/lib/microtask"
-import { type AsyncResult, Ok } from "@/lib/result"
+import { type AsyncResult, Ok, wrapErr } from "@/lib/result"
 
 type OnSettingChangedHandler = <K extends KeyPaths<Settings>>(data: {
     setting: {
@@ -46,10 +47,22 @@ export class SettingsController {
         }
     }
 
+    public static ErrLoadSettings = createErrType(
+        "SettingsController",
+        "error loading settings",
+    )
     public async loadSettings(ctx: Context): AsyncResult<Settings> {
-        return this._repo.loadSettings(ctx)
+        let [settings, err] = await this._repo.loadSettings(ctx)
+        if (err) {
+            return wrapErr`${new SettingsController.ErrLoadSettings()}: ${err}`
+        }
+        return Ok(settings)
     }
 
+    public static ErrUpdateSetting = createErrType(
+        "SettingsController",
+        "error updating setting",
+    )
     async updateSetting<K extends KeyPaths<Settings>>(
         ctx: Context,
         setting: {
@@ -58,40 +71,45 @@ export class SettingsController {
         },
     ): AsyncResult<void> {
         return this._transactioner.inTransaction(ctx, async (ctx) => {
-            let res = await this._repo.updateSetting(ctx, setting)
-            if (!res.ok) {
-                return res
+            let [_, err] = await this._repo.updateSetting(ctx, setting)
+            if (err) {
+                return wrapErr`${new SettingsController.ErrUpdateSetting()}: ${err}`
             }
 
-            let entryCreated = await this._changelog.createChangelogEntry(ctx, {
-                revision: 0,
-                targetType: "settings",
-                targetID: setting.key,
-                value: {
-                    value: setting.value as any,
-                } satisfies SettingChangelogEntry["value"],
-                isSynced: false,
-                isApplied: true,
-            })
-            if (!entryCreated.ok) {
-                return entryCreated
+            let [_created, entryCreationErr] =
+                await this._changelog.createChangelogEntry(ctx, {
+                    revision: 0,
+                    targetType: "settings",
+                    targetID: setting.key,
+                    value: {
+                        value: setting.value as any,
+                    } satisfies SettingChangelogEntry["value"],
+                    isSynced: false,
+                    isApplied: true,
+                })
+            if (entryCreationErr) {
+                return wrapErr`${new SettingsController.ErrUpdateSetting()}: error creating changlog entry: ${entryCreationErr}`
             }
 
-            return res
+            return Ok()
         })
     }
 
+    public static ErrApplyChangelogEntries = createErrType(
+        "SettingsController",
+        "error applying changelog entries",
+    )
     public async applyChangelogEntries(
         ctx: Context<{ db?: DBExec }>,
         entries: SettingChangelogEntry[],
     ): AsyncResult<void> {
         for (let entry of entries) {
-            let applied = await this._repo.updateSetting(ctx, {
+            let [_, err] = await this._repo.updateSetting(ctx, {
                 key: entry.targetID,
                 value: entry.value.value,
             })
-            if (!applied.ok) {
-                return applied
+            if (err) {
+                return wrapErr`${new SettingsController.ErrApplyChangelogEntries()}: ${err}`
             }
 
             this._triggerEvent("onSettingChanged", {
@@ -102,7 +120,7 @@ export class SettingsController {
             })
         }
 
-        return Ok(undefined)
+        return Ok()
     }
 
     private _triggerEvent<K extends KeyPaths<Settings>>(
