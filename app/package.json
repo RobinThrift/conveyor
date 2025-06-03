@@ -12,10 +12,8 @@
         "@redux-devtools/core": "^4.1.1",
         "@redux-devtools/inspector-monitor": "^6.1.1",
         "@redux-devtools/inspector-monitor-trace-tab": "^4.1.1",
-        "@storybook/addon-essentials": "^8.6.12",
-        "@storybook/react": "^8.6.12",
-        "@storybook/react-vite": "^8.6.12",
-        "@storybook/test": "^8.6.12",
+        "@storybook/addon-docs": "^9.0.4",
+        "@storybook/react-vite": "^9.0.4",
         "@tailwindcss/typography": "^0.5.16",
         "@tailwindcss/vite": "^4.1.8",
         "@tauri-apps/cli": "^2.4.0",
@@ -35,7 +33,7 @@
         "playwright": "^1.51.1",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
-        "storybook": "^8.6.12",
+        "storybook": "^9.0.4",
         "tailwindcss": "^4.1.8",
         "tailwindcss-animate": "^1.0.7",
         "typescript": "^5.8.2",
@@ -94,5 +92,8 @@
     },
     "engines": {
         "node": ">=23.0.0"
+    },
+    "overrides": {
+        "storybook": "$storybook"
     }
 }

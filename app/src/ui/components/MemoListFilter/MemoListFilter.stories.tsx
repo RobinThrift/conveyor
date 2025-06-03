@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import React, { useCallback, useEffect, useState } from "react"
 
 import type { ListMemosQuery as Filter } from "@/domain/Memo"

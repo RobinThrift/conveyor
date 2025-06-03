@@ -1,5 +1,5 @@
 import { Form } from "@radix-ui/react-form"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 
 import "@/ui/styles/index.css"

@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker"
-import { action } from "@storybook/addon-actions"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
+import { action } from "storybook/actions"
 
 import { decorator } from "@/lib/testhelper/rootStore"
 import "@/ui/styles/index.css"
