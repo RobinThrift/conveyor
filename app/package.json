@@ -30,7 +30,7 @@
         "culori": "^4.0.1",
         "lightningcss": "^1.29.3",
         "micromark-util-types": "^2.0.0",
-        "msw": "^2.7.3",
+        "msw": "^2.9.0",
         "msw-storybook-addon": "^2.0.4",
         "playwright": "^1.51.1",
         "react": "^19.1.0",
