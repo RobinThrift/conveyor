@@ -70,9 +70,8 @@ test *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
 test-watch *flags="-v -failfast -timeout 15m ./...": (_install-tool "gotestsum")
     {{ local_bin }}/gotestsum --format {{ go_test_reporter }} --format-hide-empty-pkg --watch -- {{ go_buildflags }} {{ flags }}
 
-# lint using staticcheck and golangci-lint
-lint: (_install-tool "staticcheck") (_install-tool "golangci-lint") (_install-tool "sqlc") (_install-tool "vacuum")
-    {{ local_bin }}/staticcheck ./...
+# lint using golangci-lint
+lint: (_install-tool "golangci-lint") (_install-tool "sqlc") (_install-tool "vacuum")
     {{ local_bin }}/golangci-lint run {{ go_lint_reporter }} --fix ./...
     {{ local_bin }}/sqlc -f internal/storage/database/sqlite/sqlc.yaml vet
     cd ../api && {{ local_bin }}/vacuum lint --ruleset ../.scripts/vacuum.yaml --details --fail-severity warn --no-banner --all-results *.openapi3.yaml

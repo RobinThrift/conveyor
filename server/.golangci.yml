@@ -2,7 +2,6 @@ version: "2"
 linters:
   default: all
   disable:
-  - staticcheck # Disabled, because the author of staticcheck doesn't support or approve the use of staticcheck as a library inside golangci-lint
   - zerologlint # Disabled, because I usually don't use zerolog
   - ginkgolinter # Disabled, because I usually don't use ginkgo or gomega
   - loggercheck # Disabled, becuse I usually don't use any of kitlog, klog, logr, zap

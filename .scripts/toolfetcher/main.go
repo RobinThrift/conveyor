@@ -37,15 +37,6 @@ func run(ctx context.Context, args []string) error {
 		BinDir:      *binDir,
 		Recipes: []recipes.Recipe{
 			{
-				Name: "staticcheck",
-				Src: recipes.Source{
-					Type:        recipes.SourceTypeGoInstall,
-					URLTemplate: "honnef.co/go/tools/cmd/staticcheck",
-				},
-				Test: []string{"--version"},
-			},
-
-			{
 				Name: "golangci-lint",
 				Src: recipes.Source{
 					Type:        recipes.SourceTypeGoInstall,
