@@ -11,6 +11,7 @@ linters:
   - exhaustruct # Disabled, because it's generally good design to have defaults that make sense
   - wrapcheck # Disable for now, maybe enable again later
   - tagliatelle # Disabled, config is too complicated for the added value
+  - funcorder # Disabled, because too strict
   - nonamedreturns
   - lll
   - ireturn # Disabled, because too restrictive

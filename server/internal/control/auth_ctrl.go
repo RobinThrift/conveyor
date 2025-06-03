@@ -64,7 +64,7 @@ type CreateAuthTokenUsingCredentialsCmd struct {
 }
 
 func (ac *AuthController) CreateAuthTokenUsingCredentials(ctx context.Context, cmd CreateAuthTokenUsingCredentialsCmd) (*auth.PlaintextAuthToken, error) {
-	account, err := ac.getAccountForCredentials(ctx, GetAccountForCredentialsQuery(cmd))
+	account, err := ac.getAccountForCredentials(ctx, getAccountForCredentialsQuery(cmd))
 	if err != nil {
 		return nil, fmt.Errorf("error creating auth token: %w", err)
 	}
@@ -171,12 +171,12 @@ func (ac *AuthController) CreateAccount(ctx context.Context, cmd CreateAccountCm
 	})
 }
 
-type GetAccountForCredentialsQuery struct {
+type getAccountForCredentialsQuery struct {
 	Username        string
 	PlaintextPasswd auth.PlaintextPassword
 }
 
-func (ac *AuthController) getAccountForCredentials(ctx context.Context, query GetAccountForCredentialsQuery) (*domain.Account, error) {
+func (ac *AuthController) getAccountForCredentials(ctx context.Context, query getAccountForCredentialsQuery) (*domain.Account, error) {
 	account, err := ac.accountCtrl.GetByUsername(ctx, query.Username)
 	if err != nil {
 		if errors.Is(err, domain.ErrAccountNotFound) {
@@ -212,7 +212,7 @@ func (ac *AuthController) ChangeAccountPassword(ctx context.Context, cmd ChangeA
 	var err error
 
 	if account == nil {
-		account, err = ac.getAccountForCredentials(ctx, GetAccountForCredentialsQuery{
+		account, err = ac.getAccountForCredentials(ctx, getAccountForCredentialsQuery{
 			Username:        cmd.Username,
 			PlaintextPasswd: cmd.CurrPasswdPlaintext,
 		})

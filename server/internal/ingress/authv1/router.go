@@ -98,7 +98,7 @@ func (router *router) requestAuthTokenUsingPassword(ctx context.Context, req Aut
 func (router *router) requestAuthTokenUsingRefreshToken(ctx context.Context, req AuthTokenRequestRefreshTokenGrant) (RequestAuthTokenResponseObject, error) {
 	refreshToken, err := auth.NewPlaintextAuthTokenValueFromString(req.RefreshToken)
 	if err != nil {
-		return RequestAuthToken400JSONResponse{
+		return RequestAuthToken400JSONResponse{ //nolint:nilerr // this is intentional
 			ErrorBadRequestJSONResponse: ErrorBadRequestJSONResponse{
 				Code:  http.StatusBadRequest,
 				Title: "Invalid Refresh Token",
@@ -111,7 +111,7 @@ func (router *router) requestAuthTokenUsingRefreshToken(ctx context.Context, req
 		PlaintextRefreshToken: *refreshToken,
 	})
 	if err != nil {
-		return RequestAuthToken401JSONResponse{
+		return RequestAuthToken401JSONResponse{ //nolint:nilerr // this is intentional
 			ErrorUnauthorizedJSONResponse: ErrorUnauthorizedJSONResponse{
 				Code:  http.StatusUnauthorized,
 				Title: "Unauthorized",
