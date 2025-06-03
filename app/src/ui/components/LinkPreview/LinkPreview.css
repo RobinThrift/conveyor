@@ -1,7 +1,11 @@
 .link-preview {
-    @apply relative rounded-lg overflow-hidden top-0 left-0 drop-shadow-md;
+    @apply relative rounded-lg overflow-hidden top-0 left-0 drop-shadow-md @container;
     @apply w-full h-min my-2;
     transition: transform 300ms ease-out;
+
+    &:has(:focus-visible) {
+        @apply outline-3 outline-primary outline-offset-2;
+    }
 
     @media (hover: hover) {
         &:hover {
@@ -37,6 +41,11 @@
                 #000 0
             );
 
+        @container (width <= 23.9rem) {
+            --r: calc(var(--spacing) * 4); /* radius */
+            --s: calc(var(--spacing) * 7); /* size of the inner curve */
+        }
+
         img {
             @apply w-full min-h-[2lh];
         }
@@ -44,12 +53,20 @@
 
     .description-container {
         @apply absolute bottom-0 left-0 right-0 rounded-xl h-min;
-        @apply py-2 px-4 mr-24 ml-2 mb-2;
+        @apply py-2 px-4 mr-14 @sm:mr-24 ml-2 mb-2;
         @apply bg-surface-level-1/50;
         backdrop-filter: blur(4px);
+
+        span {
+            @apply text-xs @sm:text-base;
+        }
+
+        p {
+            @apply hidden @sm:block;
+        }
     }
 
-    h4 {
+    span {
         @apply font-bold;
     }
 
@@ -60,6 +77,10 @@
 
         &:hover {
             @apply bg-primary text-primary-contrast;
+        }
+
+        @container (width <= 23.9rem) {
+            @apply text-base p-2 right-1 bottom-1;
         }
     }
 }

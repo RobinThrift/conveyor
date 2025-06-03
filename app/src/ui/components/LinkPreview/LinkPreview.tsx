@@ -73,6 +73,7 @@ export const LinkPreview = React.memo(function LinkPreview(
                 target={props.title}
                 className="preview-img"
                 rel="noreferrer noopener"
+                aria-label={props.title}
             >
                 <Image
                     src={props.img}
@@ -82,7 +83,7 @@ export const LinkPreview = React.memo(function LinkPreview(
             </a>
             <div className="description-container">
                 <div className="description content">
-                    {props.title && <h4>{props.title}</h4>}
+                    {props.title && <span>{props.title}</span>}
                     <p>{props.description}</p>
                 </div>
             </div>
@@ -91,7 +92,9 @@ export const LinkPreview = React.memo(function LinkPreview(
                 href={props.children}
                 target={props.title}
                 rel="noreferrer noopener"
+                aria-label={props.title}
                 className="arrow"
+                tabIndex={-1}
             >
                 <ArrowUpRightIcon weight="bold" />
             </a>

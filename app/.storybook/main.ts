@@ -13,7 +13,7 @@ const config: StorybookConfig = {
         { from: "../build/sqlite3", to: "/assets/sqlite3" },
     ],
 
-    addons: ["@storybook/addon-docs"],
+    addons: ["@storybook/addon-docs", "@storybook/addon-a11y"],
 
     framework: {
         name: "@storybook/react-vite",

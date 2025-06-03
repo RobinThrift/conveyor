@@ -33,6 +33,7 @@ export const translations = {
 
     "components/Memo": {
         ShowMore: "Show More",
+        FootnoteBackLink: "Jump back",
     },
 
     "components/Memo/Actions": {
@@ -126,6 +127,10 @@ export const translations = {
         TriggerLabel: "More filter",
         OffScreenTitle: "Tags",
         OffScreenDescription: "Tags and state filters",
+    },
+
+    "components/MemoListFilter/Search": {
+        Label: "Search for memos",
     },
 
     "components/MemoListFilter/DatePicker": {

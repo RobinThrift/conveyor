@@ -12,6 +12,7 @@
         "@redux-devtools/core": "^4.1.1",
         "@redux-devtools/inspector-monitor": "^6.1.1",
         "@redux-devtools/inspector-monitor-trace-tab": "^4.1.1",
+        "@storybook/addon-a11y": "^9.0.4",
         "@storybook/addon-docs": "^9.0.4",
         "@storybook/react-vite": "^9.0.4",
         "@tailwindcss/typography": "^0.5.16",

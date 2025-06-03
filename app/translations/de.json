@@ -29,7 +29,8 @@
     },
 
     "components/Memo": {
-        "ShowMore": "Alles Anzeigen"
+        "ShowMore": "Alles Anzeigen",
+        "FootnoteBackLink": "Zurück springen"
     },
 
     "components/Memo/Actions": {
@@ -122,6 +123,10 @@
         "TriggerLabel": "Mehr filter",
         "OffScreenTitle": "Tags",
         "OffScreenDescription": "Tag- und  Zustandsfilters"
+    },
+
+    "components/MemoListFilter/Search": {
+        "Label": "Memos durchsuchen"
     },
 
     "components/MemoListFilter/DatePicker": {

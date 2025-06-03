@@ -64,7 +64,7 @@ export const DatePicker = React.memo(function DatePicker({
                 value={props.selected ?? null}
                 className="date-picker-calendar"
             >
-                <header className="date-picker-header">
+                <div className="date-picker-header">
                     <Button
                         iconLeft={<CaretLeftIcon />}
                         plain={true}
@@ -87,7 +87,7 @@ export const DatePicker = React.memo(function DatePicker({
                         plain={true}
                         slot="next"
                     />
-                </header>
+                </div>
                 <AriaCalendarGrid className="calendar-grid">
                     <AriaCalendarGridHeader className="calendar-grid-header">
                         {(day) => (

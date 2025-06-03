@@ -11,6 +11,10 @@
         @apply rounded-3xl py-1 px-4;
     }
 
+    .btn.sm {
+        @apply gap-1 py-0.5 px-2 text-sm;
+    }
+
     .input-field .input {
         @apply appearance-none bg-surface-level-2 border border-subtle rounded-2xl ring ring-transparent;
         @apply hover:border-subtle-dark;

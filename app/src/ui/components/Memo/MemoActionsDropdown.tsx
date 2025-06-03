@@ -25,6 +25,7 @@ export function MemoActionsDropdown({
         <div className="memo-actions not-prose">
             {actions?.edit && (
                 <Button
+                    ariaLabel={t.Edit}
                     iconLeft={<PencilIcon />}
                     plain={true}
                     size="sm"

@@ -36,6 +36,7 @@ import type {
 
 import type { Screens } from "@/control/NavigationController"
 import { Loader } from "@/ui/components/Loader"
+import { useT } from "@/ui/i18n"
 
 interface Document {
     id: string
@@ -418,23 +419,7 @@ function footnoteDefinitionToJSX(
     doc: Document,
     node: FootnoteDefinition,
 ): ReactNode {
-    doc.footnotes.push(
-        <li id={`fn:${doc.id}-${node.identifier}`} key={nodeKey(node)}>
-            {stripParagraph(node).map((c) => astNodeToJSX(doc, c))}
-
-            {/* biome-ignore lint/a11y/useValidAriaRole: false positive */}
-            {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: false positive */}
-            <a
-                href={`#fnref:${doc.id}-${node.identifier}`}
-                role="doc-backlink"
-                className="ml-1 p-1 relative top-0.5 inline-flex hover:text-primary-contrast hover:bg-primary rounded-sm"
-            >
-                {doc.componentMap.FootnoteReturnIcon && (
-                    <doc.componentMap.FootnoteReturnIcon />
-                )}
-            </a>
-        </li>,
-    )
+    doc.footnotes.push(<FootnoteLinkItem doc={doc} node={node} />)
     return null
 }
 
@@ -532,4 +517,32 @@ function idFromText(...fragements: string[]): string {
 
 function nodeKey(node: Node): Key {
     return `${node.position?.start.line}:${node.position?.start.column}-${node.position?.end.line}:${node.position?.end.column}`
+}
+
+function FootnoteLinkItem({
+    doc,
+    node,
+}: {
+    doc: Document
+    node: FootnoteDefinition
+}) {
+    let t = useT("components/Memo")
+    return (
+        <li id={`fn:${doc.id}-${node.identifier}`} key={nodeKey(node)}>
+            {stripParagraph(node).map((c) => astNodeToJSX(doc, c))}
+
+            {/* biome-ignore lint/a11y/useValidAriaRole: false positive */}
+            {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: false positive */}
+            <a
+                href={`#fnref:${doc.id}-${node.identifier}`}
+                role="doc-backlink"
+                aria-label={t.FootnoteBackLink}
+                className="ml-1 p-1 relative top-0.5 inline-flex hover:text-primary-contrast hover:bg-primary rounded-sm"
+            >
+                {doc.componentMap.FootnoteReturnIcon && (
+                    <doc.componentMap.FootnoteReturnIcon />
+                )}
+            </a>
+        </li>
+    )
 }
