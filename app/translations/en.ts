@@ -212,6 +212,7 @@ export const translations = {
         TabLabelSync: "Sync",
         TabLabelAPITokens: "API Tokens",
         TabLabelAbout: "About",
+        TabLabelData: "Data",
     },
 
     "screens/Settings/InterfaceSettings": {
@@ -320,5 +321,18 @@ export const translations = {
         ServerVersionLabel: "Server Version:",
         ServerPublishDateLabel: "Server Published on:",
         ServerGoVersionLabel: "Go Version:",
+    },
+
+    "screens/Settings/Data": {
+        Title: "Data",
+        Description: "Data Managment and Maintenance.",
+    },
+
+    "screens/Settings/Data/Jobs": {
+        Title: "Jobs",
+        RunLabel: "Run",
+        RunningLabel: "Running",
+        CleanupJobLabel: "Cleanup",
+        CleanupJobDescription: "Removes orphaned metadata.",
     },
 } satisfies Components

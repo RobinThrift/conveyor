@@ -7,6 +7,7 @@ import {
 import type { APITokenController } from "@/control/APITokenController"
 import type { AttachmentController } from "@/control/AttachmentController"
 import type { AuthController } from "@/control/AuthController"
+import type { ChangelogController } from "@/control/ChangelogController"
 import type { MemoController } from "@/control/MemoController"
 import type { NavigationController } from "@/control/NavigationController"
 import type { SettingsController } from "@/control/SettingsController"
@@ -19,6 +20,7 @@ import * as attachments from "./attachments"
 import * as auth from "./auth"
 import { registerEffects as registerErrorEffects } from "./errors"
 import * as notifications from "./global/notifications"
+import * as jobs from "./jobs"
 import * as memos from "./memos"
 import * as navigation from "./navigation"
 import * as settings from "./settings"
@@ -48,6 +50,7 @@ export function configureRootStore(preloadedState?: any) {
         unlock.slice,
         apitokens.slice,
         navigation.slice,
+        jobs.slice,
     )
 
     const store = configureStore({
@@ -96,6 +99,7 @@ export function configureEffects(
         unlockCtrl,
         apiTokenCtrl,
         navCtrl,
+        changelogCtrl,
     }: {
         memoCtrl: MemoController
         attachmentCtrl: AttachmentController
@@ -106,6 +110,7 @@ export function configureEffects(
         unlockCtrl: UnlockController
         apiTokenCtrl: APITokenController
         navCtrl: NavigationController
+        changelogCtrl: ChangelogController
     },
 ) {
     memos.registerEffects(startListening, {
@@ -150,5 +155,10 @@ export function configureEffects(
 
     navigation.registerEffects(startListening, {
         navCtrl,
+    })
+
+    jobs.registerEffects(startListening, {
+        memoCtrl,
+        changelogCtrl,
     })
 }

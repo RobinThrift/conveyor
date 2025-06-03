@@ -4,7 +4,7 @@
 
     &::before {
         @apply w-12 h-2 top-14;
-        content: '';
+        content: "";
         background: var(--color-primary-extra-light);
         position: absolute;
         left: 0;
@@ -14,7 +14,7 @@
 
     &::after {
         @apply rounded-lg;
-        content: '';
+        content: "";
         width: 100%;
         height: 100%;
         background: var(--color-primary);
@@ -35,7 +35,7 @@
     }
 
     50% {
-        transform: translateY(18px) scale(1, .9) rotate(45deg);
+        transform: translateY(18px) scale(1, 0.9) rotate(45deg);
         border-bottom-right-radius: 40px;
     }
 
@@ -49,7 +49,8 @@
 }
 
 @keyframes loading-shadow {
-    0%, 100% {
+    0%,
+    100% {
         transform: scale(1, 1);
     }
 

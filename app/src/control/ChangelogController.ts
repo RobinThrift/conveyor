@@ -112,6 +112,13 @@ export class ChangelogController {
     ): AsyncResult<C[]> {
         return this._repo.listChangelogEntriesForID(ctx, targetID)
     }
+
+    public async deleteChangelogEntry(
+        ctx: Context<{ db?: DBExec }>,
+        id: ChangelogEntryID,
+    ): AsyncResult<void> {
+        return this._repo.deleteChangelogEntry(ctx, id)
+    }
 }
 
 interface Repo {
@@ -153,5 +160,10 @@ interface Repo {
     markChangelogEntriesAsApplied(
         ctx: Context<{ db: DBExec }>,
         entries: ChangelogEntryID[],
+    ): AsyncResult<void>
+
+    deleteChangelogEntry(
+        ctx: Context<{ db?: DBExec }>,
+        id: ChangelogEntryID,
     ): AsyncResult<void>
 }

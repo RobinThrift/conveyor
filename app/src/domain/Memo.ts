@@ -1,3 +1,4 @@
+import { createErrType } from "@/lib/errors"
 import {
     type CalendarDate,
     calendarDateToISO8601String,
@@ -28,6 +29,8 @@ export interface ListMemosQuery {
     isArchived?: boolean
     isDeleted?: boolean
 }
+
+export const ErrMemoNotFound = createErrType("Memos", "memo not found")
 
 export interface FilterQueryParams {
     "filter[tag]"?: string

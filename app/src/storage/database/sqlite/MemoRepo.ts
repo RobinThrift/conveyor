@@ -1,4 +1,10 @@
-import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
+import {
+    ErrMemoNotFound,
+    type ListMemosQuery,
+    type Memo,
+    type MemoID,
+    type MemoList,
+} from "@/domain/Memo"
 import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
 import type { Context } from "@/lib/context"
@@ -52,7 +58,7 @@ export class MemoRepo {
         }
 
         if (row === null) {
-            return Err(new Error(`memo not found: ${memoID}`))
+            return wrapErr`${new ErrMemoNotFound()}: ${memoID}`
         }
 
         return Ok<Memo>({

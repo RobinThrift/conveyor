@@ -204,7 +204,8 @@
         "TabLabelLangLocale": "Sprache & Region",
         "TabLabelSync": "Sync",
         "TabLabelAPITokens": "API Tokens",
-        "TabLabelAbout": "Info"
+        "TabLabelAbout": "Info",
+        "TabLabelData": "Daten"
     },
 
     "screens/Settings/InterfaceSettings": {
@@ -311,5 +312,18 @@
         "ServerVersionLabel": "Server Version:",
         "ServerPublishDateLabel": "Server Veröffentlicht on:",
         "ServerGoVersionLabel": "Go Version:"
+    },
+
+    "screens/Settings/Data": {
+        "Title": "Datenverwaltung",
+        "Description": "Verwalte Deine Daten."
+    },
+
+    "screens/Settings/Data/Jobs": {
+        "Title": "Jobs",
+        "RunLabel": "Ausgeführen",
+        "RunningLabel": "Wird Ausgeführt",
+        "CleanupJobLabel": "Aufräumen",
+        "CleanupJobDescriptio": "Löscht übergebliebene Metadaten."
     }
 }

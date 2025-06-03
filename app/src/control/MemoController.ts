@@ -3,13 +3,19 @@ import type {
     MemoChangelogEntry,
     MemoContentChanges,
 } from "@/domain/Changelog"
-import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
+import {
+    ErrMemoNotFound,
+    type ListMemosQuery,
+    type Memo,
+    type MemoID,
+    type MemoList,
+} from "@/domain/Memo"
 import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
 import { mergeChanges, resolveChanges } from "@/lib/diff"
-import { createErrType } from "@/lib/errors"
+import { createErrType, isErr } from "@/lib/errors"
 import { queueTask } from "@/lib/microtask"
 import { type AsyncResult, Err, Ok, wrapErr } from "@/lib/result"
 
@@ -64,10 +70,23 @@ export class MemoController {
         }
     }
 
+    public static ErrGetMemo = createErrType(
+        "MemoController",
+        "error getting memo",
+    )
     public async getMemo(ctx: Context, memoID: MemoID): AsyncResult<Memo> {
-        return this._transactioner.inTransaction(ctx, (ctx) =>
+        let [memo, err] = await this._transactioner.inTransaction(ctx, (ctx) =>
             this._repo.getMemo(ctx, memoID),
         )
+        if (err) {
+            if (isErr(err, ErrMemoNotFound)) {
+                return wrapErr`${new MemoController.ErrGetMemo()}: ${err}`
+            }
+
+            return wrapErr`${new MemoController.ErrGetMemo()}: ${memoID}: ${err}`
+        }
+
+        return Ok(memo)
     }
 
     public async listMemos(

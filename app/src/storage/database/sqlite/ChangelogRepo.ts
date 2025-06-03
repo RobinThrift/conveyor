@@ -162,6 +162,19 @@ export class ChangelogRepo {
 
         return Ok(rows.map((row) => changelogEntryRowChangelogEntry(row) as C))
     }
+
+    public async deleteChangelogEntry(
+        ctx: Context<{ db?: DBExec }>,
+        id: ChangelogEntryID,
+    ): AsyncResult<void> {
+        return fromPromise(
+            queries.deleteChangelogEntry(
+                ctx.getData("db", this._db),
+                { publicId: id },
+                ctx.signal,
+            ),
+        )
+    }
 }
 
 function changelogEntryRowChangelogEntry(

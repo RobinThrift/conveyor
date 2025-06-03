@@ -4,8 +4,8 @@ import React, { useCallback } from "react"
 import { MagnifyingGlassIcon } from "@/ui/components/Icons"
 import { Input } from "@/ui/components/Input"
 import { useDebounce } from "@/ui/hooks/useDebounce"
-import clsx from "clsx"
 import { useT } from "@/ui/i18n"
+import clsx from "clsx"
 
 export function SearchBar(props: {
     onChange: (v: string) => void

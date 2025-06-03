@@ -2,6 +2,7 @@ import { actions as apitokens } from "./apitokens"
 import { actions as attachments } from "./attachments"
 import { actions as auth } from "./auth"
 import { slice as notifications } from "./global/notifications"
+import { actions as jobs } from "./jobs"
 import { actions as memos } from "./memos"
 import { actions as navigation } from "./navigation"
 import { actions as settings } from "./settings"
@@ -18,6 +19,7 @@ export const actions = {
     apitokens,
     attachments,
     auth,
+    jobs,
     navigation,
     memos,
     settings,

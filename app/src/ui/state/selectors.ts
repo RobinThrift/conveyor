@@ -1,6 +1,7 @@
 import { selectors as apitokens } from "./apitokens"
 import { selectors as attachments } from "./attachments"
 import { selectors as auth } from "./auth"
+import { selectors as jobs } from "./jobs"
 import { selectors as memos } from "./memos"
 import { selectors as navigation } from "./navigation"
 import { selectors as settings } from "./settings"
@@ -13,6 +14,7 @@ export const selectors = {
     apitokens,
     attachments,
     auth,
+    jobs,
     memos,
     navigation,
     settings,

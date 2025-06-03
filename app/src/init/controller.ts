@@ -161,5 +161,6 @@ export async function initController(platform: PlatformDependencies) {
         setupCtrl,
         syncCtrl,
         unlockCtrl,
+        changelogCtrl,
     }
 }

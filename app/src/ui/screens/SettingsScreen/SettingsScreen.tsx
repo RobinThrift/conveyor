@@ -14,6 +14,7 @@ import { useSelector } from "react-redux"
 import {
     CloudCheckIcon,
     CloudSlashIcon,
+    DatabaseIcon,
     GlobeIcon,
     InfoIcon,
     KeyIcon,
@@ -28,6 +29,7 @@ import { selectors } from "@/ui/state"
 import { Button } from "@/ui/components/Button"
 import { APITokensTab } from "./APITokensTab"
 import { AboutTab } from "./AboutTab"
+import { DataTab } from "./DataTab"
 import { InterfaceSettingsTab } from "./InterfaceSettingsTab"
 import { LocaleSettingsTab } from "./LocaleSettingsTab"
 import { SyncSettingsTab } from "./SyncSettingsTab"
@@ -135,6 +137,10 @@ function SettingsScreenContent({ close }: { close?: () => void }) {
                             {t.TabLabelAPITokens}
                         </AriaTab>
                     )}
+                    <AriaTab id="data" className="settings-tab-list-item">
+                        <DatabaseIcon weight="fill" className="icon" />
+                        {t.TabLabelData}
+                    </AriaTab>
                     <AriaTab id="about" className="settings-tab-list-item">
                         <InfoIcon weight="fill" className="icon" />
                         {t.TabLabelAbout}
@@ -154,6 +160,9 @@ function SettingsScreenContent({ close }: { close?: () => void }) {
                         <APITokensTab />
                     </AriaTabPanel>
                 )}
+                <AriaTabPanel id="data" className="settings-tab">
+                    <DataTab />
+                </AriaTabPanel>
                 <AriaTabPanel id="about" className="settings-tab">
                     <AboutTab />
                 </AriaTabPanel>

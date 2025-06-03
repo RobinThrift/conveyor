@@ -313,3 +313,18 @@ export async function markChangelogEntriesAsApplied(
         abort,
     )
 }
+
+const deleteChangelogEntryQuery = `-- name: DeleteChangelogEntry :exec
+DELETE FROM changelog WHERE public_id = ?`
+
+export interface DeleteChangelogEntryArgs {
+    publicId: string
+}
+
+export async function deleteChangelogEntry(
+    database: Database,
+    args: DeleteChangelogEntryArgs,
+    abort?: AbortSignal,
+) {
+    await database.exec(deleteChangelogEntryQuery, [args.publicId], abort)
+}

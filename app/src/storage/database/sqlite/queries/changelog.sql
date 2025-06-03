@@ -78,3 +78,6 @@ WHERE public_id IN (sqlc.slice('public_ids'));
 UPDATE changelog
 SET is_applied = TRUE, applied_at = COALESCE(applied_at, strftime('%Y-%m-%d %H:%M:%SZ', CURRENT_TIMESTAMP))
 WHERE public_id IN (sqlc.slice('public_ids'));
+
+-- name: DeleteChangelogEntry :exec
+DELETE FROM changelog WHERE public_id = ?;

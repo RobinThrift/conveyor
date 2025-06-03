@@ -1,6 +1,7 @@
 import type { APITokenController } from "@/control/APITokenController"
 import type { AttachmentController } from "@/control/AttachmentController"
 import type { AuthController } from "@/control/AuthController"
+import type { ChangelogController } from "@/control/ChangelogController"
 import type { MemoController } from "@/control/MemoController"
 import type { NavigationController } from "@/control/NavigationController"
 import type { SettingsController } from "@/control/SettingsController"
@@ -22,6 +23,7 @@ export function initRootStore(
         unlockCtrl: UnlockController
         apiTokenCtrl: APITokenController
         navCtrl: NavigationController
+        changelogCtrl: ChangelogController
     },
 ) {
     let rootStore = configureRootStore(initState)
