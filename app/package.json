@@ -58,7 +58,7 @@
         "@lezer/highlight": "^1.2.1",
         "@nanostores/i18n": "^1.0.0",
         "@phosphor-icons/react": "^2.1.7",
-        "@radix-ui/react-form": "^0.1.2",
+        "@radix-ui/react-form": "^0.1.7",
         "@radix-ui/react-hover-card": "^1.1.6",
         "@radix-ui/react-toast": "^1.2.6",
         "@reduxjs/toolkit": "^2.6.1",
