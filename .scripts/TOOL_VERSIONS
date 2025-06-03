@@ -5,7 +5,7 @@ watchexec: github-releases://watchexec/watchexec@2.2.0
 
 # Code Generation
 oapi-codegen: github-releases://oapi-codegen/oapi-codegen@2.4.1
-sqlc: github-releases://sqlc-dev/sqlc@1.27.0
+sqlc: github-releases://sqlc-dev/sqlc@1.29.0
 goose: go://github.com/pressly/goose@3.22.1
 
 # Changelog
