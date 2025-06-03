@@ -40,6 +40,7 @@ export function SearchBar(props: {
                 name="q"
                 type="search"
                 label={t.Label}
+                labelClassName="sr-only"
                 icon={<MagnifyingGlassIcon />}
                 onChange={onChangeDebounced}
                 defaultValue={props.query}
