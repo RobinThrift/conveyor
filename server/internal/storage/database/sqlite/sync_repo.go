@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"go.robinthrift.com/conveyor/internal/domain"
 	"go.robinthrift.com/conveyor/internal/storage/database"
@@ -83,7 +84,7 @@ func (r *SyncRepo) CreateChangelogEntries(ctx context.Context, entries []domain.
 			AccountID:    entry.AccountID,
 			SyncClientID: entry.SyncClientID,
 			Data:         entry.Data,
-			Timestamp:    types.NewSQLiteDatetime(entry.Timestamp),
+			Timestamp:    types.NewSQLiteDatetime(time.Now()),
 		})
 		if err != nil {
 			return fmt.Errorf("error creating changelog entry: %w", err)
