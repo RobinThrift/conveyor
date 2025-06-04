@@ -90,6 +90,13 @@ export const OPFSWorker = createWorker({
         return lock.run(ctx, async () => {
             let [_, err] = await fromPromise(dir.removeEntry(filename))
             if (err) {
+                if (
+                    err instanceof DOMException &&
+                    err.name === "NotFoundError"
+                ) {
+                    return wrapErr`${new ErrRemoveFile()}: ${new FSNotFoundError(filepath, { cause: err })}`
+                }
+
                 return wrapErr`${new ErrRemoveFile()}: ${filepath}: ${err}`
             }
 
@@ -134,6 +141,10 @@ async function getDirHandle(
     let curr = rootDir
     let dirs = dirpath.split("/")
 
+    if (dirpath === ".") {
+        return rootDir
+    }
+
     for (let dir of dirs) {
         if (dir === "") {
             continue
@@ -167,7 +178,7 @@ function splitFilepath(filepath: string): {
 
     let dir = filepath.substring(0, lastSlashIndex)
     if (dir === "") {
-        return { dir: ".", filename: filepath }
+        return { dir: ".", filename: filepath.replace(/^\//, "") }
     }
 
     let filename = filepath.substring(lastSlashIndex + 1)

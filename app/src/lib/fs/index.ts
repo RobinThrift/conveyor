@@ -44,7 +44,11 @@ export function dirname(filepath: string): string {
 export function join(...segments: string[]): string {
     let final = ""
     for (let s of segments) {
-        if (s[0] === "/") {
+        if (!s) {
+            continue
+        }
+
+        if (s[0] === "/" || final.at(-1) === "/") {
             final += s
         } else {
             final += `/${s}`

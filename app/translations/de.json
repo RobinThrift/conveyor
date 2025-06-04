@@ -321,9 +321,15 @@
 
     "screens/Settings/Data/Jobs": {
         "Title": "Jobs",
+
         "RunLabel": "Ausgeführen",
         "RunningLabel": "Wird Ausgeführt",
+
         "CleanupJobLabel": "Aufräumen",
-        "CleanupJobDescriptio": "Löscht übergebliebene Metadaten."
+        "CleanupJobDescription": "Löscht übergebliebene Metadaten.",
+
+        "ExportJobLabel": "Datenbank Export",
+        "ExportJobDescription": "Lädt eine verschlüsselte Kopie der Datenbank herunter.",
+        "ExportJobPrivateKeyLabel": "Privater Schlüssel"
     }
 }

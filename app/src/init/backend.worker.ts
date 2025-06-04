@@ -43,7 +43,11 @@ async function run() {
 
     setupAttachmentLoader(controller.attachmentCtrl)
 
-    let rootStore = initRootStore(initState, controller)
+    let rootStore = initRootStore(initState, {
+        ...controller,
+        fs: platform.fs,
+        db: platform.db,
+    })
 
     initJobs({ jobCtrl: controller.jobCtrl, rootStore: rootStore })
 

@@ -1,11 +1,11 @@
 import type { ChangelogController } from "@/control/ChangelogController"
 import type { MemoController } from "@/control/MemoController"
 import type { MemoChangelogEntry } from "@/domain/Changelog"
+import { ErrMemoNotFound } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
+import { isErr } from "@/lib/errors"
 import { type AsyncResult, Err, Ok, all, wrapErr } from "@/lib/result"
 
-import { ErrMemoNotFound } from "@/domain/Memo"
-import { isErr } from "@/lib/errors"
 import type { Job } from "./types"
 
 export class CleanupJob implements Job {

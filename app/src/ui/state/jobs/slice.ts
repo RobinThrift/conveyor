@@ -1,6 +1,6 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 
-type Jobs = "cleanup"
+type Jobs = "cleanup" | "export"
 
 type JobStatus = {
     status: "requested" | "running" | "done" | "error"
@@ -11,13 +11,17 @@ type JobsState = Record<Jobs, JobStatus | undefined>
 
 const initialState: JobsState = {
     cleanup: undefined,
+    export: undefined,
 }
 
 export const slice = createSlice({
     name: "jobs",
     initialState,
     reducers: {
-        startJob: (state, { payload }: PayloadAction<{ job: Jobs }>) => {
+        startJob: (
+            state,
+            { payload }: PayloadAction<{ job: Jobs; params?: any }>,
+        ) => {
             state[payload.job] = {
                 status: "requested",
                 error: undefined,
@@ -32,6 +36,10 @@ export const slice = createSlice({
                 status: payload.status,
                 error: payload.error,
             }
+        },
+
+        resetJob: (state, { payload }: PayloadAction<{ job: Jobs }>) => {
+            state[payload.job] = undefined
         },
     },
 

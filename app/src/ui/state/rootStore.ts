@@ -14,6 +14,8 @@ import type { SettingsController } from "@/control/SettingsController"
 import type { SetupController } from "@/control/SetupController"
 import type { SyncController } from "@/control/SyncController"
 import type { UnlockController } from "@/control/UnlockController"
+import type { Database } from "@/lib/database"
+import type { FS } from "@/lib/fs"
 
 import * as apitokens from "./apitokens"
 import * as attachments from "./attachments"
@@ -100,6 +102,8 @@ export function configureEffects(
         apiTokenCtrl,
         navCtrl,
         changelogCtrl,
+        db,
+        fs,
     }: {
         memoCtrl: MemoController
         attachmentCtrl: AttachmentController
@@ -111,6 +115,8 @@ export function configureEffects(
         apiTokenCtrl: APITokenController
         navCtrl: NavigationController
         changelogCtrl: ChangelogController
+        db: Database
+        fs: FS
     },
 ) {
     memos.registerEffects(startListening, {
@@ -160,5 +166,7 @@ export function configureEffects(
     jobs.registerEffects(startListening, {
         memoCtrl,
         changelogCtrl,
+        db,
+        fs,
     })
 }

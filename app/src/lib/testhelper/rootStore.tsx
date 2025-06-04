@@ -187,6 +187,8 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
             unlockCtrl,
             navCtrl,
             changelogCtrl,
+            db,
+            fs: mockFS,
         })
 
         // @ts-expect-error: this is for debugging

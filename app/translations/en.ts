@@ -330,9 +330,15 @@ export const translations = {
 
     "screens/Settings/Data/Jobs": {
         Title: "Jobs",
+
         RunLabel: "Run",
         RunningLabel: "Running",
+
         CleanupJobLabel: "Cleanup",
         CleanupJobDescription: "Removes orphaned metadata.",
+
+        ExportJobLabel: "Export Database",
+        ExportJobDescription: "Download an encrypted copy of the database.",
+        ExportJobPrivateKeyLabel: "Private Key",
     },
 } satisfies Components

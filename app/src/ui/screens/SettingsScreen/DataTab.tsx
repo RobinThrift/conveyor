@@ -1,8 +1,10 @@
-import React, { useCallback } from "react"
+import React, { useActionState, useCallback, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import { Alert } from "@/ui/components/Alert"
 import { Button } from "@/ui/components/Button"
+import { Form } from "@/ui/components/Form"
+import { Input } from "@/ui/components/Input"
 import { useT } from "@/ui/i18n"
 import { actions, selectors } from "@/ui/state"
 import { createSelector } from "@reduxjs/toolkit"
@@ -74,7 +76,101 @@ function DataJobs() {
                         </Alert>
                     ) : undefined}
                 </li>
+
+                <ExportJob />
             </ul>
         </div>
     )
+}
+
+const exportJobSelector = createSelector(
+    [(state) => selectors.jobs.getJob(state, "export")],
+    (state) => ({ ...state }),
+)
+
+function ExportJob() {
+    let t = useT("screens/Settings/Data/Jobs")
+    let dispatch = useDispatch()
+    let jobState = useSelector(exportJobSelector)
+    let filename = "export.db"
+
+    let isRunning =
+        jobState?.status === "running" || jobState?.status === "requested"
+
+    let [_, startJob] = useActionState((_: unknown, formData: FormData) => {
+        dispatch(
+            actions.jobs.startJob({
+                job: "export",
+                params: {
+                    filename,
+                    privateKey: formData.get("private_key"),
+                },
+            }),
+        )
+        return null
+    }, null)
+
+    useEffect(() => {
+        if (jobState?.status === "done") {
+            // dispatch(actions.jobs.resetJob({ job: "export" }))
+            downloadDB(filename).catch((err) => console.error(err))
+        }
+    }, [jobState?.status, filename])
+
+    return (
+        <li className="flex flex-col">
+            <Form action={startJob}>
+                <div>
+                    <strong>{t.ExportJobLabel}</strong>:{" "}
+                    {t.ExportJobDescription}
+                </div>
+
+                <Input
+                    name="private_key"
+                    type="password"
+                    label={t.ExportJobPrivateKeyLabel}
+                    className="my-2 md:flex md:items-center md:gap-2"
+                    disabled={isRunning}
+                />
+
+                <Button
+                    variant="primary"
+                    type="submit"
+                    className="w-fit"
+                    size="sm"
+                    isDisabled={isRunning}
+                >
+                    {isRunning ? t.RunningLabel : t.RunLabel}
+                </Button>
+
+                {jobState?.error ? (
+                    <Alert variant="danger">
+                        {jobState?.error.name}: {jobState?.error.message}
+                        {jobState?.error.stack && (
+                            <pre>
+                                <code>{jobState?.error.stack}</code>
+                            </pre>
+                        )}
+                    </Alert>
+                ) : undefined}
+            </Form>
+        </li>
+    )
+}
+
+async function downloadDB(filename: string) {
+    let root = await navigator.storage.getDirectory()
+
+    let file = await root.getFileHandle(filename)
+
+    let objURL = URL.createObjectURL(await file.getFile())
+
+    let fauxDownloadEl = document.createElement("a")
+    fauxDownloadEl.href = objURL
+    fauxDownloadEl.download = filename
+    document.body.appendChild(fauxDownloadEl)
+    fauxDownloadEl.click()
+    fauxDownloadEl.remove()
+
+    URL.revokeObjectURL(objURL)
 }

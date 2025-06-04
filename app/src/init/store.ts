@@ -8,6 +8,8 @@ import type { SettingsController } from "@/control/SettingsController"
 import type { SetupController } from "@/control/SetupController"
 import type { SyncController } from "@/control/SyncController"
 import type { UnlockController } from "@/control/UnlockController"
+import type { Database } from "@/lib/database"
+import type { FS } from "@/lib/fs"
 import { configureEffects, configureRootStore } from "@/ui/state"
 import { runStoreInWorker } from "@/ui/state/worker"
 
@@ -24,6 +26,8 @@ export function initRootStore(
         apiTokenCtrl: APITokenController
         navCtrl: NavigationController
         changelogCtrl: ChangelogController
+        db: Database
+        fs: FS
     },
 ) {
     let rootStore = configureRootStore(initState)
