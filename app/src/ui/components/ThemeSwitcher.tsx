@@ -1,5 +1,6 @@
 import React, { useCallback } from "react"
 
+import { DEFAULT_SETTINGS } from "@/domain/Settings"
 import { MoonIcon, SunHorizonIcon, SunIcon } from "@/ui/components/Icons"
 import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
@@ -16,9 +17,9 @@ export function SelectColourScheme({
     )
     let [_, setDarkColourScheme] = useSetting("ui.colourScheme.dark")
     let onChange = useCallback(
-        (v: typeof lightColourScheme) => {
-            setLightColourScheme(v)
-            setDarkColourScheme(v)
+        (v?: typeof lightColourScheme) => {
+            setLightColourScheme(v ?? DEFAULT_SETTINGS.ui.colourScheme.light)
+            setDarkColourScheme(v ?? DEFAULT_SETTINGS.ui.colourScheme.light)
         },
         [setLightColourScheme, setDarkColourScheme],
     )
@@ -47,8 +48,8 @@ export function SelectMode({
     let t = useT("components/ThemeSwitcher")
     let [mode, setMode] = useSetting("ui.colourScheme.mode")
     let onChange = useCallback(
-        (v: typeof mode) => {
-            setMode(v)
+        (v?: typeof mode) => {
+            setMode(v ?? DEFAULT_SETTINGS.ui.colourScheme.mode)
         },
         [setMode],
     )

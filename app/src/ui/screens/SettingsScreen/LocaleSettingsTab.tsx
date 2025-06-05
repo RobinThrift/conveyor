@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from "react"
 
+import { DEFAULT_SETTINGS } from "@/domain/Settings"
 import {
     type Language,
     type Region,
@@ -17,15 +18,15 @@ export function LocaleSettingsTab() {
     let [region, setRegion] = useSetting("locale.region")
 
     let onChangeLanguage = useCallback(
-        (v: Language) => {
-            setLang(v)
+        (v?: Language) => {
+            setLang(v ?? DEFAULT_SETTINGS.locale.language)
         },
         [setLang],
     )
 
     let onChangeRegion = useCallback(
-        (v: Region) => {
-            setRegion(v)
+        (v?: Region) => {
+            setRegion(v ?? DEFAULT_SETTINGS.locale.region)
         },
         [setRegion],
     )
