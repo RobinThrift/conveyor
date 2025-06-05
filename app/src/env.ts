@@ -12,7 +12,7 @@ export const Env: _Env = {
     isDeviceSecureStorageAvailable: false,
 }
 
-export function setEnv(env: Partial<_Env>) {
+export function setEnv(env: Partial<_Env>, fromRemote = false) {
     for (let key in env) {
         let k = key as keyof _Env
         if (typeof env[k] !== "undefined") {
@@ -20,10 +20,12 @@ export function setEnv(env: Partial<_Env>) {
         }
     }
 
-    globalThis.__CONVEYOR_ENV_CHANNEL__?.postMessage({
-        type: "env:set",
-        data: env,
-    } satisfies SetEnvMessag)
+    if (!fromRemote) {
+        globalThis.__CONVEYOR_ENV_CHANNEL__?.postMessage({
+            type: "env:set",
+            data: env,
+        } satisfies SetEnvMessag)
+    }
 }
 
 declare global {
@@ -43,7 +45,7 @@ if (!("__CONVEYOR_ENV_CHANNEL__" in globalThis)) {
 
             evt.stopImmediatePropagation()
 
-            setEnv(msg.data)
+            setEnv(msg.data, true)
         },
     )
 }
