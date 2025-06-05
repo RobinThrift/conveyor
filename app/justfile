@@ -65,7 +65,7 @@ typecheck-watch: install
     {{ local_bin }}/tsc --noEmit --watch
 
 install:
-    if [ ! -d node_modules/.bin ] || [ package.json -nt package-lock.json ]; then npm ci --no-audit --no-fund --install-links=false ; fi
+    if [ ! -d node_modules/.bin ] || [ package-lock.json -nt node_modules ]; then npm ci --no-audit --no-fund --install-links=false ; fi
     @echo "TypeScript:" $({{ local_bin }}/tsc --version)
     @echo "Biome:" $({{ local_bin }}/biome --version)
 
