@@ -7,24 +7,21 @@
     );
     z-index: 9999;
     backdrop-filter: blur(2px);
-    transition: background-color 200ms, backdrop-filter 200ms;
+    transition: background-color 100ms;
 
     &[data-entering] {
         background-color: transparent;
-        backdrop-filter: blur(0px);
     }
 
     &[data-exiting] {
         background-color: transparent;
-        backdrop-filter: blur(0px);
     }
 }
 
 .settings-modal {
-    @apply animate-in slide-in-from-bottom ease-linear duration-200;
-    @apply xs:fade-in xs:slide-in-from-bottom-0;
     @apply relative rounded-lg bg-surface-level-1 border shadow-lg xs:max-w-[95dvw] md:max-w-6xl w-full;
     @apply border-subtle-extra-light dark:border-subtle-extra-dark;
+    animation-fill-mode: both;
 
     height: 95svh;
 
@@ -32,8 +29,13 @@
         height: 80svh;
     }
 
+    &[data-entering] {
+        @apply animate-in slide-in-from-bottom ease-linear duration-100;
+        @apply xs:fade-in xs:slide-in-from-bottom-0;
+    }
+
     &[data-exiting] {
-        @apply animate-out slide-out-to-bottom ease-linear duration-200;
+        @apply animate-out slide-out-to-bottom ease-linear duration-100;
         @apply xs:fade-out xs:slide-out-to-bottom-0;
     }
 }

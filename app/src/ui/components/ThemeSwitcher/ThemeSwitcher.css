@@ -13,8 +13,6 @@
     pointer-events: none;
 }
 
-
-
 @keyframes theme-mode-transition {
     0% {
         clip-path: circle(0%);
