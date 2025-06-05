@@ -160,6 +160,7 @@ function MonthDropdown({
     return (
         <select
             aria-label="Month"
+            name="month"
             onChange={onChange}
             value={currentMonth.month}
         >
@@ -211,7 +212,7 @@ function YearDropdown({
     }
 
     return (
-        <select aria-label="Year" onChange={onChange} value={20}>
+        <select aria-label="Year" name="year" onChange={onChange}>
             {years.map((year, i) => (
                 <option key={year.formatted} value={i}>
                     {year.formatted}
