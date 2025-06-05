@@ -18,7 +18,7 @@ import {
 import { Button } from "@/ui/components/Button"
 import { DateTime } from "@/ui/components/DateTime"
 import {
-    ArrowsCounterClockwiseIcon,
+    ArrowsClockwiseIcon,
     CaretDownIcon,
     CloudArrowDownIcon,
     CloudArrowUpIcon,
@@ -215,7 +215,7 @@ function SectionSyncInfo({
                             isDisabled={isLoading}
                             size="sm"
                             onPress={manualSync}
-                            iconLeft={<ArrowsCounterClockwiseIcon />}
+                            iconLeft={<ArrowsClockwiseIcon />}
                         >
                             {t.ManualSyncButtonLabel}
                         </Button>

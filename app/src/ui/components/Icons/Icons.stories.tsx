@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React, { useState } from "react"
 
-import * as Icons from "./index"
 import { Select } from "@/ui/components/Select"
+
+import * as Icons from "./index"
 
 const meta: Meta = {
     title: "Conveyor/Icons",
