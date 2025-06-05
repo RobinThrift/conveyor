@@ -39,6 +39,7 @@
 @import "../components/OffCanvas/OffCanvas.css" layer(components);
 @import "../components/Select/Select.css" layer(components);
 @import "../components/Tooltip/Tooltip.css" layer(components);
+@import "../components/ThemeSwitcher/ThemeSwitcher.css" layer(components);
 @import "../App/App.css" layer(components);
 @import "../screens/EditMemoScreen/EditMemoScreen.css" layer(components);
 @import "../screens/ErrorScreen/ErrorScreen.css" layer(components);

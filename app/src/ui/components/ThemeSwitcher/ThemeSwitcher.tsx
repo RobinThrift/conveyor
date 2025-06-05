@@ -49,9 +49,21 @@ export function SelectMode({
     let [mode, setMode] = useSetting("ui.colourScheme.mode")
     let onChange = useCallback(
         (v?: typeof mode) => {
-            setMode(v ?? DEFAULT_SETTINGS.ui.colourScheme.mode)
+            if (v === mode) {
+                setMode(v ?? DEFAULT_SETTINGS.ui.colourScheme.mode)
+            } else {
+                document.documentElement.classList.add("theme-mode-transition")
+                document.startViewTransition(() => {
+                    setMode(v ?? DEFAULT_SETTINGS.ui.colourScheme.mode)
+                    requestAnimationFrame(() => {
+                        document.documentElement.classList.remove(
+                            "theme-mode-transition",
+                        )
+                    })
+                })
+            }
         },
-        [setMode],
+        [mode, setMode],
     )
 
     return (
