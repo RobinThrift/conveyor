@@ -1,6 +1,6 @@
 import React, { startTransition, useCallback } from "react"
 
-import type { MemoListLayouts } from "@/domain/Settings"
+import { DEFAULT_SETTINGS, type MemoListLayouts } from "@/domain/Settings"
 import { ListIcon, TableIcon } from "@/ui/components/Icons"
 import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
@@ -12,9 +12,9 @@ export const LayoutSelect = React.memo(function LayoutSelect() {
     let [listLayout, setListLayout] = useSetting("ui.memoList.layout")
 
     let onChange = useCallback(
-        (value: MemoListLayouts) => {
+        (value?: MemoListLayouts) => {
             startTransition(() => {
-                setListLayout(value)
+                setListLayout(value ?? DEFAULT_SETTINGS.ui.memoList.layout)
             })
         },
         [setListLayout],

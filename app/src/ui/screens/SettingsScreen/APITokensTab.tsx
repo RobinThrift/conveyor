@@ -91,6 +91,13 @@ function CreateNewAPIToken({
         "1d" | "7d" | "30d" | "6m" | "12m"
     >("1d")
 
+    let onChangeExpiresIn = useCallback(
+        (e?: ReturnType<typeof expiresIn>) => {
+            setExpiresIn(e ?? "1d")
+        },
+        [setExpiresIn],
+    )
+
     let onChangeName = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             setName(e.target.value)
@@ -157,7 +164,7 @@ function CreateNewAPIToken({
                         name="api_token_expires_in"
                         className="col-span-4 py-2!"
                         value={expiresIn()}
-                        onChange={setExpiresIn}
+                        onChange={onChangeExpiresIn}
                         isDisabled={isLoading}
                     >
                         <Select.Option value="1d">

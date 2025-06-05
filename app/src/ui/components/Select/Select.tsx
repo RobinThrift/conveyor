@@ -27,14 +27,14 @@ export interface SelectProps<T extends string = string> {
     children:
         | React.ReactElement<SelectOptionProps>
         | React.ReactElement<SelectOptionProps>[]
-    onChange: (value: T) => void
+    onChange: (value?: T) => void
     "aria-labeledby"?: string
 }
 
 export function Select<T extends string = string>(props: SelectProps<T>) {
     let onSelectionChange = useCallback(
-        (value: Key) => {
-            props.onChange(value as T)
+        (value: Key | null) => {
+            props.onChange(value ? (value as T) : undefined)
         },
         [props.onChange],
     )
