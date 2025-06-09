@@ -93,3 +93,8 @@ export function useAttachment({
 
     return state
 }
+
+export function useAttachmentLoader() {
+    let attachmentProvider = useAttachmentProvider()
+    return attachmentProvider.getAttachmentDataByID
+}

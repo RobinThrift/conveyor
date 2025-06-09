@@ -23,11 +23,13 @@ import {
     placeholder as placeholderExt,
 } from "@codemirror/view"
 
-import type { AttachmentID } from "@/domain/Attachment"
+import type { Attachment, AttachmentID } from "@/domain/Attachment"
 import type { Tag } from "@/domain/Tag"
+import type { AsyncResult } from "@/lib/result"
 
 import { attachments } from "./attachments"
 import { fileDropHandler } from "./fileDropHandler"
+import { inlineImages } from "./inlineImages"
 import { markdownDecorations } from "./markdownDecorations"
 import { tagAutoComplete } from "./tagAutoComplete"
 import { theme } from "./theme"
@@ -39,6 +41,7 @@ export const extensions = ({
     autocomplete,
     vimModeEnabled,
     transferAttachment,
+    getAttachmentDataByID,
 }: {
     placeholder?: string
     autocomplete?: {
@@ -50,6 +53,9 @@ export const extensions = ({
         filename: string
         content: ArrayBufferLike
     }): Promise<void>
+    getAttachmentDataByID(
+        id: AttachmentID,
+    ): AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>
 }) => {
     let exts: Extension[] = [
         keymap.of([
@@ -73,6 +79,7 @@ export const extensions = ({
         attachments({ transferAttachment }),
         fileDropHandler(),
         markdown({ base: markdownLanguage, codeLanguages: languages }),
+        inlineImages(getAttachmentDataByID),
         markdownDecorations,
         toolbarPositionFix,
     ]

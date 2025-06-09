@@ -1,5 +1,6 @@
 import { useMemo } from "react"
 
+import { attachmentIDFromURL } from "@/domain/Attachment"
 import { thumbhashToDataURL } from "@/external/thumbhash"
 import { useAttachment } from "@/ui/attachments"
 
@@ -48,21 +49,15 @@ export function useImageState({
 function parseImgURL(
     src: string,
 ): { attachmentID: string; thumbhash?: string } | undefined {
-    let u: URL
-    try {
-        u = new URL(src)
-    } catch {
+    let attachment = attachmentIDFromURL(src)
+    if (!attachment) {
         return
     }
-
-    if (u.protocol !== "attachment:") {
-        return
-    }
-
-    let th = u.searchParams.get("thumbhash")
 
     return {
-        attachmentID: u.hostname || u.pathname,
-        thumbhash: th ? thumbhashToDataURL(th) : undefined,
+        ...attachment,
+        thumbhash: attachment.thumbhash
+            ? thumbhashToDataURL(attachment.thumbhash)
+            : undefined,
     }
 }

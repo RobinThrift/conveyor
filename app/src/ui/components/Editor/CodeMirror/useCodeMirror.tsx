@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react"
 import type { AttachmentID } from "@/domain/Attachment"
 import type { Tag } from "@/domain/Tag"
 
+import { useAttachmentLoader } from "@/ui/attachments"
 import { extensions } from "./extensions"
 
 export function useCodeMirror({
@@ -44,6 +45,8 @@ export function useCodeMirror({
     let [editorState, setEditorState] = useState<EditorState>()
     let [editorView, setEditorView] = useState<EditorView>()
 
+    let getAttachmentDataByID = useAttachmentLoader()
+
     let updateListener = useMemo(
         () =>
             onChange
@@ -76,6 +79,7 @@ export function useCodeMirror({
                     vimModeEnabled,
                     autocomplete,
                     transferAttachment,
+                    getAttachmentDataByID,
                 }),
                 updateListener,
             ],
