@@ -28,6 +28,7 @@ import type { Tag } from "@/domain/Tag"
 
 import { attachments } from "./attachments"
 import { fileDropHandler } from "./fileDropHandler"
+import { markdownDecorations } from "./markdownDecorations"
 import { tagAutoComplete } from "./tagAutoComplete"
 import { theme } from "./theme"
 import { toolbarPositionFix } from "./toolbarPositionFix"
@@ -72,6 +73,7 @@ export const extensions = ({
         attachments({ transferAttachment }),
         fileDropHandler(),
         markdown({ base: markdownLanguage, codeLanguages: languages }),
+        markdownDecorations,
         toolbarPositionFix,
     ]
 

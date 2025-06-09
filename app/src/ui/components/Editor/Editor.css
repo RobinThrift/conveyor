@@ -129,3 +129,21 @@
     font-weight: 600;
     color: var(--code-heading);
 }
+
+.tok-monospace {
+    @apply font-mono;
+}
+
+.tok-blockquote {
+    @apply italic;
+}
+
+.cm-hide-token {
+    .tok-meta {
+        font-size: 0px;
+    }
+
+    .tok-heading {
+        margin-right: -1rem;
+    }
+}
