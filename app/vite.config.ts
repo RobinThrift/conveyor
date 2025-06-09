@@ -59,7 +59,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             },
         },
 
-        plugins: [tailwindcss(), react()],
+        plugins: [tailwindcss(), react({ devTarget: "es2024" })],
 
         optimizeDeps: {
             exclude: ["@sqlite.org/sqlite-wasm", "bippy"],
@@ -108,6 +108,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             sourcemap: config.mode === "development" ? "inline" : false,
             minify: config.mode !== "development",
             cssMinify: "lightningcss",
+            target: "es2024",
 
             reportCompressedSize: false,
 
