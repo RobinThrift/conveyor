@@ -3,6 +3,7 @@ import type { AttachmentID } from "@/domain/Attachment"
 import { BaseContext } from "@/lib/context"
 
 import { newID } from "@/domain/ID"
+import { trace } from "@/lib/tracing"
 import { tryAutoUnlock } from "./autounlock"
 import { initController } from "./controller"
 import { initJobs } from "./jobs"
@@ -30,12 +31,17 @@ async function run() {
 
     let controller = await initController(platform)
 
-    let [initState, initStateErr] = await tryAutoUnlock(BaseContext, {
-        unlockCtrl: controller.unlockCtrl,
-        settingsCtrl: controller.settingsCtrl,
-        setupCtrl: controller.setupCtrl,
-        syncCtrl: controller.syncCtrl,
-    })
+    let [initState, initStateErr] = await trace(
+        BaseContext,
+        "AutoUnlock",
+        (ctx) =>
+            tryAutoUnlock(ctx, {
+                unlockCtrl: controller.unlockCtrl,
+                settingsCtrl: controller.settingsCtrl,
+                setupCtrl: controller.setupCtrl,
+                syncCtrl: controller.syncCtrl,
+            }),
+    )
 
     if (initStateErr) {
         throw initStateErr

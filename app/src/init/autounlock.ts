@@ -6,7 +6,7 @@ import type { UnlockController } from "@/control/UnlockController"
 import { DEFAULT_SETTINGS } from "@/domain/Settings"
 import type { Context } from "@/lib/context"
 import { type AsyncResult, Err, Ok, toPromise } from "@/lib/result"
-import { getThreadName } from "@/lib/thread"
+import { trace } from "@/lib/tracing"
 import { type RootStore, actions, selectors } from "@/ui/state"
 import type { SettingsState } from "@/ui/state/settings/slice"
 import type { SetupState } from "@/ui/state/setup/slice"
@@ -34,11 +34,11 @@ export async function tryAutoUnlock(
         syncCtrl: SyncController
     },
 ): AsyncResult<AutoUnlockResult | undefined> {
-    performance.mark("autoUnlock:loadSetupInfo:start")
-    let [loadSetupInfo, loadSetupInfoErr] = await setupCtrl.loadSetupInfo(ctx)
-    performance.mark("autoUnlock:loadSetupInfo:end", {
-        detail: { thread: getThreadName(), ok: loadSetupInfoErr === undefined },
-    })
+    let [loadSetupInfo, loadSetupInfoErr] = await trace(
+        ctx,
+        "loadSetupInfo",
+        (ctx) => setupCtrl.loadSetupInfo(ctx),
+    )
 
     if (loadSetupInfoErr) {
         return Err(loadSetupInfoErr)
@@ -50,28 +50,23 @@ export async function tryAutoUnlock(
 
     let isUnlocked = false
 
-    performance.mark("autoUnlock:tryGetPlaintextPrivateKey:start")
-    let [plaintextKeyData, plaintextKeyDataErr] =
-        await unlockCtrl.tryGetPlaintextPrivateKey(ctx)
-    performance.mark("autoUnlock:tryGetPlaintextPrivateKey:end", {
-        detail: {
-            thread: getThreadName(),
-            ok: plaintextKeyDataErr === undefined,
-        },
-    })
+    let [plaintextKeyData, plaintextKeyDataErr] = await trace(
+        ctx,
+        "tryGetPlaintextPrivateKey",
+        (ctx) => unlockCtrl.tryGetPlaintextPrivateKey(ctx),
+    )
 
     if (!plaintextKeyDataErr && plaintextKeyData) {
-        performance.mark("autoUnlock:unlock:start")
-        let [_, unlockErr] = await unlockCtrl.unlock(ctx, {
-            plaintextKeyData: plaintextKeyData,
-        })
-        performance.mark("autoUnlock:unlock:end", {
-            detail: { thread: getThreadName(), ok: unlockErr === undefined },
-        })
+        let [_, unlockErr] = await trace(ctx, "unlock", (ctx) =>
+            unlockCtrl.unlock(ctx, {
+                plaintextKeyData: plaintextKeyData,
+            }),
+        )
 
         if (unlockErr) {
             throw unlockErr
         }
+
         isUnlocked = true
     }
 
@@ -104,21 +99,17 @@ export async function tryAutoUnlock(
         })
     }
 
-    performance.mark("autoUnlock:loadSettings:start")
-    let [settings, loadSettingsErr] = await settingsCtrl.loadSettings(ctx)
-    performance.mark("autoUnlock:loadSettings:end", {
-        detail: { thread: getThreadName(), ok: loadSettingsErr === undefined },
-    })
+    let [settings, loadSettingsErr] = await trace(ctx, "loadSettings", (ctx) =>
+        settingsCtrl.loadSettings(ctx),
+    )
 
     if (loadSettingsErr) {
         return Err(loadSettingsErr)
     }
 
-    performance.mark("autoUnlock:loadSyncInfo:start")
-    let [syncInfo, loadSyncInfoErr] = await syncCtrl.load(ctx)
-    performance.mark("autoUnlock:loadSyncInfo:end", {
-        detail: { thread: getThreadName(), ok: loadSyncInfoErr === undefined },
-    })
+    let [syncInfo, loadSyncInfoErr] = await trace(ctx, "loadSyncInfo", (ctx) =>
+        syncCtrl.load(ctx),
+    )
 
     if (loadSyncInfoErr) {
         return Err(loadSyncInfoErr)

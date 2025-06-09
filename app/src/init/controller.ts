@@ -24,6 +24,7 @@ import { WebCryptoSha256Hasher } from "@/external/browser/crypto"
 import { EncryptedKVStore, SingleItemKVStore } from "@/lib/KVStore"
 import { BaseContext } from "@/lib/context"
 import { EncryptedFS } from "@/lib/fs/EncryptedFS"
+import { createTracedProxy } from "@/lib/tracing"
 import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
 import { MemoRepo } from "@/storage/database/sqlite/MemoRepo"
@@ -33,121 +34,163 @@ import { Env } from "../env"
 import type { PlatformDependencies } from "./platform"
 
 export async function initController(platform: PlatformDependencies) {
-    let db = platform.db
+    let db = createTracedProxy(platform.db)
 
-    let cryptoCtrl = new CryptoController({
-        crypto: platform.crypto,
-    })
+    let cryptoCtrl = createTracedProxy(
+        new CryptoController({
+            crypto: platform.crypto,
+        }),
+    )
 
     await platform.fs.mkdirp(BaseContext, ".")
 
-    let encryptedFS = new EncryptedFS(platform.fs, cryptoCtrl)
+    let encryptedFS = createTracedProxy(
+        new EncryptedFS(platform.fs, cryptoCtrl),
+    )
 
-    let authCtrl = new AuthController({
-        origin: globalThis.location.host,
-        storage: new EncryptedKVStore<{
-            [key: string]: AuthToken
-        }>({
-            kv: platform.keyValueContainer.getKVStore("auth"),
-            crypto: platform.crypto,
-            deserialize: authTokenFromJSON,
+    let authCtrl = createTracedProxy(
+        new AuthController({
+            origin: globalThis.location.host,
+            storage: createTracedProxy(
+                new EncryptedKVStore<{
+                    [key: string]: AuthToken
+                }>({
+                    kv: platform.keyValueContainer.getKVStore("auth"),
+                    crypto: platform.crypto,
+                    deserialize: authTokenFromJSON,
+                }),
+            ),
+            authPIClient: createTracedProxy(
+                new AuthV1APIClient({
+                    baseURL: globalThis.location.href,
+                }),
+            ),
         }),
-        authPIClient: new AuthV1APIClient({
-            baseURL: globalThis.location.href,
-        }),
-    })
+    )
 
-    let syncAPIClient = new SyncV1APIClient({
-        baseURL: globalThis.location.href,
-        tokenStorage: authCtrl,
-    })
-
-    let changelogCtrl = new ChangelogController({
-        sourceName: "web",
-        transactioner: db,
-        repo: new ChangelogRepo(db),
-    })
-
-    let settingsCtrl = new SettingsController({
-        transactioner: db,
-        repo: new SettingsRepo(db),
-        changelog: changelogCtrl,
-    })
-
-    let attachmentCtrl = new AttachmentController({
-        transactioner: db,
-        repo: new AttachmentRepo(db),
-        fs: encryptedFS,
-        hasher: new WebCryptoSha256Hasher(),
-        remote: new EncryptedRemoteAttachmentFetcher({
-            syncAPIClient,
-            decrypter: cryptoCtrl,
-        }),
-        changelog: changelogCtrl,
-    })
-
-    let memoCtrl = new MemoController({
-        transactioner: db,
-        repo: new MemoRepo(db),
-        attachments: attachmentCtrl,
-        changelog: changelogCtrl,
-    })
-
-    let syncCtrl = new SyncController({
-        storage: new SingleItemKVStore(
-            SyncController.storageKey,
-            new EncryptedKVStore<
-                Record<typeof SyncController.storageKey, SyncInfo>
-            >({
-                kv: platform.keyValueContainer.getKVStore("sync"),
-                crypto: platform.crypto,
-            }),
-        ),
-        dbPath: "conveyor.db",
-        transactioner: db,
-        syncAPIClient,
-        cryptoRemoteAPI: new AccountKeysV1APIClient({
+    let syncAPIClient = createTracedProxy(
+        new SyncV1APIClient({
             baseURL: globalThis.location.href,
             tokenStorage: authCtrl,
         }),
-        memos: memoCtrl,
-        attachments: attachmentCtrl,
-        settings: settingsCtrl,
-        changelog: changelogCtrl,
-        fs: platform.fs,
-        crypto: cryptoCtrl,
-    })
+    )
 
-    let setupCtrl = new SetupController({
-        storage: new SingleItemKVStore(
-            SetupController.storageKey,
-            platform.keyValueContainer.getKVStore("setup"),
-        ),
-    })
+    let changelogCtrl = createTracedProxy(
+        new ChangelogController({
+            sourceName: "web",
+            transactioner: db,
+            repo: createTracedProxy(new ChangelogRepo(db)),
+        }),
+    )
+
+    let settingsCtrl = createTracedProxy(
+        new SettingsController({
+            transactioner: db,
+            repo: createTracedProxy(new SettingsRepo(db)),
+            changelog: changelogCtrl,
+        }),
+    )
+
+    let attachmentCtrl = createTracedProxy(
+        new AttachmentController({
+            transactioner: db,
+            repo: createTracedProxy(new AttachmentRepo(db)),
+            fs: encryptedFS,
+            hasher: createTracedProxy(new WebCryptoSha256Hasher()),
+            remote: createTracedProxy(
+                new EncryptedRemoteAttachmentFetcher({
+                    syncAPIClient,
+                    decrypter: cryptoCtrl,
+                }),
+            ),
+            changelog: changelogCtrl,
+        }),
+    )
+
+    let memoCtrl = createTracedProxy(
+        new MemoController({
+            transactioner: db,
+            repo: createTracedProxy(new MemoRepo(db)),
+            attachments: attachmentCtrl,
+            changelog: changelogCtrl,
+        }),
+    )
+
+    let syncCtrl = createTracedProxy(
+        new SyncController({
+            storage: createTracedProxy(
+                new SingleItemKVStore(
+                    SyncController.storageKey,
+                    new EncryptedKVStore<
+                        Record<typeof SyncController.storageKey, SyncInfo>
+                    >({
+                        kv: platform.keyValueContainer.getKVStore("sync"),
+                        crypto: platform.crypto,
+                    }),
+                ),
+            ),
+            dbPath: "conveyor.db",
+            transactioner: db,
+            syncAPIClient,
+            cryptoRemoteAPI: createTracedProxy(
+                new AccountKeysV1APIClient({
+                    baseURL: globalThis.location.href,
+                    tokenStorage: authCtrl,
+                }),
+            ),
+            memos: memoCtrl,
+            attachments: attachmentCtrl,
+            settings: settingsCtrl,
+            changelog: changelogCtrl,
+            fs: platform.fs,
+            crypto: cryptoCtrl,
+        }),
+    )
+
+    let setupCtrl = createTracedProxy(
+        new SetupController({
+            storage: createTracedProxy(
+                new SingleItemKVStore(
+                    SetupController.storageKey,
+                    platform.keyValueContainer.getKVStore("setup"),
+                ),
+            ),
+        }),
+    )
 
     let unlockControllerStorage: UnlockControllerStorage | undefined
     if (Env.isDeviceSecureStorageAvailable) {
-        unlockControllerStorage = platform.deviceSecureStorage
+        unlockControllerStorage = createTracedProxy(
+            platform.deviceSecureStorage,
+        )
     }
 
-    let unlockCtrl = new UnlockController({
-        storage: unlockControllerStorage,
-        db: db,
-        crypto: cryptoCtrl,
-    })
-
-    let apiTokenCtrl = new APITokenController({
-        apiTokenAPIClient: new APITokensV1APIClient({
-            baseURL: globalThis.location.href,
-            tokenStorage: authCtrl,
+    let unlockCtrl = createTracedProxy(
+        new UnlockController({
+            storage: unlockControllerStorage,
+            db: db,
+            crypto: cryptoCtrl,
         }),
-    })
+    )
 
-    let navCtrl = new NavigationController({
-        backend: platform.navigationBackend,
-    })
+    let apiTokenCtrl = createTracedProxy(
+        new APITokenController({
+            apiTokenAPIClient: createTracedProxy(
+                new APITokensV1APIClient({
+                    baseURL: globalThis.location.href,
+                    tokenStorage: authCtrl,
+                }),
+            ),
+        }),
+    )
 
-    let jobCtrl = new JobController()
+    let navCtrl = createTracedProxy(
+        new NavigationController({
+            backend: platform.navigationBackend,
+        }),
+    )
+
+    let jobCtrl = createTracedProxy(new JobController())
 
     return {
         apiTokenCtrl,

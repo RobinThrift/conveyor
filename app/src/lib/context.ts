@@ -1,5 +1,11 @@
 import type { Duration } from "@/lib/duration"
 
+const __isContext = Symbol("__isContext")
+
+export function isContext(v: any): boolean {
+    return v && typeof v === "object" && __isContext in v
+}
+
 export type CancelFunc = (reason?: Error) => void
 
 export interface Context<
@@ -48,6 +54,9 @@ export const BaseContext: Context = {
     err(): Error | undefined {
         return undefined
     },
+
+    //@ts-expect-error
+    [__isContext]: true,
 }
 
 class context<D extends Record<string, unknown> = Record<string, any>> {
@@ -55,7 +64,9 @@ class context<D extends Record<string, unknown> = Record<string, any>> {
     private _err?: Error
     private _data: D
     private _isCancelled = false
-    private _parent: Context
+    private _parent: Context;
+
+    [__isContext] = true
 
     constructor(
         parent: Context,
