@@ -101,6 +101,10 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             format: "es",
         },
 
+        esbuild: {
+            target: "es2024",
+        },
+
         build: {
             outDir: "build",
             emptyOutDir: true,
@@ -108,7 +112,6 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             sourcemap: config.mode === "development" ? "inline" : false,
             minify: config.mode !== "development",
             cssMinify: "lightningcss",
-            target: "es2024",
 
             reportCompressedSize: false,
 
