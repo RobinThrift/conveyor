@@ -15,6 +15,10 @@ let formatter = new Intl.DateTimeFormat("en-gb", {
 export function SQLLogDevTool() {
     let events = useSyncExternalStore(_sqlllog_subscribe, _sqlllog_getSnapshot)
 
+    let [selected, setSelected] = useState<SQLLogStatementEvent | undefined>(
+        undefined,
+    )
+
     let onClickClear = useCallback(() => {
         _snapshot = []
     }, [])
@@ -28,6 +32,7 @@ export function SQLLogDevTool() {
                     <Event
                         {...(events[i] as SQLLogStatementEvent)}
                         key={events[i].id}
+                        onClick={(e) => setSelected(e)}
                     />,
                 )
             }
@@ -37,6 +42,7 @@ export function SQLLogDevTool() {
                     <Transaction
                         {...(events[i] as SQLLogTransactionEvent)}
                         key={events[i].id}
+                        onClick={(e) => setSelected(e)}
                     />,
                 )
             }
@@ -46,59 +52,93 @@ export function SQLLogDevTool() {
     }, [events])
 
     return (
-        <div className="min-h-full w-full relative overscroll-contain">
-            <header className="sticky top-0 left-0 right-0 p-2 text-xl font-mono text-text backdrop-blur-sm flex justify-between items-center rounded">
-                SQL Log
-                <button
-                    type="button"
-                    className="text-sm cursor-pointer"
-                    onClick={onClickClear}
-                >
-                    [clear]
-                </button>
-            </header>
-            <ul className="divide-y divide-subtle">{items}</ul>
+        <div className="devtools-entry-list-detail-wrapper">
+            <ul className="devtools-entry-list">
+                <li className="devtools-entry-list-header">
+                    <button
+                        type="button"
+                        className="text-sm cursor-pointer"
+                        onClick={onClickClear}
+                    >
+                        [clear]
+                    </button>
+                </li>
+                {items}
+            </ul>
+
+            <div className="devtools-entry-list-item-details">
+                {selected && <SQLEventDetails {...selected} />}
+            </div>
         </div>
     )
 }
 
 const Event = React.memo(function Event({
-    name,
-    sql,
-    args = [],
-    timestamp,
-    measure,
-}: SQLLogStatementEvent) {
-    let [showResolved, setShowResolved] = useState(false)
-
+    onClick,
+    ...event
+}: SQLLogStatementEvent & { onClick?: (e: SQLLogStatementEvent) => void }) {
     return (
-        <li className="p-4 hover:bg-surface-level-1">
-            <div className="flex items-center justify-between w-full text-subtle-light font-mono text-sm">
-                <h3 className="capitalize">
-                    {name}
-                    {measure && (
-                        <span>
-                            {" - "}
-                            {measure.duration.toFixed(2)}ms
-                        </span>
-                    )}
-                </h3>
-
-                <time className="text-sm">
-                    [{formatter.format(timestamp)}.{timestamp.getMilliseconds()}
-                    ]
+        <li className="devtools-entry-list-item">
+            <div className="devtools-entry-list-item-timing">
+                {event.measure && (
+                    <span>{event.measure.duration.toFixed(2)}ms</span>
+                )}
+                <time>
+                    {formatter.format(event.timestamp)}.
+                    {event.timestamp.getMilliseconds()}
                 </time>
             </div>
+
+            {/* biome-ignore lint/a11y/useButtonType: devtools only */}
+            <button
+                className="devtools-entry-list-item-title"
+                onClick={() => onClick?.(event)}
+            >
+                {event.name}
+            </button>
+        </li>
+    )
+})
+
+function SQLEventDetails({
+    name,
+    measure,
+    timestamp,
+    sql,
+    args = [],
+}: SQLLogStatementEvent) {
+    let [showResolved, setShowResolved] = useState(false)
+    let resolved = useMemo(() => {
+        let count = 0
+        return sql?.replaceAll(/\?(\d+)?/g, (_, index) => {
+            count++
+            if (!index) {
+                return JSON.stringify(args[count - 1])
+            }
+            return JSON.stringify(args[Number.parseInt(index, 10) - 1])
+        })
+    }, [sql, args])
+
+    return (
+        <>
+            <div className="devtools-entry-list-item-timing">
+                {measure && <span>{measure.duration.toFixed(2)}ms</span>}
+                <time>
+                    {formatter.format(timestamp)}.{timestamp.getMilliseconds()}
+                </time>
+            </div>
+
+            <h3 className="devtools-entry-list-item-title">{name}</h3>
+
             {sql && showResolved && (
                 <Code
                     className="dark rosepine rounded p-2 my-2 text-wrap text-sm"
                     lang="sql"
                 >
-                    {sql.replaceAll(/\?(\d+)/g, (_, index) =>
-                        JSON.stringify(args[Number.parseInt(index, 10) - 1]),
-                    )}
+                    {resolved ?? sql}
                 </Code>
             )}
+
             {sql && !showResolved && (
                 <Code
                     className="dark rosepine rounded p-2 my-2 text-wrap text-sm"
@@ -107,6 +147,7 @@ const Event = React.memo(function Event({
                     {sql}
                 </Code>
             )}
+
             {args.length && !showResolved ? (
                 <Code
                     className="dark rosepine rounded p-2 my-2 text-wrap text-sm"
@@ -121,48 +162,50 @@ const Event = React.memo(function Event({
                     )}
                 </Code>
             ) : null}
+
             {args.length ? (
                 <button
                     type="button"
-                    className="text-subtle-light font-mono text-xs cursor-pointer"
+                    className="font-mono text-xs cursor-pointer"
                     onClick={() => setShowResolved(!showResolved)}
                 >
                     {showResolved ? "Show Original" : "Resolve"}
                 </button>
             ) : null}
-        </li>
+        </>
     )
-})
+}
 
 const Transaction = React.memo(function Transaction({
     statements,
     timestamp,
     measure,
-}: SQLLogTransactionEvent) {
+    onClick,
+}: SQLLogTransactionEvent & { onClick: (e: SQLLogStatementEvent) => void }) {
     let items = statements.map((event) => (
-        <Event {...(event as SQLLogStatementEvent)} key={event.id} />
+        <Event
+            {...(event as SQLLogStatementEvent)}
+            key={event.id}
+            onClick={onClick}
+        />
     ))
 
     return (
-        <li className="p-4 hover:bg-surface-level-1">
-            <details>
-                <summary className="text-subtle-light font-mono cursor-pointer text-sm flex items-center justify-between">
-                    <span>
-                        Transaction
-                        {measure && (
-                            <span className="text-subtle-light font-mono">
-                                {" - "}
-                                {measure.duration.toFixed(2)}ms
-                            </span>
-                        )}
-                    </span>
+        <li className="devtools-entry-list-item">
+            <div className="devtools-entry-list-item-timing">
+                {measure && <span>{measure.duration.toFixed(2)}ms</span>}
+                <time>
+                    {formatter.format(timestamp)}.{timestamp.getMilliseconds()}
+                </time>
+            </div>
 
-                    <time className="text-sm">
-                        [{formatter.format(timestamp)}.
-                        {timestamp.getMilliseconds()}]
-                    </time>
+            <details>
+                <summary>
+                    <span className="devtools-entry-list-item-title inline!">
+                        Transaction
+                    </span>
                 </summary>
-                <ul className="divide-y divide-subtle ps-8">{items}</ul>
+                <ul className="devtools-entry-list">{items}</ul>
             </details>
         </li>
     )

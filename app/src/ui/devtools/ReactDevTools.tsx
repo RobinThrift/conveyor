@@ -94,8 +94,6 @@ export function ReactDevTools() {
     return (
         <div className="dark min-h-full w-full relative overscroll-contain">
             <header className="sticky top-0 left-0 right-0 p-2 text-xl font-mono text-text backdrop-blur-sm flex justify-between items-center rounded">
-                <span>React</span>
-
                 <button
                     type="button"
                     className="text-xs cursor-pointer"

@@ -31,15 +31,12 @@ export function FPSMeter() {
     }, [])
 
     return (
-        <div
-            className="bg-[var(--btn-bg)]/70 backdrop-blur-xs text-sm py-1! px-2! h-fit rounded-full text-[var(--btn-color)] select-none pointer-events-none flex items-center gap-2"
-            title={`MaxFPS: ${maxFPS}`}
-        >
-            <div className="flex justify-end items-end h-[1lh] w-10">
+        <div className="devtools-fps-meter" title={`MaxFPS: ${maxFPS}`}>
+            <div className="fps-meter-barchart">
                 {history.map(({ ts, value }) => (
                     <div
                         key={ts}
-                        className="w-1 bg-white first:rounded-l last:rounded-r"
+                        className="fps-meter-bar"
                         style={{
                             height: `${(value / maxFPS) * 100}%`,
                         }}
@@ -61,9 +58,8 @@ function FPSDisplay({ fps }: { fps: number }) {
     }
 
     return (
-        <span className="font-mono">
-            <span style={{ color }}>{fps}</span>
-            {" FPS"}
+        <span className="font-mono" style={{ color }}>
+            {fps}
         </span>
     )
 }

@@ -38,7 +38,7 @@ const rosepineTheme = {
 }
 
 export const ReduxDevTools = createDevTools(
-    <InspectorMonitor tabs={tabs} invertTheme={false} theme={rosepineTheme} />,
+    <InspectorMonitor tabs={tabs} invertTheme={true} theme={rosepineTheme} />,
 )
 
 export const instrument = ReduxDevTools.instrument({
