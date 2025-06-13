@@ -438,7 +438,7 @@ async function decryptChangeLogEntries(
 
     for (let entry of encrytpedEntries) {
         let [decrypted, err] = await decrypter.decryptData(
-            dataFromBase64(entry.data),
+            dataFromBase64(entry.data)[0],
         )
         if (err) {
             return wrapErr`error decrytping changelog entry: ${err}`

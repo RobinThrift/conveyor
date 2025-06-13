@@ -30,7 +30,7 @@ suite("api/syncv1/AccountKeysV1APIClient", async () => {
                     assert.equal(body.name, PrimaryAccountKeyName)
                     assert.equal(body.type, AgeV1AccountKeyType)
                     assert.equal(
-                        decodeText(dataFromBase64(body.data)),
+                        decodeText(dataFromBase64(body.data)[0]),
                         accountKey,
                     )
 

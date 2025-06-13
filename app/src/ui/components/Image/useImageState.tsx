@@ -54,10 +54,18 @@ function parseImgURL(
         return
     }
 
+    let thumbhash: string | undefined
+    if (attachment.thumbhash) {
+        let [dataURL, thErr] = thumbhashToDataURL(attachment.thumbhash)
+        if (thErr) {
+            console.error(thErr)
+        } else {
+            thumbhash = dataURL
+        }
+    }
+
     return {
         ...attachment,
-        thumbhash: attachment.thumbhash
-            ? thumbhashToDataURL(attachment.thumbhash)
-            : undefined,
+        thumbhash,
     }
 }

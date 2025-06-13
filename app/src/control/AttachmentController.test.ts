@@ -195,7 +195,7 @@ suite("control/AttachmentController", () => {
             originalFilename: "test.txt",
             sha256: dataFromBase64(
                 "Qre2VSnlfbVQVK6Bedy8NNSTR20zySWH3XKjtGnfuEs=",
-            ),
+            )[0],
             sizeBytes: 23,
             createdAt: row.createdAt,
         })

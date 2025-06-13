@@ -495,9 +495,13 @@ export class SyncController {
         let entries: ChangelogEntry[] = []
 
         for (let entry of encrytpedEntries) {
-            let [decrypted, decryptionErr] = await this._crypto.decryptData(
-                dataFromBase64(entry.data),
-            )
+            let [data, decodeErr] = dataFromBase64(entry.data)
+            if (decodeErr) {
+                return wrapErr`error decoding changelog entry base64 data: ${decodeErr}`
+            }
+
+            let [decrypted, decryptionErr] =
+                await this._crypto.decryptData(data)
             if (decryptionErr) {
                 return wrapErr`error decrytping changelog entry: ${decryptionErr}`
             }

@@ -269,12 +269,20 @@ export class AttachmentController {
                 let attachment = entry.value.created
                 let [_, err] = await this._transactioner.inTransaction(
                     ctx,
-                    (ctx) =>
-                        this._repo.createAttachment(ctx, {
+                    (ctx) => {
+                        let [sha256, sha256Err] = dataFromBase64(
+                            attachment.sha256,
+                        )
+                        if (sha256Err) {
+                            return Promise.resolve(Err(sha256Err))
+                        }
+
+                        return this._repo.createAttachment(ctx, {
                             ...attachment,
                             id: entry.targetID,
-                            sha256: dataFromBase64(attachment.sha256),
-                        }),
+                            sha256,
+                        })
+                    },
                 )
                 if (err) {
                     return Err(err)

@@ -1,3 +1,5 @@
+import { Err, Ok, type Result } from "./result"
+
 export function encodeToBase64(
     data: ArrayBuffer | Uint8Array<ArrayBufferLike>,
 ): string {
@@ -20,17 +22,27 @@ export function encodeToBase64(
     return btoa(String.fromCharCode(...arr))
 }
 
-export function dataFromBase64(data: string): Uint8Array<ArrayBufferLike> {
+export function dataFromBase64(
+    data: string,
+): Result<Uint8Array<ArrayBufferLike>> {
     if (
         "fromBase64" in Uint8Array &&
         typeof Uint8Array.fromBase64 === "function"
     ) {
-        return Uint8Array.fromBase64(data) as Uint8Array<ArrayBufferLike>
+        try {
+            return Ok(
+                Uint8Array.fromBase64(data) as Uint8Array<ArrayBufferLike>,
+            )
+        } catch (err) {
+            return Err(err as Error)
+        }
     }
 
-    return new Uint8Array(
-        atob(data)
-            .split("")
-            .map((x) => x.charCodeAt(0)),
+    return Ok(
+        new Uint8Array(
+            atob(data)
+                .split("")
+                .map((x) => x.charCodeAt(0)),
+        ),
     )
 }

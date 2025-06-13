@@ -1,4 +1,5 @@
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
+import { type Result, fromThrowing, wrapErr } from "@/lib/result"
 import * as ThumbHash from "./thumbhash"
 
 export async function thumbhashFromFile(data: File | Blob): Promise<string> {
@@ -33,6 +34,10 @@ export async function thumbhashFromFile(data: File | Blob): Promise<string> {
     return encodeToBase64(binaryThumbHash)
 }
 
-export function thumbhashToDataURL(str: string): string {
-    return ThumbHash.thumbHashToDataURL(dataFromBase64(str))
+export function thumbhashToDataURL(str: string): Result<string> {
+    let [data, decodeErr] = dataFromBase64(str)
+    if (decodeErr) {
+        return wrapErr`error converting thunmbhash to data URL: error decoding data: ${decodeErr}`
+    }
+    return fromThrowing(() => ThumbHash.thumbHashToDataURL(data))
 }
