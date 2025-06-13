@@ -4,7 +4,6 @@
 package app
 
 import (
-	_ "embed"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
