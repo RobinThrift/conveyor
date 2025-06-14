@@ -25,6 +25,7 @@ export function NewMemoEditor(props: NewMemoEditorProps) {
                     vimModeEnabled={settings.vimModeEnabled}
                     onSave={createMemo}
                     transferAttachment={transferAttachment}
+                    autoFocus={true}
                 />
             </div>
             <LinkButton
