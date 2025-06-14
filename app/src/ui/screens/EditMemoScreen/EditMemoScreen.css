@@ -1,14 +1,18 @@
 .edit-memo-screen {
-    @apply container mx-auto max-w-[80rem] h-full w-full p-2 lg:p-4 relative;
+    @apply container mx-auto max-w-[80rem] h-full w-full px-2 lg:p-4 relative;
     min-height: 100dvh;
 
     .memo {
-        @apply shadow-md;
+        @apply shadow-md px-0!;
         min-height: calc(
             100dvh -
             (env(safe-area-inset-bottom, 0) + var(--spacing) * 4) -
             2lh
         );
+
+        .text-editor {
+            @apply px-4;
+        }
 
         @media (max-width: 768px) {
             @apply rounded-none border-0 border-b;
