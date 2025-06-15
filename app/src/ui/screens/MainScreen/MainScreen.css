@@ -36,11 +36,13 @@
         }
 
         @media (min-width: 1440px) {
+            @apply pt-2;
             order: 1;
         }
 
         @media (min-width: 1680px) {
-            padding: 0 calc(var(--sidebar-width) + var(--spacing) * 4);
+            order: 2;
+            padding-right: calc(var(--sidebar-width) + var(--spacing) * 4);
         }
     }
 }
@@ -102,7 +104,6 @@
             @apply flex-1;
             order: 2;
             position: relative;
-            overflow: auto;
 
             @media (max-width: 1023px) {
                 z-index: 10;
@@ -121,8 +122,9 @@
 
             @media (min-width: 1680px) {
                 order: 1;
-                position: fixed;
+                position: relative;
                 width: var(--sidebar-width);
+                height: auto;
                 padding-right: 0;
             }
         }
@@ -139,7 +141,7 @@
             @media (min-width: 1024px) {
                 .memo-list-day-group:nth-of-type(2) {
                     .memo-list-day {
-                        margin-top: var(--appheader-height);
+                        @apply mt-1;
                     }
                 }
             }
