@@ -4,8 +4,9 @@
 
 .editor-toolbar {
     @apply bg-surface-level-1 flex gap-1 items-center rounded-t overflow-x-auto;
-    @apply fixed left-0 right-0 h-[2lh] bottom-0;
+    @apply fixed left-0 right-0 bottom-0;
     box-shadow: -1px -2px 4px -2px rgba(0 0 0 / 0.1);
+    height: 2lh;
 
     transform: translateY(var(--toolbar-offset, 0));
 

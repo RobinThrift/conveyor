@@ -33,7 +33,6 @@ import { inlineImages } from "./inlineImages"
 import { markdownDecorations } from "./markdownDecorations"
 import { tagAutoComplete } from "./tagAutoComplete"
 import { theme } from "./theme"
-import { toolbarPositionFix } from "./toolbarPositionFix"
 import { vim } from "./vim"
 
 export const extensions = ({
@@ -81,7 +80,6 @@ export const extensions = ({
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         inlineImages(getAttachmentDataByID),
         markdownDecorations,
-        toolbarPositionFix,
     ]
 
     if (placeholder) {

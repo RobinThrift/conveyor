@@ -23,8 +23,9 @@ import { decodeText } from "@/lib/textencoding"
 import type { ToolbarCommands } from "./TextEditor"
 import type { PasteItem } from "./commands"
 
-// biome-ignore lint/style/noNonNullAssertion: this is given
-let initViewport = window.visualViewport!
+let initViewport = getVisualViewport()
+
+const resetPosition = "0px"
 
 export function Toolbar({
     toggleBold,
@@ -35,112 +36,7 @@ export function Toolbar({
     pasteFromClipboard: paste,
 }: ToolbarCommands) {
     let t = useT("components/Editor/Toolbar")
-    let ref = useRef<HTMLDivElement | null>(null)
-
-    let lastScrollPos = useRef<number>(initViewport.pageTop)
-    let dirChangeStart = useRef<number>(initViewport.pageTop)
-
-    let animFrame = useRef<
-        ReturnType<typeof requestAnimationFrame> | undefined
-    >(undefined)
-
-    useEffect(() => {
-        let reposition = () => {
-            if (!ref.current) {
-                return
-            }
-
-            if (document.activeElement === document.body) {
-                ref.current.style.setProperty("--toolbar-offset", "0px")
-                return
-            }
-
-            // biome-ignore lint/style/noNonNullAssertion: this is given
-            let vp = window.visualViewport!
-            let pageTop = vp.pageTop
-
-            let height = vp.height
-            let windowHeight = window.innerHeight
-
-            let lastPageTop = lastScrollPos.current
-            lastScrollPos.current = pageTop
-
-            if (windowHeight <= height) {
-                ref.current.style.setProperty("--toolbar-offset", "0px")
-                return
-            }
-
-            if (pageTop < windowHeight - height && lastPageTop !== pageTop) {
-                let offset = -Math.floor(
-                    windowHeight - height - Math.max(pageTop, 0),
-                )
-                ref.current.style.setProperty("--toolbar-offset", `${offset}px`)
-                requestReposition()
-                return
-            }
-
-            if (lastPageTop < pageTop) {
-                dirChangeStart.current = pageTop
-                ref.current.style.setProperty("--toolbar-offset", "0px")
-                requestReposition()
-                return
-            }
-
-            let rect = ref.current.getBoundingClientRect()
-            let currOffset = Number.parseInt(
-                ref.current.style.getPropertyValue("--toolbar-offset") ?? "",
-                10,
-            )
-            let delta = Math.floor(rect.bottom - vp.height - currOffset)
-            ref.current.style.setProperty("--toolbar-offset", `${-delta}px`)
-        }
-
-        let requestReposition = () => {
-            if (animFrame.current) {
-                cancelAnimationFrame(animFrame.current)
-            }
-
-            animFrame.current = requestAnimationFrame(() => {
-                reposition()
-            })
-        }
-
-        let onresize = () => {
-            // biome-ignore lint/style/noNonNullAssertion: this is given
-            let vp = window.visualViewport!
-            let pageTop = vp.pageTop
-            lastScrollPos.current = pageTop
-            reposition()
-        }
-
-        let onscroll = () => {
-            requestReposition()
-        }
-
-        let onblur = () => {
-            if (ref.current) {
-                ref.current.style.setProperty("--toolbar-offset", "0px")
-            }
-        }
-
-        window.visualViewport?.addEventListener("resize", onresize, {
-            passive: true,
-        })
-
-        window.visualViewport?.addEventListener("scroll", onscroll, {
-            passive: true,
-        })
-
-        window.addEventListener("focusout", onblur, {
-            passive: true,
-        })
-
-        return () => {
-            window.visualViewport?.removeEventListener("resize", onresize)
-            window.visualViewport?.removeEventListener("scroll", onscroll)
-            window.removeEventListener("focusout", onblur)
-        }
-    }, [])
+    let ref = useToolbarPosition()
 
     return (
         <AriaToolbar className="editor-toolbar" aria-label={t.Label} ref={ref}>
@@ -358,4 +254,149 @@ function PasteMenu({
             </DropdownMenu.Items>
         </DropdownMenu>
     )
+}
+
+function useToolbarPosition() {
+    let ref = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+        if (!ref.current) {
+            return
+        }
+
+        let reposition = () => {
+            if (!ref.current) {
+                return
+            }
+
+            let vp = getVisualViewport()
+            let windowHeight = window.innerHeight
+
+            if (vp.pageTop < 0) {
+                animFrame = requestAnimationFrame(() => {
+                    reposition()
+                })
+                return
+            }
+
+            if (
+                document.activeElement === document.body ||
+                windowHeight <= vp.height
+            ) {
+                setToolbarOffset(ref.current)
+                return
+            }
+
+            let { bottom } = ref.current.getBoundingClientRect()
+            let currOffset = getToolbarOffset(ref.current)
+            let delta = Math.max(Math.floor(bottom - vp.height - currOffset), 0)
+            if (-delta !== currOffset) {
+                setToolbarOffset(ref.current, `${-delta}px`)
+            }
+
+            animFrame = requestAnimationFrame(() => {
+                reposition()
+            })
+        }
+        let animFrame: ReturnType<typeof requestAnimationFrame> | undefined =
+            undefined
+
+        let unsubResize = onResizeVisualViewport((resizedVp) => {
+            if (animFrame) {
+                cancelAnimationFrame(animFrame)
+            }
+
+            if (resizedVp.height < initViewport.height) {
+                animFrame = requestAnimationFrame(() => {
+                    reposition()
+                })
+
+                requestAnimationFrame(() => {
+                    if (!ref.current) {
+                        return
+                    }
+
+                    let selection = window.getSelection()
+                    if (!selection || selection.type !== "Caret") {
+                        return
+                    }
+
+                    let selectionRect = selection
+                        .getRangeAt(0)
+                        .getBoundingClientRect()
+                    if (selectionRect.height === 0) {
+                        return
+                    }
+
+                    let rect = ref.current.getBoundingClientRect()
+                    if (rect.height === 0) {
+                        return
+                    }
+
+                    let diff = selectionRect.top - rect.top
+                    if (selectionRect.top > rect.top) {
+                        document.documentElement.scrollTo({
+                            left: document.documentElement.scrollLeft,
+                            top:
+                                document.documentElement.scrollTop +
+                                diff +
+                                selectionRect.height * 2,
+                            behavior: "smooth",
+                        })
+                    }
+                })
+
+                return
+            }
+
+            if (ref.current) {
+                setToolbarOffset(ref.current)
+            }
+        })
+
+        return () => {
+            unsubResize()
+        }
+    })
+
+    return ref
+}
+
+function setToolbarOffset(el: HTMLElement, offset: string = resetPosition) {
+    el.style.setProperty("--toolbar-offset", offset)
+}
+
+function getToolbarOffset(el: HTMLElement) {
+    return (
+        Number.parseInt(
+            el.style.getPropertyValue("--toolbar-offset") ?? "0px",
+            10,
+        ) || 0
+    )
+}
+
+function getVisualViewport() {
+    // biome-ignore lint/style/noNonNullAssertion: this must be set
+    let vp = window.visualViewport!
+    return {
+        height: vp.height,
+        pageTop: vp.pageTop,
+    }
+}
+
+function onResizeVisualViewport(
+    cb: (vp: ReturnType<typeof getVisualViewport>) => void,
+) {
+    let onresize = () => {
+        let updated = getVisualViewport()
+        cb({ height: updated.height, pageTop: vp.pageTop })
+    }
+
+    // biome-ignore lint/style/noNonNullAssertion: this must be set
+    let vp = window.visualViewport!
+    vp.addEventListener("resize", onresize, { passive: true })
+
+    return () => {
+        vp.removeEventListener("resize", onresize)
+    }
 }
