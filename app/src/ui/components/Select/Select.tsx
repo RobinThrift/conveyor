@@ -1,24 +1,13 @@
 import clsx from "clsx"
 import React, { useCallback } from "react"
-import {
-    Button as AriaButton,
-    Header as AriaHeader,
-    Label as AriaLabel,
-    ListBox as AriaListBox,
-    ListBoxItem as AriaListBoxItem,
-    ListBoxSection as AriaListBoxSection,
-    Popover as AriaPopover,
-    Select as AriaSelect,
-    SelectValue as AriaSelectValue,
-    type Key,
-} from "react-aria-components"
 
 import { CaretDownIcon } from "@/ui/components/Icons"
 
 export interface SelectProps<T extends string = string> {
     className?: string
+    fieldClassName?: string
+    wrapperClassName?: string
     labelClassName?: string
-    buttonClassName?: string
     label?: string
     name: string
     value?: T
@@ -28,52 +17,41 @@ export interface SelectProps<T extends string = string> {
         | React.ReactElement<SelectOptionProps>
         | React.ReactElement<SelectOptionProps>[]
     onChange: (value?: T) => void
-    "aria-labeledby"?: string
 }
 
 export function Select<T extends string = string>(props: SelectProps<T>) {
-    let onSelectionChange = useCallback(
-        (value: Key | null) => {
-            props.onChange(value ? (value as T) : undefined)
+    let onChange = useCallback(
+        (e: React.ChangeEvent<HTMLSelectElement>) => {
+            props.onChange(e.target.value as T)
         },
         [props.onChange],
     )
 
     return (
-        <AriaSelect
-            name={props.name}
-            onSelectionChange={onSelectionChange}
-            defaultSelectedKey={props.value}
-            isDisabled={props.isDisabled}
-            placeholder={props.placeholder}
-            className={props.className}
-            aria-labelledby={props["aria-labeledby"] ?? `${props.name}-value`}
-        >
+        <div className={clsx("select-field", props.fieldClassName)}>
             {props.label && (
-                <AriaLabel
+                <label
                     className={clsx("select-label", props.labelClassName)}
+                    htmlFor={props.name}
                 >
                     {props.label}
-                </AriaLabel>
+                </label>
             )}
-            <AriaButton
-                className={clsx(
-                    "select-input",
-                    props.buttonClassName ?? "input",
-                )}
-            >
-                <AriaSelectValue id={`${props.name}-value`} />
-                <span aria-hidden="true">
-                    <CaretDownIcon />
-                </span>
-            </AriaButton>
 
-            <AriaPopover>
-                <AriaListBox className="select-list">
+            <div className={clsx("select-wrapper", props.wrapperClassName)}>
+                <select
+                    name={props.name}
+                    id={props.name}
+                    disabled={props.isDisabled}
+                    onChange={onChange}
+                    className={clsx("select", props.className)}
+                >
                     {props.children}
-                </AriaListBox>
-            </AriaPopover>
-        </AriaSelect>
+                </select>
+
+                <CaretDownIcon className="select-arrow" />
+            </div>
+        </div>
     )
 }
 
@@ -87,10 +65,9 @@ export interface SelectOptionGroupProps {
 
 export function OptionGroup(props: SelectOptionGroupProps) {
     return (
-        <AriaListBoxSection className="select-group">
-            <AriaHeader>{props.label}</AriaHeader>
+        <optgroup className="select-group" label={props.label}>
             {props.children}
-        </AriaListBoxSection>
+        </optgroup>
     )
 }
 
@@ -103,13 +80,12 @@ export interface SelectOptionProps<T extends string = string> {
 
 export function Option(props: SelectOptionProps) {
     return (
-        <AriaListBoxItem
-            id={props.value}
+        <option
             className={clsx("select-item", props.className)}
-            textValue={props.value}
-            isDisabled={props.isDisabled}
+            disabled={props.isDisabled}
+            value={props.value}
         >
             {props.children}
-        </AriaListBoxItem>
+        </option>
     )
 }

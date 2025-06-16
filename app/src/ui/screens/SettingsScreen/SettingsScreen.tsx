@@ -1,9 +1,5 @@
 import React, { type Key, useCallback } from "react"
 import {
-    Dialog as AriaDialog,
-    Heading as AriaHeading,
-    Modal as AriaModal,
-    ModalOverlay as AriaModalOverlay,
     Tab as AriaTab,
     TabList as AriaTabList,
     TabPanel as AriaTabPanel,
@@ -11,6 +7,7 @@ import {
 } from "react-aria-components"
 import { useSelector } from "react-redux"
 
+import { Dialog } from "@/ui/components/Dialog"
 import {
     CloudCheckIcon,
     CloudSlashIcon,
@@ -19,14 +16,12 @@ import {
     InfoIcon,
     KeyIcon,
     PaletteIcon,
-    XIcon,
 } from "@/ui/components/Icons"
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
 import { useCurrentPage, useNavigation } from "@/ui/navigation"
 import { selectors } from "@/ui/state"
 
-import { Button } from "@/ui/components/Button"
 import { APITokensTab } from "./APITokensTab"
 import { AboutTab } from "./AboutTab"
 import { DataTab } from "./DataTab"
@@ -36,40 +31,23 @@ import { SyncSettingsTab } from "./SyncSettingsTab"
 import { useSettingsModalState } from "./useSettingsModalState"
 
 export function SettingsScreen() {
-    let {
-        isOpen,
-        animRef,
-        onPointerDown,
-        onPointerCancel,
-        onPointerMove,
-        close,
-    } = useSettingsModalState()
+    let { isOpen, onClose } = useSettingsModalState()
 
     return (
-        <AriaModalOverlay
-            className="settings-modal-overlay"
-            isOpen={isOpen}
-            isDismissable={false}
-            isKeyboardDismissDisabled={false}
+        <Dialog
+            isModal={true}
+            open={isOpen}
+            isKeyboardDismissable={false}
+            onClose={onClose}
         >
-            <AriaModal className="settings-modal" ref={animRef}>
-                <div className="sync-indicator" aria-hidden />
-                <AriaDialog className="settings-dialog">
-                    <SettingsScreenContent close={close} />
-                </AriaDialog>
-            </AriaModal>
-            <div
-                className="settings-modal-drag-handle"
-                onPointerDown={onPointerDown}
-                onPointerUp={onPointerCancel}
-                onPointerMove={onPointerMove}
-                onPointerCancel={onPointerCancel}
-            />
-        </AriaModalOverlay>
+            <Dialog.Content className="settings-dialog">
+                <SettingsScreenContent />
+            </Dialog.Content>
+        </Dialog>
     )
 }
 
-function SettingsScreenContent({ close }: { close?: () => void }) {
+function SettingsScreenContent() {
     let t = useT("screens/Settings")
     let isSyncEnabled = useSelector(selectors.sync.isEnabled)
 
@@ -88,16 +66,9 @@ function SettingsScreenContent({ close }: { close?: () => void }) {
 
     return (
         <div className="settings-screen">
-            <AriaHeading level={1} slot="title">
-                {t.Title}
-            </AriaHeading>
-            <Button
-                plain
-                iconRight={<XIcon />}
-                aria-label="Close"
-                className="settings-dialog-close-btn"
-                onPress={close}
-            />
+            <Dialog.Title>
+                <h1>{t.Title}</h1>
+            </Dialog.Title>
 
             <AriaTabs
                 selectedKey={tab}

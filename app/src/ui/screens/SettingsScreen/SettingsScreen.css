@@ -1,94 +1,40 @@
-.settings-modal-overlay {
-    @apply fixed left-0 top-0 bottom-0 right-0 flex items-end xs:items-center justify-center;
-    background-color: color-mix(
-        in srgb,
-        var(--color-modal-overlay-bg) 80%,
-        transparent
-    );
-    z-index: 9999;
-    backdrop-filter: blur(2px);
-    transition: background-color 100ms;
+.settings-dialog {
+    @apply border border-subtle-extra-light dark:border-subtle-extra-dark p-0!;
 
-    &[data-entering] {
-        background-color: transparent;
+    .dialog-close {
+        @apply right-2 top-3 xs:right-3;
     }
 
-    &[data-exiting] {
-        background-color: transparent;
-    }
-}
-
-.settings-modal {
-    @apply relative rounded-lg bg-surface-level-1 border shadow-lg xs:max-w-[95dvw] md:max-w-6xl w-full;
-    @apply border-subtle-extra-light dark:border-subtle-extra-dark;
-    animation-fill-mode: both;
-
-    height: 95svh;
-
-    @media (min-width: 1024px) {
+    @media (min-width: 768px) {
+        @apply max-w-6xl;
+        width: 100%;
         height: 80svh;
-    }
-
-    &[data-entering] {
-        @apply animate-in slide-in-from-bottom ease-linear duration-100;
-        @apply xs:fade-in xs:slide-in-from-bottom-0;
-    }
-
-    &[data-exiting] {
-        @apply animate-out slide-out-to-bottom ease-linear duration-100;
-        @apply xs:fade-out xs:slide-out-to-bottom-0;
     }
 }
 
 @property --sync-indicator-angle {
     syntax: "<angle>";
-    initial-value: 0deg;
+    initial-value: 45deg;
     inherits: false;
 }
 
-.sync-indicator {
-    @apply rounded-lg absolute hidden;
-    overflow: hidden;
-
-    left: -1px;
-    top: -1px;
-    right: -1px;
-    bottom: -1px;
-
+.settings-dialog:has(.is-syncing) {
+    overflow: visible;
     &::before {
-        --sync-indicator-angle: 0deg;
-        content: "";
+        @apply rounded-2xl inset-0 border-2 border-primary;
         display: block;
+        content: "";
         position: absolute;
-        left: calc(var(--spacing) * -1);
-        top: calc(var(--spacing) * -1);
-        right: calc(var(--spacing) * -1);
-        bottom: calc(var(--spacing) * -1);
-        background: repeating-conic-gradient(
-                from var(--sync-indicator-angle),
-                transparent 0% 40%,
-                var(--color-primary-dark) 50%,
-                transparent 60%
-            )
-            border-box;
+        pointer-events: none;
         animation: sync-rotate-border 5s linear infinite;
-    }
-
-    &::after {
-        @apply rounded-lg bg-surface-level-1;
-        content: "";
-        display: block;
-        position: absolute;
-        left: var(--spacing);
-        top: var(--spacing);
-        right: var(--spacing);
-        bottom: var(--spacing);
-    }
-}
-
-.settings-modal:has(.is-syncing) {
-    .sync-indicator {
-        display: block;
+        mask: conic-gradient(#000 0 0) content-box,
+            linear-gradient(
+                var(--sync-indicator-angle),
+                #0000 30%,
+                #000 40% 60%,
+                #0000 70%
+            )
+            subtract, conic-gradient(#000 0 0) padding-box;
     }
 }
 
@@ -102,32 +48,8 @@
     }
 }
 
-.settings-modal-drag-handle {
-    @apply xs:hidden text-3xl;
-    position: absolute;
-    left: 0;
-    top: calc(5svh + env(safe-area-inset-top, 0));
-    width: 100%;
-    height: 2lh;
-    z-index: 10000;
-    touch-action: none;
-
-    @media (min-width: 1024px) {
-        top: 20svh;
-    }
-}
-
-.settings-dialog {
-    @apply h-full focus:outline-hidden relative;
-}
-
-.settings-dialog-close-btn {
-    @apply absolute top-3 right-2 size-10;
-    z-index: 11000;
-}
-
 .settings-screen {
-    @apply h-full flex flex-col;
+    @apply h-full flex flex-col relative;
     h1 {
         @apply w-full text-3xl font-serif p-3 xs:p-5 xs:py-4 relative;
     }

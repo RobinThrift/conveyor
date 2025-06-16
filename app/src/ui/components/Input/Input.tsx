@@ -81,6 +81,8 @@ export function Input(props: InputProps) {
                         )}
                         placeholder={props.placeholder}
                         autoComplete={autocomplete}
+                        // biome-ignore lint/a11y/noAutofocus: controlled by prop
+                        autoFocus={props.autoFocus}
                         required={props.required}
                         disabled={props.disabled}
                         onKeyUp={props.onKeyUp}

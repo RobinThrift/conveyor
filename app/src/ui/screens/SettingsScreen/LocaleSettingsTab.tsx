@@ -65,7 +65,7 @@ export function LocaleSettingsTab() {
             </header>
 
             <div className="settings-section">
-                <div className="sm:mb-0 md:grid grid-cols-6 space-y-1">
+                <div className="sm:mb-0 md:grid grid-cols-6 space-y-2">
                     <label
                         htmlFor="language"
                         className="flex items-center font-semibold text-sm"
@@ -73,7 +73,8 @@ export function LocaleSettingsTab() {
                         {t.LabelSelectLanguage}
                     </label>
                     <Select
-                        className="col-span-5"
+                        fieldClassName="col-span-5"
+                        wrapperClassName="w-full"
                         name="language"
                         onChange={onChangeLanguage}
                         value={lang}
@@ -82,7 +83,7 @@ export function LocaleSettingsTab() {
                     </Select>
                 </div>
 
-                <div className="sm:mb-0 md:grid grid-cols-6 space-y-1">
+                <div className="sm:mb-0 md:grid grid-cols-6 space-y-2 mt-2">
                     <label
                         htmlFor="region"
                         className="flex items-center font-semibold text-sm"
@@ -90,7 +91,8 @@ export function LocaleSettingsTab() {
                         {t.LabelSelectRegion}
                     </label>
                     <Select
-                        className="col-span-5"
+                        fieldClassName="col-span-5"
+                        wrapperClassName="w-full"
                         name="region"
                         onChange={onChangeRegion}
                         value={region}

@@ -107,14 +107,12 @@ export function AuthForm(props: AuthFormProps) {
             </Form>
 
             <Dialog
-                modal={true}
-                dismissible={false}
-                defaultOpen={showChangePasswordDialog}
+                isModal={true}
+                isKeyboardDismissable={false}
+                autofocus={false}
                 open={showChangePasswordDialog}
-                onOpenChange={(isOpen) => {
-                    if (!isOpen) {
-                        cancelPasswordChangeDialog()
-                    }
+                onClose={() => {
+                    cancelPasswordChangeDialog()
                 }}
             >
                 <Dialog.Content className="change-password-dialog">

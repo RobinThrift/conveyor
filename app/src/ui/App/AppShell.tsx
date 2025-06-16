@@ -66,7 +66,7 @@ export function AppShell() {
                     return [
                         ...(prevPageComp ?? []),
                         <Suspense key="settings-screen-overlay-suspense">
-                            <SettingsScreen key="settings-screen-overlay" />,
+                            <SettingsScreen key="settings-screen-overlay" />
                         </Suspense>,
                     ]
             }

@@ -21,6 +21,7 @@
         outline-style: solid;
         outline-color: var(--btn-bg-active);
         outline-width: 1px;
+        outline-offset: 1px;
     }
 
     &:active {

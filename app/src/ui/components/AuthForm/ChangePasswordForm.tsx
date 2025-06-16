@@ -71,6 +71,7 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
                 label={t.FieldCurrentPasswordLabel}
                 ariaLabel={t.FieldCurrentPasswordLabel}
                 autoComplete="current_password"
+                autoFocus={true}
                 required
                 messages={t}
                 className="md:grid grid-cols-6 space-y-1"

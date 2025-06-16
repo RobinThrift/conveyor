@@ -1,107 +1,157 @@
-import { Dialog as BaseUIDialog } from "@base-ui-components/react/dialog"
 import clsx from "clsx"
-import React from "react"
+import React, { useContext } from "react"
 
 import { Button, type ButtonProps } from "@/ui/components//Button"
 import { XIcon } from "@/ui/components/Icons"
+import { dialogContext } from "./context"
+import { useDialog, useDialogDragHandle } from "./useDialog"
 
-export interface DialogProps extends BaseUIDialog.Root.Props {}
-
-export function Dialog(props: DialogProps) {
-    return <BaseUIDialog.Root {...props} />
+export type DialogProps = {
+    open?: boolean
+    isModal?: boolean
+    isKeyboardDismissable?: boolean
+    autofocus?: boolean
+    children: React.ReactNode | React.ReactNode[]
+    defaultOpen?: boolean
+    onClose?: () => void
 }
 
-Dialog.Trigger = DialogTrigger
+export function Dialog(props: DialogProps) {
+    let ctx = useDialog(props)
+    return (
+        <dialogContext.Provider value={ctx}>
+            {props.children}
+        </dialogContext.Provider>
+    )
+}
+
 Dialog.Content = DialogContent
+Dialog.Trigger = DialogTrigger
 Dialog.Title = DialogTitle
 Dialog.Description = DialogDescription
 Dialog.Buttons = DialogButtons
 Dialog.CloseButton = DialogCloseButton
 
-export interface DialogTriggerProps extends ButtonProps {}
-
-export function DialogTrigger(props: DialogTriggerProps) {
-    return (
-        <BaseUIDialog.Trigger
-            disabled={props.isDisabled}
-            render={(triggerProps) => (
-                <Button
-                    {...props}
-                    {...triggerProps}
-                    className={clsx("dialog-btn", props.className)}
-                />
-            )}
-        />
-    )
-}
-
-export interface DialogContentProps extends BaseUIDialog.Popup.Props {
+export type DialogContentProps = {
+    className?: string
     withCloseButton?: boolean
+    children: React.ReactNode | React.ReactNode[]
 }
 
-export function DialogContent({
-    withCloseButton = true,
-    className,
-    ...props
-}: DialogContentProps) {
-    return (
-        <BaseUIDialog.Portal>
-            <BaseUIDialog.Backdrop className="dialog-backdrop" />
-            <BaseUIDialog.Popup
-                className={clsx("dialog", className)}
-                {...props}
-            >
-                {withCloseButton && (
-                    <BaseUIDialog.Close
-                        render={(closeProps) => {
-                            return (
-                                <Button
-                                    iconRight={<XIcon />}
-                                    ariaLabel="Close"
-                                    className="dialog-close"
-                                    plain
-                                    {...closeProps}
-                                />
-                            )
-                        }}
-                    />
-                )}
+export function DialogContent(props: DialogContentProps) {
+    let dialogCtx = useContext(dialogContext)
+    let { onPointerDown, onPointerCancel, onPointerMove } = useDialogDragHandle(
+        {
+            ref: dialogCtx?.ref ?? (undefined as any),
+            onClose: dialogCtx?.close ?? (() => {}),
+        },
+    )
 
-                {props.children}
-            </BaseUIDialog.Popup>
-        </BaseUIDialog.Portal>
+    if (!dialogCtx) {
+        throw new Error(
+            "<DialogContent> component called outside of <Dialog> component",
+        )
+    }
+
+    let withCloseButton = props.withCloseButton ?? true
+
+    return (
+        <dialog
+            ref={dialogCtx.ref}
+            // biome-ignore lint/a11y/noAutofocus: controlled by prop
+            autoFocus={dialogCtx.autofocus}
+            open={dialogCtx.defaultOpen}
+            className={clsx(
+                "dialog",
+                { "is-modal": dialogCtx.isModal },
+                props.className,
+            )}
+            aria-labelledby={dialogCtx.labelledByID}
+            aria-describedby={dialogCtx.describedByID}
+            style={{ "--nested-dialogs": 0 } as React.CSSProperties}
+        >
+            {dialogCtx.isOpen && (
+                <React.Fragment>
+                    {withCloseButton && (
+                        <DialogCloseButton
+                            iconRight={<XIcon />}
+                            ariaLabel="Close"
+                            className="dialog-close"
+                            plain
+                        />
+                    )}
+
+                    {props.children}
+
+                    <div
+                        className="dialog-drag-handle"
+                        onPointerDown={onPointerDown}
+                        onPointerUp={onPointerCancel}
+                        onPointerMove={onPointerMove}
+                        onPointerCancel={onPointerCancel}
+                    />
+                </React.Fragment>
+            )}
+        </dialog>
     )
 }
 
-export type DialogTitleProps = BaseUIDialog.Title.Props
+export function DialogTrigger(props: Omit<ButtonProps, "onPress">) {
+    let dialogCtx = useContext(dialogContext)
+    if (!dialogCtx) {
+        throw new Error(
+            "<DialogTrigger> component called outside of <Dialog> component",
+        )
+    }
+
+    return <Button {...props} onPress={dialogCtx.open} />
+}
+
+export type DialogTitleProps = React.HTMLAttributes<HTMLDivElement>
 
 export function DialogTitle({ className, ...props }: DialogTitleProps) {
+    let dialogCtx = useContext(dialogContext)
+    if (!dialogCtx) {
+        throw new Error(
+            "<DialogTitle> component called outside of <Dialog> component",
+        )
+    }
+
     return (
-        <BaseUIDialog.Title
+        <div
             className={clsx("dialog-title", className)}
+            id={dialogCtx.labelledByID}
             {...props}
         >
             {props.children}
-        </BaseUIDialog.Title>
+        </div>
     )
 }
 
-export type DialogDescriptionProps = BaseUIDialog.Description.Props
+export type DialogDescriptionProps = React.HTMLAttributes<HTMLDivElement>
 
 export function DialogDescription({
     className,
     ...props
 }: DialogDescriptionProps) {
+    let dialogCtx = useContext(dialogContext)
+    if (!dialogCtx) {
+        throw new Error(
+            "<DialogDescription> component called outside of <Dialog> component",
+        )
+    }
+
     return (
-        <BaseUIDialog.Description
+        <div
+            id={dialogCtx.describedByID}
             className={clsx("dialog-description", className)}
             {...props}
         >
             {props.children}
-        </BaseUIDialog.Description>
+        </div>
     )
 }
-
+//
 export function DialogButtons({
     className,
     children,
@@ -109,22 +159,21 @@ export function DialogButtons({
     return <div className={clsx("dialog-btns", className)}>{children}</div>
 }
 
-export type DialogCloseButtonProps = ButtonProps
-
 export function DialogCloseButton({
     className,
     ...props
-}: DialogCloseButtonProps) {
+}: Omit<ButtonProps, "onPress">) {
+    let dialogCtx = useContext(dialogContext)
+    if (!dialogCtx) {
+        throw new Error(
+            "<DialogCloseButton> component called outside of <Dialog> component",
+        )
+    }
     return (
-        <BaseUIDialog.Close
-            render={(closeProps) => (
-                <Button
-                    outline
-                    {...props}
-                    {...closeProps}
-                    className={clsx("dialog-close-btn", className)}
-                />
-            )}
+        <Button
+            {...props}
+            className={clsx("dialog-close-btn", className)}
+            onPress={dialogCtx.close}
         />
     )
 }

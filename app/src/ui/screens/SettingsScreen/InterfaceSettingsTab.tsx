@@ -82,24 +82,30 @@ export function InterfaceSettingsTab() {
                     {t.SectionTheme}
                 </h3>
 
-                <div className="sm:mb-0 md:grid grid-cols-6 space-y-1">
+                <div className="sm:mb-0 md:grid grid-cols-6 space-y-2">
                     <label
                         htmlFor="colourscheme"
                         className="flex items-center font-semibold text-sm"
                     >
                         {t.LabelColourScheme}
                     </label>
-                    <SelectColourScheme className="col-span-5" />
+                    <SelectColourScheme
+                        fieldClassName="col-span-5"
+                        wrapperClassName="w-full"
+                    />
                 </div>
 
-                <div className="md:grid grid-cols-6 space-y-1">
+                <div className="md:grid grid-cols-6 mt-2 space-y-2">
                     <label
                         htmlFor="mode"
                         className="flex items-center mt-4 sm:mt-0 font-semibold text-sm"
                     >
                         {t.LabelModeOverride}
                     </label>
-                    <SelectMode className="col-span-5" />
+                    <SelectMode
+                        fieldClassName="col-span-5"
+                        wrapperClassName="w-full"
+                    />
                 </div>
             </div>
 

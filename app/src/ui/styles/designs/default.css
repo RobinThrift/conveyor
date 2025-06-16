@@ -27,7 +27,7 @@
     }
 
     .dialog {
-        @apply rounded-3xl p-4;
+        @apply rounded-t-2xl xs:rounded-2xl p-4;
     }
 
     .new-memo-editor .memo {
@@ -75,7 +75,7 @@
         }
     }
 
-    .select-input {
+    .select {
         @apply rounded-xl;
     }
 }

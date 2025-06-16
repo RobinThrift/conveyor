@@ -8,8 +8,12 @@ import { useSetting } from "@/ui/settings"
 
 export function SelectColourScheme({
     className,
+    fieldClassName,
+    wrapperClassName,
 }: {
     className?: string
+    fieldClassName?: string
+    wrapperClassName?: string
 }) {
     let t = useT("components/ThemeSwitcher")
     let [lightColourScheme, setLightColourScheme] = useSetting(
@@ -27,6 +31,8 @@ export function SelectColourScheme({
     return (
         <Select
             className={className}
+            fieldClassName={fieldClassName}
+            wrapperClassName={wrapperClassName}
             name="theme.colourScheme"
             label={t.SelectColourSchemeAriaLabel}
             labelClassName="sr-only"
@@ -42,8 +48,12 @@ export function SelectColourScheme({
 
 export function SelectMode({
     className,
+    fieldClassName,
+    wrapperClassName,
 }: {
     className?: string
+    fieldClassName?: string
+    wrapperClassName?: string
 }) {
     let t = useT("components/ThemeSwitcher")
     let [mode, setMode] = useSetting("ui.colourScheme.mode")
@@ -70,6 +80,8 @@ export function SelectMode({
         <Select
             name="theme.mode"
             className={className}
+            fieldClassName={fieldClassName}
+            wrapperClassName={wrapperClassName}
             label={t.SelectModeAriaLabel}
             labelClassName="sr-only"
             onChange={onChange}

@@ -155,14 +155,15 @@ function CreateNewAPIToken({
 
                 <div className="sm:mb-0 md:grid grid-cols-6 space-y-1">
                     <label
-                        htmlFor="mode"
+                        htmlFor="api_token_expires_in"
                         className="flex items-center mt-4 sm:mt-0 font-semibold text-sm col-span-2"
                     >
                         {t.FieldExpiresInLabel}
                     </label>
                     <Select
                         name="api_token_expires_in"
-                        className="col-span-4 py-2!"
+                        fieldClassName="col-span-4 py-2!"
+                        wrapperClassName="w-full"
                         value={expiresIn()}
                         onChange={onChangeExpiresIn}
                         isDisabled={isLoading}
