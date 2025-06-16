@@ -303,6 +303,9 @@ export function useDialogDragHandle({
                 )
                 animation.current.play()
             } else {
+                if (animation.current.currentTime < 0.1) {
+                    animation.current.currentTime = 0.1
+                }
                 animation.current.reverse()
             }
         },
