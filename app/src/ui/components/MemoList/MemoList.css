@@ -3,11 +3,13 @@
 }
 
 .memo-list-day {
-    @apply sticky py-1 px-2 w-fit rounded-lg top-2;
+    @apply sticky py-1 px-2 w-fit rounded-lg;
     @apply text-subtle-dark;
-    @apply bg-body/80 xs:top-2 xs:text-xl;
+    @apply bg-body/80 xs:text-xl;
 
     z-index: 200;
+
+    top: calc(var(--spacing) * 2 + env(safe-area-inset-top, 0));
 
     backdrop-filter: blur(4px);
 
