@@ -10,8 +10,6 @@ export function useImageState({
 }: {
     ref: React.RefObject<HTMLImageElement | null>
     src: string
-    alt: string
-    onError?: () => void
     style?: React.CSSProperties
 }) {
     let attachment = useMemo(() => parseImgURL(props.src), [props.src])

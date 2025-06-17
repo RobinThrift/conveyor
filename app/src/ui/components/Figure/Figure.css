@@ -1,6 +1,7 @@
 .figure {
     img {
         @apply rounded-lg;
+        transition: opacity 100ms;
     }
 }
 
@@ -17,7 +18,7 @@
 }
 
 .figure.is-zoomed img {
-    visibility: hidden;
+    opacity: 0;
 }
 
 .zoomed-img {
