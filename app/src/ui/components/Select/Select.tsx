@@ -45,6 +45,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
                     disabled={props.isDisabled}
                     onChange={onChange}
                     className={clsx("select", props.className)}
+                    value={props.value}
                 >
                     {props.children}
                 </select>
