@@ -45,12 +45,15 @@ export function useFigure(props: {
                             transform: `translateX(${translateX}px) translateY(${translateY}px) scaleX(${scaleX}) scaleY(${scaleY})`,
                         },
                     ],
-                    { duration: 200 },
+                    {
+                        duration: 300,
+                        easing: "linear(0, 0.379 5.6%, 0.66 11.7%, 0.855 18.5%, 0.924 22.3%, 0.976 26.4%, 1.01 33%, 1.025 41.1%, 1.005 72.8%, 1)",
+                    },
                 )
 
-                let imgAnim = imgRef.current?.animate([{ opacity: 1 }], {
+                let imgAnim = imgRef.current?.animate([{ opacity: 0.8 }], {
                     duration: 1,
-                    delay: 199,
+                    delay: 299,
                     fill: "forwards",
                 })
 
