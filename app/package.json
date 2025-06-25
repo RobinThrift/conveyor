@@ -38,9 +38,9 @@
         "tailwindcss": "^4.1.8",
         "tailwindcss-animate": "^1.0.7",
         "typescript": "^5.8.2",
-        "vite": "^6.3.5",
+        "vite": "^7.0.0",
         "vitest": "^3.2.0",
-        "vitest-browser-react": "^0.3.0"
+        "vitest-browser-react": "^1.0.0"
     },
     "dependencies": {
         "@codemirror/autocomplete": "^6.18.6",
