@@ -30,11 +30,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             __LOG_LEVEL__: JSON.stringify(
                 config.mode === "development" ? "debug" : "error",
             ),
-            __VERSION__: JSON.stringify(
-                vcsInfo.numCommits
-                    ? `${vcsInfo.version}-${vcsInfo.numCommits}`
-                    : vcsInfo.version,
-            ),
+            __VERSION__: JSON.stringify(`${vcsInfo.version}${vcsInfo.suffix}`),
             __COMMIT_HASH__: JSON.stringify(vcsInfo.hash),
             __COMMIT_DATE__: JSON.stringify(vcsInfo.date),
             __PROJECT_LINK__: JSON.stringify(
@@ -142,7 +138,7 @@ async function getVCSInfo() {
 
         return {
             version,
-            numCommits,
+            suffix: numCommits !== "0" ? `-${numCommits}` : "",
             hash: hash.substring(1),
             date,
         }
@@ -152,7 +148,7 @@ async function getVCSInfo() {
 
     return {
         version: "dev",
-        numCommits: "0",
+        suffix: "",
         hash: "dev",
         date: new Date(),
     }
