@@ -1,6 +1,7 @@
 import { awaitWithAbort } from "@/lib/awaitWithAbort"
 import { BaseContext, type Context } from "@/lib/context"
 import { Second } from "@/lib/duration"
+import { isErr } from "@/lib/errors"
 import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
 import { decodeText, encodeText } from "@/lib/textencoding"
 import { createWorker, isWorkerContext } from "@/lib/worker"
@@ -70,10 +71,7 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
         ])
 
         if (insertedErr) {
-            if (
-                insertedErr.name === "DataError" ||
-                (insertedErr.cause as Error)?.name === "DataErro"
-            ) {
+            if (isErr(insertedErr, "DataError")) {
                 ;[generatedKey, generatedKeyErr] =
                     await generateECDHLocalCryptoKey()
                 if (generatedKeyErr) {

@@ -3,13 +3,17 @@ export type ErrorCode = string & { readonly "": unique symbol }
 export function isErr<
     ToCheck extends Error,
     Target extends { new (...a: any[]): Error },
->(value: ToCheck | null | undefined, target: Target): boolean {
+>(value: ToCheck | null | undefined, target: Target | string): boolean {
     if (!value) {
         return false
     }
 
     if (value instanceof AggregateError) {
         return value.errors.some((err) => isErr(err, target))
+    }
+
+    if (typeof target === "string") {
+        return value.name === target || (value.cause as Error)?.name === target
     }
 
     if (
