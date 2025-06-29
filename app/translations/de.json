@@ -311,7 +311,8 @@
         "PublishDateLabel": "Veröffentlicht am:",
         "ServerVersionLabel": "Server Version:",
         "ServerPublishDateLabel": "Server Veröffentlicht on:",
-        "ServerGoVersionLabel": "Go Version:"
+        "ServerGoVersionLabel": "Go Version:",
+        "ChangelogLink": "Changelog"
     },
 
     "screens/Settings/Data": {

@@ -20,7 +20,15 @@ export function AboutTab() {
                         <dt>{t.VersionLabel}</dt>
                         <dd className="font-semibold">
                             {buildInfo.version} (
-                            {buildInfo.commitHash.substring(0, 7)})
+                            {buildInfo.commitHash.substring(0, 7)}
+                            {") "}
+                            <a
+                                className="text-primary hover:underline focus:outline"
+                                target="changelog"
+                                href={`${buildInfo.projectLink}/blob/main/CHANGELOG/CHANGELOG-${buildInfo.version}.md`}
+                            >
+                                {t.ChangelogLink}
+                            </a>
                         </dd>
                     </div>
                     <div className="flex gap-2">

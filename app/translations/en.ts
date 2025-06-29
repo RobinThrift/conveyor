@@ -321,6 +321,7 @@ export const translations = {
         ServerVersionLabel: "Server Version:",
         ServerPublishDateLabel: "Server Published on:",
         ServerGoVersionLabel: "Go Version:",
+        ChangelogLink: "Changelog",
     },
 
     "screens/Settings/Data": {
