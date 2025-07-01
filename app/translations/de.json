@@ -120,9 +120,7 @@
     },
 
     "components/MemoListFilter": {
-        "TriggerLabel": "Mehr filter",
-        "OffScreenTitle": "Tags",
-        "OffScreenDescription": "Tag- und  Zustandsfilters"
+        "ShowTagTreeFilterOffCanvas": "Tag Baum Anzeigen"
     },
 
     "components/MemoListFilter/Search": {
@@ -135,12 +133,19 @@
     },
 
     "components/MemoListFilter/StateFilter": {
+        "Label": "Nach Zustand filtern",
         "Archived": "Archiviert",
         "Deleted": "Gelöscht"
     },
 
+    "components/MemoListFilter/TagTreeFilter": {
+        "Title": "Tags",
+        "CloseBtn": "Schließen"
+    },
+
     "components/MemoListFilter/TagTree": {
-        "Label": "Tags"
+        "Label": "Tags",
+        "Count": "Anzahl"
     },
 
     "components/AlertDialog": {

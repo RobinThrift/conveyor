@@ -45,7 +45,7 @@
     }
 
     .memo-list-filter {
-        @apply bg-surface-level-1 space-y-2 rounded-2xl px-2 border;
+        @apply bg-surface-level-1 tablet:space-y-2 rounded-2xl px-2 border;
         @apply tablet:pt-2 tablet:rounded-3xl;
         @apply border-subtle dark:border-subtle-extra-dark;
 

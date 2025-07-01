@@ -1,11 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React, { useCallback, useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
 
 import type { ListMemosQuery as Filter } from "@/domain/Memo"
 import { generateMockMemos } from "@/lib/testhelper/memos"
-import { decorator } from "@/lib/testhelper/rootStore"
+import { decoratorWithMockData } from "@/lib/testhelper/rootStore"
+import { actions } from "@/ui/state"
+
 import "@/ui/styles/index.css"
 
+import { AppHeaderProvider } from "../AppHeader"
 import { MemoListFilter } from "./MemoListFilter"
 
 let { tags: mockTags } = generateMockMemos()
@@ -20,14 +24,7 @@ const meta: Meta<typeof MemoListFilter> = {
     parameters: {
         layout: "fullscreen",
     },
-    decorators: [
-        decorator,
-        (Story) => (
-            <div className="mx-auto px-1 tablet:px-4 w-full max-w-[400px]">
-                <Story />
-            </div>
-        ),
-    ],
+    decorators: [decoratorWithMockData],
 }
 
 export default meta
@@ -37,6 +34,7 @@ export const Overview: Story = {
     name: "MemoListFilter",
 
     render: (args) => {
+        let dispatch = useDispatch()
         let [filter, setFilter] = useState<Filter>(args.filter)
 
         let onChangeFilter = useCallback(
@@ -53,12 +51,19 @@ export const Overview: Story = {
             }
         }, [args.filter])
 
+        useEffect(() => {
+            dispatch(actions.tags.loadTags())
+        }, [dispatch])
+
         return (
-            <MemoListFilter
-                {...args}
-                filter={filter}
-                onChangeFilter={onChangeFilter}
-            />
+            <div className="mx-auto px-1 tablet:px-4 w-full max-w-[400px]">
+                <AppHeaderProvider />
+                <MemoListFilter
+                    {...args}
+                    filter={filter}
+                    onChangeFilter={onChangeFilter}
+                />
+            </div>
         )
     },
 }

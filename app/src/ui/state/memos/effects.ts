@@ -69,7 +69,18 @@ export const registerEffects = (
     })
 
     startListening({
-        actionCreator: list.slice.actions.setFilter,
+        predicate: (action, currentState, originalState) => {
+            if (
+                action.type !== list.slice.actions.setFilter.type &&
+                action.type !== list.slice.actions.setTagFilter.type
+            ) {
+                return false
+            }
+            return (
+                currentState.memos.list.filter !==
+                originalState.memos.list.filter
+            )
+        },
         effect: async (_, { cancelActiveListeners, dispatch, getState }) => {
             cancelActiveListeners()
 

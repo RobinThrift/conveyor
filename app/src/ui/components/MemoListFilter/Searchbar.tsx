@@ -41,7 +41,7 @@ export function SearchBar(props: {
                 type="search"
                 label={t.Label}
                 labelClassName="sr-only"
-                icon={<MagnifyingGlassIcon />}
+                icon={<MagnifyingGlassIcon aria-hidden />}
                 onChange={onChangeDebounced}
                 defaultValue={props.query}
             />

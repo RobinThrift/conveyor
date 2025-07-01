@@ -9,13 +9,20 @@ export const registerEffects = (
     { navCtrl }: { navCtrl: NavigationController },
 ) => {
     startListening({
-        actionCreator: memoList.actions.setFilter,
-        effect: async ({ payload }, { cancelActiveListeners, getState }) => {
-            cancelActiveListeners()
-            if (payload.source === "navigation") {
-                return
+        predicate: (action, currentState, originalState) => {
+            if (
+                action.type !== memoList.actions.setFilter.type &&
+                action.type !== memoList.actions.setTagFilter.type
+            ) {
+                return false
             }
-
+            return (
+                currentState.memos.list.filter !==
+                originalState.memos.list.filter
+            )
+        },
+        effect: async (_, { cancelActiveListeners, getState }) => {
+            cancelActiveListeners()
             let state = getState()
             let currScreen = slice.selectors.currentName(state)
             if (
@@ -24,7 +31,7 @@ export const registerEffects = (
                 currScreen === "memo.edit"
             ) {
                 navCtrl.updateParams({
-                    filter: payload.filter,
+                    filter: state.memos.list.filter,
                 })
             }
         },

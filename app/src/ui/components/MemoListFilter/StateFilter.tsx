@@ -28,6 +28,7 @@ export function StateFilter(props: StateFilterProps) {
 
     return (
         <ToggleGroup
+            aria-label={t.Label}
             className={clsx("state-filter", props.className)}
             value={selected}
             onValueChange={([selected]) => {
@@ -35,11 +36,11 @@ export function StateFilter(props: StateFilterProps) {
             }}
         >
             <Toggle value="isArchived" className="state-filter-item">
-                <ArchiveIcon />
+                <ArchiveIcon aria-hidden />
                 <span>{t.Archived}</span>
             </Toggle>
             <Toggle value="isDeleted" className="state-filter-item">
-                <BinIcon />
+                <BinIcon aria-hidden />
                 <span>{t.Deleted}</span>
             </Toggle>
         </ToggleGroup>

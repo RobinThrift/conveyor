@@ -1,3 +1,6 @@
+@import "./TagTreeFilter.css";
+@import "./TagTree.css";
+
 .memo-list-filter {
     @apply overscroll-none flex flex-col;
 
@@ -129,6 +132,10 @@
     .collapsibile-date-picker {
         @apply flex flex-col mb-3 tablet:hidden;
 
+        .state-filter {
+            @apply hidden mt-2;
+        }
+
         & > .btn {
             min-height: auto !important;
 
@@ -173,17 +180,16 @@
             .date-picker {
                 display: block;
             }
-        }
-    }
 
-    .tag-tree {
-        @apply hidden tablet:block sm:overflow-auto flex-1 py-2 overscroll-contain;
+            .state-filter {
+                @apply grid;
+            }
+        }
     }
 }
 
 .state-filter {
-    @apply hidden tablet:grid;
-    @apply grid-cols-2 gap-1 items-center justify-stretch w-full bg-surface-level-2 rounded-2xl mb-2;
+    @apply grid grid-cols-2 gap-1 items-center justify-stretch w-full bg-surface-level-2 rounded-2xl mb-2;
 
     .state-filter-item {
         @apply flex gap-2 items-center justify-center p-1 text-sm rounded-xl border border-surface-level-2 cursor-pointer text-subtle-extra-dark;
@@ -202,7 +208,7 @@
     --btn-border-color: var(--color-subtle-dark);
     --btn-bg: var(--color-text);
     --btn-bg-active: var(--color-subtle-light);
-    @apply tablet:hidden -ms-1 size-10 ps-0! pe-0! focus:outline-0 focus-visible:outline-0;
+    @apply tablet:hidden -ms-1 size-10 ps-0! pe-0! focus:outline-0 focus-visible:outline-2 focus-visible:outline-subtle-dark;
 
     .icon {
         @apply border-0! bg-transparent! items-center! p-0! justify-center -ml-1;
@@ -240,36 +246,10 @@
     }
 }
 
-.tag-tree-item {
-    .icon,
-    & > span {
-        @apply text-subtle-dark;
+.appheader:has(input:focus) {
+    .filter-offcanvas-trigger {
+        display: none;
     }
-
-    &[data-expanded] .tag-tree-item-expand-toggle-btn {
-        @apply rotate-90 mt-1;
-    }
-
-    &[data-selected] .tag-tree-item-expand-toggle {
-        @apply bg-primary-light! text-primary-contrast!;
-        .icon,
-        & > span {
-            @apply text-primary-contrast;
-        }
-    }
-}
-
-.tag-tree-item-expand-toggle {
-    @apply w-full flex items-center cursor-pointer rounded-sm xs:hover:bg-subtle active:bg-subtle ps-1 pe-2;
-    padding-left: calc((var(--tree-item-level, 1) - 1) * var(--spacing, 0) * 8);
-
-    & > span {
-        @apply flex-1;
-    }
-}
-
-.tag-tree-item-expand-toggle-btn {
-    transition: rotate 0.25s;
 }
 
 .memo-list-filter-search {

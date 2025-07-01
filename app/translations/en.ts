@@ -124,9 +124,7 @@ export const translations = {
     },
 
     "components/MemoListFilter": {
-        TriggerLabel: "More filter",
-        OffScreenTitle: "Tags",
-        OffScreenDescription: "Tags and state filters",
+        ShowTagTreeFilterOffCanvas: "Show Tag Tree",
     },
 
     "components/MemoListFilter/Search": {
@@ -138,11 +136,18 @@ export const translations = {
         Today: "Today",
     },
 
+    "components/MemoListFilter/TagTreeFilter": {
+        Title: "Tags",
+        CloseBtn: "Close",
+    },
+
     "components/MemoListFilter/TagTree": {
         Label: "Tags",
+        Count: "Count",
     },
 
     "components/MemoListFilter/StateFilter": {
+        Label: "Filter by state",
         Archived: "Archived",
         Deleted: "Deleted",
     },

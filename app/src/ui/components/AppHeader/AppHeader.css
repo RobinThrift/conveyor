@@ -3,7 +3,7 @@
 }
 
 .appheader {
-    @apply flex items-baseline gap-2 px-4 py-2;
+    @apply flex tablet:items-baseline gap-2 px-1 tablet:px-4 py-2;
 
     padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
 
@@ -13,9 +13,10 @@
 }
 
 .appheader .settings-nav-button {
-    @apply hidden tablet:flex relative z-[1000];
+    @apply relative z-[1000];
     @apply size-10 px-0! py-0! text-lg aspect-square;
     --btn-border-color: var(--color-subtle-dark);
+    @apply focus-visible:outline-2 focus-visible:outline-subtle-dark;
 }
 
 :root.dark .appheader .settings-nav-button {

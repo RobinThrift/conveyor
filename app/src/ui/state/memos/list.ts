@@ -61,7 +61,7 @@ export const slice = createSlice({
                 payload,
             }: PayloadAction<{ filter: Filter; source: "user" | "navigation" }>,
         ) => {
-            if (isEqual(state.filter, payload)) {
+            if (isEqual(state.filter, payload.filter)) {
                 return state
             }
 
@@ -75,6 +75,23 @@ export const slice = createSlice({
                 hasNextPage: true,
                 isListOutdated: false,
             } satisfies MemosListState
+        },
+
+        setTagFilter: (
+            state,
+            { payload }: PayloadAction<{ tag: Filter["tag"] }>,
+        ) => {
+            if (state.filter.tag === payload.tag) {
+                return state
+            }
+
+            state.filter.tag = payload.tag
+            state.isLoading = true
+            state.error = undefined
+            state.memos = []
+            state.nextPage = undefined
+            state.hasNextPage = true
+            state.isListOutdated = false
         },
 
         setMemo: (state, { payload }: PayloadAction<{ memo: Memo }>) => {
@@ -133,5 +150,7 @@ export const slice = createSlice({
         hasNextPage: (state) => state.hasNextPage,
         getMemo: (state, id: MemoID) => state.memos.find((m) => m.id === id),
         isListOutdated: (state) => state.isListOutdated,
+
+        tagFilterValue: (state) => state.filter.tag,
     },
 })

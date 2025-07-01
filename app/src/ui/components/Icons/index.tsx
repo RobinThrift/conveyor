@@ -1,3 +1,8 @@
+import React from "react"
+
+import { CaretRightIcon as CaretRightIconBase } from "@phosphor-icons/react/CaretRight"
+import { HashIcon as HashIconBase } from "@phosphor-icons/react/Hash"
+
 export { ArchiveIcon } from "@phosphor-icons/react/Archive"
 export { ArrowLeftIcon } from "@phosphor-icons/react/ArrowLeft"
 export { ArrowsClockwiseIcon } from "@phosphor-icons/react/ArrowsClockwise"
@@ -6,7 +11,7 @@ export { ArrowUpRightIcon } from "@phosphor-icons/react/ArrowUpRight"
 export { AsteriskIcon } from "@phosphor-icons/react/Asterisk"
 export { CaretDownIcon } from "@phosphor-icons/react/CaretDown"
 export { CaretLeftIcon } from "@phosphor-icons/react/CaretLeft"
-export { CaretRightIcon } from "@phosphor-icons/react/CaretRight"
+export const CaretRightIcon = React.memo(CaretRightIconBase)
 export { CheckIcon } from "@phosphor-icons/react/Check"
 export { ClipboardIcon } from "@phosphor-icons/react/Clipboard"
 export { CloudArrowDownIcon } from "@phosphor-icons/react/CloudArrowDown"
@@ -19,7 +24,7 @@ export { DatabaseIcon } from "@phosphor-icons/react/Database"
 export { DotsThreeVerticalIcon } from "@phosphor-icons/react/DotsThreeVertical"
 export { FlaskIcon } from "@phosphor-icons/react/Flask"
 export { GlobeIcon } from "@phosphor-icons/react/Globe"
-export { HashIcon } from "@phosphor-icons/react/Hash"
+export const HashIcon = React.memo(HashIconBase)
 export { InfoIcon } from "@phosphor-icons/react/Info"
 export { KeyboardIcon } from "@phosphor-icons/react/Keyboard"
 export { KeyIcon } from "@phosphor-icons/react/Key"

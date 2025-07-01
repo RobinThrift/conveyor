@@ -8,7 +8,7 @@
 
 .memo-list-header {
     @apply text-lg tablet:text-lg lg:text-xl text-subtle-extra-dark tablet:py-2;
-
+    @apply flex items-center;
     pointer-events: none;
 
     em {

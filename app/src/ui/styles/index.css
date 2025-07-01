@@ -58,35 +58,6 @@
     }
 }
 
-.tree-node-group--expanded {
-    position: relative;
-
-    .tree-node {
-        @apply animate-in fade-in-10;
-    }
-}
-
-.tree-node-group--expanded .tree-node {
-    &::before {
-        @apply bg-subtle top-0 bottom-0;
-        margin-left: -9px;
-        content: "";
-        width: 1px;
-        display: block;
-        position: absolute;
-    }
-
-    &:hover {
-        &::before {
-            @apply bg-subtle-dark z-20;
-        }
-    }
-}
-
-.tree-leaf-list-item:only-of-type .tree-node::before {
-    display: none;
-}
-
 :root::view-transition-old(*) {
     display: none;
 }

@@ -1,0 +1,51 @@
+.tag-tree-item {
+    @apply w-full;
+
+    span {
+        @apply flex-1;
+    }
+
+    .icon {
+        @apply text-subtle-dark;
+    }
+
+    &[aria-expanded="true"]
+        > .tag-tree-item-content
+        > .tag-tree-item-expand-toggle-btn
+        svg {
+        @apply rotate-90 mt-0.5;
+    }
+
+    &[aria-selected="true"] > .tag-tree-item-content {
+        @apply bg-primary-light! text-primary-contrast!;
+        .icon,
+        .tag-tree-item-count {
+            @apply text-primary-contrast;
+        }
+    }
+
+    .tag-tree-item-children {
+        @apply w-full ps-4;
+    }
+
+    &:focus-visible {
+        @apply outline-none;
+        & > .tag-tree-item-content {
+            @apply outline outline-2 outline-primary-dark -outline-offset-3 text-primary;
+        }
+    }
+}
+
+.tag-tree-item-content {
+    @apply w-full flex items-center cursor-pointer rounded-lg xs:hover:bg-subtle active:bg-subtle ps-1 pe-2 py-0.5;
+    .tag-tree-item-count {
+        @apply text-subtle-dark;
+    }
+}
+
+.tag-tree-item-expand-toggle-btn {
+    @apply w-6 flex items-center justify-center hover:bg-surface-level-2 rounded-lg cursor-pointer py-0.5;
+    svg {
+        transition: rotate 0.25s;
+    }
+}
