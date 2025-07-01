@@ -54,7 +54,7 @@ export function useFigure(props: {
                 let anim = figureRef.animate(
                     [
                         {
-                            transform: `translateX(${translateX}px) translateY(${translateY}px) scaleX(${scaleX}) scaleY(${scaleY})`,
+                            transform: `translate3d(${translateX}px, ${translateY}px, 0) scaleX(${scaleX}) scaleY(${scaleY})`,
                             borderRadius: `calc(${1 / scaleX} * var(--spacing) * 2)`,
                         },
                     ],
@@ -159,15 +159,57 @@ export function useDraggableFigure({
     )
     let pointerPos = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
     let pointerIDs = useRef<Set<number>>(new Set())
-    let reset = useCallback((el: HTMLElement) => {
-        let anim = el.animate(
-            [{ transform: "translateX(0px) translateY(0px)" }],
-            { duration: 200 },
+
+    let animFrame = useRef<
+        ReturnType<typeof requestAnimationFrame> | undefined
+    >(undefined)
+
+    let updatePos = useCallback(() => {
+        let animRef = ref.current
+
+        if (!animRef) {
+            return
+        }
+
+        if (pointerIDs.current.size > 1) {
+            return
+        }
+
+        let translateX =
+            pointerPos.current.x - boundingRect.current.x - offset.current.x
+        let translateY =
+            pointerPos.current.y - boundingRect.current.y - offset.current.y
+
+        let length = Math.sqrt(
+            (translateX / boundingRect.current.width) ** 2 +
+                (translateY / boundingRect.current.height) ** 2,
         )
+        let scale = 1 - length * 0.3
+
+        animRef.style.transition = "none"
+        animRef.parentElement?.style.setProperty(
+            "--normalized-drag-length",
+            length.toFixed(2),
+        )
+        if (pointerIDs.current.size !== 0) {
+            animRef.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(clamp(0.7, ${scale}, 1.0))`
+        }
+
+        animFrame.current = requestAnimationFrame(updatePos)
+    }, [ref.current])
+
+    let reset = useCallback((el: HTMLElement) => {
+        if (animFrame.current) {
+            cancelAnimationFrame(animFrame.current)
+        }
+
+        let anim = el.animate([{ transform: "translate3d(0px, 0px, 0px)" }], {
+            duration: 200,
+        })
         anim?.addEventListener(
             "finish",
             () => {
-                el.style.transform = "translateX(0px) translateY(0px)"
+                el.style.transform = "translate3d(0px, 0px, 0px)"
                 delete el.dataset.isDragging
             },
             { once: true },
@@ -209,8 +251,10 @@ export function useDraggableFigure({
                     y: e.nativeEvent.offsetY,
                 }
             }
+
+            animFrame.current = requestAnimationFrame(updatePos)
         },
-        [ref.current, reset],
+        [ref.current, reset, updatePos],
     )
 
     let onPointerCancel = useCallback(
@@ -240,6 +284,9 @@ export function useDraggableFigure({
                 Math.abs(translateY) > boundingRect.current.height / 4
             ) {
                 ref.current.dataset.isClosing = "true"
+                if (animFrame.current) {
+                    cancelAnimationFrame(animFrame.current)
+                }
                 close(boundingRect.current)
             } else {
                 reset(ref.current)
@@ -254,33 +301,10 @@ export function useDraggableFigure({
                 return
             }
 
-            let animRef = ref.current
-            if (pointerIDs.current.size !== 1 || !animRef || !e.isPrimary) {
+            if (pointerIDs.current.size !== 1 || !ref.current || !e.isPrimary) {
                 return
             }
             e.stopPropagation()
-
-            let translateX =
-                e.clientX - boundingRect.current.x - offset.current.x
-            let translateY =
-                e.clientY - boundingRect.current.y - offset.current.y
-
-            let length = Math.sqrt(
-                (translateX / boundingRect.current.width) ** 2 +
-                    (translateY / boundingRect.current.height) ** 2,
-            )
-            let scale = 1 - length * 0.3
-
-            animRef.style.transition = "none"
-            requestAnimationFrame(() => {
-                animRef.parentElement?.style.setProperty(
-                    "--normalized-drag-length",
-                    length.toFixed(2),
-                )
-                if (pointerIDs.current.size !== 0) {
-                    animRef.style.transform = `translateX(${translateX}px) translateY(${translateY}px) scale(clamp(0.7, ${scale}, 1.0))`
-                }
-            })
 
             pointerPos.current.x = e.clientX
             pointerPos.current.y = e.clientY
@@ -293,10 +317,14 @@ export function useDraggableFigure({
     }, [])
 
     let onClickClose = useCallback(() => {
+        let rect =
+            boundingRect.current.width !== 0
+                ? boundingRect.current
+                : ref.current?.getBoundingClientRect()
         if (ref.current) {
             ref.current.dataset.isClosing = "true"
         }
-        close(ref.current?.getBoundingClientRect())
+        close(rect)
     }, [close, ref.current])
 
     return {

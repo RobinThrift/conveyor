@@ -23,7 +23,7 @@
 }
 
 .zoomed-img {
-    @apply flex-col items-center justify-center p-4;
+    @apply flex-col items-center justify-center p-4 overflow-hidden;
     position: fixed;
     left: 0;
     top: 0;
@@ -47,11 +47,10 @@
                 transparent
             ) !important;
             opacity: calc(1 - var(--normalized-drag-length, 0));
+            transform: translate3d(0, 0, 0);
         }
 
         &:has([data-is-closing]) figure {
-            @apply overflow-clip;
-
             figcaption {
                 opacity: 0;
             }
@@ -71,6 +70,7 @@
         position: relative;
         max-height: 100%;
         max-width: 100%;
+        transform: translate3d(0, 0, 0);
 
         &[data-is-dragging] figcaption {
             opacity: 0;
@@ -119,4 +119,5 @@ html:has(dialog.zoomed-img[open]) {
 :root::view-transition-new(figure-zoomed) {
     animation: none;
     mix-blend-mode: normal;
+    transform: translate3d(0, 0, 0);
 }
