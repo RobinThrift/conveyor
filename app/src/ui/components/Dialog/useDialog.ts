@@ -198,7 +198,6 @@ function useNesting(ref: React.RefObject<HTMLDialogElement | null>) {
         )
     }, [existingCtx?.ref.current, ref.current])
 }
-
 export function useDialogDragHandle({
     ref,
     ...props
@@ -325,7 +324,6 @@ export function useDialogDragHandle({
     )
 
     return {
-        close,
         onPointerDown,
         onPointerCancel,
         onPointerMove,
