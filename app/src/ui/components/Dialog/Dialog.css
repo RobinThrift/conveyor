@@ -127,3 +127,7 @@
     touch-action: none;
     z-index: 100;
 }
+
+:root:has(.dialog.is-modal) {
+    overflow-y: hidden !important;
+}
