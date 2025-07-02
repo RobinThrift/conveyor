@@ -1,3 +1,10 @@
+/**
+ * Due to bugs in how Safari handles ES-Modules, and agains the spec, each module is reevaluted on every import even from with the same context.
+ * This means that the `const Env` expression gets overwritten even after it was changed and mutliple BroadcastChannels would be created.
+ * To prevent this the values are saved to the global scope, as they are designed to be globals.
+ * I'm sure I will discover even more of this type of bug soon...
+ */
+
 interface _Env {
     platform: "web" | "pwa" | "macos" | "tauri-generic"
     lang: readonly string[]
@@ -6,11 +13,12 @@ interface _Env {
 
 type SetEnvMessag = { type: "env:set"; data: Partial<_Env> }
 
-export const Env: _Env = {
+export const Env: _Env = globalThis.__CONVEYOR_ENV__ ?? {
     platform: "web",
     lang: [],
     isDeviceSecureStorageAvailable: false,
 }
+globalThis.__CONVEYOR_ENV__ = Env
 
 export function setEnv(env: Partial<_Env>, fromRemote = false) {
     for (let key in env) {
@@ -30,6 +38,7 @@ export function setEnv(env: Partial<_Env>, fromRemote = false) {
 
 declare global {
     var __CONVEYOR_ENV_CHANNEL__: BroadcastChannel
+    var __CONVEYOR_ENV__: _Env
 }
 
 if (!("__CONVEYOR_ENV_CHANNEL__" in globalThis)) {
