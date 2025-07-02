@@ -1,21 +1,24 @@
-import React, {
-    useCallback,
-    useState,
-    useSyncExternalStore,
-    useMemo,
-} from "react"
+import { Store, useStore } from "@tanstack/react-store"
+import React, { useCallback, useState, useMemo } from "react"
 
 import type { Span } from "@/lib/tracing"
 import { Code } from "@/ui/components/Markdown/Code"
 
+let _childSpans = new Map<string, Span[]>()
+const tracingStore = new Store<{
+    spans: Span[]
+}>({
+    spans: [],
+})
+
 export function TracingDevTool() {
-    let spans = useSyncExternalStore(_observer_subscribe, _observer_getSnapshot)
+    let { spans } = useStore(tracingStore)
 
     let [selected, setSelected] = useState<Span | undefined>(undefined)
     let [filter, setFilter] = useState<string | undefined>(undefined)
 
     let onClickClear = useCallback(() => {
-        _snapshot = []
+        tracingStore.setState({ spans: [] })
         _childSpans.clear()
     }, [])
 
@@ -254,15 +257,7 @@ const SpanGanttItem = React.memo(function SpanGanttItem({
     )
 })
 
-let _notifyMeasures: (() => void) | undefined = undefined
-let _snapshot: Span[] | undefined = undefined
-let _childSpans = new Map<string, Span[]>()
-
 const observer = new PerformanceObserver((list) => {
-    if (!_notifyMeasures) {
-        return
-    }
-
     let spans: Span[] = []
 
     for (let entry of list.getEntries()) {
@@ -278,8 +273,9 @@ const observer = new PerformanceObserver((list) => {
     }
 
     if (spans.length) {
-        _snapshot = [...(_snapshot ?? []), ...spans]
-        _notifyMeasures()
+        tracingStore.setState((state) => ({
+            spans: [...state.spans, ...spans],
+        }))
     }
 })
 
@@ -294,25 +290,10 @@ observer.observe({
     buffered: true,
 })
 
-function _observer_subscribe(callback: () => void) {
-    _notifyMeasures = callback
-
-    return () => {
-        _notifyMeasures = undefined
-    }
-}
-
-function _observer_getSnapshot() {
-    if (_snapshot) {
-        return _snapshot
-    }
-
+function _init() {
     let rootSpans: Span[] = []
 
-    let allEntries = [
-        ...performance.getEntries().values(),
-        ...observer.takeRecords().values(),
-    ]
+    let allEntries = [...observer.takeRecords().values()]
 
     for (let entry of allEntries) {
         if (
@@ -337,7 +318,7 @@ function _observer_getSnapshot() {
         }
     }
 
-    _snapshot = rootSpans
-
-    return rootSpans
+    tracingStore.setState({ spans: rootSpans })
 }
+
+_init()
