@@ -62,16 +62,18 @@
 
 @media (max-width: 767px) {
     :root {
-        main {
+        main,
+        .appheader {
             transition: transform 200ms;
         }
 
-        &:has(.dialog.is-modal[open]) main {
-            transform: perspective(100px) translatez(-5px);
-        }
-
-        &:has(.dialog.is-modal[data-state="closing"]) main {
-            transform: perspective(100px) translatez(0px);
+        &:has(.dialog.is-modal[open]) {
+            main {
+                transform: scale(0.97) translate3D(0, -80px, 0);
+            }
+            .appheader {
+                transform: scale(0.97) translate3D(0, 10px, 0);
+            }
         }
     }
 }
@@ -129,5 +131,6 @@
 }
 
 :root:has(.dialog.is-modal) {
-    overflow-y: hidden !important;
+    overflow: hidden !important;
+    overscroll-behavior: contain !important;
 }

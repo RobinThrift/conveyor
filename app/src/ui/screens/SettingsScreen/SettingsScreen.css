@@ -20,6 +20,7 @@
 
 .settings-dialog:has(.is-syncing) {
     overflow: visible;
+    overscroll-behavior: contain;
     &::before {
         @apply rounded-2xl inset-0 border-2 border-primary;
         display: block;

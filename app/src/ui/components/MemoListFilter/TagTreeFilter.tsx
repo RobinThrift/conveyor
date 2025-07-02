@@ -3,6 +3,7 @@ import clsx from "clsx"
 import React, { useEffect, useRef, useCallback } from "react"
 
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
+import { usePreventScroll } from "@/ui/hooks/usePreventScroll"
 import { useT } from "@/ui/i18n"
 import { Button } from "../Button"
 import { XIcon } from "../Icons"
@@ -14,6 +15,8 @@ export function TagTreeFilter(props: { className?: string }) {
     let { isOffCanvasOpen, isOffCanvasClosing, closeOffCanvas } =
         useTagTreeFilterStore()
     let closeBtn = useRef<HTMLButtonElement | null>(null)
+
+    usePreventScroll({ isDisabled: !isOffCanvas || !isOffCanvasOpen })
 
     let ref = useRef<HTMLDivElement | null>(null)
 

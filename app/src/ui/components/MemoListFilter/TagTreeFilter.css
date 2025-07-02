@@ -57,5 +57,6 @@
 }
 
 :root:has(.tag-tree-filter.is-offcanvas[data-is-open="true"]) {
-    overflow-y: hidden !important;
+    overflow: hidden !important;
+    overscroll-behavior: contain !important;
 }

@@ -9,6 +9,8 @@ import React, {
     startTransition,
 } from "react"
 
+import { usePreventScroll } from "@/ui/hooks/usePreventScroll"
+
 import { type DialogContext, dialogContext } from "./context"
 
 export function useDialog(props: {
@@ -25,6 +27,8 @@ export function useDialog(props: {
     let describedByID = useId()
     let incrementNesting = useNesting(ref)
     let [isOpen, setIsOpen] = useState(false)
+
+    usePreventScroll({ isDisabled: !isOpen })
 
     let open = useCallback(() => {
         if (isOpen) {

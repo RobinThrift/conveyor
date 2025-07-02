@@ -40,7 +40,6 @@
 
         &::backdrop {
             @apply animate-in fade-in duration-250;
-            backdrop-filter: blur(3px);
             background-color: color-mix(
                 in srgb,
                 var(--color-modal-overlay-bg) 80%,
@@ -48,6 +47,10 @@
             ) !important;
             opacity: calc(1 - var(--normalized-drag-length, 0));
             transform: translate3d(0, 0, 0);
+
+            @media (max-width: 767px) {
+                backdrop-filter: blur(3px);
+            }
         }
 
         &:has([data-is-closing]) figure {
@@ -108,8 +111,9 @@
     right: max(calc(var(--spacing) * 4), env(safe-area-inset-right, 0));
 }
 
-html:has(dialog.zoomed-img[open]) {
-    overflow: hidden;
+:root:has(dialog.zoomed-img[open]) {
+    overflow: hidden !important;
+    overscroll-behavior: contain !important;
 }
 
 :root::view-transition-old(figure-zoomed) {

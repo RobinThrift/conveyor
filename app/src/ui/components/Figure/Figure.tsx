@@ -1,8 +1,10 @@
+import clsx from "clsx"
 import React from "react"
 
 import { XIcon } from "@/ui/components/Icons"
+import { usePreventScroll } from "@/ui/hooks/usePreventScroll"
 import { useT } from "@/ui/i18n"
-import clsx from "clsx"
+
 import { useDraggableFigure, useFigure } from "./useFigure"
 
 export interface FigureProps {
@@ -100,6 +102,8 @@ const DraggableFigure = React.memo(function DraggableFigure({
         onDragStart,
         onClickClose,
     } = useDraggableFigure({ ref, close })
+
+    usePreventScroll()
 
     return (
         <>
