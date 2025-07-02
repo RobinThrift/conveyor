@@ -101,14 +101,17 @@ export function useFigure(props: {
             }
             setIsZoomed(true)
 
-            let rect = e.currentTarget.getBoundingClientRect()
-            srcRect.current = {
-                x: rect.x,
-                y: rect.y,
-                width: rect.width,
-                height: rect.height,
-                borderRadius: ref.current?.style.borderRadius ?? "",
-            }
+            let target = e.currentTarget
+            requestAnimationFrame(() => {
+                let rect = target.getBoundingClientRect()
+                srcRect.current = {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.width,
+                    height: rect.height,
+                    borderRadius: ref.current?.style.borderRadius ?? "",
+                }
+            })
 
             dialog.addEventListener(
                 "close",
@@ -119,11 +122,13 @@ export function useFigure(props: {
                 { once: true, passive: true },
             )
 
-            document.startViewTransition(() => {
-                if (ref.current) {
-                    ref.current.style.viewTransitionName = ""
-                }
-                dialog.showModal()
+            requestAnimationFrame(() => {
+                document.startViewTransition(() => {
+                    if (ref.current) {
+                        ref.current.style.viewTransitionName = ""
+                    }
+                    dialog.showModal()
+                })
             })
         },
         [],
