@@ -92,7 +92,7 @@ export function ReactDevTools() {
     }, [events])
 
     return (
-        <div className="dark min-h-full w-full relative overscroll-contain">
+        <div className="dark h-full w-full overflow-auto relative overscroll-contain">
             <header className="sticky top-0 left-0 right-0 p-2 text-xl font-mono text-text backdrop-blur-sm flex justify-between items-center rounded">
                 <button
                     type="button"
