@@ -75,6 +75,13 @@
                 transform: scale(0.97) translate3D(0, 10px, 0);
             }
         }
+
+        &:has(.dialog.is-modal[data-state="closing"]) {
+            main,
+            .appheader {
+                transform: scale(1) translate3D(0, 0, 0);
+            }
+        }
     }
 }
 
