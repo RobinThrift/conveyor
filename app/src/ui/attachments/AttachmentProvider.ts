@@ -1,11 +1,4 @@
-import {
-    type RefObject,
-    createContext,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from "react"
+import { type RefObject, createContext, useContext, useEffect, useRef, useState } from "react"
 
 import type { Attachment, AttachmentID } from "@/domain/Attachment"
 import { type AsyncResult, Err } from "@/lib/result"
@@ -112,29 +105,21 @@ export function useAttachment({
             isLoading: true,
         })
 
-        attachmentProvider
-            .getAttachmentDataByID(id)
-            .then(([attachment, err]) => {
-                setState((state) => {
-                    if (state?.id !== id) {
-                        return state
-                    }
-                    if (err) {
-                        return { id, error: err, isLoading: false }
-                    }
+        attachmentProvider.getAttachmentDataByID(id).then(([attachment, err]) => {
+            setState((state) => {
+                if (state?.id !== id) {
+                    return state
+                }
+                if (err) {
+                    return { id, error: err, isLoading: false }
+                }
 
-                    _attachmentCache.set(id, attachment.data)
+                _attachmentCache.set(id, attachment.data)
 
-                    return { id, data: attachment.data, isLoading: false }
-                })
+                return { id, data: attachment.data, isLoading: false }
             })
-    }, [
-        loadOnVisible,
-        isVisible,
-        id,
-        state?.id,
-        attachmentProvider.getAttachmentDataByID,
-    ])
+        })
+    }, [loadOnVisible, isVisible, id, state?.id, attachmentProvider.getAttachmentDataByID])
 
     return state
 }

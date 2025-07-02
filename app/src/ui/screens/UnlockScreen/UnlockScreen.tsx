@@ -31,8 +31,7 @@ export function UnlockScreen() {
 
             if (plaintextPrivateKey) {
                 unlock({
-                    plaintextKeyData:
-                        plaintextPrivateKey as PlaintextPrivateKey,
+                    plaintextKeyData: plaintextPrivateKey as PlaintextPrivateKey,
                     storeKey: formData.get("store_key") === "on",
                 })
             }

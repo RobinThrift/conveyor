@@ -61,22 +61,14 @@ export class ExportJob implements Job {
         }
 
         let [_export, exportErr] = await fromPromise(
-            this._db.exec(
-                "SELECT sqlcipher_export('export')",
-                undefined,
-                ctx.signal,
-            ),
+            this._db.exec("SELECT sqlcipher_export('export')", undefined, ctx.signal),
         )
         if (exportErr) {
             return wrapErr`[ExportJob]: error exporting database: ${exportErr}`
         }
 
         let [_setUserVersion, setUserVersionErr] = await fromPromise(
-            this._db.exec(
-                `PRAGMA export.user_version = ${userVersion};`,
-                undefined,
-                ctx.signal,
-            ),
+            this._db.exec(`PRAGMA export.user_version = ${userVersion};`, undefined, ctx.signal),
         )
         if (setUserVersionErr) {
             return wrapErr`[ExportJob]: error setting user_version on exported database: ${setUserVersionErr}`

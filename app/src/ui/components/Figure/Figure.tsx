@@ -17,27 +17,15 @@ export interface FigureProps {
 
 export function Figure(props: FigureProps) {
     let t = useT("components/Figure")
-    let {
-        ref,
-        dialogRef,
-        zoomedFigRef,
-        imgRef,
-        isZoomed,
-        close,
-        onClickZoom,
-        img,
-    } = useFigure(props)
+    let { ref, dialogRef, zoomedFigRef, imgRef, isZoomed, close, onClickZoom, img } =
+        useFigure(props)
 
     return (
         <>
             <figure
                 id={props.id}
                 ref={ref}
-                className={clsx(
-                    "figure",
-                    { "is-zoomed": isZoomed },
-                    props.className,
-                )}
+                className={clsx("figure", { "is-zoomed": isZoomed }, props.className)}
             >
                 <button
                     type="button"
@@ -95,13 +83,8 @@ const DraggableFigure = React.memo(function DraggableFigure({
     ref: React.RefObject<HTMLElement | null>
 }) {
     let t = useT("components/Figure")
-    let {
-        onPointerDown,
-        onPointerCancel,
-        onPointerMove,
-        onDragStart,
-        onClickClose,
-    } = useDraggableFigure({ ref, close })
+    let { onPointerDown, onPointerCancel, onPointerMove, onDragStart, onClickClose } =
+        useDraggableFigure({ ref, close })
 
     usePreventScroll()
 

@@ -59,8 +59,7 @@ export function useNotifications() {
 export function useNotificationDispatcher() {
     let dispatch = useDispatch()
     return useCallback(
-        (notification: Notification) =>
-            dispatch(slice.actions.add({ notification })),
+        (notification: Notification) => dispatch(slice.actions.add({ notification })),
         [dispatch],
     )
 }

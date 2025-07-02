@@ -23,9 +23,7 @@ export function useAuthFormState(props: UseAuthFormStateProps) {
     let [username, setUsername] = useState<string>("")
     let [requestFired, setRequestFired] = useState(false)
     let isLoading = useMemo(
-        () =>
-            props.status === "authenticating" ||
-            props.status === "password-change-in-progress",
+        () => props.status === "authenticating" || props.status === "password-change-in-progress",
         [props.status],
     )
     let showChangePasswordDialog = useMemo(
@@ -67,8 +65,7 @@ export function useAuthFormState(props: UseAuthFormStateProps) {
 
             props.login({
                 server:
-                    server.value ||
-                    `${globalThis.location.protocol}//${globalThis.location.host}`,
+                    server.value || `${globalThis.location.protocol}//${globalThis.location.host}`,
                 username: username.value,
                 password: password.value as PlaintextPassword,
             })

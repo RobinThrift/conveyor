@@ -22,11 +22,7 @@ function readGenerateRequest(stream: NodeJS.ReadStream) {
         let chunks: Buffer<ArrayBufferLike>[] = []
 
         stream.on("readable", () => {
-            for (
-                let data: Buffer = stream.read();
-                data !== null;
-                data = stream.read()
-            ) {
+            for (let data: Buffer = stream.read(); data !== null; data = stream.read()) {
                 chunks.push(data)
             }
             // let data: Buffer

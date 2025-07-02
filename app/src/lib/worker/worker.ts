@@ -4,26 +4,17 @@ import { type AsyncResult, Err, type Result, fromPromise } from "@/lib/result"
 import { getThreadName } from "../thread"
 
 export function isWorkerContext() {
-    return (
-        typeof WorkerGlobalScope !== "undefined" &&
-        globalThis instanceof WorkerGlobalScope
-    )
+    return typeof WorkerGlobalScope !== "undefined" && globalThis instanceof WorkerGlobalScope
 }
 
 export function createWorker<
     Messages extends string,
-    Handlers extends Record<
-        Messages,
-        (ctx: Context, params: any) => AsyncResult<unknown>
-    >,
+    Handlers extends Record<Messages, (ctx: Context, params: any) => AsyncResult<unknown>>,
 >(
     handlers: Handlers,
 ): {
     runIfWorker: () => void
-    createClient: (
-        worker: Worker,
-        signal?: AbortSignal,
-    ) => Client<Messages, Handlers>
+    createClient: (worker: Worker, signal?: AbortSignal) => Client<Messages, Handlers>
 } {
     let createClient = (worker: Worker, signal?: AbortSignal) => {
         let wrapper = new WorkerWrapper(worker, signal)
@@ -80,9 +71,7 @@ export function createWorker<
         }>,
     ) => {
         let result: Result<any> = Err(
-            new Error(
-                `[${getThreadName()}] unknown request type ${evt.data.type as string}`,
-            ),
+            new Error(`[${getThreadName()}] unknown request type ${evt.data.type as string}`),
         )
 
         let handler = handlers[evt.data.type]
@@ -137,18 +126,12 @@ export function createWorker<
 
 type WorkerClient<
     Messages extends string,
-    Handlers extends Record<
-        Messages,
-        (ctx: Context, params: any) => AsyncResult<unknown>
-    >,
+    Handlers extends Record<Messages, (ctx: Context, params: any) => AsyncResult<unknown>>,
 > = Handlers
 
 type Client<
     Messages extends string,
-    Handlers extends Record<
-        Messages,
-        (ctx: Context, params: any) => AsyncResult<unknown>
-    >,
+    Handlers extends Record<Messages, (ctx: Context, params: any) => AsyncResult<unknown>>,
 > = WorkerClient<Messages, Handlers> & {
     addEventListener: (
         event: "error",
@@ -172,21 +155,14 @@ export interface WorkerErrorResponseMessage {
 
 class WorkerWrapper {
     private _worker: Worker
-    private _requests = new Map<
-        string,
-        ReturnType<typeof Promise.withResolvers<any>>
-    >()
+    private _requests = new Map<string, ReturnType<typeof Promise.withResolvers<any>>>()
 
     constructor(worker: Worker, signal?: AbortSignal) {
         this._worker = worker
 
         this._worker.addEventListener(
             "message",
-            (
-                evt: MessageEvent<
-                    WorkerSuccessResponseMessage | WorkerErrorResponseMessage
-                >,
-            ) => {
+            (evt: MessageEvent<WorkerSuccessResponseMessage | WorkerErrorResponseMessage>) => {
                 switch (evt.data.type) {
                     case "success":
                         evt.stopImmediatePropagation()
@@ -197,9 +173,7 @@ class WorkerWrapper {
                         this._handleError(evt.data)
                         break
                     default:
-                        throw new Error(
-                            `unknown output type ${JSON.stringify(evt.data)}`,
-                        )
+                        throw new Error(`unknown output type ${JSON.stringify(evt.data)}`)
                 }
             },
             { signal },
@@ -236,11 +210,7 @@ class WorkerWrapper {
     ): void {
         switch (event) {
             case "error":
-                this._worker.addEventListener(
-                    event,
-                    cb as (ev: ErrorEvent) => any,
-                    options,
-                )
+                this._worker.addEventListener(event, cb as (ev: ErrorEvent) => any, options)
                 break
             case "message":
                 this._worker.addEventListener(

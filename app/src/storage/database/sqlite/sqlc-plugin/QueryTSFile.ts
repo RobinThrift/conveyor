@@ -30,10 +30,7 @@ export class QueryTSFile {
     }
 
     public toString() {
-        return astToString(this.name, [
-            ...generateImportDeclaration(this.imports),
-            ...this.nodes,
-        ])
+        return astToString(this.name, [...generateImportDeclaration(this.imports), ...this.nodes])
     }
 
     private addImport(named: ImportSpecifier[], from: string) {
@@ -44,9 +41,7 @@ export class QueryTSFile {
         }
 
         for (let n of named) {
-            if (
-                imports.find((i) => i.name.escapedText === n.name.escapedText)
-            ) {
+            if (imports.find((i) => i.name.escapedText === n.name.escapedText)) {
                 continue
             }
             imports.push(n)
@@ -55,13 +50,7 @@ export class QueryTSFile {
 
     private generate(queries: Query[]) {
         this.addImport(
-            [
-                factory.createImportSpecifier(
-                    true,
-                    undefined,
-                    factory.createIdentifier("Database"),
-                ),
-            ],
+            [factory.createImportSpecifier(true, undefined, factory.createIdentifier("Database"))],
             "./db",
         )
 
@@ -106,9 +95,7 @@ export class QueryTSFile {
             })
 
         this.options?.overrides
-            ?.filter((o) =>
-                query.columns.find((c) => fullColumName(c) === o.column),
-            )
+            ?.filter((o) => query.columns.find((c) => fullColumName(c) === o.column))
             .filter((o) => o.to_sql?.import || o.from_sql?.import)
             .forEach((o) => {
                 if (o.to_sql) {

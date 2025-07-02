@@ -49,12 +49,7 @@ export function useEditMemoScreenState() {
         let memoID = memo?.id
         nav.popStack().then(() => {
             if (memoID) {
-                nav.push(
-                    "memo.view",
-                    { memoID },
-                    { scrollOffsetTop: 0 },
-                    "single-memo",
-                )
+                nav.push("memo.view", { memoID }, { scrollOffsetTop: 0 }, "single-memo")
             }
         })
     }, [nav.popStack, nav.push, memo?.id])
@@ -81,9 +76,7 @@ export function useEditMemoScreenState() {
         error,
         settings,
         placeCursorAt:
-            "editPosition" in currentPageParams
-                ? currentPageParams.editPosition
-                : undefined,
+            "editPosition" in currentPageParams ? currentPageParams.editPosition : undefined,
         updateMemo,
         cancelEdit,
         transferAttachment,

@@ -1,11 +1,6 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit"
 
-import type {
-    Params,
-    Restore,
-    Screens,
-    Stacks,
-} from "@/control/NavigationController"
+import type { Params, Restore, Screens, Stacks } from "@/control/NavigationController"
 import type { NavgationState } from "@/lib/navigation"
 
 interface NavigationSlice {

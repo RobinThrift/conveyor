@@ -29,10 +29,7 @@ export function useMemoListState() {
     let nav = useNavigation()
     let memoActions = useMemo(
         () => ({
-            edit: (
-                memoID: MemoID,
-                position?: { x: number; y: number; snippet?: string },
-            ) => {
+            edit: (memoID: MemoID, position?: { x: number; y: number; snippet?: string }) => {
                 nav.push(
                     "memo.edit",
                     {
@@ -89,25 +86,18 @@ export function useMemoListState() {
         memoActions,
         layout,
         doubleClickToEdit,
-        focusedMemoID:
-            "memoID" in currentPageParams
-                ? currentPageParams.memoID
-                : undefined,
+        focusedMemoID: "memoID" in currentPageParams ? currentPageParams.memoID : undefined,
     }
 }
 
-const groupMemosByDaySelector = createSelector(
-    [(state) => selectors.memos.memos(state)],
-    (memos) => groupByDay(memos),
+const groupMemosByDaySelector = createSelector([(state) => selectors.memos.memos(state)], (memos) =>
+    groupByDay(memos),
 )
 
 function groupByDay(
     memos: Memo[],
 ): Record<string, { date: Date; memos: Memo[]; diffToToday: number }> {
-    let grouped: Record<
-        string,
-        { date: Date; memos: Memo[]; diffToToday: number }
-    > = {}
+    let grouped: Record<string, { date: Date; memos: Memo[]; diffToToday: number }> = {}
     let now = roundToNearestMinutes(currentDateTime())
 
     memos.forEach((memo) => {

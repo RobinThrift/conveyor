@@ -1,17 +1,7 @@
-import type {
-    CompileContext,
-    Extension as MDASTExtension,
-    Token,
-} from "mdast-util-from-markdown"
+import type { CompileContext, Extension as MDASTExtension, Token } from "mdast-util-from-markdown"
 import { markdownLineEndingOrSpace } from "micromark-util-character"
 import { codes } from "micromark-util-symbol"
-import type {
-    Code,
-    Effects,
-    Extension,
-    State,
-    TokenizeContext,
-} from "micromark-util-types"
+import type { Code, Effects, Extension, State, TokenizeContext } from "micromark-util-types"
 
 export function autoTagLinks(): Extension {
     return {
@@ -41,12 +31,7 @@ function tokenizeTag(effects: Effects, ok: State, nok: State) {
     let buffer = ""
 
     function consumeTag(code: Code) {
-        if (
-            !code ||
-            code === codes.space ||
-            code === codes.lineFeed ||
-            code === codes.eof
-        ) {
+        if (!code || code === codes.space || code === codes.lineFeed || code === codes.eof) {
             effects.exit("chunkString")
             let token = effects.exit("autoTagLink")
             token._tag = buffer
@@ -83,10 +68,7 @@ export function mdastAutoTagLinks(): MDASTExtension {
 }
 
 function enterAutoTagLink(this: CompileContext, token: Token) {
-    this.enter(
-        { type: "autoTagLink", tag: token._tag || "", children: [] },
-        token,
-    )
+    this.enter({ type: "autoTagLink", tag: token._tag || "", children: [] }, token)
 }
 
 function exitAutoTagLink(this: CompileContext, token: Token) {

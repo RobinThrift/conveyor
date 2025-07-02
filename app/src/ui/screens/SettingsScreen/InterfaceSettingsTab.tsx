@@ -30,22 +30,15 @@ export function InterfaceSettingsTab() {
         [controls, setControls],
     )
 
-    let [_, displayNameFormAction] = useActionState(
-        (_: unknown, formData: FormData) => {
-            setDisplayName(
-                formData.get("account.name")?.toString() ?? displayName,
-            )
-        },
-        null,
-    )
+    let [_, displayNameFormAction] = useActionState((_: unknown, formData: FormData) => {
+        setDisplayName(formData.get("account.name")?.toString() ?? displayName)
+    }, null)
 
     return (
         <>
             <header>
                 <h2>{t.Title}</h2>
-                <small className="settings-tab-description">
-                    {t.Description}
-                </small>
+                <small className="settings-tab-description">{t.Description}</small>
             </header>
 
             <div className="settings-section">
@@ -89,10 +82,7 @@ export function InterfaceSettingsTab() {
                     >
                         {t.LabelColourScheme}
                     </label>
-                    <SelectColourScheme
-                        fieldClassName="col-span-5"
-                        wrapperClassName="w-full"
-                    />
+                    <SelectColourScheme fieldClassName="col-span-5" wrapperClassName="w-full" />
                 </div>
 
                 <div className="md:grid grid-cols-6 mt-2 space-y-2">
@@ -102,10 +92,7 @@ export function InterfaceSettingsTab() {
                     >
                         {t.LabelModeOverride}
                     </label>
-                    <SelectMode
-                        fieldClassName="col-span-5"
-                        wrapperClassName="w-full"
-                    />
+                    <SelectMode fieldClassName="col-span-5" wrapperClassName="w-full" />
                 </div>
             </div>
 

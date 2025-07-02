@@ -109,10 +109,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         })
 
         let syncCtrl = new SyncController({
-            storage: new SingleItemKVStore<
-                typeof SyncController.storageKey,
-                SyncInfo
-            >(
+            storage: new SingleItemKVStore<typeof SyncController.storageKey, SyncInfo>(
                 SyncController.storageKey,
                 new TestInMemKVStore<Record<string, any>>(),
             ),
@@ -135,10 +132,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         })
 
         let setupCtrl = new SetupController({
-            storage: new SingleItemKVStore<
-                typeof SetupController.storageKey,
-                SetupInfo
-            >(
+            storage: new SingleItemKVStore<typeof SetupController.storageKey, SetupInfo>(
                 SetupController.storageKey,
                 new TestInMemKVStore<Record<string, any>>(),
             ),
@@ -160,12 +154,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
         })
 
         let navCtrl = new NavigationController({
-            backend: new HistoryNavigationBackend<
-                Screens,
-                Stacks,
-                Params,
-                Restore
-            >({
+            backend: new HistoryNavigationBackend<Screens, Stacks, Params, Restore>({
                 fromURLParams: NavigationController.fromURLParams,
                 toURLParams: NavigationController.toURLParams,
                 screenToURLMapping: NavigationController.screenToURLMapping,
@@ -212,9 +201,7 @@ export function MockRootStoreProvider(props: MockRootStoreProviderProps) {
     return (
         <Provider store={rootStore}>
             <NavigationProvider value={navCtrl}>
-                <AttachmentProvider
-                    value={attachmentContextFromController(attachmentCtrl)}
-                >
+                <AttachmentProvider value={attachmentContextFromController(attachmentCtrl)}>
                     <SettingsLoader>{props.children}</SettingsLoader>
                 </AttachmentProvider>
             </NavigationProvider>
@@ -303,11 +290,8 @@ function initNavigation({
     })
 }
 
-function attachmentContextFromController(
-    ctrl: AttachmentController,
-): AttachmentContext {
+function attachmentContextFromController(ctrl: AttachmentController): AttachmentContext {
     return {
-        getAttachmentDataByID: (id) =>
-            ctrl.getAttachmentDataByID(BaseContext, id),
+        getAttachmentDataByID: (id) => ctrl.getAttachmentDataByID(BaseContext, id),
     }
 }

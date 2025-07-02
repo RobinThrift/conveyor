@@ -31,9 +31,7 @@ export const LayoutSelect = React.memo(function LayoutSelect() {
             >
                 <Select.Option value="masonry">{t.LayoutMasonry}</Select.Option>
                 <Select.Option value="single">{t.LayoutSingle}</Select.Option>
-                <Select.Option value="ultra-compact">
-                    {t.LayoutUltraCompact}
-                </Select.Option>
+                <Select.Option value="ultra-compact">{t.LayoutUltraCompact}</Select.Option>
             </Select>
         </div>
     )

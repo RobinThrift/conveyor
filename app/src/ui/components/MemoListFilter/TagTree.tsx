@@ -46,9 +46,7 @@ export function TagTree({ className }: TagTreeProps) {
                         level={1}
                         expanded={expandedChildren}
                         selected={
-                            currentTagFilter?.startsWith(item.tag)
-                                ? currentTagFilter
-                                : undefined
+                            currentTagFilter?.startsWith(item.tag) ? currentTagFilter : undefined
                         }
                         focussed={
                             (focussed ?? firstTag)?.startsWith(item.tag)
@@ -86,8 +84,7 @@ const TagTreeItem = React.memo(
     }: TagTreeItemProps) => {
         let t = useT("components/MemoListFilter/TagTree")
         let labeledByID = useId()
-        let isExpanded =
-            expanded && expanded?.length > 0 && item.children.length > 0
+        let isExpanded = expanded && expanded?.length > 0 && item.children.length > 0
 
         return (
             <li
@@ -137,19 +134,9 @@ const TagTreeItem = React.memo(
                                 item={c}
                                 key={c.tag}
                                 level={level + 1}
-                                expanded={expanded?.filter((e) =>
-                                    e.startsWith(c.tag),
-                                )}
-                                selected={
-                                    selected?.startsWith(c.tag)
-                                        ? selected
-                                        : undefined
-                                }
-                                focussed={
-                                    focussed?.startsWith(c.tag)
-                                        ? focussed
-                                        : undefined
-                                }
+                                expanded={expanded?.filter((e) => e.startsWith(c.tag))}
+                                selected={selected?.startsWith(c.tag) ? selected : undefined}
+                                focussed={focussed?.startsWith(c.tag) ? focussed : undefined}
                                 toggleExpandItem={toggleExpandItem}
                                 selectItem={selectItem}
                             />

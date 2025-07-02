@@ -31,10 +31,7 @@ export class UnlockController {
 
     public async reset(ctx: Context): AsyncResult<void> {
         this.isUnlocked = false
-        return (
-            this._storage?.removeItem(ctx, _plaintextPrivateKeyStorageKey) ??
-            Ok(undefined)
-        )
+        return this._storage?.removeItem(ctx, _plaintextPrivateKeyStorageKey) ?? Ok(undefined)
     }
 
     public static ErrTryGetPlaintextPrivateKey = createErrType(
@@ -52,10 +49,7 @@ export class UnlockController {
             return Ok(undefined)
         }
 
-        let [key, err] = await this._storage.getItem(
-            ctx,
-            _plaintextPrivateKeyStorageKey,
-        )
+        let [key, err] = await this._storage.getItem(ctx, _plaintextPrivateKeyStorageKey)
         if (err) {
             return wrapErr`${new UnlockController.ErrTryGetPlaintextPrivateKey()}: ${err}`
         }
@@ -63,10 +57,7 @@ export class UnlockController {
         return Ok(key as PlaintextPrivateKey | undefined)
     }
 
-    public static ErrUnlock = createErrType(
-        "UnlockController",
-        "error unlocking",
-    )
+    public static ErrUnlock = createErrType("UnlockController", "error unlocking")
     public async unlock(
         ctx: Context,
         {
@@ -86,26 +77,23 @@ export class UnlockController {
             return Ok(undefined)
         }
 
-        let key = new AgePrivateCryptoKey(
-            plaintextKeyData as string as Identity,
-        )
+        let key = new AgePrivateCryptoKey(plaintextKeyData as string as Identity)
 
         let [privateKeyStr, privateKeyErr] = await key.exportPrivateKey()
         if (privateKeyErr) {
             return wrapErr`${new UnlockController.ErrUnlock()}: ${privateKeyErr}`
         }
 
-        let [[_cryptoInit, cryptoInitErr], [_dbOpen, dbOpenErr]] =
-            await Promise.all([
-                this._crypto.init(ctx, { agePrivateCryptoKey: key }),
-                fromPromise(
-                    this._db.open(ctx, {
-                        enckey: privateKeyStr,
-                        file: db?.file ?? "conveyor.db",
-                        enableTracing: db?.enableTracing ?? false,
-                    }),
-                ),
-            ])
+        let [[_cryptoInit, cryptoInitErr], [_dbOpen, dbOpenErr]] = await Promise.all([
+            this._crypto.init(ctx, { agePrivateCryptoKey: key }),
+            fromPromise(
+                this._db.open(ctx, {
+                    enckey: privateKeyStr,
+                    file: db?.file ?? "conveyor.db",
+                    enableTracing: db?.enableTracing ?? false,
+                }),
+            ),
+        ])
         if (cryptoInitErr) {
             return wrapErr`${new UnlockController.ErrUnlock()}: error initializing crypto provider: ${cryptoInitErr}`
         }
@@ -117,11 +105,7 @@ export class UnlockController {
         this.isUnlocked = true
 
         if (storeKey && this._storage) {
-            return this._storage.setItem(
-                ctx,
-                _plaintextPrivateKeyStorageKey,
-                plaintextKeyData,
-            )
+            return this._storage.setItem(ctx, _plaintextPrivateKeyStorageKey, plaintextKeyData)
         }
 
         return Ok()

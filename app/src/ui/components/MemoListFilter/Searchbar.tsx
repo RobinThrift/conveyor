@@ -32,10 +32,7 @@ export function SearchBar(props: {
     }, [])
 
     return (
-        <Form
-            onSubmit={onSubmit}
-            className={clsx("memo-list-filter-search", props.className)}
-        >
+        <Form onSubmit={onSubmit} className={clsx("memo-list-filter-search", props.className)}>
             <Input
                 name="q"
                 type="search"

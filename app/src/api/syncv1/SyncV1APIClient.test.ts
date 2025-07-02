@@ -11,8 +11,7 @@ import { SyncV1APIClient } from "./SyncV1APIClient"
 
 suite("api/syncv1/SyncV1APIClient", async () => {
     test("getFullSync", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, syncV1APIClient } =
-            await setupSyncV1APIClientTest()
+        let { ctx, setup, cleanup, useMocks, syncV1APIClient } = await setupSyncV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
@@ -34,8 +33,7 @@ suite("api/syncv1/SyncV1APIClient", async () => {
     })
 
     test("uploadFullDB", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, syncV1APIClient } =
-            await setupSyncV1APIClientTest()
+        let { ctx, setup, cleanup, useMocks, syncV1APIClient } = await setupSyncV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
@@ -45,24 +43,18 @@ suite("api/syncv1/SyncV1APIClient", async () => {
 
         useMocks(
             http.post("/api/sync/v1/full", async ({ request }) => {
-                assert.equal(
-                    decodeText(new Uint8Array(await request.arrayBuffer())),
-                    content,
-                )
+                assert.equal(decodeText(new Uint8Array(await request.arrayBuffer())), content)
                 return new HttpResponse(null, {
                     status: 201,
                 })
             }),
         )
 
-        await assertOkResult(
-            syncV1APIClient.uploadFullSyncData(ctx, data.buffer),
-        )
+        await assertOkResult(syncV1APIClient.uploadFullSyncData(ctx, data.buffer))
     })
 
     test("uploadAttachment", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, syncV1APIClient } =
-            await setupSyncV1APIClientTest()
+        let { ctx, setup, cleanup, useMocks, syncV1APIClient } = await setupSyncV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
@@ -115,15 +107,12 @@ async function setupSyncV1APIClientTest() {
             cancel()
             mockWorker.stop()
         },
-        useMocks: ((...args) =>
-            mockWorker.use(...args)) as typeof mockWorker.use,
+        useMocks: ((...args) => mockWorker.use(...args)) as typeof mockWorker.use,
         syncV1APIClient,
     }
 }
 
-async function decompressData(
-    stream: ReadableStream<Uint8Array<ArrayBufferLike>>,
-) {
+async function decompressData(stream: ReadableStream<Uint8Array<ArrayBufferLike>>) {
     let { readable, writable } = new TransformStream()
     stream.pipeThrough(new DecompressionStream("gzip")).pipeTo(writable)
 

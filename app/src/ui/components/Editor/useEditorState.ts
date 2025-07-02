@@ -9,8 +9,7 @@ export function useEditorState(props: {
     onSave: (memo: Memo, changeset: MemoContentChanges) => void
     onCancel?: () => void
 }) {
-    let [confirmationDialogIsOpen, setConfirmationDialogIsOpen] =
-        useState(false)
+    let [confirmationDialogIsOpen, setConfirmationDialogIsOpen] = useState(false)
 
     let confirmDiscard = useCallback(() => {
         setConfirmationDialogIsOpen(false)

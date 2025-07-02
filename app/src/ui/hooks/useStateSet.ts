@@ -7,9 +7,7 @@ export interface UseStateSetter<S> {
     delete(s: S): void
 }
 
-export function useStateSet<S>(
-    init: Iterable<S> | (() => Iterable<S>),
-): [S[], UseStateSetter<S>] {
+export function useStateSet<S>(init: Iterable<S> | (() => Iterable<S>)): [S[], UseStateSetter<S>] {
     let [values, setValues] = useState<S[]>([])
     let state = useRef<Set<S>>(new Set())
     let setter = useRef<UseStateSetter<S>>({

@@ -4,14 +4,9 @@ import { type Translation, format } from "@/lib/i18n"
 
 import { i18nContext } from "./context"
 
-export function useT<K extends keyof Translation>(
-    component: K,
-): Translation[K] {
+export function useT<K extends keyof Translation>(component: K): Translation[K] {
     let ctx = useContext(i18nContext)
-    return useMemo(
-        () => ctx.translations[component],
-        [component, ctx.translations],
-    )
+    return useMemo(() => ctx.translations[component], [component, ctx.translations])
 }
 
 export function useFormat() {

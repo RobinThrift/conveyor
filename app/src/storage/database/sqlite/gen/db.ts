@@ -3,11 +3,7 @@
 import type { SqlValue } from "@sqlite.org/sqlite-wasm"
 
 export interface Database {
-    exec: (
-        sql: string,
-        args?: (SqlValue | boolean)[],
-        abort?: AbortSignal,
-    ) => Promise<number>
+    exec: (sql: string, args?: (SqlValue | boolean)[], abort?: AbortSignal) => Promise<number>
     query: <R extends Record<string, SqlValue | boolean>>(
         sql: string,
         args?: (SqlValue | boolean)[],

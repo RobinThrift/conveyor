@@ -81,8 +81,7 @@ function formatDistanceDateTime(
     let date = earlierDate.toDate(getLocalTimeZone())
 
     let diffDays =
-        laterDate.calendar.toJulianDay(laterDate) -
-        earlierDate.calendar.toJulianDay(earlierDate)
+        laterDate.calendar.toJulianDay(laterDate) - earlierDate.calendar.toJulianDay(earlierDate)
 
     let formatted: string
     if (diffDays === 0) {
@@ -165,13 +164,7 @@ function formatDistanceDates(
 }
 
 // calulates the diff in seconds
-function diffCalendarDateTime(
-    laterDate: CalendarDateTime,
-    earlierDate: CalendarDateTime,
-): number {
+function diffCalendarDateTime(laterDate: CalendarDateTime, earlierDate: CalendarDateTime): number {
     let tz = getLocalTimeZone()
-    return Math.floor(
-        (laterDate.toDate(tz).getTime() - earlierDate.toDate(tz).getTime()) /
-            1000,
-    )
+    return Math.floor((laterDate.toDate(tz).getTime() - earlierDate.toDate(tz).getTime()) / 1000)
 }

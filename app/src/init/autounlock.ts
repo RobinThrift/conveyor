@@ -34,10 +34,8 @@ export async function tryAutoUnlock(
         syncCtrl: SyncController
     },
 ): AsyncResult<AutoUnlockResult | undefined> {
-    let [loadSetupInfo, loadSetupInfoErr] = await trace(
-        ctx,
-        "loadSetupInfo",
-        (ctx) => setupCtrl.loadSetupInfo(ctx),
+    let [loadSetupInfo, loadSetupInfoErr] = await trace(ctx, "loadSetupInfo", (ctx) =>
+        setupCtrl.loadSetupInfo(ctx),
     )
 
     if (loadSetupInfoErr) {
@@ -107,9 +105,7 @@ export async function tryAutoUnlock(
         return Err(loadSettingsErr)
     }
 
-    let [syncInfo, loadSyncInfoErr] = await trace(ctx, "loadSyncInfo", (ctx) =>
-        syncCtrl.load(ctx),
-    )
+    let [syncInfo, loadSyncInfoErr] = await trace(ctx, "loadSyncInfo", (ctx) => syncCtrl.load(ctx))
 
     if (loadSyncInfoErr) {
         return Err(loadSyncInfoErr)

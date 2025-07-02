@@ -7,15 +7,11 @@ import {
 
 export function calendarDateTimeFromSQLite(value: null): null
 export function calendarDateTimeFromSQLite(value: string): CalendarDateTime
-export function calendarDateTimeFromSQLite(
-    value: string | null,
-): CalendarDateTime | null {
+export function calendarDateTimeFromSQLite(value: string | null): CalendarDateTime | null {
     if (!value) {
         return null
     }
-    return parseDateTimeISO8601(
-        value.replace(" ", "T").substring(0, value.length - 1),
-    )
+    return parseDateTimeISO8601(value.replace(" ", "T").substring(0, value.length - 1))
 }
 
 export function calendarDateTimeToSQLite(
@@ -28,9 +24,7 @@ export function calendarDateTimeToSQLite(
     let d = value
     if (typeof d === "string") {
         let strValue = value as string
-        d = parseDateTimeISO8601(
-            strValue.replace(" ", "T").substring(0, strValue.length - 1),
-        )
+        d = parseDateTimeISO8601(strValue.replace(" ", "T").substring(0, strValue.length - 1))
     }
 
     if ("calendar" in d && !("second" in d)) {

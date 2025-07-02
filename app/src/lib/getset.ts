@@ -1,19 +1,16 @@
-export function getPath<
-    T extends Record<string, unknown>,
-    K extends KeyPaths<T>,
->(obj: T, path: K): ValueAt<T, K> {
+export function getPath<T extends Record<string, unknown>, K extends KeyPaths<T>>(
+    obj: T,
+    path: K,
+): ValueAt<T, K> {
     return getByKey(obj != null ? obj : {}, (path as string).split("."))
 }
 
-export function setPath<
-    T extends Record<string, unknown>,
-    K extends KeyPaths<T>,
->(obj: T, path: K, value: ValueAt<T, K>): T {
-    return setByKey(
-        obj != null ? obj : {},
-        (path as string).split("."),
-        value,
-    ) as T
+export function setPath<T extends Record<string, unknown>, K extends KeyPaths<T>>(
+    obj: T,
+    path: K,
+    value: ValueAt<T, K>,
+): T {
+    return setByKey(obj != null ? obj : {}, (path as string).split("."), value) as T
 }
 
 export function setByKey<T extends Record<string, unknown>>(
@@ -38,10 +35,10 @@ export function setByKey<T extends Record<string, unknown>>(
     return copy
 }
 
-export function getByKey<
-    T extends Record<string, unknown>,
-    V extends T[keyof T],
->(obj: T, path: PropertyKey[]): V {
+export function getByKey<T extends Record<string, unknown>, V extends T[keyof T]>(
+    obj: T,
+    path: PropertyKey[],
+): V {
     let [key, ...rest] = path
     if (path.length === 1) {
         return obj[key as keyof T] as V
@@ -60,11 +57,7 @@ export type KeyPaths<
           [K in keyof T]-?: K extends string
               ?
                     | (T[K] extends Record<string, unknown>
-                          ? KeyPaths<
-                                T[K],
-                                ConcatPath<P, K>,
-                                Subtract<MaxDepth, 1>
-                            >
+                          ? KeyPaths<T[K], ConcatPath<P, K>, Subtract<MaxDepth, 1>>
                           : ConcatPath<P, K>)
                     | (P extends "" ? never : P)
               : never
@@ -78,10 +71,7 @@ export type ValueAt<T, P> = T extends unknown
         : NestedObjKey<T, P>
     : never
 
-export type KeyPath<
-    T extends Record<string, unknown>,
-    P,
-> = P extends `${infer A}.${infer B}`
+export type KeyPath<T extends Record<string, unknown>, P> = P extends `${infer A}.${infer B}`
     ? A extends keyof T
         ? ValueAt<T[A], B>
         : never
@@ -93,9 +83,7 @@ type NestedObjKey<T, P> = P extends `${infer A}.${infer B}`
         : never
     : never
 
-type ConcatPath<T extends string, P extends string> = T extends ""
-    ? P
-    : `${T}.${P}`
+type ConcatPath<T extends string, P extends string> = T extends "" ? P : `${T}.${P}`
 
 type Length<T extends any[]> = T extends { length: infer L } ? L : never
 

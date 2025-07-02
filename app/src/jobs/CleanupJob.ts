@@ -34,12 +34,8 @@ export class CleanupJob implements Job {
         return Ok()
     }
 
-    private async _removeOrphanedChangelogEntries(
-        ctx: Context,
-    ): AsyncResult<void> {
-        for await (let [page, pageErr] of this._listUnsyncedChangelogEntries(
-            ctx,
-        )) {
+    private async _removeOrphanedChangelogEntries(ctx: Context): AsyncResult<void> {
+        for await (let [page, pageErr] of this._listUnsyncedChangelogEntries(ctx)) {
             if (pageErr) {
                 return Err(pageErr)
             }
@@ -48,12 +44,7 @@ export class CleanupJob implements Job {
                 page.items
                     .values()
                     .filter((e) => e.targetType === "memos")
-                    .map((e) =>
-                        this._checkMemoChangelogEntry(
-                            ctx,
-                            e as MemoChangelogEntry,
-                        ),
-                    ),
+                    .map((e) => this._checkMemoChangelogEntry(ctx, e as MemoChangelogEntry)),
             )
             if (err) {
                 return Err(err)
@@ -67,19 +58,13 @@ export class CleanupJob implements Job {
         ctx: Context,
         entry: MemoChangelogEntry,
     ): AsyncResult<void> {
-        let [memo, getMemoErr] = await this._memoCtrl.getMemo(
-            ctx,
-            entry.targetID,
-        )
+        let [memo, getMemoErr] = await this._memoCtrl.getMemo(ctx, entry.targetID)
         if (memo) {
             return Ok()
         }
 
         if (isErr(getMemoErr, ErrMemoNotFound)) {
-            let [_, deleteErr] = await this._changelogCtrl.deleteChangelogEntry(
-                ctx,
-                entry.id,
-            )
+            let [_, deleteErr] = await this._changelogCtrl.deleteChangelogEntry(ctx, entry.id)
             if (deleteErr) {
                 return wrapErr`error deleting changelog entry: ${deleteErr}`
             }
@@ -92,13 +77,12 @@ export class CleanupJob implements Job {
         let after: [number, Date] | undefined
 
         while (true) {
-            let [page, pageErr] =
-                await this._changelogCtrl.listUnsyncedChangelogEntries(ctx, {
-                    pagination: {
-                        pageSize: 50,
-                        after,
-                    },
-                })
+            let [page, pageErr] = await this._changelogCtrl.listUnsyncedChangelogEntries(ctx, {
+                pagination: {
+                    pageSize: 50,
+                    after,
+                },
+            })
             if (pageErr) {
                 return wrapErr`error getting unsynced changelog entries: ${pageErr}`
             }

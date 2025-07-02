@@ -1,20 +1,15 @@
-import {
-    type RefObject,
-    useEffect,
-    useState,
-    useSyncExternalStore,
-} from "react"
+import { type RefObject, useEffect, useState, useSyncExternalStore } from "react"
 
 export function useOnResize(ref: RefObject<HTMLElement | null>): {
     clientHeight: number
     scrollHeight: number
 } {
-    let [subscribe, setSubscribe] = useState<ReturnType<typeof _subscribe>>(
-        () => _subscribe(ref.current),
+    let [subscribe, setSubscribe] = useState<ReturnType<typeof _subscribe>>(() =>
+        _subscribe(ref.current),
     )
-    let [getSnapshot, setGetSnapshot] = useState<
-        ReturnType<typeof _getSnapshot>
-    >(() => _getSnapshot(ref.current))
+    let [getSnapshot, setGetSnapshot] = useState<ReturnType<typeof _getSnapshot>>(() =>
+        _getSnapshot(ref.current),
+    )
 
     useEffect(() => {
         if (ref.current) {
@@ -34,10 +29,7 @@ export function useOnResize(ref: RefObject<HTMLElement | null>): {
     }
 }
 
-let _snapshots = new WeakMap<
-    Element,
-    { clientHeight: number; scrollHeight: number }
->()
+let _snapshots = new WeakMap<Element, { clientHeight: number; scrollHeight: number }>()
 let _subscriber = new Set<() => void>()
 
 let _observer = new ResizeObserver((entries) => {

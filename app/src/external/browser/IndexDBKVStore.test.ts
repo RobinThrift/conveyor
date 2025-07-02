@@ -25,15 +25,9 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
         }, 1000)
 
         let kvs = {
-            a: container.getKVStore<
-                Record<`item-a-${string}`, { content: string }>
-            >("store-a"),
-            b: container.getKVStore<Record<`item-b-${string}`, string>>(
-                "store-b",
-            ),
-            c: container.getKVStore<
-                Record<`item-c-${string}`, { text: string }>
-            >("store-c"),
+            a: container.getKVStore<Record<`item-a-${string}`, { content: string }>>("store-a"),
+            b: container.getKVStore<Record<`item-b-${string}`, string>>("store-b"),
+            c: container.getKVStore<Record<`item-c-${string}`, { text: string }>>("store-c"),
         }
 
         for (let c of ["a", "b", "c"]) {
@@ -43,9 +37,7 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
                         content: `content-a-${c}`,
                     }),
                 ),
-                assertOkResult(
-                    kvs.b.setItem(ctx, `item-b-${c}`, `content-b-${c}`),
-                ),
+                assertOkResult(kvs.b.setItem(ctx, `item-b-${c}`, `content-b-${c}`)),
                 assertOkResult(
                     kvs.c.setItem(ctx, `item-c-${c}`, {
                         text: `content-c-${c}`,
@@ -59,30 +51,21 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
                 switch (name) {
                     case "a": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.a).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.a).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.equal(item?.content, `content-${name}-${c}`)
                         break
                     }
                     case "b": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.b).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.b).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.equal(item, `content-${name}-${c}`)
                         break
                     }
                     case "c": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.c).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.c).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.equal(item?.text, `content-${name}-${c}`)
                         break
@@ -98,9 +81,7 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
                         content: `updated-a-${c}`,
                     }),
                 ),
-                assertOkResult(
-                    kvs.b.setItem(ctx, `item-b-${c}`, `updated-b-${c}`),
-                ),
+                assertOkResult(kvs.b.setItem(ctx, `item-b-${c}`, `updated-b-${c}`)),
                 assertOkResult(
                     kvs.c.setItem(ctx, `item-c-${c}`, {
                         text: `updated-c-${c}`,
@@ -114,30 +95,21 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
                 switch (name) {
                     case "a": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.a).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.a).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.equal(item?.content, `updated-${name}-${c}`)
                         break
                     }
                     case "b": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.b).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.b).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.equal(item, `updated-${name}-${c}`)
                         break
                     }
                     case "c": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.c).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.c).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.equal(item?.text, `updated-${name}-${c}`)
                         break
@@ -159,30 +131,21 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
                 switch (name) {
                     case "a": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.a).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.a).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.isUndefined(item)
                         break
                     }
                     case "b": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.b).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.b).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.isUndefined(item)
                         break
                     }
                     case "c": {
                         let item = await assertOkResult(
-                            (kv as typeof kvs.c).getItem(
-                                ctx,
-                                `item-${name}-${c}`,
-                            ),
+                            (kv as typeof kvs.c).getItem(ctx, `item-${name}-${c}`),
                         )
                         assert.isUndefined(item)
                         break
@@ -203,9 +166,7 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
         )
         onTestFinished(async () => {
             container.close()
-            await deleteIndexedDBDatabase(
-                "tests.IndexDBKVStore.custom-not-found-error",
-            )
+            await deleteIndexedDBDatabase("tests.IndexDBKVStore.custom-not-found-error")
         }, 1000)
 
         class NotFoundErr extends Error {
@@ -214,10 +175,7 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
             }
         }
 
-        let kv = container.getKVStore<never, NotFoundErr>(
-            "custom-not-found-error",
-            { NotFoundErr },
-        )
+        let kv = container.getKVStore<never, NotFoundErr>("custom-not-found-error", { NotFoundErr })
 
         let err = await assertErrResult(kv.getItem(ctx, "not-found"))
         assert.isTrue(err instanceof NotFoundErr)
@@ -225,12 +183,7 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
 
     test("binary data", async ({ onTestFinished }) => {
         let container = await assertOkResult(
-            IndexedDBKVStoreContainer.open(
-                ctx,
-                "tests.IndexDBKVStore.binary_data",
-                ["store-a"],
-                1,
-            ),
+            IndexedDBKVStoreContainer.open(ctx, "tests.IndexDBKVStore.binary_data", ["store-a"], 1),
         )
         onTestFinished(async () => {
             container.close()
@@ -239,9 +192,7 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
 
         let kv = container.getKVStore("store-a")
 
-        await assertOkResult(
-            kv.setItem(ctx, "item-a", encodeText("Content Item A")),
-        )
+        await assertOkResult(kv.setItem(ctx, "item-a", encodeText("Content Item A")))
 
         let item = await assertOkResult(kv.getItem(ctx, "item-a"))
         assert.deepEqual(item, encodeText("Content Item A"))
@@ -258,80 +209,52 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
         )
         onTestFinished(async () => {
             container.close()
-            await deleteIndexedDBDatabase(
-                "tests.IndexDBKVStore.non-existing-store",
-            )
+            await deleteIndexedDBDatabase("tests.IndexDBKVStore.non-existing-store")
         }, 1000)
 
         await expect(async () => {
             let kv = container.getKVStore("non-existing")
-            await assertOkResult(
-                kv.setItem(ctx, "item-a", encodeText("Content Item A")),
-            )
+            await assertOkResult(kv.setItem(ctx, "item-a", encodeText("Content Item A")))
         }).rejects.toThrow()
     })
 })
 
-suite(
-    "external/browser/IndexDBKVStore/IndexedDBKVStoreContainer",
-    { timeout: 5000 },
-    () => {
-        let [ctx, cancel] = BaseContext.withCancel()
-        afterAll(() => cancel())
+suite("external/browser/IndexDBKVStore/IndexedDBKVStoreContainer", { timeout: 5000 }, () => {
+    let [ctx, cancel] = BaseContext.withCancel()
+    afterAll(() => cancel())
 
-        test("auto migrations", async ({ onTestFinished }) => {
-            let opened: IndexedDBKVStoreContainer<any>[] = []
-            onTestFinished(async () => {
-                opened.forEach((c) => c.close())
-                await deleteIndexedDBDatabase("tests.auto_migrations")
-            }, 1000)
+    test("auto migrations", async ({ onTestFinished }) => {
+        let opened: IndexedDBKVStoreContainer<any>[] = []
+        onTestFinished(async () => {
+            opened.forEach((c) => c.close())
+            await deleteIndexedDBDatabase("tests.auto_migrations")
+        }, 1000)
 
-            let containerV1 = await assertOkResult(
-                IndexedDBKVStoreContainer.open(
-                    ctx,
-                    "tests.auto_migrations",
-                    ["a", "b", "c"],
-                    1,
-                ),
-            )
-            opened.push(containerV1)
-            containerV1.close()
+        let containerV1 = await assertOkResult(
+            IndexedDBKVStoreContainer.open(ctx, "tests.auto_migrations", ["a", "b", "c"], 1),
+        )
+        opened.push(containerV1)
+        containerV1.close()
 
-            let containerV1Again = await assertOkResult(
-                IndexedDBKVStoreContainer.open(
-                    ctx,
-                    "tests.auto_migrations",
-                    ["a", "b", "c"],
-                    1,
-                ),
-            )
-            opened.push(containerV1Again)
-            containerV1Again.close()
+        let containerV1Again = await assertOkResult(
+            IndexedDBKVStoreContainer.open(ctx, "tests.auto_migrations", ["a", "b", "c"], 1),
+        )
+        opened.push(containerV1Again)
+        containerV1Again.close()
 
-            let containerV2 = await assertOkResult(
-                IndexedDBKVStoreContainer.open(
-                    ctx,
-                    "tests.auto_migrations",
-                    ["a", "b", "c", "d"],
-                    2,
-                ),
-            )
-            opened.push(containerV2)
-            containerV2.close()
+        let containerV2 = await assertOkResult(
+            IndexedDBKVStoreContainer.open(ctx, "tests.auto_migrations", ["a", "b", "c", "d"], 2),
+        )
+        opened.push(containerV2)
+        containerV2.close()
 
-            let containerV3 = await assertOkResult(
-                IndexedDBKVStoreContainer.open(
-                    ctx,
-                    "tests.auto_migrations",
-                    ["a", "b", "d"],
-                    3,
-                ),
-            )
-            opened.push(containerV3)
-            containerV3.close()
-        })
-    },
-)
+        let containerV3 = await assertOkResult(
+            IndexedDBKVStoreContainer.open(ctx, "tests.auto_migrations", ["a", "b", "d"], 3),
+        )
+        opened.push(containerV3)
+        containerV3.close()
+    })
+})
 
 function deleteIndexedDBDatabase(name: string) {
     let { resolve, reject, promise } = Promise.withResolvers<void>()

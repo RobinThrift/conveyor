@@ -12,16 +12,10 @@ suite("lib/worker", () => {
 
     test("createWorker", async () => {
         let client = TestWorker.createClient(
-            new Worker(
-                new URL(
-                    "./__test__/worker.internal?worker&url",
-                    import.meta.url,
-                ),
-                {
-                    type: "module",
-                    name: "TestWorker",
-                },
-            ),
+            new Worker(new URL("./__test__/worker.internal?worker&url", import.meta.url), {
+                type: "module",
+                name: "TestWorker",
+            }),
             ctx.signal,
         )
 
@@ -31,9 +25,7 @@ suite("lib/worker", () => {
             }
         })
 
-        let res = await assertOkResult(
-            client.concat(ctx, { strArg: "foo", numArg: 120 }),
-        )
+        let res = await assertOkResult(client.concat(ctx, { strArg: "foo", numArg: 120 }))
 
         assert.equal(res, "foo.120")
 

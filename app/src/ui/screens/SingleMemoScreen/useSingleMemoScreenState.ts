@@ -70,19 +70,14 @@ export function useSingleMemoScreenState() {
                 cancelAnimationFrame(raf)
             }
             window.removeEventListener("scroll", onscroll)
-            document.documentElement.style.removeProperty(
-                "--memo-scroll-progress",
-            )
+            document.documentElement.style.removeProperty("--memo-scroll-progress")
         }
     }, [isMobile])
 
     let nav = useNavigation()
     let memoActions = useMemo(
         () => ({
-            edit: (
-                memoID: MemoID,
-                position?: { x: number; y: number; snippet?: string },
-            ) => {
+            edit: (memoID: MemoID, position?: { x: number; y: number; snippet?: string }) => {
                 nav.push(
                     "memo.edit",
                     {

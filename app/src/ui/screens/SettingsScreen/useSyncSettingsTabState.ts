@@ -49,9 +49,7 @@ export function useSyncSettingsTabState() {
         [dispatch],
     )
 
-    let [showPasswordChange, setShowPasswordChange] = useState<boolean>(
-        info.isEnabled,
-    )
+    let [showPasswordChange, setShowPasswordChange] = useState<boolean>(info.isEnabled)
 
     useEffect(() => {
         setShowPasswordChange(info.isEnabled)

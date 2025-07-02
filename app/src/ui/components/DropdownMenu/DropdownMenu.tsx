@@ -46,11 +46,7 @@ export function DropdownMenuItems(props: DropdownMenuItemsProps) {
     return (
         <AriaPopover>
             <AriaMenu
-                className={clsx(
-                    "dropdown-menu-list",
-                    props.size,
-                    props.className,
-                )}
+                className={clsx("dropdown-menu-list", props.size, props.className)}
                 selectionMode="none"
             >
                 {props.children}
@@ -105,14 +101,9 @@ export interface DropdownMenuItemDescriptionProps {
     className?: string
 }
 
-export function DropdownMenuItemDescription(
-    props: DropdownMenuItemDescriptionProps,
-) {
+export function DropdownMenuItemDescription(props: DropdownMenuItemDescriptionProps) {
     return (
-        <AriaText
-            slot="description"
-            className={clsx("description", props.className)}
-        >
+        <AriaText slot="description" className={clsx("description", props.className)}>
             {props.children}
         </AriaText>
     )

@@ -39,10 +39,7 @@ export function isEqual(a: any, b: any): boolean {
         return (
             value1AsMap.size === value2AsMap.size &&
             [...value1AsMap].every(([iterKey, iterValue]) => {
-                return (
-                    value2AsMap.has(iterKey) &&
-                    isEqual(iterValue, value2AsMap.get(iterKey))
-                )
+                return value2AsMap.has(iterKey) && isEqual(iterValue, value2AsMap.get(iterKey))
             })
         )
     }

@@ -42,9 +42,7 @@ This is some test content for an attachment`
                 assert.fail(`${err.message}: ${err.stack}`)
             }
 
-            let readCopy = new Uint8Array(
-                new ArrayBuffer(readResult.byteLength),
-            )
+            let readCopy = new Uint8Array(new ArrayBuffer(readResult.byteLength))
             readCopy.set(new Uint8Array(readResult), 0)
 
             let readbackContent = decodeText(readCopy)

@@ -54,9 +54,7 @@ export function differenceInCalendarDays(
     b: CalendarDateTime | CalendarDate,
 ) {
     let first = a instanceof Date ? calendarDateTimeFromDate(a) : a
-    return Math.abs(
-        first.calendar.toJulianDay(first) - b.calendar.toJulianDay(b),
-    )
+    return Math.abs(first.calendar.toJulianDay(first) - b.calendar.toJulianDay(b))
 }
 
 export function roundToNearestMinutes(d: CalendarDateTime) {

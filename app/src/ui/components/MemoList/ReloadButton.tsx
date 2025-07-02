@@ -9,9 +9,7 @@ export function ReloadButton({ reload }: { reload: () => void }) {
 
     return (
         <div className="memo-list-reload-btn">
-            <small className="description animate-in slide-in-from-top">
-                {t.Description}
-            </small>
+            <small className="description animate-in slide-in-from-top">{t.Description}</small>
 
             <Button
                 className="shadow-md animate-in slide-in-from-top text-sm"

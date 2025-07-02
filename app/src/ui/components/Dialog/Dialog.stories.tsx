@@ -25,9 +25,7 @@ export const Overview: Story = {
             <Dialog.Trigger key="trigger">Open Dialog</Dialog.Trigger>,
             <Dialog.Content key="content">
                 <Dialog.Title>Dialog Title</Dialog.Title>
-                <Dialog.Description>
-                    {faker.lorem.sentence()}
-                </Dialog.Description>
+                <Dialog.Description>{faker.lorem.sentence()}</Dialog.Description>
 
                 {faker.lorem
                     .sentences({ min: 5, max: 10 })
@@ -78,9 +76,7 @@ export const Design: Story = {
         children: [
             <Dialog.Content key="content">
                 <Dialog.Title>Dialog Title</Dialog.Title>
-                <Dialog.Description>
-                    {faker.lorem.sentence()}
-                </Dialog.Description>
+                <Dialog.Description>{faker.lorem.sentence()}</Dialog.Description>
 
                 {faker.lorem
                     .sentences({ min: 5, max: 10 })
@@ -105,14 +101,10 @@ export const Nested: Story = {
             <main>
                 <NestedDialog>
                     <Dialog isModal={true} isKeyboardDismissable={false}>
-                        <Dialog.Trigger key="trigger">
-                            Open Dialog
-                        </Dialog.Trigger>
+                        <Dialog.Trigger key="trigger">Open Dialog</Dialog.Trigger>
                         <Dialog.Content key="content">
                             <Dialog.Title>Dialog Title</Dialog.Title>
-                            <Dialog.Description>
-                                {faker.lorem.sentence()}
-                            </Dialog.Description>
+                            <Dialog.Description>{faker.lorem.sentence()}</Dialog.Description>
 
                             {faker.lorem
                                 .sentences({ min: 5, max: 10 })
@@ -123,10 +115,7 @@ export const Nested: Story = {
                                 ))}
 
                             <Dialog.Buttons>
-                                <Button
-                                    variant="success"
-                                    onPress={action("ok")}
-                                >
+                                <Button variant="success" onPress={action("ok")}>
                                     Ok
                                 </Button>
                                 <Dialog.CloseButton>Close</Dialog.CloseButton>
@@ -145,9 +134,7 @@ function NestedDialog(props: React.PropsWithChildren) {
             <Dialog.Trigger key="trigger">Open Dialog</Dialog.Trigger>
             <Dialog.Content key="content">
                 <Dialog.Title>Dialog Title</Dialog.Title>
-                <Dialog.Description>
-                    {faker.lorem.sentence()}
-                </Dialog.Description>
+                <Dialog.Description>{faker.lorem.sentence()}</Dialog.Description>
 
                 {faker.lorem
                     .sentences(5)

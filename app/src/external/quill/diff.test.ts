@@ -17,10 +17,7 @@ suite("external/quill/diff/applyChanges", () => {
         ]
     >([
         ["Empty String", { input: "", expected: "", changes: [] }],
-        [
-            "Add to empty",
-            { input: "", expected: "added", changes: [{ insert: "added" }] },
-        ],
+        ["Add to empty", { input: "", expected: "added", changes: [{ insert: "added" }] }],
         [
             "Insert at end",
             {
@@ -34,11 +31,7 @@ suite("external/quill/diff/applyChanges", () => {
             {
                 input: "Modify text at end test,",
                 expected: "Modify text at end test, with more content",
-                changes: [
-                    { retain: 23 },
-                    { delete: 1 },
-                    { insert: ", with more content" },
-                ],
+                changes: [{ retain: 23 }, { delete: 1 }, { insert: ", with more content" }],
             },
         ],
     ])("%s", (_, { input, expected, changes }) => {
@@ -79,10 +72,6 @@ Line 4 unchanged`
 
         let actual = changesToString(diff.ops)
 
-        assert.equal(
-            actual,
-            expected,
-            `acutal: \n${actual}\n\nexpected: \n${expected}`,
-        )
+        assert.equal(actual, expected, `acutal: \n${actual}\n\nexpected: \n${expected}`)
     })
 })

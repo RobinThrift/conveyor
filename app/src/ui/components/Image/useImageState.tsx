@@ -21,16 +21,12 @@ export function useImageState({
             return undefined
         }
 
-        return URL.createObjectURL(
-            new Blob([new Uint8Array(attachmentData?.data)]),
-        )
+        return URL.createObjectURL(new Blob([new Uint8Array(attachmentData?.data)]))
     }, [attachmentData])
 
     let src = attachment ? (attachmentURL ?? hash) : props.src
 
-    let isLoading =
-        typeof attachment !== "undefined" &&
-        typeof attachmentURL === "undefined"
+    let isLoading = typeof attachment !== "undefined" && typeof attachmentURL === "undefined"
 
     let style = {
         minWidth: hash && !attachmentURL ? "200px" : undefined,
@@ -44,9 +40,7 @@ export function useImageState({
     }
 }
 
-function parseImgURL(
-    src: string,
-): { attachmentID: string; thumbhash?: string } | undefined {
+function parseImgURL(src: string): { attachmentID: string; thumbhash?: string } | undefined {
     let attachment = attachmentIDFromURL(src)
     if (!attachment) {
         return

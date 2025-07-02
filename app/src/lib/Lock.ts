@@ -7,10 +7,7 @@ export class Lock {
         this.name = name
     }
 
-    public async run<T>(
-        ctx: Context,
-        fn: (ctx: Context) => AsyncResult<T>,
-    ): AsyncResult<T> {
+    public async run<T>(ctx: Context, fn: (ctx: Context) => AsyncResult<T>): AsyncResult<T> {
         return this._run(ctx, {}, fn)
     }
 

@@ -1,7 +1,4 @@
-export function awaitWithAbort<R>(
-    other: Promise<R>,
-    signal?: AbortSignal,
-): Promise<R> {
+export function awaitWithAbort<R>(other: Promise<R>, signal?: AbortSignal): Promise<R> {
     if (!signal) {
         return other
     }
@@ -9,11 +6,9 @@ export function awaitWithAbort<R>(
     return Promise.race([
         other,
         new Promise<R>((_, reject) => {
-            signal.addEventListener(
-                "abort",
-                (evt) => reject((evt.target as AbortSignal).reason),
-                { once: true },
-            )
+            signal.addEventListener("abort", (evt) => reject((evt.target as AbortSignal).reason), {
+                once: true,
+            })
         }),
     ])
 }

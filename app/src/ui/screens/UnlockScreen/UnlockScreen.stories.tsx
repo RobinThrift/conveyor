@@ -1,8 +1,4 @@
-import {
-    combineSlices,
-    configureStore,
-    createListenerMiddleware,
-} from "@reduxjs/toolkit"
+import { combineSlices, configureStore, createListenerMiddleware } from "@reduxjs/toolkit"
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 import { Provider as ReduxProvider, useDispatch } from "react-redux"

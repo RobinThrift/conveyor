@@ -21,9 +21,7 @@ export const Overview: Story = {
     name: "AlertDialog",
     args: {
         children: [
-            <AlertDialog.Trigger key="trigger">
-                Open AlertDialog
-            </AlertDialog.Trigger>,
+            <AlertDialog.Trigger key="trigger">Open AlertDialog</AlertDialog.Trigger>,
             <AlertDialog.Content key="content">
                 <AlertDialog.Title>AlertDialog Title</AlertDialog.Title>
                 <AlertDialog.Icon>

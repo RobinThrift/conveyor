@@ -20,24 +20,18 @@ export const registerEffects = (
 ) => {
     startListening({
         actionCreator: slice.actions.unlock,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, getState, dispatch, signal }) => {
             if (slice.selectors.isUnlocked(getState())) {
                 return
             }
 
             cancelActiveListeners()
 
-            let [_, err] = await unlockCtrl.unlock(
-                BaseContext.withSignal(signal),
-                {
-                    plaintextKeyData: payload.plaintextKeyData,
-                    storeKey: payload.storeKey,
-                    db: payload.db,
-                },
-            )
+            let [_, err] = await unlockCtrl.unlock(BaseContext.withSignal(signal), {
+                plaintextKeyData: payload.plaintextKeyData,
+                storeKey: payload.storeKey,
+                db: payload.db,
+            })
 
             if (signal.aborted) {
                 return
@@ -73,10 +67,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: setup.actions.setupCandidatePrivateCryptoKey,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, signal }) => {
             cancelActiveListeners()
 
             let ctx = BaseContext.withSignal(signal)

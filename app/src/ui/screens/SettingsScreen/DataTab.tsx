@@ -16,9 +16,7 @@ export function DataTab() {
         <div className="h-full space-y-4">
             <div>
                 <h2 className="block">{t.Title}</h2>
-                <small className="settings-tab-description">
-                    {t.Description}
-                </small>
+                <small className="settings-tab-description">{t.Description}</small>
             </div>
 
             <DataJobs />
@@ -36,9 +34,7 @@ function DataJobs() {
     let dispatch = useDispatch()
     let cleanupState = useSelector(cleanupJobSelector)
 
-    let isRunning =
-        cleanupState?.status === "running" ||
-        cleanupState?.status === "requested"
+    let isRunning = cleanupState?.status === "running" || cleanupState?.status === "requested"
 
     let startCleanupJob = useCallback(() => {
         dispatch(actions.jobs.startJob({ job: "cleanup" }))
@@ -50,8 +46,7 @@ function DataJobs() {
             <ul className="space-y-4">
                 <li className="flex flex-col">
                     <div>
-                        <strong>{t.CleanupJobLabel}</strong>:{" "}
-                        {t.CleanupJobDescription}
+                        <strong>{t.CleanupJobLabel}</strong>: {t.CleanupJobDescription}
                     </div>
 
                     <Button
@@ -66,8 +61,7 @@ function DataJobs() {
 
                     {cleanupState?.error ? (
                         <Alert variant="danger">
-                            {cleanupState?.error.name}:{" "}
-                            {cleanupState?.error.message}
+                            {cleanupState?.error.name}: {cleanupState?.error.message}
                             {cleanupState?.error.stack && (
                                 <pre>
                                     <code>{cleanupState?.error.stack}</code>
@@ -94,8 +88,7 @@ function ExportJob() {
     let jobState = useSelector(exportJobSelector)
     let filename = "export.db"
 
-    let isRunning =
-        jobState?.status === "running" || jobState?.status === "requested"
+    let isRunning = jobState?.status === "running" || jobState?.status === "requested"
 
     let [_, startJob] = useActionState((_: unknown, formData: FormData) => {
         dispatch(
@@ -121,8 +114,7 @@ function ExportJob() {
         <li className="flex flex-col">
             <Form action={startJob}>
                 <div>
-                    <strong>{t.ExportJobLabel}</strong>:{" "}
-                    {t.ExportJobDescription}
+                    <strong>{t.ExportJobLabel}</strong>: {t.ExportJobDescription}
                 </div>
 
                 <Input

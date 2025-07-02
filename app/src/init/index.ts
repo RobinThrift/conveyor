@@ -16,12 +16,7 @@ export async function init() {
 
     let navCtrl = initNavigation({
         rootStore,
-        navigationBackend: new HistoryNavigationBackend<
-            Screens,
-            Stacks,
-            Params,
-            Restore
-        >({
+        navigationBackend: new HistoryNavigationBackend<Screens, Stacks, Params, Restore>({
             fromURLParams: NavigationController.fromURLParams,
             toURLParams: NavigationController.toURLParams,
             screenToURLMapping: NavigationController.screenToURLMapping,
@@ -29,11 +24,7 @@ export async function init() {
     })
 
     onNavigationEvent(
-        (
-            evt: MessageEvent<
-                RemoteNavigationPushMessage<Screens, Stacks, Restore>
-            >,
-        ) => {
+        (evt: MessageEvent<RemoteNavigationPushMessage<Screens, Stacks, Restore>>) => {
             let msg = evt.data
             if (msg?.type === "navigation:push") {
                 evt.stopImmediatePropagation()

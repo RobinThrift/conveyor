@@ -94,9 +94,7 @@ const columnNameToFieldNameFuncDecl = factory.createFunctionDeclaration(
                                     factory.createCallExpression(
                                         factory.createPropertyAccessExpression(
                                             factory.createIdentifier("group"),
-                                            factory.createIdentifier(
-                                                "toUpperCase",
-                                            ),
+                                            factory.createIdentifier("toUpperCase"),
                                         ),
                                         undefined,
                                         undefined,
@@ -104,10 +102,7 @@ const columnNameToFieldNameFuncDecl = factory.createFunctionDeclaration(
                                     factory.createIdentifier("replace"),
                                 ),
                                 undefined,
-                                [
-                                    factory.createStringLiteral("_"),
-                                    factory.createStringLiteral(""),
-                                ],
+                                [factory.createStringLiteral("_"), factory.createStringLiteral("")],
                             ),
                         ),
                     ],
@@ -166,9 +161,7 @@ const mapRowToObjFuncDecl = factory.createFunctionDeclaration(
                                 undefined, // dotDotDotToken
                                 factory.createIdentifier("v"), // name
                                 undefined, // questionToken
-                                factory.createKeywordTypeNode(
-                                    SyntaxKind.AnyKeyword,
-                                ), // type
+                                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword), // type
                                 undefined, // initializer
                             ),
                         ],
@@ -191,9 +184,7 @@ const mapRowToObjFuncDecl = factory.createFunctionDeclaration(
                             undefined,
                             undefined,
                             factory.createAsExpression(
-                                factory.createObjectLiteralExpression(
-                                    undefined,
-                                ),
+                                factory.createObjectLiteralExpression(undefined),
                                 factory.createTypeReferenceNode("T", undefined),
                             ),
                         ),
@@ -226,22 +217,13 @@ const mapRowToObjFuncDecl = factory.createFunctionDeclaration(
                                         undefined,
                                         factory.createAsExpression(
                                             factory.createCallExpression(
-                                                factory.createIdentifier(
-                                                    "columnNameToFieldName",
-                                                ),
+                                                factory.createIdentifier("columnNameToFieldName"),
                                                 undefined,
-                                                [
-                                                    factory.createIdentifier(
-                                                        "key",
-                                                    ),
-                                                ],
+                                                [factory.createIdentifier("key")],
                                             ),
                                             factory.createTypeOperatorNode(
                                                 SyntaxKind.KeyOfKeyword,
-                                                factory.createTypeReferenceNode(
-                                                    "T",
-                                                    undefined,
-                                                ),
+                                                factory.createTypeReferenceNode("T", undefined),
                                             ),
                                         ),
                                     ),
@@ -265,14 +247,9 @@ const mapRowToObjFuncDecl = factory.createFunctionDeclaration(
                                                 factory.createIdentifier("key"),
                                             ),
                                             factory.createIndexedAccessTypeNode(
-                                                factory.createTypeReferenceNode(
-                                                    "T",
-                                                    undefined,
-                                                ),
+                                                factory.createTypeReferenceNode("T", undefined),
                                                 factory.createTypeQueryNode(
-                                                    factory.createIdentifier(
-                                                        "field",
-                                                    ),
+                                                    factory.createIdentifier("field"),
                                                     undefined,
                                                 ),
                                             ),
@@ -296,20 +273,12 @@ const mapRowToObjFuncDecl = factory.createFunctionDeclaration(
                                             factory.createIdentifier("value"),
                                             factory.createCallExpression(
                                                 factory.createElementAccessChain(
-                                                    factory.createIdentifier(
-                                                        "overrides",
-                                                    ),
+                                                    factory.createIdentifier("overrides"),
                                                     undefined,
-                                                    factory.createIdentifier(
-                                                        "field",
-                                                    ),
+                                                    factory.createIdentifier("field"),
                                                 ),
                                                 undefined,
-                                                [
-                                                    factory.createIdentifier(
-                                                        "value",
-                                                    ),
-                                                ],
+                                                [factory.createIdentifier("value")],
                                             ),
                                         ),
                                     ),
@@ -329,14 +298,9 @@ const mapRowToObjFuncDecl = factory.createFunctionDeclaration(
                                             factory.createIdentifier("field"),
                                         ),
                                         factory.createIndexedAccessTypeNode(
-                                            factory.createTypeReferenceNode(
-                                                "T",
-                                                undefined,
-                                            ),
+                                            factory.createTypeReferenceNode("T", undefined),
                                             factory.createTypeQueryNode(
-                                                factory.createIdentifier(
-                                                    "field",
-                                                ),
+                                                factory.createIdentifier("field"),
                                                 undefined,
                                             ),
                                         ),

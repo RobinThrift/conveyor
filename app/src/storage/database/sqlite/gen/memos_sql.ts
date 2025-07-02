@@ -4,10 +4,7 @@ import type { Database } from "./db"
 
 import { mapRowToObj, numberToBool } from "./utils"
 
-import {
-    dateFromSQLite,
-    dateToSQLite,
-} from "@/storage/database/sqlite/types/datetime"
+import { dateFromSQLite, dateToSQLite } from "@/storage/database/sqlite/types/datetime"
 
 const getMemoQuery = `-- name: GetMemo :one
 SELECT public_id, content, is_archived, is_deleted, created_at, updated_at
@@ -363,11 +360,7 @@ export async function updateMemoContent(
     args: UpdateMemoContentArgs,
     abort?: AbortSignal,
 ) {
-    return database.exec(
-        updateMemoContentQuery,
-        [args.content, args.publicId],
-        abort,
-    )
+    return database.exec(updateMemoContentQuery, [args.content, args.publicId], abort)
 }
 
 const seteMemoArchiveStatusQuery = `-- name: SeteMemoArchiveStatus :execrows
@@ -387,11 +380,7 @@ export async function seteMemoArchiveStatus(
     args: SeteMemoArchiveStatusArgs,
     abort?: AbortSignal,
 ) {
-    return database.exec(
-        seteMemoArchiveStatusQuery,
-        [args.isArchived, args.publicId],
-        abort,
-    )
+    return database.exec(seteMemoArchiveStatusQuery, [args.isArchived, args.publicId], abort)
 }
 
 const setMemoDeletionStatusQuery = `-- name: SetMemoDeletionStatus :execrows
@@ -411,20 +400,13 @@ export async function setMemoDeletionStatus(
     args: SetMemoDeletionStatusArgs,
     abort?: AbortSignal,
 ) {
-    return database.exec(
-        setMemoDeletionStatusQuery,
-        [args.isDeleted, args.publicId],
-        abort,
-    )
+    return database.exec(setMemoDeletionStatusQuery, [args.isDeleted, args.publicId], abort)
 }
 
 const cleanupDeletedMemosQuery = `-- name: CleanupDeletedMemos :execrows
 DELETE FROM memos WHERE is_deleted = true AND date(updated_at) < date('now','-30 days')`
 
-export async function cleanupDeletedMemos(
-    database: Database,
-    abort?: AbortSignal,
-) {
+export async function cleanupDeletedMemos(database: Database, abort?: AbortSignal) {
     return database.exec(cleanupDeletedMemosQuery, [], abort)
 }
 
@@ -453,11 +435,7 @@ export async function listTags(
     args: ListTagsArgs,
     abort?: AbortSignal,
 ): Promise<ListTagsRow[]> {
-    let result = await database.query(
-        listTagsQuery,
-        [args.pageAfter, args.pageSize],
-        abort,
-    )
+    let result = await database.query(listTagsQuery, [args.pageAfter, args.pageSize], abort)
     return result.map((row) =>
         mapRowToObj<ListTagsRow>(row, {
             createdAt: dateFromSQLite,
@@ -479,11 +457,7 @@ export interface CreateTagArgs {
     tag: string
 }
 
-export async function createTag(
-    database: Database,
-    args: CreateTagArgs,
-    abort?: AbortSignal,
-) {
+export async function createTag(database: Database, args: CreateTagArgs, abort?: AbortSignal) {
     await database.exec(createTagQuery, [args.tag], abort)
 }
 
@@ -506,20 +480,13 @@ export async function updateTagCount(
         "/*SLICE:tags*/?",
         [...Array(args.tags.length).keys()].map((i) => `?${i + 1}`).join(","),
     )
-    await database.exec(
-        updateTagCountQueryWithSliceParams,
-        [...args.tags],
-        abort,
-    )
+    await database.exec(updateTagCountQueryWithSliceParams, [...args.tags], abort)
 }
 
 const cleanupTagsWithNoCountQuery = `-- name: CleanupTagsWithNoCount :exec
 DELETE FROM tags WHERE count = 0`
 
-export async function cleanupTagsWithNoCount(
-    database: Database,
-    abort?: AbortSignal,
-) {
+export async function cleanupTagsWithNoCount(database: Database, abort?: AbortSignal) {
     await database.exec(cleanupTagsWithNoCountQuery, [], abort)
 }
 
@@ -540,11 +507,7 @@ export async function createMemoTagConnection(
     args: CreateMemoTagConnectionArgs,
     abort?: AbortSignal,
 ) {
-    await database.exec(
-        createMemoTagConnectionQuery,
-        [args.memoId, args.tag],
-        abort,
-    )
+    await database.exec(createMemoTagConnectionQuery, [args.memoId, args.tag], abort)
 }
 
 const cleanupeMemoTagConnectionQuery = `-- name: CleanupeMemoTagConnection :many
@@ -564,21 +527,16 @@ export async function cleanupeMemoTagConnection(
     args: CleanupeMemoTagConnectionArgs,
     abort?: AbortSignal,
 ): Promise<CleanupeMemoTagConnectionRow[]> {
-    let cleanupeMemoTagConnectionQueryWithSliceParams =
-        cleanupeMemoTagConnectionQuery.replace(
-            "/*SLICE:tags*/?",
-            [...Array(args.tags.length).keys()]
-                .map((i) => `?${i + 2}`)
-                .join(","),
-        )
+    let cleanupeMemoTagConnectionQueryWithSliceParams = cleanupeMemoTagConnectionQuery.replace(
+        "/*SLICE:tags*/?",
+        [...Array(args.tags.length).keys()].map((i) => `?${i + 2}`).join(","),
+    )
     let result = await database.query(
         cleanupeMemoTagConnectionQueryWithSliceParams,
         [args.memoId, ...args.tags],
         abort,
     )
-    return result.map((row) =>
-        mapRowToObj<CleanupeMemoTagConnectionRow>(row, {}),
-    )
+    return result.map((row) => mapRowToObj<CleanupeMemoTagConnectionRow>(row, {}))
 }
 
 const deleteMemoTagConnectionsQuery = `-- name: DeleteMemoTagConnections :many
@@ -597,12 +555,6 @@ export async function deleteMemoTagConnections(
     args: DeleteMemoTagConnectionsArgs,
     abort?: AbortSignal,
 ): Promise<DeleteMemoTagConnectionsRow[]> {
-    let result = await database.query(
-        deleteMemoTagConnectionsQuery,
-        [args.memoId],
-        abort,
-    )
-    return result.map((row) =>
-        mapRowToObj<DeleteMemoTagConnectionsRow>(row, {}),
-    )
+    let result = await database.query(deleteMemoTagConnectionsQuery, [args.memoId], abort)
+    return result.map((row) => mapRowToObj<DeleteMemoTagConnectionsRow>(row, {}))
 }

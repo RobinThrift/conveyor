@@ -1,18 +1,9 @@
-import {
-    type Attachment,
-    type AttachmentID,
-    attachmentIDFromURL,
-} from "@/domain/Attachment"
+import { type Attachment, type AttachmentID, attachmentIDFromURL } from "@/domain/Attachment"
 import type { AsyncResult } from "@/lib/result"
 import { syntaxTree } from "@codemirror/language"
 import type { Range } from "@codemirror/state"
 import { Decoration, type EditorView } from "@codemirror/view"
-import {
-    type DecorationSet,
-    ViewPlugin,
-    type ViewUpdate,
-    WidgetType,
-} from "@codemirror/view"
+import { type DecorationSet, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view"
 
 type GetAttachmentDataByID = (
     id: AttachmentID,
@@ -33,10 +24,7 @@ export const inlineImages = (getAttachmentDataByID: GetAttachmentDataByID) =>
                     update.viewportChanged ||
                     syntaxTree(update.startState) !== syntaxTree(update.state)
                 ) {
-                    this.decorations = renderImages(
-                        update.view,
-                        getAttachmentDataByID,
-                    )
+                    this.decorations = renderImages(update.view, getAttachmentDataByID)
                 }
             }
         },
@@ -45,10 +33,7 @@ export const inlineImages = (getAttachmentDataByID: GetAttachmentDataByID) =>
         },
     )
 
-function renderImages(
-    view: EditorView,
-    getAttachmentDataByID: GetAttachmentDataByID,
-) {
+function renderImages(view: EditorView, getAttachmentDataByID: GetAttachmentDataByID) {
     let widgets: Range<Decoration>[] = []
     for (let { from, to } of view.visibleRanges) {
         syntaxTree(view.state).iterate({
@@ -101,22 +86,18 @@ class ImageWidget extends WidgetType {
 
         let attachment = attachmentIDFromURL(this._src)
         if (attachment?.attachmentID) {
-            this._getAttachmentDataByID(attachment.attachmentID).then(
-                ([data, err]) => {
-                    if (err) {
-                        console.error(err)
-                        return
-                    }
+            this._getAttachmentDataByID(attachment.attachmentID).then(([data, err]) => {
+                if (err) {
+                    console.error(err)
+                    return
+                }
 
-                    if (!this._dom || !data?.data) {
-                        return
-                    }
+                if (!this._dom || !data?.data) {
+                    return
+                }
 
-                    this._dom.src = URL.createObjectURL(
-                        new Blob([new Uint8Array(data?.data)]),
-                    )
-                },
-            )
+                this._dom.src = URL.createObjectURL(new Blob([new Uint8Array(data?.data)]))
+            })
         } else {
             this._dom.src = this._src
         }

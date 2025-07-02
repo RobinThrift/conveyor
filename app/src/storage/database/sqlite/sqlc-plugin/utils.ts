@@ -19,9 +19,7 @@ import {
 import type { Options, Override } from "./Options.ts"
 import type { Column, Parameter, Query } from "./proto/codegen_pb.js"
 
-export function generateImportDeclaration(
-    imports: Record<string, ImportSpecifier[]>,
-) {
+export function generateImportDeclaration(imports: Record<string, ImportSpecifier[]>) {
     let importNodes: Node[] = []
     for (let from in imports) {
         let specs = imports[from]
@@ -37,9 +35,7 @@ export function generateImportDeclaration(
                         specs.map((s) => {
                             return {
                                 ...s,
-                                isTypeOnly: allTypeImports
-                                    ? false
-                                    : s.isTypeOnly,
+                                isTypeOnly: allTypeImports ? false : s.isTypeOnly,
                             }
                         }),
                     ),
@@ -92,11 +88,7 @@ export function generateQueryArgsInterfaceDeclaration(
                 undefined,
                 createColumnType(
                     param.column,
-                    overrides.find(
-                        (o) =>
-                            param.column &&
-                            o.column === fullColumName(param.column),
-                    ),
+                    overrides.find((o) => param.column && o.column === fullColumName(param.column)),
                 ),
             ),
         ),
@@ -153,12 +145,7 @@ export function generateExecQueryFunctionDeclaration(
                 ...statements,
                 factory.createExpressionStatement(
                     factory.createAwaitExpression(
-                        createDatabaseExecStatement(
-                            queryIdent,
-                            params,
-                            "exec",
-                            options,
-                        ),
+                        createDatabaseExecStatement(queryIdent, params, "exec", options),
                     ),
                 ),
             ],
@@ -192,12 +179,7 @@ export function generateExecRowsQueryFunctionDeclaration(
             [
                 ...statements,
                 factory.createReturnStatement(
-                    createDatabaseExecStatement(
-                        queryIdent,
-                        params,
-                        "exec",
-                        options,
-                    ),
+                    createDatabaseExecStatement(queryIdent, params, "exec", options),
                 ),
             ],
             true,
@@ -248,10 +230,7 @@ export function generateOneQueryFunctionDeclaration(
 
         factory.createTypeReferenceNode(factory.createIdentifier("Promise"), [
             factory.createUnionTypeNode([
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier(returnIface),
-                    undefined,
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier(returnIface), undefined),
                 factory.createLiteralTypeNode(factory.createNull()),
             ]),
         ]),
@@ -268,12 +247,7 @@ export function generateOneQueryFunctionDeclaration(
                                 undefined,
                                 undefined,
                                 factory.createAwaitExpression(
-                                    createDatabaseExecStatement(
-                                        queryIdent,
-                                        params,
-                                        "one",
-                                        options,
-                                    ),
+                                    createDatabaseExecStatement(queryIdent, params, "one", options),
                                 ),
                             ),
                         ],
@@ -348,10 +322,7 @@ export function generateManyQueryFunctionDeclaration(
 
         factory.createTypeReferenceNode(factory.createIdentifier("Promise"), [
             factory.createArrayTypeNode(
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier(returnIface),
-                    undefined,
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier(returnIface), undefined),
             ),
         ]),
 
@@ -404,11 +375,7 @@ export function generateManyQueryFunctionDeclaration(
                                 undefined,
                                 factory.createCallExpression(
                                     factory.createIdentifier("mapRowToObj"),
-                                    [
-                                        factory.createTypeReferenceNode(
-                                            returnIface,
-                                        ),
-                                    ],
+                                    [factory.createTypeReferenceNode(returnIface)],
                                     mapRowToObjParams,
                                 ),
                             ),
@@ -421,20 +388,14 @@ export function generateManyQueryFunctionDeclaration(
     )
 }
 
-function createQueryFunctionParams(
-    iface: string | undefined,
-    params: Parameter[],
-) {
+function createQueryFunctionParams(iface: string | undefined, params: Parameter[]) {
     let funcParams = [
         factory.createParameterDeclaration(
             undefined,
             undefined,
             factory.createIdentifier("database"),
             undefined,
-            factory.createTypeReferenceNode(
-                factory.createIdentifier("Database"),
-                undefined,
-            ),
+            factory.createTypeReferenceNode(factory.createIdentifier("Database"), undefined),
             undefined,
         ),
     ]
@@ -446,10 +407,7 @@ function createQueryFunctionParams(
                 undefined,
                 factory.createIdentifier("args"),
                 undefined,
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier(iface),
-                    undefined,
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier(iface), undefined),
                 undefined,
             ),
         )
@@ -461,10 +419,7 @@ function createQueryFunctionParams(
             undefined,
             factory.createIdentifier("abort"),
             factory.createToken(SyntaxKind.QuestionToken),
-            factory.createTypeReferenceNode(
-                factory.createIdentifier("AbortSignal"),
-                undefined,
-            ),
+            factory.createTypeReferenceNode(factory.createIdentifier("AbortSignal"), undefined),
             undefined,
         ),
     )
@@ -510,9 +465,7 @@ function createSliceParamMacro(queryName: string, params: Parameter[]) {
                                                 factory.createSpreadElement(
                                                     createCallChain(
                                                         [
-                                                            factory.createIdentifier(
-                                                                "Array",
-                                                            ),
+                                                            factory.createIdentifier("Array"),
                                                             [
                                                                 factory.createPropertyAccessExpression(
                                                                     factory.createPropertyAccessExpression(
@@ -547,9 +500,7 @@ function createSliceParamMacro(queryName: string, params: Parameter[]) {
                                                     factory.createParameterDeclaration(
                                                         undefined,
                                                         undefined,
-                                                        factory.createIdentifier(
-                                                            "i",
-                                                        ),
+                                                        factory.createIdentifier("i"),
                                                         undefined,
                                                         undefined,
                                                         undefined,
@@ -558,15 +509,11 @@ function createSliceParamMacro(queryName: string, params: Parameter[]) {
                                                 undefined,
                                                 undefined,
                                                 factory.createTemplateExpression(
-                                                    factory.createTemplateHead(
-                                                        "?",
-                                                    ),
+                                                    factory.createTemplateHead("?"),
                                                     [
                                                         factory.createTemplateSpan(
                                                             factory.createBinaryExpression(
-                                                                factory.createIdentifier(
-                                                                    "i",
-                                                                ),
+                                                                factory.createIdentifier("i"),
                                                                 factory.createToken(
                                                                     SyntaxKind.PlusToken,
                                                                 ),
@@ -574,9 +521,7 @@ function createSliceParamMacro(queryName: string, params: Parameter[]) {
                                                                     sliceParam.number,
                                                                 ),
                                                             ),
-                                                            factory.createTemplateTail(
-                                                                "",
-                                                            ),
+                                                            factory.createTemplateTail(""),
                                                         ),
                                                     ],
                                                 ),
@@ -675,10 +620,7 @@ export function astToString(name: string, nodes: Node[]) {
     return output
 }
 
-export function createColumnType(
-    column?: Column,
-    override?: Override,
-): TypeNode {
+export function createColumnType(column?: Column, override?: Override): TypeNode {
     if (column === undefined || column.type === undefined) {
         return factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
     }
@@ -704,10 +646,7 @@ export function createColumnType(
         case "date":
         case "datetime":
         case "timestamp": {
-            typ = factory.createTypeReferenceNode(
-                factory.createIdentifier("Date"),
-                undefined,
-            )
+            typ = factory.createTypeReferenceNode(factory.createIdentifier("Date"), undefined)
             break
         }
     }
@@ -720,17 +659,10 @@ export function createColumnType(
         return typ
     }
 
-    return factory.createUnionTypeNode([
-        typ,
-        factory.createLiteralTypeNode(factory.createNull()),
-    ])
+    return factory.createUnionTypeNode([typ, factory.createLiteralTypeNode(factory.createNull())])
 }
 
-function createProperyCallExp(
-    expr: Expression,
-    property: string | MemberName,
-    args: Expression[],
-) {
+function createProperyCallExp(expr: Expression, property: string | MemberName, args: Expression[]) {
     return factory.createCallExpression(
         factory.createPropertyAccessExpression(expr, property),
         undefined,
@@ -738,12 +670,12 @@ function createProperyCallExp(
     )
 }
 
-function createCallChain(
-    first: [Expression, Expression[]],
-    ...chain: [string, Expression[]][]
-) {
-    let expr: ReturnType<typeof factory.createCallExpression> =
-        factory.createCallExpression(first[0], undefined, first[1])
+function createCallChain(first: [Expression, Expression[]], ...chain: [string, Expression[]][]) {
+    let expr: ReturnType<typeof factory.createCallExpression> = factory.createCallExpression(
+        first[0],
+        undefined,
+        first[1],
+    )
     for (let i = 0; i < chain.length; i++) {
         let curr = chain[i]
         expr = factory.createCallExpression(
@@ -756,11 +688,7 @@ function createCallChain(
     return expr
 }
 
-export function fieldName(
-    prefix: string,
-    index: number,
-    column?: Column,
-): string {
+export function fieldName(prefix: string, index: number, column?: Column): string {
     let name = `${prefix}_${index}`
     if (column) {
         name = column.name
@@ -777,9 +705,7 @@ export function columnName(index: number, column?: Column): string {
 }
 
 export function strToCamelCase(str: string) {
-    return str.replace(/([_][a-z])/g, (group) =>
-        group.toUpperCase().replace("_", ""),
-    )
+    return str.replace(/([_][a-z])/g, (group) => group.toUpperCase().replace("_", ""))
 }
 
 export function fullColumName(column: Column): string {
@@ -797,9 +723,7 @@ export function validateQueryColumns(query: Query) {
         }
         let count = colmap.get(column.name) || 0
         if (count > 0) {
-            throw new Error(
-                `duplicate column: ${column.name} in query ${query.name}`,
-            )
+            throw new Error(`duplicate column: ${column.name} in query ${query.name}`)
         }
         colmap.set(column.name, count + 1)
     }

@@ -4,10 +4,7 @@ import type { Database } from "./db"
 
 import { mapRowToObj, numberToBool } from "./utils"
 
-import {
-    dateFromSQLite,
-    dateToSQLite,
-} from "@/storage/database/sqlite/types/datetime"
+import { dateFromSQLite, dateToSQLite } from "@/storage/database/sqlite/types/datetime"
 
 const listUnsyncedChangesQuery = `-- name: ListUnsyncedChanges :many
 SELECT id, public_id, source, revision, timestamp, target_type, target_id, value, is_applied, is_synced, applied_at, synced_at, created_at, updated_at
@@ -54,11 +51,7 @@ export async function listUnsyncedChanges(
 ): Promise<ListUnsyncedChangesRow[]> {
     let result = await database.query(
         listUnsyncedChangesQuery,
-        [
-            dateToSQLite(args.chlgPageAfterDate),
-            args.chlgPageAfterId,
-            args.pageSize,
-        ],
+        [dateToSQLite(args.chlgPageAfterDate), args.chlgPageAfterId, args.pageSize],
         abort,
     )
     return result.map((row) =>
@@ -118,11 +111,7 @@ export async function listUnappliedChanges(
 ): Promise<ListUnappliedChangesRow[]> {
     let result = await database.query(
         listUnappliedChangesQuery,
-        [
-            dateToSQLite(args.chlgPageAfterDate),
-            args.chlgPageAfterId,
-            args.pageSize,
-        ],
+        [dateToSQLite(args.chlgPageAfterDate), args.chlgPageAfterId, args.pageSize],
         abort,
     )
     return result.map((row) =>
@@ -169,11 +158,7 @@ export async function listChangelogEntriesForID(
     args: ListChangelogEntriesForIDArgs,
     abort?: AbortSignal,
 ): Promise<ListChangelogEntriesForIDRow[]> {
-    let result = await database.query(
-        listChangelogEntriesForIDQuery,
-        [args.targetId],
-        abort,
-    )
+    let result = await database.query(listChangelogEntriesForIDQuery, [args.targetId], abort)
     return result.map((row) =>
         mapRowToObj<ListChangelogEntriesForIDRow>(row, {
             timestamp: dateFromSQLite,
@@ -275,9 +260,7 @@ export async function markChangelogEntriesAsSynced(
     let markChangelogEntriesAsSyncedQueryWithSliceParams =
         markChangelogEntriesAsSyncedQuery.replace(
             "/*SLICE:public_ids*/?",
-            [...Array(args.publicIds.length).keys()]
-                .map((i) => `?${i + 1}`)
-                .join(","),
+            [...Array(args.publicIds.length).keys()].map((i) => `?${i + 1}`).join(","),
         )
     await database.exec(
         markChangelogEntriesAsSyncedQueryWithSliceParams,
@@ -303,9 +286,7 @@ export async function markChangelogEntriesAsApplied(
     let markChangelogEntriesAsAppliedQueryWithSliceParams =
         markChangelogEntriesAsAppliedQuery.replace(
             "/*SLICE:public_ids*/?",
-            [...Array(args.publicIds.length).keys()]
-                .map((i) => `?${i + 1}`)
-                .join(","),
+            [...Array(args.publicIds.length).keys()].map((i) => `?${i + 1}`).join(","),
         )
     await database.exec(
         markChangelogEntriesAsAppliedQueryWithSliceParams,

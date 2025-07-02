@@ -1,9 +1,4 @@
-import {
-    type DependencyList,
-    type RefObject,
-    useCallback,
-    useEffect,
-} from "react"
+import { type DependencyList, type RefObject, useCallback, useEffect } from "react"
 
 export function useOnIntersection(
     onChange: (isVisible: boolean) => void,
@@ -17,9 +12,7 @@ export function useOnIntersection(
         if (ref.current) {
             let observer = new IntersectionObserver(
                 (entries: IntersectionObserverEntry[]) => {
-                    onChangeMemoed(
-                        (entries[0].intersectionRatio ?? 0) > options.ratio,
-                    )
+                    onChangeMemoed((entries[0].intersectionRatio ?? 0) > options.ratio)
                 },
                 {
                     threshold: options.threshold,

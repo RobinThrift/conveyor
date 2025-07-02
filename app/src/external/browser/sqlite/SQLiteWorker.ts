@@ -7,13 +7,7 @@ import sqlite3InitModule, {
 
 import type { Context } from "@/lib/context"
 import { createErrType } from "@/lib/errors"
-import {
-    type AsyncResult,
-    Ok,
-    fromPromise,
-    fromThrowing,
-    wrapErr,
-} from "@/lib/result"
+import { type AsyncResult, Ok, fromPromise, fromThrowing, wrapErr } from "@/lib/result"
 import { createWorker } from "@/lib/worker"
 
 import { privateKeyToDBKey } from "./privateKeyToDBKey"
@@ -113,9 +107,7 @@ export const SQLiteWorker = createWorker({
     },
 
     close: async (): AsyncResult<void> => {
-        console.debug(
-            `Closing SQLite3 database (version: ${sqlite3?.version.libVersion})`,
-        )
+        console.debug(`Closing SQLite3 database (version: ${sqlite3?.version.libVersion})`)
 
         return fromThrowing(() => {
             db?.affirmOpen().close()
@@ -128,8 +120,7 @@ export const SQLiteWorker = createWorker({
         { sql, args }: { sql: string; args?: (SqlValue | boolean)[] },
     ): AsyncResult<number> => {
         return fromThrowing(() => {
-            let changed =
-                db?.affirmOpen().exec({ sql, bind: args }).changes() ?? 0
+            let changed = db?.affirmOpen().exec({ sql, bind: args }).changes() ?? 0
             return changed
         })
     },

@@ -31,10 +31,7 @@ export const slice = createSlice({
             state.requiresReload = true
         },
 
-        setState: (
-            state,
-            { payload }: PayloadAction<{ isLoading: boolean; error?: Error }>,
-        ) => {
+        setState: (state, { payload }: PayloadAction<{ isLoading: boolean; error?: Error }>) => {
             state.isLoading = payload.isLoading
             state.error = payload.error
             state.requiresReload = false

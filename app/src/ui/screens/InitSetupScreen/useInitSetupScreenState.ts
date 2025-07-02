@@ -32,22 +32,19 @@ export function useInitSetupScreenState() {
 
     let setSyncMethod = useCallback(
         (m: SyncMethod) => {
-            dispatch(
-                actions.setup.setSetupOption({ key: "syncMethod", value: m }),
-            )
+            dispatch(actions.setup.setSetupOption({ key: "syncMethod", value: m }))
         },
         [dispatch],
     )
 
-    let generatePrivateCryptoKey =
-        useCallback(async (): AsyncResult<string> => {
-            let [key, err] = await AgePrivateCryptoKey.generate()
-            if (err) {
-                return Err(err)
-            }
+    let generatePrivateCryptoKey = useCallback(async (): AsyncResult<string> => {
+        let [key, err] = await AgePrivateCryptoKey.generate()
+        if (err) {
+            return Err(err)
+        }
 
-            return await key.exportPrivateKey()
-        }, [])
+        return await key.exportPrivateKey()
+    }, [])
 
     let importPrivateCryptoKey = useCallback(
         (key: string) => {
@@ -62,9 +59,7 @@ export function useInitSetupScreenState() {
     )
 
     let checkPrivateCryptoKey = useCallback((key: string) => {
-        return fromThrowing(
-            () => new AgePrivateCryptoKey(key as Identity) as any,
-        )
+        return fromThrowing(() => new AgePrivateCryptoKey(key as Identity) as any)
     }, [])
 
     return {
@@ -83,9 +78,7 @@ export function useInitSetupScreenState() {
     }
 }
 
-export function useStepConfigureRemoteSyncState({
-    next,
-}: { next: () => void }) {
+export function useStepConfigureRemoteSyncState({ next }: { next: () => void }) {
     let dispatch = useDispatch()
 
     let authError = useSelector(selectors.auth.error)

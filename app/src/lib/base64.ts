@@ -1,8 +1,6 @@
 import { Err, Ok, type Result } from "./result"
 
-export function encodeToBase64(
-    data: ArrayBuffer | Uint8Array<ArrayBufferLike>,
-): string {
+export function encodeToBase64(data: ArrayBuffer | Uint8Array<ArrayBufferLike>): string {
     let arr: Uint8Array<ArrayBufferLike>
 
     if (data instanceof ArrayBuffer) {
@@ -11,28 +9,17 @@ export function encodeToBase64(
         arr = data
     }
 
-    if (
-        arr instanceof Uint8Array &&
-        "toBase64" in arr &&
-        typeof arr.toBase64 === "function"
-    ) {
+    if (arr instanceof Uint8Array && "toBase64" in arr && typeof arr.toBase64 === "function") {
         return arr.toBase64() as string
     }
 
     return btoa(String.fromCharCode(...arr))
 }
 
-export function dataFromBase64(
-    data: string,
-): Result<Uint8Array<ArrayBufferLike>> {
-    if (
-        "fromBase64" in Uint8Array &&
-        typeof Uint8Array.fromBase64 === "function"
-    ) {
+export function dataFromBase64(data: string): Result<Uint8Array<ArrayBufferLike>> {
+    if ("fromBase64" in Uint8Array && typeof Uint8Array.fromBase64 === "function") {
         try {
-            return Ok(
-                Uint8Array.fromBase64(data) as Uint8Array<ArrayBufferLike>,
-            )
+            return Ok(Uint8Array.fromBase64(data) as Uint8Array<ArrayBufferLike>)
         } catch (err) {
             return Err(err as Error)
         }

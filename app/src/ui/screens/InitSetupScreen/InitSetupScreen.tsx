@@ -15,10 +15,7 @@ import type { SyncMethod } from "@/ui/state"
 
 import { AuthForm } from "@/ui/components/AuthForm"
 import { Loader } from "@/ui/components/Loader"
-import {
-    useInitSetupScreenState,
-    useStepConfigureRemoteSyncState,
-} from "./useInitSetupScreenState"
+import { useInitSetupScreenState, useStepConfigureRemoteSyncState } from "./useInitSetupScreenState"
 
 export function InitSetupScreen() {
     let t = useT("screens/InitSetup")
@@ -40,12 +37,7 @@ export function InitSetupScreen() {
     let stepComp: React.ReactNode
     switch (step) {
         case "initial-setup":
-            stepComp = (
-                <StepChooseStart
-                    startNew={startNew}
-                    startFromRemote={startFromRemote}
-                />
-            )
+            stepComp = <StepChooseStart startNew={startNew} startFromRemote={startFromRemote} />
             break
         case "choose-sync-method":
             stepComp = (
@@ -59,13 +51,7 @@ export function InitSetupScreen() {
             break
         case "configure-remote-sync":
         case "remote-error":
-            stepComp = (
-                <StepConfigureRemoteSync
-                    next={next}
-                    error={error}
-                    back={back}
-                />
-            )
+            stepComp = <StepConfigureRemoteSync next={next} error={error} back={back} />
             break
         case "configure-encryption":
             stepComp = (
@@ -180,8 +166,7 @@ function StepConfigureRemoteSync({
 }) {
     let t = useT("screens/InitSetup")
 
-    let { authStatus, login, changePassword, authError } =
-        useStepConfigureRemoteSyncState({ next })
+    let { authStatus, login, changePassword, authError } = useStepConfigureRemoteSyncState({ next })
 
     return (
         <div className="space-y-4">
@@ -291,11 +276,7 @@ function StepConfigureEncryption({
                     {t.BackButtonLabel}
                 </Button>
 
-                <Button
-                    variant="primary"
-                    type="submit"
-                    isDisabled={value().length === 0}
-                >
+                <Button variant="primary" type="submit" isDisabled={value().length === 0}>
                     {t.NextButtonLabel}
                 </Button>
             </div>

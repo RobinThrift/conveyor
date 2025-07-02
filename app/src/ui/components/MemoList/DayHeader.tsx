@@ -3,10 +3,7 @@ import React from "react"
 import { DateTime } from "@/ui/components/DateTime"
 import { useT } from "@/ui/i18n"
 
-export function DayHeader({
-    date,
-    diffToToday,
-}: { date: Date; diffToToday: number }) {
+export function DayHeader({ date, diffToToday }: { date: Date; diffToToday: number }) {
     let t = useT("components/MemoList/DayHeader")
     let prefix = ""
     if (diffToToday < 1) {

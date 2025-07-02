@@ -1,18 +1,12 @@
 import * as age from "age-encryption"
 
-import type {
-    PlaintextPrivateKey,
-    PrivateCryptoKey,
-    PublicCryptoKey,
-} from "@/lib/crypto"
+import type { PlaintextPrivateKey, PrivateCryptoKey, PublicCryptoKey } from "@/lib/crypto"
 import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
 
 export type Identity = string & { readonly "": unique symbol }
 export type Recipient = string & { readonly "": unique symbol }
 
-export class AgePrivateCryptoKey
-    implements PrivateCryptoKey<Identity, Recipient>
-{
+export class AgePrivateCryptoKey implements PrivateCryptoKey<Identity, Recipient> {
     private _public?: PublicCryptoKey<Recipient>
     public type = "agev1"
     public data: Identity
@@ -25,9 +19,7 @@ export class AgePrivateCryptoKey
             return Ok(this._public)
         }
 
-        let [receipientFromIdent, err] = await fromPromise(
-            age.identityToRecipient(this.data),
-        )
+        let [receipientFromIdent, err] = await fromPromise(age.identityToRecipient(this.data))
         if (err) {
             return wrapErr`error constructing recipient from identity: ${err}`
         }
@@ -84,9 +76,7 @@ export class AgeCrypto {
         return Ok(undefined)
     }
 
-    async encryptData(
-        data: Uint8Array<ArrayBufferLike>,
-    ): AsyncResult<ArrayBufferLike> {
+    async encryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike> {
         if (!this._initialised) {
             return Err(new Error("encryptData called before `init`"))
         }
@@ -99,9 +89,7 @@ export class AgeCrypto {
         return Ok(encrypted.buffer)
     }
 
-    async decryptData(
-        data: Uint8Array<ArrayBufferLike>,
-    ): AsyncResult<ArrayBufferLike> {
+    async decryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike> {
         if (!this._initialised) {
             return Err(new Error("decryptData called before `init`"))
         }

@@ -41,13 +41,9 @@ const i18nSelector = createSelector(
     }),
 )
 
-export function I18nProvider(
-    props: React.PropsWithChildren<{ value?: I18nContext }>,
-) {
+export function I18nProvider(props: React.PropsWithChildren<{ value?: I18nContext }>) {
     let { language, region } = useSelector(i18nSelector)
-    let [value, setValue] = useState<I18nContext>(
-        props.value ?? DEFAULT_I18N_CONTEXT,
-    )
+    let [value, setValue] = useState<I18nContext>(props.value ?? DEFAULT_I18N_CONTEXT)
 
     if (value.language !== language || value.region !== region) {
         setValue((value) => ({
@@ -60,10 +56,7 @@ export function I18nProvider(
 
             let translations: ReturnType<typeof resolveTranslation> | undefined
             if (translationJSON) {
-                translations = resolveTranslation(
-                    `${language}-${region}`,
-                    translationJSON,
-                )
+                translations = resolveTranslation(`${language}-${region}`, translationJSON)
             }
 
             if (translations) {
@@ -75,9 +68,5 @@ export function I18nProvider(
         })
     }
 
-    return (
-        <i18nContext.Provider value={value}>
-            {props.children}
-        </i18nContext.Provider>
-    )
+    return <i18nContext.Provider value={value}>{props.children}</i18nContext.Provider>
 }

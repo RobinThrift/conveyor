@@ -26,15 +26,9 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.loadStart,
-        effect: async (
-            _,
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async (_, { cancelActiveListeners, getState, dispatch, signal }) => {
             let state = getState()
-            if (
-                slice.selectors.isLoaded(state) ||
-                slice.selectors.isLoading(state)
-            ) {
+            if (slice.selectors.isLoaded(state) || slice.selectors.isLoading(state)) {
                 return
             }
 
@@ -42,9 +36,7 @@ export const registerEffects = (
 
             dispatch(slice.actions.setIsLoading())
 
-            let [ctx, cancel] = BaseContext.withSignal(signal).withTimeout(
-                Second * 5,
-            )
+            let [ctx, cancel] = BaseContext.withSignal(signal).withTimeout(Second * 5)
 
             let [loaded, err] = await settingsCtrl.loadSettings(ctx)
 
@@ -62,13 +54,10 @@ export const registerEffects = (
     startListening({
         actionCreator: slice.actions.set,
         effect: async ({ payload }, { dispatch, signal }) => {
-            let [_, err] = await settingsCtrl.updateSetting(
-                BaseContext.withSignal(signal),
-                {
-                    key: payload.key,
-                    value: payload.value,
-                },
-            )
+            let [_, err] = await settingsCtrl.updateSetting(BaseContext.withSignal(signal), {
+                key: payload.key,
+                value: payload.value,
+            })
 
             if (err) {
                 dispatch(slice.actions.setError(err))

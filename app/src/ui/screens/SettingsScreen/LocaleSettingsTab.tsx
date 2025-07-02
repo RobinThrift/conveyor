@@ -1,12 +1,7 @@
 import React, { useCallback, useMemo } from "react"
 
 import { DEFAULT_SETTINGS } from "@/domain/Settings"
-import {
-    type Language,
-    type Region,
-    supportedLanguages,
-    supportedRegions,
-} from "@/lib/i18n"
+import { type Language, type Region, supportedLanguages, supportedRegions } from "@/lib/i18n"
 import { Select } from "@/ui/components/Select"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
@@ -59,17 +54,12 @@ export function LocaleSettingsTab() {
         <>
             <header>
                 <h2>{t.Title}</h2>
-                <small className="settings-tab-description">
-                    {t.Description}
-                </small>
+                <small className="settings-tab-description">{t.Description}</small>
             </header>
 
             <div className="settings-section">
                 <div className="sm:mb-0 md:grid grid-cols-6 space-y-2">
-                    <label
-                        htmlFor="language"
-                        className="flex items-center font-semibold text-sm"
-                    >
+                    <label htmlFor="language" className="flex items-center font-semibold text-sm">
                         {t.LabelSelectLanguage}
                     </label>
                     <Select
@@ -84,10 +74,7 @@ export function LocaleSettingsTab() {
                 </div>
 
                 <div className="sm:mb-0 md:grid grid-cols-6 space-y-2 mt-2">
-                    <label
-                        htmlFor="region"
-                        className="flex items-center font-semibold text-sm"
-                    >
+                    <label htmlFor="region" className="flex items-center font-semibold text-sm">
                         {t.LabelSelectRegion}
                     </label>
                     <Select

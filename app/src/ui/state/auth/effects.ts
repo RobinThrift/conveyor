@@ -17,10 +17,7 @@ export const registerEffects = (
 ) => {
     startListening({
         actionCreator: slice.actions.authenticate,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, getState, dispatch, signal }) => {
             let status = slice.selectors.status(getState())
             if (status === "authenticating") {
                 return
@@ -80,15 +77,9 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.changePassword,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, getState, dispatch, signal }) => {
             let status = slice.selectors.status(getState())
-            if (
-                status === "password-change-in-progress" ||
-                status === "authenticating"
-            ) {
+            if (status === "password-change-in-progress" || status === "authenticating") {
                 return
             }
 
@@ -100,10 +91,7 @@ export const registerEffects = (
                 }),
             )
 
-            let [_, err] = await authCtrl.changePassword(
-                BaseContext.withSignal(signal),
-                payload,
-            )
+            let [_, err] = await authCtrl.changePassword(BaseContext.withSignal(signal), payload)
 
             if (err) {
                 dispatch(

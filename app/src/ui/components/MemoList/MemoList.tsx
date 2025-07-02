@@ -67,21 +67,10 @@ export function MemoList(props: MemoListProps) {
 
         let el = ref.current.querySelector(`#memo-${focusedMemoID}`)
         el?.scrollIntoView({ behavior: "instant", block: "start" })
-    }, [
-        ref.current?.querySelector(`#memo-${focusedMemoID}`),
-        focusedMemoID,
-        isMobile,
-    ])
+    }, [ref.current?.querySelector(`#memo-${focusedMemoID}`), focusedMemoID, isMobile])
 
     return (
-        <div
-            className={clsx(
-                "memo-list",
-                `list-layout-${layout}`,
-                props.className,
-            )}
-            ref={ref}
-        >
+        <div className={clsx("memo-list", `list-layout-${layout}`, props.className)} ref={ref}>
             {isListOutdated ? <ReloadButton reload={reload} /> : null}
 
             <LayoutSelect />

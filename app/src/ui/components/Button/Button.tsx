@@ -1,9 +1,6 @@
 import clsx from "clsx"
 import React from "react"
-import {
-    Button as AriaButton,
-    type ButtonProps as AriaButtonProps,
-} from "react-aria-components"
+import { Button as AriaButton, type ButtonProps as AriaButtonProps } from "react-aria-components"
 export type { PressEvent } from "react-aria"
 
 export interface ButtonProps extends AriaButtonProps {

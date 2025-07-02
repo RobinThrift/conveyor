@@ -34,12 +34,7 @@ export function SettingsScreen() {
     let { isOpen, onClose } = useSettingsModalState()
 
     return (
-        <Dialog
-            isModal={true}
-            open={isOpen}
-            isKeyboardDismissable={false}
-            onClose={onClose}
-        >
+        <Dialog isModal={true} open={isOpen} isKeyboardDismissable={false} onClose={onClose}>
             <Dialog.Content className="settings-dialog">
                 <SettingsScreenContent />
             </Dialog.Content>
@@ -76,18 +71,12 @@ function SettingsScreenContent() {
                 className="settings-tabs"
                 orientation={isMobile ? "horizontal" : "vertical"}
             >
-                <AriaTabList
-                    aria-label={t.TabListLabel}
-                    className="settings-tab-list"
-                >
+                <AriaTabList aria-label={t.TabListLabel} className="settings-tab-list">
                     <AriaTab id="interface" className="settings-tab-list-item">
                         <PaletteIcon weight="fill" className="icon" />
                         {t.TabLabelInterface}
                     </AriaTab>
-                    <AriaTab
-                        id="lang-locale"
-                        className="settings-tab-list-item"
-                    >
+                    <AriaTab id="lang-locale" className="settings-tab-list-item">
                         <GlobeIcon weight="fill" className="icon" />
                         {t.TabLabelLangLocale}
                     </AriaTab>
@@ -100,10 +89,7 @@ function SettingsScreenContent() {
                         {t.TabLabelSync}
                     </AriaTab>
                     {isSyncEnabled && (
-                        <AriaTab
-                            id="apitokens"
-                            className="settings-tab-list-item"
-                        >
+                        <AriaTab id="apitokens" className="settings-tab-list-item">
                             <KeyIcon weight="fill" className="icon" />
                             {t.TabLabelAPITokens}
                         </AriaTab>

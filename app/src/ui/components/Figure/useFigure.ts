@@ -32,9 +32,7 @@ export function useFigure(props: {
             let reset = () => {
                 startTransition(() => {
                     dialogRef.current?.close()
-                    dialogRef.current?.style.removeProperty(
-                        "--normalized-drag-length",
-                    )
+                    dialogRef.current?.style.removeProperty("--normalized-drag-length")
                     srcRect.current = undefined
                     setIsZoomed(false)
                 })
@@ -89,50 +87,47 @@ export function useFigure(props: {
         [],
     )
 
-    let onClickZoom = useCallback(
-        (e: React.PointerEvent<HTMLButtonElement>) => {
-            let dialog = dialogRef.current
-            if (!dialog) {
-                return
-            }
+    let onClickZoom = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+        let dialog = dialogRef.current
+        if (!dialog) {
+            return
+        }
 
-            if (ref.current) {
-                ref.current.style.viewTransitionName = "figure-zoomed"
-            }
-            setIsZoomed(true)
+        if (ref.current) {
+            ref.current.style.viewTransitionName = "figure-zoomed"
+        }
+        setIsZoomed(true)
 
-            let target = e.currentTarget
-            requestAnimationFrame(() => {
-                let rect = target.getBoundingClientRect()
-                srcRect.current = {
-                    x: rect.x,
-                    y: rect.y,
-                    width: rect.width,
-                    height: rect.height,
-                    borderRadius: ref.current?.style.borderRadius ?? "",
+        let target = e.currentTarget
+        requestAnimationFrame(() => {
+            let rect = target.getBoundingClientRect()
+            srcRect.current = {
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height,
+                borderRadius: ref.current?.style.borderRadius ?? "",
+            }
+        })
+
+        dialog.addEventListener(
+            "close",
+            () => {
+                srcRect.current = undefined
+                setIsZoomed(false)
+            },
+            { once: true, passive: true },
+        )
+
+        requestAnimationFrame(() => {
+            document.startViewTransition(() => {
+                if (ref.current) {
+                    ref.current.style.viewTransitionName = ""
                 }
+                dialog.showModal()
             })
-
-            dialog.addEventListener(
-                "close",
-                () => {
-                    srcRect.current = undefined
-                    setIsZoomed(false)
-                },
-                { once: true, passive: true },
-            )
-
-            requestAnimationFrame(() => {
-                document.startViewTransition(() => {
-                    if (ref.current) {
-                        ref.current.style.viewTransitionName = ""
-                    }
-                    dialog.showModal()
-                })
-            })
-        },
-        [],
-    )
+        })
+    }, [])
 
     return {
         ref,
@@ -159,15 +154,11 @@ export function useDraggableFigure({
     ref: React.RefObject<HTMLElement | null>
 }) {
     let offset = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
-    let boundingRect = useRef<DOMRect>(
-        ref.current?.getBoundingClientRect() ?? new DOMRect(),
-    )
+    let boundingRect = useRef<DOMRect>(ref.current?.getBoundingClientRect() ?? new DOMRect())
     let pointerPos = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
     let pointerIDs = useRef<Set<number>>(new Set())
 
-    let animFrame = useRef<
-        ReturnType<typeof requestAnimationFrame> | undefined
-    >(undefined)
+    let animFrame = useRef<ReturnType<typeof requestAnimationFrame> | undefined>(undefined)
 
     let updatePos = useCallback(() => {
         let animRef = ref.current
@@ -180,10 +171,8 @@ export function useDraggableFigure({
             return
         }
 
-        let translateX =
-            pointerPos.current.x - boundingRect.current.x - offset.current.x
-        let translateY =
-            pointerPos.current.y - boundingRect.current.y - offset.current.y
+        let translateX = pointerPos.current.x - boundingRect.current.x - offset.current.x
+        let translateY = pointerPos.current.y - boundingRect.current.y - offset.current.y
 
         let length = Math.sqrt(
             (translateX / boundingRect.current.width) ** 2 +
@@ -192,10 +181,7 @@ export function useDraggableFigure({
         let scale = 1 - length * 0.3
 
         animRef.style.transition = "none"
-        animRef.parentElement?.style.setProperty(
-            "--normalized-drag-length",
-            length.toFixed(2),
-        )
+        animRef.parentElement?.style.setProperty("--normalized-drag-length", length.toFixed(2))
         if (pointerIDs.current.size !== 0) {
             animRef.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(clamp(0.7, ${scale}, 1.0))`
         }
@@ -279,10 +265,8 @@ export function useDraggableFigure({
                 return
             }
 
-            let translateX =
-                e.clientX - boundingRect.current.x - offset.current.x
-            let translateY =
-                e.clientY - boundingRect.current.y - offset.current.y
+            let translateX = e.clientX - boundingRect.current.x - offset.current.x
+            let translateY = e.clientY - boundingRect.current.y - offset.current.y
 
             if (
                 Math.abs(translateX) > boundingRect.current.width / 4 ||

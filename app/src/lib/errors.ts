@@ -1,9 +1,9 @@
 export type ErrorCode = string & { readonly "": unique symbol }
 
-export function isErr<
-    ToCheck extends Error,
-    Target extends { new (...a: any[]): Error },
->(value: ToCheck | null | undefined, target: Target | string): boolean {
+export function isErr<ToCheck extends Error, Target extends { new (...a: any[]): Error }>(
+    value: ToCheck | null | undefined,
+    target: Target | string,
+): boolean {
     if (!value) {
         return false
     }
@@ -32,8 +32,7 @@ export function isErr<
             CustomErrCode in value.__proto__ &&
             (value.__proto__[CustomErrCode] as string))
 
-    let targetCode =
-        CustomErrCode in target && (target[CustomErrCode] as string)
+    let targetCode = CustomErrCode in target && (target[CustomErrCode] as string)
 
     if (!targetCode) {
         return false

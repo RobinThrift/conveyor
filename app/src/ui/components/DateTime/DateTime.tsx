@@ -1,20 +1,13 @@
 import React, { useMemo, useState } from "react"
 import { ToggleButton as AriaButton } from "react-aria-components"
 
-import {
-    type CalendarDate,
-    type CalendarDateTime,
-    currentDateTime,
-} from "@/lib/i18n"
+import { type CalendarDate, type CalendarDateTime, currentDateTime } from "@/lib/i18n"
 import { Tooltip } from "@/ui/components/Tooltip"
 import { useFormat, useT } from "@/ui/i18n"
 
 export interface DateTimeProps
     extends Omit<
-        React.DetailedHTMLProps<
-            React.TimeHTMLAttributes<HTMLTimeElement>,
-            HTMLTimeElement
-        >,
+        React.DetailedHTMLProps<React.TimeHTMLAttributes<HTMLTimeElement>, HTMLTimeElement>,
         "datetime"
     > {
     className?: string
@@ -36,10 +29,7 @@ export const DateTime = React.memo(function DateTime({
 
     let formatted = useMemo(() => {
         try {
-            return formatDateTime(
-                date,
-                opts ?? { dateStyle: "long", timeStyle: "short" },
-            )
+            return formatDateTime(date, opts ?? { dateStyle: "long", timeStyle: "short" })
         } catch (err) {
             return t.invalidTime({
                 date: date?.toString(),
@@ -91,32 +81,14 @@ const RelativeDateTime = React.memo(function RelativeDateTime({
                 error: (err as Error).message,
             })
         }
-    }, [
-        date,
-        absolute,
-        showAbsolute,
-        formatRelative,
-        opts,
-        t.datetime,
-        t.invalidTime,
-    ])
+    }, [date, absolute, showAbsolute, formatRelative, opts, t.datetime, t.invalidTime])
 
     return (
-        <Tooltip
-            content={
-                showAbsolute
-                    ? t.ShowRelativeDateTooltip
-                    : t.ShowAbsoluteDateTooltip
-            }
-        >
+        <Tooltip content={showAbsolute ? t.ShowRelativeDateTooltip : t.ShowAbsoluteDateTooltip}>
             <AriaButton
                 type="button"
                 onChange={() => setShowAbsolute(!showAbsolute)}
-                aria-label={
-                    showAbsolute
-                        ? t.ShowRelativeDateTooltip
-                        : t.ShowAbsoluteDateTooltip
-                }
+                aria-label={showAbsolute ? t.ShowRelativeDateTooltip : t.ShowAbsoluteDateTooltip}
                 isSelected={showAbsolute}
             >
                 <time {...intrinsics} dateTime={JSON.stringify(date)} ref={ref}>

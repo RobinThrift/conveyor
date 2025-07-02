@@ -12,16 +12,17 @@ import { TagTree } from "./TagTree"
 export function TagTreeFilter(props: { className?: string }) {
     let t = useT("components/MemoListFilter/TagTreeFilter")
     let isOffCanvas = useIsMobile()
-    let { isOffCanvasOpen, isOffCanvasClosing, closeOffCanvas } =
-        useTagTreeFilterStore()
+    let { isOffCanvasOpen, isOffCanvasClosing, closeOffCanvas } = useTagTreeFilterStore()
     let closeBtn = useRef<HTMLButtonElement | null>(null)
 
     usePreventScroll({ isDisabled: !isOffCanvas || !isOffCanvasOpen })
 
     let ref = useRef<HTMLDivElement | null>(null)
 
-    let { onPointerDown, onPointerCancel, onPointerMove } =
-        useOffCanvasDragging({ ref, close: closeOffCanvas })
+    let { onPointerDown, onPointerCancel, onPointerMove } = useOffCanvasDragging({
+        ref,
+        close: closeOffCanvas,
+    })
 
     useEffect(() => {
         if (isOffCanvas && isOffCanvasOpen && closeBtn.current) {
@@ -55,11 +56,9 @@ export function TagTreeFilter(props: { className?: string }) {
 
         for (let anim of ref.current.getAnimations()) {
             hasAnimation =
-                hasAnimation ||
-                (anim instanceof Animation && anim.playState === "running")
+                hasAnimation || (anim instanceof Animation && anim.playState === "running")
             hasTransition =
-                hasTransition ||
-                (anim instanceof CSSTransition && anim.playState === "running")
+                hasTransition || (anim instanceof CSSTransition && anim.playState === "running")
         }
 
         if (!hasAnimation && !hasTransition) {
@@ -190,9 +189,7 @@ function useOffCanvasDragging({
     let velocity = useRef(0)
     let width = useRef(0)
     let durationMs = 250
-    let animFrame = useRef<
-        ReturnType<typeof requestAnimationFrame> | undefined
-    >(undefined)
+    let animFrame = useRef<ReturnType<typeof requestAnimationFrame> | undefined>(undefined)
 
     let animation = useRef<Animation | undefined>(undefined)
 

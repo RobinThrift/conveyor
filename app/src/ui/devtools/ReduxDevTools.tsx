@@ -4,15 +4,10 @@ import { TraceTab } from "@redux-devtools/inspector-monitor-trace-tab"
 import React from "react"
 import type { Action } from "redux"
 
-let tabs = (
-    defaultTabs: Tab<unknown, Action<string>>[],
-): Tab<unknown, Action<string>>[] => {
+let tabs = (defaultTabs: Tab<unknown, Action<string>>[]): Tab<unknown, Action<string>>[] => {
     return [
         ...defaultTabs,
-        { name: "Trace", component: TraceTab } as unknown as Tab<
-            unknown,
-            Action<string>
-        >,
+        { name: "Trace", component: TraceTab } as unknown as Tab<unknown, Action<string>>,
     ]
 }
 

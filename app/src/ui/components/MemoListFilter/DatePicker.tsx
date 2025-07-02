@@ -9,12 +9,7 @@ import {
     type DateValue,
 } from "react-aria-components"
 
-import {
-    type CalendarDate,
-    currentDate,
-    getLocalTimeZone,
-    isSameDay,
-} from "@/lib/i18n"
+import { type CalendarDate, currentDate, getLocalTimeZone, isSameDay } from "@/lib/i18n"
 import { Button } from "@/ui/components/Button"
 import { CaretLeftIcon, CaretRightIcon } from "@/ui/components/Icons"
 import { useFormat, useT } from "@/ui/i18n"
@@ -27,14 +22,9 @@ export interface DatePickerProps {
     onSelect: (date?: CalendarDate) => void
 }
 
-export const DatePicker = React.memo(function DatePicker({
-    className,
-    ...props
-}: DatePickerProps) {
+export const DatePicker = React.memo(function DatePicker({ className, ...props }: DatePickerProps) {
     let t = useT("components/MemoListFilter/DatePicker")
-    let [focusedDate, setFocusedDate] = useState<CalendarDate>(
-        props.selected ?? currentDate(),
-    )
+    let [focusedDate, setFocusedDate] = useState<CalendarDate>(props.selected ?? currentDate())
 
     let onClickTodayBtn = useCallback(() => {
         setFocusedDate(currentDate())
@@ -65,11 +55,7 @@ export const DatePicker = React.memo(function DatePicker({
                 className="date-picker-calendar"
             >
                 <div className="date-picker-header">
-                    <Button
-                        iconLeft={<CaretLeftIcon />}
-                        plain={true}
-                        slot="previous"
-                    />
+                    <Button iconLeft={<CaretLeftIcon />} plain={true} slot="previous" />
                     <div className="date-picker-dropdowns">
                         <MonthDropdown
                             currentMonth={focusedDate}
@@ -82,11 +68,7 @@ export const DatePicker = React.memo(function DatePicker({
                             maxValue={today}
                         />
                     </div>
-                    <Button
-                        iconLeft={<CaretRightIcon />}
-                        plain={true}
-                        slot="next"
-                    />
+                    <Button iconLeft={<CaretRightIcon />} plain={true} slot="next" />
                 </div>
                 <AriaCalendarGrid className="calendar-grid">
                     <AriaCalendarGridHeader className="calendar-grid-header">
@@ -110,12 +92,7 @@ export const DatePicker = React.memo(function DatePicker({
             </AriaCalendar>
 
             <div className="mt-2 flex justify-end">
-                <Button
-                    size="sm"
-                    variant="primary"
-                    outline={true}
-                    onPress={onClickTodayBtn}
-                >
+                <Button size="sm" variant="primary" outline={true} onPress={onClickTodayBtn}>
                     {t.Today}
                 </Button>
             </div>
@@ -158,18 +135,9 @@ function MonthDropdown({
     }
 
     return (
-        <select
-            aria-label="Month"
-            name="month"
-            onChange={onChange}
-            value={currentMonth.month}
-        >
+        <select aria-label="Month" name="month" onChange={onChange} value={currentMonth.month}>
             {months.map((month) => (
-                <option
-                    key={month.value}
-                    value={month.value}
-                    disabled={month.isDisabled}
-                >
+                <option key={month.value} value={month.value} disabled={month.isDisabled}>
                     {month.label}
                 </option>
             ))}

@@ -1,10 +1,4 @@
-import {
-    BaseDirectory,
-    mkdir,
-    readFile,
-    remove,
-    writeFile,
-} from "@tauri-apps/plugin-fs"
+import { BaseDirectory, mkdir, readFile, remove, writeFile } from "@tauri-apps/plugin-fs"
 
 import type { Context } from "@/lib/context"
 import { type FS, join } from "@/lib/fs"
@@ -24,10 +18,7 @@ export class TauriFS implements FS {
         )
     }
 
-    public async read(
-        _ctx: Context,
-        filepath: string,
-    ): AsyncResult<ArrayBufferLike> {
+    public async read(_ctx: Context, filepath: string): AsyncResult<ArrayBufferLike> {
         let [_, readyErr] = await this._ready
         if (readyErr) {
             return Err(readyErr)

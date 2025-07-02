@@ -3,11 +3,7 @@
 /* eslint-disable */
 
 import type { Message } from "@bufbuild/protobuf"
-import type {
-    GenFile,
-    GenMessage,
-    GenService,
-} from "@bufbuild/protobuf/codegenv1"
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1"
 
 /**
  * Describes the file plugin/codegen.proto.

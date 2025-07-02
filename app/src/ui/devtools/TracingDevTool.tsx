@@ -35,25 +35,13 @@ export function TracingDevTool() {
 
         for (let i = spans.length - 1; i >= 0; i--) {
             if (filter) {
-                if (
-                    spans[i].name.toLowerCase().includes(filter.toLowerCase())
-                ) {
+                if (spans[i].name.toLowerCase().includes(filter.toLowerCase())) {
                     els.push(
-                        <SpanListItem
-                            key={spans[i].id}
-                            span={spans[i]}
-                            onClick={setSelected}
-                        />,
+                        <SpanListItem key={spans[i].id} span={spans[i]} onClick={setSelected} />,
                     )
                 }
             } else {
-                els.push(
-                    <SpanListItem
-                        key={spans[i].id}
-                        span={spans[i]}
-                        onClick={setSelected}
-                    />,
-                )
+                els.push(<SpanListItem key={spans[i].id} span={spans[i]} onClick={setSelected} />)
             }
         }
 
@@ -64,16 +52,8 @@ export function TracingDevTool() {
         <div className="devtools-entry-list-detail-wrapper">
             <ul className="devtools-entry-list">
                 <li className="devtools-entry-list-header">
-                    <input
-                        type="search"
-                        name="devtools_tracing_search"
-                        onChange={onChangeSearch}
-                    />
-                    <button
-                        type="button"
-                        className="text-sm cursor-pointer"
-                        onClick={onClickClear}
-                    >
+                    <input type="search" name="devtools_tracing_search" onChange={onChangeSearch} />
+                    <button type="button" className="text-sm cursor-pointer" onClick={onClickClear}>
                         [clear]
                     </button>
                 </li>
@@ -102,17 +82,11 @@ function SpanListItem({
         <li className="devtools-entry-list-item">
             <div className="devtools-entry-list-item-timing">
                 <span>
-                    {(span.endTime &&
-                        (span.endTime - span.startTime).toFixed(2)) ??
-                        0}
+                    {(span.endTime && (span.endTime - span.startTime).toFixed(2)) ?? 0}
                     ms
                 </span>
 
-                <time>
-                    {formatter.format(
-                        performance.timeOrigin + span.startTime.valueOf(),
-                    )}
-                </time>
+                <time>{formatter.format(performance.timeOrigin + span.startTime.valueOf())}</time>
             </div>
 
             {/* biome-ignore lint/a11y/useButtonType: devtools only */}
@@ -137,11 +111,7 @@ const SpanDetails = React.memo(function SpanDetails({ span }: { span: Span }) {
             <div className="devtools-entry-list-item-timing">
                 <span>{duration.toFixed(2)}ms</span>
 
-                <time>
-                    {formatter.format(
-                        performance.timeOrigin + span.startTime.valueOf(),
-                    )}
-                </time>
+                <time>{formatter.format(performance.timeOrigin + span.startTime.valueOf())}</time>
             </div>
 
             <h3 className="devtools-entry-list-item-title">{span.name}</h3>
@@ -153,10 +123,7 @@ const SpanDetails = React.memo(function SpanDetails({ span }: { span: Span }) {
             )}
 
             {!hasChildren && Object.keys(span.attrs).length > 0 ? (
-                <Code
-                    className="dark rosepine rounded p-2 my-2 text-wrap text-sm"
-                    lang="json"
-                >
+                <Code className="dark rosepine rounded p-2 my-2 text-wrap text-sm" lang="json">
                     {JSON.stringify(span.attrs, undefined, 2)}
                 </Code>
             ) : null}
@@ -235,10 +202,7 @@ const SpanGanttItem = React.memo(function SpanGanttItem({
 
             {showDetails && (
                 <div className="devtools-span-gantt-item-details">
-                    <Code
-                        className="dark rosepine rounded p-2 my-2 text-wrap text-sm"
-                        lang="json"
-                    >
+                    <Code className="dark rosepine rounded p-2 my-2 text-wrap text-sm" lang="json">
                         {JSON.stringify(span.attrs, undefined, 2)}
                     </Code>
                 </div>

@@ -1,19 +1,9 @@
-import {
-    type AuthToken,
-    PasswordChangeRequiredError,
-    type PlaintextAuthTokenValue,
-} from "@/auth"
+import { type AuthToken, PasswordChangeRequiredError, type PlaintextAuthTokenValue } from "@/auth"
 import type { PlaintextPassword } from "@/auth/credentials"
 import type { Context } from "@/lib/context"
 import { createErrType } from "@/lib/errors"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
-import {
-    type AsyncResult,
-    Ok,
-    fromPromise,
-    fromThrowing,
-    wrapErr,
-} from "@/lib/result"
+import { type AsyncResult, Ok, fromPromise, fromThrowing, wrapErr } from "@/lib/result"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 
@@ -38,10 +28,7 @@ export class AuthV1APIClient {
     )
     public async getTokenUsingCredentials(
         ctx: Context,
-        {
-            username,
-            password,
-        }: { username: string; password: PlaintextPassword },
+        { username, password }: { username: string; password: PlaintextPassword },
     ): AsyncResult<AuthToken> {
         let req = new Request(new URL("/api/auth/v1/token", this._baseURL), {
             method: "POST",
@@ -74,9 +61,7 @@ export class AuthV1APIClient {
             return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${err}`
         }
 
-        let [token, deserializationErr] = this._authTokenFromJSON(
-            await res.text(),
-        )
+        let [token, deserializationErr] = this._authTokenFromJSON(await res.text())
         if (deserializationErr) {
             return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${deserializationErr}`
         }
@@ -113,19 +98,14 @@ export class AuthV1APIClient {
             return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${err}`
         }
 
-        let [token, deserializationErr] = this._authTokenFromJSON(
-            await res.text(),
-        )
+        let [token, deserializationErr] = this._authTokenFromJSON(await res.text())
         if (deserializationErr) {
             return wrapErr`${new AuthV1APIClient.ErrGetTokenUsingCredentials()}: ${deserializationErr}`
         }
         return Ok(token)
     }
 
-    public static ErrChangePassword = createErrType(
-        "AuthV1APIClient",
-        "error changing password",
-    )
+    public static ErrChangePassword = createErrType("AuthV1APIClient", "error changing password")
     public async changePassword(
         ctx: Context,
         {
@@ -140,18 +120,15 @@ export class AuthV1APIClient {
             newPasswordRepeat: PlaintextPassword
         },
     ): AsyncResult<void> {
-        let req = new Request(
-            new URL("/api/auth/v1/change-password", this._baseURL),
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    username,
-                    currentPassword,
-                    newPassword,
-                    newPasswordRepeat,
-                }),
-            },
-        )
+        let req = new Request(new URL("/api/auth/v1/change-password", this._baseURL), {
+            method: "POST",
+            body: JSON.stringify({
+                username,
+                currentPassword,
+                newPassword,
+                newPasswordRepeat,
+            }),
+        })
 
         let [res, err] = await fromPromise(fetch(req, { signal: ctx.signal }))
         if (err) {
@@ -172,9 +149,7 @@ export class AuthV1APIClient {
 
     private _authTokenFromJSON(raw: string) {
         return jsonDeserialize<AuthToken, Record<string, any>>(raw, (obj) => {
-            let [expiresAt, expiresAtParseErr] = parseJSONDate(
-                obj.expiresAt as string,
-            )
+            let [expiresAt, expiresAtParseErr] = parseJSONDate(obj.expiresAt as string)
             if (expiresAtParseErr) {
                 return wrapErr`error parsing expiresAt date: ${expiresAtParseErr}`
             }
@@ -186,9 +161,7 @@ export class AuthV1APIClient {
                 return wrapErr`error parsing refreshExpiresAt date: ${refreshExpiresAtParseErr}`
             }
 
-            let [serverURL, serverURLParseErr] = fromThrowing(
-                () => new URL(this._baseURL),
-            )
+            let [serverURL, serverURLParseErr] = fromThrowing(() => new URL(this._baseURL))
             if (serverURLParseErr) {
                 return wrapErr`error parsing serverURL: ${serverURLParseErr}`
             }

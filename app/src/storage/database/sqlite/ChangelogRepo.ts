@@ -58,12 +58,8 @@ export class ChangelogRepo {
                 ctx.getData("db", this._db),
                 {
                     pageSize: pagination.pageSize,
-                    chlgPageAfterDate: pagination.after
-                        ? pagination.after[1]
-                        : undefined,
-                    chlgPageAfterId: pagination.after
-                        ? pagination.after[0]
-                        : null,
+                    chlgPageAfterDate: pagination.after ? pagination.after[1] : undefined,
+                    chlgPageAfterId: pagination.after ? pagination.after[0] : null,
                 },
                 ctx.signal,
             ),
@@ -96,12 +92,8 @@ export class ChangelogRepo {
                 ctx.getData("db", this._db),
                 {
                     pageSize: pagination.pageSize,
-                    chlgPageAfterDate: pagination.after
-                        ? pagination.after[1]
-                        : undefined,
-                    chlgPageAfterId: pagination.after
-                        ? pagination.after[0]
-                        : null,
+                    chlgPageAfterDate: pagination.after ? pagination.after[1] : undefined,
+                    chlgPageAfterId: pagination.after ? pagination.after[0] : null,
                 },
                 ctx.signal,
             ),
@@ -168,18 +160,12 @@ export class ChangelogRepo {
         id: ChangelogEntryID,
     ): AsyncResult<void> {
         return fromPromise(
-            queries.deleteChangelogEntry(
-                ctx.getData("db", this._db),
-                { publicId: id },
-                ctx.signal,
-            ),
+            queries.deleteChangelogEntry(ctx.getData("db", this._db), { publicId: id }, ctx.signal),
         )
     }
 }
 
-function changelogEntryRowChangelogEntry(
-    row: queries.ListUnsyncedChangesRow,
-): ChangelogEntry {
+function changelogEntryRowChangelogEntry(row: queries.ListUnsyncedChangesRow): ChangelogEntry {
     let value = JSON.parse(row.value)
 
     if (row.targetType === "memos" && "created" in value) {

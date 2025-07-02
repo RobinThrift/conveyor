@@ -10,9 +10,7 @@ export const slice = {
 }
 
 export const selectors = {
-    ...transfer.slice.getSelectors(
-        (state: RootState) => state.attachments.transfer,
-    ),
+    ...transfer.slice.getSelectors((state: RootState) => state.attachments.transfer),
 }
 
 export const actions = {

@@ -41,9 +41,7 @@ export const Overview: Story = {
 
                 <div className="flex gap-4 justify-stretch">
                     <div>
-                        <h3 className="font-semibold text-lg">
-                            Regular Authentication
-                        </h3>
+                        <h3 className="font-semibold text-lg">Regular Authentication</h3>
                         <dl>
                             <div className="flex gap-2">
                                 <dt>Username:</dt>
@@ -61,9 +59,7 @@ export const Overview: Story = {
                     </div>
 
                     <div>
-                        <h3 className="font-semibold text-lg">
-                            Requires Password Change
-                        </h3>
+                        <h3 className="font-semibold text-lg">Requires Password Change</h3>
                         <dl>
                             <div className="flex gap-2">
                                 <dt>Username:</dt>

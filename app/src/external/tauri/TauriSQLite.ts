@@ -170,9 +170,7 @@ export class TauriSQLite implements Database {
                 return Err(beginErr)
             }
 
-            let [res, err] = await fn(
-                ctx.withData("db", new Transaction(this._handle)),
-            )
+            let [res, err] = await fn(ctx.withData("db", new Transaction(this._handle)))
             if (err) {
                 await this._rollback(ctx)
                 return Err(err)
@@ -195,11 +193,7 @@ class Transaction {
         this._handle = handle
     }
 
-    async exec(
-        sql: string,
-        args?: (SqlValue | boolean)[],
-        abort?: AbortSignal,
-    ): Promise<number> {
+    async exec(sql: string, args?: (SqlValue | boolean)[], abort?: AbortSignal): Promise<number> {
         let [rowsAffected] = await awaitWithAbort(
             invoke<[number, number]>("plugin:sqlite|tx_exec", {
                 db: this._handle,

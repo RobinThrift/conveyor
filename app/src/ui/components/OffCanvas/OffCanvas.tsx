@@ -50,35 +50,28 @@ export function OffCanvasContent({
         }
     }, [])
 
-    let onPointerCancel = useCallback(
-        (e: React.PointerEvent<HTMLDivElement>) => {
-            if (!isDragging.current || !animRef.current) {
-                return
-            }
+    let onPointerCancel = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+        if (!isDragging.current || !animRef.current) {
+            return
+        }
 
-            isDragging.current = false
-            ;(e.target as HTMLDivElement).releasePointerCapture(e.pointerId)
+        isDragging.current = false
+        ;(e.target as HTMLDivElement).releasePointerCapture(e.pointerId)
 
-            let boundingRect = animRef.current.getBoundingClientRect()
-            let translateBy = Math.min(
-                e.clientX - offsetX.current - boundingRect.width,
-                0,
-            )
+        let boundingRect = animRef.current.getBoundingClientRect()
+        let translateBy = Math.min(e.clientX - offsetX.current - boundingRect.width, 0)
 
-            if (
-                (Math.abs(translateBy) > boundingRect.width * 0.5 &&
-                    velocity.current < 0) ||
-                velocity.current < -27
-            ) {
-                closeFn.current?.()
-            } else {
-                animRef.current.style.transition = "transform 250ms"
-                animRef.current.style.transform = "translateX(0px)"
-                animRef.current.style.animationDuration = "200ms"
-            }
-        },
-        [],
-    )
+        if (
+            (Math.abs(translateBy) > boundingRect.width * 0.5 && velocity.current < 0) ||
+            velocity.current < -27
+        ) {
+            closeFn.current?.()
+        } else {
+            animRef.current.style.transition = "transform 250ms"
+            animRef.current.style.transform = "translateX(0px)"
+            animRef.current.style.animationDuration = "200ms"
+        }
+    }, [])
 
     let onPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         if (!isDragging.current || !animRef.current) {
@@ -89,10 +82,7 @@ export function OffCanvasContent({
         lastPointerX.current = e.clientX
 
         let boundingRect = animRef.current.getBoundingClientRect()
-        let translateBy = Math.min(
-            e.clientX - offsetX.current - boundingRect.width,
-            0,
-        )
+        let translateBy = Math.min(e.clientX - offsetX.current - boundingRect.width, 0)
 
         animRef.current.style.transform = `translateX(${translateBy}px)`
         animRef.current.style.animationDuration = "0"

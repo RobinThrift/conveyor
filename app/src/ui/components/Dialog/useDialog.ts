@@ -109,8 +109,7 @@ export function useDialog(props: {
             ({
                 ref,
                 isModal: props.isModal,
-                isKeyboardDismissable:
-                    props.isKeyboardDismissable ?? !props.isModal,
+                isKeyboardDismissable: props.isKeyboardDismissable ?? !props.isModal,
                 autofocus: props.autofocus ?? props.isModal,
                 isOpen,
                 defaultOpen: props.defaultOpen,
@@ -175,25 +174,18 @@ function useNesting(ref: React.RefObject<HTMLDialogElement | null>) {
 
         let currNested =
             Number.parseInt(
-                existingCtx.ref.current.style.getPropertyValue(
-                    "--nested-dialogs",
-                ) ?? "0",
+                existingCtx.ref.current.style.getPropertyValue("--nested-dialogs") ?? "0",
                 10,
             ) || 0
 
-        existingCtx.ref.current.style.setProperty(
-            "--nested-dialogs",
-            `${currNested + 1}`,
-        )
+        existingCtx.ref.current.style.setProperty("--nested-dialogs", `${currNested + 1}`)
 
         ref.current?.addEventListener(
             "close",
             () => {
                 let currNested =
                     Number.parseInt(
-                        existingCtx?.ref.current?.style.getPropertyValue(
-                            "--nested-dialogs",
-                        ) ?? "0",
+                        existingCtx?.ref.current?.style.getPropertyValue("--nested-dialogs") ?? "0",
                         10,
                     ) || 0
 
@@ -219,9 +211,7 @@ export function useDialogDragHandle({
     let velocity = useRef(0)
     let height = useRef(0)
     let durationMs = 250
-    let animFrame = useRef<
-        ReturnType<typeof requestAnimationFrame> | undefined
-    >(undefined)
+    let animFrame = useRef<ReturnType<typeof requestAnimationFrame> | undefined>(undefined)
 
     let animation = useRef<Animation | undefined>(undefined)
 

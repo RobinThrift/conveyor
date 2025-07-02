@@ -42,8 +42,7 @@ export function Link<S extends keyof Screens>({
     )
 }
 
-export interface LinkButtonProps<S extends keyof Screens>
-    extends React.AnchorHTMLAttributes<any> {
+export interface LinkButtonProps<S extends keyof Screens> extends React.AnchorHTMLAttributes<any> {
     iconLeft?: React.ReactNode
     iconRight?: React.ReactNode
     size?: "sm" | "md" | "lg"
@@ -77,8 +76,7 @@ export function LinkButton<S extends keyof Screens>({
                         params || {},
                         {
                             scrollOffsetTop: Math.ceil(
-                                window.visualViewport?.pageTop ??
-                                    window.scrollY,
+                                window.visualViewport?.pageTop ?? window.scrollY,
                             ),
                         },
                         stack,

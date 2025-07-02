@@ -14,8 +14,7 @@ import { SettingsController } from "./SettingsController"
 
 suite("control/SettingsController", async () => {
     test("loadSettings (defaults)", async ({ onTestFinished }) => {
-        let { settingsCtrl, ctx, setup, cleanup } =
-            await settingsCtrlTestSetup()
+        let { settingsCtrl, ctx, setup, cleanup } = await settingsCtrlTestSetup()
 
         await setup()
         onTestFinished(cleanup)
@@ -26,8 +25,7 @@ suite("control/SettingsController", async () => {
     })
 
     test("updateSetting", async ({ onTestFinished }) => {
-        let { settingsCtrl, ctx, setup, cleanup } =
-            await settingsCtrlTestSetup()
+        let { settingsCtrl, ctx, setup, cleanup } = await settingsCtrlTestSetup()
 
         await setup()
         onTestFinished(cleanup)
@@ -46,8 +44,7 @@ suite("control/SettingsController", async () => {
     })
 
     test("changelog", async ({ onTestFinished }) => {
-        let { settingsCtrl, changelogCtrl, ctx, setup, cleanup } =
-            await settingsCtrlTestSetup()
+        let { settingsCtrl, changelogCtrl, ctx, setup, cleanup } = await settingsCtrlTestSetup()
 
         await setup()
         onTestFinished(cleanup)
@@ -110,8 +107,7 @@ suite("control/SettingsController", async () => {
     })
 
     test("applyChangelogEntries", async ({ onTestFinished }) => {
-        let { settingsCtrl, ctx, setup, cleanup } =
-            await settingsCtrlTestSetup()
+        let { settingsCtrl, ctx, setup, cleanup } = await settingsCtrlTestSetup()
 
         await setup()
         onTestFinished(cleanup)

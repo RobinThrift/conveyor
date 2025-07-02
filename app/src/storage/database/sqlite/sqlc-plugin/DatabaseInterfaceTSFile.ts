@@ -71,9 +71,7 @@ const databaseInterfaceDeclaration = factory.createInterfaceDeclaration(
                                     factory.createIdentifier("SqlValue"),
                                     undefined,
                                 ),
-                                factory.createKeywordTypeNode(
-                                    SyntaxKind.BooleanKeyword,
-                                ),
+                                factory.createKeywordTypeNode(SyntaxKind.BooleanKeyword),
                             ]),
                         ),
                         undefined,
@@ -91,10 +89,9 @@ const databaseInterfaceDeclaration = factory.createInterfaceDeclaration(
                         undefined,
                     ),
                 ],
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier("Promise"),
-                    [factory.createKeywordTypeNode(SyntaxKind.NumberKeyword)],
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier("Promise"), [
+                    factory.createKeywordTypeNode(SyntaxKind.NumberKeyword),
+                ]),
             ),
         ),
 
@@ -108,17 +105,13 @@ const databaseInterfaceDeclaration = factory.createInterfaceDeclaration(
                         undefined,
                         "R",
                         factory.createTypeReferenceNode("Record", [
-                            factory.createKeywordTypeNode(
-                                SyntaxKind.StringKeyword,
-                            ),
+                            factory.createKeywordTypeNode(SyntaxKind.StringKeyword),
                             factory.createUnionTypeNode([
                                 factory.createTypeReferenceNode(
                                     factory.createIdentifier("SqlValue"),
                                     undefined,
                                 ),
-                                factory.createKeywordTypeNode(
-                                    SyntaxKind.BooleanKeyword,
-                                ),
+                                factory.createKeywordTypeNode(SyntaxKind.BooleanKeyword),
                             ]),
                         ]),
                     ),
@@ -144,9 +137,7 @@ const databaseInterfaceDeclaration = factory.createInterfaceDeclaration(
                                     factory.createIdentifier("SqlValue"),
                                     undefined,
                                 ),
-                                factory.createKeywordTypeNode(
-                                    SyntaxKind.BooleanKeyword,
-                                ),
+                                factory.createKeywordTypeNode(SyntaxKind.BooleanKeyword),
                             ]),
                         ),
                         undefined,
@@ -164,17 +155,11 @@ const databaseInterfaceDeclaration = factory.createInterfaceDeclaration(
                         undefined,
                     ),
                 ],
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier("Promise"),
-                    [
-                        factory.createArrayTypeNode(
-                            factory.createTypeReferenceNode(
-                                factory.createIdentifier("R"),
-                                undefined,
-                            ),
-                        ),
-                    ],
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier("Promise"), [
+                    factory.createArrayTypeNode(
+                        factory.createTypeReferenceNode(factory.createIdentifier("R"), undefined),
+                    ),
+                ]),
             ),
         ),
 
@@ -188,17 +173,13 @@ const databaseInterfaceDeclaration = factory.createInterfaceDeclaration(
                         undefined,
                         "R",
                         factory.createTypeReferenceNode("Record", [
-                            factory.createKeywordTypeNode(
-                                SyntaxKind.StringKeyword,
-                            ),
+                            factory.createKeywordTypeNode(SyntaxKind.StringKeyword),
                             factory.createUnionTypeNode([
                                 factory.createTypeReferenceNode(
                                     factory.createIdentifier("SqlValue"),
                                     undefined,
                                 ),
-                                factory.createKeywordTypeNode(
-                                    SyntaxKind.BooleanKeyword,
-                                ),
+                                factory.createKeywordTypeNode(SyntaxKind.BooleanKeyword),
                             ]),
                         ]),
                     ),
@@ -224,9 +205,7 @@ const databaseInterfaceDeclaration = factory.createInterfaceDeclaration(
                                     factory.createIdentifier("SqlValue"),
                                     undefined,
                                 ),
-                                factory.createKeywordTypeNode(
-                                    SyntaxKind.BooleanKeyword,
-                                ),
+                                factory.createKeywordTypeNode(SyntaxKind.BooleanKeyword),
                             ]),
                         ),
                         undefined,
@@ -244,20 +223,12 @@ const databaseInterfaceDeclaration = factory.createInterfaceDeclaration(
                         undefined,
                     ),
                 ],
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier("Promise"),
-                    [
-                        factory.createUnionTypeNode([
-                            factory.createTypeReferenceNode(
-                                factory.createIdentifier("R"),
-                                undefined,
-                            ),
-                            factory.createKeywordTypeNode(
-                                SyntaxKind.UndefinedKeyword,
-                            ),
-                        ]),
-                    ],
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier("Promise"), [
+                    factory.createUnionTypeNode([
+                        factory.createTypeReferenceNode(factory.createIdentifier("R"), undefined),
+                        factory.createKeywordTypeNode(SyntaxKind.UndefinedKeyword),
+                    ]),
+                ]),
             ),
         ),
     ],

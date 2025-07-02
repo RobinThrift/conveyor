@@ -26,8 +26,7 @@ export function ConveyorBeltText(props: ConveyorBeltTextProps) {
             let parentWidth =
                 current.parentElement?.getBoundingClientRect().width ??
                 current.getBoundingClientRect().width
-            let textWidth =
-                current.children[0]?.getBoundingClientRect().width ?? 1
+            let textWidth = current.children[0]?.getBoundingClientRect().width ?? 1
 
             let ratio = parentWidth / textWidth
 

@@ -8,10 +8,7 @@ import { Loader } from "@/ui/components/Loader"
 import { useT } from "@/ui/i18n"
 import type { AuthStatus } from "@/ui/state"
 
-import {
-    type ChangePasswordArgs,
-    ChangePasswordForm,
-} from "./ChangePasswordForm"
+import { type ChangePasswordArgs, ChangePasswordForm } from "./ChangePasswordForm"
 import { type LoginArgs, useAuthFormState } from "./useAuthFormState"
 
 export type { LoginArgs } from "./useAuthFormState"
@@ -26,22 +23,12 @@ export interface AuthFormProps {
 
 export function AuthForm(props: AuthFormProps) {
     let t = useT("components/AuthForm")
-    let {
-        username,
-        isLoading,
-        showChangePasswordDialog,
-        cancelPasswordChangeDialog,
-        onSubmit,
-    } = useAuthFormState(props)
+    let { username, isLoading, showChangePasswordDialog, cancelPasswordChangeDialog, onSubmit } =
+        useAuthFormState(props)
 
     return (
         <div className={props.className}>
-            <Form
-                className="space-y-4 relative"
-                action="#"
-                method="post"
-                onSubmit={onSubmit}
-            >
+            <Form className="space-y-4 relative" action="#" method="post" onSubmit={onSubmit}>
                 <Input
                     name="username"
                     type="text"
@@ -86,11 +73,7 @@ export function AuthForm(props: AuthFormProps) {
                 />
 
                 <div className="flex justify-end items-center mt-2">
-                    <Button
-                        variant="primary"
-                        type="submit"
-                        isDisabled={isLoading}
-                    >
+                    <Button variant="primary" type="submit" isDisabled={isLoading}>
                         {t.AuthenticateButtonLabel}
                     </Button>
                 </div>
@@ -116,12 +99,8 @@ export function AuthForm(props: AuthFormProps) {
                 }}
             >
                 <Dialog.Content className="change-password-dialog">
-                    <Dialog.Title>
-                        {t.ChangePasswordFormDialogTitle}
-                    </Dialog.Title>
-                    <Dialog.Description>
-                        {t.ChangePasswordFormDialogDescription}
-                    </Dialog.Description>
+                    <Dialog.Title>{t.ChangePasswordFormDialogTitle}</Dialog.Title>
+                    <Dialog.Description>{t.ChangePasswordFormDialogDescription}</Dialog.Description>
 
                     <ChangePasswordForm
                         username={username}

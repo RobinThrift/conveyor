@@ -28,10 +28,7 @@ export const slice = createSlice({
     name: "sync",
     initialState,
     reducers: {
-        loadSyncInfo: (
-            state,
-            _: PayloadAction<{ syncOnLoad?: boolean } | undefined>,
-        ) => state,
+        loadSyncInfo: (state, _: PayloadAction<{ syncOnLoad?: boolean } | undefined>) => state,
         setup: (
             state,
             {
@@ -62,8 +59,7 @@ export const slice = createSlice({
         ) => {
             state.status = payload.status
             state.error = payload.error
-            state.isSyncRequested =
-                payload.isSyncRequested ?? state.isSyncRequested
+            state.isSyncRequested = payload.isSyncRequested ?? state.isSyncRequested
         },
 
         disable: (state) => {

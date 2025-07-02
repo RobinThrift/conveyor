@@ -28,11 +28,7 @@ import type {
     TableCell,
     TableRow,
 } from "mdast"
-import type {
-    ContainerDirective,
-    LeafDirective,
-    TextDirective,
-} from "mdast-util-directive"
+import type { ContainerDirective, LeafDirective, TextDirective } from "mdast-util-directive"
 
 import type { Screens } from "@/control/NavigationController"
 import { Loader } from "@/ui/components/Loader"
@@ -82,9 +78,7 @@ export function astToJSX(
         directives: opts.directives ?? {},
     }
 
-    let nodes: ReactNode[] = [
-        ast.children.map((node) => astNodeToJSX(doc, node)),
-    ]
+    let nodes: ReactNode[] = [ast.children.map((node) => astNodeToJSX(doc, node))]
 
     if (doc.footnotes.length !== 0) {
         nodes.push(
@@ -211,9 +205,7 @@ function paragraphtoJSX(doc: Document, node: Paragraph): ReactNode {
         if (c.type === "image") {
             if (currentParagraphChildren.length !== 0) {
                 paragraphs.push(
-                    <p key={`${nodeKey(node)}-${paragraphs.length}`}>
-                        {currentParagraphChildren}
-                    </p>,
+                    <p key={`${nodeKey(node)}-${paragraphs.length}`}>{currentParagraphChildren}</p>,
                 )
                 currentParagraphChildren = []
             }
@@ -225,9 +217,7 @@ function paragraphtoJSX(doc: Document, node: Paragraph): ReactNode {
 
     if (currentParagraphChildren.length !== 0) {
         paragraphs.push(
-            <p key={`${nodeKey(node)}-${paragraphs.length}`}>
-                {currentParagraphChildren}
-            </p>,
+            <p key={`${nodeKey(node)}-${paragraphs.length}`}>{currentParagraphChildren}</p>,
         )
     }
 
@@ -245,11 +235,7 @@ function listToJSX(doc: Document, node: List): ReactNode {
 }
 
 function listItemToJSX(doc: Document, node: ListItem): ReactNode {
-    return (
-        <li key={nodeKey(node)}>
-            {stripParagraph(node).map((c) => astNodeToJSX(doc, c))}
-        </li>
-    )
+    return <li key={nodeKey(node)}>{stripParagraph(node).map((c) => astNodeToJSX(doc, c))}</li>
 }
 
 function blockquoteToJSX(doc: Document, node: Blockquote): ReactNode {
@@ -261,27 +247,15 @@ function blockquoteToJSX(doc: Document, node: Blockquote): ReactNode {
 }
 
 function emphasisToJSX(doc: Document, node: Emphasis): ReactNode {
-    return (
-        <em key={nodeKey(node)}>
-            {node.children.map((c) => astNodeToJSX(doc, c))}
-        </em>
-    )
+    return <em key={nodeKey(node)}>{node.children.map((c) => astNodeToJSX(doc, c))}</em>
 }
 
 function deleteToJSX(doc: Document, node: Delete): ReactNode {
-    return (
-        <del key={nodeKey(node)}>
-            {node.children.map((c) => astNodeToJSX(doc, c))}
-        </del>
-    )
+    return <del key={nodeKey(node)}>{node.children.map((c) => astNodeToJSX(doc, c))}</del>
 }
 
 function strongToJSX(doc: Document, node: Strong): ReactNode {
-    return (
-        <strong key={nodeKey(node)}>
-            {node.children.map((c) => astNodeToJSX(doc, c))}
-        </strong>
-    )
+    return <strong key={nodeKey(node)}>{node.children.map((c) => astNodeToJSX(doc, c))}</strong>
 }
 
 function inlineCodeToJSX(node: InlineCode): ReactNode {
@@ -349,11 +323,7 @@ function codeToJSX(doc: Document, node: CodeBlock): ReactNode {
     let Code = doc.componentMap.Code ?? "pre"
 
     return (
-        <Code
-            key={nodeKey(node)}
-            lang={node.lang ?? undefined}
-            meta={node.meta ?? undefined}
-        >
+        <Code key={nodeKey(node)} lang={node.lang ?? undefined} meta={node.meta ?? undefined}>
             {node.value}
         </Code>
     )
@@ -372,19 +342,13 @@ function tableToJSX(doc: Document, node: Table): ReactNode {
         <div key={nodeKey(node)} className="table-wrapper">
             <table>
                 <thead>{tableRowToJSX(doc, header, alignments)}</thead>
-                <tbody>
-                    {rows.map((row) => tableRowToJSX(doc, row, alignments))}
-                </tbody>
+                <tbody>{rows.map((row) => tableRowToJSX(doc, row, alignments))}</tbody>
             </table>
         </div>
     )
 }
 
-function tableRowToJSX(
-    doc: Document,
-    node: TableRow,
-    alignments: AlignType[],
-): ReactNode {
+function tableRowToJSX(doc: Document, node: TableRow, alignments: AlignType[]): ReactNode {
     return (
         <tr key={nodeKey(node)}>
             {node.children.map((c, i) => tableCellToJSX(doc, c, alignments[i]))}
@@ -392,11 +356,7 @@ function tableRowToJSX(
     )
 }
 
-function tableCellToJSX(
-    doc: Document,
-    node: TableCell,
-    alignment: AlignType,
-): ReactNode {
+function tableCellToJSX(doc: Document, node: TableCell, alignment: AlignType): ReactNode {
     return (
         <td
             key={nodeKey(node)}
@@ -411,18 +371,12 @@ function tableCellToJSX(
     )
 }
 
-function footnoteDefinitionToJSX(
-    doc: Document,
-    node: FootnoteDefinition,
-): ReactNode {
+function footnoteDefinitionToJSX(doc: Document, node: FootnoteDefinition): ReactNode {
     doc.footnotes.push(<FootnoteLinkItem doc={doc} node={node} />)
     return null
 }
 
-function footnoteReferenceToJSX(
-    doc: Document,
-    node: FootnoteReference,
-): ReactNode {
+function footnoteReferenceToJSX(doc: Document, node: FootnoteReference): ReactNode {
     return (
         <sup id={`fnref:${doc.id}-${node.identifier}`} key={nodeKey(node)}>
             {/* biome-ignore lint/a11y/useValidAriaRole: false positive */}
@@ -442,10 +396,7 @@ function directiveToJSX(
     if (!Directive) {
         let Alert = doc.componentMap.Alert ?? "div"
         return (
-            <Alert
-                variant="danger"
-                key={nodeKey(node)}
-            >{`Unknown directive "${node.name}"`}</Alert>
+            <Alert variant="danger" key={nodeKey(node)}>{`Unknown directive "${node.name}"`}</Alert>
         )
     }
 
@@ -535,9 +486,7 @@ function FootnoteLinkItem({
                 aria-label={t.FootnoteBackLink}
                 className="ml-1 p-1 relative top-0.5 inline-flex hover:text-primary-contrast hover:bg-primary rounded-sm"
             >
-                {doc.componentMap.FootnoteReturnIcon && (
-                    <doc.componentMap.FootnoteReturnIcon />
-                )}
+                {doc.componentMap.FootnoteReturnIcon && <doc.componentMap.FootnoteReturnIcon />}
             </a>
         </li>
     )

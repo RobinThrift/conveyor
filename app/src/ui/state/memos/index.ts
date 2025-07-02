@@ -11,12 +11,7 @@ export type { UpdateMemoRequest } from "./update"
 
 export const slice = {
     reducerPath: "memos",
-    reducer: combineSlices(
-        list.slice,
-        create.slice,
-        update.slice,
-        single.slice,
-    ),
+    reducer: combineSlices(list.slice, create.slice, update.slice, single.slice),
 }
 
 export * from "./selectors"

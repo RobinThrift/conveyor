@@ -1,9 +1,5 @@
 import { createErrType } from "@/lib/errors"
-import {
-    type CalendarDate,
-    calendarDateToISO8601String,
-    parseDateISO8601,
-} from "@/lib/i18n"
+import { type CalendarDate, calendarDateToISO8601String, parseDateISO8601 } from "@/lib/i18n"
 
 export type MemoID = string
 
@@ -123,10 +119,7 @@ export function filterToSearchParams(filter: ListMemosQuery) {
     return searchParams
 }
 
-function addFilterToSearchParams(
-    searchParams: URLSearchParams,
-    filter: ListMemosQuery,
-) {
+function addFilterToSearchParams(searchParams: URLSearchParams, filter: ListMemosQuery) {
     if (filter.tag) {
         searchParams.set("filter[tag]", filter.tag)
     }
@@ -136,17 +129,11 @@ function addFilterToSearchParams(
     }
 
     if (filter.exactDate) {
-        searchParams.set(
-            "filter[created_at]",
-            calendarDateToISO8601String(filter.exactDate),
-        )
+        searchParams.set("filter[created_at]", calendarDateToISO8601String(filter.exactDate))
     }
 
     if (filter.startDate) {
-        searchParams.set(
-            "filter[created_at]",
-            calendarDateToISO8601String(filter.startDate),
-        )
+        searchParams.set("filter[created_at]", calendarDateToISO8601String(filter.startDate))
         searchParams.set("op[created_at]", "<=")
     }
 

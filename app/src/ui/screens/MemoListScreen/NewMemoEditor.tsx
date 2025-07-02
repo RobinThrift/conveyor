@@ -12,8 +12,7 @@ export interface NewMemoEditorProps {
 }
 
 export function NewMemoEditor(props: NewMemoEditorProps) {
-    let { createMemo, newMemo, transferAttachment, tags, settings } =
-        useNewMemoEditorState()
+    let { createMemo, newMemo, transferAttachment, tags, settings } = useNewMemoEditorState()
 
     return (
         <>

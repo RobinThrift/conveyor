@@ -5,12 +5,7 @@ import {
     filterToSearchParams,
 } from "@/domain/Memo"
 import { isEqual } from "@/lib/isEqual"
-import type {
-    NavgationState,
-    NavigationBackend,
-    OnPop,
-    OnPush,
-} from "@/lib/navigation"
+import type { NavgationState, NavigationBackend, OnPop, OnPush } from "@/lib/navigation"
 
 export type Screens = {
     root: {
@@ -96,10 +91,9 @@ export class NavigationController {
     }
 
     public push(
-        next: Omit<
-            NavgationState<Screens, Stacks, Restore>,
-            "stack" | "index"
-        > & { stack?: Stacks },
+        next: Omit<NavgationState<Screens, Stacks, Restore>, "stack" | "index"> & {
+            stack?: Stacks
+        },
     ) {
         if (isEqual(next.screen, this._currentState.screen)) {
             return
@@ -109,10 +103,7 @@ export class NavigationController {
 
         let nextState = this._backend.push({
             ...next,
-            index:
-                stack === this._currentState.stack
-                    ? this._currentState.index + 1
-                    : 0,
+            index: stack === this._currentState.stack ? this._currentState.index + 1 : 0,
             stack,
         })
         let current = this._currentState
@@ -138,14 +129,8 @@ export class NavigationController {
         this._currentState = { ...next }
     }
 
-    addEventListener(
-        event: "pop",
-        handler: OnPop<Screens, Stacks, Restore>,
-    ): void
-    addEventListener(
-        event: "push",
-        handler: OnPush<Screens, Stacks, Restore>,
-    ): void
+    addEventListener(event: "pop", handler: OnPop<Screens, Stacks, Restore>): void
+    addEventListener(event: "push", handler: OnPush<Screens, Stacks, Restore>): void
     addEventListener(
         event: "pop" | "push",
         handler: (
@@ -212,10 +197,7 @@ export class NavigationController {
         }
 
         if ("editPosition" in params && params.editPosition) {
-            urlParams.set(
-                "editPosition",
-                encodeURIComponent(JSON.stringify(params.editPosition)),
-            )
+            urlParams.set("editPosition", encodeURIComponent(JSON.stringify(params.editPosition)))
         }
 
         if ("tab" in params && params.tab) {

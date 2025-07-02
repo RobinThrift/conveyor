@@ -44,9 +44,7 @@ export async function initController(platform: PlatformDependencies) {
 
     await platform.fs.mkdirp(BaseContext, ".")
 
-    let encryptedFS = createTracedProxy(
-        new EncryptedFS(platform.fs, cryptoCtrl),
-    )
+    let encryptedFS = createTracedProxy(new EncryptedFS(platform.fs, cryptoCtrl))
 
     let authCtrl = createTracedProxy(
         new AuthController({
@@ -121,9 +119,7 @@ export async function initController(platform: PlatformDependencies) {
             storage: createTracedProxy(
                 new SingleItemKVStore(
                     SyncController.storageKey,
-                    new EncryptedKVStore<
-                        Record<typeof SyncController.storageKey, SyncInfo>
-                    >({
+                    new EncryptedKVStore<Record<typeof SyncController.storageKey, SyncInfo>>({
                         kv: platform.keyValueContainer.getKVStore("sync"),
                         crypto: platform.crypto,
                     }),
@@ -160,9 +156,7 @@ export async function initController(platform: PlatformDependencies) {
 
     let unlockControllerStorage: UnlockControllerStorage | undefined
     if (Env.isDeviceSecureStorageAvailable) {
-        unlockControllerStorage = createTracedProxy(
-            platform.deviceSecureStorage,
-        )
+        unlockControllerStorage = createTracedProxy(platform.deviceSecureStorage)
     }
 
     let unlockCtrl = createTracedProxy(

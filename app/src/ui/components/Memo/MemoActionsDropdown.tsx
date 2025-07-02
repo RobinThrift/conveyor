@@ -3,12 +3,7 @@ import React from "react"
 import type { Memo } from "@/domain/Memo"
 import { Button } from "@/ui/components/Button"
 import { DropdownMenu } from "@/ui/components/DropdownMenu"
-import {
-    ArchiveIcon,
-    BinIcon,
-    DotsThreeVerticalIcon,
-    PencilIcon,
-} from "@/ui/components/Icons"
+import { ArchiveIcon, BinIcon, DotsThreeVerticalIcon, PencilIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 import type { MemoActions } from "./MemoActions"
 
@@ -44,12 +39,7 @@ export function MemoActionsDropdown({
                     <DropdownMenu.Items>
                         {actions?.archive && (
                             <DropdownMenu.Item
-                                action={() =>
-                                    actions?.archive?.(
-                                        memo.id,
-                                        !memo.isArchived,
-                                    )
-                                }
+                                action={() => actions?.archive?.(memo.id, !memo.isArchived)}
                             >
                                 <DropdownMenu.ItemLabel icon={<ArchiveIcon />}>
                                     {memo.isArchived ? t.Unarchive : t.Archive}
@@ -60,9 +50,7 @@ export function MemoActionsDropdown({
                         {actions?.delete && (
                             <DropdownMenu.Item
                                 destructive
-                                action={() =>
-                                    actions?.delete?.(memo.id, !memo.isDeleted)
-                                }
+                                action={() => actions?.delete?.(memo.id, !memo.isDeleted)}
                             >
                                 <DropdownMenu.ItemLabel icon={<BinIcon />}>
                                     {memo.isDeleted ? t.Restore : t.Delete}

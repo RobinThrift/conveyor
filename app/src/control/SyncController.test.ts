@@ -41,15 +41,14 @@ suite("control/SyncController", async () => {
         let dbPath = "syncCtrl_fetchFullDB_test.db"
         let content = "THIS IS TOTALLY A DATABASE"
 
-        let { ctx, setup, cleanup, syncCtrl, crypto, fs } =
-            await setupSyncControllerTest({
-                dbPath,
-                syncAPI: {
-                    getFullSync: async () => {
-                        return crypto.encryptData(encodeText(content))
-                    },
+        let { ctx, setup, cleanup, syncCtrl, crypto, fs } = await setupSyncControllerTest({
+            dbPath,
+            syncAPI: {
+                getFullSync: async () => {
+                    return crypto.encryptData(encodeText(content))
                 },
-            })
+            },
+        })
 
         await setup()
         onTestFinished(cleanup)
@@ -63,36 +62,30 @@ suite("control/SyncController", async () => {
 
     test("uploadFullDB", async ({ onTestFinished }) => {
         let dbPath = "syncCtrl_uploadFullDB_test.db"
-        let { ctx, setup, cleanup, syncCtrl, crypto, fs } =
-            await setupSyncControllerTest({
-                dbPath,
-                syncAPI: {
-                    uploadFullSyncData: async (_, data) => {
-                        let [decrypted, err] = await crypto.decryptData(
-                            new Uint8Array(data),
-                        )
+        let { ctx, setup, cleanup, syncCtrl, crypto, fs } = await setupSyncControllerTest({
+            dbPath,
+            syncAPI: {
+                uploadFullSyncData: async (_, data) => {
+                    let [decrypted, err] = await crypto.decryptData(new Uint8Array(data))
 
-                        if (err) {
-                            return Err(err)
-                        }
+                    if (err) {
+                        return Err(err)
+                    }
 
-                        assert.equal(
-                            decodeText(new Uint8Array(decrypted)),
-                            content,
-                        )
+                    assert.equal(decodeText(new Uint8Array(decrypted)), content)
 
-                        return Ok(undefined)
-                    },
+                    return Ok(undefined)
                 },
-                cryptoRemoteAPI: {
-                    uploadAccountKey: async (_, accountKey) => {
-                        assert.isDefined(accountKey.data)
-                        assert.equal(accountKey.type, "agev1")
-                        assert.equal(accountKey.name, "primary")
-                        return Ok(undefined)
-                    },
+            },
+            cryptoRemoteAPI: {
+                uploadAccountKey: async (_, accountKey) => {
+                    assert.isDefined(accountKey.data)
+                    assert.equal(accountKey.type, "agev1")
+                    assert.equal(accountKey.name, "primary")
+                    return Ok(undefined)
                 },
-            })
+            },
+        })
 
         await setup()
         onTestFinished(cleanup)
@@ -115,9 +108,9 @@ suite("control/SyncController", async () => {
                 value: { value: true },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(
-                    currentDateTime().subtract({ minutes: 5 }),
-                ).toDate("utc"),
+                timestamp: roundToNearestMinutes(currentDateTime().subtract({ minutes: 5 })).toDate(
+                    "utc",
+                ),
             } satisfies SettingChangelogEntry,
             {
                 id: newID(),
@@ -128,9 +121,9 @@ suite("control/SyncController", async () => {
                 value: { value: "light" },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(
-                    currentDateTime().subtract({ minutes: 5 }),
-                ).toDate("utc"),
+                timestamp: roundToNearestMinutes(currentDateTime().subtract({ minutes: 5 })).toDate(
+                    "utc",
+                ),
             } satisfies SettingChangelogEntry,
             {
                 id: newID(),
@@ -149,9 +142,9 @@ suite("control/SyncController", async () => {
                 },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(
-                    currentDateTime().subtract({ minutes: 5 }),
-                ).toDate("utc"),
+                timestamp: roundToNearestMinutes(currentDateTime().subtract({ minutes: 5 })).toDate(
+                    "utc",
+                ),
             } satisfies AttachmentChangelogEntry,
         ]
         let remoteChanges: ChangelogEntry[] = [
@@ -164,58 +157,43 @@ suite("control/SyncController", async () => {
                 value: { value: "dark" },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(
-                    currentDateTime().add({ minutes: 5 }),
-                ).toDate("utc"),
+                timestamp: roundToNearestMinutes(currentDateTime().add({ minutes: 5 })).toDate(
+                    "utc",
+                ),
             } satisfies SettingChangelogEntry,
         ]
 
-        let {
-            ctx,
-            setup,
-            cleanup,
-            fs,
-            syncCtrl,
-            changelogCtrl,
-            settingsCtrl,
-            crypto,
-        } = await setupSyncControllerTest({
-            syncAPI: {
-                listChangelogEntries: async (_ctx, _since) => {
-                    return encryptChangeLogEntries(
-                        crypto,
-                        "remote",
-                        remoteChanges,
-                    )
-                },
+        let { ctx, setup, cleanup, fs, syncCtrl, changelogCtrl, settingsCtrl, crypto } =
+            await setupSyncControllerTest({
+                syncAPI: {
+                    listChangelogEntries: async (_ctx, _since) => {
+                        return encryptChangeLogEntries(crypto, "remote", remoteChanges)
+                    },
 
-                uploadChangelogEntries: async (_ctx, entries) => {
-                    let [decrypted, err] = await decryptChangeLogEntries(
-                        crypto,
-                        entries,
-                    )
-                    if (err) {
-                        return Err(err)
-                    }
-                    assert.deepEqual(decrypted, localChanges)
-                    return Ok(undefined)
-                },
+                    uploadChangelogEntries: async (_ctx, entries) => {
+                        let [decrypted, err] = await decryptChangeLogEntries(crypto, entries)
+                        if (err) {
+                            return Err(err)
+                        }
+                        assert.deepEqual(decrypted, localChanges)
+                        return Ok(undefined)
+                    },
 
-                uploadAttachment: async (_ctx, attachment) => {
-                    assert.deepEqual(decodeText(attachment.data), "TEST FILE")
-                    assert.deepEqual(attachment.filepath, "/a/b/c/d/e/f/g")
-                    return Ok(undefined)
+                    uploadAttachment: async (_ctx, attachment) => {
+                        assert.deepEqual(decodeText(attachment.data), "TEST FILE")
+                        assert.deepEqual(attachment.filepath, "/a/b/c/d/e/f/g")
+                        return Ok(undefined)
+                    },
                 },
-            },
-            cryptoRemoteAPI: {
-                uploadAccountKey: async (_, accountKey) => {
-                    assert.isDefined(accountKey.data)
-                    assert.equal(accountKey.type, "agev1")
-                    assert.equal(accountKey.name, "primary")
-                    return Ok(undefined)
+                cryptoRemoteAPI: {
+                    uploadAccountKey: async (_, accountKey) => {
+                        assert.isDefined(accountKey.data)
+                        assert.equal(accountKey.type, "agev1")
+                        assert.equal(accountKey.name, "primary")
+                        return Ok(undefined)
+                    },
                 },
-            },
-        })
+            })
 
         syncCtrl.init(ctx, {
             server: "",
@@ -227,16 +205,10 @@ suite("control/SyncController", async () => {
         onTestFinished(cleanup)
 
         await assertOkResult(
-            fs.write(
-                ctx,
-                `/${ATTACHMENT_BASE_DIR}/a/b/c/d/e/f/g`,
-                encodeText("TEST FILE").buffer,
-            ),
+            fs.write(ctx, `/${ATTACHMENT_BASE_DIR}/a/b/c/d/e/f/g`, encodeText("TEST FILE").buffer),
         )
 
-        await assertOkResult(
-            changelogCtrl.insertExternalChangelogEntries(ctx, localChanges),
-        )
+        await assertOkResult(changelogCtrl.insertExternalChangelogEntries(ctx, localChanges))
 
         await assertOkResult(syncCtrl.sync(ctx))
 
@@ -269,10 +241,7 @@ async function setupSyncControllerTest({
     dbPath?: string
     syncAPI?: {
         getFullSync?: (ctx: Context) => AsyncResult<ArrayBufferLike>
-        uploadFullSyncData?: (
-            ctx: Context,
-            data: ArrayBufferLike,
-        ) => AsyncResult<void>
+        uploadFullSyncData?: (ctx: Context, data: ArrayBufferLike) => AsyncResult<void>
         listChangelogEntries?: (
             ctx: Context,
             since?: Date,
@@ -288,16 +257,10 @@ async function setupSyncControllerTest({
                 data: Uint8Array<ArrayBufferLike>
             },
         ) => AsyncResult<void>
-        registerClient?: (
-            ctx: Context,
-            syncClient: { clientID: string },
-        ) => AsyncResult<void>
+        registerClient?: (ctx: Context, syncClient: { clientID: string }) => AsyncResult<void>
     }
     cryptoRemoteAPI?: {
-        uploadAccountKey?: (
-            ctx: Context,
-            accountKey: AccountKey,
-        ) => AsyncResult<void>
+        uploadAccountKey?: (ctx: Context, accountKey: AccountKey) => AsyncResult<void>
     }
 }) {
     let [ctx, cancel] = BaseContext.withCancel()
@@ -342,10 +305,7 @@ async function setupSyncControllerTest({
     )
 
     let syncCtrl = new SyncController({
-        storage: new SingleItemKVStore<
-            typeof SyncController.storageKey,
-            SyncInfo
-        >(
+        storage: new SingleItemKVStore<typeof SyncController.storageKey, SyncInfo>(
             SyncController.storageKey,
             new TestInMemKVStore<Record<string, any>>(),
         ),
@@ -353,20 +313,16 @@ async function setupSyncControllerTest({
         syncAPIClient: {
             setBaseURL: () => {},
             getFullSync:
-                syncAPI?.getFullSync ??
-                (async () => Err(new Error("getFullSync unimplemented"))),
+                syncAPI?.getFullSync ?? (async () => Err(new Error("getFullSync unimplemented"))),
             uploadFullSyncData:
                 syncAPI?.uploadFullSyncData ??
-                (async () =>
-                    Err(new Error("uploadFullSyncData unimplemented"))),
+                (async () => Err(new Error("uploadFullSyncData unimplemented"))),
             listChangelogEntries:
                 syncAPI?.listChangelogEntries ??
-                (async () =>
-                    Err(new Error("listChangelogEntries unimplemented"))),
+                (async () => Err(new Error("listChangelogEntries unimplemented"))),
             uploadChangelogEntries:
                 syncAPI?.uploadChangelogEntries ??
-                (async () =>
-                    Err(new Error("uploadChangelogEntries unimplemented"))),
+                (async () => Err(new Error("uploadChangelogEntries unimplemented"))),
             uploadAttachment:
                 syncAPI?.uploadAttachment ??
                 (async () => Err(new Error("uploadAttachment unimplemented"))),
@@ -413,9 +369,7 @@ async function encryptChangeLogEntries(
     let encrytpedEntries: EncryptedChangelogEntry[] = []
 
     for (let entry of entries) {
-        let [encrypted, err] = await encrypter.encryptData(
-            encodeText(JSON.stringify(entry)),
-        )
+        let [encrypted, err] = await encrypter.encryptData(encodeText(JSON.stringify(entry)))
         if (err) {
             return wrapErr`error encrytping changelog entry: ${err}`
         }
@@ -437,34 +391,32 @@ async function decryptChangeLogEntries(
     let entries: ChangelogEntry[] = []
 
     for (let entry of encrytpedEntries) {
-        let [decrypted, err] = await decrypter.decryptData(
-            dataFromBase64(entry.data)[0],
-        )
+        let [decrypted, err] = await decrypter.decryptData(dataFromBase64(entry.data)[0])
         if (err) {
             return wrapErr`error decrytping changelog entry: ${err}`
         }
 
-        let [parsed, parseErr] = jsonDeserialize<
-            ChangelogEntry,
-            Record<string, any>
-        >(decrypted, (obj) => {
-            let [timestamp, parseErr] = parseJSONDate(obj.timestamp)
-            if (parseErr) {
-                return Err(parseErr)
-            }
+        let [parsed, parseErr] = jsonDeserialize<ChangelogEntry, Record<string, any>>(
+            decrypted,
+            (obj) => {
+                let [timestamp, parseErr] = parseJSONDate(obj.timestamp)
+                if (parseErr) {
+                    return Err(parseErr)
+                }
 
-            return Ok({
-                id: obj.id,
-                source: obj.source,
-                revision: obj.revision,
-                targetType: obj.targetType,
-                targetID: obj.targetID,
-                value: obj.value,
-                isSynced: obj.isSynced,
-                isApplied: obj.isApplied,
-                timestamp: timestamp,
-            })
-        })
+                return Ok({
+                    id: obj.id,
+                    source: obj.source,
+                    revision: obj.revision,
+                    targetType: obj.targetType,
+                    targetID: obj.targetID,
+                    value: obj.value,
+                    isSynced: obj.isSynced,
+                    isApplied: obj.isApplied,
+                    timestamp: timestamp,
+                })
+            },
+        )
         if (parseErr) {
             return Err(parseErr)
         }

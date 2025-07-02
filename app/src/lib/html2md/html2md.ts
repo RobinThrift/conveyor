@@ -104,9 +104,7 @@ function codeSnippet2md(el: HTMLElement): string {
         .join("\n")
 
     if (!lang) {
-        let langClass = Array.from(el.classList).find((l) =>
-            l.startsWith("language-"),
-        )
+        let langClass = Array.from(el.classList).find((l) => l.startsWith("language-"))
         if (langClass) {
             lang = langClass.substring(9)
         }

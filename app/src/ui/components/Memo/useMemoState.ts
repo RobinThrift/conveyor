@@ -10,10 +10,7 @@ export function useMemoState(props: {
     doubleClickToEdit?: boolean
     forceRender?: boolean
     actions?: {
-        edit?: (
-            memoID: MemoID,
-            position?: { x: number; y: number; snippet?: string },
-        ) => void
+        edit?: (memoID: MemoID, position?: { x: number; y: number; snippet?: string }) => void
     }
 }) {
     let forceRender = props.forceRender ?? false
@@ -24,9 +21,7 @@ export function useMemoState(props: {
     let [shouldRender, setShouldRender] = useState(forceRender || isVisible)
     let { clientHeight, scrollHeight } = useOnResize(ref)
 
-    let needsCollapsing = props.collapsible
-        ? clientHeight < scrollHeight
-        : false
+    let needsCollapsing = props.collapsible ? clientHeight < scrollHeight : false
     let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
 
     let onDoubleClick = useMemo(() => {

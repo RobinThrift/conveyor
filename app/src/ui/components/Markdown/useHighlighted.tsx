@@ -17,9 +17,7 @@ export function useHightlighted({
     lang?: string
 }): string | React.ReactNode[] {
     let addNotification = useNotificationDispatcher()
-    let [parser, setParser] = useState<
-        { lang: string; parser: Parser } | undefined
-    >(() => {
+    let [parser, setParser] = useState<{ lang: string; parser: Parser } | undefined>(() => {
         if (!lang) {
             return undefined
         }
@@ -30,20 +28,18 @@ export function useHightlighted({
 
         return { lang, parser }
     })
-    let [highlighted, setHighlighted] = useState<string | React.ReactNode[]>(
-        () => {
-            if (!lang) {
-                return code
-            }
+    let [highlighted, setHighlighted] = useState<string | React.ReactNode[]>(() => {
+        if (!lang) {
+            return code
+        }
 
-            let parser = _parsers.get(lang)
-            if (!parser) {
-                return code
-            }
+        let parser = _parsers.get(lang)
+        if (!parser) {
+            return code
+        }
 
-            return hightlight({ code, parser })
-        },
-    )
+        return hightlight({ code, parser })
+    })
 
     if (lang && parser && parser?.lang !== lang) {
         setParser(undefined)
@@ -68,11 +64,7 @@ export function useHightlighted({
                 return await parser
             }
 
-            let info = LanguageDescription.matchLanguageName(
-                languages,
-                lang,
-                true,
-            )
+            let info = LanguageDescription.matchLanguageName(languages, lang, true)
             if (!info) {
                 return
             }

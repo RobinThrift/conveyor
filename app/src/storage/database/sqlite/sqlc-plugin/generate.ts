@@ -18,10 +18,7 @@ import {
     type Query,
 } from "./proto/codegen_pb.js"
 
-export function generate(
-    input: GenerateRequest,
-    options: Options,
-): GenerateResponse {
+export function generate(input: GenerateRequest, options: Options): GenerateResponse {
     let files: File[] = []
 
     let queryFiles = new Map<string, Query[]>()
@@ -35,11 +32,7 @@ export function generate(
     }
 
     for (let [filename, queries] of queryFiles.entries()) {
-        let file = new QueryTSFile(
-            `${filename.replace(".", "_")}.ts`,
-            queries,
-            options,
-        )
+        let file = new QueryTSFile(`${filename.replace(".", "_")}.ts`, queries, options)
         files.push(
             create(FileSchema, {
                 name: file.name,

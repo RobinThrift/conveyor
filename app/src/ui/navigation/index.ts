@@ -16,12 +16,7 @@ const navContext = createContext<NavigationController | undefined>(undefined)
 export const NavigationProvider = navContext.Provider
 
 export function useNavigation(): {
-    push: (
-        name: keyof Screens,
-        params: Params,
-        restore: Restore,
-        stack?: Stacks,
-    ) => void
+    push: (name: keyof Screens, params: Params, restore: Restore, stack?: Stacks) => void
     pop: () => void
     popStack: () => Promise<void>
     updateParams: (params: Partial<Params>) => void
@@ -29,21 +24,13 @@ export function useNavigation(): {
     let navCtrl = useContext(navContext)
     return {
         push: useCallback(
-            (
-                name: keyof Screens,
-                params: Params,
-                restore: Restore,
-                stack?: Stacks,
-            ) => {
+            (name: keyof Screens, params: Params, restore: Restore, stack?: Stacks) => {
                 navCtrl?.push({ screen: { name, params }, stack, restore })
             },
             [navCtrl],
         ),
         pop: useCallback(() => navCtrl?.pop(), [navCtrl]),
-        popStack: useCallback(
-            () => navCtrl?.popStack() ?? Promise.resolve(),
-            [navCtrl],
-        ),
+        popStack: useCallback(() => navCtrl?.popStack() ?? Promise.resolve(), [navCtrl]),
         updateParams: useCallback(
             (params: Partial<Params>) => {
                 navCtrl?.updateParams(params)

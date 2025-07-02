@@ -13,10 +13,7 @@ export class EncryptedFS implements FS {
         this._crypto = crypto
     }
 
-    public async read(
-        ctx: Context,
-        filepath: string,
-    ): AsyncResult<ArrayBufferLike> {
+    public async read(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike> {
         let [value, err] = await this._wrapped.read(ctx, filepath)
         if (err) {
             return wrapErr`error reading file: ${filepath}: ${err}`
@@ -30,9 +27,7 @@ export class EncryptedFS implements FS {
         filepath: string,
         content: ArrayBufferLike,
     ): AsyncResult<number> {
-        let [encrypted, err] = await this._crypto.encryptData(
-            new Uint8Array(content),
-        )
+        let [encrypted, err] = await this._crypto.encryptData(new Uint8Array(content))
         if (err) {
             return wrapErr`error encrypting file contents: ${filepath}: ${err}`
         }

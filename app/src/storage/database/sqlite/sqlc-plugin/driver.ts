@@ -32,10 +32,7 @@ export class WasmSQLite3Driver {
             case "date":
             case "datetime":
             case "timestamp": {
-                typ = factory.createTypeReferenceNode(
-                    factory.createIdentifier("Date"),
-                    undefined,
-                )
+                typ = factory.createTypeReferenceNode(factory.createIdentifier("Date"), undefined)
                 break
             }
         }
@@ -106,9 +103,7 @@ export class WasmSQLite3Driver {
                             ),
                             undefined,
                             [
-                                factory.createRegularExpressionLiteral(
-                                    "/([_][a-z])/g",
-                                ),
+                                factory.createRegularExpressionLiteral("/([_][a-z])/g"),
                                 factory.createArrowFunction(
                                     undefined, // modifiers
                                     undefined, // typeParameters
@@ -128,12 +123,8 @@ export class WasmSQLite3Driver {
                                         factory.createPropertyAccessExpression(
                                             factory.createCallExpression(
                                                 factory.createPropertyAccessExpression(
-                                                    factory.createIdentifier(
-                                                        "group",
-                                                    ),
-                                                    factory.createIdentifier(
-                                                        "toUpperCase",
-                                                    ),
+                                                    factory.createIdentifier("group"),
+                                                    factory.createIdentifier("toUpperCase"),
                                                 ),
                                                 undefined,
                                                 undefined,
@@ -191,13 +182,8 @@ export class WasmSQLite3Driver {
                                     undefined,
                                     undefined,
                                     factory.createAsExpression(
-                                        factory.createObjectLiteralExpression(
-                                            undefined,
-                                        ),
-                                        factory.createTypeReferenceNode(
-                                            "T",
-                                            undefined,
-                                        ),
+                                        factory.createObjectLiteralExpression(undefined),
+                                        factory.createTypeReferenceNode("T", undefined),
                                     ),
                                 ),
                             ],
@@ -224,9 +210,7 @@ export class WasmSQLite3Driver {
                                     factory.createVariableDeclarationList(
                                         [
                                             factory.createVariableDeclaration(
-                                                factory.createIdentifier(
-                                                    "field",
-                                                ),
+                                                factory.createIdentifier("field"),
                                                 undefined,
                                                 undefined,
                                                 factory.createAsExpression(
@@ -235,11 +219,7 @@ export class WasmSQLite3Driver {
                                                             "columnNameToFieldName",
                                                         ),
                                                         undefined,
-                                                        [
-                                                            factory.createIdentifier(
-                                                                "key",
-                                                            ),
-                                                        ],
+                                                        [factory.createIdentifier("key")],
                                                     ),
                                                     factory.createTypeOperatorNode(
                                                         SyntaxKind.KeyOfKeyword,
@@ -251,8 +231,7 @@ export class WasmSQLite3Driver {
                                                 ),
                                             ),
                                         ],
-                                        NodeFlags.Let |
-                                            NodeFlags.TypeExcludesFlags,
+                                        NodeFlags.Let | NodeFlags.TypeExcludesFlags,
                                     ),
                                 ),
 
@@ -261,23 +240,14 @@ export class WasmSQLite3Driver {
                                         factory.createParenthesizedExpression(
                                             factory.createAsExpression(
                                                 factory.createElementAccessChain(
-                                                    factory.createIdentifier(
-                                                        "obj",
-                                                    ),
+                                                    factory.createIdentifier("obj"),
                                                     undefined,
-                                                    factory.createIdentifier(
-                                                        "field",
-                                                    ),
+                                                    factory.createIdentifier("field"),
                                                 ),
                                                 factory.createIndexedAccessTypeNode(
-                                                    factory.createTypeReferenceNode(
-                                                        "T",
-                                                        undefined,
-                                                    ),
+                                                    factory.createTypeReferenceNode("T", undefined),
                                                     factory.createTypeQueryNode(
-                                                        factory.createIdentifier(
-                                                            "field",
-                                                        ),
+                                                        factory.createIdentifier("field"),
                                                         undefined,
                                                     ),
                                                 ),
@@ -290,14 +260,9 @@ export class WasmSQLite3Driver {
                                                 factory.createIdentifier("key"),
                                             ),
                                             factory.createIndexedAccessTypeNode(
-                                                factory.createTypeReferenceNode(
-                                                    "T",
-                                                    undefined,
-                                                ),
+                                                factory.createTypeReferenceNode("T", undefined),
                                                 factory.createTypeQueryNode(
-                                                    factory.createIdentifier(
-                                                        "field",
-                                                    ),
+                                                    factory.createIdentifier("field"),
                                                     undefined,
                                                 ),
                                             ),
@@ -308,9 +273,7 @@ export class WasmSQLite3Driver {
                             true,
                         ),
                     ),
-                    factory.createReturnStatement(
-                        factory.createIdentifier("obj"),
-                    ),
+                    factory.createReturnStatement(factory.createIdentifier("obj")),
                 ],
                 true,
             ),
@@ -362,10 +325,7 @@ export class WasmSQLite3Driver {
             undefined,
             funcParams,
             factory.createUnionTypeNode([
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier(returnIface),
-                    undefined,
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier(returnIface), undefined),
                 factory.createLiteralTypeNode(factory.createNull()),
             ]),
             factory.createBlock(
@@ -378,11 +338,7 @@ export class WasmSQLite3Driver {
                                     factory.createIdentifier("result"),
                                     undefined,
                                     undefined,
-                                    createDatabaseExecStatement(
-                                        queryName,
-                                        params,
-                                        "one",
-                                    ),
+                                    createDatabaseExecStatement(queryName, params, "one"),
                                 ),
                             ],
                             NodeFlags.Let | NodeFlags.TypeExcludesFlags,
@@ -391,17 +347,11 @@ export class WasmSQLite3Driver {
                     factory.createIfStatement(
                         factory.createBinaryExpression(
                             factory.createIdentifier("result"),
-                            factory.createToken(
-                                SyntaxKind.EqualsEqualsEqualsToken,
-                            ),
+                            factory.createToken(SyntaxKind.EqualsEqualsEqualsToken),
                             factory.createIdentifier("undefined"),
                         ),
                         factory.createBlock(
-                            [
-                                factory.createReturnStatement(
-                                    factory.createNull(),
-                                ),
-                            ],
+                            [factory.createReturnStatement(factory.createNull())],
                             true,
                         ),
                         undefined,
@@ -436,10 +386,7 @@ export class WasmSQLite3Driver {
             undefined,
             funcParams,
             factory.createArrayTypeNode(
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier(returnIface),
-                    undefined,
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier(returnIface), undefined),
             ),
             factory.createBlock(
                 [
@@ -451,11 +398,7 @@ export class WasmSQLite3Driver {
                                     factory.createIdentifier("result"),
                                     undefined,
                                     undefined,
-                                    createDatabaseExecStatement(
-                                        queryName,
-                                        params,
-                                        "many",
-                                    ),
+                                    createDatabaseExecStatement(queryName, params, "many"),
                                 ),
                             ],
                             NodeFlags.Let | NodeFlags.TypeExcludesFlags,
@@ -505,9 +448,7 @@ export class WasmSQLite3Driver {
         _argIface: string | undefined,
         _params: Parameter[],
     ): FunctionDeclaration {
-        throw new Error(
-            "sqlite3-wasm driver currently does not support :execlastid",
-        )
+        throw new Error("sqlite3-wasm driver currently does not support :execlastid")
     }
 
     execrowsDecl(
@@ -530,11 +471,7 @@ export class WasmSQLite3Driver {
                     factory.createReturnStatement(
                         factory.createCallExpression(
                             factory.createPropertyAccessExpression(
-                                createDatabaseExecStatement(
-                                    queryName,
-                                    params,
-                                    "exec",
-                                ),
+                                createDatabaseExecStatement(queryName, params, "exec"),
                                 factory.createIdentifier("changes"),
                             ),
                             undefined,
@@ -555,10 +492,7 @@ function funcParamsDecl(iface: string | undefined, params: Parameter[]) {
             undefined,
             factory.createIdentifier("database"),
             undefined,
-            factory.createTypeReferenceNode(
-                factory.createIdentifier("Database"),
-                undefined,
-            ),
+            factory.createTypeReferenceNode(factory.createIdentifier("Database"), undefined),
             undefined,
         ),
     ]
@@ -570,10 +504,7 @@ function funcParamsDecl(iface: string | undefined, params: Parameter[]) {
                 undefined,
                 factory.createIdentifier("args"),
                 undefined,
-                factory.createTypeReferenceNode(
-                    factory.createIdentifier(iface),
-                    undefined,
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier(iface), undefined),
                 undefined,
             ),
         )
@@ -583,11 +514,7 @@ function funcParamsDecl(iface: string | undefined, params: Parameter[]) {
 }
 
 // https://stackoverflow.com/questions/40710628/how-to-convert-snake-case-to-camelcase
-export function fieldName(
-    prefix: string,
-    index: number,
-    column?: Column,
-): string {
+export function fieldName(prefix: string, index: number, column?: Column): string {
     let name = `${prefix}_${index}`
     if (column) {
         name = column.name
@@ -604,9 +531,7 @@ export function colName(index: number, column?: Column): string {
 }
 
 export function strToCamelCase(str: string) {
-    return str.replace(/([_][a-z])/g, (group) =>
-        group.toUpperCase().replace("_", ""),
-    )
+    return str.replace(/([_][a-z])/g, (group) => group.toUpperCase().replace("_", ""))
 }
 
 function createDatabaseExecStatement(

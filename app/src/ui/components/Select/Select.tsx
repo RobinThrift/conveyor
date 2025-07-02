@@ -13,9 +13,7 @@ export interface SelectProps<T extends string = string> {
     value?: T
     placeholder?: string
     isDisabled?: boolean
-    children:
-        | React.ReactElement<SelectOptionProps>
-        | React.ReactElement<SelectOptionProps>[]
+    children: React.ReactElement<SelectOptionProps> | React.ReactElement<SelectOptionProps>[]
     onChange: (value?: T) => void
 }
 
@@ -30,10 +28,7 @@ export function Select<T extends string = string>(props: SelectProps<T>) {
     return (
         <div className={clsx("select-field", props.fieldClassName)}>
             {props.label && (
-                <label
-                    className={clsx("select-label", props.labelClassName)}
-                    htmlFor={props.name}
-                >
+                <label className={clsx("select-label", props.labelClassName)} htmlFor={props.name}>
                     {props.label}
                 </label>
             )}

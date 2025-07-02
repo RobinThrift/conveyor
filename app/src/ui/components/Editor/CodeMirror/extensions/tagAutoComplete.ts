@@ -1,8 +1,4 @@
-import {
-    type Completion,
-    type CompletionContext,
-    autocompletion,
-} from "@codemirror/autocomplete"
+import { type Completion, type CompletionContext, autocompletion } from "@codemirror/autocomplete"
 import type { Extension } from "@codemirror/state"
 
 import type { Tag } from "@/domain/Tag"

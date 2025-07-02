@@ -4,9 +4,7 @@ import { LockIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 import clsx from "clsx"
 
-export function Lock({
-    unlockState,
-}: { unlockState: "locked" | "unlocked" | "unlocking" }) {
+export function Lock({ unlockState }: { unlockState: "locked" | "unlocked" | "unlocking" }) {
     let t = useT("screens/Unlock")
 
     return (

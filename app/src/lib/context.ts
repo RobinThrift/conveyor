@@ -8,9 +8,7 @@ export function isContext(v: any): boolean {
 
 export type CancelFunc = (reason?: Error) => void
 
-export interface Context<
-    D extends Record<string, unknown> = Record<string, any>,
-> {
+export interface Context<D extends Record<string, unknown> = Record<string, any>> {
     signal?: AbortSignal
 
     withSignal(signal?: AbortSignal): Context<D>
@@ -68,10 +66,7 @@ class context<D extends Record<string, unknown> = Record<string, any>> {
 
     [__isContext] = true
 
-    constructor(
-        parent: Context,
-        { signal, data }: { signal?: AbortSignal; data?: D },
-    ) {
+    constructor(parent: Context, { signal, data }: { signal?: AbortSignal; data?: D }) {
         this.signal = signal
         this._data = (data ?? {}) as D
         this._parent = parent
@@ -117,12 +112,7 @@ class context<D extends Record<string, unknown> = Record<string, any>> {
         let abortCntrl = new AbortController()
 
         return [
-            this.withSignal(
-                AbortSignal.any([
-                    abortCntrl.signal,
-                    AbortSignal.timeout(timeout),
-                ]),
-            ),
+            this.withSignal(AbortSignal.any([abortCntrl.signal, AbortSignal.timeout(timeout)])),
             (reason: Error = new Error("context was cancelled")) => {
                 abortCntrl.abort(reason)
             },

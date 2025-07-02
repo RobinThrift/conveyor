@@ -49,7 +49,8 @@
     },
     "javascript": {
         "formatter": {
-            "semicolons": "asNeeded"
+            "semicolons": "asNeeded",
+            "lineWidth": 100
         },
         "jsxRuntime": "reactClassic"
     },

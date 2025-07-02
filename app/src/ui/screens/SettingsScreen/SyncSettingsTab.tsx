@@ -10,11 +10,7 @@ import {
 import type { SyncInfo } from "@/domain/SyncInfo"
 import { Alert } from "@/ui/components/Alert"
 import { AlertDialog } from "@/ui/components/AlertDialog"
-import {
-    AuthForm,
-    type ChangePasswordArgs,
-    ChangePasswordForm,
-} from "@/ui/components/AuthForm"
+import { AuthForm, type ChangePasswordArgs, ChangePasswordForm } from "@/ui/components/AuthForm"
 import { Button } from "@/ui/components/Button"
 import { DateTime } from "@/ui/components/DateTime"
 import {
@@ -30,10 +26,7 @@ import { useT } from "@/ui/i18n"
 import type { AuthStatus } from "@/ui/state"
 
 import clsx from "clsx"
-import {
-    type SetupArgs,
-    useSyncSettingsTabState,
-} from "./useSyncSettingsTabState"
+import { type SetupArgs, useSyncSettingsTabState } from "./useSyncSettingsTabState"
 
 export function SyncSettingsTab() {
     let t = useT("screens/Settings/SyncSettings")
@@ -60,9 +53,7 @@ export function SyncSettingsTab() {
         <>
             <header>
                 <h2>{t.Title}</h2>
-                <small className="settings-tab-description">
-                    {t.Description}
-                </small>
+                <small className="settings-tab-description">{t.Description}</small>
             </header>
 
             <div className="settings-section">
@@ -90,10 +81,7 @@ export function SyncSettingsTab() {
                     className="settings-disclosure-group"
                     defaultExpandedKeys={!info.isEnabled ? ["setup"] : []}
                 >
-                    <AriaDisclosure
-                        id="setup"
-                        className="settings-disclosure-group-item"
-                    >
+                    <AriaDisclosure id="setup" className="settings-disclosure-group-item">
                         <AriaHeading className="settings-section-header">
                             <AriaButton slot="trigger">
                                 <CaretDownIcon className="icon" />
@@ -244,10 +232,7 @@ function SectionSyncInfo({
                                 </AlertDialog.Description>
 
                                 <AlertDialog.Buttons>
-                                    <Button
-                                        variant="danger"
-                                        onPress={manualFullUpload}
-                                    >
+                                    <Button variant="danger" onPress={manualFullUpload}>
                                         {t.ManualFullUploadButtonLabel}
                                     </Button>
                                     <AlertDialog.CancelButton />
@@ -279,10 +264,7 @@ function SectionSyncInfo({
                                 </AlertDialog.Description>
 
                                 <AlertDialog.Buttons>
-                                    <Button
-                                        variant="danger"
-                                        onPress={manualFullDownload}
-                                    >
+                                    <Button variant="danger" onPress={manualFullDownload}>
                                         {t.ManualFullDownloadButtonLabel}
                                     </Button>
                                     <AlertDialog.CancelButton />

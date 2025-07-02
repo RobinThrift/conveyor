@@ -1,8 +1,4 @@
-import {
-    combineSlices,
-    configureStore,
-    createListenerMiddleware,
-} from "@reduxjs/toolkit"
+import { combineSlices, configureStore, createListenerMiddleware } from "@reduxjs/toolkit"
 
 import type { APITokenController } from "@/control/APITokenController"
 import type { AttachmentController } from "@/control/AttachmentController"
@@ -33,10 +29,7 @@ import * as unlock from "./unlock"
 
 const listenerMiddleware = createListenerMiddleware()
 
-export const startListening = listenerMiddleware.startListening.withTypes<
-    RootState,
-    AppDispatch
->()
+export const startListening = listenerMiddleware.startListening.withTypes<RootState, AppDispatch>()
 
 export function configureRootStore(preloadedState?: any) {
     let rootReducer = combineSlices(
@@ -62,8 +55,7 @@ export function configureRootStore(preloadedState?: any) {
 
         preloadedState,
 
-        enhancers: (getDefaultEnhancers) =>
-            getDefaultEnhancers({ autoBatch: false }),
+        enhancers: (getDefaultEnhancers) => getDefaultEnhancers({ autoBatch: false }),
 
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
@@ -83,9 +75,7 @@ export function configureRootStore(preloadedState?: any) {
 
 export type RootStore = ReturnType<typeof configureRootStore>
 
-export type RootState = ReturnType<
-    ReturnType<typeof configureRootStore>["getState"]
->
+export type RootState = ReturnType<ReturnType<typeof configureRootStore>["getState"]>
 export type AppDispatch = ReturnType<typeof configureRootStore>["dispatch"]
 export type StartListening = typeof startListening
 

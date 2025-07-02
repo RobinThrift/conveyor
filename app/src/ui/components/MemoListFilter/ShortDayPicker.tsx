@@ -20,13 +20,9 @@ export interface ShortDayPickerProps {
     onSelect: (date?: CalendarDate) => void
 }
 
-export const ShortDayPicker = React.memo(function ShortDayPicker(
-    props: ShortDayPickerProps,
-) {
+export const ShortDayPicker = React.memo(function ShortDayPicker(props: ShortDayPickerProps) {
     let scrollToRef = useRef<HTMLTableCellElement | null>(null)
-    let [focusedDate, setFocusedDate] = useState<CalendarDate>(
-        props.selected ?? currentDate(),
-    )
+    let [focusedDate, setFocusedDate] = useState<CalendarDate>(props.selected ?? currentDate())
 
     let today = useMemo(() => {
         return currentDate()

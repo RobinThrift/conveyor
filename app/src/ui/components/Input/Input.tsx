@@ -49,21 +49,14 @@ export function Input(props: InputProps) {
             serverInvalid={props.serverInvalid}
         >
             {props.label && (
-                <Form.Label
-                    htmlFor={props.name}
-                    className={props.labelClassName}
-                >
+                <Form.Label htmlFor={props.name} className={props.labelClassName}>
                     {props.label}
-                    {props.required && (
-                        <AsteriskIcon className="required-icon" />
-                    )}
+                    {props.required && <AsteriskIcon className="required-icon" />}
                 </Form.Label>
             )}
             <div className={clsx("relative", props.inputWrapperClassName)}>
                 {props.icon && (
-                    <span className={clsx("icon", props.iconClassName)}>
-                        {props.icon}
-                    </span>
+                    <span className={clsx("icon", props.iconClassName)}>{props.icon}</span>
                 )}
                 <Form.Control asChild>
                     <input
@@ -96,12 +89,7 @@ export function Input(props: InputProps) {
 
             {props.messages && (
                 <Form.Message match="valueMissing" asChild>
-                    <div
-                        className={clsx(
-                            "mt-2 field-message",
-                            props.messageClassName,
-                        )}
-                    >
+                    <div className={clsx("mt-2 field-message", props.messageClassName)}>
                         {translate("Invalid/Empty", props.messages, {
                             name: props.label ?? props.name,
                         })}
@@ -111,12 +99,7 @@ export function Input(props: InputProps) {
 
             {props.message && (
                 <Form.Message asChild>
-                    <div
-                        className={clsx(
-                            "mt-2 field-message",
-                            props.messageClassName,
-                        )}
-                    >
+                    <div className={clsx("mt-2 field-message", props.messageClassName)}>
                         {translate(props.message, props.messages, {
                             name: props.label ?? props.name,
                         })}
@@ -125,9 +108,7 @@ export function Input(props: InputProps) {
             )}
 
             {props.description && (
-                <small
-                    className={clsx("description", props.descriptionClassName)}
-                >
+                <small className={clsx("description", props.descriptionClassName)}>
                     {props.description}
                 </small>
             )}
@@ -135,11 +116,7 @@ export function Input(props: InputProps) {
     )
 }
 
-function translate(
-    key: string,
-    messages: InputProps["messages"],
-    data: { name: string },
-): string {
+function translate(key: string, messages: InputProps["messages"], data: { name: string }): string {
     let message = messages?.[key]
     if (!message) {
         return key

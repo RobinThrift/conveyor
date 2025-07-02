@@ -11,13 +11,10 @@ declare const __ENABLE_DEVTOOLS__: boolean
 export async function initBackend() {
     let rootStore: RootStore
 
-    let worker = new Worker(
-        new URL("./backend.worker?worker&url", import.meta.url),
-        {
-            type: "module",
-            name: `Backend-${newID()}`,
-        },
-    )
+    let worker = new Worker(new URL("./backend.worker?worker&url", import.meta.url), {
+        type: "module",
+        name: `Backend-${newID()}`,
+    })
 
     if (__ENABLE_DEVTOOLS__) {
         listenForPerformanceEntries(worker)
@@ -26,9 +23,7 @@ export async function initBackend() {
     let onNavigationEvent = bufferNavigationEvents(worker)
 
     if (__ENABLE_DEVTOOLS__) {
-        rootStore = (await connectoToWorkerStore(worker, [
-            instrument,
-        ])) as RootStore
+        rootStore = (await connectoToWorkerStore(worker, [instrument])) as RootStore
     } else {
         rootStore = (await connectoToWorkerStore(worker)) as RootStore
     }
@@ -56,19 +51,16 @@ function bufferNavigationEvents(worker: Worker) {
     let buffered: MessageEvent<{ type: string }>[] = []
     let handler: ((evt: MessageEvent) => void) | undefined
 
-    worker.addEventListener(
-        "message",
-        (evt: MessageEvent<{ type: string }>) => {
-            if (evt.data.type.startsWith("navigation:")) {
-                evt.stopImmediatePropagation()
-                if (handler) {
-                    handler(evt)
-                } else {
-                    buffered.push(evt)
-                }
+    worker.addEventListener("message", (evt: MessageEvent<{ type: string }>) => {
+        if (evt.data.type.startsWith("navigation:")) {
+            evt.stopImmediatePropagation()
+            if (handler) {
+                handler(evt)
+            } else {
+                buffered.push(evt)
             }
-        },
-    )
+        }
+    })
 
     return (cb: (evt: MessageEvent) => void) => {
         handler = cb

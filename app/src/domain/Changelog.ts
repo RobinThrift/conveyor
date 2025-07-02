@@ -74,15 +74,14 @@ export type AttachmentChangelogEntry = ChangelogEntry<
       }
 >
 
-export type SettingChangelogEntry<
-    K extends KeyPaths<Settings> = KeyPaths<Settings>,
-> = ChangelogEntry<
-    "settings",
-    K,
-    {
-        value: ValueAt<Settings, K>
-    }
->
+export type SettingChangelogEntry<K extends KeyPaths<Settings> = KeyPaths<Settings>> =
+    ChangelogEntry<
+        "settings",
+        K,
+        {
+            value: ValueAt<Settings, K>
+        }
+    >
 
 export interface EncryptedChangelogEntry {
     syncClientID: string

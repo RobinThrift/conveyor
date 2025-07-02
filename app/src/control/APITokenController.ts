@@ -57,10 +57,7 @@ interface APITokenAPIClient {
         },
     ): AsyncResult<APITokenList>
 
-    createAPIToken(
-        ctx: Context,
-        apitoken: CreateAPITokenRequest,
-    ): AsyncResult<{ token: string }>
+    createAPIToken(ctx: Context, apitoken: CreateAPITokenRequest): AsyncResult<{ token: string }>
 
     deleteAPIToken(ctx: Context, name: string): AsyncResult<void>
 }

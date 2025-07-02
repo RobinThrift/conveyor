@@ -18,11 +18,7 @@ export type DialogProps = {
 
 export function Dialog(props: DialogProps) {
     let ctx = useDialog(props)
-    return (
-        <dialogContext.Provider value={ctx}>
-            {props.children}
-        </dialogContext.Provider>
-    )
+    return <dialogContext.Provider value={ctx}>{props.children}</dialogContext.Provider>
 }
 
 Dialog.Content = DialogContent
@@ -40,17 +36,13 @@ export type DialogContentProps = {
 
 export function DialogContent(props: DialogContentProps) {
     let dialogCtx = useContext(dialogContext)
-    let { onPointerDown, onPointerCancel, onPointerMove } = useDialogDragHandle(
-        {
-            ref: dialogCtx?.ref ?? (undefined as any),
-            onClose: dialogCtx?.close ?? (() => {}),
-        },
-    )
+    let { onPointerDown, onPointerCancel, onPointerMove } = useDialogDragHandle({
+        ref: dialogCtx?.ref ?? (undefined as any),
+        onClose: dialogCtx?.close ?? (() => {}),
+    })
 
     if (!dialogCtx) {
-        throw new Error(
-            "<DialogContent> component called outside of <Dialog> component",
-        )
+        throw new Error("<DialogContent> component called outside of <Dialog> component")
     }
 
     let withCloseButton = props.withCloseButton ?? true
@@ -61,11 +53,7 @@ export function DialogContent(props: DialogContentProps) {
             // biome-ignore lint/a11y/noAutofocus: controlled by prop
             autoFocus={dialogCtx.autofocus}
             open={dialogCtx.defaultOpen}
-            className={clsx(
-                "dialog",
-                { "is-modal": dialogCtx.isModal },
-                props.className,
-            )}
+            className={clsx("dialog", { "is-modal": dialogCtx.isModal }, props.className)}
             aria-labelledby={dialogCtx.labelledByID}
             aria-describedby={dialogCtx.describedByID}
             style={{ "--nested-dialogs": 0 } as React.CSSProperties}
@@ -99,9 +87,7 @@ export function DialogContent(props: DialogContentProps) {
 export function DialogTrigger(props: Omit<ButtonProps, "onPress">) {
     let dialogCtx = useContext(dialogContext)
     if (!dialogCtx) {
-        throw new Error(
-            "<DialogTrigger> component called outside of <Dialog> component",
-        )
+        throw new Error("<DialogTrigger> component called outside of <Dialog> component")
     }
 
     return <Button {...props} onPress={dialogCtx.open} />
@@ -112,17 +98,11 @@ export type DialogTitleProps = React.HTMLAttributes<HTMLDivElement>
 export function DialogTitle({ className, ...props }: DialogTitleProps) {
     let dialogCtx = useContext(dialogContext)
     if (!dialogCtx) {
-        throw new Error(
-            "<DialogTitle> component called outside of <Dialog> component",
-        )
+        throw new Error("<DialogTitle> component called outside of <Dialog> component")
     }
 
     return (
-        <div
-            className={clsx("dialog-title", className)}
-            id={dialogCtx.labelledByID}
-            {...props}
-        >
+        <div className={clsx("dialog-title", className)} id={dialogCtx.labelledByID} {...props}>
             {props.children}
         </div>
     )
@@ -130,15 +110,10 @@ export function DialogTitle({ className, ...props }: DialogTitleProps) {
 
 export type DialogDescriptionProps = React.HTMLAttributes<HTMLDivElement>
 
-export function DialogDescription({
-    className,
-    ...props
-}: DialogDescriptionProps) {
+export function DialogDescription({ className, ...props }: DialogDescriptionProps) {
     let dialogCtx = useContext(dialogContext)
     if (!dialogCtx) {
-        throw new Error(
-            "<DialogDescription> component called outside of <Dialog> component",
-        )
+        throw new Error("<DialogDescription> component called outside of <Dialog> component")
     }
 
     return (
@@ -159,15 +134,10 @@ export function DialogButtons({
     return <div className={clsx("dialog-btns", className)}>{children}</div>
 }
 
-export function DialogCloseButton({
-    className,
-    ...props
-}: Omit<ButtonProps, "onPress">) {
+export function DialogCloseButton({ className, ...props }: Omit<ButtonProps, "onPress">) {
     let dialogCtx = useContext(dialogContext)
     if (!dialogCtx) {
-        throw new Error(
-            "<DialogCloseButton> component called outside of <Dialog> component",
-        )
+        throw new Error("<DialogCloseButton> component called outside of <Dialog> component")
     }
     return (
         <Button

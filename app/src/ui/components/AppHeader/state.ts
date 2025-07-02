@@ -13,9 +13,7 @@ export function useAddToAppHeader(items: {
     useEffect(() => {
         _state = {
             left: items.left ? [..._state.left, items.left] : _state.left,
-            centre: items.centre
-                ? [..._state.centre, items.centre]
-                : _state.centre,
+            centre: items.centre ? [..._state.centre, items.centre] : _state.centre,
             right: items.right ? [..._state.right, items.right] : _state.right,
         }
         queueTask(() => {
@@ -24,9 +22,7 @@ export function useAddToAppHeader(items: {
         return () => {
             _state = {
                 left: _state.left.filter((i) => items.left?.key !== i.key),
-                centre: _state.centre.filter(
-                    (i) => items.centre?.key !== i.key,
-                ),
+                centre: _state.centre.filter((i) => items.centre?.key !== i.key),
                 right: _state.right.filter((i) => items.right?.key !== i.key),
             }
             queueTask(() => {

@@ -3,9 +3,7 @@ import React from "react"
 import { Alert } from "./Alert"
 
 export type ErrorBoundaryProps = React.PropsWithChildren<{
-    fallback?:
-        | React.ReactNode
-        | ((error: Error, info: React.ErrorInfo) => React.ReactNode)
+    fallback?: React.ReactNode | ((error: Error, info: React.ErrorInfo) => React.ReactNode)
     resetOn: any[]
 }>
 
@@ -27,10 +25,7 @@ const initState: ErrorBoundaryState = {
     info: null,
 }
 
-export class ErrorBoundary extends React.Component<
-    ErrorBoundaryProps,
-    ErrorBoundaryState
-> {
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
     constructor(props: ErrorBoundaryProps) {
         super(props)
         this.state = initState
@@ -53,10 +48,7 @@ export class ErrorBoundary extends React.Component<
         this.setState(initState)
     }
 
-    componentDidUpdate(
-        prevProps: ErrorBoundaryProps,
-        prevState: ErrorBoundaryState,
-    ) {
+    componentDidUpdate(prevProps: ErrorBoundaryProps, prevState: ErrorBoundaryState) {
         if (!prevState.didCatch) {
             return
         }
@@ -81,9 +73,7 @@ export class ErrorBoundary extends React.Component<
                 )}
                 {this.state.info && (
                     <pre>
-                        <code>
-                            {JSON.stringify(this.state.info, undefined, 4)}
-                        </code>
+                        <code>{JSON.stringify(this.state.info, undefined, 4)}</code>
                     </pre>
                 )}
             </Alert>

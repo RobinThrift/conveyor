@@ -13,26 +13,19 @@ export interface Transform {
     input: string
 }
 
-export type TranslationDefinition<T extends Translations> = Record<
-    keyof T,
-    string | Transform
->
+export type TranslationDefinition<T extends Translations> = Record<keyof T, string | Transform>
 
 type TranslationKey<T extends Translation, K extends keyof T> = K
 
-export const translationFiles = import.meta.glob<
-    boolean,
-    string,
-    { default: ComponentsJSON }
->("../../../translations/*.json")
+export const translationFiles = import.meta.glob<boolean, string, { default: ComponentsJSON }>(
+    "../../../translations/*.json",
+)
 
 export type Translation = typeof base
 
 export const fallback = resolveTranslation("en", translationToJSON(base))
 
-export async function loadTranslation(
-    code: string,
-): Promise<ComponentsJSON | undefined> {
+export async function loadTranslation(code: string): Promise<ComponentsJSON | undefined> {
     let [lang, _] = code.split("-")
 
     let load =

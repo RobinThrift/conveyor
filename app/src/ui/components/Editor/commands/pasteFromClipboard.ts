@@ -83,9 +83,6 @@ export function pastePlainText(
             to: to || undefined,
             insert: text,
         },
-        selection:
-            from === to
-                ? EditorSelection.cursor(from + text.length)
-                : undefined,
+        selection: from === to ? EditorSelection.cursor(from + text.length) : undefined,
     })
 }

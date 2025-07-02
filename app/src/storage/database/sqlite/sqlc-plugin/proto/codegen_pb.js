@@ -2,11 +2,7 @@
 // @generated from file plugin/codegen.proto (package plugin, syntax proto3)
 /* eslint-disable */
 
-import {
-    fileDesc,
-    messageDesc,
-    serviceDesc,
-} from "@bufbuild/protobuf/codegenv1"
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1"
 
 /**
  * Describes the file plugin/codegen.proto.

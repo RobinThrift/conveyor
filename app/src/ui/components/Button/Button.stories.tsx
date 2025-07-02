@@ -1,13 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 
-import {
-    ArrowUpRightIcon,
-    BinIcon,
-    PlusIcon,
-    SlidersIcon,
-    UserIcon,
-} from "@/ui/components/Icons"
+import { ArrowUpRightIcon, BinIcon, PlusIcon, SlidersIcon, UserIcon } from "@/ui/components/Icons"
 import "@/ui/styles/index.css"
 
 import { Button } from "./Button"
@@ -135,21 +129,11 @@ export const Icons: Story = {
                     <Button {...args} iconRight={<BinIcon />} size="sm">
                         Icon Right
                     </Button>
-                    <Button
-                        {...args}
-                        iconRight={<PlusIcon />}
-                        iconLeft={<SlidersIcon />}
-                        size="sm"
-                    >
+                    <Button {...args} iconRight={<PlusIcon />} iconLeft={<SlidersIcon />} size="sm">
                         Icon left and right
                     </Button>
 
-                    <Button
-                        {...args}
-                        iconRight={<PlusIcon />}
-                        aria-label="Icon Only"
-                        size="sm"
-                    />
+                    <Button {...args} iconRight={<PlusIcon />} aria-label="Icon Only" size="sm" />
                 </div>
 
                 <h3>Large</h3>
@@ -160,31 +144,16 @@ export const Icons: Story = {
                     <Button {...args} iconRight={<BinIcon />} size="lg">
                         Icon Right
                     </Button>
-                    <Button
-                        {...args}
-                        iconRight={<PlusIcon />}
-                        iconLeft={<SlidersIcon />}
-                        size="lg"
-                    >
+                    <Button {...args} iconRight={<PlusIcon />} iconLeft={<SlidersIcon />} size="lg">
                         Icon left and right
                     </Button>
 
-                    <Button
-                        {...args}
-                        iconRight={<PlusIcon />}
-                        aria-label="Icon Only"
-                        size="lg"
-                    />
+                    <Button {...args} iconRight={<PlusIcon />} aria-label="Icon Only" size="lg" />
                 </div>
 
                 <h3>Plain</h3>
                 <div className="flex items-start gap-2">
-                    <Button
-                        {...args}
-                        iconRight={<BinIcon />}
-                        aria-label="Icon Only"
-                        plain={true}
-                    />
+                    <Button {...args} iconRight={<BinIcon />} aria-label="Icon Only" plain={true} />
                     <Button
                         {...args}
                         iconRight={<BinIcon />}

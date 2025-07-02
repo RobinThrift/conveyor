@@ -1,9 +1,4 @@
-import React, {
-    useCallback,
-    useMemo,
-    useState,
-    useSyncExternalStore,
-} from "react"
+import React, { useCallback, useMemo, useState, useSyncExternalStore } from "react"
 
 import { newID } from "@/domain/ID"
 import { Code } from "@/ui/components/Markdown/Code"
@@ -15,9 +10,7 @@ let formatter = new Intl.DateTimeFormat("en-gb", {
 export function SQLLogDevTool() {
     let events = useSyncExternalStore(_sqlllog_subscribe, _sqlllog_getSnapshot)
 
-    let [selected, setSelected] = useState<SQLLogStatementEvent | undefined>(
-        undefined,
-    )
+    let [selected, setSelected] = useState<SQLLogStatementEvent | undefined>(undefined)
 
     let onClickClear = useCallback(() => {
         _snapshot = []
@@ -55,11 +48,7 @@ export function SQLLogDevTool() {
         <div className="devtools-entry-list-detail-wrapper">
             <ul className="devtools-entry-list">
                 <li className="devtools-entry-list-header">
-                    <button
-                        type="button"
-                        className="text-sm cursor-pointer"
-                        onClick={onClickClear}
-                    >
+                    <button type="button" className="text-sm cursor-pointer" onClick={onClickClear}>
                         [clear]
                     </button>
                 </li>
@@ -80,33 +69,21 @@ const Event = React.memo(function Event({
     return (
         <li className="devtools-entry-list-item">
             <div className="devtools-entry-list-item-timing">
-                {event.measure && (
-                    <span>{event.measure.duration.toFixed(2)}ms</span>
-                )}
+                {event.measure && <span>{event.measure.duration.toFixed(2)}ms</span>}
                 <time>
-                    {formatter.format(event.timestamp)}.
-                    {event.timestamp.getMilliseconds()}
+                    {formatter.format(event.timestamp)}.{event.timestamp.getMilliseconds()}
                 </time>
             </div>
 
             {/* biome-ignore lint/a11y/useButtonType: devtools only */}
-            <button
-                className="devtools-entry-list-item-title"
-                onClick={() => onClick?.(event)}
-            >
+            <button className="devtools-entry-list-item-title" onClick={() => onClick?.(event)}>
                 {event.name}
             </button>
         </li>
     )
 })
 
-function SQLEventDetails({
-    name,
-    measure,
-    timestamp,
-    sql,
-    args = [],
-}: SQLLogStatementEvent) {
+function SQLEventDetails({ name, measure, timestamp, sql, args = [] }: SQLLogStatementEvent) {
     let [showResolved, setShowResolved] = useState(false)
     let resolved = useMemo(() => {
         let count = 0
@@ -131,34 +108,23 @@ function SQLEventDetails({
             <h3 className="devtools-entry-list-item-title">{name}</h3>
 
             {sql && showResolved && (
-                <Code
-                    className="dark rosepine rounded p-2 my-2 text-wrap text-sm"
-                    lang="sql"
-                >
+                <Code className="dark rosepine rounded p-2 my-2 text-wrap text-sm" lang="sql">
                     {resolved ?? sql}
                 </Code>
             )}
 
             {sql && !showResolved && (
-                <Code
-                    className="dark rosepine rounded p-2 my-2 text-wrap text-sm"
-                    lang="sql"
-                >
+                <Code className="dark rosepine rounded p-2 my-2 text-wrap text-sm" lang="sql">
                     {sql}
                 </Code>
             )}
 
             {args.length && !showResolved ? (
-                <Code
-                    className="dark rosepine rounded p-2 my-2 text-wrap text-sm"
-                    lang="json"
-                >
+                <Code className="dark rosepine rounded p-2 my-2 text-wrap text-sm" lang="json">
                     {JSON.stringify(
                         args,
                         undefined,
-                        args.length > 2 || typeof args[0] === "object"
-                            ? 4
-                            : undefined,
+                        args.length > 2 || typeof args[0] === "object" ? 4 : undefined,
                     )}
                 </Code>
             ) : null}
@@ -183,11 +149,7 @@ const Transaction = React.memo(function Transaction({
     onClick,
 }: SQLLogTransactionEvent & { onClick: (e: SQLLogStatementEvent) => void }) {
     let items = statements.map((event) => (
-        <Event
-            {...(event as SQLLogStatementEvent)}
-            key={event.id}
-            onClick={onClick}
-        />
+        <Event {...(event as SQLLogStatementEvent)} key={event.id} onClick={onClick} />
     ))
 
     return (
@@ -201,9 +163,7 @@ const Transaction = React.memo(function Transaction({
 
             <details>
                 <summary>
-                    <span className="devtools-entry-list-item-title inline!">
-                        Transaction
-                    </span>
+                    <span className="devtools-entry-list-item-title inline!">Transaction</span>
                 </summary>
                 <ul className="devtools-entry-list">{items}</ul>
             </details>
@@ -247,9 +207,7 @@ const observer = new PerformanceObserver((list) => {
     let entries = list
         .getEntriesByType("mark")
         .values()
-        .filter((entry) =>
-            entry.name.startsWith("sql:"),
-        ) as IteratorObject<PerformanceMark>
+        .filter((entry) => entry.name.startsWith("sql:")) as IteratorObject<PerformanceMark>
 
     let sqlEvents = _performanceMarksToEvents(entries)
     _snapshot = [...(_snapshot ?? []), ...sqlEvents]
@@ -289,9 +247,7 @@ function _sqlllog_getSnapshot() {
 
 let _namePattern = /sql:(.+):start/
 
-function _performanceMarksToEvents(
-    list: Iterable<PerformanceMark>,
-): SQLLogEvent[] {
+function _performanceMarksToEvents(list: Iterable<PerformanceMark>): SQLLogEvent[] {
     let events: SQLLogEvent[] = []
 
     for (let entry of list) {

@@ -5,10 +5,7 @@ import { type AsyncResult, Err, Ok } from "@/lib/result"
 export class MockFS implements FS {
     private _files = new Map<string, ArrayBufferLike>()
 
-    public async read(
-        _: Context,
-        filepath: string,
-    ): AsyncResult<ArrayBufferLike> {
+    public async read(_: Context, filepath: string): AsyncResult<ArrayBufferLike> {
         let contents = this._files.get(filepath)
         if (!contents) {
             return Err(new FSNotFoundError(filepath))

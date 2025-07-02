@@ -80,22 +80,19 @@ suite("control/AttachmentController", () => {
 
     suite("Remote Fallback", async () => {
         test("found", async ({ onTestFinished }) => {
-            let { attachmentCtrl, fs, ctx, setup, cleanup } =
-                await attachmentCtrlTestSetup({
-                    remote: {
-                        async getAttachmentDataByFilepath(_, filepath) {
-                            if (
-                                filepath ===
-                                "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b"
-                            ) {
-                                return Ok(
-                                    attachmentTestContent["test_file_a.txt"],
-                                )
-                            }
-                            return Err(new Error("not found"))
-                        },
+            let { attachmentCtrl, fs, ctx, setup, cleanup } = await attachmentCtrlTestSetup({
+                remote: {
+                    async getAttachmentDataByFilepath(_, filepath) {
+                        if (
+                            filepath ===
+                            "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b"
+                        ) {
+                            return Ok(attachmentTestContent["test_file_a.txt"])
+                        }
+                        return Err(new Error("not found"))
                     },
-                })
+                },
+            })
 
             await setup()
             onTestFinished(cleanup)
@@ -124,14 +121,13 @@ suite("control/AttachmentController", () => {
         })
 
         test("not found", async ({ onTestFinished }) => {
-            let { attachmentCtrl, fs, ctx, setup, cleanup } =
-                await attachmentCtrlTestSetup({
-                    remote: {
-                        async getAttachmentDataByFilepath() {
-                            return Err(new Error("not found"))
-                        },
+            let { attachmentCtrl, fs, ctx, setup, cleanup } = await attachmentCtrlTestSetup({
+                remote: {
+                    async getAttachmentDataByFilepath() {
+                        return Err(new Error("not found"))
                     },
-                })
+                },
+            })
 
             await setup()
             onTestFinished(cleanup)
@@ -145,9 +141,7 @@ suite("control/AttachmentController", () => {
 
             fs.removeAllFiles()
 
-            await assertErrResult(
-                attachmentCtrl.getAttachmentDataByID(ctx, attachmentID),
-            )
+            await assertErrResult(attachmentCtrl.getAttachmentDataByID(ctx, attachmentID))
         })
     })
 
@@ -193,9 +187,7 @@ suite("control/AttachmentController", () => {
             filepath:
                 "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
             originalFilename: "test.txt",
-            sha256: dataFromBase64(
-                "Qre2VSnlfbVQVK6Bedy8NNSTR20zySWH3XKjtGnfuEs=",
-            )[0],
+            sha256: dataFromBase64("Qre2VSnlfbVQVK6Bedy8NNSTR20zySWH3XKjtGnfuEs=")[0],
             sizeBytes: 23,
             createdAt: row.createdAt,
         })
@@ -206,10 +198,7 @@ async function attachmentCtrlTestSetup({
     remote,
 }: {
     remote?: {
-        getAttachmentDataByFilepath(
-            ctx: Context,
-            filepath: string,
-        ): AsyncResult<ArrayBufferLike>
+        getAttachmentDataByFilepath(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike>
     }
 } = {}) {
     let [ctx, cancel] = BaseContext.withCancel()

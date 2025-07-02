@@ -13,14 +13,12 @@ import { AccountKeysV1APIClient } from "./AccountKeysV1APIClient"
 
 suite("api/syncv1/AccountKeysV1APIClient", async () => {
     test("uploadAccountKey", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } =
-            await setupAuthV1APIClientTest()
+        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
 
-        let accountKey =
-            "age1py392mrpw6tv0rm2gvcz5lwugmnw3j05nzqgs0w9thnq6qeu3pns9mryhf"
+        let accountKey = "age1py392mrpw6tv0rm2gvcz5lwugmnw3j05nzqgs0w9thnq6qeu3pns9mryhf"
 
         useMocks(
             http.post<never, { name: string; type: "agev1"; data: string }>(
@@ -29,10 +27,7 @@ suite("api/syncv1/AccountKeysV1APIClient", async () => {
                     let body = await request.json()
                     assert.equal(body.name, PrimaryAccountKeyName)
                     assert.equal(body.type, AgeV1AccountKeyType)
-                    assert.equal(
-                        decodeText(dataFromBase64(body.data)[0]),
-                        accountKey,
-                    )
+                    assert.equal(decodeText(dataFromBase64(body.data)[0]), accountKey)
 
                     return new HttpResponse(null, { status: 201 })
                 },
@@ -70,8 +65,7 @@ async function setupAuthV1APIClientTest() {
             cancel()
             mockWorker.stop()
         },
-        useMocks: ((...args) =>
-            mockWorker.use(...args)) as typeof mockWorker.use,
+        useMocks: ((...args) => mockWorker.use(...args)) as typeof mockWorker.use,
         authV1APIClient,
     }
 }

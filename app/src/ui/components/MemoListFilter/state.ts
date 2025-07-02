@@ -11,8 +11,7 @@ export function useMemoListFilterState(props: {
     filter: Filter
     onChangeFilter: (f: Filter) => void
 }) {
-    let [collapsibileDatePickerExpaned, setCollapsibileDatePickerExpaned] =
-        useState(false)
+    let [collapsibileDatePickerExpaned, setCollapsibileDatePickerExpaned] = useState(false)
 
     let onChangeSearch = useCallback(
         (query: string) => {
@@ -68,11 +67,6 @@ export function useMemoListFilterState(props: {
             onSelectDate,
             onSelectStateFilter,
         }),
-        [
-            collapsibileDatePickerExpaned,
-            onChangeSearch,
-            onSelectDate,
-            onSelectStateFilter,
-        ],
+        [collapsibileDatePickerExpaned, onChangeSearch, onSelectDate, onSelectStateFilter],
     )
 }

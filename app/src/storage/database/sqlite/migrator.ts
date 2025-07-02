@@ -3,13 +3,10 @@ import type { Context } from "@/lib/context"
 import type { DBExec, Database, Transactioner } from "@/lib/database"
 import { type AsyncResult, fromAsyncFn } from "@/lib/result"
 
-const migrations = import.meta.glob<boolean, string, string>(
-    "./migrations/*.sql",
-    {
-        query: "?raw",
-        import: "default",
-    },
-)
+const migrations = import.meta.glob<boolean, string, string>("./migrations/*.sql", {
+    query: "?raw",
+    import: "default",
+})
 
 export async function migrate(ctx: Context, db: DBExec & Transactioner) {
     performance.mark("sql:migrate:start")
@@ -36,9 +33,7 @@ export async function migrate(ctx: Context, db: DBExec & Transactioner) {
     versions.sort()
 
     if (lastAppliedMigration?.version) {
-        let lastAppliedIndex = versions.findIndex((v) =>
-            v.includes(lastAppliedMigration?.version),
-        )
+        let lastAppliedIndex = versions.findIndex((v) => v.includes(lastAppliedMigration?.version))
         if (lastAppliedIndex !== -1) {
             versions = versions.slice(lastAppliedIndex + 1)
         }
@@ -55,9 +50,7 @@ export async function migrate(ctx: Context, db: DBExec & Transactioner) {
     console.log(`${versions.length} migration(s) to apply`)
 
     for (let versionFile of versions) {
-        let version = versionFile
-            .replace("./migrations/", "")
-            .replace(".sql", "")
+        let version = versionFile.replace("./migrations/", "").replace(".sql", "")
         console.log(`applying migration ${version}`)
         performance.mark("sql:migrate:migrate-apply:start", {
             detail: `version: ${version}`,
@@ -70,10 +63,7 @@ export async function migrate(ctx: Context, db: DBExec & Transactioner) {
                 let tx = ctx.getData("db")
                 return fromAsyncFn(async () => {
                     await tx.exec(sql)
-                    await tx.exec(
-                        "INSERT INTO migrations (version) VALUES(?1)",
-                        [version],
-                    )
+                    await tx.exec("INSERT INTO migrations (version) VALUES(?1)", [version])
                 })
             })
             performance.mark("sql:migrate:migrate-apply:end")
@@ -103,9 +93,7 @@ export async function migrateDBEncryption(
     { db, enckey }: { db: Database; enckey: string },
 ): AsyncResult<any> {
     return fromAsyncFn(async () => {
-        let userVersion = await db.queryOne<{ user_version: number }>(
-            "PRAGMA user_version",
-        )
+        let userVersion = await db.queryOne<{ user_version: number }>("PRAGMA user_version")
         if (userVersion?.user_version === 1) {
             return
         }

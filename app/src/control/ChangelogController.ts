@@ -1,8 +1,4 @@
-import type {
-    ChangelogEntry,
-    ChangelogEntryID,
-    ChangelogEntryList,
-} from "@/domain/Changelog"
+import type { ChangelogEntry, ChangelogEntryID, ChangelogEntryList } from "@/domain/Changelog"
 import { newID } from "@/domain/ID"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
@@ -122,10 +118,7 @@ export class ChangelogController {
 }
 
 interface Repo {
-    createChangelogEntry(
-        ctx: Context<{ db?: DBExec }>,
-        entry: ChangelogEntry,
-    ): AsyncResult<void>
+    createChangelogEntry(ctx: Context<{ db?: DBExec }>, entry: ChangelogEntry): AsyncResult<void>
 
     listUnsyncedChangelogEntries(
         ctx: Context<{ db?: DBExec }>,
@@ -162,8 +155,5 @@ interface Repo {
         entries: ChangelogEntryID[],
     ): AsyncResult<void>
 
-    deleteChangelogEntry(
-        ctx: Context<{ db?: DBExec }>,
-        id: ChangelogEntryID,
-    ): AsyncResult<void>
+    deleteChangelogEntry(ctx: Context<{ db?: DBExec }>, id: ChangelogEntryID): AsyncResult<void>
 }

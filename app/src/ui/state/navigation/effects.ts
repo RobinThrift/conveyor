@@ -16,20 +16,13 @@ export const registerEffects = (
             ) {
                 return false
             }
-            return (
-                currentState.memos.list.filter !==
-                originalState.memos.list.filter
-            )
+            return currentState.memos.list.filter !== originalState.memos.list.filter
         },
         effect: async (_, { cancelActiveListeners, getState }) => {
             cancelActiveListeners()
             let state = getState()
             let currScreen = slice.selectors.currentName(state)
-            if (
-                currScreen === "root" ||
-                currScreen === "memo.view" ||
-                currScreen === "memo.edit"
-            ) {
+            if (currScreen === "root" || currScreen === "memo.view" || currScreen === "memo.edit") {
                 navCtrl.updateParams({
                     filter: state.memos.list.filter,
                 })

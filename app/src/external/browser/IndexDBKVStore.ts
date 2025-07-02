@@ -26,9 +26,7 @@ export class IndexDBKVStore<
     private _instantiate: <K extends keyof Items>(
         raw: Record<string, unknown> | ArrayBufferLike,
     ) => Result<Items[K]>
-    private NotFoundErr?: NotFoundError extends Error
-        ? { new (key: string): NotFoundError }
-        : never
+    private NotFoundErr?: NotFoundError extends Error ? { new (key: string): NotFoundError } : never
 
     constructor(
         name: Name,
@@ -40,9 +38,7 @@ export class IndexDBKVStore<
             instantiate?: <K extends keyof Items>(
                 raw: Record<string, unknown> | ArrayBufferLike,
             ) => Result<Items[K]>
-            NotFoundErr?: NotFoundError extends Error
-                ? { new (key: string): NotFoundError }
-                : never
+            NotFoundErr?: NotFoundError extends Error ? { new (key: string): NotFoundError } : never
         },
     ) {
         this._name = name
@@ -55,11 +51,7 @@ export class IndexDBKVStore<
         ctx: Context,
         key: K,
     ): AsyncResult<Items[K] | undefined> {
-        let [item, err] = await this._db.get<Items[K]>(
-            ctx,
-            this._name,
-            key as string,
-        )
+        let [item, err] = await this._db.get<Items[K]>(ctx, this._name, key as string)
         if (err) {
             return wrapErr`error getting item: ${key}: ${err}`
         }
@@ -88,10 +80,7 @@ export class IndexDBKVStore<
         ])
     }
 
-    public async removeItem<K extends keyof Items>(
-        ctx: Context,
-        key: K,
-    ): AsyncResult<void> {
+    public async removeItem<K extends keyof Items>(ctx: Context, key: K): AsyncResult<void> {
         return this._db.delete(ctx, this._name, key as string)
     }
 
@@ -112,9 +101,7 @@ export class IndexDBKVStore<
     }
 }
 
-export class IndexedDBKVStoreContainer<Stores extends string>
-    implements KVStoreContainer<Stores>
-{
+export class IndexedDBKVStoreContainer<Stores extends string> implements KVStoreContainer<Stores> {
     private _db!: IDBDatabase
 
     static async open<Stores extends string>(
@@ -128,11 +115,7 @@ export class IndexedDBKVStoreContainer<Stores extends string>
         let req = globalThis.indexedDB.open(name, version)
 
         req.addEventListener("error", () => {
-            reject(
-                new Error(
-                    `error opening database "${name}@${version}": ${req.error?.message}`,
-                ),
-            )
+            reject(new Error(`error opening database "${name}@${version}": ${req.error?.message}`))
         })
 
         req.addEventListener("success", () => {
@@ -215,18 +198,13 @@ export class IndexedDBKVStoreContainer<Stores extends string>
         return this._db.close()
     }
 
-    public getKVStore<
-        Items extends Record<string, unknown>,
-        NotFoundError extends Error = never,
-    >(
+    public getKVStore<Items extends Record<string, unknown>, NotFoundError extends Error = never>(
         name: Stores,
         opts: {
             instantiate?: <K extends keyof Items>(
                 raw: Record<string, unknown> | ArrayBufferLike,
             ) => Result<Items[K]>
-            NotFoundErr?: NotFoundError extends Error
-                ? { new (key: string): NotFoundError }
-                : never
+            NotFoundErr?: NotFoundError extends Error ? { new (key: string): NotFoundError } : never
         } = {},
     ): IndexDBKVStore<Stores, Items, NotFoundError> {
         return new IndexDBKVStore(name, this, opts)
@@ -238,9 +216,7 @@ export class IndexedDBKVStoreContainer<Stores extends string>
         data: KVRow<Item>[],
     ): AsyncResult<void> {
         return this._inTransaction(ctx, storeName, "readwrite", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -266,9 +242,7 @@ export class IndexedDBKVStoreContainer<Stores extends string>
         key: IDBValidKey,
     ): AsyncResult<KVRow<R> | undefined> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -282,14 +256,9 @@ export class IndexedDBKVStoreContainer<Stores extends string>
         })
     }
 
-    public async listKeys(
-        ctx: Context,
-        storeName: Stores,
-    ): AsyncResult<IDBValidKey[]> {
+    public async listKeys(ctx: Context, storeName: Stores): AsyncResult<IDBValidKey[]> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -299,8 +268,7 @@ export class IndexedDBKVStoreContainer<Stores extends string>
                 return wrapErr`error getting all keys for objectStore: ${storeName}: ${getAllKeysErr}`
             }
 
-            let { resolve, reject, promise } =
-                Promise.withResolvers<IDBValidKey[]>()
+            let { resolve, reject, promise } = Promise.withResolvers<IDBValidKey[]>()
 
             keys.addEventListener("error", () => {
                 reject(keys.error)
@@ -318,15 +286,9 @@ export class IndexedDBKVStoreContainer<Stores extends string>
         })
     }
 
-    public async delete(
-        ctx: Context,
-        storeName: Stores,
-        key: IDBValidKey,
-    ): AsyncResult<void> {
+    public async delete(ctx: Context, storeName: Stores, key: IDBValidKey): AsyncResult<void> {
         return this._inTransaction(ctx, storeName, "readwrite", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -353,9 +315,7 @@ export class IndexedDBKVStoreContainer<Stores extends string>
         let abortErr: Error | undefined = undefined
         let result: R | undefined = undefined
 
-        let [tx, txErr] = fromThrowing(() =>
-            this._db.transaction(storeName as string, mode),
-        )
+        let [tx, txErr] = fromThrowing(() => this._db.transaction(storeName as string, mode))
         if (txErr) {
             return wrapErr`error starting transaction: ${txErr}`
         }
@@ -393,9 +353,7 @@ export class IndexedDBKVStoreContainer<Stores extends string>
     }
 }
 
-function wrapIDBRequest<Req extends IDBRequest>(
-    req: Req,
-): AsyncResult<Req["result"]> {
+function wrapIDBRequest<Req extends IDBRequest>(req: Req): AsyncResult<Req["result"]> {
     let { resolve, reject, promise } = Promise.withResolvers<Req["result"]>()
     req.addEventListener("error", () => {
         reject(req.error)

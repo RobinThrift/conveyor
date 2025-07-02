@@ -18,15 +18,14 @@ import { type RootState, startListening } from "./rootStore"
 
 const REPLACE_STATE_ACTION_TYPE = "@internal/REPLACE_STATE"
 
-interface ReplaceStateAction<S>
-    extends Action<typeof REPLACE_STATE_ACTION_TYPE> {
+interface ReplaceStateAction<S> extends Action<typeof REPLACE_STATE_ACTION_TYPE> {
     state: S
 }
 
-export async function connectoToWorkerStore<
-    S,
-    A extends Action = UnknownAction,
->(worker: Worker, additionalEnhancers?: StoreEnhancer[]): Promise<Store<S, A>> {
+export async function connectoToWorkerStore<S, A extends Action = UnknownAction>(
+    worker: Worker,
+    additionalEnhancers?: StoreEnhancer[],
+): Promise<Store<S, A>> {
     let reducer: Reducer<S, A & ReplaceStateAction<S>> = (state, action) => {
         if (action.type === REPLACE_STATE_ACTION_TYPE) {
             return action.state
@@ -56,10 +55,9 @@ type WorkerNotification<S, A> =
           trace?: string
       }
 
-async function forwardToWorkerEnhancer<
-    S = any,
-    A extends Action = UnknownAction,
->(worker: Worker): Promise<StoreEnhancer> {
+async function forwardToWorkerEnhancer<S = any, A extends Action = UnknownAction>(
+    worker: Worker,
+): Promise<StoreEnhancer> {
     let ready = Promise.withResolvers<S>()
     let stateCache: S
 
@@ -105,26 +103,21 @@ async function forwardToWorkerEnhancer<
                 initialState,
             )
 
-            worker.addEventListener(
-                "message",
-                (evt: MessageEvent<WorkerNotification<S, A>>) => {
-                    let msg = evt.data
-                    if (msg.type === "store:notification:dispatch") {
-                        performance.mark(
-                            `store:dispatch(${msg.data.action.type}):end`,
-                        )
-                        stateCache = produce(stateCache, (draft) =>
-                            fixState(patch(draft, msg.data.state)),
-                        )
-                        baseStore.dispatch({
-                            ...msg.data.action,
-                            trace: msg.trace,
-                        } as any)
-                        evt.stopImmediatePropagation()
-                        return
-                    }
-                },
-            )
+            worker.addEventListener("message", (evt: MessageEvent<WorkerNotification<S, A>>) => {
+                let msg = evt.data
+                if (msg.type === "store:notification:dispatch") {
+                    performance.mark(`store:dispatch(${msg.data.action.type}):end`)
+                    stateCache = produce(stateCache, (draft) =>
+                        fixState(patch(draft, msg.data.state)),
+                    )
+                    baseStore.dispatch({
+                        ...msg.data.action,
+                        trace: msg.trace,
+                    } as any)
+                    evt.stopImmediatePropagation()
+                    return
+                }
+            })
 
             return {
                 ...baseStore,
@@ -148,9 +141,7 @@ async function forwardToWorkerEnhancer<
         }
 }
 
-export function runStoreInWorker<S = any, A extends Action = UnknownAction>(
-    store: Store<S, A>,
-) {
+export function runStoreInWorker<S = any, A extends Action = UnknownAction>(store: Store<S, A>) {
     self.addEventListener("message", (evt: MessageEvent<WorkerRequests<A>>) => {
         let msg = evt.data
         if (msg.type === "store:dispatch:request") {

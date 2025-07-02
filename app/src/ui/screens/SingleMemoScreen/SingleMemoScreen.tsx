@@ -41,11 +41,7 @@ export function SingleMemoScreen(props: SingleMemoScreenProps) {
             />
 
             {memo && (
-                <Memo
-                    memo={memo}
-                    actions={memoActions}
-                    doubleClickToEdit={doubleClickToEdit}
-                />
+                <Memo memo={memo} actions={memoActions} doubleClickToEdit={doubleClickToEdit} />
             )}
         </div>
     )

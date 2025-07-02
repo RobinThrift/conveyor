@@ -41,24 +41,15 @@ export function Toolbar({
     return (
         <AriaToolbar className="editor-toolbar" aria-label={t.Label} ref={ref}>
             <ToolbarButtonGroup label={t.GroupTextFormatting}>
-                <ToolbarToggleButton
-                    label={t.TextFormattingBold}
-                    action={toggleBold}
-                >
+                <ToolbarToggleButton label={t.TextFormattingBold} action={toggleBold}>
                     <TextBolderIcon />
                 </ToolbarToggleButton>
 
-                <ToolbarToggleButton
-                    label={t.TextFormattingItalic}
-                    action={toggleItalics}
-                >
+                <ToolbarToggleButton label={t.TextFormattingItalic} action={toggleItalics}>
                     <TextItalicIcon />
                 </ToolbarToggleButton>
 
-                <ToolbarToggleButton
-                    label={t.TextFormattingMonospace}
-                    action={toggleMonospace}
-                >
+                <ToolbarToggleButton label={t.TextFormattingMonospace} action={toggleMonospace}>
                     <CodeIcon />
                 </ToolbarToggleButton>
 
@@ -67,10 +58,7 @@ export function Toolbar({
                 </ToolbarToggleButton>
             </ToolbarButtonGroup>
 
-            <ClipboardButtons
-                copyToClipboard={copy}
-                pasteFromClipboard={paste}
-            />
+            <ClipboardButtons copyToClipboard={copy} pasteFromClipboard={paste} />
         </AriaToolbar>
     )
 }
@@ -132,14 +120,10 @@ function ToolbarToggleButton({
 }
 
 function ToolbarSeparator() {
-    return (
-        <AriaSeparator className="toolbar-separator" orientation="vertical" />
-    )
+    return <AriaSeparator className="toolbar-separator" orientation="vertical" />
 }
 
-function ClipboardButtons(
-    props: Pick<ToolbarCommands, "copyToClipboard" | "pasteFromClipboard">,
-) {
+function ClipboardButtons(props: Pick<ToolbarCommands, "copyToClipboard" | "pasteFromClipboard">) {
     if (typeof navigator.clipboard === "undefined") {
         return null
     }
@@ -157,9 +141,7 @@ function ClipboardButtons(
     )
 }
 
-function PasteMenu({
-    pasteFromClipboard,
-}: Pick<ToolbarCommands, "pasteFromClipboard">) {
+function PasteMenu({ pasteFromClipboard }: Pick<ToolbarCommands, "pasteFromClipboard">) {
     let pastePlain = useCallback(() => {
         navigator.clipboard
             .readText()
@@ -199,9 +181,7 @@ function PasteMenu({
                         items.push({
                             type: "uri",
                             data: decodeText(
-                                await item
-                                    .getType("text/uri-list")
-                                    .then((b) => b.arrayBuffer()),
+                                await item.getType("text/uri-list").then((b) => b.arrayBuffer()),
                             ),
                         })
                         continue
@@ -211,9 +191,7 @@ function PasteMenu({
                         items.push({
                             type: "text",
                             data: decodeText(
-                                await item
-                                    .getType("text/plain")
-                                    .then((b) => b.arrayBuffer()),
+                                await item.getType("text/plain").then((b) => b.arrayBuffer()),
                             ),
                         })
                         continue
@@ -242,14 +220,10 @@ function PasteMenu({
             />
             <DropdownMenu.Items>
                 <DropdownMenu.Item action={pastePlain}>
-                    <DropdownMenu.ItemLabel>
-                        Paste Plain Text
-                    </DropdownMenu.ItemLabel>
+                    <DropdownMenu.ItemLabel>Paste Plain Text</DropdownMenu.ItemLabel>
                 </DropdownMenu.Item>
                 <DropdownMenu.Item action={pasteAsMarkdown}>
-                    <DropdownMenu.ItemLabel>
-                        Paste as Markdown
-                    </DropdownMenu.ItemLabel>
+                    <DropdownMenu.ItemLabel>Paste as Markdown</DropdownMenu.ItemLabel>
                 </DropdownMenu.Item>
             </DropdownMenu.Items>
         </DropdownMenu>
@@ -279,10 +253,7 @@ function useToolbarPosition() {
                 return
             }
 
-            if (
-                document.activeElement === document.body ||
-                windowHeight <= vp.height
-            ) {
+            if (document.activeElement === document.body || windowHeight <= vp.height) {
                 setToolbarOffset(ref.current)
                 return
             }
@@ -298,8 +269,7 @@ function useToolbarPosition() {
                 reposition()
             })
         }
-        let animFrame: ReturnType<typeof requestAnimationFrame> | undefined =
-            undefined
+        let animFrame: ReturnType<typeof requestAnimationFrame> | undefined = undefined
 
         let unsubResize = onResizeVisualViewport((resizedVp) => {
             if (animFrame) {
@@ -321,9 +291,7 @@ function useToolbarPosition() {
                         return
                     }
 
-                    let selectionRect = selection
-                        .getRangeAt(0)
-                        .getBoundingClientRect()
+                    let selectionRect = selection.getRangeAt(0).getBoundingClientRect()
                     if (selectionRect.height === 0) {
                         return
                     }
@@ -367,12 +335,7 @@ function setToolbarOffset(el: HTMLElement, offset: string = resetPosition) {
 }
 
 function getToolbarOffset(el: HTMLElement) {
-    return (
-        Number.parseInt(
-            el.style.getPropertyValue("--toolbar-offset") ?? "0px",
-            10,
-        ) || 0
-    )
+    return Number.parseInt(el.style.getPropertyValue("--toolbar-offset") ?? "0px", 10) || 0
 }
 
 function getVisualViewport() {
@@ -384,9 +347,7 @@ function getVisualViewport() {
     }
 }
 
-function onResizeVisualViewport(
-    cb: (vp: ReturnType<typeof getVisualViewport>) => void,
-) {
+function onResizeVisualViewport(cb: (vp: ReturnType<typeof getVisualViewport>) => void) {
     let onresize = () => {
         let updated = getVisualViewport()
         cb({ height: updated.height, pageTop: vp.pageTop })

@@ -136,10 +136,7 @@ function useTagTreeNavigation({
                         break
 
                     case navKeyCodes.ArrowRight:
-                        if (
-                            target.attributes.getNamedItem("aria-expanded")
-                                ?.value !== "true"
-                        ) {
+                        if (target.attributes.getNamedItem("aria-expanded")?.value !== "true") {
                             toggleExpandItem(tag)
                         } else {
                             focusNextItem(tag)
@@ -149,10 +146,7 @@ function useTagTreeNavigation({
                         break
 
                     case navKeyCodes.ArrowLeft:
-                        if (
-                            target.attributes.getNamedItem("aria-expanded")
-                                ?.value === "true"
-                        ) {
+                        if (target.attributes.getNamedItem("aria-expanded")?.value === "true") {
                             toggleExpandItem(tag)
                         } else {
                             // setFocusToParentItem(tag);
@@ -245,16 +239,10 @@ function sumTreeItemCount(item: TagTreeItem): number {
         return item.count
     }
 
-    return item.children.reduce(
-        (sum, child) => sum + sumTreeItemCount(child),
-        0,
-    )
+    return item.children.reduce((sum, child) => sum + sumTreeItemCount(child), 0)
 }
 
-function useExpandedItems({
-    selectedTag,
-    tags,
-}: { tags: Tag[]; selectedTag?: string }) {
+function useExpandedItems({ selectedTag, tags }: { tags: Tag[]; selectedTag?: string }) {
     let [manuallyExpanded, manuallyExpandedSetter] = useStateSet<string>([])
 
     let expanded = useMemo(() => {
@@ -281,17 +269,10 @@ function useExpandedItems({
         [manuallyExpandedSetter.toggle],
     )
 
-    return [expanded, toggleExpandItem] as [
-        typeof expanded,
-        typeof toggleExpandItem,
-    ]
+    return [expanded, toggleExpandItem] as [typeof expanded, typeof toggleExpandItem]
 }
 
-function findPreviousItem(
-    tag: string,
-    tagTree: TagTreeItem[],
-    expanded: Set<string>,
-) {
+function findPreviousItem(tag: string, tagTree: TagTreeItem[], expanded: Set<string>) {
     let segments = tag.split("/")
 
     let prev: TagTreeItem | undefined
@@ -321,16 +302,10 @@ function findPreviousItem(
         return
     }
 
-    return prev.children.some((c) => c.tag === tag)
-        ? prev
-        : findLastItem(prev, expanded)
+    return prev.children.some((c) => c.tag === tag) ? prev : findLastItem(prev, expanded)
 }
 
-function findNextItem(
-    tag: string,
-    tagTree: TagTreeItem[],
-    expanded: Set<string>,
-) {
+function findNextItem(tag: string, tagTree: TagTreeItem[], expanded: Set<string>) {
     let next: TagTreeItem | undefined
 
     let hierachy = getSubtreeForTag(tagTree, tag)

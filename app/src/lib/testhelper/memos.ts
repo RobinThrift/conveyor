@@ -34,10 +34,7 @@ export function generateMockMemos() {
     tags.sort()
 
     for (let i = 0; i < 120; i++) {
-        let memoTags = [
-            faker.helpers.arrayElement(tags).tag,
-            faker.helpers.arrayElement(tags).tag,
-        ]
+        let memoTags = [faker.helpers.arrayElement(tags).tag, faker.helpers.arrayElement(tags).tag]
 
         tags.forEach((t) => {
             if (memoTags.includes(t.tag)) {
@@ -137,10 +134,7 @@ ${faker.lorem.paragraph()}
 `
 }
 
-export function generateMemo({
-    title,
-    tags,
-}: { title: string; tags: string[] }) {
+export function generateMemo({ title, tags }: { title: string; tags: string[] }) {
     if (faker.number.float({ min: 0, max: 10 }) > 9.5) {
         return `${generateOpenGraphDirective()}
 #${tags.join(" #")}`

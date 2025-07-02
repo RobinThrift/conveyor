@@ -8,16 +8,12 @@ export class TestInMemKVStore<
 > implements KVStore<Items>
 {
     private _values = new Map<keyof Items, Items[keyof Items]>()
-    private NotFoundErr?: NotFoundError extends Error
-        ? { new (key: string): NotFoundError }
-        : never
+    private NotFoundErr?: NotFoundError extends Error ? { new (key: string): NotFoundError } : never
 
     constructor({
         NotFoundErr,
     }: {
-        NotFoundErr?: NotFoundError extends Error
-            ? { new (key: string): NotFoundError }
-            : never
+        NotFoundErr?: NotFoundError extends Error ? { new (key: string): NotFoundError } : never
     } = {}) {
         this.NotFoundErr = NotFoundErr
     }
@@ -42,10 +38,7 @@ export class TestInMemKVStore<
         return Ok(undefined)
     }
 
-    public async removeItem<K extends keyof Items>(
-        _ctx: Context,
-        key: K,
-    ): AsyncResult<void> {
+    public async removeItem<K extends keyof Items>(_ctx: Context, key: K): AsyncResult<void> {
         this._values.delete(key)
         return Ok(undefined)
     }

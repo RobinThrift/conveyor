@@ -18,20 +18,14 @@ export const slice = createSlice({
     name: "jobs",
     initialState,
     reducers: {
-        startJob: (
-            state,
-            { payload }: PayloadAction<{ job: Jobs; params?: any }>,
-        ) => {
+        startJob: (state, { payload }: PayloadAction<{ job: Jobs; params?: any }>) => {
             state[payload.job] = {
                 status: "requested",
                 error: undefined,
             }
         },
 
-        setJobStatus: (
-            state,
-            { payload }: PayloadAction<{ job: Jobs } & JobStatus>,
-        ) => {
+        setJobStatus: (state, { payload }: PayloadAction<{ job: Jobs } & JobStatus>) => {
             state[payload.job] = {
                 status: payload.status,
                 error: payload.error,

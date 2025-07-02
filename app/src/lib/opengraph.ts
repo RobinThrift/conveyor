@@ -6,9 +6,7 @@ type OpenGraphData = {
     imageURL?: string
 }
 
-export async function fetchOpenGraphData(
-    uri: URL,
-): AsyncResult<OpenGraphData | undefined> {
+export async function fetchOpenGraphData(uri: URL): AsyncResult<OpenGraphData | undefined> {
     return fromAsyncFn(async () => {
         let res = await fetch(uri, { credentials: "omit", mode: "cors" })
 
@@ -16,9 +14,7 @@ export async function fetchOpenGraphData(
         let parser = new DOMParser()
         let doc = parser.parseFromString(html, "text/html")
 
-        let titleEl =
-            doc.querySelector(`meta[property="og:title"]`) ??
-            doc.querySelector("title")
+        let titleEl = doc.querySelector(`meta[property="og:title"]`) ?? doc.querySelector("title")
         let descriptionEl = doc.querySelector(`meta[property="og:description"]`)
         let imageEl = doc.querySelector(`meta[property="og:image"]`)
 

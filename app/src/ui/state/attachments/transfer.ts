@@ -23,17 +23,11 @@ export const slice = createSlice({
     name: "transfer",
     initialState,
     reducers: {
-        startTransfer: (
-            state,
-            { payload }: PayloadAction<TransferAttachmentRequest>,
-        ) => {
+        startTransfer: (state, { payload }: PayloadAction<TransferAttachmentRequest>) => {
             state[payload.id] = { state: "transferring" }
         },
 
-        setTransferDone: (
-            state,
-            { payload }: PayloadAction<{ id: AttachmentID }>,
-        ) => {
+        setTransferDone: (state, { payload }: PayloadAction<{ id: AttachmentID }>) => {
             state[payload.id] = { state: "done" }
         },
 

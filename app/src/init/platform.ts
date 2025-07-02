@@ -29,6 +29,4 @@ export interface PlatformDependencies {
     navigationBackend: NavigationBackend<Screens, Stacks, Restore>
 }
 
-export type InitPlatform = (
-    args: PlatformInitArgs,
-) => Promise<PlatformDependencies>
+export type InitPlatform = (args: PlatformInitArgs) => Promise<PlatformDependencies>

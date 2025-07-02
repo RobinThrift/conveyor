@@ -2,11 +2,7 @@ import React from "react"
 export function LockIcon({ className }: { className?: string }) {
     return (
         // biome-ignore lint/a11y/noSvgWithoutTitle: is an icon
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 256 256"
-            className={className}
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className={className}>
             <rect width="256" height="256" fill="none" />
             <rect
                 x="40"

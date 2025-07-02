@@ -63,10 +63,7 @@ export function Memo(props: MemoProps) {
             <div className="memo-header content">
                 {title ? (
                     <h1>
-                        <MemoActionsDropdown
-                            memo={props.memo}
-                            actions={props.actions}
-                        />
+                        <MemoActionsDropdown memo={props.memo} actions={props.actions} />
 
                         {props.headerLink ? (
                             <Link
@@ -82,10 +79,7 @@ export function Memo(props: MemoProps) {
                         )}
                     </h1>
                 ) : (
-                    <MemoActionsDropdown
-                        memo={props.memo}
-                        actions={props.actions}
-                    />
+                    <MemoActionsDropdown memo={props.memo} actions={props.actions} />
                 )}
                 <MemoDate createdAt={props.memo.createdAt} />
             </div>

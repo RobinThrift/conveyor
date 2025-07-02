@@ -20,9 +20,7 @@ export async function listSettings(
     abort?: AbortSignal,
 ): Promise<ListSettingsRow[]> {
     let result = await database.query(listSettingsQuery, [], abort)
-    return result.map((row) =>
-        mapRowToObj<ListSettingsRow>(row, { value: JSON.parse }),
-    )
+    return result.map((row) => mapRowToObj<ListSettingsRow>(row, { value: JSON.parse }))
 }
 
 const saveSettingQuery = `-- name: SaveSetting :exec
@@ -40,14 +38,6 @@ export interface SaveSettingArgs {
     value: any
 }
 
-export async function saveSetting(
-    database: Database,
-    args: SaveSettingArgs,
-    abort?: AbortSignal,
-) {
-    await database.exec(
-        saveSettingQuery,
-        [args.key, JSON.stringify(args.value)],
-        abort,
-    )
+export async function saveSetting(database: Database, args: SaveSettingArgs, abort?: AbortSignal) {
+    await database.exec(saveSettingQuery, [args.key, JSON.stringify(args.value)], abort)
 }

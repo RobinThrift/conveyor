@@ -28,6 +28,4 @@ export interface PlatformDependencies {
     deviceSecureStorage: DeviceSecureStorage
 }
 
-export type InitPlatform = (
-    args: PlatformInitArgs,
-) => Promise<PlatformDependencies>
+export type InitPlatform = (args: PlatformInitArgs) => Promise<PlatformDependencies>

@@ -50,10 +50,7 @@ export function AppShell() {
                 case "memo.edit":
                     return [
                         <Suspense key="main-screen-suspense">
-                            <MainScreen
-                                key="main-screen"
-                                activeScreen={currentPage.name}
-                            />
+                            <MainScreen key="main-screen" activeScreen={currentPage.name} />
                         </Suspense>,
                     ]
                 case "memo.new":

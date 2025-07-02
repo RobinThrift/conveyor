@@ -5,11 +5,7 @@ import type { AsyncResult } from "@/lib/result"
 export interface FS {
     read(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike>
 
-    write(
-        ctx: Context,
-        filepath: string,
-        content: ArrayBufferLike,
-    ): AsyncResult<number>
+    write(ctx: Context, filepath: string, content: ArrayBufferLike): AsyncResult<number>
 
     remove(ctx: Context, filepath: string): AsyncResult<void>
 
@@ -20,10 +16,7 @@ export class FSNotFoundError extends Error {
     public static [CustomErrCode] = "FS_NOT_FOUND_ERROR" as ErrorCode
 
     constructor(filepath: string, options?: ErrorOptions) {
-        super(
-            `[${FSNotFoundError[CustomErrCode]}] file not found: ${filepath}`,
-            options,
-        )
+        super(`[${FSNotFoundError[CustomErrCode]}] file not found: ${filepath}`, options)
     }
 }
 

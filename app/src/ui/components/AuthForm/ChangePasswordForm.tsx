@@ -26,10 +26,7 @@ export interface ChangePasswordFormProps {
 
 export function ChangePasswordForm(props: ChangePasswordFormProps) {
     let t = useT("components/AuthForm/ChangePasswordForm")
-    let isLoading = useMemo(
-        () => props.status === "password-change-in-progress",
-        [props.status],
-    )
+    let isLoading = useMemo(() => props.status === "password-change-in-progress", [props.status])
 
     let onSubmit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,15 +35,9 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
 
             let target = e.target as HTMLFormElement
 
-            let currentPassword = target.querySelector(
-                "#current_password",
-            ) as HTMLInputElement
-            let newPassword = target.querySelector(
-                "#new_password",
-            ) as HTMLInputElement
-            let newPasswordRepeat = target.querySelector(
-                "#repeat_new_password",
-            ) as HTMLInputElement
+            let currentPassword = target.querySelector("#current_password") as HTMLInputElement
+            let newPassword = target.querySelector("#new_password") as HTMLInputElement
+            let newPasswordRepeat = target.querySelector("#repeat_new_password") as HTMLInputElement
 
             props.changePassword({
                 username: props.username,

@@ -2,14 +2,7 @@ import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { type Hsl, converter, formatCss } from "culori"
 
-const variants = [
-    "DEFAULT",
-    "light",
-    "extra-light",
-    "dark",
-    "extra-dark",
-    "contrast",
-]
+const variants = ["DEFAULT", "light", "extra-light", "dark", "extra-dark", "contrast"]
 
 const requireVariants = ["primary", "success", "danger", "subtle"]
 
@@ -47,9 +40,7 @@ async function main(file: string) {
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
             "body-bg": formatCss(toOKLCH(colours["body-bg"]))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
-            "body-bg-contrast": formatCss(
-                toOKLCH(colours["body-bg-contrast"]),
-            )!,
+            "body-bg-contrast": formatCss(toOKLCH(colours["body-bg-contrast"]))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
             "surface-level-1": formatCss(toOKLCH(colours["surface-level-1"]))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
@@ -57,9 +48,7 @@ async function main(file: string) {
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
             text: formatCss(toOKLCH(colours.text))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
-            "modal-overlay-bg": formatCss(
-                toOKLCH(colours["modal-overlay-bg"]),
-            )!,
+            "modal-overlay-bg": formatCss(toOKLCH(colours["modal-overlay-bg"]))!,
         } as Output
 
         for (let name of requireVariants) {
@@ -77,9 +66,7 @@ async function main(file: string) {
 
 type Palette = Record<Variants, string>
 
-export const DEFAULT_STOPS = [
-    0, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000,
-]
+export const DEFAULT_STOPS = [0, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000]
 
 function generatePalette(value: Hsl): Palette {
     let valueStop = 500
@@ -96,12 +83,7 @@ function generatePalette(value: Hsl): Palette {
     valueS = +(valueS * 100).toFixed(1)
     lightnessValue = +(lightnessValue * 100).toFixed(1)
 
-    let distributionScale = createDistributionValues(
-        lMin,
-        lMax,
-        lightnessValue,
-        valueStop,
-    )
+    let distributionScale = createDistributionValues(lMin, lMax, lightnessValue, valueStop)
 
     let swatches = hueScale.map(({ stop }, stopIndex) => {
         let newH = unsignedModulo(valueH + hueScale[stopIndex].tweak, 360)
@@ -175,9 +157,7 @@ function createSaturationScale(tweak: number, stop: number) {
 
     return stops.map((stop) => {
         let diff = Math.abs(stops.indexOf(stop) - index)
-        let tweakValue = tweak
-            ? Math.round((diff + 1) * tweak * (1 + diff / 10))
-            : 0
+        let tweakValue = tweak ? Math.round((diff + 1) * tweak * (1 + diff / 10)) : 0
 
         if (tweakValue > 100) {
             return { stop, tweak: 100 }
@@ -187,12 +167,7 @@ function createSaturationScale(tweak: number, stop: number) {
     })
 }
 
-function createDistributionValues(
-    min: number,
-    max: number,
-    lightness: number,
-    stop: number,
-) {
+function createDistributionValues(min: number, max: number, lightness: number, stop: number) {
     let stops = DEFAULT_STOPS
 
     let newValues = [
@@ -211,14 +186,9 @@ function createDistributionValues(
         let diff = Math.abs((stopValue - stop) / 100)
         let totalDiff =
             stopValue < stop
-                ? Math.abs(
-                      stops.indexOf(stop) - stops.indexOf(DEFAULT_STOPS[0]),
-                  ) - 1
+                ? Math.abs(stops.indexOf(stop) - stops.indexOf(DEFAULT_STOPS[0])) - 1
                 : Math.abs(
-                      stops.indexOf(stop) -
-                          stops.indexOf(
-                              DEFAULT_STOPS[DEFAULT_STOPS.length - 1],
-                          ),
+                      stops.indexOf(stop) - stops.indexOf(DEFAULT_STOPS[DEFAULT_STOPS.length - 1]),
                   ) - 1
         let increment = stopValue < stop ? max - lightness : lightness - min
 

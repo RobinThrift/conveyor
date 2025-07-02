@@ -6,9 +6,7 @@ import { type AsyncResult, Err, Ok, type Result, wrapErr } from "@/lib/result"
 
 export class CryptoController {
     private _crypto: Crypto
-    public publicKey: Result<PublicCryptoKey<string>> = Err(
-        new Error("crypto not setup yet"),
-    )
+    public publicKey: Result<PublicCryptoKey<string>> = Err(new Error("crypto not setup yet"))
 
     constructor({
         crypto,
@@ -34,9 +32,7 @@ export class CryptoController {
     ): AsyncResult<void> {
         let key: AgePrivateCryptoKey
         if ("plaintextKeyData" in args) {
-            key = new AgePrivateCryptoKey(
-                args.plaintextKeyData as string as Identity,
-            )
+            key = new AgePrivateCryptoKey(args.plaintextKeyData as string as Identity)
         } else {
             key = args.agePrivateCryptoKey
         }
@@ -64,15 +60,11 @@ export class CryptoController {
         return Ok(undefined)
     }
 
-    public async encryptData(
-        data: Uint8Array<ArrayBufferLike>,
-    ): AsyncResult<ArrayBufferLike> {
+    public async encryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike> {
         return this._crypto.encryptData(data)
     }
 
-    public async decryptData(
-        data: Uint8Array<ArrayBufferLike>,
-    ): AsyncResult<ArrayBufferLike> {
+    public async decryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike> {
         return this._crypto.decryptData(data)
     }
 }

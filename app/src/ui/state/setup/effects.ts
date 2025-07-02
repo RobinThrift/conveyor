@@ -21,10 +21,7 @@ export const registerEffects = (
 ) => {
     startListening({
         actionCreator: slice.actions.loadSetupInfo,
-        effect: async (
-            _,
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async (_, { cancelActiveListeners, getState, dispatch, signal }) => {
             if (slice.selectors.isSetup(getState())) {
                 return
             }
@@ -109,10 +106,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: sync.actions.setStatus,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, getState },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, getState }) => {
             let state = getState()
             if (slice.selectors.isSetup(state)) {
                 return
@@ -148,10 +142,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: auth.actions.setAuthStatus,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, getState },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, getState }) => {
             if (slice.selectors.isSetup(getState())) {
                 return
             }

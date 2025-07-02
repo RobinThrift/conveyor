@@ -1,12 +1,5 @@
 import clsx from "clsx"
-import React, {
-    startTransition,
-    Suspense,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from "react"
+import React, { startTransition, Suspense, useCallback, useEffect, useRef, useState } from "react"
 
 import { FlaskIcon, XIcon } from "../components/Icons"
 import { Loader } from "../components/Loader"
@@ -90,11 +83,7 @@ export function DevTools() {
             </button>
 
             {isOpen && (
-                <div
-                    className="devtools-panels-positioner"
-                    tabIndex={-1}
-                    ref={resizeRef}
-                >
+                <div className="devtools-panels-positioner" tabIndex={-1} ref={resizeRef}>
                     <div className="devtools-panels" tabIndex={-1}>
                         <div
                             className="devtools-panels-resizer"
@@ -109,25 +98,19 @@ export function DevTools() {
                                 <button
                                     key={tabname}
                                     type="button"
-                                    className={clsx(
-                                        "devtools-panel-list-item",
-                                        { active: tabname === activeTab },
-                                    )}
+                                    className={clsx("devtools-panel-list-item", {
+                                        active: tabname === activeTab,
+                                    })}
                                     tabIndex={0}
                                     onClick={() =>
                                         startTransition(() => {
-                                            if (
-                                                isOpen &&
-                                                tabname === activeTab
-                                            ) {
+                                            if (isOpen && tabname === activeTab) {
                                                 setIsOpen(false)
                                                 return
                                             }
 
                                             setIsOpen(true)
-                                            setActiveTab(
-                                                tabname as keyof typeof tabs,
-                                            )
+                                            setActiveTab(tabname as keyof typeof tabs)
                                         })
                                     }
                                 >

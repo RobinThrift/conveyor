@@ -73,14 +73,9 @@ export const OPFSWorker = createWorker({
         })
     },
 
-    remove: async (
-        ctx: Context,
-        { filepath }: { filepath: string },
-    ): AsyncResult<void> => {
+    remove: async (ctx: Context, { filepath }: { filepath: string }): AsyncResult<void> => {
         let { dir: dirname, filename } = splitFilepath(filepath)
-        let [dir, err] = await fromPromise(
-            getDirHandle(await _rootDir, dirname),
-        )
+        let [dir, err] = await fromPromise(getDirHandle(await _rootDir, dirname))
         if (err) {
             return wrapErr`${new ErrRemoveFile()}: ${filepath}: error getting dir handle: ${err}`
         }
@@ -90,10 +85,7 @@ export const OPFSWorker = createWorker({
         return lock.run(ctx, async () => {
             let [_, err] = await fromPromise(dir.removeEntry(filename))
             if (err) {
-                if (
-                    err instanceof DOMException &&
-                    err.name === "NotFoundError"
-                ) {
+                if (err instanceof DOMException && err.name === "NotFoundError") {
                     return wrapErr`${new ErrRemoveFile()}: ${new FSNotFoundError(filepath, { cause: err })}`
                 }
 
@@ -104,10 +96,7 @@ export const OPFSWorker = createWorker({
         })
     },
 
-    mkdirp: async (
-        _: Context,
-        { dirpath }: { dirpath: string },
-    ): AsyncResult<void> => {
+    mkdirp: async (_: Context, { dirpath }: { dirpath: string }): AsyncResult<void> => {
         let curr = await _rootDir
         if (dirpath === ".") {
             return Ok(undefined)
@@ -120,9 +109,7 @@ export const OPFSWorker = createWorker({
                 continue
             }
 
-            let [result, err] = await fromPromise(
-                curr.getDirectoryHandle(dir, { create: true }),
-            )
+            let [result, err] = await fromPromise(curr.getDirectoryHandle(dir, { create: true }))
             if (err) {
                 return wrapErr`${new ErrMkdir()}: error getting directory handle: ${dir}: ${err}`
             }
@@ -134,10 +121,7 @@ export const OPFSWorker = createWorker({
     },
 })
 
-async function getDirHandle(
-    rootDir: FileSystemDirectoryHandle,
-    dirpath: string,
-) {
+async function getDirHandle(rootDir: FileSystemDirectoryHandle, dirpath: string) {
     let curr = rootDir
     let dirs = dirpath.split("/")
 
@@ -156,11 +140,7 @@ async function getDirHandle(
     return curr
 }
 
-async function openFile(
-    rootDir: FileSystemDirectoryHandle,
-    filepath: string,
-    create?: boolean,
-) {
+async function openFile(rootDir: FileSystemDirectoryHandle, filepath: string, create?: boolean) {
     let { dir: dirname, filename } = splitFilepath(filepath)
     let dir = await getDirHandle(rootDir, dirname)
 

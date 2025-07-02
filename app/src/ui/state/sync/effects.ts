@@ -12,17 +12,13 @@ export const registerEffects = (
 ) => {
     startListening({
         actionCreator: auth.actions.setAuthStatus,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, getState, dispatch, signal }) => {
             let state = getState()
             let status = slice.selectors.status(state)
 
             if (
                 status === "awaiting-authentication" &&
-                (payload.status === "password-change-required" ||
-                    payload.status === "error")
+                (payload.status === "password-change-required" || payload.status === "error")
             ) {
                 dispatch(
                     slice.actions.setStatus({
@@ -94,10 +90,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.setup,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, getState, dispatch, signal }) => {
             let state = getState()
 
             let status = slice.selectors.status(state)
@@ -159,15 +152,10 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.loadSyncInfo,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, signal }) => {
             cancelActiveListeners()
 
-            let [loaded, err] = await syncCtrl.load(
-                BaseContext.withSignal(signal),
-            )
+            let [loaded, err] = await syncCtrl.load(BaseContext.withSignal(signal))
             if (err) {
                 dispatch(
                     slice.actions.setStatus({
@@ -205,10 +193,7 @@ export const registerEffects = (
             )
         },
 
-        effect: async (
-            _action,
-            { cancelActiveListeners, dispatch, signal },
-        ) => {
+        effect: async (_action, { cancelActiveListeners, dispatch, signal }) => {
             cancelActiveListeners()
 
             dispatch(slice.actions.setStatus({ status: "syncing" }))
@@ -238,10 +223,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.syncStartUploadFull,
-        effect: async (
-            _action,
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async (_action, { cancelActiveListeners, getState, dispatch, signal }) => {
             let status = slice.selectors.status(getState())
             if (!(status === "ready" || status === "error")) {
                 return
@@ -251,9 +233,7 @@ export const registerEffects = (
 
             dispatch(slice.actions.setStatus({ status: "syncing" }))
 
-            let [_, err] = await syncCtrl.uploadFullDB(
-                BaseContext.withSignal(signal),
-            )
+            let [_, err] = await syncCtrl.uploadFullDB(BaseContext.withSignal(signal))
 
             if (err) {
                 dispatch(
@@ -277,10 +257,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.syncStartDownloadFull,
-        effect: async (
-            _action,
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async (_action, { cancelActiveListeners, getState, dispatch, signal }) => {
             let status = slice.selectors.status(getState())
             if (!(status === "ready" || status === "error")) {
                 return
@@ -290,9 +267,7 @@ export const registerEffects = (
 
             dispatch(slice.actions.setStatus({ status: "syncing" }))
 
-            let [_, err] = await syncCtrl.fetchFullDB(
-                BaseContext.withSignal(signal),
-            )
+            let [_, err] = await syncCtrl.fetchFullDB(BaseContext.withSignal(signal))
             if (err) {
                 dispatch(
                     slice.actions.setStatus({

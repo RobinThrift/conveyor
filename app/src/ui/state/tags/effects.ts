@@ -18,10 +18,7 @@ export const registerEffects = (
 ) => {
     startListening({
         actionCreator: tags.actions.loadTags,
-        effect: async (
-            _,
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async (_, { cancelActiveListeners, getState, dispatch, signal }) => {
             let state = getState()
             let requiresReload = tags.selectors.requiresReload(state)
             let isLoading = tags.selectors.isLoading(state)
@@ -37,12 +34,9 @@ export const registerEffects = (
                 }),
             )
 
-            let [list, err] = await memoCtrl.listTags(
-                BaseContext.withSignal(signal),
-                {
-                    pagination: { pageSize: tagPageSize },
-                },
-            )
+            let [list, err] = await memoCtrl.listTags(BaseContext.withSignal(signal), {
+                pagination: { pageSize: tagPageSize },
+            })
 
             if (err) {
                 dispatch(

@@ -78,14 +78,9 @@ export const mimeTypesByExtension: { [key: string]: string } = Object.freeze({
 export function mimeTypeForFilename(filename: string): string {
     let dotindex = filename.lastIndexOf(".")
     if (dotindex === -1) {
-        return (
-            mimeTypesByExtension[filename as any] || "application/octet-stream"
-        )
+        return mimeTypesByExtension[filename as any] || "application/octet-stream"
     }
-    return (
-        mimeTypesByExtension[filename.substring(dotindex)] ||
-        "application/octet-stream"
-    )
+    return mimeTypesByExtension[filename.substring(dotindex)] || "application/octet-stream"
 }
 
 export function extensionForMimeType(mime: string): string {

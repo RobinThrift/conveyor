@@ -3,10 +3,7 @@ export function getThreadName() {
 }
 
 export function isMainThread() {
-    return !(
-        typeof WorkerGlobalScope !== "undefined" &&
-        globalThis instanceof WorkerGlobalScope
-    )
+    return !(typeof WorkerGlobalScope !== "undefined" && globalThis instanceof WorkerGlobalScope)
 }
 
 export function getTransferables(value: any): Transferable[] {

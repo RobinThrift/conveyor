@@ -109,9 +109,7 @@ export const Overview: Story = {
                         >
                             <XIcon />
                         </button>
-                        <div className="notification-message">
-                            {faker.lorem.sentence()}
-                        </div>
+                        <div className="notification-message">{faker.lorem.sentence()}</div>
 
                         <div className="notification-buttons">
                             <Button>Undo</Button>
@@ -133,9 +131,7 @@ export const Overview: Story = {
                         >
                             <XIcon />
                         </button>
-                        <div className="notification-message">
-                            {faker.lorem.sentence()}
-                        </div>
+                        <div className="notification-message">{faker.lorem.sentence()}</div>
 
                         <div className="notification-buttons">
                             <Button>Retry</Button>
@@ -147,8 +143,8 @@ export const Overview: Story = {
                             <div className="icon">
                                 <InfoIcon />
                             </div>
-                            Example Notification with very, mutliline text and
-                            multiple sentences of message.
+                            Example Notification with very, mutliline text and multiple sentences of
+                            message.
                         </div>
                         <button
                             className="notification-close"
@@ -158,9 +154,7 @@ export const Overview: Story = {
                         >
                             <XIcon />
                         </button>
-                        <div className="notification-message">
-                            {faker.lorem.sentences(4)}
-                        </div>
+                        <div className="notification-message">{faker.lorem.sentences(4)}</div>
 
                         <div className="notification-buttons">
                             <Button variant="danger">Delete</Button>

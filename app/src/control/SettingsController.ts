@@ -37,20 +37,14 @@ export class SettingsController {
         this._changelog = changelog
     }
 
-    public addEventListener(
-        event: "onSettingChanged",
-        cb: OnSettingChangedHandler,
-    ): () => void {
+    public addEventListener(event: "onSettingChanged", cb: OnSettingChangedHandler): () => void {
         this._events[event].push(cb)
         return () => {
             this._events[event] = this._events[event].filter((i) => cb !== i)
         }
     }
 
-    public static ErrLoadSettings = createErrType(
-        "SettingsController",
-        "error loading settings",
-    )
+    public static ErrLoadSettings = createErrType("SettingsController", "error loading settings")
     public async loadSettings(ctx: Context): AsyncResult<Settings> {
         let [settings, err] = await this._repo.loadSettings(ctx)
         if (err) {
@@ -59,10 +53,7 @@ export class SettingsController {
         return Ok(settings)
     }
 
-    public static ErrUpdateSetting = createErrType(
-        "SettingsController",
-        "error updating setting",
-    )
+    public static ErrUpdateSetting = createErrType("SettingsController", "error updating setting")
     async updateSetting<K extends KeyPaths<Settings>>(
         ctx: Context,
         setting: {
@@ -76,17 +67,16 @@ export class SettingsController {
                 return wrapErr`${new SettingsController.ErrUpdateSetting()}: ${err}`
             }
 
-            let [_created, entryCreationErr] =
-                await this._changelog.createChangelogEntry(ctx, {
-                    revision: 0,
-                    targetType: "settings",
-                    targetID: setting.key,
-                    value: {
-                        value: setting.value as any,
-                    } satisfies SettingChangelogEntry["value"],
-                    isSynced: false,
-                    isApplied: true,
-                })
+            let [_created, entryCreationErr] = await this._changelog.createChangelogEntry(ctx, {
+                revision: 0,
+                targetType: "settings",
+                targetID: setting.key,
+                value: {
+                    value: setting.value as any,
+                } satisfies SettingChangelogEntry["value"],
+                isSynced: false,
+                isApplied: true,
+            })
             if (entryCreationErr) {
                 return wrapErr`${new SettingsController.ErrUpdateSetting()}: error creating changlog entry: ${entryCreationErr}`
             }

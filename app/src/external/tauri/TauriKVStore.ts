@@ -2,24 +2,12 @@ import { LazyStore } from "@tauri-apps/plugin-store"
 
 import type { KVStore, KVStoreContainer } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
-import {
-    type AsyncResult,
-    Err,
-    Ok,
-    type Result,
-    fromPromise,
-    wrapErr,
-} from "@/lib/result"
+import { type AsyncResult, Err, Ok, type Result, fromPromise, wrapErr } from "@/lib/result"
 
-export class TauriKVStoreContainer<Names extends string>
-    implements KVStoreContainer<Names>
-{
+export class TauriKVStoreContainer<Names extends string> implements KVStoreContainer<Names> {
     private _stores: LazyStore[] = []
 
-    public getKVStore<
-        Items extends Record<string, unknown>,
-        NotFoundError extends Error = never,
-    >(
+    public getKVStore<Items extends Record<string, unknown>, NotFoundError extends Error = never>(
         name: Names,
         opts: {
             instantiate?: <K extends keyof Items>(
@@ -99,10 +87,7 @@ export class TauriKVStore<
         return fromPromise(this._store.set(key as string, value))
     }
 
-    public async removeItem<K extends keyof Items>(
-        _ctx: Context,
-        key: K,
-    ): AsyncResult<void> {
+    public async removeItem<K extends keyof Items>(_ctx: Context, key: K): AsyncResult<void> {
         let [_, err] = await fromPromise(this._store.delete(key as string))
         if (err) {
             return wrapErr`error removing item: ${key}: ${err}`

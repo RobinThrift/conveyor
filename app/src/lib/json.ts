@@ -31,11 +31,9 @@ export function parseJSONDate(raw: string): Result<Date> {
     return Ok(date)
 }
 
-export function parseJSONDates<
-    R extends object,
-    K extends keyof R,
-    V extends Record<K, unknown>,
->(...keys: K[]): (v: V) => Result<R> {
+export function parseJSONDates<R extends object, K extends keyof R, V extends Record<K, unknown>>(
+    ...keys: K[]
+): (v: V) => Result<R> {
     return (obj) => {
         let parsed = {
             ...obj,

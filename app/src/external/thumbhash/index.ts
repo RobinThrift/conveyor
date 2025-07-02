@@ -15,9 +15,7 @@ export async function thumbhashFromFile(data: File | Blob): Promise<string> {
     let canvas = document.createElement("canvas")
     let context = canvas.getContext("2d")
     if (!context) {
-        throw new Error(
-            "error calculating thumbhash: error getting canvas context",
-        )
+        throw new Error("error calculating thumbhash: error getting canvas context")
     }
 
     let scale = 100 / Math.max(img.width, img.height)
@@ -25,11 +23,7 @@ export async function thumbhashFromFile(data: File | Blob): Promise<string> {
     canvas.height = Math.round(img.height * scale)
     context.drawImage(img, 0, 0, canvas.width, canvas.height)
     let pixels = context.getImageData(0, 0, canvas.width, canvas.height)
-    let binaryThumbHash = ThumbHash.rgbaToThumbHash(
-        pixels.width,
-        pixels.height,
-        pixels.data,
-    )
+    let binaryThumbHash = ThumbHash.rgbaToThumbHash(pixels.width, pixels.height, pixels.data)
 
     return encodeToBase64(binaryThumbHash)
 }

@@ -28,9 +28,7 @@ export const registerEffects = (
     })
 
     memoCtrl.addEventListener("onMemoCreated", () => {
-        rootStore.dispatch(
-            list.slice.actions.setIsListOutdated({ isListOutdated: true }),
-        )
+        rootStore.dispatch(list.slice.actions.setIsListOutdated({ isListOutdated: true }))
     })
 
     startListening({
@@ -76,10 +74,7 @@ export const registerEffects = (
             ) {
                 return false
             }
-            return (
-                currentState.memos.list.filter !==
-                originalState.memos.list.filter
-            )
+            return currentState.memos.list.filter !== originalState.memos.list.filter
         },
         effect: async (_, { cancelActiveListeners, dispatch, getState }) => {
             cancelActiveListeners()
@@ -112,13 +107,10 @@ export const registerEffects = (
         ) => {
             cancelActiveListeners()
 
-            let [memos, err] = await memoCtrl.listMemos(
-                BaseContext.withSignal(signal),
-                {
-                    filter,
-                    pagination,
-                },
-            )
+            let [memos, err] = await memoCtrl.listMemos(BaseContext.withSignal(signal), {
+                filter,
+                pagination,
+            })
 
             if (err) {
                 dispatch(
@@ -139,10 +131,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: create.slice.actions.create,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, getState, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, getState, dispatch, signal }) => {
             cancelActiveListeners()
 
             let [created, err] = await memoCtrl.createMemo(
@@ -170,10 +159,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: single.slice.actions.setCurrentSingleMemoID,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, getState, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, getState, signal }) => {
             let state = getState()
             if (
                 selectors.isLoadingSingleMemo(state) &&
@@ -184,10 +170,7 @@ export const registerEffects = (
 
             cancelActiveListeners()
 
-            let foundInList = list.slice.selectors.getMemo(
-                state.memos,
-                payload.id,
-            )
+            let foundInList = list.slice.selectors.getMemo(state.memos, payload.id)
             if (foundInList) {
                 dispatch(
                     single.slice.actions.setCurrentSingleMemo({
@@ -217,10 +200,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: update.slice.actions.update,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, signal }) => {
             cancelActiveListeners()
 
             let ctx = BaseContext.withSignal(signal)
@@ -255,10 +235,7 @@ export const registerEffects = (
                 }
             }
 
-            if (
-                typeof payload.memo.isDeleted !== "undefined" &&
-                payload.memo.isDeleted
-            ) {
+            if (typeof payload.memo.isDeleted !== "undefined" && payload.memo.isDeleted) {
                 let [_, err] = await memoCtrl.deleteMemo(ctx, payload.memo.id)
                 if (err) {
                     dispatch(
@@ -270,10 +247,7 @@ export const registerEffects = (
                 }
             }
 
-            if (
-                typeof payload.memo.isDeleted !== "undefined" &&
-                !payload.memo.isDeleted
-            ) {
+            if (typeof payload.memo.isDeleted !== "undefined" && !payload.memo.isDeleted) {
                 let [_, err] = await memoCtrl.undeleteMemo(ctx, payload.memo.id)
                 if (err) {
                     dispatch(
@@ -306,10 +280,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: navigation.setPage,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, getState },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, getState }) => {
             cancelActiveListeners()
             let state = getState()
 
@@ -327,10 +298,7 @@ export const registerEffects = (
             }
 
             if ("memoID" in payload.params) {
-                if (
-                    single.slice.selectors.currentMemoID(state.memos) !==
-                    payload.params.memoID
-                ) {
+                if (single.slice.selectors.currentMemoID(state.memos) !== payload.params.memoID) {
                     dispatch(
                         single.slice.actions.setCurrentSingleMemoID({
                             id: payload.params.memoID as string,
@@ -343,10 +311,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: navigation.init,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, getState },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, getState }) => {
             cancelActiveListeners()
             let state = getState()
 
@@ -364,10 +329,7 @@ export const registerEffects = (
             }
 
             if ("memoID" in payload.params) {
-                if (
-                    single.slice.selectors.currentMemoID(state.memos) !==
-                    payload.params.memoID
-                ) {
+                if (single.slice.selectors.currentMemoID(state.memos) !== payload.params.memoID) {
                     dispatch(
                         single.slice.actions.setCurrentSingleMemoID({
                             id: payload.params.memoID as string,

@@ -19,29 +19,17 @@ export class RemoteNavigationBackend<
     Restore extends Record<string, unknown>,
 > implements NavigationBackend<S, Stacks, Restore>
 {
-    private _postMessage: (
-        message: any,
-        options?: StructuredSerializeOptions,
-    ) => void
+    private _postMessage: (message: any, options?: StructuredSerializeOptions) => void
 
-    constructor(
-        postMessage: (
-            message: any,
-            options?: StructuredSerializeOptions,
-        ) => void,
-    ) {
+    constructor(postMessage: (message: any, options?: StructuredSerializeOptions) => void) {
         this._postMessage = postMessage
     }
 
-    init(
-        _: NavgationState<S, Stacks, Restore>,
-    ): NavgationState<S, Stacks, Restore> {
+    init(_: NavgationState<S, Stacks, Restore>): NavgationState<S, Stacks, Restore> {
         throw new Error("init is not available on RemoteNavigationBackend")
     }
 
-    public push(
-        next: NavgationState<S, Stacks, Restore>,
-    ): NavgationState<S, Stacks, Restore> {
+    public push(next: NavgationState<S, Stacks, Restore>): NavgationState<S, Stacks, Restore> {
         if (__LOG_LEVEL__ === "debug") {
             console.debug(`==> [${getThreadName()}] navigation:push`, next)
         }
@@ -72,9 +60,7 @@ export function navigationEventHandler<
     Stacks extends string,
     Restore extends Record<string, unknown>,
 >(cb: (next: NavgationState<S, Stacks, Restore>) => void) {
-    return (
-        evt: MessageEvent<RemoteNavigationPushMessage<S, Stacks, Restore>>,
-    ) => {
+    return (evt: MessageEvent<RemoteNavigationPushMessage<S, Stacks, Restore>>) => {
         let msg = evt.data
         if (msg?.type === "navigation:push") {
             evt.stopImmediatePropagation()

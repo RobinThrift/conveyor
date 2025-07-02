@@ -17,8 +17,7 @@ import { AuthV1APIClient } from "./AuthV1APIClient"
 
 suite("api/syncv1/AuthV1APIClient", async () => {
     test("getTokenUsingCredentials/valid", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } =
-            await setupAuthV1APIClientTest()
+        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
@@ -28,25 +27,25 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         let now = currentDateTime()
 
         useMocks(
-            http.post<
-                never,
-                { username: string; password: string; grant_type: "password" }
-            >("/api/auth/v1/token", async ({ request }) => {
-                let body = await request.json()
-                assert.equal(body.grant_type, "password")
-                assert.equal(body.username, username)
-                assert.equal(body.password, password)
+            http.post<never, { username: string; password: string; grant_type: "password" }>(
+                "/api/auth/v1/token",
+                async ({ request }) => {
+                    let body = await request.json()
+                    assert.equal(body.grant_type, "password")
+                    assert.equal(body.username, username)
+                    assert.equal(body.password, password)
 
-                return HttpResponse.json(
-                    {
-                        accessToken: "MOCK_ACCESS_TOKEN",
-                        expiresAt: now.add({ hours: 1 }).toDate("utc"),
-                        refreshToken: "MOCK_REFRESH_TOKEN",
-                        refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
-                    },
-                    { status: 201 },
-                )
-            }),
+                    return HttpResponse.json(
+                        {
+                            accessToken: "MOCK_ACCESS_TOKEN",
+                            expiresAt: now.add({ hours: 1 }).toDate("utc"),
+                            refreshToken: "MOCK_REFRESH_TOKEN",
+                            refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
+                        },
+                        { status: 201 },
+                    )
+                },
+            ),
         )
 
         let token = await assertOkResult(
@@ -64,8 +63,7 @@ suite("api/syncv1/AuthV1APIClient", async () => {
     })
 
     test("getTokenUsingCredentials/invalid", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } =
-            await setupAuthV1APIClientTest()
+        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
@@ -101,11 +99,8 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         assert.isTrue(isErr(err, UnauthorizedError))
     })
 
-    test("getTokenUsingCredentials/requiresChange", async ({
-        onTestFinished,
-    }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } =
-            await setupAuthV1APIClientTest()
+    test("getTokenUsingCredentials/requiresChange", async ({ onTestFinished }) => {
+        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
@@ -114,22 +109,22 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         let password = "passwd"
 
         useMocks(
-            http.post<
-                never,
-                { username: string; password: string; grant_type: "password" }
-            >("/api/auth/v1/token", async ({ request }) => {
-                let body = await request.json()
-                assert.equal(body.grant_type, "password")
-                assert.equal(body.username, username)
-                assert.equal(body.password, password)
+            http.post<never, { username: string; password: string; grant_type: "password" }>(
+                "/api/auth/v1/token",
+                async ({ request }) => {
+                    let body = await request.json()
+                    assert.equal(body.grant_type, "password")
+                    assert.equal(body.username, username)
+                    assert.equal(body.password, password)
 
-                return new HttpResponse(null, {
-                    status: 204,
-                    headers: {
-                        Location: "/change-password",
-                    },
-                })
-            }),
+                    return new HttpResponse(null, {
+                        status: 204,
+                        headers: {
+                            Location: "/change-password",
+                        },
+                    })
+                },
+            ),
         )
 
         let err = await assertErrResult(
@@ -143,8 +138,7 @@ suite("api/syncv1/AuthV1APIClient", async () => {
     })
 
     test("getTokenUsingRefreshToken/valid", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } =
-            await setupAuthV1APIClientTest()
+        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
@@ -153,24 +147,24 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         let now = currentDateTime()
 
         useMocks(
-            http.post<
-                never,
-                { refresh_token: string; grant_type: "refresh_token" }
-            >("/api/auth/v1/token", async ({ request }) => {
-                let body = await request.json()
-                assert.equal(body.grant_type, "refresh_token")
-                assert.equal(body.refresh_token, refreshToken)
+            http.post<never, { refresh_token: string; grant_type: "refresh_token" }>(
+                "/api/auth/v1/token",
+                async ({ request }) => {
+                    let body = await request.json()
+                    assert.equal(body.grant_type, "refresh_token")
+                    assert.equal(body.refresh_token, refreshToken)
 
-                return HttpResponse.json(
-                    {
-                        accessToken: "MOCK_ACCESS_TOKEN",
-                        expiresAt: now.add({ hours: 1 }).toDate("utc"),
-                        refreshToken: "MOCK_REFRESH_TOKEN",
-                        refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
-                    },
-                    { status: 201 },
-                )
-            }),
+                    return HttpResponse.json(
+                        {
+                            accessToken: "MOCK_ACCESS_TOKEN",
+                            expiresAt: now.add({ hours: 1 }).toDate("utc"),
+                            refreshToken: "MOCK_REFRESH_TOKEN",
+                            refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
+                        },
+                        { status: 201 },
+                    )
+                },
+            ),
         )
 
         let token = await assertOkResult(
@@ -187,8 +181,7 @@ suite("api/syncv1/AuthV1APIClient", async () => {
     })
 
     test("getTokenUsingRefreshToken/invalid", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } =
-            await setupAuthV1APIClientTest()
+        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
 
         await setup()
         onTestFinished(cleanup)
@@ -196,23 +189,23 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         let refreshToken = "TEST_VALID_REFRESH_TOKEN"
 
         useMocks(
-            http.post<
-                never,
-                { refresh_token: string; grant_type: "refresh_token" }
-            >("/api/auth/v1/token", async ({ request }) => {
-                let body = await request.json()
-                assert.equal(body.grant_type, "refresh_token")
-                assert.equal(body.refresh_token, refreshToken)
+            http.post<never, { refresh_token: string; grant_type: "refresh_token" }>(
+                "/api/auth/v1/token",
+                async ({ request }) => {
+                    let body = await request.json()
+                    assert.equal(body.grant_type, "refresh_token")
+                    assert.equal(body.refresh_token, refreshToken)
 
-                return HttpResponse.json(
-                    {
-                        code: 401,
-                        type: "conveyor/api/v1/auth/Unauthorized",
-                        title: "UnauthorizedError",
-                    },
-                    { status: 401 },
-                )
-            }),
+                    return HttpResponse.json(
+                        {
+                            code: 401,
+                            type: "conveyor/api/v1/auth/Unauthorized",
+                            title: "UnauthorizedError",
+                        },
+                        { status: 401 },
+                    )
+                },
+            ),
         )
 
         let err = await assertErrResult(
@@ -244,8 +237,7 @@ async function setupAuthV1APIClientTest() {
             cancel()
             mockWorker.stop()
         },
-        useMocks: ((...args) =>
-            mockWorker.use(...args)) as typeof mockWorker.use,
+        useMocks: ((...args) => mockWorker.use(...args)) as typeof mockWorker.use,
         authV1APIClient,
     }
 }

@@ -48,17 +48,12 @@ export class AuthController {
         ctx: Context,
         creds: { username: string; password: PlaintextPassword },
     ): AsyncResult<void> {
-        let [token, getTokenErr] =
-            await this._authPIClient.getTokenUsingCredentials(ctx, creds)
+        let [token, getTokenErr] = await this._authPIClient.getTokenUsingCredentials(ctx, creds)
         if (getTokenErr) {
             return wrapErr`${new AuthController.ErrGetInitialToken()}: ${getTokenErr}`
         }
 
-        let [_, storeErr] = await this._storage.setItem(
-            ctx,
-            token.origin,
-            token,
-        )
+        let [_, storeErr] = await this._storage.setItem(ctx, token.origin, token)
         if (storeErr) {
             return wrapErr`${new AuthController.ErrGetInitialToken()}: error storing item for origin "${token.origin}": ${storeErr}`
         }
@@ -67,10 +62,7 @@ export class AuthController {
         return Ok(undefined)
     }
 
-    public static ErrGetToken = createErrType(
-        "AuthController",
-        "error getting token",
-    )
+    public static ErrGetToken = createErrType("AuthController", "error getting token")
     public async getToken(ctx: Context): AsyncResult<string> {
         let [_, loadErr] = await this._loadCurrentToken(ctx)
         if (loadErr) {
@@ -78,10 +70,7 @@ export class AuthController {
         }
 
         let now = currentDateTime()
-        if (
-            this._current?.expiresAt &&
-            isAfter(this._current.expiresAt, now.add({ minutes: 1 }))
-        ) {
+        if (this._current?.expiresAt && isAfter(this._current.expiresAt, now.add({ minutes: 1 }))) {
             return Ok(this._current.accessToken)
         }
 
@@ -113,19 +102,14 @@ export class AuthController {
             return Err(new Error("no valid access token or refresh token"))
         }
 
-        let [token, getTokenErr] =
-            await this._authPIClient.getTokenUsingRefreshToken(ctx, {
-                refreshToken,
-            })
+        let [token, getTokenErr] = await this._authPIClient.getTokenUsingRefreshToken(ctx, {
+            refreshToken,
+        })
         if (getTokenErr) {
             return Err(getTokenErr)
         }
 
-        let [_, storeErr] = await this._storage.setItem(
-            ctx,
-            token.origin,
-            token,
-        )
+        let [_, storeErr] = await this._storage.setItem(ctx, token.origin, token)
         if (storeErr) {
             return Err(storeErr)
         }
@@ -134,9 +118,7 @@ export class AuthController {
         return Ok(token.accessToken)
     }
 
-    private async _loadCurrentToken(
-        ctx: Context,
-    ): AsyncResult<AuthToken | undefined> {
+    private async _loadCurrentToken(ctx: Context): AsyncResult<AuthToken | undefined> {
         if (this._current) {
             return Ok(this._current)
         }
@@ -163,10 +145,7 @@ interface AuthAPIClient {
     setBaseURL(baseURL: string): void
     getTokenUsingCredentials(
         ctx: Context,
-        {
-            username,
-            password,
-        }: { username: string; password: PlaintextPassword },
+        { username, password }: { username: string; password: PlaintextPassword },
     ): AsyncResult<AuthToken>
     getTokenUsingRefreshToken(
         ctx: Context,

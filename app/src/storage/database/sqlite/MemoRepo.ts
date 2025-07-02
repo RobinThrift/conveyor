@@ -41,16 +41,9 @@ export class MemoRepo {
         this._db = db
     }
 
-    public async getMemo(
-        ctx: Context<{ db?: DBExec }>,
-        memoID: MemoID,
-    ): AsyncResult<Memo> {
+    public async getMemo(ctx: Context<{ db?: DBExec }>, memoID: MemoID): AsyncResult<Memo> {
         let [row, err] = await fromPromise(
-            queries.getMemo(
-                ctx.getData("db", this._db),
-                { publicId: memoID },
-                ctx.signal,
-            ),
+            queries.getMemo(ctx.getData("db", this._db), { publicId: memoID }, ctx.signal),
         )
 
         if (err) {
@@ -101,9 +94,7 @@ export class MemoRepo {
             tag: filter?.tag,
 
             withCreatedAt: typeof filter?.exactDate !== "undefined",
-            createdAt: filter?.exactDate
-                ? calendarDateTimeToSQLite(filter.exactDate)
-                : undefined,
+            createdAt: filter?.exactDate ? calendarDateTimeToSQLite(filter.exactDate) : undefined,
 
             withCreatedAtOrOlder: typeof filter?.startDate !== "undefined",
             createdAtOrOlder: filter?.startDate
@@ -132,23 +123,13 @@ export class MemoRepo {
                 )
         } else if (filter?.query && !filter.tag) {
             listFn = (db, query, signal) =>
-                queries.listMemosWithSearch(
-                    db,
-                    query as queries.ListMemosWithSearchArgs,
-                    signal,
-                )
+                queries.listMemosWithSearch(db, query as queries.ListMemosWithSearchArgs, signal)
         } else if (filter?.tag) {
             listFn = (db, query, signal) =>
-                queries.listMemosForTag(
-                    db,
-                    query as queries.ListMemosForTagArgs,
-                    signal,
-                )
+                queries.listMemosForTag(db, query as queries.ListMemosForTagArgs, signal)
         }
 
-        let [rows, err] = await fromPromise(
-            listFn(ctx.getData("db", this._db), query, ctx.signal),
-        )
+        let [rows, err] = await fromPromise(listFn(ctx.getData("db", this._db), query, ctx.signal))
 
         if (err) {
             return wrapErr`error listing memos: ${err}`
@@ -233,11 +214,7 @@ export class MemoRepo {
         }
 
         if (updated === 0) {
-            return Err(
-                new Error(
-                    `error updating memo content: memo not found: ${memo.id}`,
-                ),
-            )
+            return Err(new Error(`error updating memo content: memo not found: ${memo.id}`))
         }
 
         await this._updateTags(ctx, memo)
@@ -264,20 +241,13 @@ export class MemoRepo {
         }
 
         if (updated === 0) {
-            return Err(
-                new Error(
-                    `error updating memo archive status: memo not found: ${memoID}`,
-                ),
-            )
+            return Err(new Error(`error updating memo archive status: memo not found: ${memoID}`))
         }
 
         return Ok(undefined)
     }
 
-    public async deleteMemo(
-        ctx: Context<{ db: DBExec }>,
-        memoID: MemoID,
-    ): AsyncResult<void> {
+    public async deleteMemo(ctx: Context<{ db: DBExec }>, memoID: MemoID): AsyncResult<void> {
         let [updated, err] = await fromPromise(
             queries.setMemoDeletionStatus(
                 ctx.getData("db", this._db),
@@ -293,11 +263,7 @@ export class MemoRepo {
         }
 
         if (updated === 0) {
-            return Err(
-                new Error(
-                    `error marking memo as deleted: memo not found: ${memoID}`,
-                ),
-            )
+            return Err(new Error(`error marking memo as deleted: memo not found: ${memoID}`))
         }
 
         let [deletedTags, deleteTagsErr] = await fromPromise(
@@ -324,10 +290,7 @@ export class MemoRepo {
         return Ok(undefined)
     }
 
-    public async undeleteMemo(
-        ctx: Context<{ db: DBExec }>,
-        memoID: MemoID,
-    ): AsyncResult<void> {
+    public async undeleteMemo(ctx: Context<{ db: DBExec }>, memoID: MemoID): AsyncResult<void> {
         let [updated, err] = await fromPromise(
             queries.setMemoDeletionStatus(
                 ctx.getData("db", this._db),
@@ -344,9 +307,7 @@ export class MemoRepo {
 
         if (updated === 0) {
             return Err(
-                new Error(
-                    `error removing memo being marked as deleted: memo not found: ${memoID}`,
-                ),
+                new Error(`error removing memo being marked as deleted: memo not found: ${memoID}`),
             )
         }
 
@@ -387,15 +348,8 @@ export class MemoRepo {
         })
     }
 
-    public async cleanupDeletedMemos(
-        ctx: Context<{ db: DBExec }>,
-    ): AsyncResult<number> {
-        return fromPromise(
-            queries.cleanupDeletedMemos(
-                ctx.getData("db", this._db),
-                ctx.signal,
-            ),
-        )
+    public async cleanupDeletedMemos(ctx: Context<{ db: DBExec }>): AsyncResult<number> {
+        return fromPromise(queries.cleanupDeletedMemos(ctx.getData("db", this._db), ctx.signal))
     }
 
     private async _updateTags(
@@ -420,11 +374,7 @@ export class MemoRepo {
 
         for (let tag of tags) {
             let createTagResult = await fromPromise(
-                queries.createTag(
-                    ctx.getData("db", this._db),
-                    { tag },
-                    ctx.signal,
-                ),
+                queries.createTag(ctx.getData("db", this._db), { tag }, ctx.signal),
             )
             if (err) {
                 return createTagResult
@@ -458,12 +408,7 @@ export class MemoRepo {
             return updateResult
         }
 
-        return fromPromise(
-            queries.cleanupTagsWithNoCount(
-                ctx.getData("db", this._db),
-                ctx.signal,
-            ),
-        )
+        return fromPromise(queries.cleanupTagsWithNoCount(ctx.getData("db", this._db), ctx.signal))
     }
 }
 
@@ -525,11 +470,7 @@ if (import.meta.vitest) {
         ["Tag Only", "#tag-a", ["tag-a"]],
         ["Unicode Char", "#täg-ü", ["täg-ü"]],
         ["Mixed Case", "#Tag/Foo", ["Tag/Foo"]],
-        [
-            "Tag with Number",
-            "#tag-23281311 #342312",
-            ["tag-23281311", "342312"],
-        ],
+        ["Tag with Number", "#tag-23281311 #342312", ["tag-23281311", "342312"]],
         [
             "Text with Inline Tags",
             "Testing inline #tag-b within a text #tag-c. This should be#ignored",

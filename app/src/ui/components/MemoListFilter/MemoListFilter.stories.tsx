@@ -58,11 +58,7 @@ export const Overview: Story = {
         return (
             <div className="mx-auto px-1 tablet:px-4 w-full max-w-[400px]">
                 <AppHeaderProvider />
-                <MemoListFilter
-                    {...args}
-                    filter={filter}
-                    onChangeFilter={onChangeFilter}
-                />
+                <MemoListFilter {...args} filter={filter} onChangeFilter={onChangeFilter} />
             </div>
         )
     },

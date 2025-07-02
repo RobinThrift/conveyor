@@ -107,21 +107,14 @@ export const slice = createSlice({
                 value: ValueAt<SetupState["selectedOptions"], K>
             }>,
         ) => {
-            state.selectedOptions = setPath(
-                state.selectedOptions,
-                payload.key,
-                payload.value,
-            )
+            state.selectedOptions = setPath(state.selectedOptions, payload.key, payload.value)
         },
 
         setupCandidatePrivateCryptoKey: (
             state,
-            {
-                payload,
-            }: PayloadAction<{ plaintextKeyData: PlaintextPrivateKey }>,
+            { payload }: PayloadAction<{ plaintextKeyData: PlaintextPrivateKey }>,
         ) => {
-            state.selectedOptions.candidatePrivateCryptoKey =
-                payload.plaintextKeyData
+            state.selectedOptions.candidatePrivateCryptoKey = payload.plaintextKeyData
 
             if (state.selectedOptions.isNew) {
                 state.step = "choose-sync-method"
@@ -130,17 +123,11 @@ export const slice = createSlice({
             }
         },
 
-        setIsSetup: (
-            state,
-            { payload }: PayloadAction<{ isSetup: boolean }>,
-        ) => {
+        setIsSetup: (state, { payload }: PayloadAction<{ isSetup: boolean }>) => {
             state.isSetup = payload.isSetup
             state.step = "done"
         },
-        setStep: (
-            state,
-            { payload }: PayloadAction<{ step: SetupStep; error?: Error }>,
-        ) => {
+        setStep: (state, { payload }: PayloadAction<{ step: SetupStep; error?: Error }>) => {
             state.step = payload.step
             state.error = payload.error
         },

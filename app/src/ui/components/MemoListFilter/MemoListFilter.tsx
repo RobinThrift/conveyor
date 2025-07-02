@@ -44,9 +44,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
                     className="filter-offcanvas-trigger"
                     onPress={openOffCanvas}
                 >
-                    <span className="sr-only">
-                        {t.ShowTagTreeFilterOffCanvas}
-                    </span>
+                    <span className="sr-only">{t.ShowTagTreeFilterOffCanvas}</span>
                 </Button>
             </AppHeader>
 
@@ -55,20 +53,11 @@ export function MemoListFilter(props: MemoListFilterProps) {
                     expanded: datepicker.expanded,
                 })}
             >
-                <ShortDayPicker
-                    onSelect={onSelectDate}
-                    selected={props.filter.exactDate}
-                />
+                <ShortDayPicker onSelect={onSelectDate} selected={props.filter.exactDate} />
 
-                <DatePicker
-                    onSelect={onSelectDate}
-                    selected={props.filter.exactDate}
-                />
+                <DatePicker onSelect={onSelectDate} selected={props.filter.exactDate} />
 
-                <StateFilter
-                    onSelect={onSelectStateFilter}
-                    selected={props.filter}
-                />
+                <StateFilter onSelect={onSelectStateFilter} selected={props.filter} />
 
                 <Button
                     iconRight={
@@ -87,10 +76,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
             </div>
 
             <div className="hidden tablet:block">
-                <SearchBar
-                    onChange={onChangeSearch}
-                    query={props.filter.query}
-                />
+                <SearchBar onChange={onChangeSearch} query={props.filter.query} />
             </div>
 
             <DatePicker

@@ -150,11 +150,7 @@ export function createTracedProxy<T extends object>(target: T): T {
 
             if (prop === "addEventListener") {
                 return new Proxy(value, {
-                    apply(
-                        self,
-                        thisArg,
-                        argumentsList: [string, (...args: any[]) => void],
-                    ) {
+                    apply(self, thisArg, argumentsList: [string, (...args: any[]) => void]) {
                         return self.apply(thisArg, [
                             argumentsList[0],
                             (...args: any) => {
@@ -162,12 +158,7 @@ export function createTracedProxy<T extends object>(target: T): T {
                                     BaseContext,
                                     `${target.constructor.name}/${argumentsList[0]}`,
                                     () =>
-                                        fromThrowing(() =>
-                                            argumentsList[1].call(
-                                                thisArg,
-                                                ...args,
-                                            ),
-                                        ),
+                                        fromThrowing(() => argumentsList[1].call(thisArg, ...args)),
                                     { event: argumentsList[0], args },
                                 )
                             },

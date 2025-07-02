@@ -58,17 +58,12 @@ export function Editor(props: EditorProps) {
                             aria-label={t.Cancel}
                             iconLeft={
                                 <>
-                                    <XIcon
-                                        weight="fill"
-                                        className="hidden tablet:block"
-                                    />
+                                    <XIcon weight="fill" className="hidden tablet:block" />
                                     <ArrowLeftIcon className="tablet:hidden" />
                                 </>
                             }
                         >
-                            <span className="sr-only tablet:not-sr-only">
-                                {t.Cancel}
-                            </span>
+                            <span className="sr-only tablet:not-sr-only">{t.Cancel}</span>
                         </Button>
                     )}
 
@@ -79,9 +74,7 @@ export function Editor(props: EditorProps) {
                         iconLeft={<CheckIcon />}
                         isDisabled={!isChanged}
                     >
-                        <span className="sr-only tablet:not-sr-only">
-                            {t.Save}
-                        </span>
+                        <span className="sr-only tablet:not-sr-only">{t.Save}</span>
                     </Button>
                 </div>
 
@@ -106,24 +99,17 @@ export function Editor(props: EditorProps) {
                     onOpenChange={confirmationDialog.setIsOpen}
                 >
                     <AlertDialog.Content>
-                        <AlertDialog.Title>
-                            {t.DiscardChangesTitle}
-                        </AlertDialog.Title>
+                        <AlertDialog.Title>{t.DiscardChangesTitle}</AlertDialog.Title>
 
                         <AlertDialog.Description>
                             {t.DiscardChangesDescription}
                         </AlertDialog.Description>
 
                         <AlertDialog.Buttons>
-                            <Button
-                                variant="danger"
-                                onPress={confirmationDialog.discard}
-                            >
+                            <Button variant="danger" onPress={confirmationDialog.discard}>
                                 {t.DiscardChangesConfirmation}
                             </Button>
-                            <AlertDialog.CancelButton>
-                                {t.Cancel}
-                            </AlertDialog.CancelButton>
+                            <AlertDialog.CancelButton>{t.Cancel}</AlertDialog.CancelButton>
                         </AlertDialog.Buttons>
                     </AlertDialog.Content>
                 </AlertDialog>

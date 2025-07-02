@@ -16,10 +16,7 @@ export const registerEffects = (
 ) => {
     startListening({
         actionCreator: slice.actions.loadPage,
-        effect: async (
-            _,
-            { cancelActiveListeners, dispatch, signal, getState },
-        ) => {
+        effect: async (_, { cancelActiveListeners, dispatch, signal, getState }) => {
             let state = getState()
             if (slice.selectors.isLoading(state)) {
                 return
@@ -93,10 +90,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.createAPIToken,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, signal, getState },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, signal, getState }) => {
             if (slice.selectors.isLoading(getState())) {
                 return
             }
@@ -127,10 +121,7 @@ export const registerEffects = (
 
     startListening({
         actionCreator: slice.actions.deleteAPIToken,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, signal, getState },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, signal, getState }) => {
             let state = getState()
             if (slice.selectors.isLoading(state)) {
                 return

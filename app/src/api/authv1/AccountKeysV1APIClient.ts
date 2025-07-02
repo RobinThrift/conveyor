@@ -29,10 +29,7 @@ export class AccountKeysV1APIClient {
         "AccountKeysV1APIClient",
         "error uploading account key",
     )
-    public async uploadAccountKey(
-        ctx: Context,
-        accountKey: AccountKey,
-    ): AsyncResult<void> {
+    public async uploadAccountKey(ctx: Context, accountKey: AccountKey): AsyncResult<void> {
         let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
@@ -47,9 +44,7 @@ export class AccountKeysV1APIClient {
             return wrapErr`${new AccountKeysV1APIClient.ErrApplyChangelogEntries()}: ${createReqErr}`
         }
 
-        let [res, uploadErr] = await fromPromise(
-            fetch(req, { signal: ctx.signal }),
-        )
+        let [res, uploadErr] = await fromPromise(fetch(req, { signal: ctx.signal }))
         if (uploadErr) {
             return wrapErr`${new AccountKeysV1APIClient.ErrApplyChangelogEntries()}: error uploading account key: ${uploadErr}`
         }

@@ -38,10 +38,7 @@ export function AlertDialogTrigger(props: AlertDialogTriggerProps) {
 
 export type AlertDialogContentProps = BaseUIAlertDialog.Popup.Props
 
-export function AlertDialogContent({
-    className,
-    ...props
-}: AlertDialogContentProps) {
+export function AlertDialogContent({ className, ...props }: AlertDialogContentProps) {
     return (
         <BaseUIAlertDialog.Portal>
             <BaseUIAlertDialog.Backdrop className="dialog-backdrop alert-dialog" />
@@ -55,15 +52,9 @@ export function AlertDialogContent({
 
 export type AlertDialogTitleProps = BaseUIAlertDialog.Title.Props
 
-export function AlertDialogTitle({
-    className,
-    ...props
-}: AlertDialogTitleProps) {
+export function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
     return (
-        <BaseUIAlertDialog.Title
-            className={clsx("dialog-title", className)}
-            {...props}
-        >
+        <BaseUIAlertDialog.Title className={clsx("dialog-title", className)} {...props}>
             {props.children}
         </BaseUIAlertDialog.Title>
     )
@@ -71,15 +62,9 @@ export function AlertDialogTitle({
 
 export type AlertDialogDescriptionProps = BaseUIAlertDialog.Description.Props
 
-export function AlertDialogDescription({
-    className,
-    ...props
-}: AlertDialogDescriptionProps) {
+export function AlertDialogDescription({ className, ...props }: AlertDialogDescriptionProps) {
     return (
-        <BaseUIAlertDialog.Description
-            className={clsx("dialog-description", className)}
-            {...props}
-        >
+        <BaseUIAlertDialog.Description className={clsx("dialog-description", className)} {...props}>
             {props.children}
         </BaseUIAlertDialog.Description>
     )
@@ -121,12 +106,6 @@ export function AlertDialogCancelButton({
     )
 }
 
-export function AlertDialogIcon(
-    props: React.PropsWithChildren<{ className?: string }>,
-) {
-    return (
-        <div className={clsx("alert-dialog-icon", props.className)}>
-            {props.children}
-        </div>
-    )
+export function AlertDialogIcon(props: React.PropsWithChildren<{ className?: string }>) {
+    return <div className={clsx("alert-dialog-icon", props.className)}>{props.children}</div>
 }

@@ -16,9 +16,7 @@ export function SelectColourScheme({
     wrapperClassName?: string
 }) {
     let t = useT("components/ThemeSwitcher")
-    let [lightColourScheme, setLightColourScheme] = useSetting(
-        "ui.colourScheme.light",
-    )
+    let [lightColourScheme, setLightColourScheme] = useSetting("ui.colourScheme.light")
     let [_, setDarkColourScheme] = useSetting("ui.colourScheme.dark")
     let onChange = useCallback(
         (v?: typeof lightColourScheme) => {
@@ -66,9 +64,7 @@ export function SelectMode({
                 document.startViewTransition(() => {
                     setMode(v ?? DEFAULT_SETTINGS.ui.colourScheme.mode)
                     requestAnimationFrame(() => {
-                        document.documentElement.classList.remove(
-                            "theme-mode-transition",
-                        )
+                        document.documentElement.classList.remove("theme-mode-transition")
                     })
                 })
             }

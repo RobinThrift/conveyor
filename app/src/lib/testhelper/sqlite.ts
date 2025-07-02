@@ -25,9 +25,7 @@ export class SQLite implements Database {
             print: (msg) => console.log(msg),
             printErr: (err) => console.error(err),
             locateFile: () => {
-                return import.meta.resolve(
-                    "../../../build/sqlite3/sqlite3.wasm",
-                )
+                return import.meta.resolve("../../../build/sqlite3/sqlite3.wasm")
             },
             setStatus: (_: string) => {
                 // this NEEDs to be set, otherwise the initialization WILL fail
@@ -90,9 +88,7 @@ export class SQLite implements Database {
         }
 
         return this._lock.run(ctx, async (ctx: Context) => {
-            let [_begin, beginErr] = await fromPromise(
-                this.exec("BEGIN DEFERRED TRANSACTION"),
-            )
+            let [_begin, beginErr] = await fromPromise(this.exec("BEGIN DEFERRED TRANSACTION"))
             if (beginErr) {
                 return Err(beginErr)
             }
@@ -103,9 +99,7 @@ export class SQLite implements Database {
                 return Err(err)
             }
 
-            let [_commit, commitErr] = await fromPromise(
-                this.exec("COMMIT TRANSACTION"),
-            )
+            let [_commit, commitErr] = await fromPromise(this.exec("COMMIT TRANSACTION"))
             if (commitErr) {
                 return Err(commitErr)
             }

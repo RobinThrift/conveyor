@@ -4,9 +4,7 @@ import * as RadixForm from "@radix-ui/react-form"
 import clsx from "clsx"
 
 export function Form(props: RadixForm.FormProps) {
-    return (
-        <RadixForm.Root {...props} className={clsx("form", props.className)} />
-    )
+    return <RadixForm.Root {...props} className={clsx("form", props.className)} />
 }
 
 Form.Message = FormMessage
@@ -45,7 +43,5 @@ export function FormMessage(props: FormMessageProps) {
         return c
     }, [props.error, props.children, props.messages])
 
-    return (
-        <div className={clsx("form-message", props.className)}>{children}</div>
-    )
+    return <div className={clsx("form-message", props.className)}>{children}</div>
 }

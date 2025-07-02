@@ -1,10 +1,4 @@
-import type {
-    NavgationState,
-    NavigationBackend,
-    OnPop,
-    OnPush,
-    Screens,
-} from "@/lib/navigation"
+import type { NavgationState, NavigationBackend, OnPop, OnPush, Screens } from "@/lib/navigation"
 
 export class HistoryNavigationBackend<
     S extends Screens,
@@ -36,9 +30,7 @@ export class HistoryNavigationBackend<
         this._screenToURLMapping = screenToURLMapping
         this._toURLParams = toURLParams
         this._fromURLParams = fromURLParams
-        this._urlToScreenMapping = {} as URLToScreenMapping<
-            ScreenToURLMapping<S>
-        >
+        this._urlToScreenMapping = {} as URLToScreenMapping<ScreenToURLMapping<S>>
 
         for (let screen in screenToURLMapping) {
             let k: keyof URLToScreenMapping<ScreenToURLMapping<S>> = screen
@@ -51,11 +43,7 @@ export class HistoryNavigationBackend<
             if (!e.state) {
                 return
             }
-            let { screen, index, stack, restore } = e.state as NavgationState<
-                S,
-                Stacks,
-                Restore
-            >
+            let { screen, index, stack, restore } = e.state as NavgationState<S, Stacks, Restore>
 
             let lastLength = this._currLength
             this._currLength = window.history.length
@@ -69,9 +57,7 @@ export class HistoryNavigationBackend<
         })
     }
 
-    init(
-        state: NavgationState<S, Stacks, Restore>,
-    ): NavgationState<S, Stacks, Restore> {
+    init(state: NavgationState<S, Stacks, Restore>): NavgationState<S, Stacks, Restore> {
         let next = state
         let current = window.history.state as NavgationState<S, Stacks, Restore>
         if (current) {
@@ -82,9 +68,7 @@ export class HistoryNavigationBackend<
             let currentURL = new URL(window.location.href)
             let mapped =
                 this._urlToScreenMapping[
-                    currentURL.pathname as keyof URLToScreenMapping<
-                        ScreenToURLMapping<S>
-                    >
+                    currentURL.pathname as keyof URLToScreenMapping<ScreenToURLMapping<S>>
                 ]
             next.screen.name = (mapped ?? next.screen.name) as keyof S
         }
@@ -97,15 +81,11 @@ export class HistoryNavigationBackend<
 
         if (import.meta.env.VITE_USE_HASH_HISTORY) {
             try {
-                let hash = JSON.parse(
-                    decodeURIComponent(window.location.hash).substring(1),
-                )
+                let hash = JSON.parse(decodeURIComponent(window.location.hash).substring(1))
 
                 let mapped =
                     this._urlToScreenMapping[
-                        hash.path as keyof URLToScreenMapping<
-                            ScreenToURLMapping<S>
-                        >
+                        hash.path as keyof URLToScreenMapping<ScreenToURLMapping<S>>
                     ]
                 next.screen.name = (mapped ?? next.screen.name) as keyof S
 
@@ -119,9 +99,7 @@ export class HistoryNavigationBackend<
         return next
     }
 
-    public push(
-        next: NavgationState<S, Stacks, Restore>,
-    ): NavgationState<S, Stacks, Restore> {
+    public push(next: NavgationState<S, Stacks, Restore>): NavgationState<S, Stacks, Restore> {
         let current = window.history.state ?? {}
         let nextScreen: NavgationState<S, Stacks, Restore> = {
             ...next,
@@ -138,8 +116,7 @@ export class HistoryNavigationBackend<
         )
 
         let nextURL = this.nextURL(
-            (this._screenToURLMapping[next.screen.name] ??
-                next.screen.name) as string,
+            (this._screenToURLMapping[next.screen.name] ?? next.screen.name) as string,
             next.screen.params as Params,
         )
 
@@ -151,8 +128,7 @@ export class HistoryNavigationBackend<
     }
 
     public pop(n?: number): Promise<NavgationState<S, Stacks, Restore>> {
-        let { promise, resolve } =
-            Promise.withResolvers<NavgationState<S, Stacks, Restore>>()
+        let { promise, resolve } = Promise.withResolvers<NavgationState<S, Stacks, Restore>>()
         if (n) {
             window.history.go(-n)
         } else {
@@ -161,11 +137,7 @@ export class HistoryNavigationBackend<
 
         requestAnimationFrame(() => {
             this._currLength = window.history.length
-            let state = window.history.state as NavgationState<
-                S,
-                Stacks,
-                Restore
-            >
+            let state = window.history.state as NavgationState<S, Stacks, Restore>
             resolve(state)
         })
 
@@ -196,8 +168,11 @@ export class HistoryNavigationBackend<
                     if (!e.state) {
                         return
                     }
-                    let { screen, index, stack, restore } =
-                        e.state as NavgationState<S, Stacks, Restore>
+                    let { screen, index, stack, restore } = e.state as NavgationState<
+                        S,
+                        Stacks,
+                        Restore
+                    >
                     handler({ screen, index, stack, restore })
                 }
                 window.addEventListener("popstate", onPopState)

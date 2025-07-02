@@ -1,10 +1,5 @@
 import { type Extension, StateEffect, StateField } from "@codemirror/state"
-import {
-    Decoration,
-    type DecorationSet,
-    EditorView,
-    ViewPlugin,
-} from "@codemirror/view"
+import { Decoration, type DecorationSet, EditorView, ViewPlugin } from "@codemirror/view"
 
 import type { AttachmentID } from "@/domain/Attachment"
 
@@ -18,17 +13,15 @@ export type StartTransferEffectValue = {
     to: number
 }
 
-export const startTransferEffect = StateEffect.define<StartTransferEffectValue>(
-    {
-        map(st, mapping) {
-            return {
-                ...st,
-                from: mapping.mapPos(st.from),
-                to: mapping.mapPos(st.to),
-            }
-        },
+export const startTransferEffect = StateEffect.define<StartTransferEffectValue>({
+    map(st, mapping) {
+        return {
+            ...st,
+            from: mapping.mapPos(st.from),
+            to: mapping.mapPos(st.to),
+        }
     },
-)
+})
 export const endTransferEffect = StateEffect.define<{
     id: AttachmentID
     status: "done" | "error"
@@ -116,22 +109,14 @@ const transferState = StateField.define<{
         let decorations = current.decorations.map(transaction.changes)
         for (let e of transaction.effects) {
             if (e.is(startTransferEffect)) {
-                if (
-                    states[e.value.id] === "done" ||
-                    states[e.value.id] === "error"
-                ) {
+                if (states[e.value.id] === "done" || states[e.value.id] === "error") {
                     continue
                 }
 
                 states[e.value.id] = e.value.status
 
                 decorations = decorations.update({
-                    add: [
-                        markTransferring(e.value.id).range(
-                            e.value.from,
-                            e.value.to + 1,
-                        ),
-                    ],
+                    add: [markTransferring(e.value.id).range(e.value.from, e.value.to + 1)],
                 })
                 continue
             }
@@ -149,12 +134,7 @@ const transferState = StateField.define<{
                 })
                 if (e.value.status === "error") {
                     decorations = decorations.update({
-                        add: [
-                            markError(e.value.id).range(
-                                e.value.from,
-                                e.value.to + 1,
-                            ),
-                        ],
+                        add: [markError(e.value.id).range(e.value.from, e.value.to + 1)],
                     })
                 }
             }

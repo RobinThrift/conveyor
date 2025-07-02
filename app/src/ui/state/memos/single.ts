@@ -19,10 +19,7 @@ export const slice = createSlice({
     name: "single",
     initialState,
     reducers: {
-        setCurrentSingleMemoID: (
-            state,
-            { payload }: PayloadAction<{ id: MemoID }>,
-        ) => {
+        setCurrentSingleMemoID: (state, { payload }: PayloadAction<{ id: MemoID }>) => {
             if (state.memoID === payload.id) {
                 return
             }
@@ -36,10 +33,7 @@ export const slice = createSlice({
             state.isLoading = true
         },
 
-        setCurrentSingleMemo: (
-            state,
-            { payload }: PayloadAction<{ memo: Memo }>,
-        ) =>
+        setCurrentSingleMemo: (state, { payload }: PayloadAction<{ memo: Memo }>) =>
             ({
                 ...state,
                 isLoading: false,

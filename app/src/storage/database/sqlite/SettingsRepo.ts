@@ -13,9 +13,7 @@ export class SettingsRepo {
         this._db = db
     }
 
-    public async loadSettings(
-        ctx: Context<{ db: DBExec }>,
-    ): AsyncResult<Settings> {
+    public async loadSettings(ctx: Context<{ db: DBExec }>): AsyncResult<Settings> {
         let settings = structuredClone(DEFAULT_SETTINGS)
 
         let [entries, err] = await fromPromise(
@@ -26,11 +24,7 @@ export class SettingsRepo {
         }
 
         for (let entry of entries) {
-            settings = setPath(
-                settings,
-                entry.key as KeyPaths<Settings>,
-                entry.value,
-            )
+            settings = setPath(settings, entry.key as KeyPaths<Settings>, entry.value)
         }
 
         return Ok(settings)
@@ -40,8 +34,6 @@ export class SettingsRepo {
         ctx: Context<{ db: DBExec }>,
         args: { key: K; value: ValueAt<Settings, K> },
     ): AsyncResult<void> {
-        return fromPromise(
-            queries.saveSetting(ctx.getData("db", this._db), args, ctx.signal),
-        )
+        return fromPromise(queries.saveSetting(ctx.getData("db", this._db), args, ctx.signal))
     }
 }

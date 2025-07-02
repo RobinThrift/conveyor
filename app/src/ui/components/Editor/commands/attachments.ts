@@ -27,9 +27,7 @@ export async function insertAttachment(
     let insertText = `[${filename}](attachment://${id})`
     if (isImg(mime)) {
         try {
-            let thumbhash = await thumbhashFromFile(
-                new Blob([data], { type: mime }),
-            )
+            let thumbhash = await thumbhashFromFile(new Blob([data], { type: mime }))
             insertText = `![${filename}](attachment://${id}?thumbhash=${thumbhash})`
         } catch (err) {
             console.error("error generating thumbhash for image: ", err)

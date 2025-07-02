@@ -5,10 +5,7 @@ export type UsePromise<T> =
     | { resolved: true; result: T; error: null }
     | { resolved: true; result: null; error: Error }
 
-export function usePromise<T>(
-    fn: () => Promise<T>,
-    deps: DependencyList = [],
-): UsePromise<T> {
+export function usePromise<T>(fn: () => Promise<T>, deps: DependencyList = []): UsePromise<T> {
     let [state, setState] = useState<UsePromise<T>>({ resolved: false })
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: edge case

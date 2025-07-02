@@ -14,10 +14,7 @@ export const registerEffects = (
 ) => {
     startListening({
         actionCreator: transfer.slice.actions.startTransfer,
-        effect: async (
-            { payload },
-            { cancelActiveListeners, dispatch, signal },
-        ) => {
+        effect: async ({ payload }, { cancelActiveListeners, dispatch, signal }) => {
             cancelActiveListeners()
 
             let ctx = BaseContext.withSignal(signal)

@@ -19,21 +19,17 @@ const _db: Promise<IndexedDB<Tables>> = (async () => {
         return undefined as any
     }
 
-    let [db, err] = await IndexedDB.open<Tables>(
-        BaseContext,
-        "conveyor-secure-storage",
-        [
-            async (db) => {
-                db.createObjectStore("keys", {
-                    keyPath: "name",
-                })
-                db.createObjectStore("items", {
-                    keyPath: "key",
-                })
-                return Ok(undefined)
-            },
-        ],
-    )
+    let [db, err] = await IndexedDB.open<Tables>(BaseContext, "conveyor-secure-storage", [
+        async (db) => {
+            db.createObjectStore("keys", {
+                keyPath: "name",
+            })
+            db.createObjectStore("items", {
+                keyPath: "key",
+            })
+            return Ok(undefined)
+        },
+    ])
 
     if (err) {
         throw err
@@ -47,11 +43,7 @@ const localCryptoKey = Promise.withResolvers<globalThis.CryptoKeyPair>()
 export const WebCryptoDeviceSecureStorageWorker = createWorker({
     init: async (ctx: Context): AsyncResult<void> => {
         let db = await _db
-        let [cryptoKey, cryptoKeyErr] = await db.get(
-            ctx,
-            "keys",
-            LOCAL_KEY_V1_NAME,
-        )
+        let [cryptoKey, cryptoKeyErr] = await db.get(ctx, "keys", LOCAL_KEY_V1_NAME)
         if (cryptoKeyErr) {
             return wrapErr`error initialising: ${cryptoKey}`
         }
@@ -72,8 +64,7 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
 
         if (insertedErr) {
             if (isErr(insertedErr, "DataError")) {
-                ;[generatedKey, generatedKeyErr] =
-                    await generateECDHLocalCryptoKey()
+                ;[generatedKey, generatedKeyErr] = await generateECDHLocalCryptoKey()
                 if (generatedKeyErr) {
                     return wrapErr`error generating key: ${generatedKeyErr}`
                 }
@@ -147,9 +138,7 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
             return Ok(undefined)
         }
 
-        let [plaintext, decryptErr] = await fromPromise(
-            decryptData(cryptoKey, item.data),
-        )
+        let [plaintext, decryptErr] = await fromPromise(decryptData(cryptoKey, item.data))
         if (decryptErr) {
             return wrapErr`error decrypting data: ${key}: ${decryptErr}`
         }
@@ -171,25 +160,18 @@ export const WebCryptoDeviceSecureStorageWorker = createWorker({
             return Err(cryptoKeyErr)
         }
 
-        let [ciphertext, encryptErr] = await fromPromise(
-            encryptData(cryptoKey, encodeText(value)),
-        )
+        let [ciphertext, encryptErr] = await fromPromise(encryptData(cryptoKey, encodeText(value)))
         if (encryptErr) {
             cancel()
             return wrapErr`error encrypting data: ${encryptErr}`
         }
 
-        let insterted = await db.insertOrUpdate(ctx, "items", [
-            { key, data: ciphertext },
-        ])
+        let insterted = await db.insertOrUpdate(ctx, "items", [{ key, data: ciphertext }])
         cancel()
         return insterted
     },
 
-    removeItem: async (
-        ctx: Context,
-        { key }: { key: string },
-    ): AsyncResult<void> => {
+    removeItem: async (ctx: Context, { key }: { key: string }): AsyncResult<void> => {
         let db = await _db
 
         return db.delete(ctx, "items", key)
@@ -226,11 +208,9 @@ async function generateX25519LocalCryptoKey(): AsyncResult<CryptoKeyPair> {
 
 async function generateECDHLocalCryptoKey(): AsyncResult<CryptoKeyPair> {
     let [cryptoKey, err] = await fromPromise(
-        globalThis.crypto.subtle.generateKey(
-            { name: "ECDH", namedCurve: "P-384" },
-            false,
-            ["deriveKey"],
-        ) as Promise<CryptoKeyPair>,
+        globalThis.crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-384" }, false, [
+            "deriveKey",
+        ]) as Promise<CryptoKeyPair>,
     )
 
     if (err) {
@@ -242,10 +222,7 @@ async function generateECDHLocalCryptoKey(): AsyncResult<CryptoKeyPair> {
 
 const IV_LEN = 12
 
-async function encryptData(
-    keyPair: CryptoKeyPair,
-    data: Uint8Array,
-): Promise<ArrayBuffer> {
+async function encryptData(keyPair: CryptoKeyPair, data: Uint8Array): Promise<ArrayBuffer> {
     let iv = generateIV()
     let key = await deriveKey(keyPair)
 
@@ -266,10 +243,7 @@ async function encryptData(
     return buf
 }
 
-async function decryptData(
-    keyPair: CryptoKeyPair,
-    data: ArrayBuffer,
-): Promise<ArrayBuffer> {
+async function decryptData(keyPair: CryptoKeyPair, data: ArrayBuffer): Promise<ArrayBuffer> {
     const iv = data.slice(0, IV_LEN)
     const encrypted = data.slice(IV_LEN)
     let key = await deriveKey(keyPair)

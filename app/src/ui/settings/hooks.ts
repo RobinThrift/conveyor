@@ -9,18 +9,10 @@ import { type RootState, actions, selectors } from "@/ui/state"
 export function useSetting<K extends KeyPaths<Settings>>(
     keypath: K,
 ): [ValueAt<Settings, K>, (v: ValueAt<Settings, K>) => void] {
-    let value = useSelector((state: RootState) =>
-        selectors.settings.value(state, keypath),
-    )
+    let value = useSelector((state: RootState) => selectors.settings.value(state, keypath))
     let dispatch = useDispatch()
     return useMemo(
-        () => [
-            value,
-            (v) =>
-                dispatch(
-                    actions.settings.set({ key: keypath, value: v as any }),
-                ),
-        ],
+        () => [value, (v) => dispatch(actions.settings.set({ key: keypath, value: v as any }))],
         [keypath, value, dispatch],
     )
 }

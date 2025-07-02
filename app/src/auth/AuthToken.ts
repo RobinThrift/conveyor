@@ -26,14 +26,9 @@ export class PasswordChangeRequiredError extends Error {
     }
 }
 
-const ErrAuthTokenFromJSON = new Error(
-    "error deserilising auth token from json",
-)
-export function authTokenFromJSON(
-    raw: Uint8Array<ArrayBufferLike>,
-): Result<AuthToken> {
-    let [obj, deserializationErr] =
-        jsonDeserialize<Record<string, unknown>>(raw)
+const ErrAuthTokenFromJSON = new Error("error deserilising auth token from json")
+export function authTokenFromJSON(raw: Uint8Array<ArrayBufferLike>): Result<AuthToken> {
+    let [obj, deserializationErr] = jsonDeserialize<Record<string, unknown>>(raw)
     if (deserializationErr) {
         return wrapErr`${ErrAuthTokenFromJSON}: ${deserializationErr}`
     }
@@ -43,9 +38,7 @@ export function authTokenFromJSON(
         return wrapErr`${ErrAuthTokenFromJSON}: error parsing expiresAt date: ${expiresAtParseErr}`
     }
 
-    let [refreshExpiresAt, refreshExpiresAtParseErr] = parseJSONDate(
-        obj.refreshExpiresAt as string,
-    )
+    let [refreshExpiresAt, refreshExpiresAtParseErr] = parseJSONDate(obj.refreshExpiresAt as string)
     if (refreshExpiresAtParseErr) {
         return wrapErr`${ErrAuthTokenFromJSON}: error parsing refreshExpiresAt date: ${refreshExpiresAtParseErr}`
     }

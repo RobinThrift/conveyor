@@ -19,8 +19,7 @@ export function AboutTab() {
                     <div className="flex gap-2">
                         <dt>{t.VersionLabel}</dt>
                         <dd className="font-semibold">
-                            {buildInfo.version} (
-                            {buildInfo.commitHash.substring(0, 7)}
+                            {buildInfo.version} ({buildInfo.commitHash.substring(0, 7)}
                             {") "}
                             <a
                                 className="text-primary hover:underline focus:outline"
@@ -33,9 +32,7 @@ export function AboutTab() {
                     </div>
                     <div className="flex gap-2">
                         <dt>{t.PublishDateLabel}</dt>
-                        <dd className="font-semibold">
-                            {buildInfo.commitDate}
-                        </dd>
+                        <dd className="font-semibold">{buildInfo.commitDate}</dd>
                     </div>
 
                     {buildInfo.server && (
@@ -45,23 +42,16 @@ export function AboutTab() {
                                 <dd className="font-semibold">
                                     {buildInfo.server.version}
                                     {buildInfo.server.commitHash &&
-                                        `(${buildInfo.server.commitHash.substring(
-                                            0,
-                                            7,
-                                        )})`}
+                                        `(${buildInfo.server.commitHash.substring(0, 7)})`}
                                 </dd>
                             </div>
                             <div className="flex gap-2">
                                 <dt>{t.ServerPublishDateLabel}</dt>
-                                <dd className="font-semibold">
-                                    {buildInfo.server.commitDate}
-                                </dd>
+                                <dd className="font-semibold">{buildInfo.server.commitDate}</dd>
                             </div>
                             <div className="flex gap-2">
                                 <dt>{t.ServerGoVersionLabel}</dt>
-                                <dd className="font-semibold">
-                                    {buildInfo.server.goVersion}
-                                </dd>
+                                <dd className="font-semibold">{buildInfo.server.goVersion}</dd>
                             </div>
                         </>
                     )}

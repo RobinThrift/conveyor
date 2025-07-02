@@ -29,10 +29,7 @@ function buildDecorations(state: EditorState) {
             }
 
             if (node.name === "HeaderMark") {
-                if (
-                    node.node?.parent &&
-                    withinRange(state.selection.main, node.node?.parent)
-                ) {
+                if (node.node?.parent && withinRange(state.selection.main, node.node?.parent)) {
                     return
                 }
                 let mark = Decoration.mark({
@@ -77,9 +74,6 @@ function buildDecorations(state: EditorState) {
     return Decoration.set(decorations)
 }
 
-function withinRange(
-    a: { from: number; to: number },
-    b: { from: number; to: number },
-): boolean {
+function withinRange(a: { from: number; to: number }, b: { from: number; to: number }): boolean {
     return a.from <= b.to && b.from <= a.to
 }

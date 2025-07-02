@@ -1,11 +1,5 @@
 import React, { useContext, useRef } from "react"
-import {
-    mergeProps,
-    useCalendarCell,
-    useFocusRing,
-    useHover,
-    usePress,
-} from "react-aria"
+import { mergeProps, useCalendarCell, useFocusRing, useHover, usePress } from "react-aria"
 import {
     type CalendarCellProps as AriaCalendarCellProps,
     CalendarStateContext as AriaCalendarStateContext,

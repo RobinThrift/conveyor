@@ -75,10 +75,8 @@ export function useTextEditorState(opts: {
         () =>
             ({
                 toggleBold: () => cmView.current && toggleBold(cmView.current),
-                toggleItalics: () =>
-                    cmView.current && toggleItalics(cmView.current),
-                toggleMonospace: () =>
-                    cmView.current && toggleMonospace(cmView.current),
+                toggleItalics: () => cmView.current && toggleItalics(cmView.current),
+                toggleMonospace: () => cmView.current && toggleMonospace(cmView.current),
                 insertLink: () => {
                     if (!cmView.current) {
                         return

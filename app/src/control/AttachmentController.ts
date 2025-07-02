@@ -1,12 +1,5 @@
-import {
-    ATTACHMENT_BASE_DIR,
-    type Attachment,
-    type AttachmentID,
-} from "@/domain/Attachment"
-import type {
-    AttachmentChangelogEntry,
-    ChangelogEntry,
-} from "@/domain/Changelog"
+import { ATTACHMENT_BASE_DIR, type Attachment, type AttachmentID } from "@/domain/Attachment"
+import type { AttachmentChangelogEntry, ChangelogEntry } from "@/domain/Changelog"
 import type { MemoID } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
@@ -58,10 +51,7 @@ export class AttachmentController {
             return wrapErr`error getting attachment: ${id}: ${err}`
         }
 
-        let [data, readErr] = await this._fs.read(
-            ctx,
-            this._filepath(attachment.filepath),
-        )
+        let [data, readErr] = await this._fs.read(ctx, this._filepath(attachment.filepath))
         if (readErr) {
             if (this._remote && isErr(readErr, FSNotFoundError)) {
                 return this._getAttachmentDataFromRemote(ctx, attachment)
@@ -96,11 +86,10 @@ export class AttachmentController {
             return Err(new Error("no remote fallback set"))
         }
 
-        let [fetched, fetchErr] =
-            await this._remote.getAttachmentDataByFilepath(
-                ctx,
-                attachment.filepath,
-            )
+        let [fetched, fetchErr] = await this._remote.getAttachmentDataByFilepath(
+            ctx,
+            attachment.filepath,
+        )
         if (fetchErr) {
             return wrapErr`error getting attachment from remote: ${fetchErr}`
         }
@@ -170,23 +159,22 @@ export class AttachmentController {
             return Err(createErr)
         }
 
-        let [_entryCreate, entryCreateErr] =
-            await this._changelog.createChangelogEntry(ctx, {
-                revision: 1,
-                targetType: "attachments",
-                targetID: created.id,
-                value: {
-                    created: {
-                        originalFilename: filename,
-                        contentType: mimeTypeForFilename(filename),
-                        filepath: attachment.filepath,
-                        sha256: encodeToBase64(attachment.sha256),
-                        sizeBytes: attachment.sizeBytes,
-                    },
-                } satisfies AttachmentChangelogEntry["value"],
-                isSynced: false,
-                isApplied: true,
-            })
+        let [_entryCreate, entryCreateErr] = await this._changelog.createChangelogEntry(ctx, {
+            revision: 1,
+            targetType: "attachments",
+            targetID: created.id,
+            value: {
+                created: {
+                    originalFilename: filename,
+                    contentType: mimeTypeForFilename(filename),
+                    filepath: attachment.filepath,
+                    sha256: encodeToBase64(attachment.sha256),
+                    sizeBytes: attachment.sizeBytes,
+                },
+            } satisfies AttachmentChangelogEntry["value"],
+            isSynced: false,
+            isApplied: true,
+        })
         if (entryCreateErr) {
             return Err(entryCreateErr)
         }
@@ -211,8 +199,10 @@ export class AttachmentController {
     ): AsyncResult<void> {
         let attachmentIDs = new Set(extractAttachmentIDs(content))
 
-        let [existingAttachments, listAttachmentsErr] =
-            await this._repo.listAttachmentsForMemo(ctx, memoID)
+        let [existingAttachments, listAttachmentsErr] = await this._repo.listAttachmentsForMemo(
+            ctx,
+            memoID,
+        )
         if (listAttachmentsErr) {
             return wrapErr`error updating memo attachments: error getting attachments for memo: ${listAttachmentsErr}`
         }
@@ -227,22 +217,14 @@ export class AttachmentController {
         }
 
         if (removed.length !== 0) {
-            let [_, err] = await this._repo.deleteMemoAttachmentLinks(
-                ctx,
-                memoID,
-                removed,
-            )
+            let [_, err] = await this._repo.deleteMemoAttachmentLinks(ctx, memoID, removed)
             if (err) {
                 return wrapErr`error updating memo attachments: error deleting memo attachment links: ${err}`
             }
         }
 
         for (let url of attachmentIDs) {
-            let [_, err] = await this._repo.createMemoAttachmentLink(
-                ctx,
-                memoID,
-                url,
-            )
+            let [_, err] = await this._repo.createMemoAttachmentLink(ctx, memoID, url)
             if (err) {
                 return wrapErr`error updating memo attachments: error creating memo attachment link: ${err}`
             }
@@ -267,23 +249,18 @@ export class AttachmentController {
         for (let entry of entries) {
             if ("created" in entry.value) {
                 let attachment = entry.value.created
-                let [_, err] = await this._transactioner.inTransaction(
-                    ctx,
-                    (ctx) => {
-                        let [sha256, sha256Err] = dataFromBase64(
-                            attachment.sha256,
-                        )
-                        if (sha256Err) {
-                            return Promise.resolve(Err(sha256Err))
-                        }
+                let [_, err] = await this._transactioner.inTransaction(ctx, (ctx) => {
+                    let [sha256, sha256Err] = dataFromBase64(attachment.sha256)
+                    if (sha256Err) {
+                        return Promise.resolve(Err(sha256Err))
+                    }
 
-                        return this._repo.createAttachment(ctx, {
-                            ...attachment,
-                            id: entry.targetID,
-                            sha256,
-                        })
-                    },
-                )
+                    return this._repo.createAttachment(ctx, {
+                        ...attachment,
+                        id: entry.targetID,
+                        sha256,
+                    })
+                })
                 if (err) {
                     return Err(err)
                 }
@@ -327,19 +304,12 @@ export class AttachmentController {
             filepath += `/${h}`
         }
 
-        let [_, mkdirpErr] = await this._fs.mkdirp(
-            ctx,
-            this._filepath(dirname(filepath)),
-        )
+        let [_, mkdirpErr] = await this._fs.mkdirp(ctx, this._filepath(dirname(filepath)))
         if (mkdirpErr) {
             return Err(mkdirpErr)
         }
 
-        let [_write, writeErr] = await this._fs.write(
-            ctx,
-            this._filepath(filepath),
-            content,
-        )
+        let [_write, writeErr] = await this._fs.write(ctx, this._filepath(filepath), content)
         if (writeErr) {
             return Err(writeErr)
         }
@@ -357,10 +327,7 @@ export class AttachmentController {
 }
 
 interface Repo {
-    getAttachment(
-        ctx: Context<{ db?: DBExec }>,
-        id: AttachmentID,
-    ): AsyncResult<Attachment>
+    getAttachment(ctx: Context<{ db?: DBExec }>, id: AttachmentID): AsyncResult<Attachment>
 
     createAttachment(
         ctx: Context<{ db?: DBExec }>,
@@ -369,10 +336,7 @@ interface Repo {
         },
     ): AsyncResult<Attachment>
 
-    listAttachmentsForMemo(
-        ctx: Context<{ db?: DBExec }>,
-        memoID: MemoID,
-    ): AsyncResult<Attachment[]>
+    listAttachmentsForMemo(ctx: Context<{ db?: DBExec }>, memoID: MemoID): AsyncResult<Attachment[]>
 
     deleteMemoAttachmentLinks(
         ctx: Context<{ db?: DBExec }>,
@@ -399,14 +363,10 @@ interface Changelog {
 }
 
 interface RemoteAttachmentStorage {
-    getAttachmentDataByFilepath(
-        ctx: Context,
-        filepath: string,
-    ): AsyncResult<ArrayBufferLike>
+    getAttachmentDataByFilepath(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike>
 }
 
-const attachmentPattern =
-    /\[.*?\]\(attachment:\/\/(?<id>[A-Za-z0-9_-]{21}).*?\)/g
+const attachmentPattern = /\[.*?\]\(attachment:\/\/(?<id>[A-Za-z0-9_-]{21}).*?\)/g
 
 function extractAttachmentIDs(content: string): string[] {
     let attachmentIDs: string[] = []

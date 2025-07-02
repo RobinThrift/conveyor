@@ -8,10 +8,7 @@ import { Editor } from "@/ui/components/Editor"
 import { Loader } from "@/ui/components/Loader"
 
 import clsx from "clsx"
-import {
-    type UpdateMemoRequest,
-    useEditMemoScreenState,
-} from "./useEditMemoScreenState"
+import { type UpdateMemoRequest, useEditMemoScreenState } from "./useEditMemoScreenState"
 
 export interface EditMemoScreenProps {
     className?: string

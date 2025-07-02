@@ -9,9 +9,7 @@ export function dateFromSQLite(value: string | null): Date | null {
     return parse(value)
 }
 
-export function dateToSQLite(
-    value: Date | CalendarDateTime | string | undefined,
-): string | null {
+export function dateToSQLite(value: Date | CalendarDateTime | string | undefined): string | null {
     if (!value) {
         return null
     }

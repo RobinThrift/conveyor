@@ -13,10 +13,7 @@ export function on<K extends keyof Events>(event: K, callback: Events[K]) {
     return EventBus.on(event, callback)
 }
 
-export function emit<K extends keyof Events>(
-    event: K,
-    ...args: Parameters<Events[K]>
-) {
+export function emit<K extends keyof Events>(event: K, ...args: Parameters<Events[K]>) {
     return EventBus.emit(event, ...(args as any))
 }
 

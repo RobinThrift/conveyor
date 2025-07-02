@@ -75,11 +75,7 @@ export class AttachmentRepo {
         }
 
         if (created === null) {
-            return Err(
-                new Error(
-                    `error creating attachment: ${attachment.originalFilename}`,
-                ),
-            )
+            return Err(new Error(`error creating attachment: ${attachment.originalFilename}`))
         }
 
         return Ok({
@@ -153,20 +149,14 @@ export class AttachmentRepo {
         filepath: string,
     ): AsyncResult<Attachment> {
         let [attachment, err] = await fromPromise(
-            queries.getAttachmentByFilepath(
-                ctx.getData("db", this._db),
-                { filepath },
-                ctx.signal,
-            ),
+            queries.getAttachmentByFilepath(ctx.getData("db", this._db), { filepath }, ctx.signal),
         )
         if (err) {
             return wrapErr`error getting attachment by filepath: ${filepath}: $err`
         }
 
         if (attachment === null) {
-            return Err(
-                new Error(`attachment not found for filepath: ${filepath}`),
-            )
+            return Err(new Error(`attachment not found for filepath: ${filepath}`))
         }
 
         return Ok({

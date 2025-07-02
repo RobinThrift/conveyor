@@ -43,11 +43,7 @@ export class NoopDeviceSecureStorage implements DeviceSecureStorage {
         return Err(new NoopDeviceSecureStorageError(`getItem: ${key}`))
     }
 
-    public async setItem(
-        _ctx: Context,
-        key: string,
-        _value: string,
-    ): AsyncResult<void> {
+    public async setItem(_ctx: Context, key: string, _value: string): AsyncResult<void> {
         return Err(new NoopDeviceSecureStorageError(`setItem: ${key}`))
     }
 

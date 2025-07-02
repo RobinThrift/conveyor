@@ -1,8 +1,4 @@
-import {
-    autocompletion,
-    closeBrackets,
-    closeBracketsKeymap,
-} from "@codemirror/autocomplete"
+import { autocompletion, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete"
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import {
@@ -57,12 +53,7 @@ export const extensions = ({
     ): AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>
 }) => {
     let exts: Extension[] = [
-        keymap.of([
-            ...closeBracketsKeymap,
-            ...defaultKeymap,
-            ...historyKeymap,
-            ...searchKeymap,
-        ]),
+        keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...searchKeymap]),
         indentUnit.of(" ".repeat(4)),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         bracketMatching(),

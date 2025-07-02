@@ -54,10 +54,8 @@ export const slice = createSlice({
     },
 
     selectors: {
-        value: <K extends KeyPaths<Settings>>(
-            state: SettingsState,
-            key: K,
-        ): ValueAt<Settings, K> => getPath(state.values, key),
+        value: <K extends KeyPaths<Settings>>(state: SettingsState, key: K): ValueAt<Settings, K> =>
+            getPath(state.values, key),
         isLoading: (state) => state.isLoading,
         isLoaded: (state) => state.isLoaded,
         error: (state) => state.error,

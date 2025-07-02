@@ -1,8 +1,6 @@
 import { useEffect } from "react"
 
-export function usePreventScroll({
-    isDisabled,
-}: { isDisabled?: boolean } = {}) {
+export function usePreventScroll({ isDisabled }: { isDisabled?: boolean } = {}) {
     useEffect(() => {
         if (isDisabled) {
             return
@@ -14,9 +12,7 @@ export function usePreventScroll({
         document.documentElement.style.overscrollBehavior = "contain"
 
         let ontouchstart = (e: TouchEvent) => {
-            scrollingElement = getNearestScrolableParent(
-                e.target as HTMLElement,
-            )
+            scrollingElement = getNearestScrolableParent(e.target as HTMLElement)
         }
 
         let ontouchmove = (e: TouchEvent) => {
@@ -72,18 +68,13 @@ function getNearestScrolableParent(node: HTMLElement): HTMLElement {
         scrollableNode = scrollableNode.parentElement
     }
 
-    return (
-        scrollableNode ||
-        (document.scrollingElement as HTMLElement) ||
-        document.documentElement
-    )
+    return scrollableNode || (document.scrollingElement as HTMLElement) || document.documentElement
 }
 
 function isScrollable(node: HTMLElement): boolean {
     let isScrollable = window.getComputedStyle(node).overflow.includes("auto")
     return (
         isScrollable &&
-        (node.scrollHeight !== node.clientHeight ||
-            node.scrollWidth !== node.clientWidth)
+        (node.scrollHeight !== node.clientHeight || node.scrollWidth !== node.clientWidth)
     )
 }

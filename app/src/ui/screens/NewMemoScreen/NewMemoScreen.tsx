@@ -6,15 +6,8 @@ import { Loader } from "@/ui/components/Loader"
 import { useNewMemoScreenState } from "./useNewMemoScreenState"
 
 export function NewMemoScreen() {
-    let {
-        newMemo,
-        isLoading,
-        tags,
-        createMemo,
-        cancelNew,
-        transferAttachment,
-        settings,
-    } = useNewMemoScreenState()
+    let { newMemo, isLoading, tags, createMemo, cancelNew, transferAttachment, settings } =
+        useNewMemoScreenState()
 
     return (
         <div className="new-memo-screen">

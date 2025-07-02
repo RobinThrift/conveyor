@@ -22,22 +22,13 @@ suite("control/AuthController", async () => {
         let { ctx, cleanup, authCtrl } = await setupAuthControllerTest({
             authAPIClient: {
                 getTokenUsingCredentials: async (_, { username, password }) => {
-                    if (
-                        username === validUsername &&
-                        password === validPassword
-                    ) {
+                    if (username === validUsername && password === validPassword) {
                         return Ok<AuthToken>({
                             origin: "conveyor.dev",
-                            accessToken:
-                                "MOCK_ACCESS_TOKEN" as PlaintextAuthTokenValue,
-                            expiresAt: currentDateTime()
-                                .add({ hours: 5 })
-                                .toDate("utc"),
-                            refreshToken:
-                                "MOCK_REFRESH_TOKEN" as PlaintextAuthTokenValue,
-                            refreshExpiresAt: currentDateTime()
-                                .add({ days: 30 })
-                                .toDate("utc"),
+                            accessToken: "MOCK_ACCESS_TOKEN" as PlaintextAuthTokenValue,
+                            expiresAt: currentDateTime().add({ hours: 5 }).toDate("utc"),
+                            refreshToken: "MOCK_REFRESH_TOKEN" as PlaintextAuthTokenValue,
+                            refreshExpiresAt: currentDateTime().add({ days: 30 }).toDate("utc"),
                         })
                     }
 
@@ -77,11 +68,9 @@ suite("control/AuthController", async () => {
                 if (refreshToken === validRefreshToken) {
                     return Ok<AuthToken>({
                         origin: "conveyor.dev",
-                        accessToken:
-                            refreshedAccessToken as PlaintextAuthTokenValue,
+                        accessToken: refreshedAccessToken as PlaintextAuthTokenValue,
                         expiresAt: now.add({ hours: 5 }).toDate("utc"),
-                        refreshToken:
-                            refreshedRefreshToken as PlaintextAuthTokenValue,
+                        refreshToken: refreshedRefreshToken as PlaintextAuthTokenValue,
                         refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
                     })
                 }
@@ -100,10 +89,9 @@ suite("control/AuthController", async () => {
         })
 
         test("valid current token", async ({ onTestFinished }) => {
-            let { ctx, cleanup, authCtrl, storage } =
-                await setupAuthControllerTest({
-                    authAPIClient,
-                })
+            let { ctx, cleanup, authCtrl, storage } = await setupAuthControllerTest({
+                authAPIClient,
+            })
             onTestFinished(cleanup)
 
             await storage.setItem(ctx, "conveyor.dev", {
@@ -119,13 +107,10 @@ suite("control/AuthController", async () => {
             assert.deepEqual(token, validAccessToken)
         })
 
-        test("expired token, valid refresh token", async ({
-            onTestFinished,
-        }) => {
-            let { ctx, cleanup, authCtrl, storage } =
-                await setupAuthControllerTest({
-                    authAPIClient,
-                })
+        test("expired token, valid refresh token", async ({ onTestFinished }) => {
+            let { ctx, cleanup, authCtrl, storage } = await setupAuthControllerTest({
+                authAPIClient,
+            })
             onTestFinished(cleanup)
 
             await storage.setItem(ctx, "conveyor.dev", {
@@ -141,13 +126,10 @@ suite("control/AuthController", async () => {
             assert.deepEqual(token, refreshedAccessToken)
         })
 
-        test("expired token, expired refresh token", async ({
-            onTestFinished,
-        }) => {
-            let { ctx, cleanup, authCtrl, storage } =
-                await setupAuthControllerTest({
-                    authAPIClient,
-                })
+        test("expired token, expired refresh token", async ({ onTestFinished }) => {
+            let { ctx, cleanup, authCtrl, storage } = await setupAuthControllerTest({
+                authAPIClient,
+            })
             onTestFinished(cleanup)
 
             await storage.setItem(ctx, "conveyor.dev", {
@@ -161,21 +143,17 @@ suite("control/AuthController", async () => {
             await assertErrResult(authCtrl.getToken(ctx))
         })
 
-        test("expired token, invalid refresh token", async ({
-            onTestFinished,
-        }) => {
-            let { ctx, cleanup, authCtrl, storage } =
-                await setupAuthControllerTest({
-                    authAPIClient,
-                })
+        test("expired token, invalid refresh token", async ({ onTestFinished }) => {
+            let { ctx, cleanup, authCtrl, storage } = await setupAuthControllerTest({
+                authAPIClient,
+            })
             onTestFinished(cleanup)
 
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
                 expiresAt: now.subtract({ hours: 5 }).toDate("utc"),
-                refreshToken:
-                    "INVALID_REFRESH_TOKEN" as PlaintextAuthTokenValue,
+                refreshToken: "INVALID_REFRESH_TOKEN" as PlaintextAuthTokenValue,
                 refreshExpiresAt: now.add({ days: 2 }).toDate("utc"),
             })
 
@@ -225,12 +203,10 @@ async function setupAuthControllerTest({
             setBaseURL: () => {},
             getTokenUsingCredentials:
                 authAPIClient?.getTokenUsingCredentials ??
-                (async () =>
-                    Err(new Error("getTokenUsingCredentials unimplemented"))),
+                (async () => Err(new Error("getTokenUsingCredentials unimplemented"))),
             getTokenUsingRefreshToken:
                 authAPIClient?.getTokenUsingRefreshToken ??
-                (async () =>
-                    Err(new Error("getTokenUsingRefreshToken unimplemented"))),
+                (async () => Err(new Error("getTokenUsingRefreshToken unimplemented"))),
             changePassword:
                 authAPIClient?.changePassword ??
                 (async () => Err(new Error("changePassword unimplemented"))),

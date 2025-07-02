@@ -33,11 +33,7 @@ export async function getAttachment(
     args: GetAttachmentArgs,
     abort?: AbortSignal,
 ): Promise<GetAttachmentRow | null> {
-    let result = await database.queryOne(
-        getAttachmentQuery,
-        [args.publicId],
-        abort,
-    )
+    let result = await database.queryOne(getAttachmentQuery, [args.publicId], abort)
     if (result === undefined) {
         return null
     }
@@ -71,11 +67,7 @@ export async function getAttachmentByFilepath(
     args: GetAttachmentByFilepathArgs,
     abort?: AbortSignal,
 ): Promise<GetAttachmentByFilepathRow | null> {
-    let result = await database.queryOne(
-        getAttachmentByFilepathQuery,
-        [args.filepath],
-        abort,
-    )
+    let result = await database.queryOne(getAttachmentByFilepathQuery, [args.filepath], abort)
     if (result === undefined) {
         return null
     }
@@ -131,14 +123,8 @@ export async function listAttachments(
     args: ListAttachmentsArgs,
     abort?: AbortSignal,
 ): Promise<ListAttachmentsRow[]> {
-    let result = await database.query(
-        listAttachmentsQuery,
-        [args.pageAfter, args.pageSize],
-        abort,
-    )
-    return result.map((row) =>
-        mapRowToObj<ListAttachmentsRow>(row, { createdAt: dateFromSQLite }),
-    )
+    let result = await database.query(listAttachmentsQuery, [args.pageAfter, args.pageSize], abort)
+    return result.map((row) => mapRowToObj<ListAttachmentsRow>(row, { createdAt: dateFromSQLite }))
 }
 
 const createAttachmentQuery = `-- name: CreateAttachment :one
@@ -204,11 +190,7 @@ export async function deleteAttachments(
         "/*SLICE:ids*/?",
         [...Array(args.ids.length).keys()].map((i) => `?${i + 1}`).join(","),
     )
-    return database.exec(
-        deleteAttachmentsQueryWithSliceParams,
-        [...args.ids],
-        abort,
-    )
+    return database.exec(deleteAttachmentsQueryWithSliceParams, [...args.ids], abort)
 }
 
 const listAttachmentsForMemoQuery = `-- name: ListAttachmentsForMemo :many
@@ -237,11 +219,7 @@ export async function listAttachmentsForMemo(
     args: ListAttachmentsForMemoArgs,
     abort?: AbortSignal,
 ): Promise<ListAttachmentsForMemoRow[]> {
-    let result = await database.query(
-        listAttachmentsForMemoQuery,
-        [args.memoId],
-        abort,
-    )
+    let result = await database.query(listAttachmentsForMemoQuery, [args.memoId], abort)
     return result.map((row) =>
         mapRowToObj<ListAttachmentsForMemoRow>(row, {
             createdAt: dateFromSQLite,
@@ -265,11 +243,7 @@ export async function createMemoAttachmentLink(
     args: CreateMemoAttachmentLinkArgs,
     abort?: AbortSignal,
 ) {
-    await database.exec(
-        createMemoAttachmentLinkQuery,
-        [args.memoId, args.attachmentId],
-        abort,
-    )
+    await database.exec(createMemoAttachmentLinkQuery, [args.memoId, args.attachmentId], abort)
 }
 
 const deleteAllMemoAttachmentLinksQuery = `-- name: DeleteAllMemoAttachmentLinks :exec
@@ -300,13 +274,10 @@ export async function deleteMemoAttachmentLinks(
     args: DeleteMemoAttachmentLinksArgs,
     abort?: AbortSignal,
 ) {
-    let deleteMemoAttachmentLinksQueryWithSliceParams =
-        deleteMemoAttachmentLinksQuery.replace(
-            "/*SLICE:attachment_ids*/?",
-            [...Array(args.attachmentIds.length).keys()]
-                .map((i) => `?${i + 2}`)
-                .join(","),
-        )
+    let deleteMemoAttachmentLinksQueryWithSliceParams = deleteMemoAttachmentLinksQuery.replace(
+        "/*SLICE:attachment_ids*/?",
+        [...Array(args.attachmentIds.length).keys()].map((i) => `?${i + 2}`).join(","),
+    )
     await database.exec(
         deleteMemoAttachmentLinksQueryWithSliceParams,
         [args.memoId, ...args.attachmentIds],

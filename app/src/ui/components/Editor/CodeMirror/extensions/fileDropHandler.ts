@@ -31,9 +31,7 @@ const fileDropHandlerExt = ViewPlugin.fromClass(
                 return
             }
 
-            let isTextData = e.clipboardData.types.some((t) =>
-                t.startsWith("text/"),
-            )
+            let isTextData = e.clipboardData.types.some((t) => t.startsWith("text/"))
             if (isTextData) {
                 return
             }

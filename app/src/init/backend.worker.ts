@@ -31,16 +31,13 @@ async function run() {
 
     let controller = await initController(platform)
 
-    let [initState, initStateErr] = await trace(
-        BaseContext,
-        "AutoUnlock",
-        (ctx) =>
-            tryAutoUnlock(ctx, {
-                unlockCtrl: controller.unlockCtrl,
-                settingsCtrl: controller.settingsCtrl,
-                setupCtrl: controller.setupCtrl,
-                syncCtrl: controller.syncCtrl,
-            }),
+    let [initState, initStateErr] = await trace(BaseContext, "AutoUnlock", (ctx) =>
+        tryAutoUnlock(ctx, {
+            unlockCtrl: controller.unlockCtrl,
+            settingsCtrl: controller.settingsCtrl,
+            setupCtrl: controller.setupCtrl,
+            syncCtrl: controller.syncCtrl,
+        }),
     )
 
     if (initStateErr) {
@@ -130,10 +127,7 @@ function setupAttachmentLoader(attachmentCtrl: AttachmentController) {
                     )
                 })
                 .catch((err) => {
-                    console.error(
-                        "attachmentCtrl.getAttachmentDataByID error",
-                        err,
-                    )
+                    console.error("attachmentCtrl.getAttachmentDataByID error", err)
                 })
         },
     )

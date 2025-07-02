@@ -57,9 +57,7 @@ export const slice = createSlice({
 
         setFilter: (
             state,
-            {
-                payload,
-            }: PayloadAction<{ filter: Filter; source: "user" | "navigation" }>,
+            { payload }: PayloadAction<{ filter: Filter; source: "user" | "navigation" }>,
         ) => {
             if (isEqual(state.filter, payload.filter)) {
                 return state
@@ -77,10 +75,7 @@ export const slice = createSlice({
             } satisfies MemosListState
         },
 
-        setTagFilter: (
-            state,
-            { payload }: PayloadAction<{ tag: Filter["tag"] }>,
-        ) => {
+        setTagFilter: (state, { payload }: PayloadAction<{ tag: Filter["tag"] }>) => {
             if (state.filter.tag === payload.tag) {
                 return state
             }
@@ -103,10 +98,7 @@ export const slice = createSlice({
             state.memos[index] = payload.memo
         },
 
-        setIsListOutdated: (
-            state,
-            { payload }: PayloadAction<{ isListOutdated: boolean }>,
-        ) => {
+        setIsListOutdated: (state, { payload }: PayloadAction<{ isListOutdated: boolean }>) => {
             state.isListOutdated = payload.isListOutdated
         },
 

@@ -101,17 +101,13 @@ async function cleanupJobTestSetup({
                 targetType: "memos",
                 isSynced: false,
                 isApplied: true,
-                timestamp: now
-                    .subtract({ minutes: entries.length - i })
-                    .toDate("utc"),
+                timestamp: now.subtract({ minutes: entries.length - i }).toDate("utc"),
             } satisfies MemoChangelogEntry
 
             toCreate.push(entry)
         }
 
-        await toPromise(
-            changelogCtrl.insertExternalChangelogEntries(ctx, toCreate),
-        )
+        await toPromise(changelogCtrl.insertExternalChangelogEntries(ctx, toCreate))
 
         return toCreate
     }

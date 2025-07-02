@@ -21,8 +21,7 @@ export function Theme({
         }
 
         document.documentElement.classList.add(colourScheme[effectiveMode])
-        document.documentElement.dataset.colourScheme =
-            colourScheme[effectiveMode]
+        document.documentElement.dataset.colourScheme = colourScheme[effectiveMode]
     }, [colourScheme, effectiveMode])
 
     useEffect(() => {
@@ -35,9 +34,7 @@ export function Theme({
                 break
         }
 
-        let bgColour = getComputedStyle(
-            document.documentElement,
-        ).getPropertyValue("--body-bg")
+        let bgColour = getComputedStyle(document.documentElement).getPropertyValue("--body-bg")
 
         document
             .querySelector("meta[name=theme-color]")

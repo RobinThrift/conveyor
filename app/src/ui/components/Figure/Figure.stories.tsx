@@ -59,10 +59,7 @@ export const InArticle: Story = {
                         })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
-                    caption={
-                        args.caption ??
-                        faker.lorem.sentences({ min: 2, max: 5 })
-                    }
+                    caption={args.caption ?? faker.lorem.sentences({ min: 2, max: 5 })}
                 />
                 <p>{faker.lorem.paragraph()}</p>
                 <p>{faker.lorem.paragraph()}</p>
@@ -76,10 +73,7 @@ export const InArticle: Story = {
                         })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
-                    caption={
-                        args.caption ??
-                        faker.lorem.sentences({ min: 2, max: 5 })
-                    }
+                    caption={args.caption ?? faker.lorem.sentences({ min: 2, max: 5 })}
                 />
                 <p>{faker.lorem.paragraph()}</p>
                 <Figure
@@ -92,10 +86,7 @@ export const InArticle: Story = {
                         })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
-                    caption={
-                        args.caption ??
-                        faker.lorem.sentences({ min: 2, max: 5 })
-                    }
+                    caption={args.caption ?? faker.lorem.sentences({ min: 2, max: 5 })}
                 />
                 <p>{faker.lorem.paragraph()}</p>
             </article>

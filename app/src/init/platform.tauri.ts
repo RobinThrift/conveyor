@@ -7,10 +7,7 @@ import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDevice
 import { TauriFS } from "@/external/tauri/TauriFS"
 import { TauriKVStoreContainer } from "@/external/tauri/TauriKVStore"
 import { TauriSQLite } from "@/external/tauri/TauriSQLite"
-import {
-    type DeviceSecureStorage,
-    NoopDeviceSecureStorage,
-} from "@/lib/DeviceSecureStorage"
+import { type DeviceSecureStorage, NoopDeviceSecureStorage } from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
 import { RemoteNavigationBackend } from "@/lib/navigation"
 
@@ -18,15 +15,12 @@ import type { PlatformDependencies, PlatformInitArgs } from "./platform"
 
 declare const __LOG_LEVEL__: string
 
-export async function init({
-    fs,
-}: PlatformInitArgs): Promise<PlatformDependencies> {
+export async function init({ fs }: PlatformInitArgs): Promise<PlatformDependencies> {
     let [ctx, cancel] = BaseContext.withCancel()
 
     let locale = await loadLocale()
 
-    let deviceSecureStorage: DeviceSecureStorage =
-        new WebCryptoDeviceSecureStorage()
+    let deviceSecureStorage: DeviceSecureStorage = new WebCryptoDeviceSecureStorage()
 
     let [_, deviceSecureStorageInitErr] = await deviceSecureStorage.init(ctx)
     if (deviceSecureStorageInitErr) {
@@ -54,8 +48,6 @@ export async function init({
         crypto: new AgeCrypto(),
         keyValueContainer: kvContainer,
         deviceSecureStorage,
-        navigationBackend: new RemoteNavigationBackend(
-            self.postMessage.bind(self),
-        ),
+        navigationBackend: new RemoteNavigationBackend(self.postMessage.bind(self)),
     }
 }

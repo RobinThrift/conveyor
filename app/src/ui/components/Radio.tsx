@@ -6,12 +6,7 @@ import React from "react"
 export type RadioGroupProps = RadixRadioGroup.Props
 
 export function RadioGroup(props: RadioGroupProps) {
-    return (
-        <RadixRadioGroup
-            {...props}
-            className={clsx("radio-group", props.className)}
-        />
-    )
+    return <RadixRadioGroup {...props} className={clsx("radio-group", props.className)} />
 }
 
 export interface RadioItemProps {
@@ -26,10 +21,7 @@ export interface RadioItemProps {
 
 export function RadioItem(props: RadioItemProps) {
     return (
-        <label
-            className={clsx("radio-item", props.className)}
-            htmlFor={props.name}
-        >
+        <label className={clsx("radio-item", props.className)} htmlFor={props.name}>
             <RadixRadio.Root
                 value={props.value}
                 disabled={props.disabled}

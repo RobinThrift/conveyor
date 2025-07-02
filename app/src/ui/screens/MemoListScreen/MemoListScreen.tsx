@@ -17,11 +17,7 @@ export function MemoListScreen(props: MemoListScreenProps) {
 
     return (
         <div className={clsx("memo-list-screen", props.className)}>
-            <MemoListFilter
-                tags={tags}
-                filter={filter}
-                onChangeFilter={setFilter}
-            />
+            <MemoListFilter tags={tags} filter={filter} onChangeFilter={setFilter} />
 
             <div className="memo-list-container">
                 <Header filter={filter} />

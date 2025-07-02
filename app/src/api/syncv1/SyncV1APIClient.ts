@@ -37,10 +37,7 @@ export class SyncV1APIClient {
         "SyncV1APIClient",
         "error registering sync client",
     )
-    public async registerClient(
-        ctx: Context,
-        syncClient: { clientID: string },
-    ): AsyncResult<void> {
+    public async registerClient(ctx: Context, syncClient: { clientID: string }): AsyncResult<void> {
         let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
@@ -73,11 +70,7 @@ export class SyncV1APIClient {
         "error fetching full DB from sync server",
     )
     public async getFullSync(ctx: Context): AsyncResult<ArrayBufferLike> {
-        let [req, createReqErr] = await this._createBaseRequest(
-            ctx,
-            "GET",
-            "/api/sync/v1/full",
-        )
+        let [req, createReqErr] = await this._createBaseRequest(ctx, "GET", "/api/sync/v1/full")
         if (createReqErr) {
             return wrapErr`${new SyncV1APIClient.ErrGetFullSync()}: ${createReqErr}`
         }
@@ -116,11 +109,7 @@ export class SyncV1APIClient {
         ctx: Context,
         location: string,
     ): AsyncResult<ArrayBufferLike> {
-        let [req, createReqErr] = await this._createBaseRequest(
-            ctx,
-            "GET",
-            location,
-        )
+        let [req, createReqErr] = await this._createBaseRequest(ctx, "GET", location)
         if (createReqErr) {
             return Err(createReqErr)
         }
@@ -136,11 +125,7 @@ export class SyncV1APIClient {
 
         if (res.status !== 200) {
             let err = await APIError.fromHTTPResponse(res)
-            return Err(
-                err.withPrefix(
-                    `error fetching full DB from sync server (${this._baseURL})`,
-                ),
-            )
+            return Err(err.withPrefix(`error fetching full DB from sync server (${this._baseURL})`))
         }
 
         let [data, receiveDataErr] = await fromPromise(res.arrayBuffer())
@@ -155,10 +140,7 @@ export class SyncV1APIClient {
         "SyncV1APIClient",
         "error uploading all data to sync server",
     )
-    public async uploadFullSyncData(
-        ctx: Context,
-        data: ArrayBufferLike,
-    ): AsyncResult<void> {
+    public async uploadFullSyncData(ctx: Context, data: ArrayBufferLike): AsyncResult<void> {
         let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
@@ -310,11 +292,7 @@ export class SyncV1APIClient {
         ctx: Context,
         filepath: string,
     ): AsyncResult<ArrayBufferLike> {
-        let [req, createReqErr] = await this._createBaseRequest(
-            ctx,
-            "GET",
-            `/blobs${filepath}`,
-        )
+        let [req, createReqErr] = await this._createBaseRequest(ctx, "GET", `/blobs${filepath}`)
         if (createReqErr) {
             return wrapErr`${new SyncV1APIClient.ErrGetAttachmentDataByFilepath()} (${this._baseURL}): ${filepath}: ${createReqErr}`
         }
@@ -364,9 +342,7 @@ interface TokenStorage {
     getToken(ctx: Context): AsyncResult<string>
 }
 
-function parseEncryptedChangelogEntryJSON(
-    raw: string,
-): Result<EncryptedChangelogEntry[]> {
+function parseEncryptedChangelogEntryJSON(raw: string): Result<EncryptedChangelogEntry[]> {
     return fromThrowing(() => {
         let objs = JSON.parse(raw)
         let entries: EncryptedChangelogEntry[] = []
@@ -401,9 +377,7 @@ async function compressData(data: Uint8Array<ArrayBufferLike>) {
     return streamToBlob(readable.getReader())
 }
 
-async function streamToBlob(
-    reader: ReadableStreamDefaultReader,
-): Promise<Blob> {
+async function streamToBlob(reader: ReadableStreamDefaultReader): Promise<Blob> {
     let chunks: BlobPart[] = []
 
     return reader.read().then(async function read({

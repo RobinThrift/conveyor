@@ -31,9 +31,7 @@ export const slice = createSlice({
         },
         setUnlockState: (
             state,
-            {
-                payload,
-            }: PayloadAction<{ state: UnlockState["state"]; error?: Error }>,
+            { payload }: PayloadAction<{ state: UnlockState["state"]; error?: Error }>,
         ) => {
             state.state = payload.state
             state.error = payload.error

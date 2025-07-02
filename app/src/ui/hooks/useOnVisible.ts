@@ -1,21 +1,12 @@
-import {
-    type RefObject,
-    startTransition,
-    useEffect,
-    useState,
-    useSyncExternalStore,
-} from "react"
+import { type RefObject, startTransition, useEffect, useState, useSyncExternalStore } from "react"
 
-export function useOnVisible(
-    ref: RefObject<HTMLElement | null>,
-    { ratio }: { ratio: number },
-) {
-    let [subscribe, setSubscribe] = useState<ReturnType<typeof _subscribe>>(
-        () => _subscribe(ref.current),
+export function useOnVisible(ref: RefObject<HTMLElement | null>, { ratio }: { ratio: number }) {
+    let [subscribe, setSubscribe] = useState<ReturnType<typeof _subscribe>>(() =>
+        _subscribe(ref.current),
     )
-    let [getSnapshot, setGetSnapshot] = useState<
-        ReturnType<typeof _getSnapshot>
-    >(() => _getSnapshot(ref.current))
+    let [getSnapshot, setGetSnapshot] = useState<ReturnType<typeof _getSnapshot>>(() =>
+        _getSnapshot(ref.current),
+    )
 
     useEffect(() => {
         if (ref.current) {

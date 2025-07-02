@@ -40,10 +40,7 @@ declare global {
     interface Window {
         __REACT_DEV_TOOLS_ENABLED__: boolean
         __REACT_DEV_TOOLS_SETUP__: boolean
-        __REACT_DEV_TOOLS_DETAILS: WeakMap<
-            PerformanceMeasure,
-            ReactDevToolsEventDetails
-        >
+        __REACT_DEV_TOOLS_DETAILS: WeakMap<PerformanceMeasure, ReactDevToolsEventDetails>
         __REACT_DEV_TOOLS_onCommitFiberRoot__: (fiber: FiberRoot) => void
     }
 }
@@ -56,10 +53,7 @@ let formatter = new Intl.DateTimeFormat("en-gb", {
 
 export function ReactDevTools() {
     let [isEnabled, setIsEnabled] = useState(window.__REACT_DEV_TOOLS_ENABLED__)
-    let events = useSyncExternalStore(
-        _reactLogs_subscribe,
-        _reactLogs_getSnapshot,
-    )
+    let events = useSyncExternalStore(_reactLogs_subscribe, _reactLogs_getSnapshot)
 
     let items = useMemo(() => {
         let els: React.ReactNode[] = []
@@ -99,8 +93,7 @@ export function ReactDevTools() {
                     className="text-xs cursor-pointer"
                     onClick={() => {
                         setIsEnabled(!window.__REACT_DEV_TOOLS_ENABLED__)
-                        window.__REACT_DEV_TOOLS_ENABLED__ =
-                            !window.__REACT_DEV_TOOLS_ENABLED__
+                        window.__REACT_DEV_TOOLS_ENABLED__ = !window.__REACT_DEV_TOOLS_ENABLED__
                     }}
                 >
                     {isEnabled ? "Disable" : "Enable"}
@@ -111,30 +104,28 @@ export function ReactDevTools() {
     )
 }
 
-const RenderHTMLElementReadable = React.memo(
-    function RenderHTMLElementReadable({
-        el,
-    }: { el: HTMLElement | undefined }) {
-        if (!el) {
-            return
-        }
+const RenderHTMLElementReadable = React.memo(function RenderHTMLElementReadable({
+    el,
+}: { el: HTMLElement | undefined }) {
+    if (!el) {
+        return
+    }
 
-        let tag = readableHTMLElement(el)
+    let tag = readableHTMLElement(el)
 
-        return (
-            <button
-                type="button"
-                className="cursor-pointer"
-                onClick={() => {
-                    el.scrollIntoView()
-                    highlightElement(el, tag)
-                }}
-            >
-                {tag}
-            </button>
-        )
-    },
-)
+    return (
+        <button
+            type="button"
+            className="cursor-pointer"
+            onClick={() => {
+                el.scrollIntoView()
+                highlightElement(el, tag)
+            }}
+        >
+            {tag}
+        </button>
+    )
+})
 
 function readableHTMLElement(el: HTMLElement) {
     let tag = el.tagName.toLowerCase()
@@ -209,9 +200,7 @@ function _reactLogs_getSnapshot() {
 }
 
 const highlightContainer = (() => {
-    let existing = document.querySelector(
-        "#__react-devtools-highlight-container",
-    )
+    let existing = document.querySelector("#__react-devtools-highlight-container")
     if (existing) return existing
 
     let container = document.createElement("div")
@@ -288,10 +277,7 @@ if (__ENABLE_DEVTOOLS__) {
             requestAnimationFrame(() => {
                 try {
                     if (stateNode instanceof HTMLElement) {
-                        highlightElement(
-                            stateNode,
-                            displayName ?? fiber.key ?? "",
-                        )
+                        highlightElement(stateNode, displayName ?? fiber.key ?? "")
                     }
                 } catch {
                     // ignore
@@ -362,8 +348,6 @@ if (__ENABLE_DEVTOOLS__) {
             PerformanceMeasure,
             ReactDevToolsEventDetails
         >()
-        onCommitFiberRoot((root) =>
-            window.__REACT_DEV_TOOLS_onCommitFiberRoot__(root),
-        )
+        onCommitFiberRoot((root) => window.__REACT_DEV_TOOLS_onCommitFiberRoot__(root))
     }
 }

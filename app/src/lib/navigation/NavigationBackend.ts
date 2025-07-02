@@ -27,13 +27,9 @@ export interface NavigationBackend<
     Stacks extends string,
     Restore extends Record<string, unknown>,
 > {
-    init(
-        state: NavgationState<S, Stacks, Restore>,
-    ): NavgationState<S, Stacks, Restore>
+    init(state: NavgationState<S, Stacks, Restore>): NavgationState<S, Stacks, Restore>
 
-    push(
-        next: NavgationState<S, Stacks, Restore>,
-    ): NavgationState<S, Stacks, Restore>
+    push(next: NavgationState<S, Stacks, Restore>): NavgationState<S, Stacks, Restore>
     pop(n?: number): Promise<NavgationState<S, Stacks, Restore>>
 
     addEventListener(

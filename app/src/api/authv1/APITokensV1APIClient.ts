@@ -32,11 +32,7 @@ export class APITokensV1APIClient {
     )
     public async listAPITokens(
         ctx: Context,
-        {
-            pagination,
-        }: {
-            pagination: Pagination<string>
-        },
+        { pagination }: { pagination: Pagination<string> },
     ): AsyncResult<APITokenList> {
         let query = new URLSearchParams()
         query.set("page[size]", pagination.pageSize.toString())
@@ -79,16 +75,12 @@ export class APITokensV1APIClient {
             }) => {
                 let items: APIToken[] = []
                 for (let item of raw.items) {
-                    let [createdAt, createdAtParseErr] = parseJSONDate(
-                        item.createdAt,
-                    )
+                    let [createdAt, createdAtParseErr] = parseJSONDate(item.createdAt)
                     if (createdAtParseErr) {
                         return wrapErr`error parsing createdAt date: ${createdAtParseErr}`
                     }
 
-                    let [expiresAt, expiresAtParseErr] = parseJSONDate(
-                        item.expiresAt,
-                    )
+                    let [expiresAt, expiresAtParseErr] = parseJSONDate(item.expiresAt)
                     if (expiresAtParseErr) {
                         return wrapErr`error parsing expiresAt date: ${expiresAtParseErr}`
                     }
@@ -146,9 +138,7 @@ export class APITokensV1APIClient {
             return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()} (${this._baseURL}): ${err}`
         }
 
-        let [token, deserializationErr] = jsonDeserialize<{ token: string }>(
-            await res.text(),
-        )
+        let [token, deserializationErr] = jsonDeserialize<{ token: string }>(await res.text())
         if (deserializationErr) {
             return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()} (${this._baseURL}): error deserilising data: ${deserializationErr}`
         }

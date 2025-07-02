@@ -1,12 +1,5 @@
 import type { Context } from "@/lib/context"
-import {
-    type AsyncResult,
-    Err,
-    Ok,
-    fromPromise,
-    fromThrowing,
-    wrapErr,
-} from "@/lib/result"
+import { type AsyncResult, Err, Ok, fromPromise, fromThrowing, wrapErr } from "@/lib/result"
 
 type IndexedDBMigration = (db: IDBDatabase) => AsyncResult<void>
 
@@ -29,11 +22,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         let req = globalThis.indexedDB.open(name, version)
 
         req.addEventListener("error", () => {
-            reject(
-                new Error(
-                    `error opening database "${name}@${version}": ${req.error?.message}`,
-                ),
-            )
+            reject(new Error(`error opening database "${name}@${version}": ${req.error?.message}`))
         })
 
         req.addEventListener("success", () => {
@@ -103,9 +92,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         data: Tables[T][],
     ): AsyncResult<void> {
         return this._inTransaction(ctx, storeName, "readwrite", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -131,9 +118,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         key: IDBValidKey,
     ): AsyncResult<Tables[T] | undefined> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -153,9 +138,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         predicate: (item: Tables[T]) => boolean,
     ): AsyncResult<Tables[T][]> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -165,8 +148,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
                 return wrapErr`error getting all items from objectStore: ${storeName}: ${err}`
             }
 
-            let { resolve, reject, promise } =
-                Promise.withResolvers<Tables[T][]>()
+            let { resolve, reject, promise } = Promise.withResolvers<Tables[T][]>()
 
             all.addEventListener("error", () => {
                 reject(all.error)
@@ -193,9 +175,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         storeName: T,
     ): AsyncResult<IDBValidKey[]> {
         return this._inTransaction(ctx, storeName, "readonly", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -205,8 +185,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
                 return wrapErr`error getting all keys for objectStore: ${storeName}: ${getAllKeysErr}`
             }
 
-            let { resolve, reject, promise } =
-                Promise.withResolvers<IDBValidKey[]>()
+            let { resolve, reject, promise } = Promise.withResolvers<IDBValidKey[]>()
 
             keys.addEventListener("error", () => {
                 reject(keys.error)
@@ -230,9 +209,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         key: IDBValidKey,
     ): AsyncResult<void> {
         return this._inTransaction(ctx, storeName, "readwrite", async (tx) => {
-            let [store, storeErr] = fromThrowing(() =>
-                tx.objectStore(storeName as string),
-            )
+            let [store, storeErr] = fromThrowing(() => tx.objectStore(storeName as string))
             if (storeErr) {
                 return wrapErr`error getting objectStore: ${storeName}: ${storeErr}`
             }
@@ -259,9 +236,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
         let abortErr: Error | undefined = undefined
         let result: R | undefined = undefined
 
-        let [tx, txErr] = fromThrowing(() =>
-            this._db.transaction(storeName as string, mode),
-        )
+        let [tx, txErr] = fromThrowing(() => this._db.transaction(storeName as string, mode))
         if (txErr) {
             return wrapErr`error starting transaction: ${txErr}`
         }
@@ -299,9 +274,7 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
     }
 }
 
-function wrapIDBRequest<Req extends IDBRequest>(
-    req: Req,
-): AsyncResult<Req["result"]> {
+function wrapIDBRequest<Req extends IDBRequest>(req: Req): AsyncResult<Req["result"]> {
     let { resolve, reject, promise } = Promise.withResolvers<Req["result"]>()
     req.addEventListener("error", () => {
         reject(req.error)

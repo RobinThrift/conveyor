@@ -4,30 +4,19 @@ import { IndexedDBKVStoreContainer } from "@/external/browser/IndexDBKVStore"
 import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
 import { OPFS } from "@/external/browser/opfs"
 import { SQLite } from "@/external/browser/sqlite"
-import {
-    type DeviceSecureStorage,
-    NoopDeviceSecureStorage,
-} from "@/lib/DeviceSecureStorage"
+import { type DeviceSecureStorage, NoopDeviceSecureStorage } from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
 import { RemoteNavigationBackend } from "@/lib/navigation"
 import { toPromise } from "@/lib/result"
 
-import type {
-    KVStores,
-    PlatformDependencies,
-    PlatformInitArgs,
-} from "./platform"
+import type { KVStores, PlatformDependencies, PlatformInitArgs } from "./platform"
 
-export async function init({
-    fs,
-    db,
-}: PlatformInitArgs): Promise<PlatformDependencies> {
+export async function init({ fs, db }: PlatformInitArgs): Promise<PlatformDependencies> {
     let [ctx, cancel] = BaseContext.withCancel()
 
     let sqlite = new SQLite(db)
 
-    let deviceSecureStorage: DeviceSecureStorage =
-        new WebCryptoDeviceSecureStorage()
+    let deviceSecureStorage: DeviceSecureStorage = new WebCryptoDeviceSecureStorage()
 
     let [_, deviceSecureStorageInitErr] = await deviceSecureStorage.init(ctx)
     if (deviceSecureStorageInitErr) {
@@ -58,9 +47,7 @@ export async function init({
         crypto: new AgeCrypto(),
         keyValueContainer: indexedDBKVStoreContainer,
         deviceSecureStorage,
-        navigationBackend: new RemoteNavigationBackend(
-            self.postMessage.bind(self),
-        ),
+        navigationBackend: new RemoteNavigationBackend(self.postMessage.bind(self)),
     }
 }
 

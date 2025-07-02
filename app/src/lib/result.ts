@@ -1,14 +1,10 @@
 import { isCustomErrType } from "./errors"
 
-export type Result<T, E extends Error = Error> =
-    | readonly [T, never]
-    | readonly [never, E]
+export type Result<T, E extends Error = Error> = readonly [T, never] | readonly [never, E]
 
 export type AsyncResult<T, E extends Error = Error> = Promise<Result<T, E>>
 
-export function fromThrowing<T, E extends Error = Error>(
-    fn: () => T,
-): Result<T, E> {
+export function fromThrowing<T, E extends Error = Error>(fn: () => T): Result<T, E> {
     try {
         return Object.freeze([fn(), undefined as never])
     } catch (e) {
@@ -26,11 +22,9 @@ export async function fromPromise<T, E extends Error = Error>(
     }
 }
 
-export async function fromAsyncFn<
-    T,
-    Fn extends () => Promise<T>,
-    E extends Error = Error,
->(fn: Fn): AsyncResult<T, E> {
+export async function fromAsyncFn<T, Fn extends () => Promise<T>, E extends Error = Error>(
+    fn: Fn,
+): AsyncResult<T, E> {
     try {
         return Object.freeze([await fn(), undefined as never])
     } catch (e) {
@@ -38,13 +32,9 @@ export async function fromAsyncFn<
     }
 }
 
-export function Ok<T, E extends Error = Error>(
-    value: PromiseLike<T>,
-): AsyncResult<T, E>
+export function Ok<T, E extends Error = Error>(value: PromiseLike<T>): AsyncResult<T, E>
 export function Ok<T, E extends Error = Error>(value: T): Result<T, E>
-export function Ok<T extends undefined, E extends Error = Error>(
-    value?: T,
-): Result<T, E>
+export function Ok<T extends undefined, E extends Error = Error>(value?: T): Result<T, E>
 export function Ok<T, E extends Error = Error>(
     value: T | PromiseLike<T>,
 ): Result<T, E> | AsyncResult<T, E> {
@@ -93,9 +83,7 @@ export function wrapErr<T, E extends Error = Error>(
     return Object.freeze([undefined as never, err as any])
 }
 
-export async function toPromise<T, E extends Error = Error>(
-    r: AsyncResult<T, E>,
-): Promise<T> {
+export async function toPromise<T, E extends Error = Error>(r: AsyncResult<T, E>): Promise<T> {
     let [value, err] = await r
     if (err) {
         return Promise.reject(err)
@@ -104,9 +92,7 @@ export async function toPromise<T, E extends Error = Error>(
     return Promise.resolve(value)
 }
 
-export async function all<T>(
-    results: Iterable<AsyncResult<T>>,
-): AsyncResult<T[]> {
+export async function all<T>(results: Iterable<AsyncResult<T>>): AsyncResult<T[]> {
     let resolved = await Promise.all(results)
     let values: T[] = []
     let errs: Error[] = []

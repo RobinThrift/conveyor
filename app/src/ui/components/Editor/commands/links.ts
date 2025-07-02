@@ -16,10 +16,7 @@ export async function insertLink(
             to,
             insert: link,
         },
-        selection:
-            from === to
-                ? EditorSelection.cursor(from + link.length)
-                : undefined,
+        selection: from === to ? EditorSelection.cursor(from + link.length) : undefined,
     })
 }
 

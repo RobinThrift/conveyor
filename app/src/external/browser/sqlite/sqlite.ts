@@ -5,10 +5,7 @@ import { Lock } from "@/lib/Lock"
 import { BaseContext, type Context } from "@/lib/context"
 import type { DBExec, Database } from "@/lib/database"
 import { type AsyncResult, Err, Ok, fromPromise, toPromise } from "@/lib/result"
-import {
-    migrate,
-    migrateDBEncryption,
-} from "@/storage/database/sqlite/migrator"
+import { migrate, migrateDBEncryption } from "@/storage/database/sqlite/migrator"
 
 import { SQLiteWorker } from "./SQLiteWorker"
 
@@ -18,10 +15,7 @@ export class SQLite implements Database {
     private _lock: Lock
     private _ready: ReturnType<typeof Promise.withResolvers<void>>
 
-    constructor({
-        baseCtx,
-        onError,
-    }: { baseCtx?: Context; onError?: (err: Error) => void } = {}) {
+    constructor({ baseCtx, onError }: { baseCtx?: Context; onError?: (err: Error) => void } = {}) {
         this._lock = new Lock(`sqlite_${newID()}}`)
         this._ready = Promise.withResolvers()
         this._baseCtx = baseCtx ?? BaseContext
@@ -69,9 +63,7 @@ export class SQLite implements Database {
     ) {
         performance.mark("sql:open:start", { detail: { args: [params] } })
         await toPromise(this._worker.open(ctx, params))
-        await toPromise(
-            this._worker.exec(ctx, { sql: "PRAGMA foreign_keys = true;" }),
-        )
+        await toPromise(this._worker.exec(ctx, { sql: "PRAGMA foreign_keys = true;" }))
         this._ready.resolve()
         performance.mark("sql:open:end")
         await migrate(ctx, this)
@@ -148,9 +140,7 @@ export class SQLite implements Database {
         }
 
         return this._lock.run(ctx, async (ctx: Context) => {
-            let [_begin, beginErr] = await fromPromise(
-                this.exec("BEGIN DEFERRED TRANSACTION"),
-            )
+            let [_begin, beginErr] = await fromPromise(this.exec("BEGIN DEFERRED TRANSACTION"))
             if (beginErr) {
                 return Err(beginErr)
             }
@@ -161,9 +151,7 @@ export class SQLite implements Database {
                 return Err(err)
             }
 
-            let [_commit, commitErr] = await fromPromise(
-                this.exec("COMMIT TRANSACTION"),
-            )
+            let [_commit, commitErr] = await fromPromise(this.exec("COMMIT TRANSACTION"))
             if (commitErr) {
                 return Err(commitErr)
             }

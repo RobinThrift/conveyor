@@ -15,15 +15,9 @@ export function useAPITokensTabState() {
     let hasNextPage = useSelector(selectors.apitokens.hasNextPage)
     let hasPreviousPage = useSelector(selectors.apitokens.hasPreviousPage)
 
-    let loadPrevPage = useCallback(
-        () => dispatch(actions.apitokens.previousPage()),
-        [dispatch],
-    )
+    let loadPrevPage = useCallback(() => dispatch(actions.apitokens.previousPage()), [dispatch])
 
-    let loadNextPage = useCallback(
-        () => dispatch(actions.apitokens.nextPage()),
-        [dispatch],
-    )
+    let loadNextPage = useCallback(() => dispatch(actions.apitokens.nextPage()), [dispatch])
 
     let createAPIToken = useCallback(
         (req: CreateAPITokenRequest) => {

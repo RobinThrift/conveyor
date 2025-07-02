@@ -1,8 +1,4 @@
-import type {
-    ChangelogEntry,
-    MemoChangelogEntry,
-    MemoContentChanges,
-} from "@/domain/Changelog"
+import type { ChangelogEntry, MemoChangelogEntry, MemoContentChanges } from "@/domain/Changelog"
 import {
     ErrMemoNotFound,
     type ListMemosQuery,
@@ -52,14 +48,8 @@ export class MemoController {
         this._changelog = changelog
     }
 
-    public addEventListener(
-        event: "onMemoCreated",
-        cb: OnMemoCreatedHandler,
-    ): () => void
-    public addEventListener(
-        event: "onMemoChange",
-        cb: OnMemoChangeHandler,
-    ): () => void
+    public addEventListener(event: "onMemoCreated", cb: OnMemoCreatedHandler): () => void
+    public addEventListener(event: "onMemoChange", cb: OnMemoChangeHandler): () => void
     public addEventListener(
         event: "onMemoChange" | "onMemoCreated",
         cb: OnMemoChangeHandler | OnMemoCreatedHandler,
@@ -70,10 +60,7 @@ export class MemoController {
         }
     }
 
-    public static ErrGetMemo = createErrType(
-        "MemoController",
-        "error getting memo",
-    )
+    public static ErrGetMemo = createErrType("MemoController", "error getting memo")
     public async getMemo(ctx: Context, memoID: MemoID): AsyncResult<Memo> {
         let [memo, err] = await this._transactioner.inTransaction(ctx, (ctx) =>
             this._repo.getMemo(ctx, memoID),
@@ -104,26 +91,19 @@ export class MemoController {
         )
     }
 
-    public static ErrCreateMemo = createErrType(
-        "MemoController",
-        "error creating memo",
-    )
-    public async createMemo(
-        ctx: Context,
-        memo: CreateMemoRequest,
-    ): AsyncResult<Memo> {
+    public static ErrCreateMemo = createErrType("MemoController", "error creating memo")
+    public async createMemo(ctx: Context, memo: CreateMemoRequest): AsyncResult<Memo> {
         return this._transactioner.inTransaction(ctx, async (ctx) => {
             let [created, err] = await this._repo.createMemo(ctx, memo)
             if (err) {
                 return wrapErr`${new MemoController.ErrCreateMemo()}: ${err}`
             }
 
-            let [_, updateAttachmentsErr] =
-                await this._attachments.updateMemoAttachments(
-                    ctx,
-                    created.id,
-                    created.content,
-                )
+            let [_, updateAttachmentsErr] = await this._attachments.updateMemoAttachments(
+                ctx,
+                created.id,
+                created.content,
+            )
             if (updateAttachmentsErr) {
                 return wrapErr`${new MemoController.ErrCreateMemo()}: ${updateAttachmentsErr}`
             }
@@ -152,20 +132,16 @@ export class MemoController {
         memo: UpdateMemoContentRequest,
     ): AsyncResult<void> {
         return this._transactioner.inTransaction(ctx, async (ctx) => {
-            let [updated, updateErr] = await this._repo.updateMemoContent(
-                ctx,
-                memo,
-            )
+            let [updated, updateErr] = await this._repo.updateMemoContent(ctx, memo)
             if (updateErr) {
                 return wrapErr`${new MemoController.ErrUpdateMemoContent()}: ${updateErr}`
             }
 
-            let [_, updateAttachmentsErr] =
-                await this._attachments.updateMemoAttachments(
-                    ctx,
-                    memo.id,
-                    memo.content,
-                )
+            let [_, updateAttachmentsErr] = await this._attachments.updateMemoAttachments(
+                ctx,
+                memo.id,
+                memo.content,
+            )
             if (updateAttachmentsErr) {
                 return wrapErr`${new MemoController.ErrUpdateMemoContent()}: ${updateAttachmentsErr}`
             }
@@ -185,10 +161,7 @@ export class MemoController {
         })
     }
 
-    public static ErrDeleteMemo = createErrType(
-        "MemoController",
-        "error deleting memo",
-    )
+    public static ErrDeleteMemo = createErrType("MemoController", "error deleting memo")
     public async deleteMemo(ctx: Context, memoID: MemoID): AsyncResult<void> {
         return this._transactioner.inTransaction(ctx, async (ctx) => {
             let [_, err] = await this._repo.deleteMemo(ctx, memoID)
@@ -209,10 +182,7 @@ export class MemoController {
         })
     }
 
-    public static ErrUndeleteMemo = createErrType(
-        "MemoController",
-        "error undeleting memo",
-    )
+    public static ErrUndeleteMemo = createErrType("MemoController", "error undeleting memo")
     public async undeleteMemo(ctx: Context, memoID: MemoID): AsyncResult<void> {
         return this._transactioner.inTransaction(ctx, async (ctx) => {
             let [_, err] = await this._repo.undeleteMemo(ctx, memoID)
@@ -288,10 +258,7 @@ export class MemoController {
         return Ok()
     }
 
-    private async _applyChangelogEntry(
-        ctx: Context,
-        entry: MemoChangelogEntry,
-    ): AsyncResult<void> {
+    private async _applyChangelogEntry(ctx: Context, entry: MemoChangelogEntry): AsyncResult<void> {
         if ("created" in entry.value) {
             let [created, err] = await this._repo.createMemo(ctx, {
                 ...entry.value.created,
@@ -301,12 +268,11 @@ export class MemoController {
                 return wrapErr`error creating memo: ${err}`
             }
 
-            let [_, updateAttachmentsErr] =
-                await this._attachments.updateMemoAttachments(
-                    ctx,
-                    created.id,
-                    created.content,
-                )
+            let [_, updateAttachmentsErr] = await this._attachments.updateMemoAttachments(
+                ctx,
+                created.id,
+                created.content,
+            )
             if (updateAttachmentsErr) {
                 return Err(updateAttachmentsErr)
             }
@@ -354,15 +320,11 @@ export class MemoController {
         return wrapErr`error applying changelog entry to memo: unknown changelog type: ${JSON.stringify(entry.value)}`
     }
 
-    private async _applyMemoContentChangelogEntry(
-        ctx: Context,
-        memo: Memo,
-    ): AsyncResult<void> {
-        let [entries, err] =
-            await this._changelog.listChangelogEntriesForID<MemoChangelogEntry>(
-                ctx,
-                memo.id,
-            )
+    private async _applyMemoContentChangelogEntry(ctx: Context, memo: Memo): AsyncResult<void> {
+        let [entries, err] = await this._changelog.listChangelogEntriesForID<MemoChangelogEntry>(
+            ctx,
+            memo.id,
+        )
         if (err) {
             return Err(err)
         }
@@ -371,31 +333,24 @@ export class MemoController {
 
         let content = resolveChanges(changes)
 
-        let [_, txErr] = await this._transactioner.inTransaction(
-            ctx,
-            async (ctx) => {
-                let [_, updateErr] = await this._repo.updateMemoContent(ctx, {
-                    id: memo.id,
-                    content,
-                })
+        let [_, txErr] = await this._transactioner.inTransaction(ctx, async (ctx) => {
+            let [_, updateErr] = await this._repo.updateMemoContent(ctx, {
+                id: memo.id,
+                content,
+            })
 
-                if (updateErr) {
-                    return wrapErr`error updating memo content: ${memo.id}: ${updateErr}`
-                }
+            if (updateErr) {
+                return wrapErr`error updating memo content: ${memo.id}: ${updateErr}`
+            }
 
-                let [_updateAttachments, updateAttachmentsErr] =
-                    await this._attachments.updateMemoAttachments(
-                        ctx,
-                        memo.id,
-                        content,
-                    )
-                if (updateAttachmentsErr) {
-                    return Err(updateAttachmentsErr)
-                }
+            let [_updateAttachments, updateAttachmentsErr] =
+                await this._attachments.updateMemoAttachments(ctx, memo.id, content)
+            if (updateAttachmentsErr) {
+                return Err(updateAttachmentsErr)
+            }
 
-                return Ok()
-            },
-        )
+            return Ok()
+        })
 
         if (!txErr) {
             this._triggerEvent("onMemoChange", {
@@ -426,10 +381,7 @@ export class MemoController {
 
     private _triggerEvent(event: "onMemoCreated", data: { memo: Memo }): void
     private _triggerEvent(event: "onMemoChange", data: { memo: Memo }): void
-    private _triggerEvent(
-        event: "onMemoChange" | "onMemoCreated",
-        data: { memo: Memo },
-    ): void {
+    private _triggerEvent(event: "onMemoChange" | "onMemoCreated", data: { memo: Memo }): void {
         this._events[event].forEach((cb) => {
             queueTask(() => cb(data))
         })
@@ -466,10 +418,7 @@ interface Repo {
         },
     ): AsyncResult<MemoList>
 
-    createMemo(
-        ctx: Context<{ db?: DBExec }>,
-        memo: CreateMemoRequest,
-    ): AsyncResult<Memo>
+    createMemo(ctx: Context<{ db?: DBExec }>, memo: CreateMemoRequest): AsyncResult<Memo>
 
     updateMemoContent(
         ctx: Context<{ db?: DBExec }>,
@@ -486,14 +435,8 @@ interface Repo {
 
     deleteMemo(ctx: Context<{ db: DBExec }>, memoID: MemoID): AsyncResult<void>
 
-    undeleteMemo(
-        ctx: Context<{ db?: DBExec }>,
-        memoID: MemoID,
-    ): AsyncResult<void>
-    listTags(
-        ctx: Context<{ db?: DBExec }>,
-        query: ListTagsQuery,
-    ): AsyncResult<TagList>
+    undeleteMemo(ctx: Context<{ db?: DBExec }>, memoID: MemoID): AsyncResult<void>
+    listTags(ctx: Context<{ db?: DBExec }>, query: ListTagsQuery): AsyncResult<TagList>
     cleanupDeletedMemos(ctx: Context<{ db?: DBExec }>): AsyncResult<number>
 }
 

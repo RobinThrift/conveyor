@@ -14,9 +14,7 @@ suite("lib/KVStore/EncryptedKVStore", () => {
     afterAll(() => cancel())
 
     test("crud", async () => {
-        let backingKV = new TestInMemKVStore<
-            Record<"a" | "b", ArrayBufferLike>
-        >()
+        let backingKV = new TestInMemKVStore<Record<"a" | "b", ArrayBufferLike>>()
 
         let crypto = new AgeCrypto()
         await crypto.init(await toPromise(crypto.generatePrivateKey()))
@@ -50,10 +48,7 @@ suite("lib/KVStore/EncryptedKVStore", () => {
 
         let backingItem = await assertOkResult(backingKV.getItem(ctx, "a"))
         assert.isTrue(backingItem instanceof ArrayBuffer)
-        assert.notDeepEqual(
-            encodeText(JSON.stringify(value)).buffer,
-            backingItem,
-        )
+        assert.notDeepEqual(encodeText(JSON.stringify(value)).buffer, backingItem)
 
         let item = await assertOkResult(kv.getItem(ctx, "a"))
         assert.deepEqual(item, value)

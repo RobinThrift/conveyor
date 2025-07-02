@@ -33,15 +33,10 @@ export function Header({ filter }: { filter: Filter }) {
 
     if (filter.exactDate) {
         children.push(
-            children.length === 0
-                ? t.MemosForExactDateStandalone
-                : t.MemosForExactDate,
+            children.length === 0 ? t.MemosForExactDateStandalone : t.MemosForExactDate,
             " ",
             <em key="exactDate">
-                <DateTime
-                    date={filter.exactDate}
-                    opts={{ dateStyle: "medium" }}
-                />
+                <DateTime date={filter.exactDate} opts={{ dateStyle: "medium" }} />
             </em>,
         )
     }

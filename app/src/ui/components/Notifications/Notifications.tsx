@@ -26,18 +26,14 @@ export function Notifications(props: NotificationsProps) {
                         key={n.title}
                         n={n}
                         ariaLabelCloseBtn={t.Dismiss}
-                        onOpenChange={(open) =>
-                            !open && setTimeout(() => remove(i), 100)
-                        }
+                        onOpenChange={(open) => !open && setTimeout(() => remove(i), 100)}
                     />
                 ) : (
                     <Notification
                         key={n.title}
                         n={n}
                         ariaLabelCloseBtn={t.Dismiss}
-                        onOpenChange={(open) =>
-                            !open && setTimeout(() => remove(i), 100)
-                        }
+                        onOpenChange={(open) => !open && setTimeout(() => remove(i), 100)}
                     />
                 ),
             ),
@@ -45,14 +41,8 @@ export function Notifications(props: NotificationsProps) {
     )
 
     return (
-        <Toast.Provider
-            swipeDirection="right"
-            duration={durationMs}
-            label={t.Label}
-        >
-            <Toast.Viewport
-                className={clsx("notifications-viewport", props.className)}
-            >
+        <Toast.Provider swipeDirection="right" duration={durationMs} label={t.Label}>
+            <Toast.Viewport className={clsx("notifications-viewport", props.className)}>
                 {toasts}
             </Toast.Viewport>
         </Toast.Provider>
@@ -75,28 +65,17 @@ function Notification({
             duration={n.durationMs}
         >
             <Toast.Title className="notification-title">
-                <div className="icon">
-                    {n.type === "info" ? <InfoIcon /> : <WarningIcon />}
-                </div>
+                <div className="icon">{n.type === "info" ? <InfoIcon /> : <WarningIcon />}</div>
                 {n.title}
             </Toast.Title>
-            <Toast.Close
-                className="notification-close"
-                aria-label={ariaLabelCloseBtn}
-            >
+            <Toast.Close className="notification-close" aria-label={ariaLabelCloseBtn}>
                 <XIcon aria-hidden />
             </Toast.Close>
-            <Toast.Description className="notification-message">
-                {n.message}
-            </Toast.Description>
+            <Toast.Description className="notification-message">{n.message}</Toast.Description>
 
             <div className="notification-buttons">
                 {n.buttons?.map((btn) => (
-                    <Toast.Action
-                        asChild
-                        key={btn.ariaLabel}
-                        altText={btn.ariaLabel || ""}
-                    >
+                    <Toast.Action asChild key={btn.ariaLabel} altText={btn.ariaLabel || ""}>
                         <Button {...btn} />
                     </Toast.Action>
                 ))}
@@ -117,9 +96,7 @@ function PermanentNotification({
     return (
         <div className={clsx("notification pointer-events-auto", n.type)}>
             <div className="notification-title">
-                <div className="icon">
-                    {n.type === "info" ? <InfoIcon /> : <WarningIcon />}
-                </div>
+                <div className="icon">{n.type === "info" ? <InfoIcon /> : <WarningIcon />}</div>
                 {n.title}
             </div>
             <button
@@ -134,11 +111,7 @@ function PermanentNotification({
 
             <div className="notification-buttons">
                 {n.buttons?.map((btn) => (
-                    <Toast.Action
-                        asChild
-                        key={btn.ariaLabel}
-                        altText={btn.ariaLabel || ""}
-                    >
+                    <Toast.Action asChild key={btn.ariaLabel} altText={btn.ariaLabel || ""}>
                         <Button
                             {...btn}
                             onPress={(e) => {

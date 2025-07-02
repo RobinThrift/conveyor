@@ -31,9 +31,7 @@ export function InfoPopover(props: InfoPopoverProps) {
                 <InfoIcon />
             </AriaButton>
             <AriaPopover className="info-popover" placement={props.placement}>
-                <AriaDialog
-                    className={clsx("info-popover-content", props.className)}
-                >
+                <AriaDialog className={clsx("info-popover-content", props.className)}>
                     {props.children}
                 </AriaDialog>
             </AriaPopover>

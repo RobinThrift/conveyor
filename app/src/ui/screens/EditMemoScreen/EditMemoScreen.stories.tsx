@@ -37,9 +37,7 @@ export const Edit: Story = {
         (Story, { args }) => {
             let dispatch = useDispatch()
             useEffect(() => {
-                dispatch(
-                    actions.memos.setCurrentSingleMemoID({ id: args.memoID }),
-                )
+                dispatch(actions.memos.setCurrentSingleMemoID({ id: args.memoID }))
             }, [dispatch, args.memoID])
 
             return <Story />

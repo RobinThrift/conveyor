@@ -10,10 +10,7 @@ export class OPFS implements FS {
     private _worker: ReturnType<typeof OPFSWorker.createClient>
     private _ready: AsyncResult<void>
 
-    constructor(
-        baseDir: string,
-        { onError }: { onError?: (err: Error) => void } = {},
-    ) {
+    constructor(baseDir: string, { onError }: { onError?: (err: Error) => void } = {}) {
         this._baseDir = baseDir
         this._worker = OPFSWorker.createClient(
             new Worker(new URL("./opfs.worker?worker&url", import.meta.url), {
@@ -44,10 +41,7 @@ export class OPFS implements FS {
         this._worker.terminate()
     }
 
-    public async read(
-        ctx: Context,
-        filepath: string,
-    ): AsyncResult<ArrayBufferLike> {
+    public async read(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike> {
         let [_ready, readyErr] = await this._ready
         if (readyErr) {
             return Err(readyErr)
