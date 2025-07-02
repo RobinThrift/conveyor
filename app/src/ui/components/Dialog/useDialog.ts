@@ -35,19 +35,23 @@ export function useDialog(props: {
             return
         }
 
-        if (ref.current) {
-            ref.current.inert = false
-            for (let anim of ref.current.getAnimations()) {
-                anim.cancel()
+        requestAnimationFrame(() => {
+            if (ref.current) {
+                ref.current.inert = false
+                for (let anim of ref.current.getAnimations()) {
+                    if (!(anim instanceof CSSTransition)) {
+                        anim.cancel()
+                    }
+                }
             }
-        }
 
-        if (props.isModal) {
-            incrementNesting()
-            ref.current?.showModal()
-        } else {
-            ref.current?.show()
-        }
+            if (props.isModal) {
+                incrementNesting()
+                ref.current?.showModal()
+            } else {
+                ref.current?.show()
+            }
+        })
         setIsOpen(true)
     }, [props.isModal, isOpen, incrementNesting])
 
