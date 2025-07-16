@@ -6,7 +6,7 @@ require (
 	filippo.io/age v1.2.1
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/matoous/go-nanoid/v2 v2.1.0
-	github.com/oapi-codegen/runtime v1.1.1
+	github.com/oapi-codegen/runtime v1.1.2
 	github.com/pressly/goose/v3 v3.24.3
 	github.com/prometheus/client_golang v1.22.0
 	github.com/segmentio/ksuid v1.0.4
