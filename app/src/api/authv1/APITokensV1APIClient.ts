@@ -148,7 +148,7 @@ export class APITokensV1APIClient {
 
     public static ErrDeleteAPIToken = createErrType(
         "APITokensV1APIClient",
-        "error creating API token",
+        "error deleting API token",
     )
     public async deleteAPIToken(ctx: Context, name: string): AsyncResult<void> {
         let [req, createReqErr] = await this._createBaseRequest(
