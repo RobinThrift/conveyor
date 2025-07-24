@@ -1,3 +1,4 @@
+import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
 import React, { useCallback, useMemo, useState } from "react"
 import {
@@ -13,18 +14,21 @@ import { type CalendarDate, currentDate, getLocalTimeZone, isSameDay } from "@/l
 import { Button } from "@/ui/components/Button"
 import { CaretLeftIcon, CaretRightIcon } from "@/ui/components/Icons"
 import { useFormat, useT } from "@/ui/i18n"
+import { actions, selectors, stores } from "@/ui/stores"
 
 import { CalendarCell } from "./CalendarCell"
 
 export interface DatePickerProps {
     className?: string
-    selected?: CalendarDate
-    onSelect: (date?: CalendarDate) => void
 }
 
-export const DatePicker = React.memo(function DatePicker({ className, ...props }: DatePickerProps) {
+export const DatePicker = React.memo(function DatePicker({ className }: DatePickerProps) {
     let t = useT("components/MemoListFilter/DatePicker")
-    let [focusedDate, setFocusedDate] = useState<CalendarDate>(props.selected ?? currentDate())
+    let exactDateFilter = useStore(
+        stores.memos.list.filter,
+        selectors.memos.list.filter("exactDate"),
+    )
+    let [focusedDate, setFocusedDate] = useState<CalendarDate>(exactDateFilter ?? currentDate())
 
     let onClickTodayBtn = useCallback(() => {
         setFocusedDate(currentDate())
@@ -34,12 +38,9 @@ export const DatePicker = React.memo(function DatePicker({ className, ...props }
         return currentDate()
     }, [])
 
-    let onChange = useCallback(
-        (value: DateValue) => {
-            props.onSelect((value as CalendarDate) || undefined)
-        },
-        [props.onSelect],
-    )
+    let onChange = useCallback((value: DateValue) => {
+        actions.memos.list.setFilter({ exactDate: (value as CalendarDate) || undefined })
+    }, [])
 
     return (
         <div className={clsx("date-picker", className)}>
@@ -51,7 +52,7 @@ export const DatePicker = React.memo(function DatePicker({ className, ...props }
                 focusedValue={focusedDate}
                 onChange={onChange}
                 onFocusChange={setFocusedDate}
-                value={props.selected ?? null}
+                value={exactDateFilter ?? null}
                 className="date-picker-calendar"
             >
                 <div className="date-picker-header">

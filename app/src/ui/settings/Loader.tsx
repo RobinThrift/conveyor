@@ -1,16 +1,18 @@
+import { useStore } from "@tanstack/react-store"
 import React, { useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
 import { Loader } from "@/ui/components/Loader"
-import { actions, selectors } from "@/ui/state"
+import { actions, selectors, stores } from "@/ui/stores"
 
 export function SettingsLoader({ children }: React.PropsWithChildren) {
-    let isSetup = useSelector(selectors.setup.isSetup)
-    let isUnlocked = useSelector(selectors.unlock.isUnlocked)
-    let isLoading = useSelector(selectors.settings.isLoading)
-    let isLoaded = useSelector(selectors.settings.isLoaded)
-    let error = useSelector(selectors.settings.error)
-    let dispatch = useDispatch()
+    let isSetup = useStore(stores.setup.isSetup)
+    let isUnlocked = useStore(stores.unlock.status, selectors.unlock.isUnlocked)
+    let isLoading = useStore(
+        stores.settings.state,
+        (s) => s.state === "loading" || s.state === "load-requested",
+    )
+    let isLoaded = useStore(stores.settings.state, (s) => s.state === "done")
+    let error = useStore(stores.settings.state, (s) => (s.state === "error" ? s.error : undefined))
 
     useEffect(() => {
         if (!isSetup || !isUnlocked) {
@@ -27,8 +29,8 @@ export function SettingsLoader({ children }: React.PropsWithChildren) {
             return
         }
 
-        dispatch(actions.settings.loadStart())
-    }, [isSetup, isUnlocked, isLoaded, isLoading, error, dispatch])
+        actions.settings.load()
+    }, [isSetup, isUnlocked, isLoaded, isLoading, error])
 
     if (!isSetup || !isUnlocked) {
         return children

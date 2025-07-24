@@ -1,61 +1,43 @@
-import { useCallback, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 
-import type { ListMemosQuery } from "@/domain/Memo"
-import type { Tag } from "@/domain/Tag"
-import type { CalendarDate } from "@/lib/i18n"
-
-export type Filter = ListMemosQuery
-
-export function useMemoListFilterState(props: {
-    tags: Tag[]
-    filter: Filter
-    onChangeFilter: (f: Filter) => void
-}) {
+export function useMemoListFilterState() {
     let [collapsibileDatePickerExpaned, setCollapsibileDatePickerExpaned] = useState(false)
 
-    let onChangeSearch = useCallback(
-        (query: string) => {
-            props.onChangeFilter({
-                ...props.filter,
-                query,
-            })
-        },
-        [props.filter, props.onChangeFilter],
-    )
-
-    let onSelectDate = useCallback(
-        (date: CalendarDate | undefined) => {
-            props.onChangeFilter({
-                ...props.filter,
-                exactDate: date,
-            })
-        },
-        [props.filter, props.onChangeFilter],
-    )
-
-    let onSelectStateFilter = useCallback(
-        (state?: "isArchived" | "isDeleted") => {
-            let { isArchived, isDeleted, ...filter } = props.filter
-
-            switch (state) {
-                case "isArchived":
-                    props.onChangeFilter({
-                        ...filter,
-                        isArchived: true,
-                    })
-                    return
-                case "isDeleted":
-                    props.onChangeFilter({
-                        ...filter,
-                        isDeleted: true,
-                    })
-                    return
-            }
-
-            props.onChangeFilter(filter)
-        },
-        [props.filter, props.onChangeFilter],
-    )
+    // let onChangeSearch = useCallback((query: string) => {
+    //     actions.memos.list.setFilter(
+    //         query,
+    //         "user",
+    //     )
+    // }, [])
+    //
+    // let onSelectDate = useCallback((date: CalendarDate | undefined) => {
+    //     actions.memos.list.setFilter({
+    //         filter: { exactDate: date },
+    //         source: "user",
+    //     })
+    // }, [])
+    //
+    // let onSelectStateFilter = useCallback((state?: "isArchived" | "isDeleted") => {
+    //     switch (state) {
+    //         case "isArchived":
+    //             actions.memos.list.setFilter({
+    //                 filter: { isArchived: true },
+    //                 source: "user",
+    //             })
+    //             return
+    //         case "isDeleted":
+    //             actions.memos.list.setFilter({
+    //                 filter: { isDeleted: true },
+    //                 source: "user",
+    //             })
+    //             return
+    //     }
+    //
+    //     actions.memos.list.setFilter({
+    //         filter: { isDeleted: undefined, isArchived: undefined },
+    //         source: "user",
+    //     })
+    // }, [])
 
     return useMemo(
         () => ({
@@ -63,10 +45,7 @@ export function useMemoListFilterState(props: {
                 expanded: collapsibileDatePickerExpaned,
                 setExpanded: setCollapsibileDatePickerExpaned,
             },
-            onChangeSearch,
-            onSelectDate,
-            onSelectStateFilter,
         }),
-        [collapsibileDatePickerExpaned, onChangeSearch, onSelectDate, onSelectStateFilter],
+        [collapsibileDatePickerExpaned],
     )
 }

@@ -216,4 +216,31 @@ export class NavigationController {
         setup: "/setup",
         root: "/",
     }
+
+    public static urlToScreenMapping = (url: URL): keyof Screens | undefined => {
+        switch (url.pathname) {
+            case "/memos/new":
+                return "memo.new"
+            case "/settings":
+                return "settings"
+            case "/setup":
+                return "setup"
+            case "/unlock":
+                return "unlock"
+        }
+
+        let hasMemoID =
+            url.searchParams.has("memoID") && url.searchParams.get("memoID")?.length !== 0
+        let hasIsEditing = url.searchParams.get("isEditing") === "true"
+
+        if (hasMemoID && hasIsEditing) {
+            return "memo.edit"
+        }
+
+        if (hasMemoID) {
+            return "memo.view"
+        }
+
+        return "root"
+    }
 }

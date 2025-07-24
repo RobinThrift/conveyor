@@ -1,11 +1,16 @@
 import { newID } from "@/domain/ID"
 import { BaseContext, type Context, isContext } from "@/lib/context"
 import { type AsyncResult, type Result, fromThrowing } from "@/lib/result"
-import { getThreadName } from "./thread"
+import { getThreadName } from "@/lib/thread"
+import { removeNonClonable } from "@/lib/transferable"
+
+const __isSpan = Symbol("__isSpan")
 
 declare const __ENABLE_DEVTOOLS__: boolean
 
 export type Span = {
+    [__isSpan]: true
+
     id: string
 
     parentSpan?: string
@@ -20,6 +25,23 @@ export type Span = {
     recordEvent(type: string, data: any): void
     recordError(err: Error): void
     end(): void
+}
+
+const noopSpan: Span = {
+    [__isSpan]: true,
+    id: "noop",
+    name: "noop",
+    thread: getThreadName(),
+    startTime: 0,
+    events: [],
+    attrs: {},
+    recordEvent() {},
+    recordError() {},
+    end() {},
+}
+
+export function isSpan(v: any): boolean {
+    return (v && typeof v === "object" && __isSpan in v) || ("__isSpan" in v && v.__isSpan)
 }
 
 export type SpanEvent<D = any> = {
@@ -38,7 +60,7 @@ export function trace<Return extends Result<any> | AsyncResult<any>>(
         return fn(ctx)
     }
 
-    let [ctxWithSpan, span] = startSpan(ctx, name)
+    let [ctxWithSpan, span] = startSpan(ctx, `trace:${name}`)
     if (attrs) {
         span.attrs = { ...span.attrs, ...attrs }
     }
@@ -72,9 +94,10 @@ export function startSpan<Ctx extends Context>(
 
     let parentSpan: Span | undefined = ctx.getData<"span">("span")
 
-    let mark = performance.mark(`trace:${name}:start`)
+    let mark = performance.mark(`${name}:start`)
 
     let span: Span = {
+        [__isSpan]: true,
         id: newID(),
         parentSpan: parentSpan?.id,
         name,
@@ -100,8 +123,8 @@ export function startSpan<Ctx extends Context>(
         },
 
         end() {
-            let mark = performance.mark(`trace:${name}:end`, {
-                detail: removeMethods(this),
+            let mark = performance.mark(`${name}:end`, {
+                detail: toPlainSpan(this),
             })
             this.endTime = mark.startTime.valueOf()
         },
@@ -111,25 +134,15 @@ export function startSpan<Ctx extends Context>(
 }
 
 type PlainSpan = {
+    __isSpan: true
     id: string
     parentSpan?: string
     name: string
+    thread: string
     startTime: number
     endTime?: number
     events: SpanEvent[]
     attrs: Record<string, any>
-}
-
-function removeMethods(span: Span): PlainSpan {
-    return {
-        id: span.id,
-        parentSpan: span.parentSpan,
-        name: span.name,
-        startTime: span.startTime,
-        endTime: span.endTime,
-        events: span.events,
-        attrs: span.attrs,
-    }
 }
 
 export function createTracedProxy<T extends object>(target: T): T {
@@ -159,7 +172,7 @@ export function createTracedProxy<T extends object>(target: T): T {
                                     `${target.constructor.name}/${argumentsList[0]}`,
                                     () =>
                                         fromThrowing(() => argumentsList[1].call(thisArg, ...args)),
-                                    { event: argumentsList[0], args },
+                                    { event: argumentsList[0], args: removeNonClonable(args) },
                                 )
                             },
                         ])
@@ -192,38 +205,53 @@ export function createTracedProxy<T extends object>(target: T): T {
     })
 }
 
-function removeNonClonable(v: any): any {
-    return JSON.parse(
-        JSON.stringify(v, (_, value) => {
-            if (value instanceof ArrayBuffer) {
-                return "[ArrayBuffer]"
-            }
-
-            if (value instanceof Uint8Array) {
-                return "[Uint8Array]"
-            }
-
-            if (typeof value === "function") {
-                return `[Function ${value.name || "anonymous"}]`
-            }
-
-            if (isContext(value)) {
-                return "[Context]"
-            }
-
-            return value
-        }),
-    )
+export function toPlainSpan(span: Span): PlainSpan {
+    return {
+        __isSpan: true,
+        id: span.id,
+        parentSpan: span.parentSpan,
+        name: span.name,
+        thread: span.thread,
+        startTime: span.startTime,
+        endTime: span.endTime,
+        events: span.events,
+        attrs: span.attrs,
+    }
 }
 
-const noopSpan: Span = {
-    id: "noop",
-    name: "noop",
-    thread: getThreadName(),
-    startTime: 0,
-    events: [],
-    attrs: {},
-    recordEvent() {},
-    recordError() {},
-    end() {},
+export function spanFromPlainSpan(span: PlainSpan): Span {
+    return {
+        [__isSpan]: true,
+        id: span.id,
+        parentSpan: span.parentSpan,
+        name: span.name,
+        thread: span.thread,
+        startTime: span.startTime,
+        endTime: span.endTime,
+        events: span.events,
+        attrs: span.attrs,
+
+        recordEvent(type: string, data: any) {
+            this.events.push({
+                type,
+                data,
+                timestamp: performance.now().valueOf(),
+            })
+        },
+
+        recordError(err: Error) {
+            this.events.push({
+                type: "error",
+                timestamp: performance.now().valueOf(),
+                data: err,
+            })
+        },
+
+        end() {
+            let mark = performance.mark(`trace:${span.name}:end`, {
+                detail: toPlainSpan(this),
+            })
+            this.endTime = mark.startTime.valueOf()
+        },
+    }
 }

@@ -2,10 +2,9 @@ import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React, { useCallback, useState } from "react"
 
-import { decorator } from "@/lib/testhelper/rootStore"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 import { Button } from "@/ui/components/Button"
 import { InfoIcon, WarningIcon, XIcon } from "@/ui/components/Icons"
-import { useNotificationDispatcher } from "@/ui/state/global/notifications"
 
 import "@/ui/styles/index.css"
 
@@ -14,7 +13,7 @@ import { Notifications } from "./Notifications"
 const meta: Meta<typeof Notifications> = {
     title: "Components/Notifications",
     component: Notifications,
-    decorators: [decorator],
+    decorators: [withMockBackend({})],
 }
 
 export default meta
@@ -29,7 +28,7 @@ export const Overview: Story = {
 
     render: (args) => {
         let [count, setCount] = useState(0)
-        let addNotification = useNotificationDispatcher()
+        let addNotification = (() => {}) as any
         let onClickInfo = useCallback(() => {
             addNotification({
                 type: "info",

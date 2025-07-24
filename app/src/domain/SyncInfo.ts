@@ -1,3 +1,5 @@
+export type SyncMethod = "local-only" | "remote-sync"
+
 export type SyncInfo =
     | { isEnabled: false }
     | {

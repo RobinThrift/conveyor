@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 import { action } from "storybook/actions"
 
-import { decorator } from "@/lib/testhelper/rootStore"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 import "@/ui/styles/index.css"
 
 import { Memo } from "./Memo"
@@ -14,7 +14,7 @@ const meta: Meta<typeof Memo> = {
     parameters: {
         layout: "fullscreen",
     },
-    decorators: [decorator],
+    decorators: [withMockBackend({})],
 }
 
 export default meta

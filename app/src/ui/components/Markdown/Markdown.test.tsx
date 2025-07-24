@@ -4,8 +4,6 @@ import { expect, suite, test } from "vitest"
 import { render } from "vitest-browser-react"
 
 import { generateRealisticBody } from "@/lib/testhelper/memos"
-import { configureRootStore } from "@/ui/state"
-import { Provider } from "@/ui/state/Provider"
 
 import { Markdown } from "./Markdown"
 
@@ -13,11 +11,7 @@ suite("ui/components/Markdown", () => {
     test("Markdown", async () => {
         let raw = `# Markdown Test\n #tag-1 #tag-2\n${generateRealisticBody()}`
 
-        let rendered = render(
-            <Provider store={configureRootStore()}>
-                <Markdown id="test-memo-id">{raw}</Markdown>
-            </Provider>,
-        )
+        let rendered = render(<Markdown id="test-memo-id">{raw}</Markdown>)
 
         await expect
             .element(rendered.getByRole("heading", { level: 1 }))

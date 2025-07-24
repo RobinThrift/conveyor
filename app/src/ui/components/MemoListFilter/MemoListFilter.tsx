@@ -1,5 +1,3 @@
-import type { ListMemosQuery } from "@/domain/Memo"
-import type { Tag } from "@/domain/Tag"
 import clsx from "clsx"
 import React from "react"
 
@@ -15,17 +13,8 @@ import { StateFilter } from "./StateFilter"
 import { TagTreeFilter, useTagTreeFilterStore } from "./TagTreeFilter"
 import { useMemoListFilterState } from "./state"
 
-export type Filter = ListMemosQuery
-
-export interface MemoListFilterProps {
-    tags: Tag[]
-    filter: Filter
-    onChangeFilter: (f: Filter) => void
-}
-
-export function MemoListFilter(props: MemoListFilterProps) {
-    let { datepicker, onChangeSearch, onSelectDate, onSelectStateFilter } =
-        useMemoListFilterState(props)
+export function MemoListFilter() {
+    let { datepicker } = useMemoListFilterState()
     let t = useT("components/MemoListFilter")
 
     let { openOffCanvas } = useTagTreeFilterStore()
@@ -33,11 +22,7 @@ export function MemoListFilter(props: MemoListFilterProps) {
     return (
         <div className="memo-list-filter">
             <AppHeader position="right" id="memo-list-filter-search">
-                <SearchBar
-                    className="collapsible"
-                    onChange={onChangeSearch}
-                    query={props.filter.query}
-                />
+                <SearchBar className="collapsible" />
                 <Button
                     iconRight=<HashIcon />
                     outline
@@ -53,11 +38,11 @@ export function MemoListFilter(props: MemoListFilterProps) {
                     expanded: datepicker.expanded,
                 })}
             >
-                <ShortDayPicker onSelect={onSelectDate} selected={props.filter.exactDate} />
+                <ShortDayPicker />
 
-                <DatePicker onSelect={onSelectDate} selected={props.filter.exactDate} />
+                <DatePicker />
 
-                <StateFilter onSelect={onSelectStateFilter} selected={props.filter} />
+                <StateFilter />
 
                 <Button
                     iconRight={
@@ -76,22 +61,14 @@ export function MemoListFilter(props: MemoListFilterProps) {
             </div>
 
             <div className="hidden tablet:block">
-                <SearchBar onChange={onChangeSearch} query={props.filter.query} />
+                <SearchBar />
             </div>
 
-            <DatePicker
-                onSelect={onSelectDate}
-                selected={props.filter.exactDate}
-                className="hidden tablet:block"
-            />
+            <DatePicker className="hidden tablet:block" />
 
             <TagTreeFilter />
 
-            <StateFilter
-                className="hidden tablet:grid"
-                onSelect={onSelectStateFilter}
-                selected={props.filter}
-            />
+            <StateFilter className="hidden tablet:grid" />
         </div>
     )
 }

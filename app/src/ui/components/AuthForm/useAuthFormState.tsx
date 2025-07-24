@@ -1,7 +1,7 @@
 import type { PlaintextPassword } from "@/auth/credentials"
-import { type AuthStatus, actions } from "@/ui/state"
+import { actions } from "@/ui/stores"
+import type { AuthStatus } from "@/ui/stores/auth"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useDispatch } from "react-redux"
 
 import type { ChangePasswordArgs } from "./ChangePasswordForm"
 
@@ -19,7 +19,6 @@ export interface LoginArgs {
 }
 
 export function useAuthFormState(props: UseAuthFormStateProps) {
-    let dispatch = useDispatch()
     let [username, setUsername] = useState<string>("")
     let [requestFired, setRequestFired] = useState(false)
     let isLoading = useMemo(
@@ -36,12 +35,8 @@ export function useAuthFormState(props: UseAuthFormStateProps) {
     )
 
     let cancelPasswordChangeDialog = useCallback(() => {
-        dispatch(
-            actions.auth.setAuthStatus({
-                status: "not-authenticated",
-            }),
-        )
-    }, [dispatch])
+        actions.auth.setAuthStatus("not-authenticated")
+    }, [])
 
     useEffect(() => {
         if (props.status === "authenticated") {

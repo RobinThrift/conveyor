@@ -1,9 +1,10 @@
 import type { Duration } from "@/lib/duration"
+import { type Span, isSpan, spanFromPlainSpan, toPlainSpan } from "./tracing"
 
 const __isContext = Symbol("__isContext")
 
 export function isContext(v: any): boolean {
-    return v && typeof v === "object" && __isContext in v
+    return v && typeof v === "object" && (__isContext in v || "__isContext" in v)
 }
 
 export type CancelFunc = (reason?: Error) => void
@@ -20,9 +21,14 @@ export interface Context<D extends Record<string, unknown> = Record<string, any>
 
     getData<K extends keyof D>(key: K): D[K]
     getData<K extends keyof D>(key: K, fallback: D[K]): Required<D>[K]
+
+    toPlainObject(): Record<string, unknown>
 }
 
 export const BaseContext: Context = {
+    //@ts-expect-error
+    [__isContext]: true,
+
     signal: undefined,
 
     withSignal(signal?: AbortSignal) {
@@ -53,8 +59,14 @@ export const BaseContext: Context = {
         return undefined
     },
 
-    //@ts-expect-error
-    [__isContext]: true,
+    toPlainObject() {
+        return {
+            __isContext: true,
+            _data: {},
+            _err: undefined,
+            _isCancelled: false,
+        }
+    },
 }
 
 class context<D extends Record<string, unknown> = Record<string, any>> {
@@ -65,6 +77,31 @@ class context<D extends Record<string, unknown> = Record<string, any>> {
     private _parent: Context;
 
     [__isContext] = true
+
+    static fromPlainObject<D extends Record<string, unknown> = Record<string, any>>(
+        obj: Record<string, unknown>,
+    ): Context<D> {
+        let data = { ...(obj._data as Record<string, unknown>) }
+        for (let key in data) {
+            let span = data[key]
+            if (!isSpan(span)) {
+                continue
+            }
+            data[key] = spanFromPlainSpan(span as any)
+            break
+        }
+
+        let ctx = new context<D>(BaseContext, { data: obj.data as D })
+        if (obj._err) {
+            ctx._err = obj.err as Error
+        }
+
+        if (obj._isCancelled) {
+            ctx._isCancelled = obj._isCancelled as boolean
+        }
+
+        return ctx
+    }
 
     constructor(parent: Context, { signal, data }: { signal?: AbortSignal; data?: D }) {
         this.signal = signal
@@ -160,4 +197,29 @@ class context<D extends Record<string, unknown> = Record<string, any>> {
             return new Error("context cancelled for unknown reason")
         }
     }
+
+    public toPlainObject(): Record<string, unknown> {
+        let data = { ...this._data }
+        for (let key in data) {
+            let span = data[key]
+            if (!isSpan(span)) {
+                continue
+            }
+            data[key] = toPlainSpan(span as Span) as any
+            break
+        }
+
+        return {
+            __isContext: true,
+            _data: data,
+            _err: this.err(),
+            _isCancelled: this._isCancelled,
+        }
+    }
+}
+
+export function contextFromPlainObject<D extends Record<string, unknown> = Record<string, any>>(
+    obj: Record<string, unknown>,
+): Context<D> {
+    return context.fromPlainObject<D>(obj)
 }

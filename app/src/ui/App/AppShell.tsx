@@ -1,8 +1,7 @@
-import React, { Suspense, useEffect, useState } from "react"
+import React, { Suspense, useEffect, useRef, useState } from "react"
 
 import { AppHeaderProvider } from "@/ui/components/AppHeader"
 import { BuildInfo } from "@/ui/components/BuildInfo"
-import { Notifications } from "@/ui/components/Notifications"
 import { Theme } from "@/ui/components/Theme"
 import { useCurrentPage } from "@/ui/navigation"
 import { ErrorScreen } from "@/ui/screens/ErrorScreen"
@@ -30,7 +29,15 @@ export function AppShell() {
 
     let [pageComp, setPageComp] = useState<React.ReactNode[] | undefined>()
 
+    let showingPage = useRef<string | undefined>(undefined)
+
     useEffect(() => {
+        if (showingPage.current === currentPage?.name) {
+            return
+        }
+
+        showingPage.current = currentPage?.name
+
         setPageComp((prevPageComp) => {
             switch (currentPage?.name) {
                 case "unlock":
@@ -92,8 +99,6 @@ export function AppShell() {
                         <BuildInfo />
                     </footer>
                 </main>
-
-                <Notifications />
             </I18nProvider>
         </Theme>
     )

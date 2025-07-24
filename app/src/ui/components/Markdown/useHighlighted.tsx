@@ -4,19 +4,18 @@ import type { Parser } from "@lezer/common"
 import { classHighlighter, highlightCode } from "@lezer/highlight"
 import React, { startTransition, useEffect, useState } from "react"
 
-import { useNotificationDispatcher } from "@/ui/state/global/notifications"
-
 const _parserInProgress = new Map<string, Promise<Parser>>()
 const _parsers = new Map<string, Parser>()
 
 export function useHightlighted({
     code,
     lang,
+    hightlightedLines,
 }: {
     code: string
     lang?: string
+    hightlightedLines?: number[]
 }): string | React.ReactNode[] {
-    let addNotification = useNotificationDispatcher()
     let [parser, setParser] = useState<{ lang: string; parser: Parser } | undefined>(() => {
         if (!lang) {
             return undefined
@@ -38,7 +37,7 @@ export function useHightlighted({
             return code
         }
 
-        return hightlight({ code, parser })
+        return hightlight({ code, parser, hightlightedLines })
     })
 
     if (lang && parser && parser?.lang !== lang) {
@@ -52,7 +51,7 @@ export function useHightlighted({
 
         if (parser) {
             startTransition(() => {
-                setHighlighted(hightlight({ code, parser: parser.parser }))
+                setHighlighted(hightlight({ code, parser: parser.parser, hightlightedLines }))
             })
             return
         }
@@ -92,12 +91,12 @@ export function useHightlighted({
                         return
                     }
                     setParser({ parser, lang })
-                    setHighlighted(hightlight({ code, parser }))
+                    setHighlighted(hightlight({ code, parser, hightlightedLines }))
                 })
             })
             .catch((error) => {
                 let [title, message] = error.message.split(/:\n/, 2)
-                addNotification({
+                console.error({
                     type: "error",
                     title,
                     message,
@@ -107,26 +106,44 @@ export function useHightlighted({
         return () => {
             interrupted = true
         }
-    }, [parser, code, lang, addNotification])
+    }, [parser, code, lang, hightlightedLines])
 
     return highlighted
 }
 
-function hightlight({ code, parser }: { code: string; parser: Parser }) {
-    let nodes: React.ReactNode[] = []
+function hightlight({
+    code,
+    parser,
+    hightlightedLines,
+}: { code: string; parser: Parser; hightlightedLines?: number[] }) {
+    let line = 0
+    let nodes: React.ReactNode[][] = [[]]
+
     let putText = (code: string, classes: string) => {
         if (code.trim().length !== 0) {
-            nodes.push(
-                <span key={nodes.length} className={classes}>
+            nodes[line].push(
+                <span key={nodes[line].length} className={classes}>
                     {code}
                 </span>,
             )
         } else {
-            nodes.push(code)
+            nodes[line].push(code)
         }
     }
+
     let putBreak = () => {
-        nodes.push("\n")
+        if (hightlightedLines?.includes(line)) {
+            nodes[line] = [
+                <span key={1} className="code-line-highlight">
+                    {nodes[line]}
+                </span>,
+            ]
+        } else {
+            nodes[line].push("\n")
+        }
+
+        line++
+        nodes[line] = []
     }
 
     highlightCode(code, parser.parse(code), classHighlighter, putText, putBreak)

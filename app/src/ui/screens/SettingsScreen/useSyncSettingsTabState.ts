@@ -1,10 +1,9 @@
-import type { PlaintextPassword } from "@/auth"
+import { useStore } from "@tanstack/react-store"
 import { useCallback, useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
+import type { PlaintextPassword } from "@/auth"
 import type { ChangePasswordArgs } from "@/ui/components/AuthForm"
-import { actions } from "@/ui/state"
-import { selectors } from "@/ui/state/selectors"
+import { actions, stores } from "@/ui/stores"
 
 export interface SetupArgs {
     server: string
@@ -13,41 +12,33 @@ export interface SetupArgs {
 }
 
 export function useSyncSettingsTabState() {
-    let dispatch = useDispatch()
+    let status = useStore(stores.sync.status)
+    let error = useStore(stores.sync.error)
+    let info = useStore(stores.sync.info)
 
-    let status = useSelector(selectors.sync.status)
-    let error = useSelector(selectors.sync.error)
-    let info = useSelector(selectors.sync.info)
-
-    let setup = useCallback(
-        (args: SetupArgs) => {
-            dispatch(actions.sync.setup(args))
-        },
-        [dispatch],
-    )
+    let setup = useCallback((args: SetupArgs) => {
+        actions.sync.setup(args)
+    }, [])
 
     let [showSetup, setShowSetup] = useState<boolean>(info.isEnabled)
 
     let manualSync = useCallback(() => {
-        dispatch(actions.sync.syncStart())
-    }, [dispatch])
+        actions.sync.syncStart()
+    }, [])
 
     let manualFullDownload = useCallback(() => {
-        dispatch(actions.sync.syncStartDownloadFull())
-    }, [dispatch])
+        actions.sync.syncStartDownloadFull()
+    }, [])
 
     let manualFullUpload = useCallback(() => {
-        dispatch(actions.sync.syncStartUploadFull())
-    }, [dispatch])
+        actions.sync.syncStartUploadFull()
+    }, [])
 
-    let authError = useSelector(selectors.auth.error)
-    let authStatus = useSelector(selectors.auth.status)
-    let changePassword = useCallback(
-        (args: ChangePasswordArgs) => {
-            dispatch(actions.auth.changePassword(args))
-        },
-        [dispatch],
-    )
+    let authError = useStore(stores.auth.error)
+    let authStatus = useStore(stores.auth.status)
+    let changePassword = useCallback((args: ChangePasswordArgs) => {
+        actions.auth.changePassword(args)
+    }, [])
 
     let [showPasswordChange, setShowPasswordChange] = useState<boolean>(info.isEnabled)
 
@@ -64,11 +55,11 @@ export function useSyncSettingsTabState() {
         setShowSetup: useCallback(
             (value: boolean) => {
                 if (!value && info.isEnabled) {
-                    dispatch(actions.sync.disable())
+                    actions.sync.disable()
                 }
                 setShowSetup(value)
             },
-            [dispatch, info.isEnabled],
+            [info.isEnabled],
         ),
         showPasswordChange,
         manualSync,

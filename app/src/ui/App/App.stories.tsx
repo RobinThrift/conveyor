@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { decoratorWithMockData } from "@/lib/testhelper/rootStore"
-import "@/ui/styles/index.css"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 
 import { App, type AppProps } from "./App"
+
+import "@/ui/styles/index.css"
 
 const meta: Meta<AppProps> = {
     title: "Conveyor/App",
@@ -11,7 +12,7 @@ const meta: Meta<AppProps> = {
     parameters: {
         layout: "fullscreen",
     },
-    decorators: [decoratorWithMockData],
+    decorators: [withMockBackend({ generateMockData: true })],
 }
 
 export default meta

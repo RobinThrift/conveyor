@@ -5,14 +5,14 @@ import { FlaskIcon, XIcon } from "../components/Icons"
 import { Loader } from "../components/Loader"
 import { FPSMeter } from "./FPSMeter"
 import { ReactDevTools } from "./ReactDevTools"
-import { ReduxDevTools } from "./ReduxDevTools"
 import { SQLLogDevTool } from "./SQLLogDevTool"
+import { StoresDevTool } from "./StoresDevTool"
 import { TracingDevTool } from "./TracingDevTool"
 
 import "./DevTools.css"
 
 let tabs = {
-    Redux: <ReduxDevTools />,
+    Stores: <StoresDevTool />,
     Trace: <TracingDevTool />,
     React: <ReactDevTools />,
     "SQL Log": <SQLLogDevTool />,
@@ -20,7 +20,7 @@ let tabs = {
 
 export function DevTools() {
     let [isOpen, setIsOpen] = useState(false)
-    let [activeTab, setActiveTab] = useState<keyof typeof tabs>("Redux")
+    let [activeTab, setActiveTab] = useState<keyof typeof tabs>("Stores")
 
     useEffect(() => {
         if (!isOpen) {

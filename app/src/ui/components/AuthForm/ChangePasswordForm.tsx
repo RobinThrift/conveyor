@@ -7,7 +7,7 @@ import { Form } from "@/ui/components/Form"
 import { Input } from "@/ui/components/Input"
 import { Loader } from "@/ui/components/Loader"
 import { useT } from "@/ui/i18n"
-import type { AuthStatus } from "@/ui/state"
+import type { AuthStatus } from "@/ui/stores/auth"
 
 export interface ChangePasswordArgs {
     username: string

@@ -23,19 +23,14 @@ export default defineConfig(async (config): Promise<UserConfig> => {
 
             "process.env.NODE_ENV": JSON.stringify(config.mode),
 
-            __ENABLE_DEVTOOLS__:
-                config.mode === "development" ? "true" : "false",
+            __ENABLE_DEVTOOLS__: config.mode === "development" ? "true" : "false",
 
             __PLATFORM__: JSON.stringify(isTauri ? "TAURI" : "WEB"),
-            __LOG_LEVEL__: JSON.stringify(
-                config.mode === "development" ? "debug" : "error",
-            ),
+            __LOG_LEVEL__: JSON.stringify(config.mode === "development" ? "debug" : "error"),
             __VERSION__: JSON.stringify(`${vcsInfo.version}${vcsInfo.suffix}`),
             __COMMIT_HASH__: JSON.stringify(vcsInfo.hash),
             __COMMIT_DATE__: JSON.stringify(vcsInfo.date),
-            __PROJECT_LINK__: JSON.stringify(
-                "https://github.com/RobinThrift/conveyor",
-            ),
+            __PROJECT_LINK__: JSON.stringify("https://github.com/RobinThrift/conveyor"),
         },
 
         resolve: {

@@ -2,14 +2,14 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 
 import "@/ui/styles/index.css"
-import { decorator } from "@/lib/testhelper/rootStore"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 
 import { SettingsScreen } from "./SettingsScreen"
 
 const meta: Meta<typeof SettingsScreen> = {
     title: "Screens/Settings",
     component: SettingsScreen,
-    decorators: [decorator],
+    decorators: [withMockBackend({})],
 }
 
 export default meta

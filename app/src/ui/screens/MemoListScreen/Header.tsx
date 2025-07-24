@@ -1,13 +1,15 @@
+import { useStore } from "@tanstack/react-store"
 import React from "react"
 
-import type { ListMemosQuery as Filter } from "@/domain/Memo"
 import { AppHeader } from "@/ui/components/AppHeader"
 import { DateTime } from "@/ui/components/DateTime"
 import { Greeting } from "@/ui/components/Greeting"
 import { useT } from "@/ui/i18n"
+import { stores } from "@/ui/stores"
 
-export function Header({ filter }: { filter: Filter }) {
+export function Header() {
     let t = useT("components/MemoListHeader")
+    let filter = useStore(stores.memos.list.filter)
 
     if (!filter) {
         return (

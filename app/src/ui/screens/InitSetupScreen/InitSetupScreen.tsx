@@ -1,20 +1,20 @@
 import React, { useCallback, useState } from "react"
 
+import type { SyncMethod } from "@/domain/SyncInfo"
 import type { PrivateCryptoKey } from "@/lib/crypto"
 import type { AsyncResult, Result } from "@/lib/result"
 import { Alert } from "@/ui/components/Alert"
+import { AuthForm } from "@/ui/components/AuthForm"
 import { BuildInfo } from "@/ui/components/BuildInfo"
 import { Button } from "@/ui/components/Button"
 import { ConveyorBeltText } from "@/ui/components/ConveyorBeltText/ConveyorBeltText"
 import { Form } from "@/ui/components/Form"
 import { Input } from "@/ui/components/Input"
+import { Loader } from "@/ui/components/Loader"
 import { RadioGroup, RadioItem } from "@/ui/components/Radio"
 import { useStateGetter } from "@/ui/hooks/useStateGetter"
 import { useT } from "@/ui/i18n"
-import type { SyncMethod } from "@/ui/state"
 
-import { AuthForm } from "@/ui/components/AuthForm"
-import { Loader } from "@/ui/components/Loader"
 import { useInitSetupScreenState, useStepConfigureRemoteSyncState } from "./useInitSetupScreenState"
 
 export function InitSetupScreen() {

@@ -1,13 +1,12 @@
 import { useCallback } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
 import type { PlaintextPrivateKey } from "@/lib/crypto"
-import { actions, selectors } from "@/ui/state"
+import { actions, stores } from "@/ui/stores"
+import { useStore } from "@tanstack/react-store"
 
 export function useUnlockScreenState() {
-    let dispatch = useDispatch()
-    let error = useSelector(selectors.unlock.error)
-    let unlockState = useSelector(selectors.unlock.state)
+    let unlockState = useStore(stores.unlock.status)
+    let error = useStore(stores.unlock.error)
     let isDisabled = unlockState !== "locked"
 
     let unlock = useCallback(
@@ -15,9 +14,9 @@ export function useUnlockScreenState() {
             plaintextKeyData,
             storeKey,
         }: { plaintextKeyData: PlaintextPrivateKey; storeKey: boolean }) => {
-            dispatch(actions.unlock.unlock({ plaintextKeyData, storeKey }))
+            actions.unlock.unlock({ plaintextKeyData, storeKey })
         },
-        [dispatch],
+        [],
     )
 
     return {

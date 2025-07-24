@@ -4,9 +4,9 @@ import React from "react"
 
 import type { Attachment } from "@/domain/Attachment"
 import { Second } from "@/lib/duration"
-import { type AsyncResult, Ok } from "@/lib/result"
+import { Ok } from "@/lib/result"
 import { delay } from "@/lib/testhelper/delay"
-import { AttachmentProvider } from "@/ui/attachments"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 
 import "@/ui/styles/index.css"
 
@@ -103,13 +103,10 @@ export const AttachmentWithThumbHash: Story = {
         src: "attachment://yLAy-2K3mImfADHe9exZr?thumbhash=GhgWJIJ/dYiaiIhnh4f5d/qGhg==",
     },
 
-    decorators: (Story) => (
-        <AttachmentProvider
-            value={{
-                getAttachmentDataByID: async (): AsyncResult<{
-                    attachment: Attachment
-                    data: ArrayBufferLike
-                }> => {
+    decorators: [
+        withMockBackend({
+            mockAttachments: {
+                "yLAy-2K3mImfADHe9exZr": async () => {
                     let res = await fetch(
                         "https://images.unsplash.com/photo-1740393148421-2159bf9e8d8e?q=80&w=6132&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     )
@@ -121,9 +118,7 @@ export const AttachmentWithThumbHash: Story = {
                         data: await res.arrayBuffer(),
                     })
                 },
-            }}
-        >
-            <Story />
-        </AttachmentProvider>
-    ),
+            },
+        }),
+    ],
 }

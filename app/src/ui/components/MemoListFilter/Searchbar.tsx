@@ -1,28 +1,26 @@
 import { Form } from "@radix-ui/react-form"
+import { useStore } from "@tanstack/react-store"
+import clsx from "clsx"
 import React, { useCallback } from "react"
 
 import { MagnifyingGlassIcon } from "@/ui/components/Icons"
 import { Input } from "@/ui/components/Input"
 import { useDebounce } from "@/ui/hooks/useDebounce"
 import { useT } from "@/ui/i18n"
-import clsx from "clsx"
+import { actions, selectors, stores } from "@/ui/stores"
 
 export function SearchBar(props: {
-    onChange: (v: string) => void
-    query?: string
     className?: string
 }) {
     let t = useT("components/MemoListFilter/Search")
-    let onChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            let value = e.target.value.trim()
-            if (value && !value.endsWith("*")) {
-                value += " *"
-            }
-            props.onChange(value)
-        },
-        [props.onChange],
-    )
+    let queryFilter = useStore(stores.memos.list.filter, selectors.memos.list.filter("query"))
+    let onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.trim()
+        if (value && !value.endsWith("*")) {
+            value += " *"
+        }
+        actions.memos.list.setFilter({ query: value })
+    }, [])
 
     let [onChangeDebounced] = useDebounce(onChange)
 
@@ -40,7 +38,7 @@ export function SearchBar(props: {
                 labelClassName="sr-only"
                 icon={<MagnifyingGlassIcon aria-hidden />}
                 onChange={onChangeDebounced}
-                defaultValue={props.query}
+                defaultValue={queryFilter}
             />
         </Form>
     )

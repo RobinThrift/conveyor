@@ -1,14 +1,14 @@
+import { withMockBackend } from "@/lib/testhelper/storybook"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import "@/ui/styles/index.css"
-import { decorator } from "@/lib/testhelper/rootStore"
-
 import { AppHeader } from "./AppHeader"
+
+import "@/ui/styles/index.css"
 
 const meta: Meta<typeof AppHeader> = {
     title: "Components/AppHeader",
     component: AppHeader,
-    decorators: [decorator],
+    decorators: [withMockBackend({})],
 }
 
 export default meta

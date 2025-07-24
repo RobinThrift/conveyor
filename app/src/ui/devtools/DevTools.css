@@ -58,7 +58,7 @@
 }
 
 .devtools-panels {
-    @apply border border-subtle rounded-lg bg-body flex flex-col h-full shadow-xl relative overflow-hidden;
+    @apply border border-subtle rounded-xl bg-body flex flex-col h-full shadow-xl relative overflow-hidden;
     pointer-events: auto;
 }
 
@@ -109,6 +109,18 @@
 
 .devtools-entry-list-item {
     @apply p-2 border border-subtle-dark rounded-lg bg-surface-level-1;
+
+    &.active {
+        background-color: color-mix(
+            in srgb,
+            var(--color-surface-level-1) 94%,
+            black
+        );
+
+        .devtools-entry-list-item-title {
+            @apply font-semibold;
+        }
+    }
 }
 
 .devtools-entry-list-item-title {
@@ -116,6 +128,10 @@
 }
 
 .devtools-entry-list-item-timing {
+    @apply flex items-center justify-between w-full font-mono text-xs text-subtle-extra-dark;
+}
+
+.devtools-entry-list-item-additional-info {
     @apply flex items-center justify-between w-full font-mono text-xs text-subtle-extra-dark;
 }
 
@@ -173,4 +189,172 @@
 .devtools-span-gantt-item-duration {
     @apply text-black text-xs font-mono py-0.5 px-1 rounded;
     background: rgba(255, 255, 255, 0.4);
+}
+
+.devtools-store-value > ul {
+    @apply rounded-lg p-2! font-mono! text-sm!;
+}
+
+.devtools-stack-trace {
+    @apply space-y-6;
+}
+
+.devtools-stack-trace-location {
+    @apply font-mono text-xs flex flex-col;
+}
+
+.devtools-stack-trace-location-file {
+    @apply text-subtle-extra-dark;
+}
+
+.jsondiffpatch-delta {
+    @apply font-mono text-xs pl-2 inline-block;
+}
+
+.jsondiffpatch-delta pre {
+    @apply font-mono text-xs m-0 p-0 inline-block;
+}
+
+ul.jsondiffpatch-delta {
+    @apply pl-4;
+}
+
+.jsondiffpatch-delta ul {
+    @apply pl-4;
+}
+
+.jsondiffpatch-added .jsondiffpatch-property-name,
+.jsondiffpatch-added .jsondiffpatch-value pre,
+.jsondiffpatch-modified .jsondiffpatch-right-value pre,
+.jsondiffpatch-textdiff-added {
+    @apply bg-success text-success-contrast;
+}
+
+.jsondiffpatch-deleted .jsondiffpatch-property-name,
+.jsondiffpatch-deleted pre,
+.jsondiffpatch-modified .jsondiffpatch-left-value pre,
+.jsondiffpatch-textdiff-deleted {
+    @apply bg-danger text-danger-contrast;
+    text-decoration: line-through;
+}
+
+.jsondiffpatch-unchanged {
+    @apply text-subtle-light hidden;
+}
+
+.jsondiffpatch-unchanged {
+    overflow-y: hidden;
+}
+
+.jsondiffpatch-unchanged-showing .jsondiffpatch-unchanged {
+    max-height: 100px;
+}
+
+.jsondiffpatch-unchanged-hidden .jsondiffpatch-unchanged {
+    max-height: 0;
+}
+
+.jsondiffpatch-unchanged-hiding {
+    display: block;
+}
+
+.jsondiffpatch-unchanged-visible .jsondiffpatch-unchanged {
+    max-height: 100px;
+}
+
+.jsondiffpatch-unchanged-hiding .jsondiffpatch-unchanged {
+    max-height: 0;
+}
+
+.jsondiffpatch-unchanged-showing .jsondiffpatch-arrow,
+.jsondiffpatch-unchanged-hiding .jsondiffpatch-arrow {
+    display: none;
+}
+
+.jsondiffpatch-value {
+    display: inline-block;
+}
+
+.jsondiffpatch-property-name {
+    @apply inline-block pr-1;
+    vertical-align: top;
+}
+
+.jsondiffpatch-property-name:after {
+    content: ": ";
+}
+
+.jsondiffpatch-child-node-type-array > .jsondiffpatch-property-name:after {
+    content: ": [";
+}
+
+.jsondiffpatch-child-node-type-array:after {
+    content: "],";
+}
+
+div.jsondiffpatch-child-node-type-array:before {
+    content: "[";
+}
+
+div.jsondiffpatch-child-node-type-array:after {
+    content: "]";
+}
+
+.jsondiffpatch-child-node-type-object > .jsondiffpatch-property-name:after {
+    content: ": {";
+}
+
+.jsondiffpatch-child-node-type-object:after {
+    content: "},";
+}
+
+div.jsondiffpatch-child-node-type-object:before {
+    content: "{";
+}
+
+div.jsondiffpatch-child-node-type-object:after {
+    content: "}";
+}
+
+.jsondiffpatch-value pre:after {
+    content: ",";
+}
+
+li:last-child > .jsondiffpatch-value pre:after,
+.jsondiffpatch-modified > .jsondiffpatch-left-value pre:after {
+    content: "";
+}
+
+.jsondiffpatch-modified .jsondiffpatch-value {
+    display: inline-block;
+}
+
+.jsondiffpatch-modified .jsondiffpatch-right-value {
+    margin-left: 5px;
+}
+
+ul.jsondiffpatch-textdiff {
+    padding: 0;
+}
+
+.jsondiffpatch-textdiff-location {
+    color: #bbb;
+    display: inline-block;
+    min-width: 60px;
+}
+
+.jsondiffpatch-textdiff-line {
+    display: inline-block;
+}
+
+.jsondiffpatch-textdiff-line-number:after {
+    content: ",";
+}
+
+.jsondiffpatch-node-type-object > .jsondiffpatch-unchanged .jsondiffpatch-value,
+.jsondiffpatch-node-type-object > .jsondiffpatch-added .jsondiffpatch-value {
+    display: inline;
+    pre {
+        display: inline;
+    }
 }

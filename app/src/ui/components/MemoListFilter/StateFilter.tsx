@@ -1,39 +1,59 @@
 import { Toggle } from "@base-ui-components/react/toggle"
 import { ToggleGroup } from "@base-ui-components/react/toggle-group"
+import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 
 import { ArchiveIcon, BinIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
+import { actions, selectors, stores } from "@/ui/stores"
 
 export interface StateFilterProps {
     className?: string
-    onSelect: (state?: "isArchived" | "isDeleted") => void
-    selected: { isArchived?: boolean; isDeleted?: boolean }
 }
 
 export function StateFilter(props: StateFilterProps) {
     let t = useT("components/MemoListFilter/StateFilter")
+    let isDeletedFilter = useStore(
+        stores.memos.list.filter,
+        selectors.memos.list.filter("isDeleted"),
+    )
+    let isArchivedFilter = useStore(
+        stores.memos.list.filter,
+        selectors.memos.list.filter("isArchived"),
+    )
     let selected = useMemo(() => {
-        if (props.selected.isArchived) {
+        if (isArchivedFilter) {
             return ["isArchived"]
         }
 
-        if (props.selected.isDeleted) {
+        if (isDeletedFilter) {
             return ["isDeleted"]
         }
 
         return []
-    }, [props.selected.isArchived, props.selected.isDeleted])
+    }, [isArchivedFilter, isDeletedFilter])
+
+    let onSelect = useCallback(([selected]: any[]) => {
+        if (selected === "isArchived") {
+            actions.memos.list.setFilter({ isArchived: true, isDeleted: undefined })
+            return
+        }
+
+        if (selected === "isDeleted") {
+            actions.memos.list.setFilter({ isArchived: undefined, isDeleted: true })
+            return
+        }
+
+        actions.memos.list.setFilter({ isArchived: undefined, isDeleted: undefined })
+    }, [])
 
     return (
         <ToggleGroup
             aria-label={t.Label}
             className={clsx("state-filter", props.className)}
             value={selected}
-            onValueChange={([selected]) => {
-                props.onSelect(selected)
-            }}
+            onValueChange={onSelect}
         >
             <Toggle value="isArchived" className="state-filter-item">
                 <ArchiveIcon aria-hidden />

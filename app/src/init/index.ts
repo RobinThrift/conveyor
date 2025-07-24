@@ -1,3 +1,4 @@
+import { BackendClient } from "@/backend/BackendClient"
 import {
     NavigationController,
     type Params,
@@ -6,36 +7,34 @@ import {
     type Stacks,
 } from "@/control/NavigationController"
 import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
-import type { RemoteNavigationPushMessage } from "@/lib/navigation"
+import * as stores from "@/ui/stores"
 
-import { initBackend } from "./backend"
 import { initNavigation } from "./navigation"
+import { initUI } from "./ui"
 
-export async function init() {
-    let { rootStore, onNavigationEvent, attachmentLoader } = await initBackend()
+export async function init({
+    rootElement,
+    serverError,
+}: {
+    rootElement: HTMLElement
+    serverError?: any
+}) {
+    let backend = new BackendClient()
 
     let navCtrl = initNavigation({
-        rootStore,
         navigationBackend: new HistoryNavigationBackend<Screens, Stacks, Params, Restore>({
             fromURLParams: NavigationController.fromURLParams,
             toURLParams: NavigationController.toURLParams,
             screenToURLMapping: NavigationController.screenToURLMapping,
+            urlToScreenMapping: NavigationController.urlToScreenMapping,
         }),
     })
 
-    onNavigationEvent(
-        (evt: MessageEvent<RemoteNavigationPushMessage<Screens, Stacks, Restore>>) => {
-            let msg = evt.data
-            if (msg?.type === "navigation:push") {
-                evt.stopImmediatePropagation()
-                navCtrl.push(evt.data.next)
-            }
-        },
-    )
+    stores.registerEffects({ backend, navCtrl })
 
-    return {
-        rootStore,
-        attachmentLoader,
+    initUI({
+        rootElement,
+        serverError,
         navCtrl,
-    }
+    })
 }

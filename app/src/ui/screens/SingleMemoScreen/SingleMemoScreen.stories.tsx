@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React, { useEffect } from "react"
-import { useDispatch } from "react-redux"
 
-import { decoratorWithMockData } from "@/lib/testhelper/rootStore"
-import { actions } from "@/ui/state"
+import { withMockBackend } from "@/lib/testhelper/storybook"
+import { actions } from "@/ui/stores"
+
 import "@/ui/styles/index.css"
 
 import { SingleMemoScreen, type SingleMemoScreenProps } from "./SingleMemoScreen"
@@ -12,7 +12,7 @@ const meta: Meta<typeof SingleMemoScreen> = {
     title: "Screens/Memos/Single",
     component: SingleMemoScreen,
 
-    decorators: [decoratorWithMockData],
+    decorators: [withMockBackend({ generateMockData: true })],
 }
 
 export default meta
@@ -24,10 +24,9 @@ export const Single: Story = {
     },
     decorators: [
         (Story, { args }) => {
-            let dispatch = useDispatch()
             useEffect(() => {
-                dispatch(actions.memos.setCurrentSingleMemoID({ id: args.memoID }))
-            }, [dispatch, args.memoID])
+                actions.memos.single.setSingleID(args.memoID)
+            }, [args.memoID])
 
             return <Story />
         },

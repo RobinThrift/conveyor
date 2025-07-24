@@ -1,13 +1,12 @@
+import { useStore } from "@tanstack/react-store"
 import React, { useActionState, useCallback, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
 import { Alert } from "@/ui/components/Alert"
 import { Button } from "@/ui/components/Button"
 import { Form } from "@/ui/components/Form"
 import { Input } from "@/ui/components/Input"
 import { useT } from "@/ui/i18n"
-import { actions, selectors } from "@/ui/state"
-import { createSelector } from "@reduxjs/toolkit"
+import { actions, selectors, stores } from "@/ui/stores"
 
 export function DataTab() {
     let t = useT("screens/Settings/Data")
@@ -24,21 +23,17 @@ export function DataTab() {
     )
 }
 
-const cleanupJobSelector = createSelector(
-    [(state) => selectors.jobs.getJob(state, "cleanup")],
-    (cleanup) => ({ ...cleanup }),
-)
-
 function DataJobs() {
     let t = useT("screens/Settings/Data/Jobs")
-    let dispatch = useDispatch()
-    let cleanupState = useSelector(cleanupJobSelector)
-
-    let isRunning = cleanupState?.status === "running" || cleanupState?.status === "requested"
+    let cleanupJob = useStore(stores.jobs.currentJob, (state) =>
+        state?.name === "cleanup" ? state : undefined,
+    )
+    let isReady = useStore(stores.jobs.currentJob, selectors.jobs.isReady)
+    let isRunning = cleanupJob?.status === "running" || cleanupJob?.status === "requested"
 
     let startCleanupJob = useCallback(() => {
-        dispatch(actions.jobs.startJob({ job: "cleanup" }))
-    }, [dispatch])
+        actions.jobs.startJob("cleanup")
+    }, [])
 
     return (
         <div className="settings-section flex-1">
@@ -53,18 +48,18 @@ function DataJobs() {
                         variant="primary"
                         className="w-fit"
                         size="sm"
-                        isDisabled={isRunning}
+                        isDisabled={isRunning || !isReady}
                         onPress={startCleanupJob}
                     >
                         {isRunning ? t.RunningLabel : t.RunLabel}
                     </Button>
 
-                    {cleanupState?.error ? (
+                    {cleanupJob?.error ? (
                         <Alert variant="danger">
-                            {cleanupState?.error.name}: {cleanupState?.error.message}
-                            {cleanupState?.error.stack && (
+                            {cleanupJob?.error.name}: {cleanupJob?.error.message}
+                            {cleanupJob?.error.stack && (
                                 <pre>
-                                    <code>{cleanupState?.error.stack}</code>
+                                    <code>{cleanupJob?.error.stack}</code>
                                 </pre>
                             )}
                         </Alert>
@@ -77,38 +72,26 @@ function DataJobs() {
     )
 }
 
-const exportJobSelector = createSelector(
-    [(state) => selectors.jobs.getJob(state, "export")],
-    (state) => ({ ...state }),
-)
-
 function ExportJob() {
     let t = useT("screens/Settings/Data/Jobs")
-    let dispatch = useDispatch()
-    let jobState = useSelector(exportJobSelector)
-    let filename = "export.db"
-
+    let jobState = useStore(stores.jobs.currentJob, (state) =>
+        state?.name === "export" ? state : undefined,
+    )
+    let isReady = useStore(stores.jobs.currentJob, selectors.jobs.isReady)
     let isRunning = jobState?.status === "running" || jobState?.status === "requested"
 
     let [_, startJob] = useActionState((_: unknown, formData: FormData) => {
-        dispatch(
-            actions.jobs.startJob({
-                job: "export",
-                params: {
-                    filename,
-                    privateKey: formData.get("private_key"),
-                },
-            }),
-        )
+        actions.jobs.startJob("export", {
+            privateKey: formData.get("private_key"),
+        })
         return null
     }, null)
 
     useEffect(() => {
         if (jobState?.status === "done") {
-            // dispatch(actions.jobs.resetJob({ job: "export" }))
-            downloadDB(filename).catch((err) => console.error(err))
+            downloadDB("export.db").catch((err) => console.error(err))
         }
-    }, [jobState?.status, filename])
+    }, [jobState?.status])
 
     return (
         <li className="flex flex-col">
@@ -122,7 +105,7 @@ function ExportJob() {
                     type="password"
                     label={t.ExportJobPrivateKeyLabel}
                     className="my-2 md:flex md:items-center md:gap-2"
-                    disabled={isRunning}
+                    disabled={isRunning || !isReady}
                 />
 
                 <Button
@@ -130,7 +113,7 @@ function ExportJob() {
                     type="submit"
                     className="w-fit"
                     size="sm"
-                    isDisabled={isRunning}
+                    isDisabled={isRunning || !isReady}
                 >
                     {isRunning ? t.RunningLabel : t.RunLabel}
                 </Button>

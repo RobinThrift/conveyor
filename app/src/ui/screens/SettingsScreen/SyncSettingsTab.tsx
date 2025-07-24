@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import React from "react"
 import {
     Button as AriaButton,
@@ -23,9 +24,8 @@ import {
 import { Checkbox } from "@/ui/components/Input/Checkbox"
 import { Loader } from "@/ui/components/Loader"
 import { useT } from "@/ui/i18n"
-import type { AuthStatus } from "@/ui/state"
+import type { AuthStatus } from "@/ui/stores/auth"
 
-import clsx from "clsx"
 import { type SetupArgs, useSyncSettingsTabState } from "./useSyncSettingsTabState"
 
 export function SyncSettingsTab() {

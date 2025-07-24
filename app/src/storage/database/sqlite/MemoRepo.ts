@@ -1,3 +1,5 @@
+import { markdownLanguage } from "@codemirror/lang-markdown"
+
 import {
     ErrMemoNotFound,
     type ListMemosQuery,
@@ -415,52 +417,29 @@ export class MemoRepo {
 const tagPattern = /(?:^|[ \t])#([\p{L}\p{N}/\-_]+)/gmu
 
 function extractTags(content: string): string[] {
-    let tags = []
+    let tags: string[] = []
 
-    let stripped = splitByCodeBlocks(content).join("\n")
+    let ast = markdownLanguage.parser.parse(content)
 
-    tagPattern.lastIndex = 0
-    let found = tagPattern.exec(stripped)
+    ast.iterate({
+        enter: (node) => {
+            if (node.name !== "Paragraph" || node.node.firstChild !== null) {
+                return
+            }
 
-    while (found !== null) {
-        tags.push(found[1])
-        found = tagPattern.exec(stripped)
-    }
+            let substr = content.substring(node.from, node.to)
+
+            tagPattern.lastIndex = 0
+            let found = tagPattern.exec(substr)
+
+            while (found !== null) {
+                tags.push(found[1])
+                found = tagPattern.exec(substr)
+            }
+        },
+    })
 
     return tags
-}
-
-const codeBlockPattern = /```[\w]*/g
-function splitByCodeBlocks(content: string): string[] {
-    codeBlockPattern.lastIndex = 0
-
-    let codeBlockPos = codeBlockPattern.exec(content)
-    if (!codeBlockPos) {
-        return [content]
-    }
-
-    let blocks: string[] = []
-
-    let start = 0
-    let i = 0
-
-    while (codeBlockPos !== null) {
-        let pos = codeBlockPos.index
-
-        if (i % 2 === 0) {
-            blocks.push(content.substring(start, codeBlockPos.index))
-            start = codeBlockPos.index + codeBlockPos[0].length
-        }
-
-        codeBlockPos = codeBlockPattern.exec(content)
-        i++
-
-        if (codeBlockPos === null && pos < content.length) {
-            blocks.push(content.substring(pos))
-        }
-    }
-
-    return blocks
 }
 
 if (import.meta.vitest) {
@@ -479,31 +458,31 @@ if (import.meta.vitest) {
         [
             "Tags on new Line",
             `# Heading
-        First line content
-        #tag-d #tag-e
+First line content
+#tag-d #tag-e
 
-        Some more content
-        	#tag-f
-        `,
+Some more content
+    #tag-f
+`,
             ["tag-d", "tag-e", "tag-f"],
         ],
         [
             "Ingnore Markdown Headings",
             `# Heading 1
-        Content line 1
+                Content line 1
 
-        ## Heading 2
-        Content line 2
+                ## Heading 2
+                Content line 2
 
-        ### Heading 3
-        Content line 3
-        `,
+                ### Heading 3
+                Content line 3
+                `,
             [],
         ],
         [
             "Ignore # in URL",
             `https://www.w3.org/TR/wot-thing-description/#sec-core-vocabulary-definition
-                     https://www.w3.org/TR/json-ld11/#expanded-document-form`,
+                             https://www.w3.org/TR/json-ld11/#expanded-document-form`,
             [],
         ],
         [
@@ -521,6 +500,179 @@ echo "# testing"
 #this-should-be-included
 `,
             ["this-should-be-included"],
+        ],
+        [
+            "Real World Example with lots of code",
+            `CSS Hover Effects
+#css
+
+https://codepen.io/t_afif/pen/BaQEVqz
+\`\`\`css
+.fancy-1 {
+  background:
+    radial-gradient(farthest-side at bottom, black 98%, transparent) bottom/calc(2*var(--d, 7px)) var(--d, 0) no-repeat,
+    linear-gradient(black 0 0) bottom /15px 3px no-repeat;
+  transition: 0.5s;
+}
+.fancy-1:hover {
+  --d: 150%;
+  color: #fff
+}
+\`\`\`
+
+https://codepen.io/t_afif/pen/QWvzQzY
+\`\`\`css
+
+
+.cloned-1:before,
+.cloned-1:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #D95B43;
+  opacity: 0;
+  transition: .2s .2s;
+}
+.cloned-1:before {
+  background: #ECD078;
+  transition-delay: 0s;
+}
+.cloned-1:hover:before,
+.cloned-1:hover:after {
+  transform: translate(-10px,10px);
+  opacity: 1; 
+}
+.cloned-1:hover:before {
+  transform: translate(-20px,20px);
+  transition-delay: .4s;
+}
+\`\`\`
+
+\`\`\`css
+.cloned-7 {
+  padding: 10px;
+  transition: .2s;
+}
+.cloned-7:hover {
+  color: #fff;
+  background: #542437;
+}
+
+.cloned-7:before,
+.cloned-7:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #D95B43;
+  opacity: 0;
+}
+.cloned-7:before {
+  background: #ECD078;
+}
+.cloned-7:hover:before,
+.cloned-7:hover:after {
+  inset: -0.1px;
+  opacity: 1; 
+  transition: inset .5s .2s cubic-bezier(0.2,250,0.8,250),opacity 0s .2s;
+}
+.cloned-7:hover:before {
+  inset: -0.2px;
+  transition-delay: .3s,.2s;
+}
+\`\`\`
+
+\`\`\`css
+.cloned-8 {
+  padding: 10px;
+  transition: .3s .3s;
+}
+.cloned-8:hover {
+  color: #fff;
+  transition: .3s;
+  background: #542437;
+}
+.cloned-8:before,
+.cloned-8:after {
+  content: "";
+  position: absolute;
+  inset: 0 50% 0 0;
+  z-index: -1;
+  box-shadow: 
+    0 0 #D95B43,
+    0 0 #ECD078;
+  opacity: 0;
+  transition:0.3s 0.3s,box-shadow .3s;
+}
+.cloned-8:after {
+  transform-origin: right;
+  transform: rotate(180deg);
+}
+.cloned-8:hover:before,
+.cloned-8:hover:after {
+  box-shadow: 
+    -10px 10px #D95B43,
+    -20px 20px #ECD078;
+  opacity: 1;
+  transition:0.3s 0.3s,opacity .3s;
+}
+\`\`\`
+
+https://codepen.io/t_afif/pen/MWmZQxg
+\`\`\`css
+.colorful-1 {
+  padding: 10px;
+  color: #0000;
+  font-weight: bold;
+  background: linear-gradient(90deg,#FF3D7F 50%,#000 0) right/200% 100% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: .4s linear;
+}
+.colorful-1:hover {
+  background-position: left;
+}
+.colorful-1:before {
+  content:"";
+  position: absolute;
+  inset:auto 0 0 100%;
+  height: 4px;
+  background: #FF3D7F;
+  transition: inherit;
+}
+.colorful-1:hover:before {
+  inset:auto 0 0 0;
+}
+\`\`\`
+
+\`\`\`css
+.colorful-3 {
+  padding: 10px;
+  color: #0000;
+  font-weight: bold;
+  background: linear-gradient(#000 0 0) center/100% 100% no-repeat #3FB8AF;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: .4s linear;
+}
+.colorful-3:hover {
+  background-size: 0 100%;
+}
+.colorful-3:before {
+  content:"";
+  position: absolute;
+  inset:auto 50% 0;
+  height: 4px;
+  background-color: inherit;
+  transition: inherit;
+}
+.colorful-3:hover:before {
+  inset:auto 0 0;
+}
+\`\`\`
+`,
+            ["css"],
         ],
     ])("extractTags/%s", (_, input, exp) => {
         let actual = extractTags(input)

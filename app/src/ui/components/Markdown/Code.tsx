@@ -7,18 +7,32 @@ export const Code = React.memo(function Code({
     className,
     children,
     lang,
+    hightlightedLines: hightlightLines,
     meta,
-}: { className?: string; children: string; lang?: string; meta?: string }) {
+}: {
+    className?: string
+    children: string
+    lang?: string
+    hightlightedLines?: number[]
+    meta?: string
+}) {
     let ref = useRef(null)
     let isVisible = useOnVisible(ref, { ratio: 0.1 })
 
     let highlighted: React.ReactNode | undefined = useMemo(() => {
         if (isVisible) {
-            return <Highlight code={children} lang={lang} meta={meta} />
+            return (
+                <Highlight
+                    code={children}
+                    lang={lang}
+                    hightlightedLines={hightlightLines}
+                    meta={meta}
+                />
+            )
         }
 
         return <code>{children}</code>
-    }, [isVisible, children, lang, meta])
+    }, [isVisible, children, lang, hightlightLines, meta])
 
     return (
         <pre
@@ -37,7 +51,8 @@ export const Code = React.memo(function Code({
 const Highlight = React.memo(function Highlight({
     code,
     lang,
-}: { code: string; lang?: string; meta?: string }) {
-    let highlighted = useHightlighted({ code, lang })
+    hightlightedLines,
+}: { code: string; lang?: string; hightlightedLines?: number[]; meta?: string }) {
+    let highlighted = useHightlighted({ code, lang, hightlightedLines })
     return <code>{highlighted || code}</code>
 })

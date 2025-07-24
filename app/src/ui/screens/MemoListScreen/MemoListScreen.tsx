@@ -13,14 +13,14 @@ export interface MemoListScreenProps {
 }
 
 export function MemoListScreen(props: MemoListScreenProps) {
-    let { showEditor, filter, tags, setFilter } = useMemoListScreenState()
+    let { showEditor } = useMemoListScreenState()
 
     return (
         <div className={clsx("memo-list-screen", props.className)}>
-            <MemoListFilter tags={tags} filter={filter} onChangeFilter={setFilter} />
+            <MemoListFilter />
 
             <div className="memo-list-container">
-                <Header filter={filter} />
+                <Header />
 
                 {showEditor && <NewMemoEditor />}
 

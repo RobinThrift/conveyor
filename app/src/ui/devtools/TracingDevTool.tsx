@@ -222,19 +222,7 @@ const SpanGanttItem = React.memo(function SpanGanttItem({
 })
 
 const observer = new PerformanceObserver((list) => {
-    let spans: Span[] = []
-
-    for (let entry of list.getEntries()) {
-        if (
-            entry.entryType !== "mark" ||
-            !entry.name.startsWith("trace:") ||
-            !entry.name.endsWith(":end")
-        ) {
-            continue
-        }
-
-        spans.push((entry as PerformanceMark).detail)
-    }
+    let { rootSpans: spans } = processEntries(list.getEntries())
 
     if (spans.length) {
         tracingStore.setState((state) => ({
@@ -255,15 +243,22 @@ observer.observe({
 })
 
 function _init() {
+    let { rootSpans } = processEntries(observer.takeRecords())
+    tracingStore.setState({ spans: rootSpans })
+}
+
+_init()
+
+function processEntries(entries: Iterable<PerformanceEntry>) {
     let rootSpans: Span[] = []
 
-    let allEntries = [...observer.takeRecords().values()]
-
-    for (let entry of allEntries) {
+    for (let entry of entries) {
         if (
             entry.entryType !== "mark" ||
             !entry.name.startsWith("trace:") ||
-            !entry.name.endsWith(":end")
+            !entry.name.endsWith(":end") ||
+            entry.name.startsWith("trace:effect") ||
+            entry.name.startsWith("trace:action")
         ) {
             continue
         }
@@ -272,6 +267,7 @@ function _init() {
 
         let span: Span = {
             ...perfEntry.detail,
+            name: perfEntry.detail.name.replace("trace:", ""),
             endTime: perfEntry.detail.endTime ?? perfEntry.startTime,
         }
         if (span.parentSpan) {
@@ -282,7 +278,5 @@ function _init() {
         }
     }
 
-    tracingStore.setState({ spans: rootSpans })
+    return { rootSpans }
 }
-
-_init()

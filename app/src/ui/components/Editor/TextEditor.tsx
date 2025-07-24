@@ -38,7 +38,7 @@ export interface TextEditorProps {
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        content: ArrayBufferLike
+        data: ArrayBufferLike
     }): Promise<void>
 
     children: (cmds: ToolbarCommands) => React.ReactNode

@@ -1,14 +1,20 @@
-import { useCallback, useMemo, useRef, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useStore } from "@tanstack/react-store"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import type { Tag } from "@/domain/Tag"
 import { useStateSet } from "@/ui/hooks/useStateSet"
-import { actions, selectors } from "@/ui/state"
+import { actions, selectors, stores } from "@/ui/stores"
 
 export function useTagTree() {
-    let dispatch = useDispatch()
-    let currentTagFilter = useSelector(selectors.memos.tagFilterValue)
-    let tags = useSelector(selectors.tags.tags)
+    let currentTagFilter = useStore(stores.memos.list.filter, selectors.memos.list.filter("tag"))
+    let tags = useStore(stores.tags.tags)
+    let tagsNeedLoading = useStore(stores.tags.state, (state) => typeof state === "undefined")
+
+    useEffect(() => {
+        if (tagsNeedLoading) {
+            actions.tags.loadTags()
+        }
+    }, [tagsNeedLoading])
 
     let tagTree = useMemo(() => tagsToTree(tags), [tags])
 
@@ -33,12 +39,12 @@ export function useTagTree() {
             }
 
             if (selectedTag.current === tag) {
-                dispatch(actions.memos.setTagFilter({ tag: undefined }))
+                actions.memos.list.setFilter({ tag: undefined })
             } else {
-                dispatch(actions.memos.setTagFilter({ tag }))
+                actions.memos.list.setFilter({ tag })
             }
         },
-        [dispatch, tagTree, toggleExpandItem],
+        [tagTree, toggleExpandItem],
     )
 
     let tagTreeNavigation = useTagTreeNavigation({

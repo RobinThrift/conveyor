@@ -4,10 +4,10 @@ import React from "react"
 
 import type { Attachment } from "@/domain/Attachment"
 import { Second } from "@/lib/duration"
-import { type AsyncResult, Ok } from "@/lib/result"
+import { Ok } from "@/lib/result"
 import { delay } from "@/lib/testhelper/delay"
 import { generateTitle } from "@/lib/testhelper/memos"
-import { AttachmentProvider } from "@/ui/attachments"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 
 import "@/ui/styles/index.css"
 
@@ -64,13 +64,10 @@ export const WithAttachmentImage: Story = {
         description: faker.lorem.sentences({ min: 1, max: 3 }),
     },
 
-    decorators: (Story) => (
-        <AttachmentProvider
-            value={{
-                getAttachmentDataByID: async (): AsyncResult<{
-                    attachment: Attachment
-                    data: ArrayBufferLike
-                }> => {
+    decorators: [
+        withMockBackend({
+            mockAttachments: {
+                "yLAy-2K3mImfADHe9exZr": async () => {
                     let res = await fetch(exampleImages[0])
 
                     await delay(5 * Second)
@@ -80,11 +77,9 @@ export const WithAttachmentImage: Story = {
                         data: await res.arrayBuffer(),
                     })
                 },
-            }}
-        >
-            <Story />
-        </AttachmentProvider>
-    ),
+            },
+        }),
+    ],
 }
 
 export const LightAndDarkImages: Story = {

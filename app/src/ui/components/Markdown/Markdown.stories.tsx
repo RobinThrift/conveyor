@@ -3,15 +3,14 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import React, { useMemo } from "react"
 
 import { generateFullTestContent } from "@/lib/testhelper/memos"
-import { decorator } from "@/lib/testhelper/rootStore"
-import "@/ui/styles/index.css"
 
 import { Markdown } from "./Markdown"
+
+import "@/ui/styles/index.css"
 
 const meta: Meta<typeof Markdown> = {
     title: "Components/Markdown",
     component: Markdown,
-    decorators: [decorator],
 }
 
 export default meta

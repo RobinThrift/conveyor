@@ -1,41 +1,38 @@
+import { useStore } from "@tanstack/react-store"
 import { useCallback, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
 import { AgePrivateCryptoKey, type Identity } from "@/external/age/AgeCrypto"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 import { type AsyncResult, Err, fromThrowing } from "@/lib/result"
 import type { ChangePasswordArgs, LoginArgs } from "@/ui/components/AuthForm"
-import { type SyncMethod, actions, selectors } from "@/ui/state"
+import { actions, selectors, stores } from "@/ui/stores"
+import type { SyncMethod } from "@/ui/stores/setup"
 
 export function useInitSetupScreenState() {
-    let dispatch = useDispatch()
-    let step = useSelector(selectors.setup.step)
-    let isNew = useSelector(selectors.setup.isNew)
-    let error = useSelector(selectors.setup.error)
-    let selectedOptions = useSelector(selectors.setup.selectedOptions)
+    let step = useStore(stores.setup.step)
+    let isNew = useStore(stores.setup.selectedOptions, selectors.setup.isNew)
+    let error = useStore(stores.setup.error)
+    let selectedOptions = useStore(stores.setup.selectedOptions)
 
     let next = useCallback(() => {
-        dispatch(actions.setup.next())
-    }, [dispatch])
+        actions.setup.next()
+    }, [])
 
     let back = useCallback(() => {
-        dispatch(actions.setup.setStep({ step: "initial-setup" }))
-    }, [dispatch])
+        actions.setup.setStep("initial-setup")
+    }, [])
 
     let startNew = useCallback(() => {
-        dispatch(actions.setup.startNew())
-    }, [dispatch])
+        actions.setup.startNew()
+    }, [])
 
     let startFromRemote = useCallback(() => {
-        dispatch(actions.setup.startFromRemote())
-    }, [dispatch])
+        actions.setup.startFromRemote()
+    }, [])
 
-    let setSyncMethod = useCallback(
-        (m: SyncMethod) => {
-            dispatch(actions.setup.setSetupOption({ key: "syncMethod", value: m }))
-        },
-        [dispatch],
-    )
+    let setSyncMethod = useCallback((m: SyncMethod) => {
+        actions.setup.setSetupOption("syncMethod", m)
+    }, [])
 
     let generatePrivateCryptoKey = useCallback(async (): AsyncResult<string> => {
         let [key, err] = await AgePrivateCryptoKey.generate()
@@ -46,17 +43,11 @@ export function useInitSetupScreenState() {
         return await key.exportPrivateKey()
     }, [])
 
-    let importPrivateCryptoKey = useCallback(
-        (key: string) => {
-            dispatch(
-                actions.setup.setupCandidatePrivateCryptoKey({
-                    plaintextKeyData: new AgePrivateCryptoKey(key as Identity)
-                        .data as string as PlaintextPrivateKey,
-                }),
-            )
-        },
-        [dispatch],
-    )
+    let importPrivateCryptoKey = useCallback((key: string) => {
+        actions.setup.setupCandidatePrivateCryptoKey(
+            new AgePrivateCryptoKey(key as Identity).data as string as PlaintextPrivateKey,
+        )
+    }, [])
 
     let checkPrivateCryptoKey = useCallback((key: string) => {
         return fromThrowing(() => new AgePrivateCryptoKey(key as Identity) as any)
@@ -79,25 +70,17 @@ export function useInitSetupScreenState() {
 }
 
 export function useStepConfigureRemoteSyncState({ next }: { next: () => void }) {
-    let dispatch = useDispatch()
+    let authError = useStore(stores.auth.error)
+    let authStatus = useStore(stores.auth.status)
+    let syncStatus = useStore(stores.sync.status)
 
-    let authError = useSelector(selectors.auth.error)
-    let authStatus = useSelector(selectors.auth.status)
-    let syncStatus = useSelector(selectors.sync.status)
+    let login = useCallback((args: LoginArgs) => {
+        actions.sync.setup(args)
+    }, [])
 
-    let login = useCallback(
-        (args: LoginArgs) => {
-            dispatch(actions.sync.setup(args))
-        },
-        [dispatch],
-    )
-
-    let changePassword = useCallback(
-        (args: ChangePasswordArgs) => {
-            dispatch(actions.auth.changePassword(args))
-        },
-        [dispatch],
-    )
+    let changePassword = useCallback((args: ChangePasswordArgs) => {
+        actions.auth.changePassword(args)
+    }, [])
 
     useEffect(() => {
         if (syncStatus === "ready") {

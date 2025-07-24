@@ -33,7 +33,7 @@ export interface EditorProps {
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        content: ArrayBufferLike
+        data: ArrayBufferLike
     }): Promise<void>
 }
 

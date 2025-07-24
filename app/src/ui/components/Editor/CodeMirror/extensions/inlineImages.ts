@@ -1,13 +1,11 @@
-import { type Attachment, type AttachmentID, attachmentIDFromURL } from "@/domain/Attachment"
+import { type AttachmentID, attachmentIDFromURL } from "@/domain/Attachment"
 import type { AsyncResult } from "@/lib/result"
 import { syntaxTree } from "@codemirror/language"
 import type { Range } from "@codemirror/state"
 import { Decoration, type EditorView } from "@codemirror/view"
 import { type DecorationSet, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view"
 
-type GetAttachmentDataByID = (
-    id: AttachmentID,
-) => AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>
+type GetAttachmentDataByID = (id: AttachmentID) => AsyncResult<{ data: ArrayBufferLike }>
 
 export const inlineImages = (getAttachmentDataByID: GetAttachmentDataByID) =>
     ViewPlugin.fromClass(

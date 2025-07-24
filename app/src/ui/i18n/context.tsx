@@ -1,4 +1,4 @@
-import { createSelector } from "@reduxjs/toolkit"
+import { useStore } from "@tanstack/react-store"
 import React, { createContext, startTransition, useState } from "react"
 
 import { DEFAULT_SETTINGS } from "@/domain/Settings"
@@ -11,8 +11,7 @@ import {
     loadTranslation,
     resolveTranslation,
 } from "@/lib/i18n"
-import { selectors } from "@/ui/state"
-import { useSelector } from "react-redux"
+import { selectors, stores } from "@/ui/stores"
 
 export interface I18nContext {
     language: Language
@@ -30,19 +29,9 @@ const DEFAULT_I18N_CONTEXT: I18nContext = {
 
 export const i18nContext = createContext<I18nContext>(DEFAULT_I18N_CONTEXT)
 
-const i18nSelector = createSelector(
-    [
-        (state) => selectors.settings.value(state, "locale.language"),
-        (state) => selectors.settings.value(state, "locale.region"),
-    ],
-    (language, region) => ({
-        language,
-        region,
-    }),
-)
-
 export function I18nProvider(props: React.PropsWithChildren<{ value?: I18nContext }>) {
-    let { language, region } = useSelector(i18nSelector)
+    let language = useStore(stores.settings.values, selectors.settings.value("locale.language"))
+    let region = useStore(stores.settings.values, selectors.settings.value("locale.region"))
     let [value, setValue] = useState<I18nContext>(props.value ?? DEFAULT_I18N_CONTEXT)
 
     if (value.language !== language || value.region !== region) {

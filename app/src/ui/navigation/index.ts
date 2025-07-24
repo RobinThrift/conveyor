@@ -1,5 +1,5 @@
+import { useStore } from "@tanstack/react-store"
 import { createContext, useCallback, useContext } from "react"
-import { useSelector } from "react-redux"
 
 import type {
     NavigationController,
@@ -8,8 +8,7 @@ import type {
     Screens,
     Stacks,
 } from "@/control/NavigationController"
-import { selectors } from "@/ui/state"
-import { createSelector } from "@reduxjs/toolkit"
+import { stores } from "@/ui/stores"
 
 const navContext = createContext<NavigationController | undefined>(undefined)
 
@@ -40,49 +39,14 @@ export function useNavigation(): {
     }
 }
 
-const currentPageSelector = createSelector(
-    [
-        selectors.navigation.currentName,
-        selectors.navigation.currentParams,
-        selectors.navigation.currentRestore,
-    ],
-    (name, params, restore) => ({
-        name,
-        params,
-        restore,
-    }),
-)
-
 export function useCurrentPage(): {
     name: keyof Screens
     params: Screens[keyof Screens]
     restore: Partial<Restore>
 } {
-    return useSelector(currentPageSelector)
-}
-
-const prevPageSelector = createSelector(
-    [
-        selectors.navigation.prevName,
-        selectors.navigation.prevParams,
-        selectors.navigation.prevRestore,
-    ],
-    (name, params, restore) =>
-        name && params && restore
-            ? {
-                  name,
-                  params,
-                  restore,
-              }
-            : undefined,
-)
-
-export function usePreviousPage():
-    | {
-          name: keyof Screens
-          params: Screens[keyof Screens]
-          restore: Partial<Restore>
-      }
-    | undefined {
-    return useSelector(prevPageSelector)
+    return useStore(stores.navigation.currentPage, (s) => ({
+        name: s.screen.name,
+        params: s.screen.params,
+        restore: s.restore,
+    }))
 }

@@ -9,8 +9,6 @@ import { type AsyncResult, Err, Ok, all, wrapErr } from "@/lib/result"
 import type { Job } from "./types"
 
 export class CleanupJob implements Job {
-    public name = "CleanupJob"
-
     private _changelogCtrl: ChangelogController
     private _memoCtrl: MemoController
 

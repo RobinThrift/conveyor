@@ -1,44 +1,40 @@
-import { createSelector } from "@reduxjs/toolkit"
+import { useStore } from "@tanstack/react-store"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
 import { newID } from "@/domain/ID"
 import { useAttachmentTransferer } from "@/ui/attachments"
 import { useNavigation } from "@/ui/navigation"
-import { type CreateMemoRequest, actions, selectors } from "@/ui/state"
-
-export type { CreateMemoRequest } from "@/ui/state/actions"
-
-const settingsSelector = createSelector(
-    [(state) => selectors.settings.value(state, "controls.vim")],
-    (vimModeEnabled) => ({ vimModeEnabled }),
-)
+import { type CreateMemoRequest, actions, selectors, stores } from "@/ui/stores"
 
 export function useNewMemoScreenState() {
     let transferAttachment = useAttachmentTransferer()
 
-    let tags = useSelector(selectors.tags.tags)
-    let error = useSelector(selectors.memos.createMemoError)
-    let isLoading = useSelector(selectors.memos.isCreatingMemo)
+    let isCreatingMemo = useStore(stores.memos.create.status, selectors.memos.create.isCreatingMemo)
+    let error = useStore(stores.memos.create.error)
+    let tags = useStore(stores.tags.tags)
+    let tagsNeedLoading = useStore(stores.tags.state, (state) => typeof state === "undefined")
 
-    let dispatch = useDispatch()
     let nav = useNavigation()
 
-    let settings = useSelector(settingsSelector)
+    let vimModeEnabled = useStore(stores.settings.values, selectors.settings.value("controls.vim"))
 
     let [startedRequest, setStartedRequest] = useState(false)
 
     useEffect(() => {
-        dispatch(actions.tags.loadTags())
-    }, [dispatch])
+        if (tagsNeedLoading) {
+            actions.tags.loadTags()
+        }
+    }, [tagsNeedLoading])
 
-    let createMemo = useCallback(
-        (memo: CreateMemoRequest) => {
-            setStartedRequest(true)
-            dispatch(actions.memos.create({ memo }))
-        },
-        [dispatch],
-    )
+    let createMemo = useCallback((memo: CreateMemoRequest) => {
+        memo.content = memo.content.trim()
+        if (memo.content === "") {
+            return
+        }
+
+        setStartedRequest(true)
+        actions.memos.create.createMemo(memo)
+    }, [])
 
     let cancelNew = useCallback(() => {
         nav.pop()
@@ -58,7 +54,7 @@ export function useNewMemoScreenState() {
     )
 
     useEffect(() => {
-        if (!startedRequest || isLoading) {
+        if (!startedRequest || isCreatingMemo) {
             return
         }
 
@@ -68,14 +64,16 @@ export function useNewMemoScreenState() {
         }
 
         nav.pop()
-    }, [isLoading, error, startedRequest, nav.pop])
+    }, [isCreatingMemo, error, startedRequest, nav.pop])
 
     return {
         tags,
-        isLoading,
+        isLoading: isCreatingMemo,
         error,
         newMemo,
-        settings,
+        settings: {
+            vimModeEnabled,
+        },
         createMemo,
         cancelNew,
         transferAttachment,

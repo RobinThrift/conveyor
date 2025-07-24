@@ -1,49 +1,51 @@
-import { createSelector } from "@reduxjs/toolkit"
+import { useStore } from "@tanstack/react-store"
 import { useCallback, useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
+import type { MemoContentChanges } from "@/domain/Changelog"
+import type { MemoID } from "@/domain/Memo"
 import { useAttachmentTransferer } from "@/ui/attachments"
 import { useNavigation } from "@/ui/navigation"
-import { type UpdateMemoRequest, actions, selectors } from "@/ui/state"
+import { actions, selectors, stores } from "@/ui/stores"
 
-export type { UpdateMemoRequest } from "@/ui/state"
-const settingsSelector = createSelector(
-    [(state) => selectors.settings.value(state, "controls.vim")],
-    (vimModeEnabled) => ({ vimModeEnabled }),
-)
+export type UpdateMemoConrentRequest = {
+    id: MemoID
+    content?: {
+        content: string
+        changes: MemoContentChanges
+    }
+}
 
 export function useEditMemoScreenState() {
     let transferAttachment = useAttachmentTransferer()
 
-    let tags = useSelector(selectors.tags.tags)
-    let isUpdatingMemo = useSelector(selectors.memos.isUpdatingMemo)
-    let isLoadingMemo = useSelector(selectors.memos.isLoadingSingleMemo)
-    let updateMemoError = useSelector(selectors.memos.updateMemoError)
-    let singleMemoError = useSelector(selectors.memos.singleMemoError)
-    let memo = useSelector(selectors.memos.currentMemo)
+    let isLoading = useStore(stores.memos.single.status, selectors.memos.single.isLoading)
+    let error = useStore(stores.memos.single.error)
+    let memo = useStore(stores.memos.single.memo)
 
-    let isLoading = isUpdatingMemo || isLoadingMemo
-    let error = updateMemoError ?? singleMemoError
+    let tags = useStore(stores.tags.tags)
+    let tagsNeedLoading = useStore(stores.tags.state, (state) => typeof state === "undefined")
 
-    let settings = useSelector(settingsSelector)
+    let settings = useStore(stores.settings.values, (state) => ({
+        vimModeEnabled: state.controls.vim,
+    }))
 
     let nav = useNavigation()
 
     let [startedRequest, setStartedRequest] = useState(false)
 
-    let dispatch = useDispatch()
-
     useEffect(() => {
-        dispatch(actions.tags.loadTags())
-    }, [dispatch])
+        if (tagsNeedLoading) {
+            actions.tags.loadTags()
+        }
+    }, [tagsNeedLoading])
 
-    let updateMemo = useCallback(
-        ({ memo }: { memo: UpdateMemoRequest }) => {
-            setStartedRequest(true)
-            dispatch(actions.memos.update({ memo }))
-        },
-        [dispatch],
-    )
+    let updateMemo = useCallback((req: UpdateMemoConrentRequest) => {
+        setStartedRequest(true)
+        actions.memos.single.updateMemoContent({
+            id: req.id,
+            content: req.content,
+        })
+    }, [])
 
     let cancelEdit = useCallback(() => {
         let memoID = memo?.id
@@ -67,7 +69,10 @@ export function useEditMemoScreenState() {
         nav.pop()
     }, [isLoading, error, startedRequest, nav.pop])
 
-    let currentPageParams = useSelector(selectors.navigation.currentParams)
+    let currentPageParams = useStore(
+        stores.navigation.currentPage,
+        selectors.navigation.currentParams,
+    )
 
     return {
         memo,

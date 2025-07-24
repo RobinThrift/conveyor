@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { decoratorWithMockData } from "@/lib/testhelper/rootStore"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 import "@/ui/styles/index.css"
 
 import { MemoList } from "./MemoList"
@@ -8,7 +8,7 @@ import { MemoList } from "./MemoList"
 const meta: Meta<typeof MemoList> = {
     title: "Components/MemoList",
     component: MemoList,
-    decorators: [decoratorWithMockData],
+    decorators: [withMockBackend({ generateMockData: true })],
 }
 
 export default meta

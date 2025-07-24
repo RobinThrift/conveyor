@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React, { useEffect } from "react"
-import { useDispatch } from "react-redux"
 
-import { decoratorWithMockData } from "@/lib/testhelper/rootStore"
-import { actions } from "@/ui/state"
-import "@/ui/styles/index.css"
+import { withMockBackend } from "@/lib/testhelper/storybook"
+import { actions } from "@/ui/stores"
 
 import { EditMemoScreen, type EditMemoScreenProps } from "./EditMemoScreen"
+
+import "@/ui/styles/index.css"
 
 const meta: Meta<typeof EditMemoScreen> = {
     title: "Screens/Memos/Edit",
@@ -17,7 +17,7 @@ const meta: Meta<typeof EditMemoScreen> = {
     },
 
     decorators: [
-        decoratorWithMockData,
+        withMockBackend({ generateMockData: true }),
         (Story) => (
             <main className="container mx-auto">
                 <Story />
@@ -35,10 +35,9 @@ export const Edit: Story = {
     },
     decorators: [
         (Story, { args }) => {
-            let dispatch = useDispatch()
             useEffect(() => {
-                dispatch(actions.memos.setCurrentSingleMemoID({ id: args.memoID }))
-            }, [dispatch, args.memoID])
+                actions.memos.single.setSingleID(args.memoID)
+            }, [args.memoID])
 
             return <Story />
         },

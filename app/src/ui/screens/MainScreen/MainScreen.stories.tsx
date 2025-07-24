@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 
-import { decoratorWithMockData } from "@/lib/testhelper/rootStore"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 import "@/ui/styles/index.css"
 
 import { MainScreen } from "./MainScreen"
@@ -15,7 +15,7 @@ const meta: Meta<typeof MainScreen> = {
     },
 
     decorators: [
-        decoratorWithMockData,
+        withMockBackend({ generateMockData: true }),
         (Story) => (
             <main className="main pt-2 mx-auto">
                 <Story />

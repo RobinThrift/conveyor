@@ -1,18 +1,16 @@
+import { useStore } from "@tanstack/react-store"
 import { useEffect, useMemo, useRef } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
 import type { MemoID } from "@/domain/Memo"
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useNavigation } from "@/ui/navigation"
-import { actions, selectors } from "@/ui/state"
+import { actions, selectors, stores } from "@/ui/stores"
 
 export function useSingleMemoScreenState() {
-    let isLoading = useSelector(selectors.memos.isLoadingSingleMemo)
-    let error = useSelector(selectors.memos.singleMemoError)
-    let memo = useSelector(selectors.memos.currentMemo)
+    let isLoading = useStore(stores.memos.single.status, selectors.memos.single.isLoading)
+    let error = useStore(stores.memos.single.error)
+    let memo = useStore(stores.memos.single.memo)
     let ref = useRef<HTMLDivElement | null>(null)
-
-    let dispatch = useDispatch()
 
     let isMobile = useIsMobile()
     let lastScrollPos = useRef<number>(window.screenY)
@@ -93,22 +91,10 @@ export function useSingleMemoScreenState() {
                     "edit-memo",
                 )
             },
-            archive: (memoID: MemoID, isArchived: boolean) => {
-                dispatch(
-                    actions.memos.update({
-                        memo: { id: memoID, isArchived },
-                    }),
-                )
-            },
-            delete: (memoID: MemoID, isDeleted: boolean) => {
-                dispatch(
-                    actions.memos.update({
-                        memo: { id: memoID, isDeleted },
-                    }),
-                )
-            },
+            archive: actions.memos.single.updateMemoArchiveStatus,
+            delete: actions.memos.single.updateMemoDeleteStatus,
         }),
-        [dispatch, nav.push],
+        [nav.push],
     )
 
     return {

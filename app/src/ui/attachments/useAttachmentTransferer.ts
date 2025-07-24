@@ -1,32 +1,26 @@
 import { useCallback } from "react"
-import { useDispatch, useStore } from "react-redux"
 
 import type { AttachmentID } from "@/domain/Attachment"
-import { type RootState, actions, selectors } from "@/ui/state"
+import { queueTask } from "@/lib/microtask"
+import { actions, stores } from "@/ui/stores"
 
 export function useAttachmentTransferer() {
-    let store = useStore<RootState>()
-    let dispatch = useDispatch()
-
     return useCallback(
         async (attachment: {
             id: AttachmentID
             filename: string
-            content: ArrayBufferLike
+            data: ArrayBufferLike
         }): Promise<void> => {
             let { resolve, reject, promise } = Promise.withResolvers<void>()
 
-            let unsub = store.subscribe(() => {
-                let transferState = selectors.attachments.getTransferState(
-                    store.getState(),
-                    attachment.id,
-                )
+            let unsub = stores.attachments.states.subscribe(({ currentVal: states }) => {
+                let transferState = states[attachment.id]?.state
 
                 if (transferState === "done" || transferState === "error") {
                     unsub()
                 }
 
-                requestAnimationFrame(() => {
+                queueTask(() => {
                     if (transferState === "done") {
                         resolve()
                         return
@@ -39,10 +33,10 @@ export function useAttachmentTransferer() {
                 })
             })
 
-            dispatch(actions.attachments.startTransfer(attachment))
+            actions.attachments.transferAttachment(attachment)
 
             return promise
         },
-        [dispatch, store.subscribe, store.getState],
+        [],
     )
 }

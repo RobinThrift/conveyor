@@ -1,41 +1,44 @@
+import { useStore } from "@tanstack/react-store"
 import { useCallback, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
-import { type CreateAPITokenRequest, actions, selectors } from "@/ui/state"
-
-export type { CreateAPITokenRequest } from "@/ui/state"
+import { actions, selectors, stores } from "@/ui/stores"
 
 export function useAPITokensTabState() {
-    let dispatch = useDispatch()
+    let firstLoad = useStore(stores.apitokens.status, (state) => typeof state === "undefined")
 
-    let isLoading = useSelector(selectors.apitokens.isLoading)
-    let error = useSelector(selectors.apitokens.error)
-    let lastCreatedValue = useSelector(selectors.apitokens.lastCreatedValue)
-    let apiTokens = useSelector(selectors.apitokens.apiTokens)
-    let hasNextPage = useSelector(selectors.apitokens.hasNextPage)
-    let hasPreviousPage = useSelector(selectors.apitokens.hasPreviousPage)
+    let isLoading = useStore(
+        stores.apitokens.status,
+        (state) => state === "loading" || state === "page-requested",
+    )
+    let error = useStore(stores.apitokens.error)
+    let lastCreatedValue = useStore(stores.apitokens.lastCreated)
+    let apiTokens = useStore(stores.apitokens.tokens)
+    let hasNextPage = useStore(stores.apitokens.pagination, selectors.apitokens.hasNextPage)
+    let hasPreviousPage = useStore(stores.apitokens.pagination, selectors.apitokens.hasPreviousPage)
 
-    let loadPrevPage = useCallback(() => dispatch(actions.apitokens.previousPage()), [dispatch])
+    let loadPrevPage = useCallback(() => actions.apitokens.previousPage(), [])
 
-    let loadNextPage = useCallback(() => dispatch(actions.apitokens.nextPage()), [dispatch])
+    let loadNextPage = useCallback(() => actions.apitokens.nextPage(), [])
 
     let createAPIToken = useCallback(
-        (req: CreateAPITokenRequest) => {
-            dispatch(actions.apitokens.createAPIToken(req))
+        (req: {
+            name: string
+            expiresAt: Date
+        }) => {
+            actions.apitokens.createAPIToken(req)
         },
-        [dispatch],
+        [],
     )
 
-    let deleteAPIToken = useCallback(
-        (name: string) => {
-            dispatch(actions.apitokens.deleteAPIToken({ name }))
-        },
-        [dispatch],
-    )
+    let deleteAPIToken = useCallback((name: string) => {
+        actions.apitokens.deleteAPIToken(name)
+    }, [])
 
     useEffect(() => {
-        dispatch(actions.apitokens.loadPage())
-    }, [dispatch])
+        if (firstLoad) {
+            actions.apitokens.loadPage()
+        }
+    }, [firstLoad])
 
     return {
         apiTokens,

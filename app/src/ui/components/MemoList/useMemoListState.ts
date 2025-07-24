@@ -1,6 +1,4 @@
-import { createSelector } from "@reduxjs/toolkit"
 import { useCallback, useMemo } from "react"
-import { useDispatch, useSelector } from "react-redux"
 
 import type { Memo, MemoID } from "@/domain/Memo"
 import {
@@ -11,17 +9,20 @@ import {
 } from "@/lib/i18n"
 import { useNavigation } from "@/ui/navigation"
 import { useSetting } from "@/ui/settings"
-import { actions, selectors } from "@/ui/state"
+import { actions, selectors, stores } from "@/ui/stores"
+import { useStore } from "@tanstack/react-store"
 
 export function useMemoListState() {
-    let dispatch = useDispatch()
-
-    let memos = useSelector(groupMemosByDaySelector)
-    let isLoading = useSelector(selectors.memos.isLoading)
-    let error = useSelector(selectors.memos.error)
-    let hasNextPage = useSelector(selectors.memos.hasNextPage)
-    let isListOutdated = useSelector(selectors.memos.isListOutdated)
-    let currentPageParams = useSelector(selectors.navigation.currentParams)
+    let memos = useStore(stores.memos.list.memos)
+    let memosByDay = useMemo(() => groupByDay(memos), [memos])
+    let isLoading = useStore(stores.memos.list.state, selectors.memos.list.isLoading)
+    let error = useStore(stores.memos.list.error)
+    let hasNextPage = useStore(stores.memos.list.nextPage, selectors.memos.list.hasNextPage)
+    let isListOutdated = useStore(stores.memos.list.isOutdated)
+    let currentPageParams = useStore(
+        stores.navigation.currentPage,
+        selectors.navigation.currentParams,
+    )
 
     let [layout] = useSetting("ui.memoList.layout")
     let [doubleClickToEdit] = useSetting("controls.doubleClickToEdit")
@@ -46,37 +47,29 @@ export function useMemoListState() {
                 )
             },
             archive: (memoID: MemoID, isArchived: boolean) => {
-                dispatch(
-                    actions.memos.update({
-                        memo: { id: memoID, isArchived },
-                    }),
-                )
+                actions.memos.single.updateMemoArchiveStatus(memoID, isArchived)
             },
             delete: (memoID: MemoID, isDeleted: boolean) => {
-                dispatch(
-                    actions.memos.update({
-                        memo: { id: memoID, isDeleted },
-                    }),
-                )
+                actions.memos.single.updateMemoDeleteStatus(memoID, isDeleted)
             },
         }),
-        [dispatch, nav.push],
+        [nav.push],
     )
 
     let onEOLReached = useCallback(() => {
         if (!isLoading) {
-            dispatch(actions.memos.nextPage())
+            actions.memos.list.loadNextPage()
         }
-    }, [isLoading, dispatch])
+    }, [isLoading])
 
     let reload = useCallback(() => {
         if (!isLoading) {
-            dispatch(actions.memos.reload())
+            actions.memos.list.reload()
         }
-    }, [isLoading, dispatch])
+    }, [isLoading])
 
     return {
-        memos,
+        memos: memosByDay,
         isLoading,
         error,
         onEOLReached,
@@ -89,10 +82,6 @@ export function useMemoListState() {
         focusedMemoID: "memoID" in currentPageParams ? currentPageParams.memoID : undefined,
     }
 }
-
-const groupMemosByDaySelector = createSelector([(state) => selectors.memos.memos(state)], (memos) =>
-    groupByDay(memos),
-)
 
 function groupByDay(
     memos: Memo[],

@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { decorator } from "@/lib/testhelper/rootStore"
-import "@/ui/styles/index.css"
+import { withMockBackend } from "@/lib/testhelper/storybook"
 
 import { NewMemoScreen } from "./NewMemoScreen"
+
+import "@/ui/styles/index.css"
 
 const meta: Meta<typeof NewMemoScreen> = {
     title: "Screens/Memos/New",
@@ -13,7 +14,7 @@ const meta: Meta<typeof NewMemoScreen> = {
         layout: "fullscreen",
     },
 
-    decorators: [decorator],
+    decorators: [withMockBackend({})],
 }
 
 export default meta

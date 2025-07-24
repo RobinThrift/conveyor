@@ -1,15 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 
-import { decorator } from "@/lib/testhelper/rootStore"
-import "@/ui/styles/index.css"
-
 import { Code } from "./Code"
+
+import "@/ui/styles/index.css"
 
 const meta: Meta<typeof Code> = {
     title: "Components/Markdown/Code",
     component: Code,
-    decorators: [decorator],
     parameters: {
         layout: "fullscreen",
     },

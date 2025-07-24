@@ -1,56 +1,10 @@
-import { type RefObject, createContext, useContext, useEffect, useRef, useState } from "react"
+import { useStore } from "@tanstack/react-store"
+import { type RefObject, useCallback, useEffect, useRef } from "react"
 
-import type { Attachment, AttachmentID } from "@/domain/Attachment"
-import { type AsyncResult, Err } from "@/lib/result"
-import { useOnVisible } from "../hooks/useOnVisible"
-
-export interface AttachmentContext {
-    getAttachmentDataByID(
-        id: AttachmentID,
-    ): AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>
-}
-
-const attachmentContext = createContext<AttachmentContext>({
-    getAttachmentDataByID() {
-        return Promise.reject(Err(new Error("no attachment provider set")))
-    },
-})
-
-export const AttachmentProvider = attachmentContext.Provider
-
-function useAttachmentProvider() {
-    return useContext(attachmentContext)
-}
-
-const _attachmentCache = {
-    data: [] as ArrayBufferLike[],
-    nextIndex: 0,
-    idIndexMap: new Map<AttachmentID, number>(),
-    set(id: AttachmentID, data: ArrayBufferLike) {
-        if (_attachmentCache.nextIndex >= 10) {
-            _attachmentCache.nextIndex = 0
-        }
-
-        let existingID = _attachmentCache.idIndexMap
-            .entries()
-            .find(([_, value]) => value === _attachmentCache.nextIndex)?.[0]
-        if (existingID) {
-            _attachmentCache.idIndexMap.delete(existingID)
-        }
-
-        _attachmentCache.data[_attachmentCache.nextIndex] = data
-        _attachmentCache.idIndexMap.set(id, _attachmentCache.nextIndex)
-        _attachmentCache.nextIndex++
-    },
-
-    get(id: AttachmentID) {
-        let cacheIndex = _attachmentCache.idIndexMap.get(id)
-        if (!cacheIndex) {
-            return
-        }
-        return _attachmentCache.data[cacheIndex]
-    },
-}
+import type { AttachmentID } from "@/domain/Attachment"
+import { type AsyncResult, Err, Ok, type Result } from "@/lib/result"
+import { useOnVisible } from "@/ui/hooks/useOnVisible"
+import { actions, selectors, stores } from "@/ui/stores"
 
 export function useAttachment({
     id,
@@ -60,31 +14,20 @@ export function useAttachment({
     id?: AttachmentID
     loadOnVisible?: boolean
     ref?: RefObject<HTMLElement | null>
-}) {
-    let attachmentProvider = useAttachmentProvider()
-    let [state, setState] = useState<
-        | {
-              id: AttachmentID
-              isLoading: boolean
-              data?: ArrayBufferLike
-              error?: Error
-          }
-        | undefined
-    >(() => {
-        if (!id) {
-            return
-        }
-        let data = _attachmentCache.get(id)
-        if (!data) {
-            return
-        }
-
-        return {
-            id,
-            isLoading: false,
-            data,
-        }
-    })
+}):
+    | {
+          id: AttachmentID
+          isLoading: boolean
+          data?: ArrayBufferLike
+          error?: Error
+      }
+    | undefined {
+    let status = useStore(stores.attachments.states, selectors.attachments.getAttachmentState(id))
+    let isLoading = useStore(
+        stores.attachments.states,
+        selectors.attachments.isAttachmentLoading(id),
+    )
+    let data = useStore(stores.attachments.attachments, selectors.attachments.getAttachmentData(id))
     let fbRef = useRef(null)
 
     let isVisible = useOnVisible(ref || fbRef, {
@@ -92,39 +35,83 @@ export function useAttachment({
     })
 
     useEffect(() => {
+        if (!id) {
+            return
+        }
+
         if (loadOnVisible && !isVisible) {
             return
         }
 
-        if (!id || id === state?.id) {
+        if (status?.state) {
             return
         }
 
-        setState({
-            id,
-            isLoading: true,
-        })
+        actions.attachments.loadAttachment(id)
+    }, [loadOnVisible, isVisible, id, status?.state])
 
-        attachmentProvider.getAttachmentDataByID(id).then(([attachment, err]) => {
-            setState((state) => {
-                if (state?.id !== id) {
-                    return state
-                }
-                if (err) {
-                    return { id, error: err, isLoading: false }
-                }
+    if (!id) {
+        return
+    }
 
-                _attachmentCache.set(id, attachment.data)
-
-                return { id, data: attachment.data, isLoading: false }
-            })
-        })
-    }, [loadOnVisible, isVisible, id, state?.id, attachmentProvider.getAttachmentDataByID])
-
-    return state
+    return {
+        id,
+        isLoading,
+        data: data?.data,
+        error: status?.state === "error" ? status.error : undefined,
+    }
 }
 
-export function useAttachmentLoader() {
-    let attachmentProvider = useAttachmentProvider()
-    return attachmentProvider.getAttachmentDataByID
+export function useAttachmentLoader(): (
+    id: AttachmentID,
+) => AsyncResult<{ data: ArrayBufferLike }> {
+    let getAttachmentDataByID = useCallback(
+        (id: AttachmentID): AsyncResult<{ data: ArrayBufferLike }> => {
+            let status = selectors.attachments.getAttachmentState(id)(
+                stores.attachments.states.state,
+            )
+            let data = selectors.attachments.getAttachmentData(id)(
+                stores.attachments.attachments.state,
+            )
+
+            if (status?.state === "error") {
+                return Promise.resolve(Err(status.error))
+            }
+
+            if (data) {
+                return Promise.resolve(Ok(data))
+            }
+
+            let promise = Promise.withResolvers<Result<{ data: ArrayBufferLike }>>()
+
+            actions.attachments.loadAttachment(id)
+
+            let unsubStates = stores.attachments.states.subscribe(({ currentVal: states }) => {
+                if (states[id]?.state === "done") {
+                    unsubStates()
+                    return
+                }
+
+                if (states[id]?.state === "error") {
+                    promise.reject(Err(states[id]?.error))
+                    unsubStates()
+                }
+            })
+
+            let unsubData = stores.attachments.attachments.subscribe(
+                ({ currentVal: attachments }) => {
+                    let data = attachments[id]
+                    if (data) {
+                        promise.resolve(Ok(data))
+                        unsubData()
+                    }
+                },
+            )
+
+            return promise.promise
+        },
+        [],
+    )
+
+    return getAttachmentDataByID
 }

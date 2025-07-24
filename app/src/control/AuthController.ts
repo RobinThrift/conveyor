@@ -31,8 +31,9 @@ export class AuthController {
         this._authPIClient = authPIClient
     }
 
-    public setOrigin(origin: string) {
+    public async setOrigin(_: Context, origin: string): AsyncResult<void> {
         this._origin = origin
+        return Ok()
     }
 
     public async reset(ctx: Context): AsyncResult<void> {

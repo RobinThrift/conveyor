@@ -1,3 +1,4 @@
+import { useStore } from "@tanstack/react-store"
 import React, { type Key, useCallback } from "react"
 import {
     Tab as AriaTab,
@@ -5,7 +6,6 @@ import {
     TabPanel as AriaTabPanel,
     Tabs as AriaTabs,
 } from "react-aria-components"
-import { useSelector } from "react-redux"
 
 import { Dialog } from "@/ui/components/Dialog"
 import {
@@ -20,7 +20,7 @@ import {
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
 import { useCurrentPage, useNavigation } from "@/ui/navigation"
-import { selectors } from "@/ui/state"
+import { selectors, stores } from "@/ui/stores"
 
 import { APITokensTab } from "./APITokensTab"
 import { AboutTab } from "./AboutTab"
@@ -44,7 +44,7 @@ export function SettingsScreen() {
 
 function SettingsScreenContent() {
     let t = useT("screens/Settings")
-    let isSyncEnabled = useSelector(selectors.sync.isEnabled)
+    let isSyncEnabled = useStore(stores.sync.info, selectors.sync.isEnabled)
 
     let isMobile = useIsMobile()
 

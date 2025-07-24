@@ -20,7 +20,7 @@ export function Alert(props: AlertProps) {
     }
 
     return (
-        <div className={clsx("alert", props.variant)}>
+        <div className={clsx("alert", props.variant, props.className)}>
             {icon}
             <div className="content">{props.children}</div>
         </div>

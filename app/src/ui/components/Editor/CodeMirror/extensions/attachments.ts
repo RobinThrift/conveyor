@@ -41,7 +41,7 @@ export interface AttachmentsPluginOpts {
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        content: ArrayBufferLike
+        data: ArrayBufferLike
     }): Promise<void>
 }
 
@@ -69,7 +69,7 @@ const attachmentsPlugin = (opts: AttachmentsPluginOpts) =>
             opts.transferAttachment({
                 id: effect.value.id,
                 filename: effect.value.filename,
-                content: effect.value.data,
+                data: effect.value.data,
             })
                 .then(() => {
                     view.dispatch({

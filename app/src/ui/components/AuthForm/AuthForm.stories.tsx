@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { useStore } from "@tanstack/react-store"
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
 
-import { decorator } from "@/lib/testhelper/rootStore"
-import { actions, selectors } from "@/ui/state"
+import { withMockBackend } from "@/lib/testhelper/storybook"
+import { actions, stores } from "@/ui/stores"
 
 import { AuthForm } from "./AuthForm"
 
 const meta: Meta<typeof AuthForm> = {
     title: "Components/AuthForm",
     component: AuthForm,
-    decorators: [decorator],
+    decorators: [withMockBackend({})],
 }
 
 export default meta
@@ -19,9 +19,8 @@ type Story = StoryObj<typeof AuthForm>
 export const Overview: Story = {
     name: "AuthForm",
     render: (args) => {
-        let dispatch = useDispatch()
-        let status = useSelector(selectors.auth.status)
-        let error = useSelector(selectors.auth.error)
+        let status = useStore(stores.auth.status)
+        let error = useStore(stores.auth.error)
 
         return (
             <div className="container mx-auto max-w-[1000px] space-y-4">
@@ -30,10 +29,10 @@ export const Overview: Story = {
                     status={status}
                     error={error}
                     login={(args) => {
-                        dispatch(actions.auth.authenticate(args))
+                        actions.auth.authenticate(args)
                     }}
                     changePassword={(args) => {
-                        dispatch(actions.auth.changePassword(args))
+                        actions.auth.changePassword(args)
                     }}
                 />
 

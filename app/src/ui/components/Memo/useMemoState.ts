@@ -45,7 +45,7 @@ export function useMemoState(props: {
         }
     }, [props.memo.id, props.doubleClickToEdit, props.actions?.edit])
 
-    if ((!shouldRender && isVisible) || forceRender) {
+    if ((!shouldRender && isVisible) || (forceRender && !shouldRender)) {
         setShouldRender(true)
     }
 

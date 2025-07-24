@@ -1,38 +1,32 @@
 import type { Context } from "@/lib/context"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 import type { Database } from "@/lib/database"
+import { isErr } from "@/lib/errors"
 import { type FS, FSNotFoundError } from "@/lib/fs"
 import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
 
-import { isErr } from "@/lib/errors"
-import type { Job } from "./types"
+import type { JobWithParams } from "./types"
 
-export class ExportJob implements Job {
-    public name = "ExportJob"
-
+export class ExportJob implements JobWithParams<{ privateKey: PlaintextPrivateKey }> {
     private _db: Database
-    private _filename: string
-    private _privateKey: PlaintextPrivateKey
+    private _filename = "export.db"
     private _fs: FS
 
     constructor({
         db,
         fs,
-        filename,
-        privateKey,
     }: {
         db: Database
         fs: FS
-        filename: string
-        privateKey: PlaintextPrivateKey
     }) {
         this._db = db
         this._fs = fs
-        this._filename = filename
-        this._privateKey = privateKey
     }
 
-    public async run(ctx: Context): AsyncResult<void> {
+    public async run(
+        ctx: Context,
+        { privateKey }: { privateKey: PlaintextPrivateKey },
+    ): AsyncResult<void> {
         let [_rm, rmErr] = await this._fs.remove(ctx, this._filename)
         if (rmErr && !isErr(rmErr, FSNotFoundError)) {
             return wrapErr`[ExportJob]: error removing old file: ${rmErr}`
@@ -51,7 +45,7 @@ export class ExportJob implements Job {
 
         let [_attach, attachErr] = await fromPromise(
             this._db.exec(
-                `ATTACH DATABASE '${this._filename}' AS export KEY '${this._privateKey}'`,
+                `ATTACH DATABASE '${this._filename}' AS export KEY '${privateKey}'`,
                 undefined,
                 ctx.signal,
             ),

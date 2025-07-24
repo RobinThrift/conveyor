@@ -19,7 +19,7 @@ import {
     placeholder as placeholderExt,
 } from "@codemirror/view"
 
-import type { Attachment, AttachmentID } from "@/domain/Attachment"
+import type { AttachmentID } from "@/domain/Attachment"
 import type { Tag } from "@/domain/Tag"
 import type { AsyncResult } from "@/lib/result"
 
@@ -46,11 +46,9 @@ export const extensions = ({
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        content: ArrayBufferLike
+        data: ArrayBufferLike
     }): Promise<void>
-    getAttachmentDataByID(
-        id: AttachmentID,
-    ): AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>
+    getAttachmentDataByID(id: AttachmentID): AsyncResult<{ data: ArrayBufferLike }>
 }) => {
     let exts: Extension[] = [
         keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...searchKeymap]),

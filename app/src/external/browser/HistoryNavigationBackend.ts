@@ -12,16 +12,18 @@ export class HistoryNavigationBackend<
     private _toURLParams?: (params: Params) => URLSearchParams
     private _fromURLParams?: (params: URLSearchParams) => Params
     private _screenToURLMapping: ScreenToURLMapping<S>
-    private _urlToScreenMapping: URLToScreenMapping<ScreenToURLMapping<S>>
+    private _urlToScreenMapping: URLToScreenMapping<S>
 
     private _currLength = window.history.length
 
     constructor({
         screenToURLMapping,
+        urlToScreenMapping,
         toURLParams,
         fromURLParams,
     }: {
         screenToURLMapping: ScreenToURLMapping<S>
+        urlToScreenMapping: URLToScreenMapping<S>
         toURLParams?: (params: Params) => URLSearchParams
         fromURLParams?: (params: URLSearchParams) => Params
     }) {
@@ -30,14 +32,7 @@ export class HistoryNavigationBackend<
         this._screenToURLMapping = screenToURLMapping
         this._toURLParams = toURLParams
         this._fromURLParams = fromURLParams
-        this._urlToScreenMapping = {} as URLToScreenMapping<ScreenToURLMapping<S>>
-
-        for (let screen in screenToURLMapping) {
-            let k: keyof URLToScreenMapping<ScreenToURLMapping<S>> = screen
-            this._urlToScreenMapping[k] = screen as URLToScreenMapping<
-                ScreenToURLMapping<S>
-            >[typeof k]
-        }
+        this._urlToScreenMapping = urlToScreenMapping
 
         window.addEventListener("popstate", (e: PopStateEvent) => {
             if (!e.state) {
@@ -64,14 +59,9 @@ export class HistoryNavigationBackend<
             next = { ...next, ...current }
         }
 
-        if (!current || !current.screen?.name) {
-            let currentURL = new URL(window.location.href)
-            let mapped =
-                this._urlToScreenMapping[
-                    currentURL.pathname as keyof URLToScreenMapping<ScreenToURLMapping<S>>
-                ]
-            next.screen.name = (mapped ?? next.screen.name) as keyof S
-        }
+        let currentURL = new URL(window.location.href)
+        let mapped = this._urlToScreenMapping(currentURL)
+        next.screen.name = mapped ?? next.screen.name
 
         if (this._fromURLParams) {
             let currentURL = new URL(window.location.href)
@@ -83,10 +73,7 @@ export class HistoryNavigationBackend<
             try {
                 let hash = JSON.parse(decodeURIComponent(window.location.hash).substring(1))
 
-                let mapped =
-                    this._urlToScreenMapping[
-                        hash.path as keyof URLToScreenMapping<ScreenToURLMapping<S>>
-                    ]
+                let mapped = this._urlToScreenMapping(hash.screen.name)
                 next.screen.name = (mapped ?? next.screen.name) as keyof S
 
                 next.screen.params = { ...next.screen.params, ...hash.params }
@@ -218,6 +205,4 @@ export class HistoryNavigationBackend<
 
 export type ScreenToURLMapping<S extends Screens> = Record<keyof S, string>
 
-export type URLToScreenMapping<T extends Record<keyof T, keyof any>> = {
-    [K in keyof T as T[K]]: K
-}
+export type URLToScreenMapping<S extends Screens> = (s: URL) => keyof S | undefined

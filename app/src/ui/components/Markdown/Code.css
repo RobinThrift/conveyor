@@ -163,3 +163,9 @@
 .tok-strikethrough {
     text-decoration: line-through;
 }
+
+.code-line-highlight {
+    display: block;
+    width: 100%;
+    background-color: color-mix(in srgb, var(--code-background) 80%, white);
+}

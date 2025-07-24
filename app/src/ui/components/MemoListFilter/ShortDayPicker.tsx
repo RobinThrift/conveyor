@@ -1,3 +1,4 @@
+import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
 import React, { useCallback, useRef, useState, useEffect, useMemo } from "react"
 import {
@@ -11,29 +12,29 @@ import {
 } from "react-aria-components"
 
 import { type CalendarDate, currentDate, isSameDay } from "@/lib/i18n"
+import { actions, selectors, stores } from "@/ui/stores"
 
 import { CalendarCell } from "./CalendarCell"
 
 export interface ShortDayPickerProps {
     className?: string
-    selected?: CalendarDate
-    onSelect: (date?: CalendarDate) => void
 }
 
 export const ShortDayPicker = React.memo(function ShortDayPicker(props: ShortDayPickerProps) {
     let scrollToRef = useRef<HTMLTableCellElement | null>(null)
-    let [focusedDate, setFocusedDate] = useState<CalendarDate>(props.selected ?? currentDate())
+    let exactDateFilter = useStore(
+        stores.memos.list.filter,
+        selectors.memos.list.filter("exactDate"),
+    )
+    let [focusedDate, setFocusedDate] = useState<CalendarDate>(exactDateFilter ?? currentDate())
 
     let today = useMemo(() => {
         return currentDate()
     }, [])
 
-    let onChange = useCallback(
-        (value: DateValue) => {
-            props.onSelect((value as CalendarDate) || undefined)
-        },
-        [props.onSelect],
-    )
+    let onChange = useCallback((value: DateValue) => {
+        actions.memos.list.setFilter({ exactDate: (value as CalendarDate) || undefined })
+    }, [])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: we need to rerender when the ref changes
     useEffect(() => {
@@ -54,7 +55,7 @@ export const ShortDayPicker = React.memo(function ShortDayPicker(props: ShortDay
             focusedValue={focusedDate}
             onChange={onChange}
             onFocusChange={setFocusedDate}
-            value={props.selected ?? null}
+            value={exactDateFilter ?? null}
             className={clsx("short-day-picker", props.className)}
         >
             <header className="sr-only">
@@ -71,8 +72,8 @@ export const ShortDayPicker = React.memo(function ShortDayPicker(props: ShortDay
                 <AriaCalendarGridBody className="calendar-grid-body">
                     {(date) => {
                         let setScrollRef =
-                            (!props.selected && isSameDay(today, date)) ||
-                            (props.selected && isSameDay(props.selected, date))
+                            (!exactDateFilter && isSameDay(today, date)) ||
+                            (exactDateFilter && isSameDay(exactDateFilter, date))
                         return (
                             <CalendarCell
                                 ref={setScrollRef ? scrollToRef : undefined}

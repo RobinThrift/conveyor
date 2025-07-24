@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import React, { useCallback, Suspense } from "react"
 
 import type { AttachmentID } from "@/domain/Attachment"
@@ -7,8 +8,7 @@ import type { Tag } from "@/domain/Tag"
 import { Editor } from "@/ui/components/Editor"
 import { Loader } from "@/ui/components/Loader"
 
-import clsx from "clsx"
-import { type UpdateMemoRequest, useEditMemoScreenState } from "./useEditMemoScreenState"
+import { type UpdateMemoConrentRequest, useEditMemoScreenState } from "./useEditMemoScreenState"
 
 export interface EditMemoScreenProps {
     className?: string
@@ -56,7 +56,7 @@ function MemoEditor(props: {
     memo: Memo
     placeCursorAt?: { x: number; y: number; snippet?: string }
     overrideKeybindings?: boolean
-    updateMemo: (req: { memo: UpdateMemoRequest }) => void
+    updateMemo: (req: UpdateMemoConrentRequest) => void
     onCancel: () => void
     settings: {
         vimModeEnabled: boolean
@@ -64,18 +64,16 @@ function MemoEditor(props: {
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        content: ArrayBufferLike
+        data: ArrayBufferLike
     }): Promise<void>
 }) {
     let onSave = useCallback(
         (memo: Memo, changeset: MemoContentChanges) => {
             props.updateMemo({
-                memo: {
-                    ...memo,
-                    content: {
-                        content: memo.content.trim(),
-                        changes: changeset,
-                    },
+                ...memo,
+                content: {
+                    content: memo.content.trim(),
+                    changes: changeset,
                 },
             })
         },
