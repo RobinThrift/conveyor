@@ -2,7 +2,7 @@ FROM --platform=$BUILDPLATFORM debian:12-slim AS sqlite3-builder
 
 COPY ./app/src/external/sqlite-wasm/scripts/install-deps.sh /scripts/install-deps.sh
 
-RUN /scripts/install-deps.sh;
+RUN /scripts/install-deps.sh
 
 COPY ./app/src/external/sqlite-wasm/scripts /scripts
 COPY ./app/src/external/sqlite-wasm/patches /patches
@@ -16,9 +16,10 @@ RUN --mount=type=cache,target=/.cache \
 
 FROM --platform=$BUILDPLATFORM node:24-alpine3.21 AS frontend
 
-RUN apk update && apk upgrade && apk add --no-cache curl git && \
-    curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
-    just --version
+RUN apk update && apk upgrade && apk add --no-cache curl git bash
+
+COPY ./.scripts/install-just.sh /install-just.sh
+RUN /install-just.sh --dest /usr/local/bin && just --version
 
 COPY ./app/package.json /conveyor/app/package.json
 COPY ./app/package-lock.json /conveyor/app/package-lock.json
@@ -34,11 +35,13 @@ COPY --from=sqlite3-builder /out /conveyor/app/src/external/sqlite-wasm/build
 
 RUN just build
 
+
 FROM --platform=$BUILDPLATFORM golang:1.24.4-alpine3.21 AS builder
 
-RUN apk update && apk upgrade && apk add --no-cache curl git &&  \
-    curl -sSf https://just.systems/install.sh | sh -s -- --to /usr/local/bin && \
-    just --version
+RUN apk update && apk upgrade && apk add --no-cache curl git bash
+
+COPY ./.scripts/install-just.sh /install-just.sh
+RUN /install-just.sh --dest /usr/local/bin && just --version
 
 COPY .git /conveyor/.git
 COPY ./server /conveyor/server
@@ -56,6 +59,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 RUN echo "nobody:*:65534:65534:nobody:/_nonexistent:/bin/false" > /etc/passwd.nonroot
 
 RUN mkdir -p /run/conveyor/files /tmp/conveyor
+
 
 FROM scratch
 

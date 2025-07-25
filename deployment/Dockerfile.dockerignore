@@ -4,11 +4,14 @@
 .golangcci.yml
 
 .bin
-**/build
+.cache
+build
+src-tauri
 
 test
+*_test.go
 deployment
 CHANGELOG
 README.md
 
-**/node_modules
+node_modules
