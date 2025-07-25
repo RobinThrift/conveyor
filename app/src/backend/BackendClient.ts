@@ -51,77 +51,77 @@ export class BackendClient {
         let workerRef = new WeakRef(this._worker)
 
         this.apiTokens = createClient({
-            name: APITokenController.name,
+            name: "APITokenController",
             target: APITokenController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.attachments = createClient({
-            name: AttachmentController.name,
+            name: "AttachmentController",
             target: AttachmentController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.auth = createClient({
-            name: AuthController.name,
+            name: "AuthController",
             target: AuthController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.changelog = createClient({
-            name: ChangelogController.name,
+            name: "ChangelogController",
             target: ChangelogController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.crypto = createClient({
-            name: CryptoController.name,
+            name: "CryptoController",
             target: CryptoController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.jobs = createClient({
-            name: JobController.name,
+            name: "JobController",
             target: JobController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.memos = createClient({
-            name: MemoController.name,
+            name: "MemoController",
             target: MemoController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.settings = createClient({
-            name: SettingsController.name,
+            name: "SettingsController",
             target: SettingsController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.setup = createClient({
-            name: SetupController.name,
+            name: "SetupController",
             target: SetupController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.sync = createClient({
-            name: SyncController.name,
+            name: "SyncController",
             target: SyncController.prototype,
             requests: this._requests,
             worker: workerRef,
         })
 
         this.unlock = createClient({
-            name: UnlockController.name,
+            name: "UnlockController",
             target: UnlockController.prototype,
             requests: this._requests,
             worker: workerRef,
