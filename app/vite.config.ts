@@ -1,9 +1,10 @@
-import path from "node:path"
 import { exec as nodeexec } from "node:child_process"
+import path from "node:path"
 import * as process from "node:process"
-import { defineConfig, type UserConfig, searchForWorkspaceRoot } from "vite"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react-swc"
+import type { GetModuleInfo } from "rollup"
+import { defineConfig, searchForWorkspaceRoot, type UserConfig } from "vite"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
     let vcsInfo = await getVCSInfo()
@@ -110,18 +111,73 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                 input: {
                     index: "./src/index.tsx",
                 },
+                preserveEntrySignatures: "strict",
                 output: {
-                    entryFileNames: `[name].${vcsInfo.hash.substring(0, 16)}.js`,
+                    entryFileNames: () => `[name].${vcsInfo.hash.substring(0, 16)}.js`,
+
                     assetFileNames: (assetInfo) => {
-                        if (assetInfo.names[0] === "index.css")
+                        if (assetInfo.names[0] === "index.css") {
                             return `index.${vcsInfo.hash.substring(0, 16)}.css`
+                        }
+
+                        if (/woff2?$/.test(assetInfo.names[0])) {
+                            return "fonts/[name][extname]"
+                        }
+
                         return assetInfo.names[0] ?? ""
                     },
+
+                    hoistTransitiveImports: false,
+                    manualChunks,
                 },
             },
         },
     }
 })
+
+function manualChunks(
+    id: string,
+    _: { getModuleInfo: GetModuleInfo; getModuleIds: () => IterableIterator<string> },
+) {
+    let translations = /app\/translations\/([a-z]+)\.(?:json|ts)/
+    let matches = translations.exec(id)
+    if (matches) {
+        return `i18n/${matches[1]}`
+    }
+
+    let codemirrorLang = /codemirror\/(?:lang-([a-z]+))|(?:legacy-modes\/mode\/([a-z]+))/
+    matches = codemirrorLang.exec(id)
+    if (matches) {
+        return `codemirror/lang-${matches[1] || matches[2]}`
+    }
+
+    let lezer = /@lezer\/([a-z]+)/
+    matches = lezer.exec(id)
+    if (matches) {
+        return `codemirror/lang-${matches[1]}`
+    }
+
+    let codemirror = /codemirror/
+    if (codemirror.test(id)) {
+        return `codemirror`
+    }
+
+    let micromark = /micromark/
+    if (micromark.test(id)) {
+        return `markdown`
+    }
+
+    let mdast = /mdast/
+    if (mdast.test(id)) {
+        return `markdown`
+    }
+
+    let migrations = /app\/src\/storage\/database\/sqlite\/migrations\/([\da-z_]+)/
+    matches = migrations.exec(id)
+    if (matches) {
+        return `migrations/${matches[1]}`
+    }
+}
 
 async function getVCSInfo() {
     try {

@@ -18,6 +18,8 @@ let db: Database | undefined
 
 const ErrOpen = createErrType("SQLiteWorker", "error reading file")
 
+import sqlite3WasmFile from "@/external/sqlite-wasm/build/sqlite3.wasm?url"
+
 export const SQLiteWorker = createWorker({
     _setup: async (_ctx: Context, _params: any): AsyncResult<void> => {
         sqlite3Init = (async () => {
@@ -26,7 +28,7 @@ export const SQLiteWorker = createWorker({
                 print: (msg) => console.log(msg),
                 printErr: (err) => console.error(err),
                 locateFile: () => {
-                    return "/assets/sqlite3/sqlite3.wasm"
+                    return sqlite3WasmFile
                 },
                 setStatus: (_: string) => {
                     // this NEEDs to be set, otherwise the initialization WILL fail

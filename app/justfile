@@ -14,8 +14,6 @@ run *args="":
 build: _build-sqlite install
     {{ local_bin }}/vite build --mode production
     just _gen-icons
-    mkdir ./build/sqlite3
-    cp ./src/external/sqlite-wasm/build/sqlite3.wasm ./build/sqlite3/sqlite3.wasm
 
 generate: _gen-sql
 
