@@ -6,7 +6,7 @@ import type {
 } from "@/domain/Changelog"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
-import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
+import { type AsyncResult, fromPromise, Ok, wrapErr } from "@/lib/result"
 
 import * as queries from "./gen/changelog_sql"
 

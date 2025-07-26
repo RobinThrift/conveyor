@@ -1,6 +1,6 @@
 import { useContext, useMemo } from "react"
 
-import { type Translation, format } from "@/lib/i18n"
+import { format, type Translation } from "@/lib/i18n"
 
 import { i18nContext } from "./context"
 

@@ -115,7 +115,11 @@ function hightlight({
     code,
     parser,
     hightlightedLines,
-}: { code: string; parser: Parser; hightlightedLines?: number[] }) {
+}: {
+    code: string
+    parser: Parser
+    hightlightedLines?: number[]
+}) {
     let line = 0
     let nodes: React.ReactNode[][] = [[]]
 

@@ -2,7 +2,7 @@ import { BaseDirectory, mkdir, readFile, remove, writeFile } from "@tauri-apps/p
 
 import type { Context } from "@/lib/context"
 import { type FS, join } from "@/lib/fs"
-import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
+import { type AsyncResult, Err, fromPromise, Ok, wrapErr } from "@/lib/result"
 
 export class TauriFS implements FS {
     private _baseDir: string

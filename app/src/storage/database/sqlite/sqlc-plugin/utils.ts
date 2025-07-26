@@ -1,6 +1,9 @@
 import {
+    createPrinter,
+    createSourceFile,
     EmitHint,
     type Expression,
+    factory,
     type ImportSpecifier,
     type MemberName,
     NewLineKind,
@@ -11,9 +14,6 @@ import {
     type Statement,
     SyntaxKind,
     type TypeNode,
-    createPrinter,
-    createSourceFile,
-    factory,
 } from "typescript"
 
 import type { Options, Override } from "./Options.ts"

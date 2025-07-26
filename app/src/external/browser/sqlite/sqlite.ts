@@ -1,10 +1,10 @@
 import type { SqlValue } from "@sqlite.org/sqlite-wasm"
 
 import { newID } from "@/domain/ID"
-import { Lock } from "@/lib/Lock"
 import { BaseContext, type Context } from "@/lib/context"
-import type { DBExec, Database } from "@/lib/database"
-import { type AsyncResult, Err, Ok, fromPromise, toPromise } from "@/lib/result"
+import type { Database, DBExec } from "@/lib/database"
+import { Lock } from "@/lib/Lock"
+import { type AsyncResult, Err, fromPromise, Ok, toPromise } from "@/lib/result"
 import { migrate, migrateDBEncryption } from "@/storage/database/sqlite/migrator"
 
 import { SQLiteWorker } from "./SQLiteWorker"

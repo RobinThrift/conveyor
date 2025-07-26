@@ -1,12 +1,12 @@
-import type { KVStore, KVStoreContainer } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
+import type { KVStore, KVStoreContainer } from "@/lib/KVStore"
 import {
     type AsyncResult,
     Err,
-    Ok,
-    type Result,
     fromPromise,
     fromThrowing,
+    Ok,
+    type Result,
     wrapErr,
 } from "@/lib/result"
 
@@ -312,8 +312,8 @@ export class IndexedDBKVStoreContainer<Stores extends string> implements KVStore
             return Err(ctx.err() as Error)
         }
 
-        let abortErr: Error | undefined = undefined
-        let result: R | undefined = undefined
+        let abortErr: Error | undefined
+        let result: R | undefined
 
         let [tx, txErr] = fromThrowing(() => this._db.transaction(storeName as string, mode))
         if (txErr) {

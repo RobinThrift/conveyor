@@ -11,17 +11,16 @@ import type {
     SettingChangelogEntry,
 } from "@/domain/Changelog"
 import type { SyncInfo } from "@/domain/SyncInfo"
-import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import type { Context } from "@/lib/context"
 import type { DBExec, Transactioner } from "@/lib/database"
 import { Second } from "@/lib/duration"
+import { createErrType } from "@/lib/errors"
 import { type FS, join } from "@/lib/fs"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Err, Ok, all, wrapErr } from "@/lib/result"
+import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
+import { type AsyncResult, all, Err, Ok, wrapErr } from "@/lib/result"
 import { encodeText } from "@/lib/textencoding"
-
-import { createErrType } from "@/lib/errors"
 import type { CryptoController } from "./CryptoController"
 
 export class SyncController {

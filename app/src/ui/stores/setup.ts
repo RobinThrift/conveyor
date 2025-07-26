@@ -1,7 +1,7 @@
 import type { BackendClient } from "@/backend/BackendClient"
 import { BUILD_INFO } from "@/buildInfo"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
-import { type KeyPaths, type ValueAt, setPath } from "@/lib/getset"
+import { type KeyPaths, setPath, type ValueAt } from "@/lib/getset"
 import { batch, createActions, createEffect, createStore } from "@/lib/store"
 
 import * as auth from "./auth"

@@ -30,14 +30,17 @@
 
     &:focus-visible {
         @apply outline-none;
+        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
         & > .tag-tree-item-content {
             @apply outline outline-2 outline-primary-dark -outline-offset-3 text-primary;
         }
     }
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
 .tag-tree-item-content {
     @apply w-full flex items-center cursor-pointer rounded-lg xs:hover:bg-subtle active:bg-subtle ps-1 pe-2 py-0.5;
+    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
     .tag-tree-item-count {
         @apply text-subtle-dark;
     }
@@ -45,6 +48,7 @@
 
 .tag-tree-item-expand-toggle-btn {
     @apply w-6 flex items-center justify-center hover:bg-surface-level-2 rounded-lg cursor-pointer py-0.5;
+    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
     svg {
         transition: rotate 0.25s;
     }

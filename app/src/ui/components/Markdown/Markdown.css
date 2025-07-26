@@ -20,6 +20,7 @@
 
     @media (max-width: 768px) {
         @container (width < 50vw) {
+            /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
             h1 {
                 @apply text-2xl;
             }

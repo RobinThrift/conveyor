@@ -6,6 +6,7 @@ export function useOnIntersection(
     ref: RefObject<HTMLElement | null>,
     options: IntersectionObserverInit & { ratio: number } = { ratio: 0.1 },
 ) {
+    // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional as it's passed in by the caller
     let onChangeMemoed = useCallback(onChange, deps)
 
     useEffect(() => {

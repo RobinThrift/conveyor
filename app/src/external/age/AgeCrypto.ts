@@ -1,7 +1,7 @@
 import * as age from "age-encryption"
 
 import type { PlaintextPrivateKey, PrivateCryptoKey, PublicCryptoKey } from "@/lib/crypto"
-import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
+import { type AsyncResult, Err, fromPromise, Ok, wrapErr } from "@/lib/result"
 
 export type Identity = string & { readonly "": unique symbol }
 export type Recipient = string & { readonly "": unique symbol }

@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { startTransition, Suspense, useCallback, useEffect, useRef, useState } from "react"
+import React, { Suspense, startTransition, useCallback, useEffect, useRef, useState } from "react"
 
 import { FlaskIcon, XIcon } from "../components/Icons"
 import { Loader } from "../components/Loader"

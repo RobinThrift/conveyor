@@ -1,6 +1,6 @@
 import { Store, useStore } from "@tanstack/react-store"
 import clsx from "clsx"
-import React, { useEffect, useRef, useCallback } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { usePreventScroll } from "@/ui/hooks/usePreventScroll"
@@ -89,7 +89,6 @@ export function TagTreeFilter(props: { className?: string }) {
     return (
         <>
             {isOffCanvas && isOffCanvasOpen && (
-                /* biome-ignore lint/a11y/useKeyWithClickEvents: this is not supposed to be focused and just simpler than the whole "click outside" thing. I am lazy. */
                 <div
                     aria-hidden="true"
                     className="tag-tree-filter-sidebar-overlay"
@@ -100,6 +99,7 @@ export function TagTreeFilter(props: { className?: string }) {
             )}
 
             {(!isOffCanvas || (isOffCanvas && isOffCanvasOpen)) && (
+                // biome-ignore lint/a11y/useAriaPropsSupportedByRole: this is th correct
                 <div
                     ref={ref}
                     role={isOffCanvas ? "dialog" : undefined}
@@ -182,7 +182,10 @@ export function useTagTreeFilterStore() {
 function useOffCanvasDragging({
     ref,
     close,
-}: { ref: React.RefObject<HTMLDivElement | null>; close: () => void }) {
+}: {
+    ref: React.RefObject<HTMLDivElement | null>
+    close: () => void
+}) {
     let startingOffsetX = useRef(0)
     let isDragging = useRef(false)
     let lastPointerX = useRef(-1)

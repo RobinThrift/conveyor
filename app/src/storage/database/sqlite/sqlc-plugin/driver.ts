@@ -1,10 +1,10 @@
 import {
     type Expression,
     type FunctionDeclaration,
+    factory,
     NodeFlags,
     SyntaxKind,
     type TypeNode,
-    factory,
 } from "typescript"
 
 import type { Column, Parameter, Query } from "./proto/codegen_pb"

@@ -1,4 +1,4 @@
-import { assert, afterEach, beforeEach, suite, test, vi } from "vitest"
+import { afterEach, assert, beforeEach, suite, test, vi } from "vitest"
 
 import { BaseContext } from "@/lib/context"
 import { Ok } from "@/lib/result"

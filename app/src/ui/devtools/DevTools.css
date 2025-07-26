@@ -29,6 +29,7 @@
     }
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive */
 .devtools-open-btn {
     @apply absolute top-2 right-2 px-1 rounded-lg flex items-center justify-center size-8 shadow-lg;
     cursor: pointer;
@@ -123,6 +124,7 @@
     }
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive */
 .devtools-entry-list-item-title {
     @apply flex items-center justify-between w-full font-mono;
 }
@@ -181,11 +183,13 @@
     }
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive */
 .devtools-span-gantt-item-bar {
     @apply bg-primary border border-primary-dark rounded-lg absolute h-7 top-0;
     text-align: center;
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive */
 .devtools-span-gantt-item-duration {
     @apply text-black text-xs font-mono py-0.5 px-1 rounded;
     background: rgba(255, 255, 255, 0.4);
@@ -275,6 +279,7 @@ ul.jsondiffpatch-delta {
     display: inline-block;
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive */
 .jsondiffpatch-property-name {
     @apply inline-block pr-1;
     vertical-align: top;

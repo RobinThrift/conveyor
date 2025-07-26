@@ -2,7 +2,7 @@ import type { AccountKey } from "@/domain/AccountKey"
 import { encodeToBase64 } from "@/lib/base64"
 import type { Context } from "@/lib/context"
 import { createErrType } from "@/lib/errors"
-import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
+import { type AsyncResult, fromPromise, Ok, wrapErr } from "@/lib/result"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 

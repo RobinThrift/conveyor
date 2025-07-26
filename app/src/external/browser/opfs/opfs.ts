@@ -1,8 +1,7 @@
+import { newID } from "@/domain/ID"
 import { BaseContext, type Context } from "@/lib/context"
 import { type FS, join } from "@/lib/fs"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
-
-import { newID } from "@/domain/ID"
 import { OPFSWorker } from "./OPFSWorker"
 
 export class OPFS implements FS {

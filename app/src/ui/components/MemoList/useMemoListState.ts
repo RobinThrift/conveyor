@@ -1,5 +1,5 @@
+import { useStore } from "@tanstack/react-store"
 import { useCallback, useMemo } from "react"
-
 import type { Memo, MemoID } from "@/domain/Memo"
 import {
     calendarDateFromDate,
@@ -10,7 +10,6 @@ import {
 import { useNavigation } from "@/ui/navigation"
 import { useSetting } from "@/ui/settings"
 import { actions, selectors, stores } from "@/ui/stores"
-import { useStore } from "@tanstack/react-store"
 
 export function useMemoListState() {
     let memos = useStore(stores.memos.list.memos)

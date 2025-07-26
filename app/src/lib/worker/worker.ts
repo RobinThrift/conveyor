@@ -1,6 +1,6 @@
 import { BaseContext, type Context } from "@/lib/context"
 import { randomID } from "@/lib/randomID"
-import { type AsyncResult, Err, type Result, fromPromise } from "@/lib/result"
+import { type AsyncResult, Err, fromPromise, type Result } from "@/lib/result"
 import { getThreadName } from "../thread"
 
 export function isWorkerContext() {

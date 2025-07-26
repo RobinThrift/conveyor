@@ -4,10 +4,10 @@ import {
     type PlaintextAuthTokenValue,
     type PlaintextPassword,
 } from "@/auth"
-import type { KVStore } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
 import { createErrType, isErr } from "@/lib/errors"
 import { currentDateTime, isAfter } from "@/lib/i18n"
+import type { KVStore } from "@/lib/KVStore"
 import { type AsyncResult, Err, Ok, wrapErr } from "@/lib/result"
 
 export class AuthController {

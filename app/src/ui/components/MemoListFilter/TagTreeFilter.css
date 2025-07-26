@@ -24,6 +24,7 @@
     }
 
     @starting-style {
+        /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
         right: -90svw;
     }
 }
@@ -40,6 +41,7 @@
     backdrop-filter: blur(2px);
     opacity: var(--backdrop-opacity, 1);
 
+    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
     &[data-is-closing="true"] {
         transition: opacity 250ms;
         opacity: 0;

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import { newID } from "@/domain/ID"
 import { useAttachmentTransferer } from "@/ui/attachments"
-import { type CreateMemoRequest, actions, selectors, stores } from "@/ui/stores"
+import { actions, type CreateMemoRequest, selectors, stores } from "@/ui/stores"
 
 export function useNewMemoEditorState() {
     let transferAttachment = useAttachmentTransferer()

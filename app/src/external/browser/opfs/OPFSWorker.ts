@@ -1,8 +1,8 @@
-import { Lock } from "@/lib/Lock"
 import type { Context } from "@/lib/context"
 import { createErrType } from "@/lib/errors"
 import { FSNotFoundError } from "@/lib/fs"
-import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
+import { Lock } from "@/lib/Lock"
+import { type AsyncResult, fromPromise, Ok, wrapErr } from "@/lib/result"
 import { createWorker, isWorkerContext } from "@/lib/worker"
 
 const _rootDir = (async () => {

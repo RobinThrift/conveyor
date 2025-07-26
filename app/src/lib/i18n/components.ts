@@ -1,7 +1,7 @@
 export {
     type Components,
     type ComponentsJSON,
-    type Translations,
     count,
     params,
+    type Translations,
 } from "@nanostores/i18n"

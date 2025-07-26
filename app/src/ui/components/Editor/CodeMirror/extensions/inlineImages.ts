@@ -1,9 +1,15 @@
-import { type AttachmentID, attachmentIDFromURL } from "@/domain/Attachment"
-import type { AsyncResult } from "@/lib/result"
 import { syntaxTree } from "@codemirror/language"
 import type { Range } from "@codemirror/state"
-import { Decoration, type EditorView } from "@codemirror/view"
-import { type DecorationSet, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view"
+import {
+    Decoration,
+    type DecorationSet,
+    type EditorView,
+    ViewPlugin,
+    type ViewUpdate,
+    WidgetType,
+} from "@codemirror/view"
+import { type AttachmentID, attachmentIDFromURL } from "@/domain/Attachment"
+import type { AsyncResult } from "@/lib/result"
 
 type GetAttachmentDataByID = (id: AttachmentID) => AsyncResult<{ data: ArrayBufferLike }>
 

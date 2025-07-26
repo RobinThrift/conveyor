@@ -38,6 +38,7 @@ export function Link<S extends keyof Screens>({
 
     return (
         // biome-ignore lint/a11y/useValidAnchor: for internal navigation
+        // biome-ignore lint/a11y/noStaticElementInteractions: for internal navigation
         <a ref={props.ref} {...props} onClick={screen ? onClick : undefined} />
     )
 }
@@ -90,6 +91,7 @@ export function LinkButton<S extends keyof Screens>({
     let { outline, plain, children, ...aProps } = props
 
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: for internal navigation
         <a
             {...aProps}
             // biome-ignore lint/a11y/useValidAnchor: required for internal navigation handling
@@ -101,7 +103,7 @@ export function LinkButton<S extends keyof Screens>({
                     sm: size === "sm",
                     lg: size === "lg",
                     "icon-only": !children,
-                    "outline-btn": props.outline,
+                    "outline-btn": outline,
                     plain: plain,
                 },
                 props.className,

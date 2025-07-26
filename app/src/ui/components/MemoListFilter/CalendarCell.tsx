@@ -64,14 +64,23 @@ export function CalendarCell({
     }
 
     let {
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onClick,
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onKeyDown,
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onDragStart,
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onFocus,
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onMouseDown,
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onPointerDown,
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onPointerEnter,
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onPointerLeave,
+        // biome-ignore lint/correctness/noUnusedVariables: is discarded
         onPointerUp,
         ...restButtonProps
     } = buttonProps

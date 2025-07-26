@@ -1,5 +1,6 @@
+import type { Parent } from "mdast-util-from-markdown"
+
 export * from "mdast-util-from-markdown"
-import type { Parent, Resource } from "mdast-util-from-markdown"
 
 declare module "mdast-util-to-markdown" {
     interface AutoTagLink extends Parent {

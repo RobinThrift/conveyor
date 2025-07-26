@@ -1,8 +1,7 @@
 import { LazyStore } from "@tauri-apps/plugin-store"
-
-import type { KVStore, KVStoreContainer } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Err, Ok, type Result, fromPromise, wrapErr } from "@/lib/result"
+import type { KVStore, KVStoreContainer } from "@/lib/KVStore"
+import { type AsyncResult, Err, fromPromise, Ok, type Result, wrapErr } from "@/lib/result"
 
 export class TauriKVStoreContainer<Names extends string> implements KVStoreContainer<Names> {
     private _stores: LazyStore[] = []

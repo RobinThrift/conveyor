@@ -52,7 +52,12 @@ const Highlight = React.memo(function Highlight({
     code,
     lang,
     hightlightedLines,
-}: { code: string; lang?: string; hightlightedLines?: number[]; meta?: string }) {
+}: {
+    code: string
+    lang?: string
+    hightlightedLines?: number[]
+    meta?: string
+}) {
     let highlighted = useHightlighted({ code, lang, hightlightedLines })
     return <code>{highlighted || code}</code>
 })

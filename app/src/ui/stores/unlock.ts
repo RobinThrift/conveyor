@@ -39,7 +39,10 @@ export const selectors = {
 export function registerEffects({
     backend,
     navCtrl,
-}: { backend: BackendClient; navCtrl: NavigationController }) {
+}: {
+    backend: BackendClient
+    navCtrl: NavigationController
+}) {
     let [, unmount] = createEffect("unlock/unlock", {
         fn: async (ctx, { batch }) => {
             if (selectors.isUnlocked(status.state)) {

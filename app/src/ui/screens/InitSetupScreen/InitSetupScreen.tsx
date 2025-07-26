@@ -306,13 +306,7 @@ function StepConfigureEncryption({
     )
 }
 
-function StepSyncing({
-    error,
-    back,
-}: {
-    error?: Error
-    back: () => void
-}) {
+function StepSyncing({ error, back }: { error?: Error; back: () => void }) {
     let t = useT("screens/InitSetup")
 
     return (

@@ -1,5 +1,3 @@
-import React, { Suspense, type Key, type ReactNode } from "react"
-
 import clsx from "clsx"
 import type {
     AlignType,
@@ -29,6 +27,7 @@ import type {
     TableRow,
 } from "mdast"
 import type { ContainerDirective, LeafDirective, TextDirective } from "mdast-util-directive"
+import React, { type Key, type ReactNode, Suspense } from "react"
 
 import type { Screens } from "@/control/NavigationController"
 import { Loader } from "@/ui/components/Loader"
@@ -83,8 +82,6 @@ export function astToJSX(
     if (doc.footnotes.length !== 0) {
         nodes.push(
             <React.Fragment key="footnotes">
-                {/* biome-ignore lint/a11y/useValidAriaRole: false positive */}
-                {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: false positive */}
                 <div className="footnotes" role="doc-endnotes">
                     <ol>{doc.footnotes}</ol>
                 </div>
@@ -379,8 +376,6 @@ function footnoteDefinitionToJSX(doc: Document, node: FootnoteDefinition): React
 function footnoteReferenceToJSX(doc: Document, node: FootnoteReference): ReactNode {
     return (
         <sup id={`fnref:${doc.id}-${node.identifier}`} key={nodeKey(node)}>
-            {/* biome-ignore lint/a11y/useValidAriaRole: false positive */}
-            {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: false positive */}
             <a href={`#fn:${doc.id}-${node.identifier}`} role="doc-noteref">
                 {node.label}
             </a>
@@ -466,20 +461,12 @@ function nodeKey(node: Node): Key {
     return `${node.position?.start.line}:${node.position?.start.column}-${node.position?.end.line}:${node.position?.end.column}`
 }
 
-function FootnoteLinkItem({
-    doc,
-    node,
-}: {
-    doc: Document
-    node: FootnoteDefinition
-}) {
+function FootnoteLinkItem({ doc, node }: { doc: Document; node: FootnoteDefinition }) {
     let t = useT("components/Memo")
     return (
         <li id={`fn:${doc.id}-${node.identifier}`} key={nodeKey(node)}>
             {stripParagraph(node).map((c) => astNodeToJSX(doc, c))}
 
-            {/* biome-ignore lint/a11y/useValidAriaRole: false positive */}
-            {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: false positive */}
             <a
                 href={`#fnref:${doc.id}-${node.identifier}`}
                 role="doc-backlink"

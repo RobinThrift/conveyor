@@ -26,6 +26,7 @@ export function TagTree({ className }: TagTreeProps) {
     return (
         <ul
             className={clsx("tag-tree", className)}
+            // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: weird false positive
             role="tree"
             aria-label={t.Label}
             onFocus={onFocus}
@@ -101,6 +102,7 @@ const TagTreeItem = React.memo(
                 <div className="tag-tree-item-content">
                     <HashIcon className={"icon"} aria-hidden />
                     {/* biome-ignore lint/a11y/useKeyWithClickEvents: key pressis handled at a higher level */}
+                    {/** biome-ignore lint/a11y/noStaticElementInteractions: false positive */}
                     <span id={labeledByID} onClick={() => selectItem(item.tag)}>
                         {item.segment}
                         {item.count ? (
@@ -111,7 +113,6 @@ const TagTreeItem = React.memo(
                         ) : null}
                     </span>
                     {item.children.length ? (
-                        // biome-ignore lint/a11y/useKeyWithClickEvents: this button is not keyboard accessible by design as it would be redunant and mess up the Tab order
                         <div
                             aria-hidden={true}
                             className="tag-tree-item-expand-toggle-btn"
@@ -123,12 +124,8 @@ const TagTreeItem = React.memo(
                 </div>
 
                 {isExpanded ? (
-                    <ul
-                        className="tag-tree-item-children"
-                        // biome-ignore lint/a11y/useSemanticElements: this is the recommended pattern as per https://www.w3.org/WAI/ARIA/apg/patterns/treeview/
-                        role="group"
-                        aria-label={item.segment}
-                    >
+                    // biome-ignore lint/a11y/useSemanticElements: this is the recommended pattern as per https://www.w3.org/WAI/ARIA/apg/patterns/treeview/
+                    <ul className="tag-tree-item-children" role="group" aria-label={item.segment}>
                         {item.children.map((c) => (
                             <TagTreeItem
                                 item={c}

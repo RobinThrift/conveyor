@@ -1,4 +1,4 @@
-import { HighlightStyle, type TagStyle, syntaxHighlighting } from "@codemirror/language"
+import { HighlightStyle, syntaxHighlighting, type TagStyle } from "@codemirror/language"
 import { EditorView } from "@codemirror/view"
 import { classHighlighter, tags as t } from "@lezer/highlight"
 

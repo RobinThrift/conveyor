@@ -3,7 +3,7 @@ import type { PlaintextPassword } from "@/auth/credentials"
 import type { Context } from "@/lib/context"
 import { createErrType } from "@/lib/errors"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
-import { type AsyncResult, Ok, fromPromise, fromThrowing, wrapErr } from "@/lib/result"
+import { type AsyncResult, fromPromise, fromThrowing, Ok, wrapErr } from "@/lib/result"
 
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
 

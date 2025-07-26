@@ -6,7 +6,7 @@ export function usePreventScroll({ isDisabled }: { isDisabled?: boolean } = {}) 
             return
         }
 
-        let scrollingElement: HTMLElement | undefined = undefined
+        let scrollingElement: HTMLElement | undefined
 
         document.documentElement.style.overflow = "hidden"
         document.documentElement.style.overscrollBehavior = "contain"

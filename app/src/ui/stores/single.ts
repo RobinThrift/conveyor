@@ -1,10 +1,9 @@
 import type { BackendClient } from "@/backend/BackendClient"
 import type { MemoContentChanges } from "@/domain/Changelog"
 import type { Memo, MemoID } from "@/domain/Memo"
-import { batch, createActions, createEffect, createStore } from "@/lib/store"
-
 import { Second } from "@/lib/duration"
 import { CustomErrCode, isErr } from "@/lib/errors"
+import { batch, createActions, createEffect, createStore } from "@/lib/store"
 import * as list from "./memos"
 
 export const singleID = createStore<MemoID | undefined>("memos/single/id", undefined)
@@ -180,7 +179,7 @@ class NewerSingleLoadRequestError extends Error {
 }
 
 export function registerEffects(backend: BackendClient) {
-    let loadAbortCntrl: AbortController | undefined = undefined
+    let loadAbortCntrl: AbortController | undefined
 
     createEffect("memos/single/load", {
         fn: async (baseCtx, { batch }) => {

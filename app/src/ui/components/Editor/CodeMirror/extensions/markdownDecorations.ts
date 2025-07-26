@@ -1,7 +1,7 @@
 import { syntaxTree } from "@codemirror/language"
 import { type EditorState, type Range, StateField } from "@codemirror/state"
-import { Decoration, EditorView } from "@codemirror/view"
 import type { DecorationSet } from "@codemirror/view"
+import { Decoration, EditorView } from "@codemirror/view"
 
 export const markdownDecorations = StateField.define<DecorationSet>({
     create(state) {

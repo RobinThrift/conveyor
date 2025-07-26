@@ -1,6 +1,6 @@
 import type { SetupInfo } from "@/domain/SetupInfo"
-import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import type { Context } from "@/lib/context"
+import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import type { AsyncResult } from "@/lib/result"
 
 export class SetupController {

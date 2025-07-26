@@ -11,7 +11,7 @@ import { gfmFootnote } from "micromark-extension-gfm-footnote"
 import { gfmStrikethrough } from "micromark-extension-gfm-strikethrough"
 import { gfmTable } from "micromark-extension-gfm-table"
 
-import { type Result, fromThrowing } from "@/lib/result"
+import { fromThrowing, type Result } from "@/lib/result"
 
 import { autoTagLinks, mdastAutoTagLinks } from "./extensions/tags"
 

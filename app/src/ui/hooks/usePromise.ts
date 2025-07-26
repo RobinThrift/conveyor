@@ -8,7 +8,6 @@ export type UsePromise<T> =
 export function usePromise<T>(fn: () => Promise<T>, deps: DependencyList = []): UsePromise<T> {
     let [state, setState] = useState<UsePromise<T>>({ resolved: false })
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: edge case
     useEffect(() => {
         setState({
             resolved: false,
@@ -29,6 +28,7 @@ export function usePromise<T>(fn: () => Promise<T>, deps: DependencyList = []): 
                     error: err,
                 })
             })
+        // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional as it's passed in by the caller
     }, deps)
 
     return state

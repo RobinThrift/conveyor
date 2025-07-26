@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { newID } from "@/domain/ID"
 import { useAttachmentTransferer } from "@/ui/attachments"
 import { useNavigation } from "@/ui/navigation"
-import { type CreateMemoRequest, actions, selectors, stores } from "@/ui/stores"
+import { actions, type CreateMemoRequest, selectors, stores } from "@/ui/stores"
 
 export function useNewMemoScreenState() {
     let transferAttachment = useAttachmentTransferer()

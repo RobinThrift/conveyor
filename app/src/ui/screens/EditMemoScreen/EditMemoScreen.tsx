@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { useCallback, Suspense } from "react"
+import React, { Suspense, useCallback } from "react"
 
 import type { AttachmentID } from "@/domain/Attachment"
 import type { MemoContentChanges } from "@/domain/Changelog"

@@ -74,12 +74,7 @@ const DraggableFigure = React.memo(function DraggableFigure({
     isLoading?: boolean
     style?: React.CSSProperties
 
-    close: (fromRect?: {
-        x: number
-        y: number
-        width: number
-        height: number
-    }) => void
+    close: (fromRect?: { x: number; y: number; width: number; height: number }) => void
     ref: React.RefObject<HTMLElement | null>
 }) {
     let t = useT("components/Figure")

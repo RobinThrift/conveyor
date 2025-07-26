@@ -1,4 +1,4 @@
-import { TraceMap, originalPositionFor, sourceContentFor } from "@jridgewell/trace-mapping"
+import { originalPositionFor, sourceContentFor, TraceMap } from "@jridgewell/trace-mapping"
 import clsx from "clsx"
 import React, { useMemo } from "react"
 
@@ -11,7 +11,11 @@ export const StackTrace = React.memo(function StackTrace({
     className,
     stack,
     filterFrames,
-}: { className?: string; stack?: string; filterFrames?: (frame: StackFrame) => boolean }) {
+}: {
+    className?: string
+    stack?: string
+    filterFrames?: (frame: StackFrame) => boolean
+}) {
     let stackFrames = usePromise(async () => {
         if (!stack) {
             return null

@@ -1,5 +1,5 @@
-import type { Notification } from "@/ui/notifications"
 import { createNanoEvents } from "nanoevents"
+import type { Notification } from "@/ui/notifications"
 
 export interface Events {
     "notifications:add": (evt: Notification) => void

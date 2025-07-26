@@ -5,11 +5,10 @@ import ReactDOM from "react-dom/client"
 import type { NavigationController } from "@/control/NavigationController"
 import { Env } from "@/env"
 import { App } from "@/ui/App"
+import { Loader } from "@/ui/components/Loader"
 import { PrettyError } from "@/ui/components/PrettyError"
 import { NavigationProvider } from "@/ui/navigation"
 import { stores } from "@/ui/stores"
-
-import { Loader } from "@/ui/components/Loader"
 import { initDevTools } from "./devtools"
 
 export async function initUI({

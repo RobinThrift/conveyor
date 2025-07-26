@@ -7,8 +7,8 @@ import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDevice
 import { TauriFS } from "@/external/tauri/TauriFS"
 import { TauriKVStoreContainer } from "@/external/tauri/TauriKVStore"
 import { TauriSQLite } from "@/external/tauri/TauriSQLite"
-import { type DeviceSecureStorage, NoopDeviceSecureStorage } from "@/lib/DeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
+import { type DeviceSecureStorage, NoopDeviceSecureStorage } from "@/lib/DeviceSecureStorage"
 import { RemoteNavigationBackend } from "@/lib/navigation"
 
 import type { PlatformDependencies, PlatformInitArgs } from "./types"

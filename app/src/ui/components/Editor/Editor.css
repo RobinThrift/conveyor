@@ -61,7 +61,9 @@
 
     @container (max-width: 28rem) {
         /* sm */
+        /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
         --editor-font-size: 1rem !important;
+        /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
         line-height: 1.75 !important;
     }
 

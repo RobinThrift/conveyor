@@ -1,16 +1,16 @@
 import sqlite3InitModule, {
-    type SqlValue,
     type InitOptions,
     type Database as SQliteDatabase,
     type Sqlite3Static,
+    type SqlValue,
 } from "@sqlite.org/sqlite-wasm"
 
 import { newID } from "@/domain/ID"
-import { Lock } from "@/lib/Lock"
 import type { Context } from "@/lib/context"
-import type { DBExec, Database } from "@/lib/database"
+import type { Database, DBExec } from "@/lib/database"
+import { Lock } from "@/lib/Lock"
 import type { AsyncResult } from "@/lib/result"
-import { Err, Ok, fromPromise } from "@/lib/result"
+import { Err, fromPromise, Ok } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
 
 export class SQLite implements Database {

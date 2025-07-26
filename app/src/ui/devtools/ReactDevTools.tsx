@@ -1,4 +1,3 @@
-import { newID } from "@/domain/ID"
 import {
     type FiberRoot,
     getDisplayName,
@@ -13,8 +12,8 @@ import {
     traverseRenderedFibers,
     traverseState,
 } from "bippy"
-
 import React, { useMemo, useState, useSyncExternalStore } from "react"
+import { newID } from "@/domain/ID"
 
 type ReactDevToolsEventDetails = {
     id: string
@@ -106,7 +105,9 @@ export function ReactDevTools() {
 
 const RenderHTMLElementReadable = React.memo(function RenderHTMLElementReadable({
     el,
-}: { el: HTMLElement | undefined }) {
+}: {
+    el: HTMLElement | undefined
+}) {
     if (!el) {
         return
     }
@@ -139,8 +140,8 @@ function readableHTMLElement(el: HTMLElement) {
     return tag
 }
 
-let _notify: (() => void) | undefined = undefined
-let _snapshot: PerformanceMeasure[] | undefined = undefined
+let _notify: (() => void) | undefined
+let _snapshot: PerformanceMeasure[] | undefined
 
 const observer = new PerformanceObserver((list) => {
     if (!_notify) {

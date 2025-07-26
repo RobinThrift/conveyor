@@ -1,20 +1,20 @@
 import sqlite3InitModule, {
-    type SqlValue,
-    type InitOptions,
     type Database,
+    type InitOptions,
     type Sqlite3Static,
+    type SqlValue,
 } from "@sqlite.org/sqlite-wasm"
 
 import type { Context } from "@/lib/context"
 import { createErrType } from "@/lib/errors"
-import { type AsyncResult, Ok, fromPromise, fromThrowing, wrapErr } from "@/lib/result"
+import { type AsyncResult, fromPromise, fromThrowing, Ok, wrapErr } from "@/lib/result"
 import { createWorker } from "@/lib/worker"
 
 import { privateKeyToDBKey } from "./privateKeyToDBKey"
 
-let sqlite3: Sqlite3Static | undefined = undefined
+let sqlite3: Sqlite3Static | undefined
 let sqlite3Init: Promise<Sqlite3Static>
-let db: Database | undefined = undefined
+let db: Database | undefined
 
 const ErrOpen = createErrType("SQLiteWorker", "error reading file")
 

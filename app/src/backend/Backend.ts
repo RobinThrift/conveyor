@@ -16,7 +16,7 @@ import { Err, type Result } from "@/lib/result"
 import { getThreadName } from "@/lib/thread"
 import { prepareForTransfer, restoreTransferredValue } from "@/lib/transferable"
 
-import { type API, type ClientNotifications, type Notifications, getMethod } from "./api"
+import { type API, type ClientNotifications, getMethod, type Notifications } from "./api"
 import type {
     Events,
     WorkerNotificationMessage,

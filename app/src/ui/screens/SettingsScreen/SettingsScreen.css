@@ -28,14 +28,16 @@
         position: absolute;
         pointer-events: none;
         animation: sync-rotate-border 5s linear infinite;
-        mask: conic-gradient(#000 0 0) content-box,
+        mask:
+            conic-gradient(#000 0 0) content-box,
             linear-gradient(
                 var(--sync-indicator-angle),
                 #0000 30%,
                 #000 40% 60%,
                 #0000 70%
             )
-            subtract, conic-gradient(#000 0 0) padding-box;
+            subtract,
+            conic-gradient(#000 0 0) padding-box;
     }
 }
 
@@ -149,6 +151,7 @@
     h3 button {
         @apply flex items-center gap-2 cursor-pointer;
 
+        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
         .icon {
             transition: transform 200ms;
         }
@@ -185,6 +188,7 @@
     }
 
     .api-token-created-at {
+        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
         &::before {
             @apply mx-1;
             display: inline;

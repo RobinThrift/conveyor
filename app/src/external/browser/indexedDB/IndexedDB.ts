@@ -1,5 +1,5 @@
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Err, Ok, fromPromise, fromThrowing, wrapErr } from "@/lib/result"
+import { type AsyncResult, Err, fromPromise, fromThrowing, Ok, wrapErr } from "@/lib/result"
 
 type IndexedDBMigration = (db: IDBDatabase) => AsyncResult<void>
 
@@ -233,8 +233,8 @@ export class IndexedDB<Tables extends Record<string, unknown>> {
             return Err(ctx.err() as Error)
         }
 
-        let abortErr: Error | undefined = undefined
-        let result: R | undefined = undefined
+        let abortErr: Error | undefined
+        let result: R | undefined
 
         let [tx, txErr] = fromThrowing(() => this._db.transaction(storeName as string, mode))
         if (txErr) {

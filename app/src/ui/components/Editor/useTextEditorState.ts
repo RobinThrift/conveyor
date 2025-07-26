@@ -4,17 +4,16 @@ import { useCallback, useEffect, useMemo, useRef } from "react"
 
 import type { Tag } from "@/domain/Tag"
 import * as eventbus from "@/ui/eventbus"
-
-import type { ToolbarCommands } from "./TextEditor"
 import {
-    type PasteItem,
     copyToClipboard,
+    type PasteItem,
     pasteFromClipboard,
     toggleBold,
     toggleItalics,
     toggleMonospace,
     wrapAsLink,
 } from "./commands"
+import type { ToolbarCommands } from "./TextEditor"
 
 export function useTextEditorState(opts: {
     id: string

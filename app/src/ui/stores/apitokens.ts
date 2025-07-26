@@ -129,7 +129,7 @@ class NewerAPITokensLoadRequestError extends Error {
 }
 
 export function registerEffects(backend: BackendClient) {
-    let loadAbortCntrl: AbortController | undefined = undefined
+    let loadAbortCntrl: AbortController | undefined
 
     createEffect("apitokens/loadPage", {
         fn: async (baseCtx: Context) => {

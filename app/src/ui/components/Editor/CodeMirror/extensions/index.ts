@@ -12,9 +12,9 @@ import { languages } from "@codemirror/language-data"
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
 import type { Extension } from "@codemirror/state"
 import {
-    EditorView,
     drawSelection,
     dropCursor,
+    EditorView,
     keymap,
     placeholder as placeholderExt,
 } from "@codemirror/view"

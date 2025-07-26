@@ -10,8 +10,8 @@ import { DatePicker } from "./DatePicker"
 import { SearchBar } from "./Searchbar"
 import { ShortDayPicker } from "./ShortDayPicker"
 import { StateFilter } from "./StateFilter"
-import { TagTreeFilter, useTagTreeFilterStore } from "./TagTreeFilter"
 import { useMemoListFilterState } from "./state"
+import { TagTreeFilter, useTagTreeFilterStore } from "./TagTreeFilter"
 
 export function MemoListFilter() {
     let { datepicker } = useMemoListFilterState()

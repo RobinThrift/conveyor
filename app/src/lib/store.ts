@@ -1,9 +1,9 @@
 import {
+    batch as baseBatch,
     type DerivedOptions,
     Effect,
     Store,
     type StoreOptions,
-    batch as baseBatch,
 } from "@tanstack/react-store"
 
 import { BaseContext, type Context } from "@/lib/context"

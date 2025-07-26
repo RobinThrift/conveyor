@@ -23,7 +23,8 @@
 
         --r: calc(var(--spacing) * 6); /* radius */
         --s: calc(var(--spacing) * 12); /* size of the inner curve */
-        --_m: / calc(2 * var(--r)) calc(2 * var(--r))
+        --_m:
+            / calc(2 * var(--r)) calc(2 * var(--r))
             radial-gradient(#000 70%, #0000 72%) no-repeat;
         mask:
             right 0 bottom calc(var(--s) + var(--r)) var(--_m),
@@ -42,6 +43,7 @@
             );
 
         @container (width <= 23.9rem) {
+            /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
             --r: calc(var(--spacing) * 4); /* radius */
             --s: calc(var(--spacing) * 7); /* size of the inner curve */
         }

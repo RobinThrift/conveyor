@@ -20,15 +20,9 @@ export function useAPITokensTabState() {
 
     let loadNextPage = useCallback(() => actions.apitokens.nextPage(), [])
 
-    let createAPIToken = useCallback(
-        (req: {
-            name: string
-            expiresAt: Date
-        }) => {
-            actions.apitokens.createAPIToken(req)
-        },
-        [],
-    )
+    let createAPIToken = useCallback((req: { name: string; expiresAt: Date }) => {
+        actions.apitokens.createAPIToken(req)
+    }, [])
 
     let deleteAPIToken = useCallback((name: string) => {
         actions.apitokens.deleteAPIToken(name)

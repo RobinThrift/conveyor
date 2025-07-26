@@ -20,10 +20,14 @@
 
     transform: translateX(-50%) translateY(var(--offset-top))
         scale(var(--scale));
-    transition: opacity 150ms, transform 250ms, top 250ms;
+    transition:
+        opacity 150ms,
+        transform 250ms,
+        top 250ms;
     opacity: 1;
 
     @starting-style {
+        /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
         --offset-top: 100%;
         --scale: 1;
     }
@@ -45,14 +49,20 @@
 
         @starting-style {
             opacity: 0;
+            /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
             --offset-top: calc(-50% + 3svh);
         }
 
+        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
         &[data-state="closing"] {
             opacity: 0;
             --offset-top: calc(-50% + 3svh);
             --backdrop-opacity: 0;
         }
+    }
+
+    .dialog-description {
+        @apply text-sm text-subtle-extra-dark mb-2;
     }
 
     .dialog-title + .dialog-description {
@@ -116,10 +126,6 @@
 
 .dialog-title {
     @apply font-medium text-xl mb-2;
-}
-
-.dialog-description {
-    @apply text-sm text-subtle-extra-dark mb-2;
 }
 
 .dialog-btns {

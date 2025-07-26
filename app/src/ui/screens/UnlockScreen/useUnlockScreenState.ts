@@ -1,8 +1,7 @@
+import { useStore } from "@tanstack/react-store"
 import { useCallback } from "react"
-
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 import { actions, stores } from "@/ui/stores"
-import { useStore } from "@tanstack/react-store"
 
 export function useUnlockScreenState() {
     let unlockState = useStore(stores.unlock.status)
@@ -13,7 +12,10 @@ export function useUnlockScreenState() {
         ({
             plaintextKeyData,
             storeKey,
-        }: { plaintextKeyData: PlaintextPrivateKey; storeKey: boolean }) => {
+        }: {
+            plaintextKeyData: PlaintextPrivateKey
+            storeKey: boolean
+        }) => {
             actions.unlock.unlock({ plaintextKeyData, storeKey })
         },
         [],

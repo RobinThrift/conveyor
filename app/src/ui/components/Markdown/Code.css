@@ -115,8 +115,7 @@
 }
 
 .tok-link {
-    color: var(--code-link, var(--code-url));
-    color: inherit;
+    color: var(--code-link, var(--code-url, inherit));
     font-weight: inherit;
     font-style: inherit;
     text-decoration: none;

@@ -193,11 +193,11 @@ type SQLLogTransactionEvent = {
 
 type SQLLogEvent = SQLLogStatementEvent | SQLLogTransactionEvent
 
-let _notifyMeasures: (() => void) | undefined = undefined
+let _notifyMeasures: (() => void) | undefined
 let _startMarks = new Map<string, PerformanceMark>()
-let _currentTransaction: SQLLogTransactionEvent | undefined = undefined
+let _currentTransaction: SQLLogTransactionEvent | undefined
 let _currentTransactionStartTime: DOMHighResTimeStamp | undefined
-let _snapshot: SQLLogEvent[] | undefined = undefined
+let _snapshot: SQLLogEvent[] | undefined
 
 const observer = new PerformanceObserver((list) => {
     if (!_notifyMeasures) {
@@ -276,7 +276,10 @@ function _performanceMarksToEvents(list: Iterable<PerformanceMark>): SQLLogEvent
 function marksToEvent({
     start,
     end,
-}: { start: PerformanceMark; end: PerformanceMark }): SQLLogEvent | undefined {
+}: {
+    start: PerformanceMark
+    end: PerformanceMark
+}): SQLLogEvent | undefined {
     let detail = (start.detail ?? {}) as { sql?: string; args?: any[] }
 
     if (detail.sql?.startsWith("BEGIN DEFERRED TRANSACTION")) {

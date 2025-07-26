@@ -40,11 +40,13 @@
     }
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive */
 .memo-actions {
     @apply float-right flex items-center;
     height: 1lh;
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive */
 .memo-date {
     @apply flex items-center w-fit text-subtle-dark italic text-xs @sm:text-sm;
 
@@ -57,6 +59,7 @@
     }
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: false positive */
 .show-more-btn {
     @apply absolute bottom-0 left-0 right-0 h-16 pb-1 flex justify-center items-end text-2xl cursor-pointer;
 }

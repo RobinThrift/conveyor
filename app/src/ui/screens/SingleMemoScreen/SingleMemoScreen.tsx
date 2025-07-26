@@ -1,14 +1,13 @@
+import clsx from "clsx"
 import React from "react"
-
 import { Button } from "@/ui/components/Button"
 import { ArrowLeftIcon } from "@/ui/components/Icons"
 import { Loader } from "@/ui/components/Loader"
 import { Memo } from "@/ui/components/Memo"
 import { useT } from "@/ui/i18n"
-import { useSetting } from "@/ui/settings"
 
 import { useNavigation } from "@/ui/navigation"
-import clsx from "clsx"
+import { useSetting } from "@/ui/settings"
 import { useSingleMemoScreenState } from "./useSingleMemoScreenState"
 
 export interface SingleMemoScreenProps {

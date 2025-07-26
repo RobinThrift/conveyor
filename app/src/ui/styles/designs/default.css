@@ -34,6 +34,7 @@
         @apply bg-surface-level-1 rounded-3xl p-2;
     }
 
+    /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
     .memo {
         @apply bg-surface-level-1 rounded-3xl p-4 border;
         @apply border-subtle dark:border-subtle-extra-dark;
@@ -51,6 +52,8 @@
 
         .search {
             @apply py-2;
+
+            /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
             .input {
                 @apply bg-surface-level-1;
             }

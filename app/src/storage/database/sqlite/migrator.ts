@@ -1,6 +1,6 @@
 import { privateKeyToDBKey } from "@/external/browser/sqlite/privateKeyToDBKey"
 import type { Context } from "@/lib/context"
-import type { DBExec, Database, Transactioner } from "@/lib/database"
+import type { Database, DBExec, Transactioner } from "@/lib/database"
 import { type AsyncResult, fromAsyncFn } from "@/lib/result"
 
 const migrations = import.meta.glob<boolean, string, string>("./migrations/*.sql", {

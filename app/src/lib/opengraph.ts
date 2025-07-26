@@ -23,7 +23,7 @@ export async function fetchOpenGraphData(uri: URL): AsyncResult<OpenGraphData | 
         }
 
         let imgURL = (imageEl as HTMLMetaElement)?.content
-        let imgDataURL: string | undefined = undefined
+        let imgDataURL: string | undefined
         if (imgURL) {
             try {
                 let res = await fetch(imgURL, {

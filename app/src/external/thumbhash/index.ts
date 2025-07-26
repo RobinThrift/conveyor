@@ -1,5 +1,5 @@
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
-import { type Result, fromThrowing, wrapErr } from "@/lib/result"
+import { fromThrowing, type Result, wrapErr } from "@/lib/result"
 import * as ThumbHash from "./thumbhash"
 
 export async function thumbhashFromFile(data: File | Blob): Promise<string> {

@@ -1,5 +1,5 @@
-import { queueTask } from "@/lib/microtask"
 import React, { useEffect, useSyncExternalStore } from "react"
+import { queueTask } from "@/lib/microtask"
 
 export function useAppHeaderState() {
     return useSyncExternalStore(_subscribe, _getSnapshot)

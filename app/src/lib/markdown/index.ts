@@ -1,2 +1,2 @@
-export * from "./parse"
 export * from "./astToJSX"
+export * from "./parse"

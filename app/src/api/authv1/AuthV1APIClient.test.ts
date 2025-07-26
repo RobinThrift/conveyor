@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw"
+import { HttpResponse, http } from "msw"
 import { setupWorker } from "msw/browser"
 import { assert, suite, test } from "vitest"
 
@@ -8,10 +8,9 @@ import {
     type PlaintextPassword,
 } from "@/auth"
 import { BaseContext } from "@/lib/context"
+import { isErr } from "@/lib/errors"
 import { currentDateTime, isAfter } from "@/lib/i18n"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
-
-import { isErr } from "@/lib/errors"
 import { UnauthorizedError } from "../apiv1/APIError"
 import { AuthV1APIClient } from "./AuthV1APIClient"
 

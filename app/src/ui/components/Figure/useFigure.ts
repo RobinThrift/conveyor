@@ -1,9 +1,7 @@
 import React, { startTransition, useCallback, useRef, useState } from "react"
 import { useImageState } from "../Image/useImageState"
 
-export function useFigure(props: {
-    src: string
-}) {
+export function useFigure(props: { src: string }) {
     let dialogRef = useRef<HTMLDialogElement | null>(null)
     let ref = useRef<HTMLElement | null>(null)
     let zoomedFigRef = useRef<HTMLElement | null>(null)
@@ -23,12 +21,7 @@ export function useFigure(props: {
     let img = useImageState({ ref: imgRef, src: props.src })
 
     let close = useCallback(
-        (fromRect?: {
-            x: number
-            y: number
-            width: number
-            height: number
-        }) => {
+        (fromRect?: { x: number; y: number; width: number; height: number }) => {
             let reset = () => {
                 startTransition(() => {
                     dialogRef.current?.close()
@@ -145,12 +138,7 @@ export function useDraggableFigure({
     ref,
     close,
 }: {
-    close: (fromRect?: {
-        x: number
-        y: number
-        width: number
-        height: number
-    }) => void
+    close: (fromRect?: { x: number; y: number; width: number; height: number }) => void
     ref: React.RefObject<HTMLElement | null>
 }) {
     let offset = useRef<{ x: number; y: number }>({ x: 0, y: 0 })

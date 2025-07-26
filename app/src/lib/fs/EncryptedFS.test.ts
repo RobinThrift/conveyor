@@ -1,4 +1,4 @@
-import { assert, afterAll, suite, test } from "vitest"
+import { afterAll, assert, suite, test } from "vitest"
 
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { BaseContext } from "@/lib/context"

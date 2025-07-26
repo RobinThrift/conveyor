@@ -1,5 +1,5 @@
+import { afterAll, assert, suite, test } from "vitest"
 import { BaseContext } from "@/lib/context"
-import { assert, afterAll, suite, test } from "vitest"
 
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 import { encodeText } from "@/lib/textencoding"

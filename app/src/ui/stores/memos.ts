@@ -1,11 +1,10 @@
 import type { BackendClient } from "@/backend/BackendClient"
 import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
+import { Second } from "@/lib/duration"
 import { CustomErrCode, isErr } from "@/lib/errors"
 import { isEqual } from "@/lib/isEqual"
 import { batch, createActions, createEffect, createStore } from "@/lib/store"
-
-import { Second } from "@/lib/duration"
 import * as create from "./create"
 import * as single from "./single"
 
@@ -169,7 +168,7 @@ class NewerMemosLoadRequestError extends Error {
 }
 
 export function registerEffects(backend: BackendClient) {
-    let loadAbortCntrl: AbortController | undefined = undefined
+    let loadAbortCntrl: AbortController | undefined
 
     createEffect("memos/load", {
         fn: async (baseCtx: Context, { batch }) => {

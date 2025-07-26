@@ -1,5 +1,5 @@
 import { Store, useStore } from "@tanstack/react-store"
-import React, { useCallback, useState, useMemo } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 
 import type { Span } from "@/lib/tracing"
 import { Code } from "@/ui/components/Markdown/Code"
@@ -71,13 +71,7 @@ let formatter = new Intl.DateTimeFormat("en-gb", {
     timeStyle: "medium",
 })
 
-function SpanListItem({
-    span,
-    onClick,
-}: {
-    span: Span
-    onClick?: (e: Span) => void
-}) {
+function SpanListItem({ span, onClick }: { span: Span; onClick?: (e: Span) => void }) {
     return (
         <li className="devtools-entry-list-item">
             <div className="devtools-entry-list-item-timing">

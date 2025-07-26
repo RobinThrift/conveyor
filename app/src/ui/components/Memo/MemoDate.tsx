@@ -2,11 +2,7 @@ import React from "react"
 
 import { DateTime } from "@/ui/components/DateTime"
 
-export function MemoDate({
-    createdAt,
-}: {
-    createdAt: Date
-}) {
+export function MemoDate({ createdAt }: { createdAt: Date }) {
     return (
         <>
             <DateTime

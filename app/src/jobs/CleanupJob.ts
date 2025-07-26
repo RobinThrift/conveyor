@@ -4,7 +4,7 @@ import type { MemoChangelogEntry } from "@/domain/Changelog"
 import { ErrMemoNotFound } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
 import { isErr } from "@/lib/errors"
-import { type AsyncResult, Err, Ok, all, wrapErr } from "@/lib/result"
+import { type AsyncResult, all, Err, Ok, wrapErr } from "@/lib/result"
 
 import type { Job } from "./types"
 

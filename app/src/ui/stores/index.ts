@@ -127,7 +127,10 @@ export const selectors = {
 export function registerEffects({
     backend,
     navCtrl,
-}: { backend: BackendClient; navCtrl: NavigationController }) {
+}: {
+    backend: BackendClient
+    navCtrl: NavigationController
+}) {
     apitokens.registerEffects(backend)
     attachments.registerEffects(backend)
     auth.registerEffects(backend)

@@ -3,13 +3,13 @@ import React, { createContext, startTransition, useState } from "react"
 
 import { DEFAULT_SETTINGS } from "@/domain/Settings"
 import {
-    type Language,
-    type Region,
-    type Translation,
     fallback,
     getLocalTimeZone,
+    type Language,
     loadTranslation,
+    type Region,
     resolveTranslation,
+    type Translation,
 } from "@/lib/i18n"
 import { selectors, stores } from "@/ui/stores"
 

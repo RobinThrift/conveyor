@@ -1,9 +1,8 @@
 import type { PlaintextPassword } from "@/auth"
 import type { BackendClient } from "@/backend/BackendClient"
 import type { SyncInfo } from "@/domain/SyncInfo"
-import { batch, createActions, createEffect, createStore } from "@/lib/store"
-
 import { randomID } from "@/lib/randomID"
+import { batch, createActions, createEffect, createStore } from "@/lib/store"
 import * as auth from "./auth"
 
 export type SyncStatus =
@@ -41,11 +40,7 @@ export const actions = createActions({
         })
     },
 
-    setup: (params: {
-        server: string
-        username: string
-        password: PlaintextPassword
-    }) => {
+    setup: (params: { server: string; username: string; password: PlaintextPassword }) => {
         batch(() => {
             status.setState("disabled")
             setup.setState(params)

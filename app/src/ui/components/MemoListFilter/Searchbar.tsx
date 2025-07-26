@@ -9,9 +9,7 @@ import { useDebounce } from "@/ui/hooks/useDebounce"
 import { useT } from "@/ui/i18n"
 import { actions, selectors, stores } from "@/ui/stores"
 
-export function SearchBar(props: {
-    className?: string
-}) {
+export function SearchBar(props: { className?: string }) {
     let t = useT("components/MemoListFilter/Search")
     let queryFilter = useStore(stores.memos.list.filter, selectors.memos.list.filter("query"))
     let onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {

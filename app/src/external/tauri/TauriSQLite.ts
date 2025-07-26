@@ -2,11 +2,11 @@ import type { SqlValue } from "@sqlite.org/sqlite-wasm"
 import { invoke } from "@tauri-apps/api/core"
 
 import { newID } from "@/domain/ID"
-import { Lock } from "@/lib/Lock"
 import { awaitWithAbort } from "@/lib/awaitWithAbort"
 import type { Context } from "@/lib/context"
-import type { DBExec, Database } from "@/lib/database"
-import { type AsyncResult, Err, Ok, fromPromise } from "@/lib/result"
+import type { Database, DBExec } from "@/lib/database"
+import { Lock } from "@/lib/Lock"
+import { type AsyncResult, Err, fromPromise, Ok } from "@/lib/result"
 import { migrate } from "@/storage/database/sqlite/migrator"
 
 export class TauriSQLite implements Database {

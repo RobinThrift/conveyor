@@ -1,6 +1,6 @@
 import { newID } from "@/domain/ID"
 import { BaseContext, type Context, isContext } from "@/lib/context"
-import { type AsyncResult, type Result, fromThrowing } from "@/lib/result"
+import { type AsyncResult, fromThrowing, type Result } from "@/lib/result"
 import { getThreadName } from "@/lib/thread"
 import { removeNonClonable } from "@/lib/transferable"
 

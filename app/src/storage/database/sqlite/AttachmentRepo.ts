@@ -1,10 +1,9 @@
 import type { Attachment, AttachmentID } from "@/domain/Attachment"
+import { newID } from "@/domain/ID"
 import type { MemoID } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
-import { type AsyncResult, Err, Ok, fromPromise, wrapErr } from "@/lib/result"
-
-import { newID } from "@/domain/ID"
 import type { DBExec } from "@/lib/database"
+import { type AsyncResult, Err, fromPromise, Ok, wrapErr } from "@/lib/result"
 import * as queries from "./gen/attachments_sql"
 
 export class AttachmentRepo {

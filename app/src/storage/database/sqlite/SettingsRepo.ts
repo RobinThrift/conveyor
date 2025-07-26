@@ -1,8 +1,8 @@
 import { DEFAULT_SETTINGS, type Settings } from "@/domain/Settings"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
-import { type KeyPaths, type ValueAt, setPath } from "@/lib/getset"
-import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
+import { type KeyPaths, setPath, type ValueAt } from "@/lib/getset"
+import { type AsyncResult, fromPromise, Ok, wrapErr } from "@/lib/result"
 
 import * as queries from "./gen/settings_sql"
 

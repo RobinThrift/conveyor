@@ -4,7 +4,7 @@ import type { Context } from "@/lib/context"
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 import type { Database } from "@/lib/database"
 import { createErrType } from "@/lib/errors"
-import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
+import { type AsyncResult, fromPromise, Ok, wrapErr } from "@/lib/result"
 
 const _plaintextPrivateKeyStorageKey = "private-key"
 

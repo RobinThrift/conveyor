@@ -1,10 +1,10 @@
 import type { Restore, Screens, Stacks } from "@/control/NavigationController"
-import type { DeviceSecureStorage } from "@/lib/DeviceSecureStorage"
-import type { KVStoreContainer } from "@/lib/KVStore"
 import type { Context } from "@/lib/context"
 import type { Crypto } from "@/lib/crypto"
+import type { DeviceSecureStorage } from "@/lib/DeviceSecureStorage"
 import type { Database } from "@/lib/database"
 import type { FS } from "@/lib/fs"
+import type { KVStoreContainer } from "@/lib/KVStore"
 import type { NavigationBackend } from "@/lib/navigation"
 
 export interface PlatformInitArgs {

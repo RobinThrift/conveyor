@@ -39,7 +39,7 @@ class NewerTagLoadRequestError extends Error {
 }
 
 export function registerEffects(backend: BackendClient) {
-    let loadAbortCntrl: AbortController | undefined = undefined
+    let loadAbortCntrl: AbortController | undefined
 
     createEffect("tags/load", {
         fn: async (baseCtx: Context) => {

@@ -23,7 +23,10 @@ const actions = createActions({
 export function registerEffects({
     backend,
     navCtrl,
-}: { backend: BackendClient; navCtrl: NavigationController }) {
+}: {
+    backend: BackendClient
+    navCtrl: NavigationController
+}) {
     let unsub = backend.addEventListener("init/autoUnlock", (data) => {
         unsub()
 

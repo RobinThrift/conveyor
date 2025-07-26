@@ -3,12 +3,6 @@ import { create } from "@bufbuild/protobuf"
 // @ts-expect-error: extension is required when running TS files with Node
 import { DatabaseInterfaceTSFile } from "./DatabaseInterfaceTSFile.ts"
 import type { Options } from "./Options.ts"
-// @ts-expect-error: extension is required when running TS files with Node
-import { QueryTSFile } from "./QueryTSFile.ts"
-// @ts-expect-error: extension is required when running TS files with Node
-import { UtilsTSFile } from "./UtilsTSFile.ts"
-// @ts-expect-error: extension is required when running TS files with Node
-import { WasmSQLite3Driver, argName, colName } from "./driver.ts"
 import {
     type File,
     FileSchema,
@@ -17,6 +11,10 @@ import {
     GenerateResponseSchema,
     type Query,
 } from "./proto/codegen_pb.js"
+// @ts-expect-error: extension is required when running TS files with Node
+import { QueryTSFile } from "./QueryTSFile.ts"
+// @ts-expect-error: extension is required when running TS files with Node
+import { UtilsTSFile } from "./UtilsTSFile.ts"
 
 export function generate(input: GenerateRequest, options: Options): GenerateResponse {
     let files: File[] = []

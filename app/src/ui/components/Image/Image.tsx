@@ -1,6 +1,5 @@
-import React, { useRef } from "react"
-
 import clsx from "clsx"
+import React, { useRef } from "react"
 import { useImageState } from "./useImageState"
 
 export interface ImageProps {

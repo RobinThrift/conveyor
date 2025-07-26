@@ -47,6 +47,7 @@ export function Markdown(props: MarkdownProps) {
     }, [props.children, props.id])
 
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: this is intentional
         <div
             ref={props.ref}
             className={clsx("markdown content", props.className)}

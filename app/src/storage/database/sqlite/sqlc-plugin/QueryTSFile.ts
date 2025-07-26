@@ -1,4 +1,4 @@
-import { type ImportSpecifier, type Node, factory } from "typescript"
+import { factory, type ImportSpecifier, type Node } from "typescript"
 
 import type { Options } from "./Options.ts"
 import type { Query } from "./proto/codegen_pb.js"

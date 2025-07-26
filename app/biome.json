@@ -1,8 +1,6 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-    "organizeImports": {
-        "enabled": true
-    },
+    "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+    "assist": { "actions": { "source": { "organizeImports": "on" } } },
     "formatter": {
         "enabled": true,
         "indentStyle": "space",
@@ -24,27 +22,26 @@
                         "requireAscii": true,
                         "filenameCases": ["camelCase", "PascalCase"]
                     }
-                }
+                },
+                "noNestedTernary": "error",
+                "noExportedImports": "error",
+                "noProcessEnv": "error"
             },
             "complexity": {
                 "noForEach": "off",
                 "noUselessStringConcat": "error",
                 "noUselessFragments": "error",
                 "useDateNow": "error",
-                "useLiteralKeys": "error"
+                "useLiteralKeys": "error",
+                "noUselessEscapeInRegex": "error"
             },
             "suspicious": {
                 "noExplicitAny": "off",
-                "noDuplicateJsxProps": "error"
-            },
-            "nursery": {
-                "noNestedTernary": "error",
+                "noDuplicateJsxProps": "error",
                 "noTemplateCurlyInString": "error",
-                "noOctalEscape": "error",
-                "noUselessEscapeInRegex": "error",
-                "noExportedImports": "error",
-                "noProcessEnv": "error"
-            }
+                "noOctalEscape": "error"
+            },
+            "nursery": {}
         }
     },
     "javascript": {
@@ -66,14 +63,14 @@
     },
     "overrides": [
         {
-            "include": [
-                "src/external/@types/**/*",
-                "src/@types/**/*",
-                "src/domain/ID.ts",
-                "src/i18n/translations/*",
-                "src/storage/database/sqlite/gen/*",
-                "src/storage/database/sqlite/sqlc-plugin/proto/*",
-                "src/ui/styles/colourschemes/generate-colourscheme.ts"
+            "includes": [
+                "**/src/external/@types/**/*",
+                "**/src/@types/**/*",
+                "**/src/domain/ID.ts",
+                "**/src/i18n/translations/**/*",
+                "**/src/storage/database/sqlite/gen/**/*",
+                "**/src/storage/database/sqlite/sqlc-plugin/proto/**/*",
+                "**/src/ui/styles/colourschemes/generate-colourscheme.ts"
             ],
             "linter": {
                 "rules": {
@@ -85,13 +82,13 @@
         },
 
         {
-            "include": [
-                "./src-tauri",
-                "./src/external/sqlite-wasm/build",
-                "./src/external/sqlite-wasm/.cache",
-                "./src/external/thumbhash/thumbhash.*"
+            "includes": [
+                "src-tauri/**",
+                "src/external/sqlite-wasm/build/**",
+                "src/external/sqlite-wasm/.cache/**",
+                "src/external/thumbhash/thumbhash.*"
             ],
-            "organizeImports": { "enabled": false },
+            "assist": { "enabled": false },
             "formatter": { "enabled": false },
             "linter": { "enabled": false }
         }

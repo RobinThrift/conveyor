@@ -1,4 +1,4 @@
-import { assert, type OnTestFinishedHandler, afterAll, beforeAll, suite, test, vi } from "vitest"
+import { afterAll, assert, beforeAll, type OnTestFinishedHandler, suite, test, vi } from "vitest"
 
 import type { MemoChangelogEntry } from "@/domain/Changelog"
 import { newID } from "@/domain/ID"
@@ -69,8 +69,8 @@ suite("control/MemoController", () => {
         afterAll(cleanup)
 
         test("List All Memos Paginated", async () => {
-            let lastMemoDate: Date | undefined = undefined
-            let lastMemoID: MemoID | undefined = undefined
+            let lastMemoDate: Date | undefined
+            let lastMemoID: MemoID | undefined
             let total = 0
 
             for (let i = 0; i < numMemos; i += 25) {
@@ -179,8 +179,8 @@ suite("control/MemoController", () => {
         })
 
         test("List All Archived Paginated", async () => {
-            let lastMemoDate: Date | undefined = undefined
-            let lastMemoID: MemoID | undefined = undefined
+            let lastMemoDate: Date | undefined
+            let lastMemoID: MemoID | undefined
             let total = 0
 
             for (let i = numMemos; i < numMemos * 1.25; i += 25) {
@@ -210,8 +210,8 @@ suite("control/MemoController", () => {
         })
 
         test("List All Deleted Paginated", async () => {
-            let lastMemoDate: Date | undefined = undefined
-            let lastMemoID: MemoID | undefined = undefined
+            let lastMemoDate: Date | undefined
+            let lastMemoID: MemoID | undefined
             let total = 0
 
             for (let i = numMemos; i < numMemos * 1.25; i += 25) {

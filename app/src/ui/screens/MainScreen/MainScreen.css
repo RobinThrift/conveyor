@@ -100,6 +100,7 @@
             display: none;
         }
 
+        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
         .memo-list-container {
             @apply flex-1;
             order: 2;
@@ -150,6 +151,7 @@
                 display: none;
             }
 
+            /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
             .memo-list-day {
                 @apply text-base;
             }

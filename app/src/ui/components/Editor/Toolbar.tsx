@@ -6,7 +6,7 @@ import {
     ToggleButton as AriaToggleButton,
     Toolbar as AriaToolbar,
 } from "react-aria-components"
-
+import { decodeText } from "@/lib/textencoding"
 import { DropdownMenu } from "@/ui/components/DropdownMenu"
 import {
     ClipboardIcon,
@@ -17,11 +17,8 @@ import {
     TextItalicIcon,
 } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
-
-import { decodeText } from "@/lib/textencoding"
-
-import type { ToolbarCommands } from "./TextEditor"
 import type { PasteItem } from "./commands"
+import type { ToolbarCommands } from "./TextEditor"
 
 let initViewport = getVisualViewport()
 
@@ -269,7 +266,7 @@ function useToolbarPosition() {
                 reposition()
             })
         }
-        let animFrame: ReturnType<typeof requestAnimationFrame> | undefined = undefined
+        let animFrame: ReturnType<typeof requestAnimationFrame> | undefined
 
         let unsubResize = onResizeVisualViewport((resizedVp) => {
             if (animFrame) {

@@ -42,11 +42,7 @@ const changePasswordRequest = createStore<
 const resetRequest = createStore("auth/resetRequest", false)
 
 export const actions = createActions({
-    authenticate: (params: {
-        username: string
-        password: PlaintextPassword
-        server: string
-    }) => {
+    authenticate: (params: { username: string; password: PlaintextPassword; server: string }) => {
         batch(() => {
             error.setState(undefined)
             status.setState("authentication-requested")

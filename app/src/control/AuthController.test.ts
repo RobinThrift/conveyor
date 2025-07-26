@@ -1,4 +1,4 @@
-import { assert, afterAll, suite, test } from "vitest"
+import { afterAll, assert, suite, test } from "vitest"
 
 import { UnauthorizedError } from "@/api/apiv1/APIError"
 import {
@@ -8,11 +8,10 @@ import {
     type PlaintextPassword,
 } from "@/auth"
 import { BaseContext, type Context } from "@/lib/context"
-import { type AsyncResult, Err, Ok } from "@/lib/result"
-import { TestInMemKVStore } from "@/lib/testhelper/TestInMemKVStore"
-import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
-
 import { currentDateTime } from "@/lib/i18n"
+import { type AsyncResult, Err, Ok } from "@/lib/result"
+import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
+import { TestInMemKVStore } from "@/lib/testhelper/TestInMemKVStore"
 import { AuthController } from "./AuthController"
 
 suite("control/AuthController", async () => {

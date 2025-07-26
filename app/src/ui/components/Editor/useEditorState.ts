@@ -1,8 +1,8 @@
+import { useCallback, useEffect, useState } from "react"
 import type { MemoContentChanges } from "@/domain/Changelog"
 import type { Memo } from "@/domain/Memo"
 import { diff } from "@/external/quill"
 import { useStateGetter } from "@/ui/hooks/useStateGetter"
-import { useCallback, useEffect, useState } from "react"
 
 export function useEditorState(props: {
     memo: Memo

@@ -1,4 +1,4 @@
-import { type Node, NodeFlags, SyntaxKind, factory } from "typescript"
+import { factory, type Node, NodeFlags, SyntaxKind } from "typescript"
 
 // @ts-expect-error: extension is required when running TS files with Node
 import { astToString } from "./utils.ts"

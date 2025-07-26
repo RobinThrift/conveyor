@@ -38,6 +38,7 @@ export const AllIcons: Story = {
 
                 <ul className="grid grid-cols-8">
                     {Object.keys(Icons).map((name) => {
+                        /* biome-ignore lint/performance/noDynamicNamespaceImportAccess: this is just a test file */
                         let Icon = Icons[name as keyof typeof Icons]
                         return (
                             <li

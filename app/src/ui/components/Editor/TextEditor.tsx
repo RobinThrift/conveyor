@@ -1,9 +1,8 @@
+import type { ChangeSet } from "@codemirror/state"
 import clsx from "clsx"
 import React from "react"
-
 import type { AttachmentID } from "@/domain/Attachment"
 import type { Tag } from "@/domain/Tag"
-import type { ChangeSet } from "@codemirror/state"
 
 import { CodeMirror } from "./CodeMirror"
 import type { PasteItem } from "./commands"

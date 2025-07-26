@@ -2,6 +2,7 @@ import React, { useCallback } from "react"
 import { GridList as AriaGridList, GridListItem as AriaGridListItem } from "react-aria-components"
 
 import type { APIToken } from "@/domain/APIToken"
+import { currentDateTime } from "@/lib/i18n"
 import { Alert } from "@/ui/components/Alert"
 import { Button } from "@/ui/components/Button"
 import { DateTime } from "@/ui/components/DateTime"
@@ -13,8 +14,6 @@ import { Select } from "@/ui/components/Select"
 import { Tooltip } from "@/ui/components/Tooltip"
 import { useStateGetter } from "@/ui/hooks/useStateGetter"
 import { useT } from "@/ui/i18n"
-
-import { currentDateTime } from "@/lib/i18n"
 import { useAPITokensTabState } from "./useAPITokensTabState"
 
 export function APITokensTab() {
@@ -216,11 +215,8 @@ function APITokensList({
                 {tokens.map((token) => (
                     <AriaGridListItem key={token.name} className="api-token" textValue={token.name}>
                         <div className="api-token-info">
-                            <span
-                                className="api-token-name"
-                                id={`api-token-label-${token.name}`}
-                                aria-label={t.LabelName}
-                            >
+                            <span className="api-token-name" id={`api-token-label-${token.name}`}>
+                                <span className="sr-only">{t.LabelName}</span>
                                 {token.name}
                             </span>
                             <span className="api-token-expires-at">

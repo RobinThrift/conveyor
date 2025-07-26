@@ -1,7 +1,7 @@
 import type { BackendClient } from "@/backend/BackendClient"
 import { DEFAULT_SETTINGS, type Settings } from "@/domain/Settings"
 import { Second } from "@/lib/duration"
-import { type KeyPaths, type ValueAt, getPath, setPath } from "@/lib/getset"
+import { getPath, type KeyPaths, setPath, type ValueAt } from "@/lib/getset"
 import { batch, createActions, createEffect, createStore } from "@/lib/store"
 
 import * as unlock from "./unlock"

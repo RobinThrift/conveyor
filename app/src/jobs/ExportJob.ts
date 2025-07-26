@@ -3,7 +3,7 @@ import type { PlaintextPrivateKey } from "@/lib/crypto"
 import type { Database } from "@/lib/database"
 import { isErr } from "@/lib/errors"
 import { type FS, FSNotFoundError } from "@/lib/fs"
-import { type AsyncResult, Ok, fromPromise, wrapErr } from "@/lib/result"
+import { type AsyncResult, fromPromise, Ok, wrapErr } from "@/lib/result"
 
 import type { JobWithParams } from "./types"
 

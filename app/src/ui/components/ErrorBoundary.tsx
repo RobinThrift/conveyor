@@ -1,5 +1,5 @@
-import { isEqual } from "@/lib/isEqual"
 import React from "react"
+import { isEqual } from "@/lib/isEqual"
 import { Alert } from "./Alert"
 
 export type ErrorBoundaryProps = React.PropsWithChildren<{

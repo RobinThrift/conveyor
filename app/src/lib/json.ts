@@ -1,4 +1,4 @@
-import { Err, Ok, type Result, fromThrowing, wrapErr } from "@/lib/result"
+import { Err, fromThrowing, Ok, type Result, wrapErr } from "@/lib/result"
 import { decodeText } from "@/lib/textencoding"
 
 export function jsonDeserialize<R, V = unknown>(

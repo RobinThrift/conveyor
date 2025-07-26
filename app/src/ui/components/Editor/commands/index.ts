@@ -1,9 +1,9 @@
-export * from "./toggleBold"
-export * from "./toggleMonospace"
-export * from "./toggleItalics"
 export * from "./copyToClipboard"
-export * from "./pasteFromClipboard"
 export * from "./links"
+export * from "./pasteFromClipboard"
+export * from "./toggleBold"
+export * from "./toggleItalics"
+export * from "./toggleMonospace"
 
 // export type BoundCommand<P = void> = (p: P) => void
 //

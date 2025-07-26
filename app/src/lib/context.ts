@@ -1,5 +1,5 @@
 import type { Duration } from "@/lib/duration"
-import { type Span, isSpan, spanFromPlainSpan, toPlainSpan } from "./tracing"
+import { isSpan, type Span, spanFromPlainSpan, toPlainSpan } from "./tracing"
 
 const __isContext = Symbol("__isContext")
 
