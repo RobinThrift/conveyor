@@ -85,17 +85,26 @@ export const WithAttachmentImage: Story = {
 export const LightAndDarkImages: Story = {
     args: {
         children: faker.internet.url(),
-        title: generateTitle(),
-        description: faker.lorem.sentences({ min: 1, max: 2 }),
     },
 
-    render: (args) => (
-        <div className="grid tablet:grid-cols-2 tablet:gap-4 md:grid-cols-4 md:gap-8">
-            {exampleImages.map((img) => (
-                <LinkPreview key={img} {...args} img={img} />
-            ))}
-        </div>
-    ),
+    render: (args) => {
+        let imgs = faker.helpers.shuffle(exampleImages)
+
+        return (
+            <div className="grid tablet:grid-cols-2 tablet:gap-4 md:grid-cols-4 md:gap-8">
+                {imgs.map((img) => (
+                    <LinkPreview
+                        key={img}
+                        title={args.title || generateTitle()}
+                        description={args.description || faker.lorem.sentences({ min: 1, max: 2 })}
+                        img={img}
+                    >
+                        {args.children}
+                    </LinkPreview>
+                ))}
+            </div>
+        )
+    },
 }
 
 export const MissingImage: Story = {

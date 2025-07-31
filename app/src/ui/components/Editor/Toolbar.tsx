@@ -84,12 +84,7 @@ function ToolbarButton({
     children: React.ReactNode
 }) {
     return (
-        <AriaButton
-            className="btn primary plain toolbar-btn"
-            aria-label={label}
-            onPress={action}
-            preventFocusOnPress
-        >
+        <AriaButton className="toolbar-btn" aria-label={label} onPress={action} preventFocusOnPress>
             {children}
         </AriaButton>
     )
@@ -106,7 +101,7 @@ function ToolbarToggleButton({
 }) {
     return (
         <AriaToggleButton
-            className="btn primary plain toolbar-btn"
+            className="toolbar-btn"
             aria-label={label}
             onPress={action}
             preventFocusOnPress

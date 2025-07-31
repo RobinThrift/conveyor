@@ -3,7 +3,7 @@
 }
 
 .editor-toolbar {
-    @apply bg-surface-level-1 flex gap-1 items-center rounded-t overflow-x-auto;
+    @apply bg-surface-level-1 flex gap-1 items-center rounded-t overflow-x-auto shadow;
     @apply fixed left-0 right-0 bottom-0;
     box-shadow: -1px -2px 4px -2px rgba(0 0 0 / 0.1);
     height: 2lh;
@@ -15,30 +15,47 @@
     }
 
     .toolbar-separator {
-        @apply bg-subtle;
+        @apply bg-surface-border;
         height: 85%;
         width: 0.1rem;
     }
 
     .toolbar-btn {
-        @apply px-1.5 py-1.5 h-full;
+        @apply rounded-lg cursor-pointer flex justify-center items-center;
+        height: 1.5lh;
+        width: 1.5lh;
+
+        &:hover {
+            @apply bg-subtle text-subtle-contrast shadow;
+        }
 
         &[data-state="on"] {
-            background-color: var(--btn-bg-active);
+            @apply bg-primary text-primary-contrast;
+        }
+
+        &[data-pressed="true"] {
+            @apply bg-primary text-primary-contrast;
         }
     }
 
     .dropdown-menu-btn {
-        @apply px-1.5 py-1.5 h-full;
+        @apply px-1.5! bg-surface-level-1 rounded-lg! gap-1!;
         min-height: auto;
+        height: 1.5lh;
+
+        &:hover {
+            @apply bg-subtle text-subtle-contrast shadow;
+        }
+
+        &[data-pressed="true"] {
+            @apply bg-primary text-primary-contrast;
+        }
     }
 
     @media (min-width: 768px) {
-        @apply sticky top-3 bottom-auto w-fit rounded-lg border border-subtle;
-        height: 1.5lh;
+        @apply sticky top-3 bottom-auto w-fit rounded-lg p-1 shadow;
         order: 1;
         margin-bottom: -1.25lh;
-        box-shadow: 1px 2px 4px -2px rgba(0 0 0 / 0.1);
         left: 50%;
         transform: translateX(-50%);
     }

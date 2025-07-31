@@ -33,7 +33,7 @@
 
 .checkbox-field {
     @apply flex items-center gap-2 cursor-pointer w-fit text-sm font-medium;
-    @apply focus:outline-primary focus:outline-offset-0;
+    @apply focus-visible:outline-primary focus-visible:outline-offset-0;
 
     &[data-selected] {
         .checkbox {
@@ -43,9 +43,7 @@
         }
     }
 
-    &[data-focused],
-    &:focus,
-    &:focus-visible {
+    &:has(:focus-visible) {
         @apply outline outline-primary outline-offset-2 rounded-sm;
     }
 
@@ -56,7 +54,7 @@
     }
 
     .checkbox {
-        @apply flex size-6 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border-2 border-subtle outline-hidden text-primary;
+        @apply flex size-6 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border border-subtle outline-hidden text-primary;
         svg path {
             stroke: currentColor;
             fill: transparent;

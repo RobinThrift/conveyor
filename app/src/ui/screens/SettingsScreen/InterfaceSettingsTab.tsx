@@ -1,9 +1,10 @@
+/** biome-ignore-all lint/a11y/useAriaPropsSupportedByRole: too many false positives */
 import React, { useActionState, useCallback } from "react"
+
 import { Button } from "@/ui/components/Button"
 import { Form } from "@/ui/components/Form"
-import { KeyboardIcon, PaletteIcon } from "@/ui/components/Icons"
+import { KeyboardIcon, MoonIcon, PaletteIcon, SunHorizonIcon, SunIcon } from "@/ui/components/Icons"
 import { Checkbox } from "@/ui/components/Input/Checkbox"
-import { SelectColourScheme, SelectMode } from "@/ui/components/ThemeSwitcher"
 import { useT } from "@/ui/i18n"
 import { useSetting } from "@/ui/settings"
 
@@ -73,25 +74,7 @@ export function InterfaceSettingsTab() {
                     {t.SectionTheme}
                 </h3>
 
-                <div className="sm:mb-0 md:grid grid-cols-6 space-y-2">
-                    <label
-                        htmlFor="colourscheme"
-                        className="flex items-center font-semibold text-sm"
-                    >
-                        {t.LabelColourScheme}
-                    </label>
-                    <SelectColourScheme fieldClassName="col-span-5" wrapperClassName="w-full" />
-                </div>
-
-                <div className="md:grid grid-cols-6 mt-2 space-y-2">
-                    <label
-                        htmlFor="mode"
-                        className="flex items-center mt-4 sm:mt-0 font-semibold text-sm"
-                    >
-                        {t.LabelModeOverride}
-                    </label>
-                    <SelectMode fieldClassName="col-span-5" wrapperClassName="w-full" />
-                </div>
+                <ThemeSelection />
             </div>
 
             <div className="settings-section">
@@ -116,5 +99,146 @@ export function InterfaceSettingsTab() {
                 </div>
             </div>
         </>
+    )
+}
+
+function ThemeSelection() {
+    let t = useT("screens/Settings/InterfaceSettings")
+    let tColours = useT("ColourSchemes")
+    let [lightColourScheme, setLightColourScheme] = useSetting("ui.colourScheme.light")
+    let [_, setDarkColourScheme] = useSetting("ui.colourScheme.dark")
+    let setColourScheme = useCallback(
+        (v: typeof lightColourScheme) => {
+            if (v === lightColourScheme) {
+                return
+            }
+
+            document.documentElement.classList.add("theme-mode-transition")
+            document.startViewTransition(() => {
+                setLightColourScheme(v)
+                setDarkColourScheme(v)
+                requestAnimationFrame(() => {
+                    document.documentElement.classList.remove("theme-mode-transition")
+                })
+            })
+        },
+        [lightColourScheme, setLightColourScheme, setDarkColourScheme],
+    )
+
+    let [mode, setModeValue] = useSetting("ui.colourScheme.mode")
+    let setMode = useCallback(
+        (v: typeof mode) => {
+            if (v === mode) {
+                return
+            }
+
+            document.documentElement.classList.add("theme-mode-transition")
+            document.startViewTransition(() => {
+                setModeValue(v)
+                requestAnimationFrame(() => {
+                    document.documentElement.classList.remove("theme-mode-transition")
+                })
+            })
+        },
+        [mode, setModeValue],
+    )
+
+    return (
+        <div className="theme-selection">
+            <div>
+                <h4 className="theme-selection-label">{t.LabelColourScheme}</h4>
+                <div
+                    className="theme-selection-items"
+                    role="radiogroup"
+                    aria-orientation="horizontal"
+                >
+                    <button
+                        type="button"
+                        className="theme-selection-item"
+                        role="radiogroup"
+                        aria-checked={lightColourScheme === "default"}
+                        tabIndex={0}
+                        onClick={() => {
+                            setColourScheme("default")
+                        }}
+                    >
+                        {tColours.ColoursDefault}
+                    </button>
+                    <button
+                        type="button"
+                        className="theme-selection-item"
+                        tabIndex={0}
+                        aria-checked={lightColourScheme === "warm"}
+                        onClick={() => {
+                            setColourScheme("warm")
+                        }}
+                    >
+                        {tColours.ColoursWarm}
+                    </button>
+                    <button
+                        type="button"
+                        className="theme-selection-item"
+                        tabIndex={0}
+                        aria-checked={lightColourScheme === "rosepine"}
+                        onClick={() => {
+                            setColourScheme("rosepine")
+                        }}
+                    >
+                        {tColours.ColoursRosePine}
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <h4 className="theme-selection-label">{t.LabelModeOverride}</h4>
+                <div
+                    className="theme-selection-items"
+                    role="radiogroup"
+                    aria-orientation="horizontal"
+                >
+                    <button
+                        type="button"
+                        className="theme-selection-item"
+                        role="radiogroup"
+                        aria-checked={mode === "auto"}
+                        tabIndex={0}
+                        onClick={() => {
+                            setMode("auto")
+                        }}
+                    >
+                        <SunHorizonIcon />
+                        {tColours.ModeAuto}
+                    </button>
+
+                    <button
+                        type="button"
+                        className="theme-selection-item"
+                        role="radiogroup"
+                        aria-checked={mode === "light"}
+                        tabIndex={0}
+                        onClick={() => {
+                            setMode("light")
+                        }}
+                    >
+                        <SunIcon />
+                        {tColours.ModeLight}
+                    </button>
+
+                    <button
+                        type="button"
+                        className="theme-selection-item"
+                        role="radiogroup"
+                        aria-checked={mode === "dark"}
+                        tabIndex={0}
+                        onClick={() => {
+                            setMode("dark")
+                        }}
+                    >
+                        <MoonIcon />
+                        {tColours.ModeDark}
+                    </button>
+                </div>
+            </div>
+        </div>
     )
 }

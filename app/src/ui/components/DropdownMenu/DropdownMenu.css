@@ -5,8 +5,7 @@
 
 .dropdown-menu-list {
     @apply p-1 overflow-auto rounded-md bg-surface-level-1 shadow-lg;
-    @apply ring-1 ring-black/50;
-    @apply dark:border dark:border-subtle-extra-dark;
+    @apply border border-surface-border;
     z-index: 9999;
 
     min-width: var(--radix-dropdown-menu-trigger-width);

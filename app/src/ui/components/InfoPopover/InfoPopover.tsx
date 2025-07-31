@@ -10,7 +10,8 @@ import {
 import { InfoIcon } from "@/ui/components/Icons"
 
 export interface InfoPopoverProps {
-    className?: string
+    buttonClassName?: string
+    popoverClassName?: string
 
     children: React.ReactNode | React.ReactNode[]
     "aria-label": string
@@ -26,12 +27,12 @@ export function InfoPopover(props: InfoPopoverProps) {
             <AriaButton
                 aria-label={props["aria-label"]}
                 isDisabled={props.isDisabled}
-                className="info-popover-trigger"
+                className={clsx("info-popover-trigger", props.buttonClassName)}
             >
                 <InfoIcon />
             </AriaButton>
             <AriaPopover className="info-popover" placement={props.placement}>
-                <AriaDialog className={clsx("info-popover-content", props.className)}>
+                <AriaDialog className={clsx("info-popover-content", props.popoverClassName)}>
                     {props.children}
                 </AriaDialog>
             </AriaPopover>

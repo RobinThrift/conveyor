@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import React from "react"
 import { Button } from "@/ui/components/Button"
-import { ArrowLeftIcon } from "@/ui/components/Icons"
+import { CaretLeftIcon } from "@/ui/components/Icons"
 import { Loader } from "@/ui/components/Loader"
 import { Memo } from "@/ui/components/Memo"
 import { useT } from "@/ui/i18n"
@@ -34,7 +34,7 @@ export function SingleMemoScreen(props: SingleMemoScreenProps) {
             <Button
                 plain
                 ariaLabel={t.Back}
-                iconRight={<ArrowLeftIcon />}
+                iconRight={<CaretLeftIcon />}
                 className="back-btn"
                 onPress={() => nav.popStack()}
             />

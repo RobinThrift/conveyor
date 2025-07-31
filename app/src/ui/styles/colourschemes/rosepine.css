@@ -1,10 +1,13 @@
 .rosepine {
     --color-body-bg: oklch(0.97 0.0103 67.7);
     --color-body-bg-contrast: oklch(0.21 0.0235 291.91);
+    --color-text: oklch(0.46 0.0598 290.02);
+
     --color-surface-level-1: oklch(0.99 0.0096 72.66);
     --color-surface-level-2: oklch(0.94 0.0136 60.57);
+    --color-surface-border: oklch(0.576 0.0428 291.54);
+
     --color-modal-overlay-bg: oklch(0.21 0.0235 291.91);
-    --color-text: oklch(0.46 0.0598 290.02);
 
     --color-primary-extra-light: oklch(71.74% 0.083 225.13);
     --color-primary-light: oklch(61.96% 0.095 228.02);

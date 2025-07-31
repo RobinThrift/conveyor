@@ -44,7 +44,7 @@ export interface DropdownMenuItemsProps {
 
 export function DropdownMenuItems(props: DropdownMenuItemsProps) {
     return (
-        <AriaPopover>
+        <AriaPopover offset={0}>
             <AriaMenu
                 className={clsx("dropdown-menu-list", props.size, props.className)}
                 selectionMode="none"

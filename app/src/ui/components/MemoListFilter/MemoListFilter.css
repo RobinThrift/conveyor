@@ -28,7 +28,7 @@
         }
 
         .calendar-grid-header .calendar-grid-cell {
-            @apply text-center p-0 font-semibold text-sm text-subtle-extra-dark pointer-events-none;
+            @apply text-center p-0 font-semibold text-sm text-subtle pointer-events-none;
         }
 
         .calendar-grid-body .calendar-grid-cell {
@@ -39,30 +39,32 @@
             }
 
             &[data-outside-month] {
-                @apply text-subtle;
+                @apply text-subtle-light;
             }
 
             &.today span {
-                @apply text-primary-dark dark:text-primary-light;
+                @apply text-primary dark:text-primary-light;
             }
 
             &[data-selected] {
                 &:hover span,
                 /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
                 span {
-                    @apply text-primary-extra-dark bg-primary-extra-light border border-primary rounded-full;
+                    @apply text-primary-dark bg-primary-extra-light border border-primary rounded-full font-semibold;
+                    @apply dark:bg-primary-dark dark:text-primary-light;
                 }
             }
 
             &:hover span {
-                @apply bg-subtle-extra-light;
+                @apply bg-subtle-extra-light dark:bg-surface-level-2;
             }
 
             &[data-disabled] {
                 /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
                 span {
-                    @apply text-subtle cursor-default;
+                    @apply text-subtle-extra-light! cursor-default dark:text-subtle!;
                 }
+
                 &:hover span {
                     @apply bg-transparent text-subtle;
                 }
@@ -108,6 +110,7 @@
             /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
             .calendar-grid-cell {
                 @apply border border-subtle-extra-light rounded-full;
+                @apply dark:border-subtle-extra-dark;
             }
         }
 
@@ -117,12 +120,14 @@
 
             /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
             &[data-outside-month] {
-                @apply text-subtle bg-subtle-extra-light/20 border-subtle-extra-light/20;
+                @apply text-subtle border-subtle-extra-light/20;
+                @apply dark:bg-subtle-extra-dark/20 dark:text-subtle-dark;
             }
 
             /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
             &[data-disabled] {
                 @apply text-subtle-extra-light cursor-default bg-subtle-extra-light/10 border-subtle-extra-light/10;
+                @apply dark:text-subtle dark:bg-subtle-extra-dark/10 dark:border-subtle-extra-dark/10;
             }
 
             &.today {
@@ -132,18 +137,21 @@
             /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
             &[data-selected] {
                 @apply text-primary-extra-dark bg-primary-extra-light border border-primary-extra-dark;
+                @apply dark:bg-primary-dark dark:text-primary-light;
             }
         }
     }
 
     .collapsibile-date-picker {
-        @apply flex flex-col mb-3 tablet:hidden;
+        @apply flex flex-col tablet:hidden;
 
         .state-filter {
             @apply hidden mt-2;
         }
 
         & > .btn {
+            @apply py-2!;
+
             min-height: auto !important;
 
             &:active {
@@ -197,17 +205,19 @@
 
 /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
 .state-filter {
-    @apply grid grid-cols-2 gap-1 items-center justify-stretch w-full bg-surface-level-2 rounded-2xl mb-2;
+    @apply grid grid-cols-2 gap-1 items-center justify-stretch w-full mb-2;
 
     .state-filter-item {
-        @apply flex gap-2 items-center justify-center p-1 text-sm rounded-xl border border-surface-level-2 cursor-pointer text-subtle-extra-dark;
+        @apply flex gap-2 items-center justify-center p-1 text-sm cursor-pointer text-subtle-extra-dark;
+        @apply dark:text-subtle-light;
 
         &:hover {
-            @apply bg-surface-level-1 border-subtle-extra-dark text-text;
+            @apply text-text;
         }
 
         &[data-pressed] {
-            @apply bg-surface-level-1 border-subtle-extra-dark text-text font-semibold;
+            @apply text-primary font-semibold;
+            @apply dark:text-primary-light dark:border-subtle;
         }
     }
 }

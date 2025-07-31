@@ -1,6 +1,15 @@
-import { type Components, params, count } from "@/lib/i18n/components"
+import { type Components, count, params } from "@/lib/i18n/components"
 
 export const translations = {
+    ColourSchemes: {
+        ColoursDefault: "Default",
+        ColoursWarm: "Warm",
+        ColoursRosePine: "Rosé Pine",
+        ModeAuto: "Auto",
+        ModeLight: "Light",
+        ModeDark: "Dark",
+    },
+
     "components/AuthForm": {
         FieldServerLabel: "Server",
         FieldUsernameLabel: "Username",
@@ -70,8 +79,7 @@ export const translations = {
         Cancel: "Cancel",
         Save: "Save",
         DiscardChangesTitle: "Discard Changes",
-        DiscardChangesDescription:
-            "Are you sure you want to discard any changes?",
+        DiscardChangesDescription: "Are you sure you want to discard any changes?",
         DiscardChangesConfirmation: "Discard",
     },
 
@@ -89,17 +97,6 @@ export const translations = {
         invalidTime: params(`Invalid date "{date}": {error}`),
         ShowAbsoluteDateTooltip: "Show absolute date",
         ShowRelativeDateTooltip: "Show relative date",
-    },
-
-    "components/ThemeSwitcher": {
-        ColoursDefault: "Default Colours",
-        ColoursWarm: "Warm",
-        RosePine: "Rosé Pine",
-        Auto: "Auto",
-        Light: "Light",
-        Dark: "Dark",
-        SelectColourSchemeAriaLabel: "Select theme",
-        SelectModeAriaLabel: "Select light/dark mode",
     },
 
     "components/Notifications": {
@@ -193,8 +190,7 @@ export const translations = {
     },
 
     "screens/Unlock/StoreUnlockKeyCheckbox": {
-        LabelDeviceSecureStorageWeb:
-            "Store Key in encrypted in local browser storage",
+        LabelDeviceSecureStorageWeb: "Store Key in encrypted in local browser storage",
         LabelDeviceSecureStorageNative: "Store key in device's secure storage",
 
         ExplainerPopupLabel: "Explanation",

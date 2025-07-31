@@ -54,7 +54,7 @@
 .settings-screen {
     @apply h-full flex flex-col relative;
     h1 {
-        @apply w-full text-3xl font-serif p-3 xs:p-5 xs:py-4 relative;
+        @apply w-full text-3xl p-3 xs:p-5 xs:py-4 relative;
     }
 }
 
@@ -88,7 +88,7 @@
     }
 
     &[data-selected] {
-        @apply border-b-3 border-primary text-primary font-semibold;
+        @apply border-b-3 border-primary text-primary;
         @apply xs:bg-primary-light xs:text-primary-contrast xs:border-0;
         .icon {
             @apply text-primary;
@@ -101,7 +101,7 @@
     @apply pt-2 pb-12 px-2 xs:px-4 space-y-4 flex-1 relative overflow-auto flex-1;
 
     h2 {
-        @apply flex gap-2 items-center w-full text-2xl font-serif font-bold;
+        @apply flex gap-2 items-center w-full text-2xl font-semibold;
     }
 
     .select-input {
@@ -144,7 +144,7 @@
 }
 
 .settings-section-header {
-    @apply flex gap-2 items-center w-full text-xl font-serif font-semibold mb-2.5;
+    @apply flex gap-2 items-center w-full text-xl mb-2.5;
 }
 
 .settings-disclosure-group-item {
@@ -194,5 +194,60 @@
             display: inline;
             content: "•";
         }
+    }
+}
+
+.theme-selection {
+    @apply space-y-4;
+}
+
+.theme-selection-label {
+    @apply flex mb-2 text-sm font-medium;
+}
+
+.theme-selection-items {
+    @apply bg-surface-level-2 rounded-3xl;
+    @apply grid auto-cols-auto grid-flow-col gap-1 items-center justify-stretch w-full;
+}
+
+.theme-selection-item {
+    @apply rounded-2xl border border-surface-level-2;
+    @apply flex gap-2 items-center justify-center p-1 text-sm cursor-pointer text-subtle-extra-dark;
+    @apply dark:text-subtle-light;
+
+    &:hover {
+        @apply text-text;
+        @apply bg-surface-level-1 border-subtle-extra-light;
+    }
+
+    &[aria-checked="true"] {
+        @apply text-primary font-semibold;
+        @apply bg-surface-level-1 border-subtle-extra-light;
+        @apply dark:text-primary-light dark:border-subtle;
+    }
+}
+
+.theme-mode-transition {
+    view-transition-name: theme-mode-transition;
+}
+
+:root::view-transition-old(theme-mode-transition) {
+    display: block !important;
+    pointer-events: none;
+}
+
+:root::view-transition-new(theme-mode-transition) {
+    animation: theme-mode-transition 250ms linear !important;
+    animation-delay: 10ms;
+    pointer-events: none;
+}
+
+@keyframes theme-mode-transition {
+    0% {
+        clip-path: circle(0%);
+    }
+
+    100% {
+        clip-path: circle(100%);
     }
 }

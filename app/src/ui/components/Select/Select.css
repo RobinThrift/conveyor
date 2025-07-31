@@ -1,6 +1,5 @@
 .select {
     @apply px-2 py-1 bg-surface-level-1 min-w-fit cursor-pointer;
-    @apply border-1 border-subtle;
     appearance: none;
 
     &:hover {

@@ -18,7 +18,7 @@
 .appheader .settings-nav-button {
     @apply relative z-[1000];
     @apply size-10 px-0! py-0! text-lg aspect-square;
-    --btn-border-color: var(--color-subtle-dark);
+    --btn-border-color: var(--color-subtle-extra-light);
     @apply focus-visible:outline-2 focus-visible:outline-subtle-dark;
 }
 

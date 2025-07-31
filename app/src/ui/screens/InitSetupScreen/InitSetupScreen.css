@@ -21,7 +21,7 @@
     @apply animate-in fade-in-50 duration-500 slide-in-from-bottom-32;
 
     h1 {
-        @apply text-7xl mb-10 font-serif font-semibold;
+        @apply text-7xl mb-10 font-semibold;
     }
 
     .btn.primary {

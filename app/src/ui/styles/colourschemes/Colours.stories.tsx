@@ -3,11 +3,16 @@ import React from "react"
 
 import { Button } from "@/ui/components/Button"
 
+import "@/ui/styles/index.css"
+
+import { useMemo } from "storybook/internal/preview-api"
 import defaultCSS from "./default.css?inline"
 
 const meta: Meta = {
     title: "Conveyor/Colours",
 }
+
+const cssVarPattern = /(--[a-z-]+):/gm
 
 export default meta
 type Story = StoryObj
@@ -16,15 +21,26 @@ export const Colours: Story = {
     render: () => {
         let start = defaultCSS.indexOf("{")
         let end = defaultCSS.indexOf("--btn-")
-        let varnames = defaultCSS
-            .substring(start + 2, end)
-            .split("\n")
-            .filter((l) => l.length !== 0 && !l.includes("font"))
-            .map((l) => {
-                let start = l.indexOf("-")
-                let end = l.indexOf(":")
-                return l.substring(start, end)
-            })
+        let varnames = useMemo(() => {
+            let varnames: string[] = []
+            let css = defaultCSS.substring(start + 2, end)
+
+            let matches = cssVarPattern.exec(css)
+            cssVarPattern.lastIndex = 0
+
+            while (matches !== null) {
+                if (!matches[1].startsWith("--color")) {
+                    matches = cssVarPattern.exec(css)
+                    continue
+                }
+
+                varnames.push(matches[1])
+
+                matches = cssVarPattern.exec(css)
+            }
+
+            return varnames
+        }, [])
 
         let swatches = varnames.map((varname) => (
             <div

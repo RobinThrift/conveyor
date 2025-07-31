@@ -9,10 +9,11 @@
 .memo-list-header {
     @apply text-lg tablet:text-lg lg:text-xl text-subtle-extra-dark tablet:py-2;
     @apply flex items-center;
+    @apply dark:text-subtle;
     pointer-events: none;
 
     em {
-        @apply text-primary font-serif italic text-balance font-semibold;
+        @apply text-primary italic text-balance font-semibold;
     }
 }
 
@@ -27,7 +28,7 @@
         @apply right-2 top-2 absolute;
         left: initial;
         transform: none;
-        opacity: 0;
+        opacity: 1;
         transition: opacity 200ms;
     }
 
@@ -68,10 +69,17 @@
 }
 
 .new-memo-editor-fab {
-    @apply fixed right-4 rounded-full! border-0 size-14 z-20 shadow-lg p-0 tablet:hidden;
-    top: calc(100dvh - 4.5rem);
+    @apply fixed right-6 rounded-full! border-0 size-14 z-20 shadow-xl p-0 tablet:hidden p-2.5!;
+    top: calc(100dvh - var(--spacing) * 10 - env(safe-area-inset-bottom, 0));
 
     & > svg {
-        @apply size-6;
+        circle {
+            fill: var(--btn-color);
+            stroke: none;
+        }
+
+        line {
+            stroke: var(--btn-bg);
+        }
     }
 }

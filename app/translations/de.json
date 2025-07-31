@@ -1,4 +1,13 @@
 {
+    "ColourSchemes": {
+        "ColoursDefault": "Standard",
+        "ColoursWarm": "Warm",
+        "RosePine": "Rosé Pine",
+        "ModeAuto": "Auto",
+        "ModeLight": "Hell",
+        "ModeDark": "Dunkel"
+    },
+
     "components/AppHeader": {
         "Settings": "Einstellungen"
     },
@@ -85,17 +94,6 @@
         "invalidTime": "Ungültiges Datum \"{date}\": {error}",
         "ShowAbsoluteDateTooltip": "Absolutes Datum anzeigen",
         "ShowRelativeDateTooltip": "Relatives Datum anzeigen"
-    },
-
-    "components/ThemeSwitcher": {
-        "ColoursDefault": "Standard Farben",
-        "ColoursWarm": "Warm",
-        "RosePine": "Rosé Pine",
-        "Auto": "Auto",
-        "Light": "Hell",
-        "Dark": "Dunkel",
-        "SelectColourSchemeAriaLabel": "Farbschemawahl",
-        "SelectModeAriaLabel": "Auswahl des Hell- oder Dunkelmodus"
     },
 
     "components/Notifications": {

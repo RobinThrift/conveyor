@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { attachmentIDFromURL } from "@/domain/Attachment"
 import { thumbhashToDataURL } from "@/external/thumbhash"
@@ -15,6 +15,7 @@ export function useImageState({
     let attachment = useMemo(() => parseImgURL(props.src), [props.src])
     let attachmentData = useAttachment({ id: attachment?.attachmentID, ref })
     let hash = attachment?.thumbhash
+    let [isLoading, setIsLoading] = useState(true)
 
     let attachmentURL = useMemo(() => {
         if (!attachmentData || !attachmentData?.data) {
@@ -26,7 +27,17 @@ export function useImageState({
 
     let src = attachment ? (attachmentURL ?? hash) : props.src
 
-    let isLoading = typeof attachment !== "undefined" && typeof attachmentURL === "undefined"
+    useEffect(() => {
+        let onload = () => {
+            setIsLoading(typeof attachment !== "undefined" && typeof attachmentURL === "undefined")
+        }
+
+        ref.current?.addEventListener("load", onload)
+
+        return () => {
+            ref.current?.removeEventListener("load", onload)
+        }
+    })
 
     let style = {
         minWidth: hash && !attachmentURL ? "200px" : undefined,

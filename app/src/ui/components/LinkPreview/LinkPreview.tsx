@@ -1,9 +1,9 @@
-import * as HoverCard from "@radix-ui/react-hover-card"
 import clsx from "clsx"
 import React, { useCallback, useEffect, useState } from "react"
 
 import { ArrowUpRightIcon } from "@/ui/components/Icons"
 import { Image } from "@/ui/components/Image"
+import { InfoPopover } from "@/ui/components/InfoPopover"
 
 export interface LinkPreviewProps {
     className?: string
@@ -36,51 +36,49 @@ export const LinkPreview = React.memo(function LinkPreview(props: LinkPreviewPro
 
     if (!props.img || imgHasError) {
         return (
-            <HoverCard.Root>
-                <HoverCard.Trigger asChild>
-                    <a href={props.children} target={props.title} rel="noreferrer noopener">
-                        {props.title}
-                        <ArrowUpRightIcon className="inline ms-0.5" />
-                    </a>
-                </HoverCard.Trigger>
-                <HoverCard.Portal>
-                    <HoverCard.Content className="link-preview-hover-card" sideOffset={5}>
-                        {props.description}
-                        <HoverCard.Arrow className="link-preview-hover-card-arrow" />
-                    </HoverCard.Content>
-                </HoverCard.Portal>
-            </HoverCard.Root>
+            <>
+                <a href={props.children} target={props.title} rel="noreferrer noopener">
+                    {props.title}
+                    <ArrowUpRightIcon className="inline ms-0.5" />
+                </a>
+                <InfoPopover
+                    aria-label="Link Description"
+                    buttonClassName="p-0.5 ms-0.5 top-1 relative"
+                >
+                    {props.description}
+                </InfoPopover>
+            </>
         )
     }
 
     return (
         <div className={clsx("link-preview not-prose", props.className)}>
+            {/** biome-ignore lint/a11y/useAnchorContent: this should be skipped by screen readers to prevent double tabbing  */}
             <a
                 href={props.children}
                 target={props.title}
                 className="preview-img"
-                rel="noreferrer noopener"
-                aria-label={props.title}
+                aria-hidden="true"
+                tabIndex={-1}
             >
                 <Image src={props.img} alt={props.alt || props.title} onError={onImgError} />
             </a>
-            <div className="description-container">
-                <div className="description content">
-                    {props.title && <span>{props.title}</span>}
-                    <p>{props.description}</p>
-                </div>
-            </div>
 
-            <a
-                href={props.children}
-                target={props.title}
-                rel="noreferrer noopener"
-                aria-label={props.title}
-                className="arrow"
-                tabIndex={-1}
-            >
-                <ArrowUpRightIcon weight="bold" />
-            </a>
+            {props.title && (
+                <a
+                    className="link-preview-title"
+                    href={props.children}
+                    target={props.title}
+                    rel="noreferrer noopener"
+                    aria-label={props.title}
+                >
+                    {props.title}
+                </a>
+            )}
+
+            <div className="link-preview-description content">
+                <p>{props.description}</p>
+            </div>
         </div>
     )
 })

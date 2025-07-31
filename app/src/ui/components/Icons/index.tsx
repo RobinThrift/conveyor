@@ -18,7 +18,7 @@ export { CloudArrowUpIcon } from "@phosphor-icons/react/CloudArrowUp"
 export { CloudCheckIcon } from "@phosphor-icons/react/CloudCheck"
 export { CloudSlashIcon } from "@phosphor-icons/react/CloudSlash"
 export { CodeIcon } from "@phosphor-icons/react/Code"
-export { CopySimple as CopyIcon } from "@phosphor-icons/react/CopySimple"
+export { CopyIcon } from "@phosphor-icons/react/Copy"
 export { DatabaseIcon } from "@phosphor-icons/react/Database"
 export { DotsThreeVerticalIcon } from "@phosphor-icons/react/DotsThreeVertical"
 export { FlaskIcon } from "@phosphor-icons/react/Flask"
@@ -46,3 +46,40 @@ export { UserIcon } from "@phosphor-icons/react/User"
 export { WarningIcon } from "@phosphor-icons/react/Warning"
 export { XIcon } from "@phosphor-icons/react/X"
 export { LockIcon } from "./LockIcon"
+
+// Inlined from https://phosphoricons.com
+// License MIT
+export function PlusCircleIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-hidden="true">
+            <circle
+                cx="128"
+                cy="128"
+                r="96"
+                stroke="currentColor"
+                stroke-miterlimit="10"
+                stroke-width="16"
+            />
+            <line
+                x1="88"
+                y1="128"
+                x2="168"
+                y2="128"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+            />
+            <line
+                x1="128"
+                y1="88"
+                x2="128"
+                y2="168"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+            />
+        </svg>
+    )
+}

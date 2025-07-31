@@ -14,7 +14,7 @@
     h4,
     h5,
     h6 {
-        @apply mb-0 font-serif font-bold;
+        @apply mb-0 font-semibold;
         text-wrap: pretty;
     }
 

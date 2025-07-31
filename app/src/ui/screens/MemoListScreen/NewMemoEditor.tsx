@@ -2,7 +2,7 @@ import clsx from "clsx"
 import React from "react"
 
 import { Editor } from "@/ui/components/Editor"
-import { PlusIcon } from "@/ui/components/Icons"
+import { PlusCircleIcon } from "@/ui/components/Icons"
 import { LinkButton } from "@/ui/components/Link"
 
 import { useNewMemoEditorState } from "./useNewMemoEditorState"
@@ -30,8 +30,7 @@ export function NewMemoEditor(props: NewMemoEditorProps) {
             <LinkButton
                 screen="memo.new"
                 className="new-memo-editor-fab"
-                iconRight={<PlusIcon />}
-                variant="primary"
+                iconRight={<PlusCircleIcon />}
             >
                 <span className="sr-only">New memo</span>
             </LinkButton>

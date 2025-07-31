@@ -1,9 +1,13 @@
 .single-memo-screen {
     @apply container mx-auto max-w-[80rem] h-full w-full p-2 lg:p-4 relative;
+    margin-top: calc(env(safe-area-inset-top, 0) - var(--appheader-height));
 
     &.is-subscreen {
         @apply p-0;
-        margin-top: calc(var(--appheader-height) * -1 + var(--spacing) * 2);
+
+        @media (min-width: 768px) {
+            margin-top: calc(var(--appheader-height) * -1 + var(--spacing) * 2);
+        }
     }
 
     .memo {
@@ -12,18 +16,16 @@
             100dvh -
             (env(safe-area-inset-bottom, 0) + var(--spacing) * 4)
         );
-
-        @media (max-width: 768px) {
-            @apply rounded-none border-0 border-b;
-        }
     }
 
     .back-btn {
         @apply absolute z-10 top-3 mt-0.5 left-1 tablet:mt-0 tablet:top-4 lg:top-6;
-        @apply rounded-sm px-2 py-1;
+        @apply size-10 px-0! py-0! aspect-square;
+        --btn-border-color: var(--color-subtle-extra-light);
 
-        & > svg {
-            @apply size-5;
+        .icon,
+        svg {
+            @apply block size-4;
         }
 
         &:hover {

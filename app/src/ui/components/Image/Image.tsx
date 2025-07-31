@@ -28,6 +28,7 @@ export const Image = React.memo(function Image(props: ImageProps) {
             className={clsx(
                 {
                     "animate-pulse": isLoading,
+                    "is-loading": isLoading,
                 },
                 props.className,
             )}

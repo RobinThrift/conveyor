@@ -47,14 +47,16 @@ export function APITokensTab() {
             </div>
 
             <div className="settings-section relative mt-4">
-                <APITokensList
-                    tokens={apiTokens}
-                    hasPreviousPage={hasPreviousPage}
-                    hasNextPage={hasNextPage}
-                    prevPage={loadPrevPage}
-                    nextPage={loadNextPage}
-                    onDelete={deleteAPIToken}
-                />
+                {apiTokens.length !== 0 && (
+                    <APITokensList
+                        tokens={apiTokens}
+                        hasPreviousPage={hasPreviousPage}
+                        hasNextPage={hasNextPage}
+                        prevPage={loadPrevPage}
+                        nextPage={loadNextPage}
+                        onDelete={deleteAPIToken}
+                    />
+                )}
             </div>
 
             {isLoading && (

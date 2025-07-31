@@ -15,6 +15,7 @@ type BaseColours = {
     "body-bg-contrast": string
     "surface-level-1": string
     "surface-level-2": string
+    "surface-border": string
     text: string
     "modal-overlay-bg": string
 }
@@ -45,6 +46,8 @@ async function main(file: string) {
             "surface-level-1": formatCss(toOKLCH(colours["surface-level-1"]))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
             "surface-level-2": formatCss(toOKLCH(colours["surface-level-2"]))!,
+            // biome-ignore lint/style/noNonNullAssertion: will never be undefined
+            "surface-border": formatCss(toOKLCH(colours["surface-border"]))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
             text: formatCss(toOKLCH(colours.text))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
@@ -96,7 +99,7 @@ function generatePalette(value: Hsl): Palette {
             case 50:
                 name = "contrast"
                 break
-            case 300:
+            case 100:
                 name = "extra-light"
                 break
             case 400:
@@ -108,7 +111,7 @@ function generatePalette(value: Hsl): Palette {
             case 600:
                 name = "dark"
                 break
-            case 700:
+            case 800:
                 name = "extra-dark"
                 break
             default:

@@ -11,7 +11,7 @@
     max-width: 400px;
 
     h1 {
-        @apply ps-4 text-7xl mb-4 font-semibold text-center font-serif;
+        @apply ps-4 text-7xl mb-4 font-semibold text-center;
         @apply animate-in fade-in slide-in-from-bottom-20 duration-500 delay-500 fill-mode-backwards;
     }
 

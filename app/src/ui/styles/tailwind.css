@@ -69,4 +69,5 @@
 
     --color-surface-level-1: var(--color-surface-level-1);
     --color-surface-level-2: var(--color-surface-level-2);
+    --color-surface-border: var(--color-surface-border);
 }

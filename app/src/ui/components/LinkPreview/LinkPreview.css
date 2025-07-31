@@ -1,4 +1,61 @@
 .link-preview {
+    @apply inline-block rounded-2xl p-2 bg-surface-level-1 shadow-lg h-min;
+    transition:
+        transform 200ms,
+        box-shadow 200ms;
+
+    .preview-img {
+        @apply rounded-xl block overflow-hidden relative;
+
+        &:not(:has(.is-loading))::after {
+            @apply block inset-0 absolute;
+            content: "";
+            box-shadow:
+                0px 1px 8px 4px rgba(255 255 255 / 0.3) inset,
+                0px -1px 8px 2px rgba(0 0 0 / 0.1) inset;
+            pointer-events: none;
+        }
+
+        img {
+            @apply w-full min-h-[2lh];
+        }
+    }
+
+    &:has(*:focus-visible) {
+        @apply outline-primary outline-2 outline-offset-2;
+    }
+
+    @media (hover: hover) {
+        &:hover {
+            @apply shadow-xl;
+            transform: translateY(calc(var(--spacing) * -0.5));
+        }
+    }
+
+    .link-preview-title {
+        @apply font-semibold text-xl text-inherit pt-2 block w-full px-4;
+
+        &:focus-visible {
+            @apply outline-none;
+        }
+    }
+
+    .link-preview-description {
+        @apply pb-2 px-4;
+    }
+}
+
+.dark .link-preview {
+    .preview-img {
+        &:not(:has(.is-loading))::after {
+            box-shadow:
+                0px 1px 8px 2px rgba(255 255 255 / 0.2) inset,
+                0px -2px 8px 2px rgba(0 0 0 / 0.6) inset;
+        }
+    }
+}
+
+._link-preview {
     @apply relative rounded-lg overflow-hidden top-0 left-0 drop-shadow-md @container;
     @apply w-full h-min my-2;
     transition: transform 300ms ease-out;
@@ -87,11 +144,11 @@
     }
 }
 
-.list-layout-masonry {
+._list-layout-masonry {
     @apply float-none max-w-full;
 }
 
-.link-preview-hover-card {
+._link-preview-hover-card {
     @apply rounded-lg bg-surface-level-1 p-4 w-fit max-w-[300px];
     filter: drop-shadow(1px 1px 10px rgba(0 0 0 / 0.1));
 
@@ -104,6 +161,6 @@
     }
 }
 
-.link-preview-hover-card-arrow {
+._link-preview-hover-card-arrow {
     @apply fill-surface-level-1 h-2 w-4;
 }
