@@ -229,15 +229,14 @@ export class NavigationController {
                 return "unlock"
         }
 
-        let hasMemoID =
-            url.searchParams.has("memoID") && url.searchParams.get("memoID")?.length !== 0
+        let hasMemo = url.searchParams.has("memo") && url.searchParams.get("memo")?.length !== 0
         let hasIsEditing = url.searchParams.get("isEditing") === "true"
 
-        if (hasMemoID && hasIsEditing) {
+        if (hasMemo && hasIsEditing) {
             return "memo.edit"
         }
 
-        if (hasMemoID) {
+        if (hasMemo) {
             return "memo.view"
         }
 
