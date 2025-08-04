@@ -39,6 +39,7 @@
         "tailwindcss-animate": "^1.0.7",
         "typescript": "^5.8.2",
         "vite": "^7.0.0",
+        "vite-plugin-pwa": "^1.0.2",
         "vitest": "^3.2.0",
         "vitest-browser-react": "^1.0.0"
     },

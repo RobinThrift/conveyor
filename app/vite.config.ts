@@ -4,6 +4,7 @@ import * as process from "node:process"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react-swc"
 import type { GetModuleInfo } from "rollup"
+import { VitePWA } from "vite-plugin-pwa"
 import { defineConfig, searchForWorkspaceRoot, type UserConfig } from "vite"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
@@ -51,7 +52,22 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             },
         },
 
-        plugins: [tailwindcss(), react({ devTarget: "es2024" })],
+        plugins: [
+            tailwindcss(),
+            react({ devTarget: "es2024" }),
+            VitePWA({
+                // strategies: "generateSW",
+                // registerType: "prompt",
+                registerType: "autoUpdate",
+                injectRegister: "auto",
+                manifest: false,
+                scope: "/assets/",
+                workbox: {
+                    globPatterns: ["**/*.{js,css,svg,woff2}"],
+                    navigateFallback: null,
+                },
+            }),
+        ],
 
         optimizeDeps: {
             exclude: ["@sqlite.org/sqlite-wasm", "bippy"],

@@ -1,5 +1,7 @@
 import "vite/modulepreload-polyfill"
 
+import { registerSW } from "virtual:pwa-register"
+
 import React from "react"
 import ReactDOM from "react-dom/client"
 
@@ -29,6 +31,8 @@ async function main() {
         ReactDOM.createRoot(rootElement).render(<PrettyError error={initErr} />)
         return
     }
+
+    registerSW({ immediate: true })
 }
 
 main()

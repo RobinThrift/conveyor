@@ -33,7 +33,7 @@
 
         "lib": ["ESNext", "DOM", "DOM.AsyncIterable", "WebWorker"],
         "skipLibCheck": true,
-        "types": ["vite/client", "vitest/importMeta"],
+        "types": ["vite/client", "vitest/importMeta", "vite-plugin-pwa/client"],
         "paths": {
             "@/*": [ "./src/*" ],
             "@translations/*": [ "./translations/*" ]
