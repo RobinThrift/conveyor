@@ -43,13 +43,14 @@
 }
 
 .devtools-close-btn {
-    @apply p-1 border border-subtle rounded-lg;
+    @apply p-1 border border-surface-border rounded-lg;
     cursor: pointer;
     pointer-events: auto;
     justify-self: end;
+    box-shadow: var(--surface-box-shadow);
 
     &:hover {
-        @apply bg-surface-level-1 border-subtle-dark;
+        @apply bg-surface-level-1 border-subtle-light shadow;
     }
 }
 
@@ -59,12 +60,12 @@
 }
 
 .devtools-panels {
-    @apply border border-subtle rounded-xl bg-body flex flex-col h-full shadow-xl relative overflow-hidden;
+    @apply border border-surface-border rounded-xl bg-body flex flex-col h-full shadow-xl relative overflow-hidden;
     pointer-events: auto;
 }
 
 .devtools-panels-resizer {
-    @apply absolute left-0 w-[1px] top-0 bottom-0 bg-subtle cursor-ew-resize rounded-l-lg;
+    @apply absolute left-0 w-[1px] top-0 bottom-0 bg-surface-border cursor-ew-resize rounded-l-lg;
     z-index: 100000;
 }
 
@@ -83,7 +84,8 @@
 
     &.active,
     &:hover {
-        @apply border-subtle bg-surface-level-1;
+        @apply border-surface-border bg-surface-level-1;
+        box-shadow: var(--surface-box-shadow);
     }
 }
 
@@ -101,7 +103,7 @@
 }
 
 .devtools-entry-list-header {
-    @apply p-2 flex gap-2 items-center justify-end border border-subtle-dark rounded-lg bg-surface-level-1/80 sticky top-0 backdrop-blur-sm shadow h-12;
+    @apply p-2 flex gap-2 items-center justify-end border border-surface-border rounded-lg bg-surface-level-1/80 sticky top-0 backdrop-blur-sm shadow h-12;
 
     input {
         @apply border border-subtle rounded-lg flex-1 py-1 px-2 bg-surface-level-1;
@@ -109,7 +111,8 @@
 }
 
 .devtools-entry-list-item {
-    @apply p-2 border border-subtle-dark rounded-lg bg-surface-level-1;
+    @apply p-2 border border-surface-border rounded-lg bg-surface-level-1;
+    box-shadow: var(--surface-box-shadow);
 
     &.active {
         background-color: color-mix(

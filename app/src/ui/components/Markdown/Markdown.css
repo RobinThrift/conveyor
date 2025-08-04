@@ -18,15 +18,6 @@
         text-wrap: pretty;
     }
 
-    @media (max-width: 768px) {
-        @container (width < 50vw) {
-            /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
-            h1 {
-                @apply text-2xl;
-            }
-        }
-    }
-
     a {
         @apply text-primary hover:underline;
     }
@@ -111,8 +102,9 @@
         content: "";
     }
 
+    figure,
     figure img {
-        @apply my-0 rounded-lg;
+        @apply my-0;
     }
 
     li > figure {

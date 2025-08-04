@@ -29,7 +29,3 @@
         @apply border-2;
     }
 }
-
-.init-setup-screen-footer {
-    @apply fixed bottom-0 p-2 flex justify-end w-full;
-}

@@ -31,20 +31,21 @@ export function SingleMemoScreen(props: SingleMemoScreenProps) {
                 </div>
             )}
 
-            <Button
-                plain
-                ariaLabel={t.Back}
-                iconRight={<CaretLeftIcon />}
-                className="back-btn"
-                onPress={() => nav.popStack()}
-            />
-
             {memo && (
                 <Memo
                     memo={memo}
                     actions={memoActions}
                     doubleClickToEdit={doubleClickToEdit}
                     forceRender
+                    beforeTitle={
+                        <Button
+                            plain
+                            ariaLabel={t.Back}
+                            iconRight={<CaretLeftIcon />}
+                            className="back-btn"
+                            onPress={() => nav.popStack()}
+                        />
+                    }
                 />
             )}
         </div>

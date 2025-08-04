@@ -321,3 +321,16 @@
         display: none;
     }
 }
+
+.memo-list-filter .overflow-blur {
+    @apply relative hidden tablet:block;
+    pointer-events: none;
+
+    &::after {
+        @apply hidden absolute h-20 -top-18 tablet:block;
+        content: "";
+        width: calc(100% - var(--spacing) * 2);
+        backdrop-filter: blur(2px);
+        mask-image: linear-gradient(to bottom, transparent 10%, black 50%);
+    }
+}

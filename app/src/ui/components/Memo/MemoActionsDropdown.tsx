@@ -17,7 +17,7 @@ export function MemoActionsDropdown({
     let t = useT("components/Memo/Actions")
 
     return (
-        <div className="memo-actions not-prose">
+        <div className="memo-actions">
             {actions?.edit && (
                 <Button
                     ariaLabel={t.Edit}

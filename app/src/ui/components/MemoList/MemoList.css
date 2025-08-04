@@ -2,6 +2,43 @@
     @apply gap-2 w-full;
 }
 
+.memo-list .memo {
+    container: memo / inline-size;
+    width: 100%;
+
+    .memo-header {
+        @apply items-center;
+    }
+
+    .memo-header-actions {
+        @apply w-fit items-baseline;
+        order: 2;
+    }
+
+    .memo-header h1 {
+        order: 1;
+    }
+
+    .memo-header .memo-date {
+        order: 3;
+    }
+
+    &:has(.content > .link-preview:first-child) .link-preview {
+        @apply px-0 pb-0;
+        box-shadow: none;
+        width: calc(100%);
+
+        .link-preview-title,
+        .link-preview-description {
+            @apply px-0;
+        }
+
+        & + p {
+            @apply mt-0;
+        }
+    }
+}
+
 .memo-list-day {
     @apply sticky py-1 px-2 w-fit rounded-lg;
     @apply text-subtle-dark;
@@ -62,8 +99,12 @@
 }
 
 .memo-list.list-layout-ultra-compact {
+    .memo-list-day-group {
+        width: 100%;
+    }
+
     .memo-list-memos {
-        @apply flex flex-col gap-2 items-center max-w-none ps-8 relative;
+        @apply flex flex-col gap-2 items-center max-w-none ps-8 relative w-full;
 
         @apply lg:grid lg:grid-cols-3 lg:items-start lg:justify-start;
 
@@ -97,11 +138,6 @@
             a {
                 display: inline;
             }
-        }
-
-        .link-preview {
-            float: none;
-            max-width: 100%;
         }
     }
 

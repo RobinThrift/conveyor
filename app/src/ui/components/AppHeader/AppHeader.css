@@ -3,7 +3,7 @@
 }
 
 .appheader {
-    @apply flex items-baseline gap-2 px-1 tablet:px-4 py-2;
+    @apply flex items-baseline gap-2 px-2 tablet:px-4 py-2 tablet:sticky tablet:top-0;
 
     padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
 
@@ -34,8 +34,9 @@ body.platform-macos .appheader {
     }
 }
 
-@media (max-width: 767px) {
-    :root:has(.main-screen.has-subscreen) {
+@media (width < 1024px) {
+    :root:has(.main-screen.has-subscreen),
+    :root:has(.new-memo-screen) {
         .appheader {
             height: max(
                 env(titlebar-area-height, var(--appheader-height)),

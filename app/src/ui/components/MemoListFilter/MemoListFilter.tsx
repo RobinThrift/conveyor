@@ -64,9 +64,11 @@ export function MemoListFilter() {
                 <SearchBar />
             </div>
 
-            <DatePicker className="hidden tablet:block" />
-
             <TagTreeFilter />
+
+            <div className="overflow-blur" />
+
+            <DatePicker className="hidden tablet:block" />
 
             <StateFilter className="hidden tablet:grid" />
         </div>

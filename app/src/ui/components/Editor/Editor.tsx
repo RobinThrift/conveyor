@@ -7,7 +7,7 @@ import type { Memo } from "@/domain/Memo"
 import type { Tag } from "@/domain/Tag"
 import { AlertDialog } from "@/ui/components/AlertDialog"
 import { Button } from "@/ui/components/Button"
-import { ArrowLeftIcon, CheckIcon, XIcon } from "@/ui/components/Icons"
+import { CheckIcon, XIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 
 import { TextEditor } from "./TextEditor"
@@ -59,7 +59,7 @@ export function Editor(props: EditorProps) {
                             iconLeft={
                                 <>
                                     <XIcon weight="fill" className="hidden tablet:block" />
-                                    <ArrowLeftIcon className="tablet:hidden" />
+                                    <XIcon className="tablet:hidden" />
                                 </>
                             }
                         >

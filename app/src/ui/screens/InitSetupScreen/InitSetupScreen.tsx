@@ -5,7 +5,6 @@ import type { PrivateCryptoKey } from "@/lib/crypto"
 import type { AsyncResult, Result } from "@/lib/result"
 import { Alert } from "@/ui/components/Alert"
 import { AuthForm } from "@/ui/components/AuthForm"
-import { BuildInfo } from "@/ui/components/BuildInfo"
 import { Button } from "@/ui/components/Button"
 import { ConveyorBeltText } from "@/ui/components/ConveyorBeltText/ConveyorBeltText"
 import { Form } from "@/ui/components/Form"
@@ -85,10 +84,6 @@ export function InitSetupScreen() {
                     <div>{stepComp}</div>
                 </div>
             </div>
-
-            <footer className="init-setup-screen-footer">
-                <BuildInfo />
-            </footer>
         </div>
     )
 }

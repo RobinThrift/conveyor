@@ -1,6 +1,7 @@
 .new-memo-screen {
-    @apply container mx-auto max-w-[80rem] h-full w-full px-2 lg:p-4 relative;
+    @apply container mx-auto max-w-[80rem] h-full w-full lg:p-4 relative;
     min-height: 100dvh;
+    margin-top: calc(env(safe-area-inset-top, 0) - var(--appheader-height));
 
     .memo {
         @apply shadow-md px-0!;
@@ -12,10 +13,6 @@
 
         .text-editor {
             @apply px-4;
-        }
-
-        @media (max-width: 768px) {
-            @apply rounded-none border-0 border-b;
         }
     }
 

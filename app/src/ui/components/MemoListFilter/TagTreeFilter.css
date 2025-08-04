@@ -1,5 +1,6 @@
 .tag-tree-filter {
-    @apply overflow-auto flex-1 py-2 overscroll-contain;
+    @apply overflow-auto flex-1 py-2 overscroll-contain pb-10;
+    scrollbar-width: thin;
 }
 
 .tag-tree-filter.is-offcanvas {

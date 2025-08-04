@@ -2,6 +2,7 @@ import clsx from "clsx"
 import React, { useMemo } from "react"
 
 import type { Memo as MemoT } from "@/domain/Memo"
+import { DateTime } from "@/ui/components/DateTime"
 import { CaretDownIcon } from "@/ui/components/Icons"
 import { Link } from "@/ui/components/Link"
 import { Markdown } from "@/ui/components/Markdown"
@@ -23,6 +24,8 @@ interface MemoProps {
     doubleClickToEdit?: boolean
     collapsible?: boolean
     forceRender?: boolean
+
+    beforeTitle?: React.ReactElement
 }
 
 export function Memo(props: MemoProps) {
@@ -51,38 +54,43 @@ export function Memo(props: MemoProps) {
         return null
     }, [shouldRender, body, props.memo.id, onDoubleClick])
 
+    let renderedTitle = title ? (
+        title
+    ) : (
+        <DateTime date={props.memo.createdAt} opts={{ dateStyle: "medium", timeStyle: "short" }} />
+    )
+
     return (
         <article
             ref={ref}
             id={`memo-${props.memo.id}`}
-            className={clsx("@container memo", props.className, {
+            className={clsx("memo", props.className, {
                 "is-collapsed": needsCollapsing && isCollapsed,
                 expanded: (needsCollapsing && !isCollapsed) || isExpanded,
             })}
         >
-            <div className="memo-header content">
-                {title ? (
-                    <h1>
-                        <MemoActionsDropdown memo={props.memo} actions={props.actions} />
-
-                        {props.headerLink ? (
-                            <Link
-                                href={`?memo=${props.memo.id}`}
-                                screen="memo.view"
-                                params={{ memoID: props.memo.id }}
-                                stack="single-memo"
-                            >
-                                {title}
-                            </Link>
-                        ) : (
-                            title
-                        )}
-                    </h1>
-                ) : (
+            <div className="memo-header">
+                <div className="memo-header-actions">
                     <MemoActionsDropdown memo={props.memo} actions={props.actions} />
-                )}
-                <MemoDate createdAt={props.memo.createdAt} />
+                    {props.beforeTitle}
+                </div>
+                <h1>
+                    {props.headerLink ? (
+                        <Link
+                            href={`?memo=${props.memo.id}`}
+                            screen="memo.view"
+                            params={{ memoID: props.memo.id }}
+                            stack="single-memo"
+                        >
+                            {renderedTitle}
+                        </Link>
+                    ) : (
+                        renderedTitle
+                    )}
+                </h1>
+                {title && <MemoDate createdAt={props.memo.createdAt} />}
             </div>
+
             {rendered}
 
             <button

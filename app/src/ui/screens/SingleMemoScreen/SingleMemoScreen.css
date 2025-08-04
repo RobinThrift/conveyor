@@ -1,25 +1,60 @@
 .single-memo-screen {
-    @apply container mx-auto max-w-[80rem] h-full w-full p-2 lg:p-4 relative;
+    @apply h-fit w-full p-2 lg:p-4 flex justify-center relative;
+    container: single-memo-screen / inline-size;
     margin-top: calc(env(safe-area-inset-top, 0) - var(--appheader-height));
+    max-width: none;
 
     &.is-subscreen {
         @apply p-0;
 
         @media (min-width: 768px) {
+            @apply ms-2;
             margin-top: calc(var(--appheader-height) * -1 + var(--spacing) * 2);
         }
     }
 
     .memo {
-        @apply shadow-md;
+        @apply max-w-[80rem] w-full;
+        overflow: visible;
         min-height: calc(
             100dvh -
             (env(safe-area-inset-bottom, 0) + var(--spacing) * 4)
         );
     }
 
+    .memo-header {
+        @apply mb-0;
+
+        h1 {
+            @apply w-fit;
+            order: 3;
+        }
+
+        .memo-header-actions {
+            @apply relative z-10;
+            @container (width > 80rem) {
+                @apply left-0 top-2 px-6 py-2;
+                width: 100cqw;
+                position: absolute;
+            }
+        }
+
+        .memo-date {
+            @apply pl-3;
+            order: 2;
+            margin-top: calc(-1lh - var(--spacing) * 2);
+
+            @container (width > 80rem) {
+                /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to container query */
+                order: 2;
+                margin-top: 0;
+                padding-left: 0;
+            }
+        }
+    }
+
     .back-btn {
-        @apply absolute z-10 top-3 mt-0.5 left-1 tablet:mt-0 tablet:top-4 lg:top-6;
+        @apply relative -left-4;
         @apply size-10 px-0! py-0! aspect-square;
         --btn-border-color: var(--color-subtle-extra-light);
 
@@ -31,15 +66,6 @@
         &:hover {
             @apply bg-subtle;
         }
-    }
-
-    &:has(.back-btn) .memo-header h1 {
-        text-indent: 2.25rem;
-    }
-
-    &:has(.back-btn) .memo-header:not(:has(h1)) {
-        @apply flex justify-between items-center pt-1.5;
-        text-indent: 2.25rem;
     }
 
     @media (max-width: 1023px) {

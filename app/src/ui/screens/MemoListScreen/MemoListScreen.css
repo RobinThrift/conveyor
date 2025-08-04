@@ -83,3 +83,11 @@
         }
     }
 }
+
+.memo-list-screen > .overflow-blur {
+    @apply absolute h-20 bottom-0 hidden;
+    width: 100%;
+    pointer-events: none;
+    backdrop-filter: blur(2px);
+    mask-image: linear-gradient(to bottom, transparent 10%, black 50%);
+}

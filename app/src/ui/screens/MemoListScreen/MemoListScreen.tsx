@@ -26,6 +26,8 @@ export function MemoListScreen(props: MemoListScreenProps) {
 
                 <MemoList />
             </div>
+
+            <div className="overflow-blur" />
         </div>
     )
 }

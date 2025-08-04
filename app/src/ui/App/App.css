@@ -1,5 +1,14 @@
+:root {
+    --appfooter-height: 2lh;
+}
+
 .main {
-    @apply sm:flex-1 pb-14 tablet:pb-4;
+    @apply sm:flex-1;
+    padding-bottom: calc(var(--appfooter-height) + var(--spacing) * 14);
+
+    @media (min-width: 1024px) {
+        padding-bottom: calc(var(--appfooter-height) + var(--spacing) * 4);
+    }
 }
 
 .dialog-open-scroll-lock .main {
@@ -8,7 +17,8 @@
 }
 
 .app-footer {
-    @apply px-2 py-4 flex justify-center items-center;
+    @apply px-2 py-4 flex justify-center items-center absolute left-0 right-0;
+    height: var(--appfooter-height);
 }
 
 .unlock-page-bg {

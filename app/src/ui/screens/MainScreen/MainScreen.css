@@ -10,7 +10,12 @@
 
     @media (min-width: 1024px) {
         --sidebar-width: 300px;
-        --sidebar-height: calc(100dvh - var(--spacing) * 4);
+        --sidebar-height: calc(
+            100dvh -
+            var(--spacing) *
+            2 -
+            var(--appheader-height)
+        );
         @apply flex-row;
 
         padding: env(safe-area-inset-top, 0) calc(var(--spacing) * 4)
@@ -22,26 +27,25 @@
     }
 
     @media (min-width: 2100px) {
-        --sidebar-width: 380px;
+        --sidebar-width: 350px;
     }
 
     .subscreen {
         @apply flex-1;
-        order: 2;
+        order: 1;
+        position: relative;
+        z-index: 20;
 
-        @media (max-width: 1023px) {
-            position: relative;
-            z-index: 20;
+        @media (min-width: 1024px) {
+            @apply pt-2;
+            order: 2;
+            margin-left: calc(var(--sidebar-width) + var(--spacing) * 6);
         }
 
         @media (min-width: 1440px) {
             @apply pt-2;
-            order: 1;
-        }
-
-        @media (min-width: 1680px) {
             order: 2;
-            padding-right: calc(var(--sidebar-width) + var(--spacing) * 4);
+            margin-left: calc(var(--sidebar-width) * 2 + var(--spacing) * 6);
         }
     }
 }
@@ -51,45 +55,29 @@
     display: contents;
 
     .memo-list-container {
-        @apply flex-1;
+        @apply flex-1 mx-2 xs:mx-0 max-w-full;
+
         order: 2;
+
         @media (min-width: 1024px) {
             order: 1;
+            padding-left: calc(var(--sidebar-width) + var(--spacing) * 4);
         }
 
-        @media (min-width: 1680px) {
-            padding-right: calc(var(--sidebar-width) + var(--spacing) * 4);
+        @media (min-width: 1440px) {
+            order: 1;
         }
     }
 }
 
-.main-screen {
-    .memo-list-filter {
-        @apply mx-2 xs:mx-0;
-        max-width: var(--sidebar-width);
-        width: var(--sidebar-width);
-        height: var(--sidebar-height);
+.main-screen .memo-list-filter {
+    @apply mx-2 xs:mx-0;
+    max-width: var(--sidebar-width);
+    width: var(--sidebar-width);
+    height: var(--sidebar-height);
 
-        @media (min-width: 1024px) {
-            order: 2;
-        }
-
-        /* md */
-        @media (min-width: 1680px) {
-            position: fixed;
-        }
-    }
-
-    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
-    .memo-list-container {
-        @apply mx-2 xs:mx-0;
-    }
-
-    &.has-subscreen .memo-list-filter {
-        display: none;
-        @media (min-width: 1680px) {
-            display: flex;
-        }
+    @media (min-width: 1024px) {
+        position: fixed;
     }
 }
 
@@ -98,7 +86,14 @@
         display: contents;
 
         .memo-list-filter {
-            order: 3;
+            display: none;
+            @media (min-width: 1024px) {
+                display: none;
+            }
+
+            @media (min-width: 1440px) {
+                display: flex;
+            }
         }
 
         .new-memo-editor-fab {
@@ -108,30 +103,41 @@
         /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
         .memo-list-container {
             @apply flex-1;
-            order: 2;
             position: relative;
-
-            @media (max-width: 1023px) {
-                z-index: 10;
-                animation: mobile-parallax-memo-list-scroll 1.01s linear;
-                animation-play-state: paused;
-                animation-delay: calc(var(--memo-scroll-progress, 1) * -1.01s);
-                animation-fill-mode: forwards;
-            }
+            z-index: 10;
+            animation: mobile-parallax-memo-list-scroll 1.01s linear;
+            animation-play-state: paused;
+            animation-delay: calc(var(--memo-scroll-progress, 1) * -1.01s);
+            animation-fill-mode: forwards;
 
             @media (min-width: 1024px) {
-                position: sticky;
-                top: env(safe-area-inset-top, 0);
+                @apply p-0.5;
+                width: var(--sidebar-width);
+                padding-top: 0;
+                z-index: revert;
+                animation: none;
+                position: fixed;
                 max-width: var(--sidebar-width);
-                height: var(--sidebar-height);
+                overflow: auto;
+                height: calc(
+                    var(--sidebar-height) -
+                    (var(--appheader-height) * -1 + var(--spacing) * 2)
+                );
             }
 
-            @media (min-width: 1680px) {
-                order: 1;
-                position: relative;
-                width: var(--sidebar-width);
-                height: auto;
-                padding-right: 0;
+            @media (min-width: 1440px) {
+                @apply top-2;
+                padding-top: 0;
+                padding-left: 0;
+                margin-left: calc(var(--sidebar-width) + var(--spacing) * 4);
+            }
+        }
+
+        & > .overflow-blur {
+            display: block;
+            @media (min-width: 1440px) {
+                left: calc(var(--sidebar-width) + var(--spacing) * 8);
+                width: calc(100% - var(--sidebar-width) + var(--spacing) * 8);
             }
         }
 
@@ -170,7 +176,7 @@
 
             .memo {
                 @apply overflow-hidden h-fit;
-                width: calc(100%);
+                width: 100%;
             }
 
             .memo:has(.memo-header h1) .markdown * {

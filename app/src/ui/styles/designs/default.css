@@ -66,10 +66,6 @@
             }
         }
 
-        @media (min-width: 1680px) {
-            @apply top-2 right-2;
-        }
-
         .state-filter {
             @apply bg-surface-level-2 rounded-3xl;
 
@@ -101,10 +97,28 @@
         }
     }
 
-    .single-memo-screen .memo,
-    .edit-memo-screen .memo {
+    .single-memo-screen,
+    .edit-memo-screen {
+        @apply bg-surface-level-1 rounded-2xl;
         box-shadow:
             var(--surface-box-shadow),
             0 5px 10px rgba(0 0 0 / 0.2);
+
+        @media (min-width: 1440px) {
+            /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
+            .memo {
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+    }
+
+    .content .tag-link {
+        @apply bg-primary text-primary-contrast inline-block rounded-lg px-1 h-fit;
+        transition: box-shadow 150ms;
+        &:hover {
+            @apply shadow-lg bg-primary-dark;
+            text-decoration: none;
+        }
     }
 }

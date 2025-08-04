@@ -1,6 +1,8 @@
 .figure {
+    @apply relative my-0;
+
     img {
-        @apply rounded-lg;
+        @apply rounded-lg my-0;
         transition: opacity 100ms;
         transition-delay: 20ms;
     }

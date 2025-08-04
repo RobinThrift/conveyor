@@ -2,7 +2,6 @@ import React, { useCallback } from "react"
 
 import type { PlaintextPrivateKey } from "@/lib/crypto"
 import { Alert } from "@/ui/components/Alert"
-import { BuildInfo } from "@/ui/components/BuildInfo"
 import { Button } from "@/ui/components/Button"
 import { Form } from "@/ui/components/Form"
 import { PasswordIcon } from "@/ui/components/Icons"
@@ -83,10 +82,6 @@ export function UnlockScreen() {
                     </div>
                 </Form>
             </div>
-
-            <footer className="unlock-footer">
-                <BuildInfo />
-            </footer>
         </div>
     )
 }
