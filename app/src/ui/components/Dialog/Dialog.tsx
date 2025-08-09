@@ -1,8 +1,9 @@
 import clsx from "clsx"
 import React, { useContext } from "react"
 
-import { Button, type ButtonProps } from "@/ui/components//Button"
+import { Button, type ButtonProps } from "@/ui/components/Button"
 import { XIcon } from "@/ui/components/Icons"
+
 import { dialogContext } from "./context"
 import { useDialog, useDialogDragHandle } from "./useDialog"
 
