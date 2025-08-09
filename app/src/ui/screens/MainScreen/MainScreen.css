@@ -34,7 +34,6 @@
         @apply flex-1;
         order: 1;
         position: relative;
-        z-index: 20;
 
         @media (min-width: 1024px) {
             @apply pt-2;
