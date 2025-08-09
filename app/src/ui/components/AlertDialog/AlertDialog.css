@@ -1,3 +1,7 @@
+.dialog.alert-dialog {
+    @apply py-3!;
+}
+
 .alert-dialog .dialog-description {
     @apply text-text text-base;
 }
