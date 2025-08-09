@@ -108,7 +108,6 @@
             /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
             .memo {
                 box-shadow: none;
-                border-radius: 0;
             }
         }
     }
