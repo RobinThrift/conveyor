@@ -39,7 +39,7 @@ export function useCodeMirror({
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        data: ArrayBufferLike
+        data: Uint8Array
     }): Promise<void>
 }) {
     let [editorState, setEditorState] = useState<EditorState>()

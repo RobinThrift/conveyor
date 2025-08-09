@@ -7,7 +7,7 @@ export type StartTransferEffectValue = {
     id: AttachmentID
     filename: string
     mime: string
-    data: ArrayBuffer
+    data: Uint8Array
     status: "transferring"
     from: number
     to: number
@@ -41,7 +41,7 @@ export interface AttachmentsPluginOpts {
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        data: ArrayBufferLike
+        data: Uint8Array
     }): Promise<void>
 }
 

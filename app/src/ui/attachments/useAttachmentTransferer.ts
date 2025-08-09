@@ -9,7 +9,7 @@ export function useAttachmentTransferer() {
         async (attachment: {
             id: AttachmentID
             filename: string
-            data: ArrayBufferLike
+            data: Uint8Array
         }): Promise<void> => {
             let { resolve, reject, promise } = Promise.withResolvers<void>()
 

@@ -711,7 +711,7 @@ suite("control/MemoController", () => {
             let buf = new ArrayBuffer(attachmentContent.byteLength)
             new Uint8Array(buf).set(attachmentContent, 0)
 
-            let attachmentID = await assertOkResult(
+            let { id: attachmentID } = await assertOkResult(
                 attachmentCtrl.createAttachment(ctx, {
                     filename: "file_a.txt",
                     content: buf,
@@ -736,7 +736,7 @@ suite("control/MemoController", () => {
             buf = new ArrayBuffer(attachmentContent.byteLength)
             new Uint8Array(buf).set(attachmentContent, 0)
 
-            let attachmentID2 = await assertOkResult(
+            let { id: attachmentID2 } = await assertOkResult(
                 attachmentCtrl.createAttachment(ctx, {
                     filename: "file_b.txt",
                     content: buf,

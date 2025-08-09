@@ -46,7 +46,7 @@ const fileDropHandlerExt = ViewPlugin.fromClass(
 
         private async startFileTransfers(files: File[], from: number) {
             for (let file of files) {
-                let data = await file.arrayBuffer()
+                let data = new Uint8Array(await file.arrayBuffer())
 
                 insertAttachment(this.view, {
                     filename: file.name,

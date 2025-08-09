@@ -11,7 +11,7 @@ import {
 import { type AttachmentID, attachmentIDFromURL } from "@/domain/Attachment"
 import type { AsyncResult } from "@/lib/result"
 
-type GetAttachmentDataByID = (id: AttachmentID) => AsyncResult<{ data: ArrayBufferLike }>
+type GetAttachmentDataByID = (id: AttachmentID) => AsyncResult<{ data: Uint8Array }>
 
 export const inlineImages = (getAttachmentDataByID: GetAttachmentDataByID) =>
     ViewPlugin.fromClass(
@@ -100,7 +100,7 @@ class ImageWidget extends WidgetType {
                     return
                 }
 
-                this._dom.src = URL.createObjectURL(new Blob([new Uint8Array(data?.data)]))
+                this._dom.src = URL.createObjectURL(new Blob([data?.data]))
             })
         } else {
             this._dom.src = this._src

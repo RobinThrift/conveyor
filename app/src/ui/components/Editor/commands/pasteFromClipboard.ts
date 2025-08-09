@@ -67,7 +67,7 @@ export async function pasteFromClipboard(view: EditorView, items: PasteItem[]) {
             filename: `pasted_item_${id}.${extensionForMimeType(item.mime)}`,
             id,
             mime: item.mime || "application/octet-stream",
-            data: await (await item.data()).arrayBuffer(),
+            data: new Uint8Array(await (await item.data()).arrayBuffer()),
             from: view.state.selection.main.from,
         })
     }

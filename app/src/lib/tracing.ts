@@ -215,7 +215,7 @@ export function toPlainSpan(span: Span): PlainSpan {
         startTime: span.startTime,
         endTime: span.endTime,
         events: span.events,
-        attrs: span.attrs,
+        attrs: removeNonClonable(span.attrs),
     }
 }
 

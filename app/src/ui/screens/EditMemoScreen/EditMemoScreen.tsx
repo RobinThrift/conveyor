@@ -64,7 +64,7 @@ function MemoEditor(props: {
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        data: ArrayBufferLike
+        data: Uint8Array
     }): Promise<void>
 }) {
     let onSave = useCallback(

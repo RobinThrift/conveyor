@@ -20,7 +20,7 @@ type AttachmentState =
 
 export const states = createStore<Record<AttachmentID, AttachmentState>>("attachments/states", {})
 export const attachments = createStore<
-    Record<AttachmentID, { filename: string; data: ArrayBufferLike }>
+    Record<AttachmentID, { filename: string; data: Uint8Array }>
 >("attachments/attachments", {})
 
 export const actions = createActions({
@@ -36,11 +36,7 @@ export const actions = createActions({
         }))
     },
 
-    transferAttachment: (attachment: {
-        id: AttachmentID
-        filename: string
-        data: ArrayBufferLike
-    }) => {
+    transferAttachment: (attachment: { id: AttachmentID; filename: string; data: Uint8Array }) => {
         batch(() => {
             attachments.setState((prev) => ({
                 ...prev,
@@ -73,7 +69,7 @@ export const selectors = {
 
 export function registerEffects(backend: BackendClient) {
     createEffect("attachments/transferAttachment", {
-        fn: async (ctx) => {
+        fn: async (ctx, { batch }) => {
             let transfers: Promise<any>[] = []
             for (let id in states.state) {
                 let { state } = states.state[id]
@@ -84,10 +80,10 @@ export function registerEffects(backend: BackendClient) {
 
                 transfers.push(
                     (async () => {
-                        let [, err] = await backend.attachments.createAttachment(ctx, {
+                        let [created, err] = await backend.attachments.createAttachment(ctx, {
                             id,
                             filename,
-                            content: data,
+                            content: data.buffer,
                         })
                         if (err) {
                             states.setState((prev) => ({
@@ -101,10 +97,20 @@ export function registerEffects(backend: BackendClient) {
                             return
                         }
 
-                        states.setState((prev) => ({
-                            ...prev,
-                            [id]: { state: "done" },
-                        }))
+                        batch(() => {
+                            attachments.setState((prev) => ({
+                                ...prev,
+                                [created.id]: {
+                                    filename,
+                                    data: new Uint8Array(created.data),
+                                },
+                            }))
+
+                            states.setState((prev) => ({
+                                ...prev,
+                                [created.id]: { state: "done" },
+                            }))
+                        })
                     })(),
                 )
             }
@@ -118,7 +124,7 @@ export function registerEffects(backend: BackendClient) {
     })
 
     createEffect("attachments/loadAttachment", {
-        fn: async (ctx) => {
+        fn: async (ctx, { batch }) => {
             let attachmentID: AttachmentID | undefined
             for (let id in states.state) {
                 let { state } = states.state[id]
@@ -157,7 +163,7 @@ export function registerEffects(backend: BackendClient) {
                     ...prev,
                     [attachmentID]: {
                         filename: attachment.attachment.filepath,
-                        data: attachment.data,
+                        data: new Uint8Array(attachment.data),
                     },
                 }))
             })

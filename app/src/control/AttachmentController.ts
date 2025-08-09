@@ -123,7 +123,7 @@ export class AttachmentController {
             filename: string
             content: ArrayBufferLike
         },
-    ): AsyncResult<AttachmentID> {
+    ): AsyncResult<{ id: AttachmentID; data: ArrayBufferLike }> {
         return this._transactioner.inTransaction(ctx, async (ctx) =>
             this._createAttachment(ctx, attachment),
         )
@@ -140,7 +140,7 @@ export class AttachmentController {
             filename: string
             content: ArrayBufferLike
         },
-    ): AsyncResult<AttachmentID> {
+    ): AsyncResult<{ id: AttachmentID; data: ArrayBufferLike }> {
         let [attachment, writeErr] = await this._writeAttachment(ctx, content)
         if (writeErr) {
             return Err(writeErr)
@@ -178,7 +178,7 @@ export class AttachmentController {
             return Err(entryCreateErr)
         }
 
-        return Ok(created.id)
+        return Ok({ id: created.id, data: content })
     }
 
     public async updateMemoAttachments(

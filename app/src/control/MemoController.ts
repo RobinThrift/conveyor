@@ -99,7 +99,7 @@ export class MemoController {
                 return wrapErr`${new MemoController.ErrCreateMemo()}: ${err}`
             }
 
-            let [_, updateAttachmentsErr] = await this._attachments.updateMemoAttachments(
+            let [, updateAttachmentsErr] = await this._attachments.updateMemoAttachments(
                 ctx,
                 created.id,
                 created.content,

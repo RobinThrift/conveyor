@@ -46,9 +46,9 @@ export const extensions = ({
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
-        data: ArrayBufferLike
+        data: Uint8Array
     }): Promise<void>
-    getAttachmentDataByID(id: AttachmentID): AsyncResult<{ data: ArrayBufferLike }>
+    getAttachmentDataByID(id: AttachmentID): AsyncResult<{ data: Uint8Array }>
 }) => {
     let exts: Extension[] = [
         keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...searchKeymap]),

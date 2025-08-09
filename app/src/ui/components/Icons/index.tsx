@@ -57,8 +57,8 @@ export function PlusCircleIcon() {
                 cy="128"
                 r="96"
                 stroke="currentColor"
-                stroke-miterlimit="10"
-                stroke-width="16"
+                strokeMiterlimit="10"
+                strokeWidth="16"
             />
             <line
                 x1="88"
@@ -66,9 +66,9 @@ export function PlusCircleIcon() {
                 x2="168"
                 y2="128"
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="16"
             />
             <line
                 x1="128"
@@ -76,9 +76,9 @@ export function PlusCircleIcon() {
                 x2="128"
                 y2="168"
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="16"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="16"
             />
         </svg>
     )

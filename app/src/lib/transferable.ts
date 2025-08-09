@@ -3,6 +3,10 @@ import { CalendarDate } from "@internationalized/date"
 import { type Context, contextFromPlainObject, isContext } from "@/lib/context"
 
 export function prepareForTransfer(value: any): { prepared: any; transferables: Transferable[] } {
+    if (value instanceof SharedArrayBuffer) {
+        return { prepared: [value], transferables: [] }
+    }
+
     if (isContext(value)) {
         return { prepared: (value as Context).toPlainObject(), transferables: [] }
     }
@@ -19,7 +23,7 @@ export function prepareForTransfer(value: any): { prepared: any; transferables: 
         )
     }
 
-    if (typeof value === "object" && Object.getOwnPropertyDescriptors(value).length) {
+    if (typeof value === "object" && Object.getOwnPropertyNames(value).length) {
         let prepared: Record<string, unknown> = {}
         let transferables: Transferable[] = []
         for (let prop in value) {
@@ -74,6 +78,10 @@ export function restoreTransferredValue<T>(value: any): T {
 }
 
 export function getTransferables(value: any): Transferable[] {
+    if (value instanceof SharedArrayBuffer) {
+        return []
+    }
+
     if (value instanceof ArrayBuffer) {
         return [value]
     }
@@ -107,6 +115,10 @@ export function removeNonClonable(value: any): any {
         return
     }
 
+    if (["string", "number", "bigint", "boolean", "symbol", "undefined"].includes(typeof value)) {
+        return value
+    }
+
     if (value instanceof Error) {
         return value
     }
@@ -135,7 +147,7 @@ export function removeNonClonable(value: any): any {
         return value.map((v) => removeNonClonable(v))
     }
 
-    if (typeof value === "object") {
+    if (typeof value === "object" && Object.getOwnPropertyNames(value).length) {
         let clonable: Record<string, unknown> = {}
         for (let prop in value) {
             clonable[prop] = removeNonClonable(value[prop])
@@ -143,7 +155,7 @@ export function removeNonClonable(value: any): any {
         return clonable
     }
 
-    return value
+    return value.toString()
 }
 
 export function removeNonTransferable(value: any): any {
@@ -171,7 +183,7 @@ export function removeNonTransferable(value: any): any {
         return value
     }
 
-    if (typeof value === "object" && Object.getOwnPropertyDescriptors(value).length) {
+    if (typeof value === "object" && Object.getOwnPropertyNames(value).length) {
         let fixed: Record<string, unknown> = {}
         for (let prop in value) {
             fixed[prop] = removeNonTransferable(value[prop])

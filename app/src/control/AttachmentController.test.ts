@@ -57,7 +57,7 @@ suite("control/AttachmentController", () => {
         assert.equal(entry.source, "tests")
         assert.equal(entry.revision, 1)
         assert.equal(entry.targetType, "attachments")
-        assert.equal(entry.targetID, created)
+        assert.equal(entry.targetID, created.id)
         assert.deepEqual(entry.value, {
             created: {
                 contentType: "application/octet-stream",
@@ -97,7 +97,7 @@ suite("control/AttachmentController", () => {
             await setup()
             onTestFinished(cleanup)
 
-            let attachmentID = await assertOkResult(
+            let { id: attachmentID } = await assertOkResult(
                 attachmentCtrl.createAttachment(ctx, {
                     filename: "file_a.txt",
                     content: attachmentTestContent["test_file_a.txt"],
@@ -132,7 +132,7 @@ suite("control/AttachmentController", () => {
             await setup()
             onTestFinished(cleanup)
 
-            let attachmentID = await assertOkResult(
+            let { id: attachmentID } = await assertOkResult(
                 attachmentCtrl.createAttachment(ctx, {
                     filename: "file_b.txt",
                     content: attachmentTestContent["test_file_b.txt"],
