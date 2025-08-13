@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM debian:12-slim AS sqlite3-builder
+FROM --platform=$BUILDPLATFORM debian:13-slim AS sqlite3-builder
 
 COPY ./app/src/external/sqlite-wasm/scripts/install-deps.sh /scripts/install-deps.sh
 
