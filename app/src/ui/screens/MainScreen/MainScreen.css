@@ -45,6 +45,7 @@
             @apply pt-2;
             order: 2;
             margin-left: calc(var(--sidebar-width) * 2 + var(--spacing) * 6);
+            margin-top: var(--appheader-height);
         }
     }
 }
@@ -77,6 +78,7 @@
 
     @media (min-width: 1024px) {
         position: fixed;
+        margin-top: var(--appheader-height);
     }
 }
 

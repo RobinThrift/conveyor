@@ -17,7 +17,7 @@
 }
 
 .app-footer {
-    @apply px-2 py-4 flex justify-center items-center absolute left-0 right-0;
+    @apply px-2 py-4 flex justify-end items-center absolute left-0 right-0;
     height: var(--appfooter-height);
 }
 

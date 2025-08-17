@@ -85,7 +85,7 @@
 }
 
 .memo-list-screen > .overflow-blur {
-    @apply absolute h-20 bottom-0 hidden;
+    @apply fixed h-20 bottom-0 hidden;
     width: 100%;
     pointer-events: none;
     backdrop-filter: blur(2px);

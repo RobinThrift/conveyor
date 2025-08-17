@@ -82,7 +82,7 @@
 }
 
 .memo-list-layout-select-positioner {
-    @apply relative h-8 max-w-3xl tablet:max-w-6xl lg:max-w-none;
+    @apply relative h-8 max-w-3xl tablet:max-w-none;
 
     .memo-list-layout-select {
         @apply absolute right-0 top-0 h-8 max-w-fit;

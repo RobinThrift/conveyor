@@ -1,5 +1,5 @@
 .tag-tree-filter {
-    @apply overflow-auto flex-1 py-2 overscroll-contain pb-10;
+    @apply overflow-auto flex-1 py-2 overscroll-contain pb-6;
     scrollbar-width: thin;
 }
 

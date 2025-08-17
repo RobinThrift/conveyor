@@ -327,7 +327,7 @@
     pointer-events: none;
 
     &::after {
-        @apply hidden absolute h-20 -top-18 tablet:block;
+        @apply hidden absolute h-15 -top-13 tablet:block;
         content: "";
         width: calc(100% - var(--spacing) * 2);
         backdrop-filter: blur(2px);
