@@ -3,7 +3,7 @@
 }
 
 .appheader {
-    @apply flex items-baseline gap-2 px-2 tablet:px-4 py-2 tablet:fixed tablet:top-0;
+    @apply flex items-baseline gap-2 px-2 tablet:px-4 py-2 md:fixed tablet:top-0;
 
     padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
 
