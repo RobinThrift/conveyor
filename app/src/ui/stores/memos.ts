@@ -54,6 +54,7 @@ export const actions = createActions({
         batch(() => {
             isOutdated.setState(false)
             memos.setState([])
+            nextPage.setState(undefined)
             status.setState("page-requested")
         }),
 })
