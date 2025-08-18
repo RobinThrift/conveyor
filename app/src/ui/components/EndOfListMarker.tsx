@@ -2,7 +2,11 @@ import React, { useRef } from "react"
 
 import { useOnIntersection } from "@/ui/hooks/useOnIntersection"
 
-export function EndOfListMarker({ onReached }: { onReached: () => void }) {
+export const EndOfListMarker = React.memo(function EndOfListMarker({
+    onReached,
+}: {
+    onReached: () => void
+}) {
     let ref = useRef<HTMLDivElement>(null)
     useOnIntersection(
         (isVisible) => {
@@ -19,4 +23,4 @@ export function EndOfListMarker({ onReached }: { onReached: () => void }) {
     )
 
     return <div className="invisible " ref={ref} />
-}
+})

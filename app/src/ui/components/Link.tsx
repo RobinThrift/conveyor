@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { startTransition, useCallback } from "react"
+import React, { useCallback } from "react"
 
 import type { Screens, Stacks } from "@/control/NavigationController"
 import type { ButtonProps } from "@/ui/components/Button"
@@ -71,18 +71,16 @@ export function LinkButton<S extends keyof Screens>({
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             if (screen) {
                 e.preventDefault()
-                startTransition(() => {
-                    push(
-                        screen,
-                        params || {},
-                        {
-                            scrollOffsetTop: Math.ceil(
-                                window.visualViewport?.pageTop ?? window.scrollY,
-                            ),
-                        },
-                        stack,
-                    )
-                })
+                push(
+                    screen,
+                    params || {},
+                    {
+                        scrollOffsetTop: Math.ceil(
+                            window.visualViewport?.pageTop ?? window.scrollY,
+                        ),
+                    },
+                    stack,
+                )
             }
         },
         [screen, params, push, stack],

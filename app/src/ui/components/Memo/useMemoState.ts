@@ -1,7 +1,6 @@
 import React, { startTransition, useMemo, useRef, useState } from "react"
 
 import type { Memo, MemoID } from "@/domain/Memo"
-import { useOnResize } from "@/ui/hooks/useOnResize"
 import { useOnVisible } from "@/ui/hooks/useOnVisible"
 
 export function useMemoState(props: {
@@ -19,10 +18,6 @@ export function useMemoState(props: {
     let { title, body } = splitContent(props.memo.content)
     let [isExpanded, setIsExpanded] = useState(!props.collapsible)
     let [shouldRender, setShouldRender] = useState(forceRender || isVisible)
-    let { clientHeight, scrollHeight } = useOnResize(ref)
-
-    let needsCollapsing = props.collapsible ? clientHeight < scrollHeight : false
-    let isCollapsed = props.collapsible && !isExpanded && needsCollapsing
 
     let onDoubleClick = useMemo(() => {
         if (!props.actions?.edit || !props.doubleClickToEdit) {
@@ -54,10 +49,8 @@ export function useMemoState(props: {
         shouldRender,
         title,
         body,
-        isExpanded,
+        isExpanded: isExpanded,
         setIsExpanded,
-        needsCollapsing,
-        isCollapsed,
         onDoubleClick,
     }
 }

@@ -3,7 +3,7 @@
 }
 
 .memo-list .memo {
-    container: memo / inline-size;
+    /* container: memo / inline-size; */
     width: 100%;
 
     .memo-header {
@@ -181,10 +181,7 @@
     }
 
     .memo {
-        @apply overflow-hidden h-fit;
-
         width: calc(50% - 0.25rem);
-        max-height: 80vh;
     }
 
     .memo:nth-of-type(1) {

@@ -12,7 +12,7 @@ export interface MemoListScreenProps {
     className?: string
 }
 
-export function MemoListScreen(props: MemoListScreenProps) {
+export const MemoListScreen = React.memo(function MemoListScreen(props: MemoListScreenProps) {
     let { showEditor } = useMemoListScreenState()
 
     return (
@@ -30,4 +30,4 @@ export function MemoListScreen(props: MemoListScreenProps) {
             <div className="overflow-blur" />
         </div>
     )
-}
+})

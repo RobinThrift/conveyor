@@ -28,18 +28,9 @@ interface MemoProps {
     beforeTitle?: React.ReactElement
 }
 
-export function Memo(props: MemoProps) {
-    let {
-        ref,
-        shouldRender,
-        title,
-        body,
-        isExpanded,
-        setIsExpanded,
-        needsCollapsing,
-        isCollapsed,
-        onDoubleClick,
-    } = useMemoState(props)
+export const Memo = React.memo(function Memo(props: MemoProps) {
+    let { ref, shouldRender, title, body, isExpanded, setIsExpanded, onDoubleClick } =
+        useMemoState(props)
     let t = useT("components/Memo")
 
     let rendered = useMemo(() => {
@@ -65,8 +56,8 @@ export function Memo(props: MemoProps) {
             ref={ref}
             id={`memo-${props.memo.id}`}
             className={clsx("memo", props.className, {
-                "is-collapsed": needsCollapsing && isCollapsed,
-                expanded: (needsCollapsing && !isCollapsed) || isExpanded,
+                collapsible: props.collapsible,
+                "is-expanded": isExpanded,
             })}
         >
             <div className="memo-header">
@@ -93,14 +84,18 @@ export function Memo(props: MemoProps) {
 
             {rendered}
 
-            <button
-                type="button"
-                aria-label={t.ShowMore}
-                className="show-more-btn"
-                onClick={() => setIsExpanded(true)}
-            >
-                <CaretDownIcon weight="bold" />
-            </button>
+            {props.collapsible && !isExpanded && (
+                <div className="show-more-btn-sizer">
+                    <button
+                        type="button"
+                        aria-label={t.ShowMore}
+                        className="show-more-btn"
+                        onClick={() => setIsExpanded(true)}
+                    >
+                        <CaretDownIcon weight="bold" />
+                    </button>
+                </div>
+            )}
         </article>
     )
-}
+})

@@ -33,9 +33,9 @@ export function MainScreen<S extends keyof Screens>(props: MainScreenProps<S>) {
         >
             {subscreen && (
                 <ErrorBoundary resetOn={[props.activeScreen]}>
-                    <div className="subscreen">
-                        <Suspense>{subscreen}</Suspense>
-                    </div>
+                    <Suspense>
+                        <div className="subscreen">{subscreen}</div>
+                    </Suspense>
                 </ErrorBoundary>
             )}
 

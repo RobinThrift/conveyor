@@ -1,49 +1,45 @@
-import { type RefObject, startTransition, useEffect, useState, useSyncExternalStore } from "react"
+import { Store } from "@tanstack/react-store"
+import { type RefObject, startTransition, useEffect, useState } from "react"
+
+let _snapshots = new Store(new WeakMap<Element, IntersectionObserverEntry>())
+let _observed = new Store(new WeakSet<Element>())
 
 export function useOnVisible(ref: RefObject<HTMLElement | null>, { ratio }: { ratio: number }) {
-    let [subscribe, setSubscribe] = useState<ReturnType<typeof _subscribe>>(() =>
-        _subscribe(ref.current),
-    )
-    let [getSnapshot, setGetSnapshot] = useState<ReturnType<typeof _getSnapshot>>(() =>
-        _getSnapshot(ref.current),
-    )
+    let [isVisible, setIsVisble] = useState<boolean>(() => {
+        if (!ref.current) {
+            return false
+        }
+        let snapshot = _snapshots.state.get(ref.current)
+        return typeof snapshot !== "undefined" && snapshot.intersectionRatio > ratio
+    })
 
     useEffect(() => {
-        if (ref.current) {
-            setSubscribe(() => _subscribe(ref.current))
-            setGetSnapshot(() => _getSnapshot(ref.current))
+        if (isVisible) {
+            return
         }
-    }, [ref.current])
 
-    let entries = useSyncExternalStore(subscribe, getSnapshot)
-
-    let [isVisible, setIsVisble] = useState(false)
-
-    if (!isVisible) {
-        if (entries.find((e) => e.intersectionRatio > ratio)) {
-            startTransition(() => {
-                setIsVisble(true)
-            })
-            if (ref.current) {
-                _observer.unobserve(ref.current)
-                _snapshots.delete(ref.current)
+        return _subscribe(ref.current, (intersectionRatio) => {
+            if (intersectionRatio < ratio) {
+                return false
             }
-        }
-    }
+
+            startTransition(() => setIsVisble(true))
+
+            return true
+        })
+    }, [ref.current, ratio, isVisible])
 
     return isVisible
 }
 
-let _snapshots = new WeakMap<Element, IntersectionObserverEntry[]>()
-let _subscriber = new Set<() => void>()
-
 let _observer = new IntersectionObserver(
     (entries: IntersectionObserverEntry[]) => {
         for (let entry of entries) {
-            let _snapshot = _snapshots.get(entry.target) ?? []
-            _snapshots.set(entry.target, [..._snapshot, entry])
+            _snapshots.setState((s) => {
+                s.set(entry.target, entry)
+                return s
+            })
         }
-        _subscriber.values().forEach((cb) => cb())
     },
     {
         threshold: [0.1, 0.5, 1],
@@ -51,47 +47,53 @@ let _observer = new IntersectionObserver(
     },
 )
 
-function _subscribe(target?: HTMLElement | undefined | null) {
-    return (callback: () => void) => {
-        if (!target) {
+function _subscribe(
+    target: HTMLElement | undefined | null,
+    cb: (intersectionRatio: number) => boolean,
+) {
+    if (!target) {
+        return () => {}
+    }
+
+    for (let entry of _observer.takeRecords()) {
+        if (entry.target === target && cb(entry.intersectionRatio)) {
             return () => {}
         }
-
-        _subscriber.add(callback)
-        _observer.observe(target)
-        _snapshots.set(target, [])
-
-        return () => {
-            _subscriber.delete(callback)
-            _snapshots.delete(target)
-            _observer.unobserve(target)
-        }
     }
-}
 
-const _emptySnapshot = [] as IntersectionObserverEntry[]
+    _observer.observe(target)
 
-function _getSnapshot(target: HTMLElement | undefined | null) {
+    _observed.setState((o) => {
+        o.add(target)
+        return o
+    })
+
+    let unsub = _snapshots.subscribe(({ currentVal: s }) => {
+        let entry = s.get(target)
+        if (!entry) {
+            return
+        }
+
+        if (!cb(entry.intersectionRatio)) {
+            return
+        }
+
+        _observer.unobserve(target)
+
+        _observed.setState((o) => {
+            o.delete(target)
+            return o
+        })
+
+        unsub()
+    })
+
     return () => {
-        if (!target) {
-            return _emptySnapshot
-        }
-
-        let _snapshot = _snapshots.get(target)
-        if (_snapshot) {
-            return _snapshot
-        }
-
-        _snapshot = []
-
-        for (let entry of _observer.takeRecords()) {
-            if (entry.target === target) {
-                _snapshot.push(entry)
-            }
-        }
-
-        _snapshots.set(target, _snapshot)
-
-        return _snapshot
+        _observer.unobserve(target)
+        _observed.setState((o) => {
+            o.delete(target)
+            return o
+        })
+        unsub()
     }
 }

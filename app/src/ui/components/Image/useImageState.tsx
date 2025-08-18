@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { startTransition, useEffect, useMemo, useState } from "react"
 
 import { attachmentIDFromURL } from "@/domain/Attachment"
 import { thumbhashToDataURL } from "@/external/thumbhash"
@@ -29,7 +29,11 @@ export function useImageState({
 
     useEffect(() => {
         let onload = () => {
-            setIsLoading(typeof attachment !== "undefined" && typeof attachmentURL === "undefined")
+            startTransition(() => {
+                setIsLoading(
+                    typeof attachment !== "undefined" && typeof attachmentURL === "undefined",
+                )
+            })
         }
 
         ref.current?.addEventListener("load", onload)

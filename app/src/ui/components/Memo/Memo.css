@@ -1,22 +1,40 @@
 .memo {
     @apply overflow-x-auto flex flex-col;
+}
 
-    .show-more-btn {
-        @apply hidden;
+.memo.is-editing {
+    max-height: max-content !important;
+    overflow: auto !important;
+}
+
+.show-more-btn-sizer {
+    @apply absolute bottom-0 left-0 right-0 top-0 pointer-events-none hidden;
+    container: show-more-btn-sizer / size;
+}
+
+.show-more-btn {
+    @apply absolute bottom-0 left-0 right-0 h-16 pb-1 flex justify-center items-end text-2xl cursor-pointer pointer-events-auto;
+
+    @container (height < 79svh) {
+        display: none;
+    }
+}
+
+.memo.collapsible {
+    @apply overflow-hidden h-fit relative;
+    max-height: 80svh;
+
+    .show-more-btn-sizer {
+        @apply block;
     }
 
-    &.is-collapsed {
-        @apply relative;
-    }
-
-    &.is-collapsed .show-more-btn {
-        @apply flex;
-    }
-
-    &.expanded,
-    &.is-editing {
-        max-height: max-content !important;
+    &.is-expanded {
+        max-height: none;
         overflow: auto !important;
+
+        .show-more-btn-sizer {
+            @apply hidden;
+        }
     }
 }
 
@@ -69,9 +87,4 @@
     &.md {
         @apply hidden @md:flex order-3 w-full;
     }
-}
-
-/* biome-ignore lint/style/noDescendingSpecificity: false positive */
-.show-more-btn {
-    @apply absolute bottom-0 left-0 right-0 h-16 pb-1 flex justify-center items-end text-2xl cursor-pointer;
 }
