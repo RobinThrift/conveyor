@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react"
+
+let counter = 0
+
 export function FPSMeter() {
     let [history, setHistory] = useState<{ ts: number; value: number }[]>([
         { ts: performance.now(), value: 0 },
@@ -8,13 +11,14 @@ export function FPSMeter() {
 
     useEffect(() => {
         let intervalID = setInterval(() => {
+            counter++
             let fps = currFPS()
             setHistory((history) => {
                 if (history.length >= 10) {
                     history.shift()
                 }
 
-                return [...history, { ts: performance.now(), value: fps }]
+                return [...history, { ts: performance.now() + counter, value: fps }]
             })
 
             setMaxFPS((maxFPS) => {
@@ -25,7 +29,7 @@ export function FPSMeter() {
             })
 
             setFps(fps)
-        }, 200)
+        }, 250)
 
         return () => clearInterval(intervalID)
     }, [])

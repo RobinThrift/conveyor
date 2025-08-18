@@ -68,7 +68,7 @@ export function StoresDevTool() {
                             className={clsx("devtools-entry-list-item", {
                                 active: selected === event.timestamp,
                             })}
-                            key={event.timestamp}
+                            key={`${event.timestamp}-${name}`}
                         >
                             <span className="devtools-entry-list-item-timing">
                                 <span>+{(event.timestamp / 1000).toFixed(4)}s</span>
