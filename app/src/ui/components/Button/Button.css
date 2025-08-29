@@ -10,7 +10,7 @@
     text-align: center;
 
     .icon {
-        @apply size-4 flex items-center;
+        @apply size-4 flex items-center justify-center;
     }
 
     &:hover {
@@ -29,6 +29,7 @@
     }
 
     &:disabled {
+        @apply cursor-default;
         background-color: color-mix(in srgb, var(--btn-bg) 80%, transparent);
         color: color-mix(in srgb, var(--btn-color) 80%, transparent);
         border-color: color-mix(
@@ -98,27 +99,10 @@
     color: var(--btn-bg);
     border: 1px solid var(--btn-border-color);
 
-    &:not(.icon-only):has(svg) {
-        @apply ps-2! pe-1! gap-1;
-    }
-
-    .icon {
-        @apply rounded-full p-1 size-6;
-        border: 1px solid var(--btn-border-color);
-    }
-
     &:hover {
         background-color: var(--btn-bg);
         color: var(--btn-color);
         border-color: var(--btn-border-color);
-
-        .icon {
-            background-color: var(--btn-color);
-            color: var(--btn-bg);
-            svg {
-                @apply animate-in slide-in-from-left;
-            }
-        }
     }
 
     &:active {

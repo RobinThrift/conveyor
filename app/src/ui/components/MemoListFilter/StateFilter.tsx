@@ -49,20 +49,22 @@ export function StateFilter(props: StateFilterProps) {
     }, [])
 
     return (
-        <ToggleGroup
-            aria-label={t.Label}
-            className={clsx("state-filter", props.className)}
-            value={selected}
-            onValueChange={onSelect}
-        >
-            <Toggle value="isArchived" className="state-filter-item">
-                <ArchiveIcon aria-hidden />
-                <span>{t.Archived}</span>
-            </Toggle>
-            <Toggle value="isDeleted" className="state-filter-item">
-                <BinIcon aria-hidden />
-                <span>{t.Deleted}</span>
-            </Toggle>
-        </ToggleGroup>
+        <div className={clsx("state-filter", props.className)}>
+            <ToggleGroup
+                aria-label={t.Label}
+                className="state-filter-items"
+                value={selected}
+                onValueChange={onSelect}
+            >
+                <Toggle value="isArchived" className="state-filter-item">
+                    <ArchiveIcon aria-hidden />
+                    <span>{t.Archived}</span>
+                </Toggle>
+                <Toggle value="isDeleted" className="state-filter-item">
+                    <BinIcon aria-hidden />
+                    <span>{t.Deleted}</span>
+                </Toggle>
+            </ToggleGroup>
+        </div>
     )
 }

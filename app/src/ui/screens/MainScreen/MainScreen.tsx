@@ -5,6 +5,7 @@ import type { Screens } from "@/control/NavigationController"
 import { ErrorBoundary } from "@/ui/components/ErrorBoundary"
 import { EditMemoScreen } from "@/ui/screens/EditMemoScreen"
 import { MemoListScreen } from "@/ui/screens/MemoListScreen"
+import { NewMemoScreen } from "@/ui/screens/NewMemoScreen"
 import { SingleMemoScreen } from "@/ui/screens/SingleMemoScreen"
 
 export interface MainScreenProps<S extends keyof Screens> {
@@ -21,7 +22,7 @@ export function MainScreen<S extends keyof Screens>(props: MainScreenProps<S>) {
             subscreen = <EditMemoScreen className="is-subscreen" />
             break
         case "memo.new":
-            subscreen = <EditMemoScreen className="is-subscreen" />
+            subscreen = <NewMemoScreen className="is-subscreen" />
             break
     }
 

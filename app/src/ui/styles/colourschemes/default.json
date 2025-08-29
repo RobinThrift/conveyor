@@ -2,9 +2,9 @@
     "light": {
         "body-bg": "#fbfbfb",
         "body-bg-contrast": "#0e0d12",
-        "surface-level-1": "#ffffff",
-        "surface-level-2": "#f2f2f2",
-        "surface-border": "#ececec",
+        "surface-level-1": "#f9f9f9",
+        "surface-level-2": "#f3f3f3",
+        "surface-border": "#ededed",
         "modal-overlay-bg": "#373949",
         "text": "#353446",
         "primary": "#4681f6",

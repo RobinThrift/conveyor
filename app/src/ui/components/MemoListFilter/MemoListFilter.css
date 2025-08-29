@@ -5,7 +5,7 @@
     @apply overscroll-none flex flex-col;
 
     .date-picker {
-        @apply px-2 w-full;
+        @apply px-2 w-full text-sm;
 
         .date-picker-header {
             @apply flex items-center justify-between mb-1;
@@ -28,14 +28,14 @@
         }
 
         .calendar-grid-header .calendar-grid-cell {
-            @apply text-center p-0 font-semibold text-sm text-subtle pointer-events-none;
+            @apply text-center p-0 font-semibold text-xs text-subtle pointer-events-none;
         }
 
         .calendar-grid-body .calendar-grid-cell {
-            @apply flex items-center justify-center text-base p-0 w-full h-full;
+            @apply flex items-center justify-center p-0 w-full h-full;
 
             span {
-                @apply size-10 rounded-full flex items-center justify-center cursor-pointer;
+                @apply size-9 flex items-center justify-center cursor-pointer;
             }
 
             &[data-outside-month] {
@@ -44,19 +44,6 @@
 
             &.today span {
                 @apply text-primary dark:text-primary-light;
-            }
-
-            &[data-selected] {
-                &:hover span,
-                /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
-                span {
-                    @apply text-primary-dark bg-primary-extra-light border border-primary rounded-full font-semibold;
-                    @apply dark:bg-primary-dark dark:text-primary-light;
-                }
-            }
-
-            &:hover span {
-                @apply bg-subtle-extra-light dark:bg-surface-level-2;
             }
 
             &[data-disabled] {
@@ -72,8 +59,12 @@
         }
     }
 
+    .tag-tree-filter {
+        @apply pt-0;
+    }
+
     .short-day-picker {
-        @apply w-full flex;
+        @apply w-full flex px-2;
 
         @media (max-width: 1024px) {
             @apply pt-1;
@@ -95,6 +86,10 @@
             }
         }
 
+        .calendar-grid-header .calendar-grid-cell {
+            @apply text-xs;
+        }
+
         .calendar-grid-body {
             @apply w-full flex flex-row flex-nowrap justify-start items-center w-full overflow-x-auto overscroll-none;
             scroll-snap-type: x mandatory;
@@ -109,7 +104,7 @@
 
             /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
             .calendar-grid-cell {
-                @apply border border-subtle-extra-light rounded-full;
+                @apply border border-subtle-extra-light;
                 @apply dark:border-subtle-extra-dark;
             }
         }
@@ -132,12 +127,6 @@
 
             &.today {
                 @apply text-primary-dark dark:text-primary-light font-semibold;
-            }
-
-            /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
-            &[data-selected] {
-                @apply text-primary-extra-dark bg-primary-extra-light border border-primary-extra-dark;
-                @apply dark:bg-primary-dark dark:text-primary-light;
             }
         }
     }
@@ -197,14 +186,13 @@
             }
 
             .state-filter {
-                @apply grid;
+                @apply block;
             }
         }
     }
 }
 
-/* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
-.state-filter {
+.state-filter-items {
     @apply grid grid-cols-2 gap-1 items-center justify-stretch w-full mb-2;
 
     .state-filter-item {
@@ -272,6 +260,8 @@
 
 .memo-list-filter-search {
     @apply flex-1;
+    @apply tablet:w-sm tablet:focus-within:w-lg tablet:transition-[width] tablet:duration-150;
+
     @media (max-width: 1024px) {
         input {
             @apply py-1.5 pe-1 ps-7;
@@ -282,8 +272,16 @@
     &.collapsible {
         @apply tablet:hidden;
 
+        input::placeholder {
+            @apply text-surface-level-1;
+        }
+
         .icon {
             @apply pointer-events-none size-10 justify-center p-0!;
+
+            svg {
+                @apply size-4;
+            }
         }
 
         .input-field {
@@ -305,12 +303,16 @@
             }
 
             .input-field .input {
-                @apply pl-8! py-1! px-1! text-text;
+                @apply pl-8! py-1! px-1! text-text -outline-offset-2;
                 width: 100%;
             }
 
             .icon {
                 @apply p-0.5 pl-2;
+            }
+
+            input::placeholder {
+                @apply text-surface-level-1;
             }
         }
     }
@@ -327,7 +329,7 @@
     pointer-events: none;
 
     &::after {
-        @apply hidden absolute h-15 -top-13 tablet:block;
+        @apply hidden absolute h-15 -top-17 tablet:block;
         content: "";
         width: calc(100% - var(--spacing) * 2);
         backdrop-filter: blur(2px);

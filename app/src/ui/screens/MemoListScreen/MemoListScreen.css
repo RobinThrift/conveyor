@@ -7,7 +7,7 @@
 }
 
 .memo-list-header {
-    @apply text-lg tablet:text-lg lg:text-xl text-subtle-extra-dark tablet:py-2;
+    @apply text-subtle-extra-dark tablet:py-2 tablet:px-2;
     @apply flex items-center;
     @apply dark:text-subtle;
     pointer-events: none;
@@ -68,19 +68,28 @@
     }
 }
 
+.new-memo-link-area {
+    @apply hidden tablet:flex flex-1 flex-col items-end justify-center h-full;
+}
+
+.new-memo-link {
+    @apply gap-1.5! text-sm h-8.5;
+
+    svg {
+        @apply size-4;
+    }
+}
+
+:root:has(.devtools-open-btn) .new-memo-link {
+    @apply me-10;
+}
+
 .new-memo-editor-fab {
     @apply fixed right-6 rounded-full! border-0 size-14 z-20 shadow-xl p-0 tablet:hidden p-2.5!;
-    top: calc(100dvh - var(--spacing) * 10 - env(safe-area-inset-bottom, 0));
+    top: calc(100dvh - var(--spacing) * 18 - env(safe-area-inset-bottom, 0));
 
     & > svg {
-        circle {
-            fill: var(--btn-color);
-            stroke: none;
-        }
-
-        line {
-            stroke: var(--btn-bg);
-        }
+        @apply size-6;
     }
 }
 

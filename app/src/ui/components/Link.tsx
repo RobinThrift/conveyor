@@ -71,6 +71,7 @@ export function LinkButton<S extends keyof Screens>({
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             if (screen) {
                 e.preventDefault()
+                performance.mark("start-nav")
                 push(
                     screen,
                     params || {},
@@ -81,6 +82,8 @@ export function LinkButton<S extends keyof Screens>({
                     },
                     stack,
                 )
+                performance.mark("end-nav")
+                performance.measure("start-nav", "end-nav")
             }
         },
         [screen, params, push, stack],
@@ -94,6 +97,7 @@ export function LinkButton<S extends keyof Screens>({
             {...aProps}
             // biome-ignore lint/a11y/useValidAnchor: required for internal navigation handling
             onClick={onClick}
+            onMouseEnter={() => performance.mark("hover")}
             className={clsx(
                 "btn cursor-pointer",
                 variant,

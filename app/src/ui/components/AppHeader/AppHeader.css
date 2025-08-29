@@ -1,25 +1,41 @@
 :root {
-    --appheader-height: calc(var(--spacing) * 15);
+    --appheader-height: calc(var(--spacing) * 12);
 }
 
 .appheader {
-    @apply flex items-baseline gap-2 px-2 tablet:px-4 py-2 md:fixed tablet:top-0;
+    @apply flex items-center gap-2 tablet:gap-4 p-2 tablet:fixed;
+
+    z-index: 1000;
 
     padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
 
     -webkit-app-region: drag;
-    min-height: max(
+    height: max(
         env(titlebar-area-height, var(--appheader-height)),
         var(--appheader-height)
     );
     width: env(titlebar-area-width, 100%);
 }
 
-.appheader .settings-nav-button {
-    @apply relative z-[1000];
-    @apply size-10 px-0! py-0! text-lg aspect-square;
-    --btn-border-color: var(--color-subtle-extra-light);
+.appheader .btn.outline-btn {
     @apply focus-visible:outline-2 focus-visible:outline-subtle-dark;
+    --btn-border-color: var(--color-subtle-extra-light);
+    --btn-bg: var(--color-subtle);
+
+    &:hover {
+        @apply shadow-sm;
+        --btn-bg: transparent;
+        --btn-color: var(--color-subtle-extra-dark);
+        --btn-border-color: var(--color-subtle-light);
+    }
+}
+
+.appheader .settings-nav-button {
+    @apply relative z-[1000] px-1! py-0! text-lg size-8.5;
+
+    svg {
+        @apply size-4;
+    }
 }
 
 :root.dark .appheader .settings-nav-button {

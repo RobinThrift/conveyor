@@ -10,16 +10,10 @@
 
     @media (min-width: 1024px) {
         --sidebar-width: 300px;
-        --sidebar-height: calc(
-            100dvh -
-            var(--spacing) *
-            2 -
-            var(--appheader-height)
-        );
+        --sidebar-height: calc(100dvh - var(--appheader-height));
         @apply flex-row;
 
-        padding: env(safe-area-inset-top, 0) calc(var(--spacing) * 4)
-            env(safe-area-inset-bottom, 0) calc(var(--spacing) * 4);
+        padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0) 0;
     }
 
     @media (min-width: 1680px) {
@@ -36,15 +30,13 @@
         position: relative;
 
         @media (min-width: 1024px) {
-            @apply pt-2;
             order: 2;
             margin-left: calc(var(--sidebar-width) + var(--spacing) * 6);
         }
 
         @media (min-width: 1680px) {
-            @apply pt-2;
             order: 2;
-            margin-left: calc(var(--sidebar-width) * 2 + var(--spacing) * 6);
+            margin-left: calc(var(--sidebar-width) * 2);
             margin-top: var(--appheader-height);
         }
     }
@@ -62,6 +54,7 @@
         @media (min-width: 1024px) {
             order: 1;
             padding-left: calc(var(--sidebar-width) + var(--spacing) * 4);
+            margin-top: var(--appheader-height);
         }
 
         @media (min-width: 1440px) {
@@ -69,7 +62,7 @@
         }
 
         @media (min-width: 1680px) {
-            @apply pt-2;
+            @apply pt-0;
             order: 1;
             margin-right: 0;
             margin-left: 0;
@@ -82,6 +75,7 @@
     max-width: var(--sidebar-width);
     width: var(--sidebar-width);
     height: var(--sidebar-height);
+    margin-top: calc(var(--spacing) * 2);
 
     @media (min-width: 1680px) {
         position: fixed;
@@ -115,25 +109,24 @@
             display: none;
         }
 
-        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
         .memo-list-container {
             @apply flex-1;
             position: relative;
-            z-index: 10;
-            animation: mobile-parallax-memo-list-scroll 1.01s linear;
-            animation-play-state: paused;
-            animation-delay: calc(var(--memo-scroll-progress, 1) * -1.01s);
-            animation-fill-mode: forwards;
+
+            @supports (animation-timeline: scroll()) {
+                animation: mobile-parallax-memo-list-scroll;
+                animation-timeline: scroll();
+            }
 
             @media (min-width: 1024px) {
                 @apply p-0.5;
                 width: var(--sidebar-width);
                 padding-top: 0;
-                z-index: revert;
                 animation: none;
                 position: fixed;
                 max-width: var(--sidebar-width);
                 overflow: auto;
+                margin-top: var(--appheader-height);
                 height: calc(
                     var(--sidebar-height) -
                     (var(--appheader-height) * -1 + var(--spacing) * 2)
@@ -161,16 +154,14 @@
             }
 
             @media (min-width: 1680px) {
-                @apply top-2;
-                margin-top: 0;
-                padding-top: 0;
-                padding-left: 0;
+                @apply top-0 p-0 pb-18;
+                margin-top: var(--appheader-height);
                 position: fixed;
                 height: calc(
                     var(--sidebar-height) -
                     (var(--appheader-height) * -1 + var(--spacing) * 2)
                 );
-                margin-left: calc(var(--sidebar-width) + var(--spacing) * 4);
+                margin-left: calc(var(--sidebar-width));
                 overflow: auto;
             }
         }
@@ -179,8 +170,8 @@
             @media (min-width: 1680px) {
                 display: block;
                 top: revert;
-                left: calc(var(--sidebar-width) + var(--spacing) * 8);
-                width: calc(100% - var(--sidebar-width) + var(--spacing) * 8);
+                left: calc(var(--sidebar-width) + var(--spacing) * 4);
+                width: calc(100% - var(--sidebar-width) + var(--spacing) * 4);
             }
         }
 
@@ -195,17 +186,15 @@
         .memo-list {
             @media (min-width: 1024px) {
                 .memo-list-day-group:nth-of-type(2) {
-                    .memo-list-day {
-                        @apply mt-1;
-                    }
+                    @apply pt-0;
                 }
 
                 .memo-list-day-group {
-                    @apply pt-4;
+                    @apply mt-0 pt-2;
                 }
 
                 .memo-list-day-divider {
-                    @apply mb-6;
+                    @apply mb-0 hidden;
                 }
             }
 
@@ -213,12 +202,12 @@
                 display: none;
             }
 
-            /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
             .memo-list-day {
-                @apply text-base text-sm;
+                @apply text-base text-sm w-full rounded-none my-0 top-0 shadow-xs;
             }
 
             .memo-list-memos {
+                @apply px-2 my-2;
                 display: flex;
                 flex-flow: row wrap;
                 gap: 0.5rem;
@@ -227,12 +216,17 @@
 
             .memo {
                 @apply overflow-hidden h-fit p-2!;
+                scroll-margin: calc(var(--spacing) * 8);
                 width: 100%;
             }
 
             .memo h1,
             .memo h1 time {
-                @apply text-lg;
+                @apply text-base;
+            }
+
+            .memo-header {
+                @apply items-start;
             }
 
             .memo p {
@@ -262,9 +256,7 @@
 
 .main-screen.has-subscreen {
     .single-memo-screen {
-        @media (min-width: 1024px) {
-            margin-top: calc(-1 * var(--appheader-height));
-        }
+        z-index: 40;
     }
 }
 

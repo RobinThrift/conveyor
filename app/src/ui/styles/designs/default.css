@@ -6,110 +6,24 @@
     }
 
     .alert {
-        @apply p-3 rounded-3xl;
-    }
-
-    .btn {
-        @apply rounded-3xl py-1 px-4;
-    }
-
-    .btn.sm {
-        @apply gap-1 py-0.5 px-2 text-sm;
-    }
-
-    .input-field .input {
-        @apply appearance-none bg-surface-level-1 border border-subtle-extra-light rounded-3xl ring ring-transparent;
-        @apply hover:border-subtle-dark;
-        @apply focus:ring-1 focus:outline-none focus:ring-primary-light;
-        @apply dark:border-subtle-extra-dark;
+        @apply p-3 rounded-lg;
     }
 
     .select {
-        @apply rounded-3xl border border-subtle-extra-light px-3;
+        @apply rounded-lg border border-subtle-extra-light px-3;
         @apply dark:border-subtle-dark;
     }
 
     .field-message {
-        @apply rounded-2xl px-3 py-2;
+        @apply rounded px-3 py-2;
     }
 
     .dialog {
-        @apply rounded-t-2xl xs:rounded-2xl p-4;
+        @apply rounded-t-lg xs:rounded-lg p-4;
     }
 
     .new-memo-editor .memo {
-        @apply bg-surface-level-1 rounded-3xl p-2;
-    }
-
-    /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
-    .memo {
-        @apply bg-surface-level-1 rounded-2xl p-4;
-        box-shadow: var(--surface-box-shadow);
-
-        .show-more-btn {
-            @apply backdrop-blur-sm;
-            mask-image: linear-gradient(to bottom, transparent -10%, black 80%);
-        }
-    }
-
-    .memo-list-filter {
-        @apply bg-surface-level-1 rounded-2xl px-2;
-        @apply tablet:pt-2 tablet:space-y-2;
-        box-shadow: var(--surface-box-shadow);
-
-        .search {
-            @apply py-2;
-
-            /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
-            .input {
-                @apply bg-surface-level-1;
-            }
-        }
-
-        .state-filter {
-            @apply bg-surface-level-2 rounded-3xl;
-
-            .state-filter-item {
-                @apply rounded-2xl border border-surface-level-2;
-
-                &:hover {
-                    @apply bg-surface-level-1 border-subtle-extra-light;
-                }
-
-                &[data-pressed] {
-                    @apply bg-surface-level-1 border-subtle-extra-light;
-                }
-            }
-        }
-    }
-
-    .memo-list-filter-search {
-        &.collapsible {
-            .input-field .input {
-                @apply rounded-full! text-surface-level-1 border-subtle-dark bg-surface-level-1;
-            }
-
-            &:has(*:focus) {
-                .input-field .input {
-                    @apply text-text;
-                }
-            }
-        }
-    }
-
-    .single-memo-screen,
-    .edit-memo-screen {
-        @apply bg-surface-level-1 rounded-2xl;
-        box-shadow:
-            var(--surface-box-shadow),
-            0 5px 10px rgba(0 0 0 / 0.2);
-
-        @media (min-width: 1440px) {
-            /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
-            .memo {
-                box-shadow: none;
-            }
-        }
+        @apply bg-surface-level-1 rounded-lg p-2;
     }
 
     .content .tag-link {
@@ -118,6 +32,148 @@
         &:hover {
             @apply shadow-lg bg-primary-dark;
             text-decoration: none;
+        }
+    }
+}
+
+[data-design="default"] .btn {
+    @apply rounded-lg py-1 px-1.5 text-sm gap-1;
+
+    &.sm {
+        @apply gap-0.5 py-0.5 px-1 text-xs;
+    }
+}
+
+[data-design="default"] .appheader {
+    @apply tablet:border-b border-surface-border tablet:bg-body/80 tablet:backdrop-blur-sm;
+
+    .new-memo-link,
+    .settings-nav-button {
+        @apply bg-body!;
+    }
+}
+
+:root[data-design="default"]:has(.main-screen.has-subscreen) body {
+    @apply tablet:bg-surface-level-1;
+}
+
+[data-design="default"] .memo-list-container {
+    @apply tablet:bg-surface-level-1;
+}
+
+[data-design="default"] .memo-list-filter {
+    @apply bg-surface-level-1  xs:z-20 rounded-lg;
+    @apply tablet:pt-2 tablet:space-y-2  tablet:rounded-none tablet:border-e border-surface-border;
+    box-shadow: var(--surface-box-shadow);
+
+    @media (min-width: 768px) {
+        box-shadow: none;
+    }
+
+    .state-filter {
+        @apply px-2;
+
+        .state-filter-items {
+            @apply bg-surface-level-2 rounded-xl;
+        }
+
+        .state-filter-item {
+            @apply rounded-lg border border-surface-level-2;
+
+            /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
+            &:hover {
+                @apply bg-surface-level-1 border-subtle-extra-light shadow-sm;
+            }
+
+            &[data-pressed] {
+                @apply bg-surface-level-1 border-subtle-extra-light shadow-sm;
+            }
+        }
+    }
+
+    .date-picker {
+        @apply pb-2 border-b border-surface-border px-2;
+    }
+
+    .tag-tree-filter {
+        @apply border-b border-surface-border px-2;
+    }
+
+    .calendar-grid-body .calendar-grid-cell span {
+        @apply rounded-lg;
+    }
+
+    .calendar-grid-body .calendar-grid-cell:hover span {
+        @apply border-subtle-extra-light bg-surface-level-2 shadow;
+    }
+
+    .calendar-grid-body .calendar-grid-cell[data-selected] {
+        &:hover span,
+        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
+        span {
+            @apply text-primary-dark border border-primary font-semibold shadow;
+            @apply dark:text-primary-light;
+        }
+    }
+
+    .short-day-picker .calendar-grid-body .calendar-grid-cell[data-selected] {
+        @apply text-primary-extra-dark bg-primary-extra-light border border-primary-extra-dark;
+        @apply dark:bg-primary-dark dark:text-primary-light;
+    }
+
+    .short-day-picker .calendar-grid-body .calendar-grid-cell {
+        @apply rounded-lg;
+    }
+}
+
+[data-design="default"] .input-field .input {
+    @apply appearance-none bg-surface-level-1 border border-subtle-extra-light rounded-lg ring ring-transparent;
+    @apply hover:border-subtle-dark;
+    @apply focus:ring-1 focus:outline-none focus:ring-primary-light;
+    @apply dark:border-subtle-extra-dark;
+}
+
+[data-design="default"] .memo-list-filter-search.collapsible {
+    .input-field .input {
+        @apply bg-body;
+    }
+
+    &:has(*:focus) {
+        .input-field .input {
+            @apply text-text bg-surface-level-1;
+        }
+    }
+}
+
+/* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
+[data-design="default"] .memo {
+    @apply bg-body rounded-lg p-2 tablet:p-4;
+    box-shadow: var(--surface-box-shadow);
+
+    .show-more-btn {
+        @apply backdrop-blur-sm;
+        mask-image: linear-gradient(to bottom, transparent -10%, black 80%);
+    }
+}
+
+[data-design="default"] .editor .text-editor .cm-editor {
+    @apply bg-body;
+}
+
+[data-design="default"] .editor .text-editor .cm-editor.cm-focused {
+    @apply bg-body;
+}
+
+[data-design="default"] .single-memo-screen,
+[data-design="default"] .new-memo-screen,
+[data-design="default"] .edit-memo-screen {
+    @apply bg-body rounded-b-lg;
+    box-shadow: 0 2px 2px var(--color-surface-border);
+
+    @media (min-width: 768px) {
+        /* biome-ignore lint/style/noDescendingSpecificity: shrug */
+        .memo {
+            box-shadow: none;
         }
     }
 }

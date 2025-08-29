@@ -3,7 +3,7 @@
 }
 
 .memo-list .memo {
-    /* container: memo / inline-size; */
+    container: memo / inline-size;
     width: 100%;
 
     .memo-header {
@@ -24,7 +24,7 @@
     }
 
     &:has(.content > .link-preview:first-child) .link-preview {
-        @apply px-0 pb-0;
+        @apply px-0 pb-0 bg-transparent;
         box-shadow: none;
         width: calc(100%);
 

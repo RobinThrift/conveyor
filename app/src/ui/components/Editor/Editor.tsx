@@ -54,14 +54,9 @@ export function Editor(props: EditorProps) {
                         <Button
                             onPress={onCancel}
                             variant="danger"
-                            plain
+                            outline
                             aria-label={t.Cancel}
-                            iconLeft={
-                                <>
-                                    <XIcon weight="fill" className="hidden tablet:block" />
-                                    <XIcon className="tablet:hidden" />
-                                </>
-                            }
+                            iconLeft={<XIcon />}
                         >
                             <span className="sr-only tablet:not-sr-only">{t.Cancel}</span>
                         </Button>
@@ -71,6 +66,7 @@ export function Editor(props: EditorProps) {
                         aria-label={t.Save}
                         onPress={onSave}
                         plain
+                        outline
                         iconLeft={<CheckIcon />}
                         isDisabled={!isChanged}
                     >

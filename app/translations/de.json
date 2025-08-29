@@ -101,12 +101,6 @@
         "Dismiss": "Schließen"
     },
 
-    "components/Greeting": {
-        "Morning": "Moin, ",
-        "Afternoon": "Moin Moin, ",
-        "Evening": "Moin, "
-    },
-
     "components/MemoListHeader": {
         "Archived": "Archivierte memos",
         "Deleted": "Gelöschte Memos",

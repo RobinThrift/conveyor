@@ -3,7 +3,7 @@ import React, { Suspense, startTransition, useCallback, useEffect, useRef, useSt
 
 import { FlaskIcon, XIcon } from "../components/Icons"
 import { Loader } from "../components/Loader"
-import { FPSMeter } from "./FPSMeter"
+// import { FPSMeter } from "./FPSMeter"
 import { ReactDevTools } from "./ReactDevTools"
 import { SQLLogDevTool } from "./SQLLogDevTool"
 import { StoresDevTool } from "./StoresDevTool"
@@ -138,8 +138,6 @@ export function DevTools() {
                     </div>
                 </div>
             )}
-
-            <FPSMeter />
         </div>
     )
 }

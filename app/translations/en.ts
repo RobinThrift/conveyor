@@ -104,12 +104,6 @@ export const translations = {
         Dismiss: "Dismiss",
     },
 
-    "components/Greeting": {
-        Morning: "Good Morning, ",
-        Afternoon: "Good Afternoon, ",
-        Evening: "Good Evening, ",
-    },
-
     "components/MemoListHeader": {
         Archived: "Archived memos",
         Deleted: "Deleted Memos",

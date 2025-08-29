@@ -1,5 +1,5 @@
 .tag-tree-item {
-    @apply w-full;
+    @apply w-full text-sm my-0.5;
 
     span {
         @apply flex-1;
@@ -17,10 +17,9 @@
     }
 
     &[aria-selected="true"] > .tag-tree-item-content {
-        @apply bg-primary-light! text-primary-contrast!;
-        .icon,
+        @apply bg-surface-level-2 shadow text-primary;
         .tag-tree-item-count {
-            @apply text-primary-contrast;
+            @apply text-primary;
         }
     }
 
@@ -39,7 +38,7 @@
 
 /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
 .tag-tree-item-content {
-    @apply w-full flex items-center cursor-pointer rounded-lg xs:hover:bg-subtle-extra-light active:bg-subtle ps-1 pe-2 py-0.5;
+    @apply w-full flex items-center cursor-pointer rounded-lg xs:hover:bg-surface-level-2 hover:shadow active:bg-subtle ps-2 pe-3 py-1;
     @apply dark:xs:hover:bg-subtle-extra-dark;
 
     /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */

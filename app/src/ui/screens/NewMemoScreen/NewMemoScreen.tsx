@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import React from "react"
 
 import { Editor } from "@/ui/components/Editor"
@@ -5,12 +6,12 @@ import { Loader } from "@/ui/components/Loader"
 
 import { useNewMemoScreenState } from "./useNewMemoScreenState"
 
-export function NewMemoScreen() {
+export function NewMemoScreen({ className }: { className?: string }) {
     let { newMemo, isLoading, tags, createMemo, cancelNew, transferAttachment, settings } =
         useNewMemoScreenState()
 
     return (
-        <div className="new-memo-screen">
+        <div className={clsx("new-memo-screen", className)}>
             <Editor
                 memo={newMemo}
                 tags={tags}

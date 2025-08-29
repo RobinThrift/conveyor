@@ -11,7 +11,7 @@
     transform: translateY(var(--toolbar-offset, 0));
 
     .toolbar-btn-grp {
-        @apply flex items-center gap-1 p-1 h-full;
+        @apply flex items-center gap-1 p-1 h-full pointer-events-auto;
     }
 
     .toolbar-separator {
@@ -53,11 +53,11 @@
     }
 
     @media (min-width: 768px) {
-        @apply sticky top-3 bottom-auto w-fit rounded-lg p-1 shadow;
+        @apply sticky top-1 bottom-auto w-fit rounded-none p-0 w-full bg-transparent flex justify-center border-b border-surface-border shadow-none;
+        @apply pointer-events-none;
+        height: calc(1.5lh + var(--spacing) * 2);
+        margin-bottom: calc(-1.5lh);
         order: 1;
-        margin-bottom: -1.25lh;
-        left: 50%;
-        transform: translateX(-50%);
     }
 }
 

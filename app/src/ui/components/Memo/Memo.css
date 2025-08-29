@@ -45,11 +45,19 @@
         @apply flex-1 font-semibold text-3xl;
 
         time {
-            @apply text-2xl;
+            font-size: inherit;
         }
 
-        @container (width < 30rem) {
-            @apply text-2xl;
+        @container (width < 25rem) {
+            @apply text-xl;
+        }
+
+        @container (width < 15rem) {
+            @apply text-lg;
+        }
+
+        @container (width < 10rem) {
+            @apply text-base;
         }
 
         @media (min-width: 768px) {

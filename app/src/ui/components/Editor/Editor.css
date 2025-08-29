@@ -1,7 +1,7 @@
 @import "./Toolbar.css";
 
 .editor {
-    @apply flex flex-col bg-surface-level-1;
+    @apply flex flex-col bg-body;
     @apply dark:border-subtle-extra-dark;
 
     @media (min-width: 768px) {
@@ -28,8 +28,8 @@
 }
 
 .editor-buttons {
-    @apply p-1 flex items-center justify-between gap-2 bg-surface-level-1;
-    height: 3rem;
+    @apply p-1 flex items-center justify-between gap-2 w-full relative -top-0.5;
+    height: 1.5lh;
 
     &:has(button:only-child) {
         @apply justify-end;
@@ -38,6 +38,8 @@
 
 .text-editor {
     @apply flex-1 overflow-auto;
+    width: 100%;
+    max-width: var(--editor-width, var(--memo-width, 100%));
 }
 
 .cm-editor {

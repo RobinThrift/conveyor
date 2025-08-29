@@ -20,7 +20,7 @@ export function AppHeaderProvider() {
         <nav className="appheader" data-tauri-drag-region>
             <LinkButton
                 screen="settings"
-                iconLeft={<SlidersIcon />}
+                iconLeft={<SlidersIcon weight="duotone" />}
                 className="settings-nav-button icon-only"
                 outline
                 stack="settings"

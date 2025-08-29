@@ -1,11 +1,10 @@
 import clsx from "clsx"
 import React from "react"
-
+import { AppHeader } from "@/ui/components/AppHeader"
 import { Button } from "@/ui/components/Button"
 import { CaretDownIcon, HashIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 
-import { AppHeader } from "../AppHeader"
 import { DatePicker } from "./DatePicker"
 import { SearchBar } from "./Searchbar"
 import { ShortDayPicker } from "./ShortDayPicker"
@@ -21,7 +20,13 @@ export function MemoListFilter() {
 
     return (
         <div className="memo-list-filter">
-            <AppHeader position="right" id="memo-list-filter-search">
+            <AppHeader position="centre" id="memo-list-filter-search-desktop">
+                <div className="hidden tablet:block">
+                    <SearchBar />
+                </div>
+            </AppHeader>
+
+            <AppHeader position="right" id="memo-list-filter-search-mobile">
                 <SearchBar className="collapsible" />
                 <Button
                     iconRight=<HashIcon />
@@ -58,10 +63,6 @@ export function MemoListFilter() {
                     size="sm"
                     onPress={() => datepicker.setExpanded(!datepicker.expanded)}
                 />
-            </div>
-
-            <div className="hidden tablet:block">
-                <SearchBar />
             </div>
 
             <TagTreeFilter />

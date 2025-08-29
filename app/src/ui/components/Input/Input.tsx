@@ -12,7 +12,6 @@ export interface InputProps {
     descriptionClassName?: string
     iconClassName?: string
     messageClassName?: string
-    size?: "sm" | "md"
 
     label?: string
     ariaLabel?: string
@@ -38,7 +37,6 @@ export interface InputProps {
 }
 
 export function Input(props: InputProps) {
-    let size = props.size ?? "md"
     let autocomplete = props.autoComplete ?? "disabled"
 
     return (
@@ -66,9 +64,7 @@ export function Input(props: InputProps) {
                         className={clsx(
                             "input",
                             {
-                                "pl-8": props.icon,
-                                "py-2 px-2": size === "md",
-                                "py-1 px-1": size === "sm",
+                                "has-icon": props.icon,
                             },
                             props.inputClassName,
                         )}

@@ -7,7 +7,6 @@ import { useCurrentPage } from "@/ui/navigation"
 import { ErrorScreen } from "@/ui/screens/ErrorScreen"
 import { InitSetupScreen } from "@/ui/screens/InitSetupScreen/InitSetupScreen"
 import { MainScreen } from "@/ui/screens/MainScreen"
-import { NewMemoScreen } from "@/ui/screens/NewMemoScreen"
 import { SettingsScreen } from "@/ui/screens/SettingsScreen"
 import { UnlockScreen } from "@/ui/screens/UnlockScreen/UnlockScreen"
 import { useTheme } from "@/ui/settings"
@@ -55,17 +54,18 @@ export function AppShell() {
                 case "root":
                 case "memo.view":
                 case "memo.edit":
+                case "memo.new":
                     return [
                         <Suspense key="main-screen-suspense">
                             <MainScreen key="main-screen" activeScreen={currentPage.name} />
                         </Suspense>,
                     ]
-                case "memo.new":
-                    return [
-                        <Suspense key="main-screen-suspense">
-                            <NewMemoScreen key="main-screen" />
-                        </Suspense>,
-                    ]
+                // case "memo.new":
+                //     return [
+                //         <Suspense key="main-screen-suspense">
+                //             <NewMemoScreen key="main-screen" />
+                //         </Suspense>,
+                //     ]
                 case "settings":
                     return [
                         ...(prevPageComp ?? []),

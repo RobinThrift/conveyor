@@ -7,16 +7,20 @@
 }
 
 .input {
-    @apply text-text;
+    @apply text-text py-1 px-1;
     width: 100%;
 
     &[data-invalid] {
         @apply border-danger focus:ring-danger;
     }
+
+    &.has-icon {
+        @apply pl-8;
+    }
 }
 
 .input-field .icon {
-    @apply text-subtle-extra-dark absolute inset-y-0 left-0 flex items-center p-1 pl-2;
+    @apply text-subtle absolute inset-y-0 left-0 flex items-center p-1 pl-2;
 }
 
 .input-field:has(input[data-invalid]) .icon {

@@ -1,28 +1,37 @@
 .edit-memo-screen {
-    @apply h-fit w-full p-2 lg:p-4 flex justify-center relative;
-    container: single-memo-screen / inline-size;
-    margin-top: calc(env(safe-area-inset-top, 0) - var(--appheader-height));
-    max-width: none;
+    @apply w-full p-2 lg:p-4 flex justify-center relative;
+    margin-top: env(safe-area-inset-top, 0);
+
+    min-height: calc(
+        100svh -
+        (env(safe-area-inset-bottom, 0) + var(--spacing) * 4)
+    );
+
+    @media (min-width: 768px) {
+        min-height: calc(100svh - var(--appheader-height, 0));
+    }
 
     &.is-subscreen {
         @apply p-0;
+    }
 
-        @media (min-width: 768px) {
-            @apply ms-2;
-            margin-top: calc(var(--appheader-height) * -1 + var(--spacing) * 2);
+    .memo.is-editing {
+        padding: 0 !important;
+        width: 100%;
+    }
+
+    --editor-width: 120rem;
+
+    .editor {
+        @apply flex items-center;
+        min-height: calc(100% - (var(--spacing)));
+
+        .text-editor {
+            @apply flex-1 p-2 tablet:p-4;
         }
-    }
 
-    .memo {
-        @apply max-w-[80rem] w-full;
-        overflow: visible;
-        min-height: calc(
-            100dvh -
-            (env(safe-area-inset-bottom, 0) + var(--spacing) * 4)
-        );
-    }
-
-    .memo .editor {
-        min-height: 100%;
+        .cm-editor {
+            height: 100%;
+        }
     }
 }

@@ -70,7 +70,7 @@
 }
 
 .settings-tab-list-item {
-    @apply flex items-center gap-2 cursor-pointer py-1 px-1 rounded border-b-3 border-transparent min-w-fit;
+    @apply flex items-center gap-2 cursor-pointer py-1 px-1 border-b-3 border-transparent min-w-fit;
     @apply xs:px-3 xs:border-0 xs:rounded-lg;
 
     &:hover {
@@ -245,9 +245,11 @@
 @keyframes theme-mode-transition {
     0% {
         clip-path: circle(0%);
+        opacity: 0;
     }
 
     100% {
         clip-path: circle(100%);
+        opacity: 1;
     }
 }

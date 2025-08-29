@@ -2,7 +2,7 @@
     --font-monospace: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
     --editor-font-size: 16px;
 
-    --color-body-bg: oklch(0.9881 0 0);
+    --color-body-bg: oklch(1 0 0);
     --color-body-bg-contrast: oklch(
         0.16270890479030045 0.010526898777742726 294.36951261965186
     );
@@ -10,9 +10,9 @@
         0.33376242597354233 0.03149811465277374 287.10370894961204
     );
 
-    --color-surface-level-1: oklch(1.0000000000000002 0 none);
-    --color-surface-level-2: oklch(0.9611513666441094 0 none);
-    --color-surface-border: oklch(0.9430889073732058 0 none);
+    --color-surface-level-1: oklch(0.9821 0 0);
+    --color-surface-level-2: oklch(1 0 0);
+    --color-surface-border: oklch(0.9461 0 0);
 
     --color-modal-overlay-bg: oklch(
         0.3493298443199242 0.027958668146576125 279.2651679991495
