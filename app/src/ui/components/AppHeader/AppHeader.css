@@ -3,11 +3,16 @@
 }
 
 .appheader {
-    @apply flex items-center gap-2 tablet:gap-4 p-2 tablet:fixed;
+    @apply flex items-center gap-2 tablet:gap-4 p-2 pt-0 tablet:fixed;
 
     z-index: 1000;
 
-    padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
+    margin-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
+
+    @media (min-width: 768px) {
+        margin-top: 0;
+        padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
+    }
 
     -webkit-app-region: drag;
     height: max(
@@ -31,7 +36,7 @@
 }
 
 .appheader .settings-nav-button {
-    @apply relative z-[1000] px-1! py-0! text-lg size-8.5;
+    @apply relative z-[1000] px-1! py-0! text-lg size-10 tablet:size-8.5;
 
     svg {
         @apply size-4;

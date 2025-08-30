@@ -223,7 +223,7 @@ function useOffCanvasDragging({
             }
 
             let rect = ref.current.getBoundingClientRect()
-            startingOffsetX.current = e.nativeEvent.offsetX
+            startingOffsetX.current = e.clientX
             width.current = rect.width
             animation.current = ref.current.animate(
                 [

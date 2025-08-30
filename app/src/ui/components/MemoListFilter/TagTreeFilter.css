@@ -12,21 +12,21 @@
     right: 0;
     top: 0;
     bottom: 0;
-    width: 90svw;
+    width: 80svw;
     z-index: 10000;
     transition: right 250ms;
 
     &[data-is-closing="true"] {
-        right: -90svw;
+        right: -80svw;
     }
 
     .tag-tree {
-        @apply px-2;
+        @apply px-0;
     }
 
     @starting-style {
         /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
-        right: -90svw;
+        right: -80svw;
     }
 }
 
@@ -51,9 +51,9 @@
 
 .tag-tree-filter-sidebar-drag-handle {
     position: fixed;
-    left: 10svw;
+    left: 15svw;
     top: 0;
-    width: 10svw;
+    width: 15svw;
     height: 100%;
     z-index: 10000;
     touch-action: none;

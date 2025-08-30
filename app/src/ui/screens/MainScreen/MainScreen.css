@@ -52,6 +52,7 @@
         order: 2;
 
         @media (min-width: 1024px) {
+            @apply pt-2;
             order: 1;
             padding-left: calc(var(--sidebar-width) + var(--spacing) * 4);
             margin-top: var(--appheader-height);
@@ -62,7 +63,6 @@
         }
 
         @media (min-width: 1680px) {
-            @apply pt-0;
             order: 1;
             margin-right: 0;
             margin-left: 0;

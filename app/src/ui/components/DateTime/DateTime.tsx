@@ -51,7 +51,7 @@ export const DateTime = React.memo(function DateTime({
     }
 
     return (
-        <time {...intrinsics} dateTime={JSON.stringify(date)} ref={ref}>
+        <time {...intrinsics} dateTime={JSON.stringify(date).replaceAll(`"`, "")} ref={ref}>
             {formatted}
         </time>
     )
@@ -62,8 +62,9 @@ const RelativeDateTime = React.memo(function RelativeDateTime({
     opts,
     absolute,
     ref,
+    buttonClassName,
     ...intrinsics
-}: Omit<DateTimeProps, "relative"> & { absolute: string }) {
+}: Omit<DateTimeProps, "relative"> & { absolute: string; buttonClassName?: string }) {
     let t = useT("components/DateTime")
     let { formatRelative } = useFormat()
 
@@ -83,15 +84,24 @@ const RelativeDateTime = React.memo(function RelativeDateTime({
         }
     }, [date, absolute, showAbsolute, formatRelative, opts, t.datetime, t.invalidTime])
 
+    if (formatted === absolute) {
+        return (
+            <time {...intrinsics} dateTime={JSON.stringify(date)} ref={ref}>
+                {formatted}
+            </time>
+        )
+    }
+
     return (
         <Tooltip content={showAbsolute ? t.ShowRelativeDateTooltip : t.ShowAbsoluteDateTooltip}>
             <AriaButton
                 type="button"
+                className={buttonClassName}
                 onChange={() => setShowAbsolute(!showAbsolute)}
                 aria-label={showAbsolute ? t.ShowRelativeDateTooltip : t.ShowAbsoluteDateTooltip}
                 isSelected={showAbsolute}
             >
-                <time {...intrinsics} dateTime={JSON.stringify(date)} ref={ref}>
+                <time {...intrinsics} dateTime={JSON.stringify(date).replaceAll(`"`, "")} ref={ref}>
                     {formatted}
                 </time>
             </AriaButton>

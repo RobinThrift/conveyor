@@ -42,7 +42,7 @@
     @apply flex flex-wrap items-baseline mb-2 gap-x-2 gap-y-0 px-1;
 
     h1 {
-        @apply flex-1 font-semibold text-3xl;
+        @apply flex-1 font-semibold text-3xl mb-2;
 
         time {
             font-size: inherit;
@@ -67,17 +67,13 @@
         }
     }
 
-    .memo-date {
-        @apply block w-full;
-    }
-
     a:hover {
         @apply underline;
     }
 }
 
 .memo-header-actions {
-    @apply flex flex-row-reverse w-full justify-between items-center;
+    @apply flex flex-row-reverse w-full justify-between items-center h-10;
 }
 
 .memo-actions {
@@ -85,14 +81,22 @@
     height: 1lh;
 }
 
-.memo-date time {
-    @apply flex items-center w-fit text-subtle-dark italic text-xs @sm:text-sm;
+.memo-header .memo-date {
+    @apply w-full flex items-center;
 
-    &.sm {
-        @apply @md:hidden col-span-3;
+    button {
+        display: contents;
     }
 
-    &.md {
-        @apply hidden @md:flex order-3 w-full;
+    time {
+        @apply w-fit text-subtle-dark italic text-xs @sm:text-sm;
+
+        &.sm {
+            @apply @md:hidden col-span-3;
+        }
+
+        &.md {
+            @apply hidden @md:flex order-3 w-full;
+        }
     }
 }
