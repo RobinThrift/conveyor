@@ -133,6 +133,14 @@
     @apply dark:border-subtle-extra-dark;
 }
 
+[data-design="default"] .memo-list-filter-search .input {
+    @apply bg-surface-level-1/50;
+
+    &:focus {
+        @apply bg-surface-level-1;
+    }
+}
+
 [data-design="default"] .memo-list-filter-search.collapsible {
     .input-field .input {
         @apply bg-body;
