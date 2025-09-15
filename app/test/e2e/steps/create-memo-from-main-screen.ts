@@ -4,7 +4,13 @@ export async function createMemoFromMainScreen({
     content,
     checks,
     page,
-}: { content: string; checks: RegExp[]; page: Page }) {
+}: {
+    content: string
+    checks: RegExp[]
+    page: Page
+}) {
+    await page.getByRole("navigation").getByText("New memo").click()
+
     await page.locator(".text-editor").click()
     await page.getByLabel("Text formatting").isVisible()
     await page.getByTestId("texteditor").getByRole("textbox").fill(content)
