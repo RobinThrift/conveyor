@@ -32,12 +32,12 @@
         @media (min-width: 1024px) {
             order: 2;
             margin-left: calc(var(--sidebar-width) + var(--spacing) * 6);
+            margin-top: var(--appheader-height);
         }
 
         @media (min-width: 1680px) {
             order: 2;
             margin-left: calc(var(--sidebar-width) * 2);
-            margin-top: var(--appheader-height);
         }
     }
 }
