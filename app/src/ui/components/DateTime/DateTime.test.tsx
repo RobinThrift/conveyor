@@ -21,12 +21,8 @@ suite("ui/components/DateTime", () => {
 
         await rendered.getByRole("button").click()
 
-        await expect
-            .element(rendered.getByRole("button"))
-            .toHaveTextContent(new RegExp(`${datetime.day}`))
+        await expect.element(rendered.baseElement).toHaveTextContent(new RegExp(`${datetime.day}`))
 
-        await expect
-            .element(rendered.getByRole("button"))
-            .toHaveTextContent(new RegExp(`${datetime.year}`))
+        await expect.element(rendered.baseElement).toHaveTextContent(new RegExp(`${datetime.year}`))
     })
 })
