@@ -5,59 +5,89 @@ import {
     type ListMemosQuery as MemoListFilter,
 } from "@/domain/Memo"
 import { isEqual } from "@/lib/isEqual"
-import type { NavgationState, NavigationBackend, OnPop, OnPush } from "@/lib/navigation"
+import type {
+    InferParams,
+    InferStacks,
+    NavgationState,
+    NavigationBackend,
+    OnPop,
+    OnPush,
+    ScreenToStackMapping,
+} from "@/lib/navigation"
 
 export type Screens = {
     root: {
-        filter?: MemoListFilter
+        stack: "default"
+        params: {
+            filter?: MemoListFilter
+        }
     }
     "memo.view": {
-        memoID?: MemoID
-        filter?: MemoListFilter
+        stack: "single-memo"
+        params: {
+            memoID?: MemoID
+            filter?: MemoListFilter
+        }
     }
     "memo.edit": {
-        memoID?: MemoID
-        filter?: MemoListFilter
-        isEditing?: boolean
-        editPosition?: { x: number; y: number; snippet?: string }
+        stack: "edit-memo"
+        params: {
+            memoID?: MemoID
+            filter?: MemoListFilter
+            isEditing?: boolean
+            editPosition?: { x: number; y: number; snippet?: string }
+        }
     }
-    "memo.new": never
+    "memo.new": {
+        stack: "new-memo"
+        // biome-ignore lint/complexity/noBannedTypes: this is intentional to prevent params from being undefined
+        params: {}
+    }
     settings: {
-        tab?: string
+        stack: "settings"
+        params: {
+            tab?: string
+        }
     }
-    unlock: never
-    setup: never
+    unlock: {
+        stack: "default"
+        // biome-ignore lint/complexity/noBannedTypes: this is intentional to prevent params from being undefined
+        params: {}
+    }
+    setup: {
+        stack: "default"
+        // biome-ignore lint/complexity/noBannedTypes: this is intentional to prevent params from being undefined
+        params: {}
+    }
 }
 
-export type Params = Screens[keyof Screens]
+export type Params = InferParams<Screens>
 
-export type Stacks = "default" | "settings" | "single-memo" | "edit-memo"
+export type Stacks = InferStacks<Screens>
 
 export type Restore = {
     scrollOffsetTop: number
 }
 
 export class NavigationController {
-    private _backend: NavigationBackend<Screens, Stacks, Restore>
-    private _onPush?: OnPush<Screens, Stacks, Restore>
-    private _onPop?: OnPop<Screens, Stacks, Restore>
+    private _backend: NavigationBackend<Screens, Restore>
+    private _onPush?: OnPush<Screens, Restore>
+    private _onPop?: OnPop<Screens, Restore>
 
-    private _currentState: NavgationState<Screens, Stacks, Restore> = {
-        screen: {
-            name: "root",
-            params: {},
-        },
+    private _currentState: NavgationState<Screens, Restore> = {
+        screen: "root",
+        params: {},
         stack: "default",
         index: 0,
         restore: { scrollOffsetTop: 0 },
     }
 
-    private _lastState?: NavgationState<Screens, Stacks, Restore> = undefined
+    private _lastState?: NavgationState<Screens, Restore> = undefined
 
     constructor({
         backend,
     }: {
-        backend: NavigationBackend<Screens, Stacks, Restore>
+        backend: NavigationBackend<Screens, Restore>
     }) {
         this._backend = backend
 
@@ -72,40 +102,30 @@ export class NavigationController {
         })
     }
 
-    public init(): NavgationState<Screens, Stacks, Restore> {
+    public init(): NavgationState<Screens, Restore> {
         this._currentState = this._backend.init(this._currentState)
         return this._currentState
     }
 
-    public updateParams<S extends keyof Screens>(params: Partial<Screens[S]>) {
+    public updateParams<S extends keyof Screens>(params: Partial<Params[S]>) {
         this.push({
             ...this._currentState,
-            screen: {
-                ...this._currentState.screen,
-                params: {
-                    ...this._currentState.screen.params,
-                    ...params,
-                },
+            params: {
+                ...this._currentState.params,
+                ...params,
             },
         })
     }
 
-    public push(
-        next: Omit<NavgationState<Screens, Stacks, Restore>, "stack" | "index"> & {
-            stack?: Stacks
-        },
-    ) {
-        if (isEqual(next.screen, this._currentState.screen)) {
+    public push(next: Omit<NavgationState<Screens, Restore>, "stack" | "index">) {
+        if (
+            this._currentState.screen === next.screen &&
+            isEqual(next.params, this._currentState.params)
+        ) {
             return
         }
 
-        let stack = next.stack ?? this._currentState.stack
-
-        let nextState = this._backend.push({
-            ...next,
-            index: stack === this._currentState.stack ? this._currentState.index + 1 : 0,
-            stack,
-        })
+        let nextState = this._backend.push(next)
         let current = this._currentState
         requestAnimationFrame(() => {
             this._onPush?.(nextState, current)
@@ -124,18 +144,27 @@ export class NavigationController {
         if (this._currentState.stack === "default") {
             return
         }
+        if (this._backend.length <= 1) {
+            this.push({
+                screen: "root",
+                params: {},
+                restore: { scrollOffsetTop: 0 },
+            })
+            return
+        }
+
         this._lastState = this._currentState
         let next = await this._backend.pop(this._currentState.index + 1)
         this._currentState = { ...next }
     }
 
-    addEventListener(event: "pop", handler: OnPop<Screens, Stacks, Restore>): void
-    addEventListener(event: "push", handler: OnPush<Screens, Stacks, Restore>): void
+    addEventListener(event: "pop", handler: OnPop<Screens, Restore>): void
+    addEventListener(event: "push", handler: OnPush<Screens, Restore>): void
     addEventListener(
         event: "pop" | "push",
         handler: (
-            next: NavgationState<Screens, Stacks, Restore>,
-            prev?: NavgationState<Screens, Stacks, Restore>,
+            next: NavgationState<Screens, Restore>,
+            prev?: NavgationState<Screens, Restore>,
         ) => void,
     ) {
         switch (event) {
@@ -150,42 +179,15 @@ export class NavigationController {
         }
     }
 
-    static fromURLParams(urlParams: URLSearchParams): Params {
-        let params: Params = {
-            filter: filterFromSearchParams(urlParams),
+    static toURLParams(params: Params[keyof Screens]): URLSearchParams {
+        let urlParams = new URLSearchParams()
+
+        if (!params) {
+            return urlParams
         }
 
-        let memoID = urlParams.get("memo")
-        if (memoID) {
-            ;(params as Screens["memo.view"]).memoID = memoID
-        }
-
-        let isEditing = urlParams.get("isEditing") === "true"
-        if (isEditing) {
-            ;(params as Screens["memo.edit"]).isEditing = isEditing
-        }
-
-        let editPosition = urlParams.get("editPosition")
-        if (editPosition) {
-            ;(params as Screens["memo.edit"]).isEditing = JSON.parse(
-                decodeURIComponent(editPosition),
-            )
-        }
-
-        let tab = urlParams.get("tab")
-        if (tab) {
-            ;(params as Screens["settings"]).tab = tab
-        }
-
-        return params
-    }
-
-    static toURLParams(params: Params): URLSearchParams {
-        let urlParams: URLSearchParams
         if ("filter" in params) {
             urlParams = filterToSearchParams(params.filter ?? {})
-        } else {
-            urlParams = new URLSearchParams()
         }
 
         if ("memoID" in params && params.memoID) {
@@ -217,29 +219,89 @@ export class NavigationController {
         root: "/",
     }
 
-    public static urlToScreenMapping = (url: URL): keyof Screens | undefined => {
+    public static screenToStackMapping: ScreenToStackMapping<Screens> = {
+        "memo.edit": "edit-memo",
+        "memo.view": "single-memo",
+        "memo.new": "new-memo",
+        settings: "settings",
+        unlock: "default",
+        setup: "default",
+        root: "default",
+    }
+
+    public static urlToScreenMapping = <S extends keyof Screens>(
+        url: URL,
+    ): { screen: S; params: Params[S]; stack: Screens[S]["stack"] } | undefined => {
         switch (url.pathname) {
             case "/memos/new":
-                return "memo.new"
+                return {
+                    screen: "memo.new" as S,
+                    stack: "single-memo",
+                    params: fromURLParams<S>(url.searchParams),
+                }
             case "/settings":
-                return "settings"
+                return {
+                    screen: "settings" as S,
+                    stack: "settings",
+                    params: fromURLParams<S>(url.searchParams),
+                }
             case "/setup":
-                return "setup"
+                return { screen: "setup" as S, stack: "default", params: {} }
             case "/unlock":
-                return "unlock"
+                return { screen: "unlock" as S, stack: "default", params: {} }
         }
 
         let hasMemo = url.searchParams.has("memo") && url.searchParams.get("memo")?.length !== 0
         let hasIsEditing = url.searchParams.get("isEditing") === "true"
 
         if (hasMemo && hasIsEditing) {
-            return "memo.edit"
+            return {
+                screen: "memo.edit" as S,
+                stack: "single-memo",
+                params: fromURLParams<S>(url.searchParams),
+            }
         }
 
         if (hasMemo) {
-            return "memo.view"
+            return {
+                screen: "memo.view" as S,
+                stack: "single-memo",
+                params: fromURLParams<S>(url.searchParams),
+            }
         }
 
-        return "root"
+        return {
+            screen: "root" as S,
+            stack: "default",
+            params: fromURLParams<S>(url.searchParams),
+        }
     }
+}
+
+function fromURLParams<S extends keyof Screens>(urlParams: URLSearchParams): Params[S] {
+    let params = {
+        filter: filterFromSearchParams(urlParams),
+    } as Params[S]
+
+    let memoID = urlParams.get("memo")
+    if (memoID) {
+        ;(params as Params["memo.view"]).memoID = memoID
+    }
+
+    let isEditing = urlParams.get("isEditing") === "true"
+    if (isEditing) {
+        ;(params as Params["memo.edit"]).isEditing = isEditing
+    }
+
+    let editPosition = urlParams.get("editPosition")
+    if (editPosition) {
+        ;(params as Params["memo.edit"]).isEditing = JSON.parse(decodeURIComponent(editPosition))
+    }
+
+    let tab = urlParams.get("tab")
+    if (tab) {
+        ;(params as Params["settings"]).tab = tab
+    }
+
+    return params
 }

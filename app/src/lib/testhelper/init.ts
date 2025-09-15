@@ -4,7 +4,6 @@ import {
     type Params,
     type Restore,
     type Screens,
-    type Stacks,
 } from "@/control/NavigationController"
 import type { Attachment } from "@/domain/Attachment"
 import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
@@ -31,11 +30,11 @@ export async function init({ generateMockData, mockAttachments }: InitOpts) {
     }
 
     let navCtrl = new NavigationController({
-        backend: new HistoryNavigationBackend<Screens, Stacks, Params, Restore>({
-            fromURLParams: NavigationController.fromURLParams,
+        backend: new HistoryNavigationBackend<Screens, Params, Restore>({
             toURLParams: NavigationController.toURLParams,
             screenToURLMapping: NavigationController.screenToURLMapping,
             urlToScreenMapping: NavigationController.urlToScreenMapping,
+            screenToStackMapping: NavigationController.screenToStackMapping,
         }),
     })
 

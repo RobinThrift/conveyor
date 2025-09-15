@@ -1,3 +1,4 @@
+import { NavigationController } from "@/control/NavigationController"
 import { setEnv } from "@/env"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { IndexedDBKVStoreContainer } from "@/external/browser/IndexDBKVStore"
@@ -8,7 +9,6 @@ import { BaseContext } from "@/lib/context"
 import { type DeviceSecureStorage, NoopDeviceSecureStorage } from "@/lib/DeviceSecureStorage"
 import { RemoteNavigationBackend } from "@/lib/navigation"
 import { toPromise } from "@/lib/result"
-
 import type { KVStores, PlatformDependencies, PlatformInitArgs } from "./types"
 
 export async function init({ fs, db }: PlatformInitArgs): Promise<PlatformDependencies> {
@@ -47,7 +47,10 @@ export async function init({ fs, db }: PlatformInitArgs): Promise<PlatformDepend
         crypto: new AgeCrypto(),
         keyValueContainer: indexedDBKVStoreContainer,
         deviceSecureStorage,
-        navigationBackend: new RemoteNavigationBackend(self.postMessage.bind(self)),
+        navigationBackend: new RemoteNavigationBackend(
+            self.postMessage.bind(self),
+            NavigationController.screenToStackMapping,
+        ),
     }
 }
 

@@ -51,7 +51,7 @@ export function useEditMemoScreenState() {
         let memoID = memo?.id
         nav.popStack().then(() => {
             if (memoID) {
-                nav.push("memo.view", { memoID }, { scrollOffsetTop: 0 }, "single-memo")
+                nav.push("memo.view", { memoID }, { scrollOffsetTop: 0 })
             }
         })
     }, [nav.popStack, nav.push, memo?.id])

@@ -1,4 +1,4 @@
-import type { Restore, Screens, Stacks } from "@/control/NavigationController"
+import type { Restore, Screens } from "@/control/NavigationController"
 import type { Context } from "@/lib/context"
 import type { Crypto } from "@/lib/crypto"
 import type { DeviceSecureStorage } from "@/lib/DeviceSecureStorage"
@@ -26,7 +26,7 @@ export interface PlatformDependencies {
     crypto: Crypto
     keyValueContainer: KVStoreContainer<KVStores>
     deviceSecureStorage: DeviceSecureStorage
-    navigationBackend: NavigationBackend<Screens, Stacks, Restore>
+    navigationBackend: NavigationBackend<Screens, Restore>
 }
 
 export type InitPlatform = (args: PlatformInitArgs) => Promise<PlatformDependencies>

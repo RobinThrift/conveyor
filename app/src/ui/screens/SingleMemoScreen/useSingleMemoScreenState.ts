@@ -27,7 +27,6 @@ export function useSingleMemoScreenState() {
                             window.visualViewport?.pageTop ?? window.scrollY,
                         ),
                     },
-                    "edit-memo",
                 )
             },
             archive: actions.memos.single.updateMemoArchiveStatus,

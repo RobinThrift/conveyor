@@ -11,22 +11,17 @@ import { batch, createActions, createEffect, createStore } from "@/lib/store"
 import * as memos from "./memos"
 import * as single from "./single"
 
-export const currentPage = createStore<NavgationState<Screens, Stacks, Restore>>(
-    "navigation/currentPage",
-    {
-        screen: {
-            name: "root",
-            params: {},
-        },
-        stack: "default",
-        index: 0,
-        restore: {
-            scrollOffsetTop: 0,
-        },
+export const currentPage = createStore<NavgationState<Screens, Restore>>("navigation/currentPage", {
+    screen: "root",
+    params: {},
+    stack: "default",
+    index: 0,
+    restore: {
+        scrollOffsetTop: 0,
     },
-)
+})
 
-export const prevPage = createStore<NavgationState<Screens, Stacks, Restore> | undefined>(
+export const prevPage = createStore<NavgationState<Screens, Restore> | undefined>(
     "navigation/prevPage",
     undefined,
 )
@@ -35,10 +30,8 @@ const updateFiltersLock = createStore("navigation/updateFiltersLock", false)
 
 export const actions = createActions({
     init: (page: {
-        screen: {
-            name: keyof Screens
-            params: Params
-        }
+        screen: keyof Screens
+        params: Params[keyof Screens]
         restore: Partial<Restore>
         stack?: Stacks
         index?: number
@@ -46,6 +39,7 @@ export const actions = createActions({
         batch(() => {
             currentPage.setState((prev) => ({
                 screen: page.screen,
+                params: page.params,
                 index: page.index ?? prev.index,
                 stack: page.stack ?? prev.stack,
                 restore: page.restore ?? prev.restore,
@@ -53,30 +47,27 @@ export const actions = createActions({
             prevPage.setState(undefined)
 
             let screen = page.screen
+            let params = page.params
             if (
-                (screen.name === "root" ||
-                    screen.name === "memo.view" ||
-                    screen.name === "memo.edit") &&
-                "filter" in screen.params &&
-                screen.params.filter
+                (screen === "root" || screen === "memo.view" || screen === "memo.edit") &&
+                "filter" in params &&
+                params.filter
             ) {
-                memos.actions.setFilter(screen.params.filter, true)
+                memos.actions.setFilter(params.filter)
             }
 
             if (
-                (screen.name === "root" ||
-                    screen.name === "memo.view" ||
-                    screen.name === "memo.edit") &&
-                "memoID" in screen.params &&
-                screen.params.memoID
+                (screen === "root" || screen === "memo.view" || screen === "memo.edit") &&
+                "memoID" in params &&
+                params.memoID
             ) {
-                single.actions.setSingleID(screen.params.memoID)
+                single.actions.setSingleID(params.memoID)
             }
         })
     },
     setPage: (page: {
         name: keyof Screens
-        params: Params
+        params: Params[keyof Screens]
         restore: Partial<Restore>
         stack?: Stacks
         index?: number
@@ -85,10 +76,8 @@ export const actions = createActions({
             prevPage.setState(currentPage.state)
 
             currentPage.setState((prev) => ({
-                screen: {
-                    name: page.name,
-                    params: page.params,
-                },
+                screen: page.name,
+                params: page.params,
                 index: page.index ?? prev.index,
                 stack: page.stack ?? prev.stack,
                 restore: page.restore,
@@ -99,7 +88,7 @@ export const actions = createActions({
                 "filter" in page.params &&
                 page.params.filter
             ) {
-                memos.actions.setFilter(page.params.filter, true)
+                memos.actions.setFilter(page.params.filter)
             }
 
             if (
@@ -114,11 +103,11 @@ export const actions = createActions({
 })
 
 export const selectors = {
-    currentName: (state: typeof currentPage.state) => state.screen.name,
-    currentParams: (state: typeof currentPage.state) => state.screen.params,
+    currentName: (state: typeof currentPage.state) => state.screen,
+    currentParams: (state: typeof currentPage.state) => state.params,
     currentRestore: (state: typeof currentPage.state) => state.restore,
-    prevName: (state: typeof prevPage.state) => state?.screen.name,
-    prevParams: (state: typeof prevPage.state) => state?.screen.params,
+    prevName: (state: typeof prevPage.state) => state?.screen,
+    prevParams: (state: typeof prevPage.state) => state?.params,
     prevRestore: (state: typeof prevPage.state) => state?.restore,
 }
 
@@ -156,8 +145,8 @@ export function registerEffects(navCtrl: NavigationController) {
 
     navCtrl.addEventListener("pop", (current) => {
         actions.setPage({
-            name: current.screen.name,
-            params: current.screen.params,
+            name: current.screen,
+            params: current.params,
             restore: current.restore,
         })
 
@@ -179,8 +168,8 @@ export function registerEffects(navCtrl: NavigationController) {
 
     navCtrl.addEventListener("push", (current) => {
         actions.setPage({
-            name: current.screen.name,
-            params: current.screen.params,
+            name: current.screen,
+            params: current.params,
             restore: current.restore,
         })
 

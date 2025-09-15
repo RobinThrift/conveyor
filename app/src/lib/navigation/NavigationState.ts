@@ -1,16 +1,13 @@
-export type Screens = Record<string, Record<string, unknown>>
+import type { Screens } from "./Screens"
 
 export type NavgationState<
     S extends Screens,
-    Stacks extends string,
     Restore extends Record<string, unknown>,
     Name extends keyof S = keyof S,
 > = {
-    screen: {
-        name: Name
-        params: S[Name]
-    }
+    screen: Name
+    params: S[Name]["params"]
     index: number
-    stack: Stacks
+    stack: S[Name]["stack"]
     restore: Partial<Restore>
 }

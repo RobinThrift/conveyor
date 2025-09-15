@@ -32,9 +32,11 @@ export const actions = createActions({
         status.setState("page-requested")
     },
 
-    setFilter: (newFilter: Partial<ListMemosQuery>, reset = false) => {
+    setFilter: (newFilter: Partial<ListMemosQuery>) => {
         let next = { ...filter.state, ...newFilter }
-        if (isEqual(filter.state, next)) {
+        if (Object.getOwnPropertyNames(newFilter).length === 0) {
+            next = newFilter
+        } else if (isEqual(filter.state, next)) {
             return
         }
 
@@ -42,11 +44,7 @@ export const actions = createActions({
             memos.setState([])
             nextPage.setState(undefined)
             filter.setState(next)
-            if (reset) {
-                status.setState(undefined)
-            } else {
-                status.setState("page-requested")
-            }
+            status.setState("page-requested")
         })
     },
 
@@ -173,6 +171,7 @@ export function registerEffects(backend: BackendClient) {
 
     createEffect("memos/load", {
         fn: async (baseCtx: Context, { batch }) => {
+            console.log("memos/load", { ...filter.state })
             batch(() => _actions.setIsLoading())
 
             loadAbortCntrl?.abort(new NewerMemosLoadRequestError())
@@ -248,10 +247,10 @@ if (import.meta.hot) {
             return
         }
 
-        newModule.list.setState(memos.state)
-        newModule.listState.setState(status.state)
-        newModule.listError.setState(error.state)
-        newModule.listFilter.setState(filter.state)
+        newModule.memos.setState(memos.state)
+        newModule.status.setState(status.state)
+        newModule.error.setState(error.state)
+        newModule.filter.setState(filter.state)
         newModule.isOutdated.setState(isOutdated.state)
     })
 }

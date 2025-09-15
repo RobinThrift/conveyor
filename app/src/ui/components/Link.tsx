@@ -1,39 +1,30 @@
 import clsx from "clsx"
 import React, { useCallback } from "react"
 
-import type { Screens, Stacks } from "@/control/NavigationController"
+import type { Params, Screens } from "@/control/NavigationController"
 import type { ButtonProps } from "@/ui/components/Button"
 import { useNavigation } from "@/ui/navigation"
 
 export function Link<S extends keyof Screens>({
     screen,
     params,
-    stack,
     ...props
 }: React.AnchorHTMLAttributes<any> & {
     ref?: React.Ref<HTMLAnchorElement>
     screen?: S
-    params?: Screens[S]
-    stack?: Stacks
+    params?: Params[S]
 }) {
     let { push } = useNavigation()
     let onClick = useCallback(
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             if (screen) {
                 e.preventDefault()
-                push(
-                    screen,
-                    params || {},
-                    {
-                        scrollOffsetTop: Math.ceil(
-                            window.visualViewport?.pageTop ?? window.scrollY,
-                        ),
-                    },
-                    stack,
-                )
+                push(screen, params || {}, {
+                    scrollOffsetTop: Math.ceil(window.visualViewport?.pageTop ?? window.scrollY),
+                })
             }
         },
-        [screen, params, stack, push],
+        [screen, params, push],
     )
 
     return (
@@ -52,8 +43,7 @@ export interface LinkButtonProps<S extends keyof Screens> extends React.AnchorHT
     plain?: boolean
     href?: string
     screen?: S
-    params?: Screens[S]
-    stack?: Stacks
+    params?: Params[S]
 }
 
 export function LinkButton<S extends keyof Screens>({
@@ -63,7 +53,6 @@ export function LinkButton<S extends keyof Screens>({
     variant = "regular",
     screen,
     params,
-    stack,
     ...props
 }: LinkButtonProps<S>) {
     let { push } = useNavigation()
@@ -72,21 +61,14 @@ export function LinkButton<S extends keyof Screens>({
             if (screen) {
                 e.preventDefault()
                 performance.mark("start-nav")
-                push(
-                    screen,
-                    params || {},
-                    {
-                        scrollOffsetTop: Math.ceil(
-                            window.visualViewport?.pageTop ?? window.scrollY,
-                        ),
-                    },
-                    stack,
-                )
+                push(screen, params || {}, {
+                    scrollOffsetTop: Math.ceil(window.visualViewport?.pageTop ?? window.scrollY),
+                })
                 performance.mark("end-nav")
                 performance.measure("start-nav", "end-nav")
             }
         },
-        [screen, params, push, stack],
+        [screen, params, push],
     )
 
     let { outline, plain, children, ...aProps } = props

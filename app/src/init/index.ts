@@ -4,7 +4,6 @@ import {
     type Params,
     type Restore,
     type Screens,
-    type Stacks,
 } from "@/control/NavigationController"
 import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
 import * as stores from "@/ui/stores"
@@ -22,11 +21,11 @@ export async function init({
     let backend = new BackendClient()
 
     let navCtrl = initNavigation({
-        navigationBackend: new HistoryNavigationBackend<Screens, Stacks, Params, Restore>({
-            fromURLParams: NavigationController.fromURLParams,
+        navigationBackend: new HistoryNavigationBackend<Screens, Params, Restore>({
             toURLParams: NavigationController.toURLParams,
             screenToURLMapping: NavigationController.screenToURLMapping,
             urlToScreenMapping: NavigationController.urlToScreenMapping,
+            screenToStackMapping: NavigationController.screenToStackMapping,
         }),
     })
 

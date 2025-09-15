@@ -23,7 +23,6 @@ export function AppHeaderProvider() {
                 iconLeft={<SlidersIcon weight="duotone" />}
                 className="settings-nav-button icon-only"
                 outline
-                stack="settings"
             >
                 <span className="sr-only">{t.Settings}</span>
             </LinkButton>

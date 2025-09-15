@@ -29,7 +29,7 @@ import type {
 import type { ContainerDirective, LeafDirective, TextDirective } from "mdast-util-directive"
 import React, { type Key, type ReactNode, Suspense } from "react"
 
-import type { Screens } from "@/control/NavigationController"
+import type { Params, Screens } from "@/control/NavigationController"
 import { Loader } from "@/ui/components/Loader"
 import { useT } from "@/ui/i18n"
 
@@ -50,7 +50,7 @@ interface ComponentMap {
     Link?: React.ComponentType<
         React.AnchorHTMLAttributes<any> & {
             screen?: keyof Screens
-            params?: Screens[keyof Screens]
+            params?: Params[keyof Screens]
         }
     >
     Image?: React.ComponentType<{

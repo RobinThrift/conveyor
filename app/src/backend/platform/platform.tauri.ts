@@ -1,6 +1,7 @@
 import { appConfigDir } from "@tauri-apps/api/path"
 import { locale as loadLocale, platform } from "@tauri-apps/plugin-os"
 
+import { NavigationController } from "@/control/NavigationController"
 import { setEnv } from "@/env"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
@@ -48,6 +49,9 @@ export async function init({ fs }: PlatformInitArgs): Promise<PlatformDependenci
         crypto: new AgeCrypto(),
         keyValueContainer: kvContainer,
         deviceSecureStorage,
-        navigationBackend: new RemoteNavigationBackend(self.postMessage.bind(self)),
+        navigationBackend: new RemoteNavigationBackend(
+            self.postMessage.bind(self),
+            NavigationController.screenToStackMapping,
+        ),
     }
 }

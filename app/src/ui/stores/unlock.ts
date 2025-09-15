@@ -75,7 +75,8 @@ export function registerEffects({
             })
 
             navCtrl.push({
-                screen: { name: "root", params: {} },
+                screen: "root",
+                params: {},
                 restore: { scrollOffsetTop: 0 },
             })
         },
