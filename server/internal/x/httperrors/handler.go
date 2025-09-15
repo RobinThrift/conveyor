@@ -79,7 +79,7 @@ func RecoverHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func(ctx context.Context) {
 			if p := recover(); p != nil {
-				if err, ok := p.(error); ok && errors.Is(err, http.ErrAbortHandler) {
+				if err, ok := p.(error); ok && errors.Is(err, http.ErrAbortHandler) { //nolint:noinlineerr // this is actually a cast, the linter just gets confused
 					// we don't recover http.ErrAbortHandler so the response
 					// to the client is aborted, this should not be logged
 					panic(p)

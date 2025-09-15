@@ -27,7 +27,6 @@ func (r *SyncRepo) CreateSyncClient(ctx context.Context, client *domain.SyncClie
 		AccountID: client.AccountID,
 		PublicID:  client.ID,
 	})
-
 	if err != nil {
 		var sqlErr *sqlite.Error
 		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {

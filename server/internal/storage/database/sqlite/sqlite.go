@@ -14,11 +14,12 @@ import (
 )
 
 type SQLite struct {
+	*sql.DB
+
 	File         string
 	Timeout      time.Duration
 	EnableWAL    bool
 	DebugEnabled bool
-	*sql.DB
 }
 
 //nolint:gochecknoglobals
@@ -84,22 +85,27 @@ func (sq *SQLite) InTransaction(ctx context.Context, fn func(ctx context.Context
 	_, err = tx.ExecContext(ctx, "PRAGMA defer_foreign_keys = 1")
 	if err != nil {
 		err = fmt.Errorf("error setting foreign key check to deferred: %w", err)
-		if rbErr := tx.Rollback(); rbErr != nil {
+
+		rbErr := tx.Rollback()
+		if rbErr != nil {
 			return fmt.Errorf("error rolling back: %w. original error: %w", rbErr, err)
 		}
 
 		return err
 	}
 
-	if err := fn(ctx); err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
+	err = fn(ctx)
+	if err != nil {
+		rbErr := tx.Rollback()
+		if rbErr != nil {
 			return fmt.Errorf("error rolling back: %w. original error: %w", rbErr, err)
 		}
 
 		return err
 	}
 
-	if err := tx.Commit(); err != nil {
+	err = tx.Commit()
+	if err != nil {
 		return fmt.Errorf("error committing transaction: %w", err)
 	}
 

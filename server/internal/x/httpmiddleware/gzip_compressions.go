@@ -8,6 +8,7 @@ import (
 
 type gzipResponseWriter struct {
 	http.ResponseWriter
+
 	gz *gzip.Writer
 }
 
@@ -27,6 +28,7 @@ func GzipCompression(next http.Handler) http.HandlerFunc {
 
 		gz := gzip.NewWriter(w)
 		defer gz.Close()
+
 		gzr := gzipResponseWriter{gz: gz, ResponseWriter: w}
 
 		next.ServeHTTP(gzr, r)

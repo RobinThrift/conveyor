@@ -28,6 +28,7 @@ func LogRequests(skipFor []string) func(next http.Handler) http.Handler {
 			wrapped := &statusResponseWriter{w, 200}
 
 			start := time.Now()
+
 			defer func(ctx context.Context) {
 				logFields = append(
 					logFields,
@@ -54,6 +55,7 @@ func LogRequests(skipFor []string) func(next http.Handler) http.Handler {
 
 type statusResponseWriter struct {
 	http.ResponseWriter
+
 	statusCode int
 }
 

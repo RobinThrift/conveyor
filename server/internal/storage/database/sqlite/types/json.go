@@ -1,4 +1,4 @@
-package types
+package types //nolint:revive // package nesting makes the usage/naming clear
 
 import (
 	"database/sql"

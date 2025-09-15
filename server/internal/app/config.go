@@ -102,7 +102,8 @@ var defaultConfig = Config{
 }
 
 func ParseConfig(prefix string) (Config, error) {
-	if err := gotenv.Load(); err != nil {
+	err := gotenv.Load()
+	if err != nil {
 		var pe = &fs.PathError{}
 		if !errors.As(err, &pe) {
 			return defaultConfig, err
@@ -111,7 +112,7 @@ func ParseConfig(prefix string) (Config, error) {
 
 	config := defaultConfig
 
-	err := env.ParseWithOptions(&config, env.Options{
+	err = env.ParseWithOptions(&config, env.Options{
 		Prefix: prefix,
 	})
 	if err != nil {

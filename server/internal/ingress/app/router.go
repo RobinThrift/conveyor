@@ -38,7 +38,8 @@ func New(basePath string, mux *http.ServeMux) {
 
 func (router *appRouter) handlerFuncWithErr(h func(w http.ResponseWriter, r *http.Request) error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if err := h(w, r); err != nil {
+		err := h(w, r)
+		if err != nil {
 			router.renderErrorPage(w, r, err)
 		}
 	}

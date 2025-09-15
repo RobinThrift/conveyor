@@ -43,6 +43,7 @@ type PlaintextAuthToken struct {
 
 type PlaintextAuthTokenValue struct {
 	sensitive.Value
+
 	salt []byte
 }
 

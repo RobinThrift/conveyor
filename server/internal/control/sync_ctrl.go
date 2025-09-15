@@ -312,7 +312,8 @@ func (sc *SyncController) writeUnencryptedDataForAttachmentChangelogEntry(cmd *C
 
 	defer func() {
 		if !encrypterClosed {
-			if closeErr := encrypter.Close(); closeErr != nil {
+			closeErr := encrypter.Close()
+			if closeErr != nil {
 				err = errors.Join(err, fmt.Errorf("error closing encrypter: %w", closeErr))
 			}
 		}
@@ -348,7 +349,7 @@ func (sc *SyncController) writeEncryptedDataForAttachmentChangelogEntry(cmd *Cre
 	return nil
 }
 
-func (sc *SyncController) newCreateMemoChangelogEntry(ctx context.Context, memo *PlaintextMemo) (*domain.ChangelogEntry, error) {
+func (sc *SyncController) newCreateMemoChangelogEntry(ctx context.Context, memo *PlaintextMemo) (*domain.ChangelogEntry, error) { //nolint:funlen
 	key, err := sc.accountCtrl.GetAccountKeyByName(ctx, domain.PrimaryAccountKeyName)
 	if err != nil {
 		return nil, err
@@ -400,7 +401,8 @@ func (sc *SyncController) newCreateMemoChangelogEntry(ctx context.Context, memo 
 		return nil, err
 	}
 
-	if err := w.Close(); err != nil {
+	err = w.Close()
+	if err != nil {
 		return nil, fmt.Errorf("error closing encrypted data: %w", err)
 	}
 
@@ -455,7 +457,8 @@ func (sc *SyncController) newCreateAttachmentChangelogEntry(cmd *CreateAttachmen
 		return "", nil, err
 	}
 
-	if err := w.Close(); err != nil {
+	err = w.Close()
+	if err != nil {
 		return "", nil, fmt.Errorf("error closing encrypted data: %w", err)
 	}
 

@@ -27,7 +27,7 @@ func TestRequestFromContext(t *testing.T) {
 func TestHTTPHeader(t *testing.T) {
 	t.Parallel()
 
-	req, err := http.NewRequest(http.MethodGet, "http://example.com", nil)
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://example.com", nil)
 	require.NoError(t, err)
 
 	fromHeader, ok := RequestIDFromHeader(req.Header)

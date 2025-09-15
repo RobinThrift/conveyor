@@ -95,7 +95,6 @@ func (r *AuthTokenRepo) CreateAuthToken(ctx context.Context, token *auth.AuthTok
 		RefreshValue:     token.RefreshValue,
 		RefreshExpiresAt: types.NewSQLiteDatetime(token.RefreshExpiresAt),
 	})
-
 	if err != nil {
 		var sqlErr *sqlite.Error
 		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {

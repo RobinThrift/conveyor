@@ -56,7 +56,6 @@ func New(ctx context.Context, config Config) (*Tracing, error) {
 			semconv.DeploymentEnvironment(config.Info.Env),
 		),
 	)
-
 	if err != nil {
 		return nil, fmt.Errorf("error constructing OTEL resource: %w", err)
 	}

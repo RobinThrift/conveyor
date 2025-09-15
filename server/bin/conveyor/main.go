@@ -14,7 +14,8 @@ import (
 )
 
 func main() {
-	if err := run(context.Background()); err != nil {
+	err := run(context.Background())
+	if err != nil {
 		panic(err)
 	}
 }

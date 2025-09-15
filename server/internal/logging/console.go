@@ -143,7 +143,7 @@ func (h *consoleHandler) writeAttr(msg *bytes.Buffer, a slog.Attr) {
 }
 
 func determineNoColor() bool {
-	if asBool, err := strconv.ParseBool(os.Getenv("NO_COLOR")); err == nil {
+	if asBool, err := strconv.ParseBool(os.Getenv("NO_COLOR")); err == nil { //nolint:noinlineerr // we don't want to leak the asBool var
 		return asBool
 	}
 

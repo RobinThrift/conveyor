@@ -96,6 +96,7 @@ func TestSyncController_CreateAttachmentChangelogEntry_Unencrypted(t *testing.T)
 	entryJSON := testhelper.AgeDecrypt(t, privateKey, bytes.NewReader(entries[0].Data))
 
 	var entry createAttachmentChangelogEntry
+
 	err = json.Unmarshal(entryJSON, &entry)
 	require.NoError(t, err)
 
@@ -142,6 +143,7 @@ func TestSyncController_CreateAttachmentChangelogEntry_Encrypted(t *testing.T) {
 	entryJSON := testhelper.AgeDecrypt(t, privateKey, bytes.NewReader(entries[0].Data))
 
 	var entry createAttachmentChangelogEntry
+
 	err = json.Unmarshal(entryJSON, &entry)
 	require.NoError(t, err)
 

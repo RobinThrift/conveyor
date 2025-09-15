@@ -36,7 +36,6 @@ func InTransaction[R any](ctx context.Context, db Transactioner, fn func(ctx con
 
 		return nil
 	})
-
 	if err != nil {
 		return result, err
 	}

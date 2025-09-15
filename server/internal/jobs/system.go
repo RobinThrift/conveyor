@@ -145,7 +145,6 @@ func (s *System) startJobExecution(ctx context.Context) {
 	err := s.transactioner.InTransaction(ctx, func(ctx context.Context) error {
 		return s.execJobs(ctx)
 	})
-
 	if err != nil {
 		slog.ErrorContext(ctx, "error executing jobs", slog.Any("error", err))
 	}
@@ -162,8 +161,8 @@ func (s *System) execJobs(ctx context.Context) error {
 
 	for _, job := range jobs {
 		slog.InfoContext(ctx, "starting job", slog.String("job_name", job.Kind), slog.Int64("job_id", job.ID))
-		result, err := s.execJob(ctx, job)
 
+		result, err := s.execJob(ctx, job)
 		if err != nil {
 			slog.ErrorContext(ctx, "error executing job", slog.String("job_name", job.Kind), slog.Int64("job_id", job.ID), slog.Any("error", err))
 			job.State = domain.JobStateError

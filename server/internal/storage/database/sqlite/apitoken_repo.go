@@ -98,7 +98,6 @@ func (r *APITokenRepo) CreateAPIToken(ctx context.Context, token *domain.APIToke
 		Name:      token.Name,
 		ExpiresAt: types.NewSQLiteDatetime(token.ExpiresAt),
 	})
-
 	if err != nil {
 		var sqlErr *sqlite.Error
 		if errors.As(err, &sqlErr) && sqlErr.Code() == 787 {

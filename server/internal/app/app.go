@@ -114,7 +114,8 @@ func (a *App) Start(ctx context.Context) error {
 
 	slog.InfoContext(ctx, fmt.Sprintf("starting server on %v", a.config.Addr))
 
-	if err := a.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+	err = a.srv.ListenAndServe()
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 
