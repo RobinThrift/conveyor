@@ -19,7 +19,7 @@ import {
 } from "@/ui/components/Icons"
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
-import { useCurrentPage, useNavigation } from "@/ui/navigation"
+import { useCurrentPageParams, useNavigation } from "@/ui/navigation"
 import { selectors, stores } from "@/ui/stores"
 import { AboutTab } from "./AboutTab"
 import { APITokensTab } from "./APITokensTab"
@@ -48,8 +48,8 @@ function SettingsScreenContent() {
     let isMobile = useIsMobile()
 
     let nav = useNavigation()
-    let currentPage = useCurrentPage()
-    let tab = "tab" in currentPage.params ? currentPage.params.tab : "interface"
+    let pageParams = useCurrentPageParams()
+    let tab = "tab" in pageParams ? pageParams.tab : "interface"
 
     let onChangeTab = useCallback(
         (tab: Key) => {

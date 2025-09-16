@@ -3,9 +3,12 @@ import type {
     NavigationBackend,
     OnPop,
     OnPush,
+    OnReplace,
     Screens,
     ScreenToStackMapping,
 } from "@/lib/navigation"
+
+declare const __ENABLE_DEVTOOLS__: boolean
 
 export class HistoryNavigationBackend<
     S extends Screens,
@@ -15,12 +18,14 @@ export class HistoryNavigationBackend<
 {
     private _onPush?: OnPush<S, Restore>
     private _onPop?: OnPop<S, Restore>
+    private _onReplace?: OnReplace<S, Restore>
     private _toURLParams?: (params: Params[keyof S]) => URLSearchParams
     private _screenToURLMapping: ScreenToURLMapping<S>
     private _urlToScreenMapping: URLToScreenMapping<S>
     private _screenToStackMapping: ScreenToStackMapping<S>
 
-    private _currLength = window.history.length
+    private _currentIndex = window.history.length
+    private readonly _initalLength = window.history.length
 
     constructor({
         screenToURLMapping,
@@ -44,15 +49,37 @@ export class HistoryNavigationBackend<
             if (!e.state) {
                 return
             }
-            let { screen, params, index, stack, restore } = e.state as NavgationState<S, Restore>
+            let { screen, params, index, stack, restore, _absoluteIndex } =
+                e.state as NavgationState<S, Restore> & { _absoluteIndex: number }
 
-            let lastLength = this._currLength
-            this._currLength = window.history.length
+            let lastIndex = this._currentIndex
+            this._currentIndex = _absoluteIndex
             requestAnimationFrame(() => {
-                if (lastLength > window.history.length) {
+                if (lastIndex < this._currentIndex) {
                     this._onPush?.({ screen, params, index, stack, restore })
+                    if (__ENABLE_DEVTOOLS__) {
+                        requestAnimationFrame(() => {
+                            performance.mark("navigation:push", {
+                                detail: {
+                                    ...e.state,
+                                    url: window.location.href,
+                                },
+                            })
+                        })
+                    }
                 } else {
                     this._onPop?.({ screen, params, index, stack, restore })
+
+                    if (__ENABLE_DEVTOOLS__) {
+                        requestAnimationFrame(() => {
+                            performance.mark("navigation:pop", {
+                                detail: {
+                                    ...e.state,
+                                    url: window.location.href,
+                                },
+                            })
+                        })
+                    }
                 }
             })
         })
@@ -62,7 +89,10 @@ export class HistoryNavigationBackend<
         let currentURL = new URL(window.location.href)
         let mapped = this._urlToScreenMapping(currentURL)
 
-        let initial = state
+        let initial: NavgationState<S, Restore> & { _absoluteIndex: number } = {
+            ...state,
+            _absoluteIndex: this._currentIndex,
+        }
         let current = window.history.state as NavgationState<S, Restore>
         if (current) {
             initial = { ...initial, ...current }
@@ -79,11 +109,21 @@ export class HistoryNavigationBackend<
         }
 
         window.history.replaceState(initial, "", window.location.href)
+
+        if (__ENABLE_DEVTOOLS__) {
+            performance.mark("navigation:init", {
+                detail: {
+                    url: window.location.href,
+                    ...initial,
+                },
+            })
+        }
+
         return initial
     }
 
     public get length(): number {
-        return window.history.length - 1
+        return this._currentIndex - this._initalLength
     }
 
     public push(
@@ -93,11 +133,12 @@ export class HistoryNavigationBackend<
 
         let stack = this._screenToStackMapping[next.screen] as S[typeof next.screen]["stack"]
 
-        let nextScreen: NavgationState<S, Restore> = {
+        let nextScreen: NavgationState<S, Restore> & { _absoluteIndex: number } = {
             ...next,
             restore: {},
             index: stack === current.stack ? current.index + 1 : 0,
             stack,
+            _absoluteIndex: this._currentIndex + 1,
         }
 
         window.history.replaceState(
@@ -115,8 +156,22 @@ export class HistoryNavigationBackend<
         )
 
         window.history.pushState(nextScreen, "", nextURL)
+        this._currentIndex++
 
-        this._currLength = window.history.length
+        if (__ENABLE_DEVTOOLS__) {
+            let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
+            Error.captureStackTrace(trace)
+
+            requestAnimationFrame(() => {
+                performance.mark("navigation:push", {
+                    detail: {
+                        ...nextScreen,
+                        url: nextURL.toString(),
+                        trace: trace.stack,
+                    },
+                })
+            })
+        }
 
         return nextScreen
     }
@@ -129,13 +184,71 @@ export class HistoryNavigationBackend<
             window.history.back()
         }
 
+        let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
+        if (__ENABLE_DEVTOOLS__) {
+            Error.captureStackTrace(trace)
+        }
+
         requestAnimationFrame(() => {
-            this._currLength = window.history.length
+            this._currentIndex = window.history.state._absoluteIndex
             let state = window.history.state as NavgationState<S, Restore>
+
+            if (__ENABLE_DEVTOOLS__) {
+                let state = window.history.state as NavgationState<S, Restore>
+
+                performance.mark("navigation:pop", {
+                    detail: {
+                        ...state,
+                        url: window.location.href,
+                        trace: trace.stack,
+                    },
+                })
+            }
+
             resolve(state)
         })
 
         return promise
+    }
+
+    public replace(
+        next: Omit<NavgationState<S, Restore>, "stack" | "index">,
+    ): NavgationState<S, Restore> {
+        let current = window.history.state ?? {}
+
+        let stack = this._screenToStackMapping[next.screen] as S[typeof next.screen]["stack"]
+
+        let nextScreen: NavgationState<S, Restore> & { _absoluteIndex: number } = {
+            screen: next.screen,
+            params: next.params,
+            restore: current?.restore ?? {},
+            index: stack === current.stack ? current.index + 1 : 0,
+            stack,
+            _absoluteIndex: this._currentIndex,
+        }
+
+        let nextURL = this.nextURL(
+            (this._screenToURLMapping[next.screen] ?? next.screen) as string,
+            next.params as Params[keyof S],
+        )
+
+        window.history.replaceState(nextScreen, "", nextURL)
+
+        if (__ENABLE_DEVTOOLS__) {
+            let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
+            Error.captureStackTrace(trace)
+            performance.mark("navigation:replace", {
+                detail: {
+                    ...nextScreen,
+                    url: nextURL.toString(),
+                    trace: trace.stack,
+                },
+            })
+        }
+
+        this._onReplace?.(nextScreen)
+
+        return nextScreen
     }
 
     addEventListener(event: "pop", handler: (next: NavgationState<S, Restore>) => void): () => void
@@ -144,7 +257,11 @@ export class HistoryNavigationBackend<
         handler: (next: NavgationState<S, Restore>, prev?: NavgationState<S, Restore>) => void,
     ): () => void
     addEventListener(
-        event: "pop" | "push",
+        event: "replace",
+        handler: (next: NavgationState<S, Restore>) => void,
+    ): () => void
+    addEventListener(
+        event: "pop" | "push" | "replace",
         handler: (next: NavgationState<S, Restore>, prev?: NavgationState<S, Restore>) => void,
     ): () => void {
         switch (event) {
@@ -166,6 +283,12 @@ export class HistoryNavigationBackend<
                 this._onPush = handler
                 return () => {
                     this._onPush = undefined
+                }
+            }
+            case "replace": {
+                this._onReplace = handler
+                return () => {
+                    this._onReplace = undefined
                 }
             }
             default:

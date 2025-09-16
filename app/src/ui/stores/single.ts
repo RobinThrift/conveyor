@@ -3,10 +3,14 @@ import type { MemoContentChanges } from "@/domain/Changelog"
 import type { Memo, MemoID } from "@/domain/Memo"
 import { Second } from "@/lib/duration"
 import { CustomErrCode, isErr } from "@/lib/errors"
-import { batch, createActions, createEffect, createStore } from "@/lib/store"
+import { batch, createActions, createDerived, createEffect, createStore } from "@/lib/store"
 import * as list from "./memos"
+import { currentParams } from "./navigation"
 
-export const singleID = createStore<MemoID | undefined>("memos/single/id", undefined)
+const [singleID] = createDerived<MemoID | undefined>("memos/single/id", {
+    fn: () => ("memoID" in currentParams.state ? currentParams.state.memoID : undefined),
+    deps: [currentParams],
+})
 
 export const single = createStore<Memo | undefined>("memos/single", undefined)
 
@@ -67,30 +71,6 @@ export const updateRequest = createStore<UpdateMemoRequest | undefined>(
 )
 
 export const actions = createActions({
-    setSingleID: (id: MemoID) => {
-        if (id === singleID.state) {
-            return
-        }
-
-        let memo = list.memos.state.find((m) => m.id === id)
-        if (memo) {
-            batch(() => {
-                singleID.setState(id)
-                status.setState("done")
-                error.setState(undefined)
-                single.setState(memo)
-            })
-            return
-        }
-
-        batch(() => {
-            singleID.setState(id)
-            status.setState("loading")
-            error.setState(undefined)
-            single.setState(undefined)
-        })
-    },
-
     updateMemoContent(memo: {
         id: MemoID
         content?: {
@@ -180,6 +160,33 @@ class NewerSingleLoadRequestError extends Error {
 
 export function registerEffects(backend: BackendClient) {
     let loadAbortCntrl: AbortController | undefined
+
+    createEffect("memos/single/memoIDFromPageParams", {
+        fn: async (_, { batch }) => {
+            let id = singleID.state
+            if (!id) {
+                return
+            }
+
+            let memo = list.memos.state.find((m) => m.id === id)
+            if (memo) {
+                batch(() => {
+                    status.setState("done")
+                    error.setState(undefined)
+                    single.setState(memo)
+                })
+                return
+            }
+
+            batch(() => {
+                status.setState("loading")
+                error.setState(undefined)
+                single.setState(undefined)
+            })
+        },
+        deps: [singleID],
+        autoMount: true,
+    })
 
     createEffect("memos/single/load", {
         fn: async (baseCtx, { batch }) => {
@@ -279,7 +286,6 @@ if (import.meta.hot) {
             return
         }
 
-        newModule.singleID.setState(singleID.state)
         newModule.single.setState(single.state)
         newModule.status.setState(status.state)
         newModule.updateRequest.setState(updateRequest.state)

@@ -1,5 +1,6 @@
 import type { BackendClient } from "@/backend/BackendClient"
 import type { NavigationController } from "@/control/NavigationController"
+import type { ListMemosQuery, MemoID } from "@/domain/Memo"
 
 import * as apitokens from "./apitokens"
 import * as attachments from "./attachments"
@@ -52,7 +53,6 @@ export const stores = {
         },
         single: {
             memo: single.single,
-            id: single.singleID,
             status: single.status,
             error: single.error,
         },
@@ -63,6 +63,7 @@ export const stores = {
     },
     navigation: {
         currentPage: navigation.currentPage,
+        currentParams: navigation.currentParams,
     },
     settings: {
         values: settings.values,
@@ -96,8 +97,18 @@ export const actions = {
     auth: auth.actions,
     jobs: jobs.actions,
     memos: {
-        list: memos.actions,
-        single: single.actions,
+        list: {
+            ...memos.actions,
+            setFilter: (newFilter: Partial<ListMemosQuery>) => {
+                navigation.actions.updateParams({ filter: newFilter })
+            },
+        },
+        single: {
+            ...single.actions,
+            setSingleID: (id: MemoID) => {
+                navigation.actions.updateParams({ memodID: id })
+            },
+        },
         create: create.actions,
     },
     navigation: navigation.actions,

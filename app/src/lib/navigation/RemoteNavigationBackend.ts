@@ -63,8 +63,14 @@ export class RemoteNavigationBackend<S extends Screens, Restore extends Record<s
         throw new Error("pop is not available on RemoteNavigationBackend")
     }
 
+    public replace(
+        _: Omit<NavgationState<S, Restore>, "stack" | "index">,
+    ): NavgationState<S, Restore> {
+        throw new Error("replace is not available on RemoteNavigationBackend")
+    }
+
     addEventListener(
-        _event: "pop" | "push",
+        _event: "pop" | "push" | "replace",
         _handler: (next: NavgationState<S, Restore>, prev?: NavgationState<S, Restore>) => void,
     ): () => void {
         return () => {}

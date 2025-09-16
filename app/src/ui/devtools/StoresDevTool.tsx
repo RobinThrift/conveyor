@@ -1,4 +1,5 @@
 import { Store, useStore } from "@tanstack/react-store"
+import clsx from "clsx"
 import { format as formatDiffAsHTML } from "jsondiffpatch/formatters/html"
 import { create as createJSONDiffPatchInstance } from "jsondiffpatch/with-text-diffs"
 import React, { useMemo, useState } from "react"
@@ -6,7 +7,6 @@ import { JSONTree } from "react-json-tree"
 
 const jsondiffpatch = createJSONDiffPatchInstance({ arrays: { detectMove: false } })
 
-import clsx from "clsx"
 import { StackTrace } from "./StackTrace"
 
 type StoreEvent =

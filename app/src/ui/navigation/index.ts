@@ -35,12 +35,14 @@ export function useNavigation(): {
 
 export function useCurrentPage(): {
     name: keyof Screens
-    params: Params[keyof Screens]
     restore: Partial<Restore>
 } {
     return useStore(stores.navigation.currentPage, (s) => ({
         name: s.screen,
-        params: s.params,
         restore: s.restore,
     }))
+}
+
+export function useCurrentPageParams(): Params[keyof Screens] {
+    return useStore(stores.navigation.currentParams)
 }

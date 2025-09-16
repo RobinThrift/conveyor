@@ -1,5 +1,6 @@
 import {
     batch as baseBatch,
+    Derived,
     type DerivedOptions,
     Effect,
     Store,
@@ -52,6 +53,49 @@ export const createStore = <TState, TUpdater extends AnyUpdater = (cb: TState) =
     }
 
     return store
+}
+
+export function createDerived<T>(
+    name: string,
+    opts: DerivedOptions<T> & { autoMount: true },
+): [Derived<T>, () => void]
+export function createDerived<T>(name: string, opts: DerivedOptions<T>): [Derived<T>, undefined]
+export function createDerived<T>(
+    name: string,
+    opts: DerivedOptions<T> & { autoMount?: true },
+): [Derived<T>, (() => void) | undefined] {
+    let baseOpts = {
+        ...opts,
+    }
+
+    if (__ENABLE_DEVTOOLS__) {
+        baseOpts.fn = (props) => {
+            let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
+            Error.captureStackTrace(trace)
+            performance.mark("stores:update", {
+                detail: {
+                    name,
+                    currValues: __getCurrentTracedStoresStates(),
+                    prevValues: __getPrevTracedStoresStates(),
+                    triggeredByAction: __currentAction,
+                    trace: trace.stack,
+                },
+            })
+            return opts.fn(props)
+        }
+    }
+
+    let derived = new Derived(baseOpts)
+
+    if (__ENABLE_DEVTOOLS__) {
+        __tracedStores.set(name, derived as any)
+    }
+
+    if (opts.autoMount) {
+        return [derived, derived.mount()]
+    }
+
+    return [derived, undefined]
 }
 
 let __currentBatch = 0

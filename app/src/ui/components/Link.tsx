@@ -4,27 +4,34 @@ import React, { useCallback } from "react"
 import type { Params, Screens } from "@/control/NavigationController"
 import type { ButtonProps } from "@/ui/components/Button"
 import { useNavigation } from "@/ui/navigation"
+import { stores } from "@/ui/stores"
 
 export function Link<S extends keyof Screens>({
     screen,
     params,
+    addParams,
     ...props
 }: React.AnchorHTMLAttributes<any> & {
     ref?: React.Ref<HTMLAnchorElement>
     screen?: S
     params?: Params[S]
+    addParams?: boolean
 }) {
     let { push } = useNavigation()
     let onClick = useCallback(
         (e: React.MouseEvent<HTMLAnchorElement>) => {
             if (screen) {
                 e.preventDefault()
-                push(screen, params || {}, {
+                let screenParams = params
+                if (addParams) {
+                    screenParams = { ...stores.navigation.currentParams.state, ...params }
+                }
+                push(screen, screenParams || {}, {
                     scrollOffsetTop: Math.ceil(window.visualViewport?.pageTop ?? window.scrollY),
                 })
             }
         },
-        [screen, params, push],
+        [screen, params, addParams, push],
     )
 
     return (

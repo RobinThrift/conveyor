@@ -3,6 +3,7 @@ import React, { Suspense, startTransition, useCallback, useEffect, useRef, useSt
 
 import { FlaskIcon, XIcon } from "../components/Icons"
 import { Loader } from "../components/Loader"
+import { NavDevTool } from "./NavDevTool"
 // import { FPSMeter } from "./FPSMeter"
 import { ReactDevTools } from "./ReactDevTools"
 import { SQLLogDevTool } from "./SQLLogDevTool"
@@ -15,6 +16,7 @@ let tabs = {
     Stores: <StoresDevTool />,
     Trace: <TracingDevTool />,
     React: <ReactDevTools />,
+    Navigation: <NavDevTool />,
     "SQL Log": <SQLLogDevTool />,
 }
 

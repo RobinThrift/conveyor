@@ -12,6 +12,7 @@ import type {
     NavigationBackend,
     OnPop,
     OnPush,
+    OnReplace,
     ScreenToStackMapping,
 } from "@/lib/navigation"
 
@@ -73,6 +74,7 @@ export class NavigationController {
     private _backend: NavigationBackend<Screens, Restore>
     private _onPush?: OnPush<Screens, Restore>
     private _onPop?: OnPop<Screens, Restore>
+    private _onReplace?: OnReplace<Screens, Restore>
 
     private _currentState: NavgationState<Screens, Restore> = {
         screen: "root",
@@ -100,6 +102,11 @@ export class NavigationController {
             this._onPop?.(current, this._lastState)
             this._currentState = { ...current }
         })
+
+        backend.addEventListener("replace", (current) => {
+            this._onReplace?.(current)
+            this._currentState = { ...current }
+        })
     }
 
     public init(): NavgationState<Screens, Restore> {
@@ -108,12 +115,13 @@ export class NavigationController {
     }
 
     public updateParams<S extends keyof Screens>(params: Partial<Params[S]>) {
+        if (isEqual(params, this._currentState.params)) {
+            return
+        }
+
         this.push({
             ...this._currentState,
-            params: {
-                ...this._currentState.params,
-                ...params,
-            },
+            params: params,
         })
     }
 
@@ -145,7 +153,7 @@ export class NavigationController {
             return
         }
         if (this._backend.length <= 1) {
-            this.push({
+            this._backend.replace({
                 screen: "root",
                 params: {},
                 restore: { scrollOffsetTop: 0 },
@@ -160,8 +168,9 @@ export class NavigationController {
 
     addEventListener(event: "pop", handler: OnPop<Screens, Restore>): void
     addEventListener(event: "push", handler: OnPush<Screens, Restore>): void
+    addEventListener(event: "replace", handler: OnReplace<Screens, Restore>): void
     addEventListener(
-        event: "pop" | "push",
+        event: "pop" | "push" | "replace",
         handler: (
             next: NavgationState<Screens, Restore>,
             prev?: NavgationState<Screens, Restore>,
@@ -173,6 +182,9 @@ export class NavigationController {
                 return
             case "push":
                 this._onPush = handler
+                return
+            case "replace":
+                this._onReplace = handler
                 return
             default:
                 throw new Error(`unknown event ${event}`)

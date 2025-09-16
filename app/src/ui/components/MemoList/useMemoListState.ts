@@ -19,7 +19,7 @@ export function useMemoListState() {
     let hasNextPage = useStore(stores.memos.list.nextPage, selectors.memos.list.hasNextPage)
     let isListOutdated = useStore(stores.memos.list.isOutdated)
     let currentPageParams = useStore(
-        stores.navigation.currentPage,
+        stores.navigation.currentParams,
         selectors.navigation.currentParams,
     )
 

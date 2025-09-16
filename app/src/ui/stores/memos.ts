@@ -4,8 +4,10 @@ import type { Context } from "@/lib/context"
 import { Second } from "@/lib/duration"
 import { CustomErrCode, isErr } from "@/lib/errors"
 import { isEqual } from "@/lib/isEqual"
-import { batch, createActions, createEffect, createStore } from "@/lib/store"
+import { batch, createActions, createDerived, createEffect, createStore } from "@/lib/store"
+
 import * as create from "./create"
+import { currentParams } from "./navigation"
 import * as single from "./single"
 
 export const memos = createStore<Memo[]>("memos/memos", [])
@@ -19,7 +21,14 @@ export const status = createStore<"done" | "page-requested" | "loading" | "error
 
 export const error = createStore<Error | undefined>("memos/error", undefined)
 
-export const filter = createStore<ListMemosQuery>("memos/filter", {})
+export const [filter] = createDerived<ListMemosQuery>("memos/filter", {
+    fn: () =>
+        "filter" in currentParams.state && currentParams.state.filter
+            ? currentParams.state.filter
+            : {},
+    deps: [currentParams],
+    autoMount: true,
+})
 
 export const isOutdated = createStore("memos/isOutdated", false)
 
@@ -30,22 +39,6 @@ export const actions = createActions({
         }
 
         status.setState("page-requested")
-    },
-
-    setFilter: (newFilter: Partial<ListMemosQuery>) => {
-        let next = { ...filter.state, ...newFilter }
-        if (Object.getOwnPropertyNames(newFilter).length === 0) {
-            next = newFilter
-        } else if (isEqual(filter.state, next)) {
-            return
-        }
-
-        batch(() => {
-            memos.setState([])
-            nextPage.setState(undefined)
-            filter.setState(next)
-            status.setState("page-requested")
-        })
     },
 
     reload: () =>
@@ -96,11 +89,10 @@ const _actions = createActions({
         }
 
         if (update.updated === "isArchived") {
-            if (filter.state.isArchived && !update.memo.isArchived) {
+            let isArchivedFilter = filter.state.isArchived
+            if (isArchivedFilter && !update.memo.isArchived) {
                 _actions.removeMemo(update.memo.id)
-            }
-
-            if (!filter.state.isArchived && update.memo.isArchived) {
+            } else if (!isArchivedFilter && update.memo.isArchived) {
                 _actions.removeMemo(update.memo.id)
             }
 
@@ -108,11 +100,12 @@ const _actions = createActions({
         }
 
         if (update.updated === "isDeleted") {
-            if (filter.state.isDeleted && !update.memo.isDeleted) {
+            let isDeletedFilter = filter.state.isDeleted
+            if (isDeletedFilter && !update.memo.isDeleted) {
                 _actions.removeMemo(update.memo.id)
             }
 
-            if (!filter.state.isDeleted && update.memo.isDeleted) {
+            if (!isDeletedFilter && update.memo.isDeleted) {
                 _actions.removeMemo(update.memo.id)
             }
 
@@ -155,9 +148,9 @@ export const selectors = {
     isLoading: (s: typeof status.state) => s === "loading" || s === "page-requested",
     hasNextPage: (n: typeof nextPage.state) => typeof n !== "undefined",
     filter:
-        <K extends keyof typeof filter.state>(key: K) =>
-        (filters: typeof filter.state) =>
-            filters[key],
+        <K extends keyof ListMemosQuery>(key: K) =>
+        (f: typeof filter.state) =>
+            f[key],
 }
 
 const pageSize = 10
@@ -169,9 +162,23 @@ class NewerMemosLoadRequestError extends Error {
 export function registerEffects(backend: BackendClient) {
     let loadAbortCntrl: AbortController | undefined
 
+    createEffect("memos/filterFromPageParams", {
+        fn: async (_, { batch }) => {
+            if (isEqual(filter.prevState, filter.state)) {
+                return
+            }
+            batch(() => {
+                memos.setState([])
+                nextPage.setState(undefined)
+                status.setState("page-requested")
+            })
+        },
+        deps: [filter],
+        autoMount: true,
+    })
+
     createEffect("memos/load", {
         fn: async (baseCtx: Context, { batch }) => {
-            console.log("memos/load", { ...filter.state })
             batch(() => _actions.setIsLoading())
 
             loadAbortCntrl?.abort(new NewerMemosLoadRequestError())
@@ -250,12 +257,16 @@ if (import.meta.hot) {
         newModule.memos.setState(memos.state)
         newModule.status.setState(status.state)
         newModule.error.setState(error.state)
-        newModule.filter.setState(filter.state)
+        // newModule.filter.setState(filter.state)
         newModule.isOutdated.setState(isOutdated.state)
     })
 }
 
-function noActiveFilters(filter: ListMemosQuery): boolean {
+function noActiveFilters(filter?: ListMemosQuery): boolean {
+    if (!filter) {
+        return true
+    }
+
     let props = Object.getOwnPropertyNames(filter)
     if (props.length === 0) {
         return true

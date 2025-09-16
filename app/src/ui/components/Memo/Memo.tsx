@@ -71,6 +71,7 @@ export const Memo = React.memo(function Memo(props: MemoProps) {
                             href={`?memo=${props.memo.id}`}
                             screen="memo.view"
                             params={{ memoID: props.memo.id }}
+                            addParams
                         >
                             {renderedTitle}
                         </Link>
