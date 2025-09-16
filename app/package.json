@@ -22,7 +22,7 @@
         "@types/react": "^19.0.12",
         "@types/react-dom": "^19.0.4",
         "@vite-pwa/assets-generator": "^1.0.0",
-        "@vitejs/plugin-react-swc": "^3.11.0",
+        "@vitejs/plugin-react-swc": "^4.0.0",
         "@vitest/browser": "^3.2.3",
         "bippy": "^0.3.16",
         "culori": "^4.0.1",
