@@ -33,6 +33,7 @@ export function useRadioGroup({
                     handled = true
                     break
 
+                case navKeyCodes.ArrowLeft:
                 case navKeyCodes.ArrowUp: {
                     let next = findPrevItem(root, focussed)
                     if (!next) {

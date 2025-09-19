@@ -12,10 +12,10 @@ export type RadioGroupProps = Omit<
     onValueChange?: (value: string) => void
 }
 
-export function RadioGroup(props: RadioGroupProps) {
+export function RadioGroup({ value, onValueChange, ...props }: RadioGroupProps) {
     let { ref, selected, focussed, onKeyDown, onFocus, onChange } = useRadioGroup({
-        defaultValue: props.value,
-        onValueChange: props.onValueChange,
+        defaultValue: value,
+        onValueChange,
     })
     let id = useId()
 
