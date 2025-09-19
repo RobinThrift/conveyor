@@ -60,7 +60,6 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
                 name="current_password"
                 type="password"
                 label={t.FieldCurrentPasswordLabel}
-                ariaLabel={t.FieldCurrentPasswordLabel}
                 autoComplete="current_password"
                 autoFocus={true}
                 required
@@ -76,7 +75,6 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
                 name="new_password"
                 type="password"
                 label={t.FieldNewPasswordLabel}
-                ariaLabel={t.FieldNewPasswordLabel}
                 autoComplete="new_password"
                 required
                 messages={t}
@@ -91,7 +89,6 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
                 name="repeat_new_password"
                 type="password"
                 label={t.FieldRepeatNewPasswordLabel}
-                ariaLabel={t.FieldRepeatNewPasswordLabel}
                 autoComplete="repeat_new_password"
                 required
                 messages={t}

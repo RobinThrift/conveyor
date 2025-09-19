@@ -1,4 +1,3 @@
-import { Form } from "@radix-ui/react-form"
 import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
 import React, { useCallback } from "react"
@@ -28,7 +27,7 @@ export function SearchBar(props: { className?: string }) {
     }, [])
 
     return (
-        <Form onSubmit={onSubmit} className={clsx("memo-list-filter-search", props.className)}>
+        <form onSubmit={onSubmit} className={clsx("memo-list-filter-search", props.className)}>
             <Input
                 name="q"
                 type="search"
@@ -39,6 +38,6 @@ export function SearchBar(props: { className?: string }) {
                 defaultValue={queryFilter}
                 placeholder="Search Memos"
             />
-        </Form>
+        </form>
     )
 }

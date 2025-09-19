@@ -1,4 +1,3 @@
-import * as Form from "@radix-ui/react-form"
 import clsx from "clsx"
 import React from "react"
 
@@ -14,7 +13,6 @@ export interface InputProps {
     messageClassName?: string
 
     label?: string
-    ariaLabel?: string
     name: string
     description?: string
     type?: "text" | "password" | "search" | "email"
@@ -26,7 +24,6 @@ export interface InputProps {
     disabled?: boolean
     readOnly?: boolean
 
-    serverInvalid?: boolean
     message?: string
     messages?: Record<string, string | ((data: { name: string }) => string)>
 
@@ -40,67 +37,48 @@ export function Input(props: InputProps) {
     let autocomplete = props.autoComplete ?? "disabled"
 
     return (
-        <Form.Field
-            name={props.name}
-            aria-label={props.ariaLabel}
-            className={clsx("input-field", props.className)}
-            serverInvalid={props.serverInvalid}
-        >
+        <div className={clsx("input-field", props.className)}>
             {props.label && (
-                <Form.Label htmlFor={props.name} className={props.labelClassName}>
+                <label htmlFor={props.name} className={props.labelClassName}>
                     {props.label}
                     {props.required && <AsteriskIcon className="required-icon" />}
-                </Form.Label>
+                </label>
             )}
             <div className={clsx("relative", props.inputWrapperClassName)}>
                 {props.icon && (
                     <span className={clsx("icon", props.iconClassName)}>{props.icon}</span>
                 )}
-                <Form.Control asChild>
-                    <input
-                        type={props.type ?? "text"}
-                        name={props.name}
-                        id={props.name}
-                        className={clsx(
-                            "input",
-                            {
-                                "has-icon": props.icon,
-                            },
-                            props.inputClassName,
-                        )}
-                        placeholder={props.placeholder}
-                        autoComplete={autocomplete}
-                        // biome-ignore lint/a11y/noAutofocus: controlled by prop
-                        autoFocus={props.autoFocus}
-                        required={props.required}
-                        disabled={props.disabled}
-                        onKeyUp={props.onKeyUp}
-                        onChange={props.onChange}
-                        value={props.value}
-                        readOnly={props.readOnly}
-                        defaultValue={props.defaultValue}
-                    />
-                </Form.Control>
+                <input
+                    type={props.type ?? "text"}
+                    name={props.name}
+                    id={props.name}
+                    className={clsx(
+                        "input",
+                        {
+                            "has-icon": props.icon,
+                        },
+                        props.inputClassName,
+                    )}
+                    placeholder={props.placeholder}
+                    autoComplete={autocomplete}
+                    // biome-ignore lint/a11y/noAutofocus: controlled by prop
+                    autoFocus={props.autoFocus}
+                    required={props.required}
+                    disabled={props.disabled}
+                    onKeyUp={props.onKeyUp}
+                    onChange={props.onChange}
+                    value={props.value}
+                    readOnly={props.readOnly}
+                    defaultValue={props.defaultValue}
+                />
             </div>
 
-            {props.messages && (
-                <Form.Message match="valueMissing" asChild>
-                    <div className={clsx("mt-2 field-message", props.messageClassName)}>
-                        {translate("Invalid/Empty", props.messages, {
-                            name: props.label ?? props.name,
-                        })}
-                    </div>
-                </Form.Message>
-            )}
-
             {props.message && (
-                <Form.Message asChild>
-                    <div className={clsx("mt-2 field-message", props.messageClassName)}>
-                        {translate(props.message, props.messages, {
-                            name: props.label ?? props.name,
-                        })}
-                    </div>
-                </Form.Message>
+                <div className={clsx("mt-2 field-message", props.messageClassName)}>
+                    {translate(props.message, props.messages, {
+                        name: props.label ?? props.name,
+                    })}
+                </div>
             )}
 
             {props.description && (
@@ -108,7 +86,7 @@ export function Input(props: InputProps) {
                     {props.description}
                 </small>
             )}
-        </Form.Field>
+        </div>
     )
 }
 

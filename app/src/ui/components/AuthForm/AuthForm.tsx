@@ -33,7 +33,6 @@ export function AuthForm(props: AuthFormProps) {
                     name="username"
                     type="text"
                     label={t.FieldUsernameLabel}
-                    ariaLabel={t.FieldUsernameLabel}
                     autoComplete="username"
                     required
                     messages={t}
@@ -48,7 +47,6 @@ export function AuthForm(props: AuthFormProps) {
                     name="password"
                     type="password"
                     label={t.FieldPasswordLabel}
-                    ariaLabel={t.FieldPasswordLabel}
                     autoComplete="password"
                     required
                     messages={t}
@@ -63,7 +61,6 @@ export function AuthForm(props: AuthFormProps) {
                     name="server"
                     type="text"
                     label={t.FieldServerLabel}
-                    ariaLabel={t.FieldServerLabel}
                     messages={t}
                     className="md:grid grid-cols-6 space-y-1"
                     labelClassName="mb-0! font-semibold! text-sm! items-center col-span-2"

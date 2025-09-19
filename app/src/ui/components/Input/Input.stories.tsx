@@ -1,9 +1,9 @@
-import { Form } from "@radix-ui/react-form"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 
 import "@/ui/styles/index.css"
 import { Button } from "@/ui/components/Button"
+import { Form } from "@/ui/components/Form"
 import { CodeIcon, UserIcon } from "@/ui/components/Icons"
 
 import { Input } from "./Input"
@@ -31,10 +31,9 @@ export const Overview: Story = {
 export const WithError: Story = {
     args: {
         label: "Input Field",
-        serverInvalid: true,
         message: "InputError",
         messages: { InputError: "Translated Error Message" },
-        value: "invalid",
+        defaultValue: "invalid",
         icon: <UserIcon />,
     },
     render: (args) => (
@@ -49,7 +48,6 @@ export const WithValidation: Story = {
         label: "Required Field",
         description: "Hit Enter to trigger validation",
         messages: { "Invalid/Empty": "Please enter a value" },
-        value: "",
         icon: <UserIcon />,
         required: true,
     },
