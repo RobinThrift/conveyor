@@ -196,10 +196,11 @@ function ThemeSelection() {
                     role="radiogroup"
                     aria-orientation="horizontal"
                 >
+                    {/* biome-ignore lint/a11y/useSemanticElements: this is correct according to the guidelines */}
                     <button
                         type="button"
                         className="theme-selection-item"
-                        role="radiogroup"
+                        role="radio"
                         aria-checked={mode === "auto"}
                         tabIndex={0}
                         onClick={() => {
@@ -210,10 +211,11 @@ function ThemeSelection() {
                         {tColours.ModeAuto}
                     </button>
 
+                    {/* biome-ignore lint/a11y/useSemanticElements: this is correct according to the guidelines */}
                     <button
                         type="button"
                         className="theme-selection-item"
-                        role="radiogroup"
+                        role="radio"
                         aria-checked={mode === "light"}
                         tabIndex={0}
                         onClick={() => {
@@ -224,10 +226,11 @@ function ThemeSelection() {
                         {tColours.ModeLight}
                     </button>
 
+                    {/* biome-ignore lint/a11y/useSemanticElements: this is correct according to the guidelines */}
                     <button
                         type="button"
                         className="theme-selection-item"
-                        role="radiogroup"
+                        role="radio"
                         aria-checked={mode === "dark"}
                         tabIndex={0}
                         onClick={() => {
