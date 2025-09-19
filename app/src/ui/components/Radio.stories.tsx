@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import React from "react"
+import React, { useId } from "react"
 import { RadioGroup, RadioItem } from "./Radio"
 
 const meta: Meta<typeof RadioGroup> = {
@@ -27,5 +27,15 @@ export const Overview: Story = {
             <RadioItem key="1" label="Item 1" value="item1" />,
             <RadioItem key="2" label="Item 2" value="item2" />,
         ],
+    },
+
+    render: (args) => {
+        let id = useId()
+        return (
+            <div>
+                <h3 id={id}>Radio Group Example</h3>
+                <RadioGroup {...args} aria-describedby={id} />
+            </div>
+        )
     },
 }
