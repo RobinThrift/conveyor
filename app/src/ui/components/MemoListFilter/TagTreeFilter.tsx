@@ -99,7 +99,7 @@ export function TagTreeFilter(props: { className?: string }) {
             )}
 
             {(!isOffCanvas || (isOffCanvas && isOffCanvasOpen)) && (
-                // biome-ignore lint/a11y/useAriaPropsSupportedByRole: this is th correct
+                // biome-ignore lint/a11y/useAriaPropsSupportedByRole: this is correct
                 <div
                     ref={ref}
                     role={isOffCanvas ? "dialog" : undefined}
