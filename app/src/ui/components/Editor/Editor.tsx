@@ -92,7 +92,7 @@ export function Editor(props: EditorProps) {
 
                 <AlertDialog
                     open={confirmationDialog.isOpen}
-                    onOpenChange={confirmationDialog.setIsOpen}
+                    onClose={() => confirmationDialog.setIsOpen(false)}
                 >
                     <AlertDialog.Content>
                         <AlertDialog.Title>{t.DiscardChangesTitle}</AlertDialog.Title>

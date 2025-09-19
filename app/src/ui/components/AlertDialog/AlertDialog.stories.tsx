@@ -35,9 +35,7 @@ export const Overview: Story = {
                     <Button variant="danger" onPress={action("delete")}>
                         Delete
                     </Button>
-                    <AlertDialog.CancelButton onPress={action("cancel")}>
-                        Cancel
-                    </AlertDialog.CancelButton>
+                    <AlertDialog.CancelButton>Cancel</AlertDialog.CancelButton>
                 </AlertDialog.Buttons>
             </AlertDialog.Content>,
         ],
@@ -51,9 +49,7 @@ export const Design: Story = {
         children: [
             <AlertDialog.Content key="content">
                 <AlertDialog.Title>AlertDialog Title</AlertDialog.Title>
-                <AlertDialog.Icon>
-                    <WarningIcon />
-                </AlertDialog.Icon>
+                <AlertDialog.Icon />
                 <AlertDialog.Description>
                     {faker.lorem.sentences({ min: 5, max: 10 })}
                 </AlertDialog.Description>
