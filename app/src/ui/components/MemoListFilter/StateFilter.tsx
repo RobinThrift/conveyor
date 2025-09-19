@@ -1,10 +1,9 @@
-import { Toggle } from "@base-ui-components/react/toggle"
-import { ToggleGroup } from "@base-ui-components/react/toggle-group"
 import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
 import React, { useCallback, useMemo } from "react"
 
 import { ArchiveIcon, BinIcon } from "@/ui/components/Icons"
+import { ToggleButton, ToggleGroup } from "@/ui/components/ToggleGroup"
 import { useT } from "@/ui/i18n"
 import { actions, selectors, stores } from "@/ui/stores"
 
@@ -24,17 +23,17 @@ export function StateFilter(props: StateFilterProps) {
     )
     let selected = useMemo(() => {
         if (isArchivedFilter) {
-            return ["isArchived"]
+            return "isArchived"
         }
 
         if (isDeletedFilter) {
-            return ["isDeleted"]
+            return "isDeleted"
         }
 
-        return []
+        return undefined
     }, [isArchivedFilter, isDeletedFilter])
 
-    let onSelect = useCallback(([selected]: any[]) => {
+    let onSelect = useCallback((selected?: string) => {
         if (selected === "isArchived") {
             actions.memos.list.setFilter({ isArchived: true, isDeleted: undefined })
             return
@@ -56,14 +55,14 @@ export function StateFilter(props: StateFilterProps) {
                 value={selected}
                 onValueChange={onSelect}
             >
-                <Toggle value="isArchived" className="state-filter-item">
+                <ToggleButton value="isArchived" className="state-filter-item">
                     <ArchiveIcon aria-hidden />
                     <span>{t.Archived}</span>
-                </Toggle>
-                <Toggle value="isDeleted" className="state-filter-item">
+                </ToggleButton>
+                <ToggleButton value="isDeleted" className="state-filter-item">
                     <BinIcon aria-hidden />
                     <span>{t.Deleted}</span>
-                </Toggle>
+                </ToggleButton>
             </ToggleGroup>
         </div>
     )
