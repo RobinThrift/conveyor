@@ -1,5 +1,5 @@
 import { useStore } from "@tanstack/react-store"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import ReactDOM from "react-dom/client"
 
 import type { NavigationController } from "@/control/NavigationController"
@@ -38,18 +38,34 @@ export async function initUI({
 function WaitForReady({ children }: React.PropsWithChildren) {
     let isReady = useStore(stores.backend.isReady)
     let backendReadyErr = useStore(stores.backend.error)
+    let [renderChildren, setRenderChildren] = useState(false)
+
+    useEffect(() => {
+        if (isReady && !backendReadyErr) {
+            document.documentElement.classList.add("autounlock-transition")
+            let vt = document.startViewTransition(() => {
+                setRenderChildren(true)
+            })
+
+            vt.finished.then(() => {
+                requestAnimationFrame(() => {
+                    document.documentElement.classList.remove("autounlock-transition")
+                })
+            })
+        }
+    }, [isReady, backendReadyErr])
 
     if (backendReadyErr) {
         return <PrettyError error={backendReadyErr} />
     }
 
-    if (!isReady) {
-        return (
-            <div className="flex items-center justify-center w-[100dvw] h-[100dvh]">
-                <Loader />
-            </div>
-        )
+    if (renderChildren) {
+        return children
     }
 
-    return children
+    return (
+        <div className="flex items-center justify-center w-[100dvw] h-[100dvh]">
+            <Loader />
+        </div>
+    )
 }

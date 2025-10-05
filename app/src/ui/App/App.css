@@ -111,3 +111,31 @@
 :root.dark .unlock-page-bg .noise {
     mix-blend-mode: overlay;
 }
+
+.autounlock-transition {
+    view-transition-name: autounlock-transition;
+}
+
+:root::view-transition-new(autounlock-transition) {
+    animation: autounlock-transition 250ms linear !important;
+    animation-delay: 10ms;
+    animation-fill-mode: both;
+    pointer-events: none;
+    mask:
+        linear-gradient(#000 0 0),
+        linear-gradient(90deg, #000 50.1%, #0000 0) content-box 50% 0% / 200%
+        100% no-repeat,
+        linear-gradient(270deg, #000 50.1%, #0000 0) content-box 50% 0% / 200%
+        100% no-repeat;
+    mask-composite: exclude, add;
+    transform: scale(0.98);
+}
+
+@keyframes autounlock-transition {
+    100% {
+        transform: scale(1);
+        mask-position:
+            0% 0%,
+            100% 0;
+    }
+}
