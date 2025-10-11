@@ -11,6 +11,7 @@
     }
 
     .memo.is-editing {
+        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
         padding: 0 !important;
         width: 100%;
 

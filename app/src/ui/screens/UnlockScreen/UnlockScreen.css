@@ -48,18 +48,15 @@
         height: 100%;
         width: 100%;
         transform: translate(-50%, -50%);
-        /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
         .lock-body {
             display: none;
         }
     }
 
     &.unlocking {
-        /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
         .when-unlocking {
             display: block;
 
-            /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
             .lock-bar,
             .lock-keyhole {
                 display: block;
@@ -75,7 +72,6 @@
     }
 
     &.unlocked {
-        /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
         .icon-wrapper .lock-bar {
             animation: 500ms unlock-anim-bar;
             animation-timing-function: linear(
@@ -119,7 +115,6 @@
             d: path("M88,88V56a40,40,0,0,1,40-40c19.35,0,36.29,13.74,40,32");
         }
 
-        /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
         .icon-wrapper .lock-body {
             animation: 500ms unlock-anim-body;
             animation-timing-function: linear(
@@ -162,7 +157,6 @@
             transform-origin: center center;
         }
 
-        /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
         .icon-wrapper {
             &::before {
                 @apply rounded-full bg-primary border-8 border-primary-extra-dark;

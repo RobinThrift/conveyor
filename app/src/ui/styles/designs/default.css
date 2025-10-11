@@ -84,7 +84,6 @@
         .state-filter-item {
             @apply rounded-lg border border-surface-level-2;
 
-            /* biome-ignore lint/style/noDescendingSpecificity: seems to be false positive */
             &:hover {
                 @apply bg-surface-level-1 border-subtle-extra-light shadow-sm;
             }
@@ -113,13 +112,13 @@
 
     .calendar-grid-body .calendar-grid-cell[data-selected] {
         &:hover span,
-        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
         span {
             @apply text-primary-dark border border-primary font-semibold shadow;
             @apply dark:text-primary-light;
         }
     }
 
+    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
     .short-day-picker .calendar-grid-body .calendar-grid-cell[data-selected] {
         @apply text-primary-extra-dark bg-primary-extra-light border border-primary-extra-dark;
         @apply dark:bg-primary-dark dark:text-primary-light;
@@ -183,7 +182,6 @@
     box-shadow: 0 2px 2px var(--color-surface-border);
 
     @media (min-width: 768px) {
-        /* biome-ignore lint/style/noDescendingSpecificity: shrug */
         .memo {
             box-shadow: none;
         }

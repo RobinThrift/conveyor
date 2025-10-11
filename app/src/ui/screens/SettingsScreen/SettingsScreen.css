@@ -73,6 +73,10 @@
     @apply flex items-center gap-2 cursor-pointer py-1 px-1 border-b-3 border-transparent min-w-fit;
     @apply xs:px-3 xs:border-0 xs:rounded-lg;
 
+    .icon {
+        @apply text-subtle;
+    }
+
     &:hover {
         @apply border-b-3 border-primary-light text-primary;
         @apply xs:bg-primary-light xs:text-primary-contrast xs:border-0;
@@ -81,10 +85,6 @@
             @apply text-primary;
             @apply xs:text-primary-contrast;
         }
-    }
-
-    .icon {
-        @apply text-subtle;
     }
 
     &[data-selected] {
@@ -151,7 +151,6 @@
     h3 button {
         @apply flex items-center gap-2 cursor-pointer;
 
-        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
         .icon {
             transition: transform 200ms;
         }
@@ -188,7 +187,6 @@
     }
 
     .api-token-created-at {
-        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
         &::before {
             @apply mx-1;
             display: inline;
@@ -232,11 +230,13 @@
 }
 
 :root::view-transition-old(theme-mode-transition) {
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden like this */
     display: block !important;
     pointer-events: none;
 }
 
 :root::view-transition-new(theme-mode-transition) {
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden like this */
     animation: theme-mode-transition 250ms linear !important;
     animation-delay: 10ms;
     pointer-events: none;

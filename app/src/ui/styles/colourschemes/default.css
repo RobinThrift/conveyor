@@ -95,7 +95,11 @@
     );
 
     --btn-regular-bg: var(--color-body-bg-contrast);
-    --btn-regular-bg-hover: color-mix(in srgb, var(--btn-regular-bg) 90%, white);
+    --btn-regular-bg-hover: color-mix(
+        in srgb,
+        var(--btn-regular-bg) 90%,
+        white
+    );
     --btn-regular-bg-active: color-mix(
         in srgb,
         var(--btn-regular-bg) 70%,

@@ -51,6 +51,7 @@ export function Header() {
     }
 
     return (
+        // biome-ignore lint/correctness/useUniqueElementIds: is unique
         <AppHeader position="centre" id="memo-list-header">
             <div className="memo-list-header">
                 <div>{children}</div>

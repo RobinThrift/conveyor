@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/correctness/useUniqueElementIds: is guaranteed to be unique */
+
 import { useStore } from "@tanstack/react-store"
 import React, { type Key, useCallback } from "react"
 import {

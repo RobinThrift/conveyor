@@ -20,12 +20,14 @@ export function MemoListFilter() {
 
     return (
         <div className="memo-list-filter">
+            {/** biome-ignore lint/correctness/useUniqueElementIds: is unique */}
             <AppHeader position="centre" id="memo-list-filter-search-desktop">
                 <div className="hidden tablet:block">
                     <SearchBar />
                 </div>
             </AppHeader>
 
+            {/** biome-ignore lint/correctness/useUniqueElementIds: is unique */}
             <AppHeader position="right" id="memo-list-filter-search-mobile">
                 <SearchBar className="collapsible" />
                 <Button

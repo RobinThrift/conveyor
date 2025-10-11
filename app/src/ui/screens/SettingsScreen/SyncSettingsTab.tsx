@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/correctness/useUniqueElementIds: is guaranteed to be unique */
+
 import clsx from "clsx"
 import React from "react"
 import {

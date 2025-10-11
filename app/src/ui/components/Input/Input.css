@@ -39,22 +39,8 @@
     @apply flex items-center gap-2 cursor-pointer w-fit text-sm font-medium;
     @apply focus-visible:outline-primary focus-visible:outline-offset-0;
 
-    &[data-selected] {
-        .checkbox {
-            svg path {
-                stroke-dashoffset: 0;
-            }
-        }
-    }
-
     &:has(:focus-visible) {
         @apply outline outline-primary outline-offset-2 rounded-sm;
-    }
-
-    &:hover {
-        .checkbox {
-            @apply border-primary;
-        }
     }
 
     .checkbox {
@@ -66,6 +52,20 @@
             stroke-dasharray: 590;
             stroke-dashoffset: 590;
             transition: all 0.2s;
+        }
+    }
+
+    &:hover {
+        .checkbox {
+            @apply border-primary;
+        }
+    }
+
+    &[data-selected] {
+        .checkbox {
+            svg path {
+                stroke-dashoffset: 0;
+            }
         }
     }
 }
@@ -95,6 +95,7 @@
 .radio-indicator {
     @apply flex before:size-2 before:rounded-full before:bg-gray-50;
 
+    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to container query */
     &[data-unchecked] {
         @apply hidden;
     }

@@ -23,9 +23,7 @@
     opacity: 1;
 
     @starting-style {
-        /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
         --scale: 0.97;
-        /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
         opacity: 0;
     }
 }
@@ -57,7 +55,6 @@
     opacity: 1;
 
     @starting-style {
-        /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
         opacity: 0;
     }
 }
@@ -86,7 +83,9 @@
     }
 }
 
-:root:has(.alert-dialog) {
+:root:has(.alert-dialog[open]) {
+    /* biome-ignore lint/complexity/noImportantStyles: we really, really want this */
     overflow: hidden !important;
+    /* biome-ignore lint/complexity/noImportantStyles: we really, really want this */
     overscroll-behavior: contain !important;
 }

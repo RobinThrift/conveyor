@@ -110,6 +110,7 @@
     }
 
     &:disabled {
+        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
         background-color: transparent !important;
         color: color-mix(in srgb, var(--btn-border-color) 50%, transparent);
         border-color: color-mix(
@@ -147,6 +148,7 @@
     }
 
     &:disabled {
+        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
         background-color: transparent !important;
         color: inherit;
         opacity: 0.5;

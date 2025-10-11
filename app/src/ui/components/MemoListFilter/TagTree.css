@@ -29,7 +29,6 @@
 
     &:focus-visible {
         @apply outline-none;
-        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
         & > .tag-tree-item-content {
             @apply outline outline-2 outline-primary-dark -outline-offset-3 text-primary;
         }

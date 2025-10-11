@@ -1,24 +1,15 @@
-:root {
-    --appfooter-height: 2lh;
-}
-
 .main {
     @apply sm:flex-1;
-    padding-bottom: calc(var(--appfooter-height) + var(--spacing) * 14);
+    padding-bottom: calc(var(--spacing) * 14);
 
     @media (min-width: 1024px) {
-        padding-bottom: calc(var(--appfooter-height) + var(--spacing) * 4);
+        padding-bottom: calc(var(--spacing) * 4);
     }
 }
 
 .dialog-open-scroll-lock .main {
     height: var(--vvp-h, 100dvh);
     overflow: hidden;
-}
-
-.app-footer {
-    @apply px-2 py-4 flex justify-end items-center absolute left-0 right-0;
-    height: var(--appfooter-height);
 }
 
 .unlock-page-bg {
@@ -117,6 +108,7 @@
 }
 
 :root::view-transition-new(autounlock-transition) {
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
     animation: autounlock-transition 250ms linear !important;
     animation-delay: 10ms;
     animation-fill-mode: both;

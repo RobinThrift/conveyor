@@ -20,6 +20,7 @@ export const MemoListScreen = React.memo(function MemoListScreen(props: MemoList
             <div className="memo-list-container">
                 <Header />
 
+                {/** biome-ignore lint/correctness/useUniqueElementIds: it's unique */}
                 <AppHeader position="right" id="new-memo">
                     <div className="new-memo-link-area">
                         <LinkButton

@@ -1,3 +1,4 @@
 .change-password-dialog {
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
     max-width: 800px !important;
 }

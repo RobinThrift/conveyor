@@ -55,7 +55,6 @@
 
             @container (width > 80rem) {
                 @apply -mt-1;
-                /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to container query */
                 order: 2;
                 padding-left: 0;
             }

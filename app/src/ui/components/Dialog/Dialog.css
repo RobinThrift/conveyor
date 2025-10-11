@@ -12,6 +12,7 @@
     max-width: none;
     max-height: none;
     height: 100svh;
+    /* biome-ignore lint/complexity/noImportantStyles: required for reset later */
     padding-bottom: 5svh !important;
 
     --offset-top: calc(env(safe-area-inset-top, 0) / 2);
@@ -27,7 +28,6 @@
     opacity: 1;
 
     @starting-style {
-        /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
         --offset-top: 100%;
         --scale: 1;
     }
@@ -45,15 +45,14 @@
         width: 80svw;
         max-height: 85svh;
         height: auto;
+        /* biome-ignore lint/complexity/noImportantStyles: required for reset */
         padding-bottom: revert !important;
 
         @starting-style {
             opacity: 0;
-            /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
             --offset-top: calc(-50% + 3svh);
         }
 
-        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
         &[data-state="closing"] {
             opacity: 0;
             --offset-top: calc(-50% + 3svh);
@@ -96,6 +95,7 @@
 /* } */
 
 .dialog.is-modal .dialog {
+    /* biome-ignore lint/complexity/noImportantStyles: required for reset */
     --backdrop-opacity: 0 !important;
 }
 
@@ -144,6 +144,8 @@
 }
 
 :root:has(.dialog.is-modal) {
+    /* biome-ignore lint/complexity/noImportantStyles: we really, really want this */
     overflow: hidden !important;
+    /* biome-ignore lint/complexity/noImportantStyles: we really, really want this */
     overscroll-behavior: contain !important;
 }

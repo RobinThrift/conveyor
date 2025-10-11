@@ -46,6 +46,10 @@
         margin-top: 0;
     }
 
+    table {
+        @apply border-collapse;
+    }
+
     .table-wrapper {
         @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6 w-full;
         @apply border-subtle-extra-dark;
@@ -53,10 +57,6 @@
             margin: 0;
             width: 100%;
         }
-    }
-
-    table {
-        @apply border-collapse;
     }
 
     thead {

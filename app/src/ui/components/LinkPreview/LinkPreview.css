@@ -97,7 +97,6 @@
             );
 
         @container (width <= 23.9rem) {
-            /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
             --r: calc(var(--spacing) * 4); /* radius */
             --s: calc(var(--spacing) * 7); /* size of the inner curve */
         }

@@ -44,6 +44,7 @@
 }
 
 :root.dark .appheader .settings-nav-button {
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
     border-color: var(--color-subtle) !important;
 }
 
@@ -62,6 +63,7 @@ body.platform-macos .appheader {
             height: max(
                 env(titlebar-area-height, var(--appheader-height)),
                 var(--appheader-height)
+                /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
             ) !important;
         }
 

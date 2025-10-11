@@ -4,7 +4,7 @@
     "private": true,
     "type": "module",
     "devDependencies": {
-        "@biomejs/biome": "2.1.2",
+        "@biomejs/biome": "2.2.5",
         "@bufbuild/protobuf": "^2.5.1",
         "@faker-js/faker": "^9.8.0",
         "@jridgewell/source-map": "^0.3.10",

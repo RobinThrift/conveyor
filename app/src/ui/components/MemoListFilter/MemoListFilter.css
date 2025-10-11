@@ -47,7 +47,6 @@
             }
 
             &[data-disabled] {
-                /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
                 span {
                     @apply text-subtle-extra-light! cursor-default dark:text-subtle!;
                 }
@@ -102,7 +101,6 @@
                 scroll-snap-align: center;
             }
 
-            /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
             .calendar-grid-cell {
                 @apply border border-subtle-extra-light;
                 @apply dark:border-subtle-extra-dark;
@@ -138,9 +136,11 @@
             @apply hidden mt-2;
         }
 
+        /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
         & > .btn {
             @apply py-2!;
 
+            /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
             min-height: auto !important;
 
             &:active {
@@ -220,20 +220,33 @@
         @apply border-0! bg-transparent! items-center! p-0! justify-center;
     }
 
+    /* biome-ignore lint/style/noDescendingSpecificity: i dunno */
     &:hover {
         --btn-bg: var(--color-subtle-extra-light);
         --btn-border-color: var(--color-subtle-light);
     }
 
+    /* biome-ignore lint/style/noDescendingSpecificity: i dunno */
     &:hover .icon svg {
+        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
         animation: none !important;
+        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
         color: var(--color-text) !important;
     }
 }
 
 .filter-offcanvas {
-    padding-top: max(env(safe-area-inset-top), calc(var(--spacing) * 4)) !important;
-    padding-bottom: calc(env(safe-area-inset-bottom, 0) + var(--spacing) * 4) !important;
+    padding-top: max(
+        env(safe-area-inset-top),
+        calc(var(--spacing) * 4)
+        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
+    ) !important;
+    padding-bottom: calc(
+        env(safe-area-inset-bottom, 0) +
+        var(--spacing) *
+        4
+        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
+    ) !important;
 
     & > nav {
         @apply w-full flex justify-center;
@@ -243,6 +256,7 @@
         @apply text-xl mb-2;
     }
 
+    /* biome-ignore lint/style/noDescendingSpecificity: i dunno */
     .state-filter {
         @apply grid-cols-1 grid-cols-1 grid!;
     }
@@ -291,8 +305,11 @@
 
         .input-field .input {
             @apply size-10;
+            /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
             padding: 0 !important;
+            /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
             padding-inline: 0 !important;
+            /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
             padding-block: 0 !important;
         }
 

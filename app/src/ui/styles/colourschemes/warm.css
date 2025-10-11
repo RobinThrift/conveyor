@@ -314,14 +314,17 @@
 /* Fixes */
 .warm.dark {
     .memo-list-header {
+        /* biome-ignore lint/complexity/noImportantStyles: is style override for colour scheme */
         color: var(--color-subtle) !important;
     }
 
     .memo-list-filter .date-picker .calendar-grid-header .calendar-grid-cell {
+        /* biome-ignore lint/complexity/noImportantStyles: is style override for colour scheme */
         color: var(--color-subtle-dark) !important;
     }
 
     .state-filter .state-filter-item {
+        /* biome-ignore lint/complexity/noImportantStyles: is style override for colour scheme */
         color: var(--color-text) !important;
     }
 }

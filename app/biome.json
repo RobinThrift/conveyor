@@ -1,5 +1,5 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+    "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
     "assist": { "actions": { "source": { "organizeImports": "on" } } },
     "formatter": {
         "enabled": true,
@@ -39,7 +39,9 @@
                 "noExplicitAny": "off",
                 "noDuplicateJsxProps": "error",
                 "noTemplateCurlyInString": "error",
-                "noOctalEscape": "error"
+                "noOctalEscape": "error",
+                "noUnknownAtRules": "off",
+                "useIterableCallbackReturn": "off"
             },
             "nursery": {}
         }

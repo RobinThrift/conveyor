@@ -3,7 +3,9 @@
 }
 
 .memo.is-editing {
+    /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
     max-height: max-content !important;
+    /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
     overflow: auto !important;
 }
 
@@ -30,6 +32,7 @@
 
     &.is-expanded {
         max-height: none;
+        /* biome-ignore lint/complexity/noImportantStyles: required */
         overflow: auto !important;
 
         .show-more-btn-sizer {

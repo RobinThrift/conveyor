@@ -25,7 +25,6 @@
     }
 
     @starting-style {
-        /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
         right: -80svw;
     }
 }
@@ -42,7 +41,6 @@
     backdrop-filter: blur(2px);
     opacity: var(--backdrop-opacity, 1);
 
-    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
     &[data-is-closing="true"] {
         transition: opacity 250ms;
         opacity: 0;
@@ -60,6 +58,8 @@
 }
 
 :root:has(.tag-tree-filter.is-offcanvas[data-is-open="true"]) {
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
     overflow: hidden !important;
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
     overscroll-behavior: contain !important;
 }
