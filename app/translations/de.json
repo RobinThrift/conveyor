@@ -149,6 +149,11 @@
         "CloseButtonLabel": "Close"
     },
 
+    "components/ZoomableImage": {
+        "ZoomButtonLabel": "Zoom Image",
+        "CloseButtonLabel": "Close"
+    },
+
     "screens/Errors/NotFound": {
         "Title": "Nicht gefunden",
         "Detail": "Die Seite kann nicht gefunden werden"

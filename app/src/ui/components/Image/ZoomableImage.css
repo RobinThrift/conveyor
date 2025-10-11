@@ -1,0 +1,124 @@
+.zoomable-image-wrapper {
+    @apply relative my-0;
+
+    img {
+        @apply rounded-lg my-0;
+        transition: opacity 100ms;
+        transition-delay: 20ms;
+    }
+}
+
+.zoomable-image-wrapper .zoom-btn {
+    @apply cursor-zoom-in rounded-lg;
+
+    &:focus {
+        @apply outline-none;
+    }
+
+    &:focus-visible {
+        @apply outline-solid outline-2 -outline-offset-4 outline-primary;
+    }
+}
+
+.zoomable-image-wrapper.is-zoomed .zoomable-image {
+    opacity: 0;
+}
+
+.zoomed-img {
+    @apply flex-col items-center justify-center p-4 overflow-hidden;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    max-height: none;
+    max-width: none;
+    height: 100svh;
+    width: 100svw;
+    background-color: transparent;
+
+    .zoomed-img-wrapper {
+        @apply w-fit;
+        position: relative;
+        max-height: 100%;
+        max-width: 100%;
+        transform: translate3d(0, 0, 0);
+
+        &[data-is-dragging] figcaption {
+            opacity: 0;
+        }
+
+        img {
+            @apply rounded-2xl;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
+
+    &:has([data-is-closing]) .zoomed-img-close-btn {
+        @apply animate-out fade-out duration-300;
+    }
+
+    &[open] {
+        @apply flex;
+
+        &::backdrop {
+            @apply animate-in fade-in duration-250;
+            background-color: color-mix(
+                in srgb,
+                var(--color-modal-overlay-bg) 80%,
+                transparent
+                /* biome-ignore lint/complexity/noImportantStyles: required */
+            ) !important;
+            opacity: calc(1 - var(--normalized-drag-length, 0));
+            transform: translate3d(0, 0, 0);
+
+            @media (max-width: 767px) {
+                backdrop-filter: blur(3px);
+            }
+        }
+
+        &:has([data-is-closing]) .zoomed-img-wrapper {
+            figcaption {
+                opacity: 0;
+            }
+
+            img {
+                @apply rounded-xl;
+            }
+        }
+
+        &:has([data-is-closing])::backdrop {
+            @apply animate-out fade-out duration-300;
+        }
+    }
+}
+
+/* biome-ignore lint/style/noDescendingSpecificity: false positive due to  nesting */
+.zoomed-img-close-btn {
+    @apply absolute flex items-center justify-center;
+    @apply p-2 rounded-full text-xl cursor-pointer;
+    @apply bg-surface-level-1/50 dark:bg-body-contrast/50;
+    @apply hover:bg-surface-level-1 hover:text-primary;
+    @apply dark:hover:bg-body-contrast dark:hover:text-primary-dark;
+    backdrop-filter: blur(4px);
+    top: max(calc(var(--spacing) * 4), env(safe-area-inset-top, 0));
+    right: max(calc(var(--spacing) * 4), env(safe-area-inset-right, 0));
+}
+
+:root:has(dialog.zoomed-img[open]) {
+    /* biome-ignore lint/complexity/noImportantStyles: we really, really want this */
+    overflow: hidden !important;
+    /* biome-ignore lint/complexity/noImportantStyles: we really, really want this */
+    overscroll-behavior: contain !important;
+}
+
+:root::view-transition-old(zoomed-image) {
+    display: none;
+}
+
+:root::view-transition-new(zoomed-image) {
+    animation: none;
+    mix-blend-mode: normal;
+    transform: translate3d(0, 0, 0);
+}

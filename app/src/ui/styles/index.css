@@ -26,6 +26,7 @@
 @import "../components/Editor/Editor.css" layer(components);
 @import "../components/Figure/Figure.css" layer(components);
 @import "../components/Form/Form.css" layer(components);
+@import "../components/Image/ZoomableImage.css" layer(components);
 @import "../components/InfoPopover/InfoPopover.css" layer(components);
 @import "../components/Input/Input.css" layer(components);
 @import "../components/LinkPreview/LinkPreview.css" layer(components);
