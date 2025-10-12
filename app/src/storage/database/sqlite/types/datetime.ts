@@ -31,12 +31,12 @@ function parse(date: string): Date {
 
     return new Date(
         Date.UTC(
-            Number.parseInt(year),
-            Number.parseInt(month) - 1,
-            Number.parseInt(day),
-            Number.parseInt(hours),
-            Number.parseInt(minutes),
-            Number.parseInt(seconds),
+            Number.parseInt(year, 10),
+            Number.parseInt(month, 10) - 1,
+            Number.parseInt(day, 10),
+            Number.parseInt(hours, 10),
+            Number.parseInt(minutes, 10),
+            Number.parseInt(seconds, 10),
         ),
     )
 }
