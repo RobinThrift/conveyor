@@ -4,8 +4,8 @@ import * as process from "node:process"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react-swc"
 import type { GetModuleInfo } from "rollup"
-import { VitePWA } from "vite-plugin-pwa"
 import { defineConfig, searchForWorkspaceRoot, type UserConfig } from "vite"
+import { VitePWA } from "vite-plugin-pwa"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
     let vcsInfo = await getVCSInfo()
@@ -63,8 +63,9 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                 manifest: false,
                 scope: "/assets/",
                 workbox: {
-                    globPatterns: ["**/*.{js,css,svg,woff2}"],
+                    globPatterns: ["**/*.{js,css,svg,woff2,wasm}"],
                     navigateFallback: null,
+                    maximumFileSizeToCacheInBytes: 3000000, // 3MiB
                 },
             }),
         ],
@@ -178,13 +179,8 @@ function manualChunks(
         return `codemirror`
     }
 
-    let micromark = /micromark/
-    if (micromark.test(id)) {
-        return `markdown`
-    }
-
-    let mdast = /mdast/
-    if (mdast.test(id)) {
+    let libMarkdown = /lib\/markdown/
+    if (libMarkdown.test(id)) {
         return `markdown`
     }
 

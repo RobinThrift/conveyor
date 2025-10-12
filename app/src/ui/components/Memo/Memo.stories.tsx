@@ -101,15 +101,19 @@ function parseMarkdown(raw: string): React.ReactNode | React.ReactNode[] {
 | Cell A2      | Cell B2        | Cell C2       |
 | Cell A3      | Cell B3        | Cell C3       |
 
-## Directives
+## Custom Blocks
 
-::link-preview[https://github.com/RobinThrift/conveyor/]{img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/conveyor" title="GitHub - RobinThrift/conveyor" description="Contribute to RobinThrift/conveyor development by creating an account on GitHub."}
+/// link-preview | url="https://github.com/RobinThrift/conveyor/"
+### GitHub - RobinThrift/conveyor
 
-:::details{className="text-primary" summary="Collapsible"}
+![](https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/conveyor)
+
+Contribute to RobinThrift/conveyor development by creating an account on GitHub.
+///
+
+/// details | className="text-primary" summary="Collapsible"
 ${faker.lorem.paragraph()}
-:::
-
-
+///
 `,
             isArchived: false,
             isDeleted: false,

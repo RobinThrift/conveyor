@@ -1,16 +1,21 @@
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React, { useMemo } from "react"
+import { action } from "storybook/actions"
 
 import { generateFullTestContent } from "@/lib/testhelper/memos"
 
 import { Markdown } from "./Markdown"
 
 import "@/ui/styles/index.css"
+import { TextEditor } from "../Editor/TextEditor"
 
 const meta: Meta<typeof Markdown> = {
     title: "Components/Markdown",
     component: Markdown,
+    args: {
+        className: "memo-content",
+    },
 }
 
 export default meta
@@ -46,6 +51,57 @@ function parseMarkdown(raw: string): React.ReactNode | React.ReactNode[] {
 ## Go
 
 \`\`\`go
+type App struct {
+    config Config
+    srv    *http.Server
+    db     *sqlite.SQLite
+}
+
+func main() {
+    if err := run(context.Background()); err != nil {
+        panic(err)
+    }
+}
+
+func run(ctx context.Context) error {
+    startCtx, startCtxCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
+    defer startCtxCancel()
+
+    config, err := app.ParseConfig("CONVEYOR_")
+    if err != nil {
+        return err
+    }
+
+    _, err = logging.NewGlobalLogger(config.Log.Level, config.Log.Format)
+    if err != nil {
+        return err
+    }
+
+    tracing, err := tracing.NewGlobal(startCtx, config.Tracing)
+    if err != nil {
+        return err
+    }
+
+    errs := make(chan error)
+
+    app := app.New(config)
+    go func() {
+        errs <- app.Start(startCtx)
+    }()
+
+    select {
+    case <-startCtx.Done():
+    case err = <-errs:
+        if err != nil {
+            return err
+        }
+    }
+
+    stopCtx, stopCtxCancel := context.WithTimeout(ctx, time.Minute)
+    defer stopCtxCancel()
+
+    return errors.Join(err, app.Stop(stopCtx), tracing.Stop(stopCtx))
+}
 \`\`\`
 
 
@@ -139,7 +195,7 @@ done
 
 # Changing file extension
 for file in *.jpeg; do
-    mv -- "$file" "\${file%.jpeg\}.jpg"
+    mv -- "$file" "\${file%.jpeg}.jpg"
 done
 \`\`\`
 
@@ -217,28 +273,80 @@ spec:
     ),
 }
 
-export const Directives: Story = {
-    name: "Directives",
+export const CustomBlocks: Story = {
+    name: "Custom Blocks",
     args: {
         id: "storybook",
         children: `
-# Directives
+# Custom Blocks
 
-::link-preview[https://github.com/RobinThrift/conveyor/]{title="GitHub - RobinThrift/conveyor" description="Contribute to RobinThrift/conveyor development by creating an account on GitHub." img="https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/conveyor"  alt="Contribute to RobinThrift/conveyor development by creating an account on GitHub."}
+/// link-preview
+[GitHub - RobinThrift/conveyor](https://github.com/RobinThrift/conveyor/)
+
+![](https://opengraph.githubassets.com/5b69586608c65af6d40aac3a56b740a0eb60af37726a32c627a0c4f61688c151/RobinThrift/conveyor)
+
+Contribute to RobinThrift/conveyor development by creating an account on GitHub.
+///
+
 
 #tag-a #tab-b
 
-:::details{className="text-primary" summary="Collapsible"}
+/// details | className="text-primary" summary="Collapsible"
 ${faker.lorem.paragraph()}
-:::
+/// 
 
 
-::foo[directive]{attrs="value"}
+/// unkown-custom-block
+${faker.lorem.paragraph()}
+///
 `,
     },
     render: (args) => (
         <div className="container mx-auto">
             <Markdown {...args} />
+        </div>
+    ),
+}
+
+export const EditorAndRendered: Story = {
+    args: {
+        id: "storybook",
+        children: generateFullTestContent(),
+        className: "memo-content",
+    },
+    render: (args) => (
+        <div className="grid grid-cols-2 gap-2">
+            <article className="@container memo">
+                <Markdown {...args} />
+            </article>
+            <article className="@container memo is-editing">
+                <div className="editor h-full">
+                    {/** biome-ignore lint/correctness/useUniqueElementIds: is just a test */}
+                    <TextEditor
+                        id="12345"
+                        onSave={action("onSave")}
+                        onChange={action("onChange")}
+                        onCancel={action("onCancel")}
+                        transferAttachment={() => {
+                            let { resolve, reject, promise } = Promise.withResolvers<void>()
+                            let r = Math.random() * 5000 + 1000
+                            setTimeout(() => {
+                                if (Math.random() > 0.8) {
+                                    reject()
+                                    return
+                                }
+                                resolve(undefined)
+                            }, r)
+                            return promise
+                        }}
+                        vimModeEnabled={true}
+                        content={args.children}
+                        tags={[]}
+                    >
+                        {() => null}
+                    </TextEditor>
+                </div>
+            </article>
         </div>
     ),
 }

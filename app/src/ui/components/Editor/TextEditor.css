@@ -1,0 +1,270 @@
+.text-editor {
+    @apply flex-1 overflow-auto;
+    width: 100%;
+    max-width: var(--editor-width, var(--memo-width, 100%));
+    --code-foreground: var(--color-text);
+}
+
+.cm-editor {
+    @apply overflow-hidden;
+    background: var(--code-background);
+    color: var(--code-foreground);
+    font-size: var(--editor-font-size);
+}
+
+.cm-editor.cm-focused {
+    /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
+    outline: none !important;
+}
+
+.cm-content,
+.cm-line {
+    /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
+    padding: 0 !important;
+    text-wrap: pretty;
+}
+
+.cm-scroller {
+    @apply grow font-sans!;
+
+    padding-bottom: calc(100dvh - var(--vvp-h));
+
+    /* line-height: 1.7142857 !important; */
+    /* --editor-font-size: 0.875rem; */
+
+    /* @container (max-width: 28rem) { */
+    /* sm */
+    /* -biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
+    /* --editor-font-size: 1rem !important; */
+    /* -biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
+    /* line-height: 1.75 !important; */
+    /* } */
+
+    /* @media (max-width: 768px) { */
+    /* prevent zoom in on iPhones */
+    /* --editor-font-size: 16px !important; */
+    /* } */
+}
+
+.vim-enabled .cm-cursor {
+    width: 10px;
+    height: 15px;
+    background: color-mix(
+        in srgb,
+        var(--color-primary) 60%,
+        transparent
+        /* biome-ignore lint/complexity/noImportantStyles: required */
+    ) !important;
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    outline: 1px solid color-mix(in srgb, var(--color-primary) 60%, transparent) !important;
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    border-left-color: transparent !important;
+}
+
+.cm-focused .cm-fat-cursor {
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    background: var(--color-primary) !important;
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    outline: 1px solid var(--color-primary) !important;
+}
+
+:not(.cm-focused) .cm-fat-cursor {
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    outline-color: var(--color-primary) !important;
+}
+
+.cm-placeholder {
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    color: var(--color-subtle-dark) !important;
+}
+
+.cm-line:has(.cm-heading-1),
+.cm-line:has(.cm-heading-2),
+.cm-line:has(.cm-heading-3),
+.cm-line:has(.cm-heading-4),
+.cm-line:has(.cm-heading-5),
+.cm-line:has(.cm-heading-6) {
+    @apply font-semibold text-text!;
+    text-wrap: pretty;
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    padding-top: 1lh !important;
+}
+
+.cm-heading-1,
+.cm-heading-2,
+.cm-heading-3,
+.cm-heading-4,
+.cm-heading-5,
+.cm-heading-6 {
+    @apply text-text!;
+}
+
+.cm-line:has(.cm-heading-1) {
+    line-height: calc(2.25 / var(--h1-size));
+    font-size: var(--h1-size);
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    padding-top: 0 !important;
+}
+
+.cm-line:has(.cm-heading-2) {
+    font-size: calc(var(--h1-size) - 0.25rem);
+    line-height: calc(2 / (var(--h1-size) - 0.25rem));
+}
+
+.cm-line:has(.cm-heading-3) {
+    font-size: calc(var(--h1-size) - 0.5rem);
+    line-height: calc(1.75 / (var(--h1-size) - 0.5rem));
+}
+
+.cm-line:has(.cm-heading-4) {
+    font-size: calc(var(--h1-size) - 0.75rem);
+    line-height: calc(1.75 / (var(--h1-size) - 0.75rem));
+}
+
+.cm-heading-5 {
+    @apply font-bold;
+}
+
+.cm-heading-6 {
+    @apply font-semibold underline;
+}
+
+.tok-monospace {
+    @apply font-mono bg-surface-level-1;
+}
+
+.tok-blockquote {
+    @apply font-serif italic text-subtle;
+}
+
+.cm-line:has(.tok-blockquote) {
+    @apply border-l border-subtle-dark ps-4!;
+    text-indent: -3px;
+    margin-top: 0.5lh;
+    margin-bottom: 0.5lh;
+}
+
+.cm-hide-token {
+    .tok-meta {
+        font-size: 0px;
+    }
+}
+.cm-hide-token .cm-heading-1 {
+    margin-right: -0.5rem;
+}
+
+.cm-hide-token .cm-heading-2,
+.cm-hide-token .cm-heading-3 {
+    margin-right: -0.4rem;
+}
+
+.cm-hide-token .cm-heading-4 {
+    margin-right: -0.3rem;
+}
+
+.cm-hide-token .cm-heading-5,
+.cm-hide-token .cm-heading-6 {
+    margin-right: -0.2rem;
+}
+
+.cm-hide-token.md-link {
+    .tok-url {
+        font-size: 0px;
+    }
+}
+
+.cm-line.tok-fenced-code {
+    @apply px-4! font-mono;
+    background-color: var(--code-background);
+    color: var(--code-foreground);
+}
+
+.cm-line.tok-fenced-code-mark {
+    @apply rounded-t font-mono pt-4!;
+    background-color: var(--code-background);
+    color: var(--code-foreground);
+}
+
+.cm-line.tok-fenced-code-end-mark {
+    @apply rounded-b font-mono pb-4!;
+    background-color: var(--code-background);
+    color: var(--code-foreground);
+}
+
+.cm-img {
+    @apply ml-1.5 rounded-lg;
+    max-height: 50dvh;
+}
+
+.cm-anchor {
+    @apply text-primary;
+    display: inline-flex;
+    align-items: center;
+    height: 1lh;
+    width: 0.7lh;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.tok-link {
+    @apply text-primary hover:underline;
+}
+
+.cm-line:has(.tok-heading) + .cm-line.tok-paragraph {
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    padding-top: 0.5lh !important;
+}
+
+.cm-line.tok-list-mark {
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    display: list-item !important;
+    list-style-type: disc;
+    margin-inline-start: 1.5714286em;
+}
+
+.cm-line.tok-list-mark.tok-list-numeric {
+    margin-inline-start: 1.5714286em;
+}
+
+.tok-list-mark .tok-meta:first-child {
+    font-size: 0;
+}
+
+.cm-padding {
+    @apply block h-0 w-0 pointer-events-none;
+}
+
+.cm-line.tok-horizontalrule {
+    @apply relative;
+    height: 1px;
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    padding-top: 2.8571429em !important;
+    /* biome-ignore lint/complexity/noImportantStyles: required */
+    padding-bottom: 2.8571429em !important;
+    color: var(--code-background);
+
+    &::after {
+        @apply bg-subtle-dark;
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+    }
+}
+
+.tok-custom-block-delim {
+    @apply font-mono;
+    color: var(--code-keyword);
+}
+
+.tok-custom-block-args {
+    @apply font-mono;
+    color: var(--code-string);
+}
+
+.tok-custom-block-name {
+    @apply font-mono;
+    color: var(--code-name);
+}

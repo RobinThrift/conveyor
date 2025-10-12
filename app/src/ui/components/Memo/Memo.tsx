@@ -36,7 +36,7 @@ export const Memo = React.memo(function Memo(props: MemoProps) {
     let rendered = useMemo(() => {
         if (shouldRender) {
             return (
-                <Markdown id={props.memo.id} onDoubleClick={onDoubleClick}>
+                <Markdown id={props.memo.id} onDoubleClick={onDoubleClick} className="memo-content">
                     {body}
                 </Markdown>
             )

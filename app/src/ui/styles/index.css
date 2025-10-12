@@ -32,7 +32,6 @@
 @import "../components/LinkPreview/LinkPreview.css" layer(components);
 @import "../components/Loader/Loader.css" layer(components);
 @import "../components/Markdown/Code.css" layer(components);
-@import "../components/Markdown/Markdown.css" layer(components);
 @import "../components/Memo/Memo.css" layer(components);
 @import "../components/MemoList/MemoList.css" layer(components);
 @import "../components/MemoListFilter/MemoListFilter.css" layer(components);
@@ -50,10 +49,17 @@
 @import "../screens/SingleMemoScreen/SingleMemoScreen.css" layer(components);
 @import "../screens/UnlockScreen/UnlockScreen.css" layer(components);
 
+@media (min-width: 768px) {
+    :root {
+        --text-base: 1rem;
+    }
+}
+
 @layer base {
     body {
         color: var(--color-text);
         background-color: var(--color-body-bg);
+        font-size: var(--text-base, 16px);
     }
 }
 

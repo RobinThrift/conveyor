@@ -1,68 +1,56 @@
 import { syntaxTree } from "@codemirror/language"
-import type { Range } from "@codemirror/state"
-import {
-    Decoration,
-    type DecorationSet,
-    type EditorView,
-    ViewPlugin,
-    type ViewUpdate,
-    WidgetType,
-} from "@codemirror/view"
+import { type EditorState, type Extension, type Range, StateField } from "@codemirror/state"
+import { Decoration, type DecorationSet, EditorView, type Rect, WidgetType } from "@codemirror/view"
 import { type AttachmentID, attachmentIDFromURL } from "@/domain/Attachment"
 import type { AsyncResult } from "@/lib/result"
 
 type GetAttachmentDataByID = (id: AttachmentID) => AsyncResult<{ data: Uint8Array }>
 
-export const inlineImages = (getAttachmentDataByID: GetAttachmentDataByID) =>
-    ViewPlugin.fromClass(
-        class {
-            decorations: DecorationSet
+export const inlineImages = (getAttachmentDataByID: GetAttachmentDataByID): Extension => {
+    return StateField.define<DecorationSet>({
+        create(state) {
+            return decorate(state, getAttachmentDataByID)
+        },
 
-            constructor(view: EditorView) {
-                this.decorations = renderImages(view, getAttachmentDataByID)
+        update(widgets, transaction) {
+            if (transaction.docChanged) {
+                return decorate(transaction.state, getAttachmentDataByID)
             }
 
-            update(update: ViewUpdate) {
-                if (
-                    update.docChanged ||
-                    update.viewportChanged ||
-                    syntaxTree(update.startState) !== syntaxTree(update.state)
-                ) {
-                    this.decorations = renderImages(update.view, getAttachmentDataByID)
-                }
-            }
+            return widgets.map(transaction.changes)
         },
-        {
-            decorations: (v) => v.decorations,
-        },
-    )
 
-function renderImages(view: EditorView, getAttachmentDataByID: GetAttachmentDataByID) {
+        provide(field) {
+            return EditorView.decorations.from(field)
+        },
+    })
+}
+
+function decorate(state: EditorState, getAttachmentDataByID: GetAttachmentDataByID) {
     let widgets: Range<Decoration>[] = []
-    for (let { from, to } of view.visibleRanges) {
-        syntaxTree(view.state).iterate({
-            from,
-            to,
-            enter: (node) => {
-                if (node.name !== "Image") {
-                    return
-                }
+    syntaxTree(state).iterate({
+        enter: (node) => {
+            if (node.name !== "Image") {
+                return
+            }
 
-                let text = view.state.doc.sliceString(node.from, node.to)
-                let imgSrcStart = text.indexOf("(")
-                let imgSrcEnd = text.lastIndexOf(")")
-                let imgSrc = text.substring(imgSrcStart + 1, imgSrcEnd)
+            let text = state.doc.sliceString(node.from, node.to)
+            let imgSrcStart = text.indexOf("(")
+            let imgSrcEnd = text.lastIndexOf(")")
+            let imgSrc = text.substring(imgSrcStart + 1, imgSrcEnd)
 
-                let widget = Decoration.widget({
-                    widget: new ImageWidget({
-                        src: imgSrc,
-                        getAttachmentDataByID,
-                    }),
-                })
-                widgets.push(widget.range(node.to))
-            },
-        })
-    }
+            let widget = Decoration.widget({
+                widget: new ImageWidget({
+                    src: imgSrc,
+                    getAttachmentDataByID,
+                }),
+                block: true,
+                side: -1,
+            })
+            widgets.push(widget.range(state.doc.lineAt(node.from).from))
+        },
+    })
+
     return Decoration.set(widgets)
 }
 
@@ -84,9 +72,20 @@ class ImageWidget extends WidgetType {
         return this._src === (widget as ImageWidget)._src
     }
 
-    toDOM() {
+    toDOM(view: EditorView) {
         this._dom = document.createElement("img")
-        this._dom.className = "max-h-[50dvh]"
+        this._dom.className = "cm-img"
+        this._dom.setAttribute("aria-hidden", "true")
+
+        this._dom.addEventListener(
+            "load",
+            () => {
+                setTimeout(() => {
+                    view.requestMeasure()
+                }, 1000)
+            },
+            { once: true },
+        )
 
         let attachment = attachmentIDFromURL(this._src)
         if (attachment?.attachmentID) {
@@ -109,11 +108,10 @@ class ImageWidget extends WidgetType {
         return this._dom
     }
 
-    get lineBreaks(): number {
-        return 1
-    }
-
-    get estimatedHeight(): number {
-        return this._dom?.height ?? 0
+    coordsAt(dom: HTMLElement, pos: number, side: number): Rect | null {
+        console.log("side", side)
+        console.log("pos", pos)
+        console.log("dom", dom)
+        return null
     }
 }

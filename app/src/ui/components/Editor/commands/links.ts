@@ -51,7 +51,14 @@ async function constructLink(uri: string) {
     }
 
     if (ogd?.imageURL) {
-        return `::link-preview[${uri}]{title="${ogd.title}" description="${ogd.description}" img="${ogd.imageURL}"}`
+        return `/// link-preview
+[${ogd?.title}](${uri})
+
+![](${ogd.imageURL})
+
+
+${ogd.description}
+///`
     }
 
     return `[${ogd?.title}](${uri})`

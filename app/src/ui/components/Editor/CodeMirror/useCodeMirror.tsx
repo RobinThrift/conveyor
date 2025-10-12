@@ -1,7 +1,7 @@
 import { SearchCursor } from "@codemirror/search"
 import { Annotation, type ChangeSet, EditorState } from "@codemirror/state"
 import { EditorView, type ViewUpdate } from "@codemirror/view"
-import { useEffect, useMemo, useState } from "react"
+import { type RefObject, useEffect, useMemo, useRef } from "react"
 
 import type { AttachmentID } from "@/domain/Attachment"
 import type { Tag } from "@/domain/Tag"
@@ -11,6 +11,7 @@ import { extensions } from "./extensions"
 
 export function useCodeMirror({
     ref,
+    id,
     text,
     autoFocus,
     placeCursorAt,
@@ -20,8 +21,9 @@ export function useCodeMirror({
     onChange,
     transferAttachment,
 }: {
-    ref?: HTMLDivElement | null
+    ref: RefObject<HTMLDivElement | null>
 
+    id: string
     text: string
 
     autoFocus?: boolean
@@ -42,8 +44,8 @@ export function useCodeMirror({
         data: Uint8Array
     }): Promise<void>
 }) {
-    let [editorState, setEditorState] = useState<EditorState>()
-    let [editorView, setEditorView] = useState<EditorView>()
+    let editorState = useRef<EditorState | undefined>(undefined)
+    let editorView = useRef<EditorView | undefined>(undefined)
 
     let getAttachmentDataByID = useAttachmentLoader()
 
@@ -63,16 +65,19 @@ export function useCodeMirror({
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: should only run once
     useEffect(() => {
-        if (!ref || editorState) {
+        if (!ref?.current) {
+            return
+        }
+
+        if (editorState.current) {
             return () => {
-                if (editorView) {
-                    setEditorState(undefined)
-                    setEditorView(undefined)
-                }
+                editorView.current?.destroy()
+                editorState.current = undefined
+                editorView.current = undefined
             }
         }
 
-        let initEditorState = EditorState.create({
+        editorState.current = EditorState.create({
             doc: text,
             extensions: [
                 ...extensions({
@@ -85,14 +90,11 @@ export function useCodeMirror({
             ],
         })
 
-        setEditorState(initEditorState)
-
-        let initEditorView = new EditorView({
-            state: initEditorState,
-            parent: ref,
+        editorView.current = new EditorView({
+            state: editorState.current,
+            parent: ref.current,
         })
-        setEditorView(initEditorView)
-        onCreateEditor?.(initEditorView)
+        onCreateEditor?.(editorView.current)
 
         if (!placeCursorAt) {
             return
@@ -101,10 +103,10 @@ export function useCodeMirror({
         let pos: number | null = null
         if (placeCursorAt.snippet) {
             let cursor = new SearchCursor(
-                initEditorView.state.doc,
+                editorState.current.doc,
                 placeCursorAt.snippet,
-                initEditorView.posAtCoords(placeCursorAt, false) ?? 0,
-                initEditorView.state.doc.length,
+                editorView.current.posAtCoords(placeCursorAt, false) ?? 0,
+                editorState.current.doc.length,
                 (x) => x.toLowerCase(),
             )
 
@@ -112,51 +114,43 @@ export function useCodeMirror({
         }
 
         if (!pos || pos === -1) {
-            pos = initEditorView.posAtCoords(placeCursorAt, false)
+            pos = editorView.current.posAtCoords(placeCursorAt, false)
         }
 
         if (pos) {
-            initEditorView.dispatch({
+            editorView.current.dispatch({
                 selection: {
                     anchor: pos,
                 },
                 scrollIntoView: true,
             })
         }
-    }, [ref, editorState])
+    }, [ref.current, editorState])
 
     useEffect(() => {
-        return () => {
-            if (editorView) {
-                editorView.destroy()
-                setEditorView(undefined)
-            }
+        if (autoFocus && editorView.current) {
+            editorView.current.focus()
         }
-    }, [editorView])
+    }, [autoFocus])
 
-    useEffect(() => {
-        if (autoFocus && editorView) {
-            editorView.focus()
-        }
-    }, [autoFocus, editorView])
-
+    // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional
     useEffect(() => {
         if (text === undefined) {
             return
         }
 
-        if (!editorView) {
+        if (!editorView.current) {
             return
         }
 
-        let currText = editorView.state.doc.toString()
+        let currText = editorState.current?.doc.toString() ?? ""
         if (text === currText) {
             return
         }
 
-        editorView.dispatch({
+        editorView.current?.dispatch({
             changes: { from: 0, to: currText.length, insert: text },
             annotations: [Annotation.define<boolean>().of(true)],
         })
-    }, [text, editorView])
+    }, [id])
 }

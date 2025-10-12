@@ -23,12 +23,15 @@
         order: 3;
     }
 
-    &:has(.content > .link-preview:first-child) .link-preview {
-        @apply px-0 pb-0 bg-transparent;
+    &:has(.memo-content > .link-preview:first-child) .link-preview {
+        @apply p-0 bg-transparent;
         box-shadow: none;
         width: calc(100%);
 
-        .link-preview-title,
+        .link-preview-title {
+            @apply px-0 pt-0;
+        }
+
         .link-preview-description {
             @apply px-0;
         }

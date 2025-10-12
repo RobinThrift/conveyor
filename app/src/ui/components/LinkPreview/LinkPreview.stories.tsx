@@ -8,6 +8,7 @@ import { Ok } from "@/lib/result"
 import { delay } from "@/lib/testhelper/delay"
 import { generateTitle } from "@/lib/testhelper/memos"
 import { withMockBackend } from "@/lib/testhelper/storybook"
+import { ZoomableImage } from "@/ui/components/Image"
 
 import "@/ui/styles/index.css"
 
@@ -18,7 +19,7 @@ const meta: Meta<typeof LinkPreview> = {
     component: LinkPreview,
     decorators: [
         (Story) => (
-            <div className="content @container container mx-auto">
+            <div className="memo-content @container container mx-auto">
                 <Story />
             </div>
         ),
@@ -49,19 +50,33 @@ const exampleImages = [
 
 export const Overview: Story = {
     args: {
-        children: faker.internet.url(),
-        img: faker.image.urlPicsumPhotos({ width: 1200, height: 600 }),
-        title: generateTitle(),
-        description: faker.lorem.sentences({ min: 1, max: 3 }),
+        children: [
+            <a key="a" href={faker.internet.url()}>
+                {generateTitle()}
+            </a>,
+            <ZoomableImage
+                key="img"
+                src={faker.image.urlPicsumPhotos({ width: 1200, height: 600 })}
+                alt=""
+            />,
+            <p key="p">{faker.lorem.sentences({ min: 1, max: 3 })}</p>,
+        ],
     },
 }
 
 export const WithAttachmentImage: Story = {
     args: {
-        children: faker.internet.url(),
-        img: "attachment://yLAy-2K3mImfADHe9exZr?thumbhash=GhgWJIJ/dYiaiIhnh4f5d/qGhg==",
-        title: generateTitle(),
-        description: faker.lorem.sentences({ min: 1, max: 3 }),
+        children: [
+            <a key="a" href={faker.internet.url()}>
+                {generateTitle()}
+            </a>,
+            <ZoomableImage
+                key="img"
+                src="attachment://yLAy-2K3mImfADHe9exZr?thumbhash=GhgWJIJ/dYiaiIhnh4f5d/qGhg=="
+                alt=""
+            />,
+            <p key="p">{faker.lorem.sentences({ min: 1, max: 3 })}</p>,
+        ],
     },
 
     decorators: [
@@ -83,23 +98,16 @@ export const WithAttachmentImage: Story = {
 }
 
 export const LightAndDarkImages: Story = {
-    args: {
-        children: faker.internet.url(),
-    },
-
     render: (args) => {
         let imgs = faker.helpers.shuffle(exampleImages)
 
         return (
             <div className="grid tablet:grid-cols-2 tablet:gap-4 md:grid-cols-4 md:gap-8">
                 {imgs.map((img) => (
-                    <LinkPreview
-                        key={img}
-                        title={args.title || generateTitle()}
-                        description={args.description || faker.lorem.sentences({ min: 1, max: 2 })}
-                        img={img}
-                    >
-                        {args.children}
+                    <LinkPreview key={img} {...args}>
+                        <a href={faker.internet.url()}>{generateTitle()}</a>
+                        <ZoomableImage src={img} alt="" />
+                        <p>{faker.lorem.sentences({ min: 1, max: 3 })}</p>
                     </LinkPreview>
                 ))}
             </div>
@@ -109,24 +117,33 @@ export const LightAndDarkImages: Story = {
 
 export const MissingImage: Story = {
     args: {
-        children: faker.internet.url(),
-        title: generateTitle(),
-        description: faker.lorem.sentences({ min: 1, max: 3 }),
+        children: [
+            <a key="a" href={faker.internet.url()}>
+                {generateTitle()}
+            </a>,
+            <p key="p">{faker.lorem.sentences({ min: 1, max: 3 })}</p>,
+        ],
     },
 }
 
 export const MissingImageAndDescription: Story = {
     args: {
-        children: faker.internet.url(),
-        title: generateTitle(),
+        children: [
+            <a key="a" href={faker.internet.url()}>
+                {generateTitle()}
+            </a>,
+        ],
     },
 }
 
 export const ErrorImage: Story = {
     args: {
-        children: faker.internet.url(),
-        title: generateTitle(),
-        img: "invalid url",
-        description: faker.lorem.sentences({ min: 1, max: 3 }),
+        children: [
+            <a key="a" href={faker.internet.url()}>
+                {generateTitle()}
+            </a>,
+            <ZoomableImage key="img" src="invalid url" alt="" />,
+            <p key="p">{faker.lorem.sentences({ min: 1, max: 3 })}</p>,
+        ],
     },
 }

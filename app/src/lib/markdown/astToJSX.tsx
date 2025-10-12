@@ -1,43 +1,17 @@
+import type { SyntaxNode, SyntaxNodeRef, Tree } from "@lezer/common"
 import clsx from "clsx"
-import type {
-    AlignType,
-    AutoTagLink,
-    BlockContent,
-    Blockquote,
-    Code as CodeBlock,
-    DefinitionContent,
-    Delete,
-    Emphasis,
-    FootnoteDefinition,
-    FootnoteReference,
-    Heading,
-    Image,
-    InlineCode,
-    Link as LinkNode,
-    List,
-    ListItem,
-    Node,
-    Paragraph,
-    PhrasingContent,
-    Root,
-    RootContent,
-    Strong,
-    Table,
-    TableCell,
-    TableRow,
-} from "mdast"
-import type { ContainerDirective, LeafDirective, TextDirective } from "mdast-util-directive"
 import React, { type Key, type ReactNode, Suspense } from "react"
-
 import type { Params, Screens } from "@/control/NavigationController"
+import { CheckIcon } from "@/ui/components/Icons"
 import { Loader } from "@/ui/components/Loader"
 import { useT } from "@/ui/i18n"
 
 interface Document {
     id: string
+    text: string
     footnotes: React.ReactNode[]
     componentMap: ComponentMap
-    directives: Directives
+    customBlocks: CustomBlocks
 }
 
 interface ComponentMap {
@@ -63,21 +37,34 @@ interface ComponentMap {
     FootnoteReturnIcon?: React.ComponentType
 }
 
-type Directives = Record<string, React.ComponentType<React.PropsWithChildren>>
+type CustomBlocks = Record<string, React.ComponentType<React.PropsWithChildren>>
 
 export function astToJSX(
-    ast: Root,
+    ast: Tree,
     documentID: string,
-    opts: { componentMap?: ComponentMap; directives?: Directives } = {},
+    document: string,
+    opts: { componentMap?: ComponentMap; customBlocks?: CustomBlocks } = {},
 ): ReactNode[] {
     let doc: Document = {
         id: documentID,
+        text: document,
         footnotes: [],
         componentMap: opts.componentMap ?? {},
-        directives: opts.directives ?? {},
+        customBlocks: opts.customBlocks ?? {},
     }
 
-    let nodes: ReactNode[] = [ast.children.map((node) => astNodeToJSX(doc, node))]
+    let nodes: ReactNode[] = []
+
+    ast.iterate({
+        enter: (cursor) => {
+            if (cursor.name === "Document") {
+                return
+            }
+
+            nodes.push(astNodeToJSX(doc, cursor.node))
+            return false
+        },
+    })
 
     if (doc.footnotes.length !== 0) {
         nodes.push(
@@ -92,70 +79,87 @@ export function astToJSX(
     return nodes
 }
 
-function astNodeToJSX(doc: Document, node: RootContent): ReactNode {
-    switch (node.type) {
-        case "text":
-            return node.value
-        case "heading":
-            return headingToJSX(doc, node)
-        case "paragraph":
-            return paragraphtoJSX(doc, node)
-        case "list":
-            return listToJSX(doc, node)
-        case "listItem":
-            return listItemToJSX(doc, node)
-        case "blockquote":
-            return blockquoteToJSX(doc, node)
-        case "strong":
-            return strongToJSX(doc, node)
-        case "emphasis":
-            return emphasisToJSX(doc, node)
-        case "delete":
-            return deleteToJSX(doc, node)
-        case "inlineCode":
-            return inlineCodeToJSX(node)
-        case "link":
-            return linkToJSX(doc, node)
-        case "autoTagLink":
-            return autoTagLinkToJSX(doc, node)
-        case "image":
-            return imageToJSX(doc, node)
-        case "code":
-            return codeToJSX(doc, node)
-        case "table":
-            return tableToJSX(doc, node)
-        case "footnoteReference":
-            return footnoteReferenceToJSX(doc, node)
-        case "footnoteDefinition":
-            return footnoteDefinitionToJSX(doc, node)
-        case "containerDirective":
-            return directiveToJSX(doc, node)
-        case "leafDirective":
-            return directiveToJSX(doc, node)
-        case "textDirective":
-            return directiveToJSX(doc, node)
-        case "break":
-            return <br key={nodeKey(node)} />
-        case "thematicBreak":
-            return <hr key={nodeKey(node)} />
-        case "html": {
-            let Alert = doc.componentMap.Alert ?? "div"
-            return (
-                <Alert variant="danger" key={nodeKey(node)}>
-                    HTML ist not supported
-                </Alert>
-            )
-        }
+function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boolean): ReactNode {
+    switch (cursor.type.name) {
+        case "ATXHeading1":
+            return headingToJSX(doc, cursor.node, 1)
+        case "ATXHeading2":
+            return headingToJSX(doc, cursor.node, 2)
+        case "ATXHeading3":
+            return headingToJSX(doc, cursor.node, 3)
+        case "ATXHeading4":
+            return headingToJSX(doc, cursor.node, 4)
+        case "ATXHeading5":
+            return headingToJSX(doc, cursor.node, 5)
+        case "ATXHeading6":
+            return headingToJSX(doc, cursor.node, 6)
+        case "Paragraph":
+            return paragraphtoJSX(doc, cursor.node, stripParagraph)
+        case "BulletList":
+            return bulletListToJSX(doc, cursor.node)
+        case "OrderedList":
+            return orderedListToJSX(doc, cursor.node)
+        case "ListItem":
+            return listItemToJSX(doc, cursor.node)
+        case "Task":
+            return taskItemToJSX(doc, cursor.node)
+        case "TaskMarker":
+            return taskMarkerToJSX(doc, cursor.node)
+        case "Blockquote":
+            return blockquoteToJSX(doc, cursor.node)
+        case "StrongEmphasis":
+            return strongToJSX(doc, cursor.node)
+        case "Emphasis":
+            return emphasisToJSX(doc, cursor.node)
+        case "Strikethrough":
+            return strikethroughToJSX(doc, cursor.node)
+        case "InlineCode":
+            return inlineCodeToJSX(doc, cursor.node)
+        case "Link":
+            return linkToJSX(doc, cursor.node)
+        case "URL":
+            return urlToJSX(doc, cursor.node)
+        case "TagLink":
+            return tagLinkToJSX(doc, cursor.node)
+        case "FootnoteRef":
+            return footnoteRefToJSX(doc, cursor.node)
+        case "FootnoteDef":
+            return footnoteDefToJSX(doc, cursor.node)
+        case "FencedCode":
+            return fencedCodeToJSX(doc, cursor.node)
+        case "Image":
+            return imageToJSX(doc, cursor.node)
+        case "Table":
+            return tableToJSX(doc, cursor.node)
+        case "CustomBlock":
+            return customBlockToJSX(doc, cursor.node)
+        case "HardBreak":
+            return <br key={nodeKey(cursor.node)} />
+        case "HorizontalRule":
+            return <hr key={nodeKey(cursor.node)} />
+        case "ListMark":
+        case "QuoteMark":
+        case "FootnoteMark":
+        case "HeaderMark":
+        case "CustomBlockEnd":
+            return null
     }
 
-    throw new Error(`unknown node type ${node.type}`)
+    throw new Error(`unknown node type ${cursor.type.name}`)
 }
 
-function headingToJSX(doc: Document, node: Heading): ReactNode {
-    let children = node.children.map((c) => astNodeToJSX(doc, c))
+function headingToJSX(doc: Document, node: SyntaxNode, level: number): ReactNode {
+    let children: ReactNode[] = []
+
+    if (!node.firstChild) {
+        children = [doc.text.substring(node.from, node.to).trim()]
+    } else {
+        children = collectChildren(doc, node)
+    }
+
     let key = nodeKey(node)
-    let id = `${doc.id}-${idFromText(...extractText(node.children))}`
-    switch (node.depth) {
+    let id = `${doc.id}-${idFromText(doc.text.substring(node.from, node.to))}`
+    switch (level) {
         case 1:
             return (
                 <h1 key={key} id={id}>
@@ -195,72 +199,94 @@ function headingToJSX(doc: Document, node: Heading): ReactNode {
     }
 }
 
-function paragraphtoJSX(doc: Document, node: Paragraph): ReactNode {
-    let paragraphs: ReactNode[] = []
-    let currentParagraphChildren: ReactNode[] = []
-    node.children.forEach((c) => {
-        if (c.type === "image") {
-            if (currentParagraphChildren.length !== 0) {
-                paragraphs.push(
-                    <p key={`${nodeKey(node)}-${paragraphs.length}`}>{currentParagraphChildren}</p>,
-                )
-                currentParagraphChildren = []
-            }
-            paragraphs.push(astNodeToJSX(doc, c))
-        } else {
-            currentParagraphChildren.push(astNodeToJSX(doc, c))
-        }
-    })
-
-    if (currentParagraphChildren.length !== 0) {
-        paragraphs.push(
-            <p key={`${nodeKey(node)}-${paragraphs.length}`}>{currentParagraphChildren}</p>,
-        )
+function paragraphtoJSX(doc: Document, node: SyntaxNode, stripParagraph?: boolean): ReactNode {
+    if (!node.firstChild && stripParagraph) {
+        return doc.text.substring(node.from, node.to).trim()
     }
 
-    return paragraphs
-}
-
-function listToJSX(doc: Document, node: List): ReactNode {
-    let children = node.children.map((c) => astNodeToJSX(doc, c))
-    let key = nodeKey(node)
-    if (node.ordered) {
-        return <ol key={key}>{children}</ol>
+    if (stripParagraph) {
+        return <React.Fragment key={nodeKey(node)}>{collectChildren(doc, node)}</React.Fragment>
     }
 
-    return <ul key={key}>{children}</ul>
+    if (!node.firstChild) {
+        return <p key={nodeKey(node)}>{doc.text.substring(node.from, node.to).trim()}</p>
+    }
+
+    let images = node.getChildren("Image")
+    if (images.length === 0) {
+        return <p key={nodeKey(node)}>{collectChildren(doc, node)}</p>
+    }
+
+    let nodes: React.ReactNode[] = []
+    let after = -1
+    let i = 0
+
+    for (let image of images) {
+        let children = collectChildren(doc, node, { before: image.from, after })
+        nodes.push(<p key={`${nodeKey(node)}-${i}`}>{children}</p>)
+        nodes.push(imageToJSX(doc, image))
+        after = image.to
+        i++
+    }
+
+    return <React.Fragment key={nodeKey(node)}>{nodes}</React.Fragment>
 }
 
-function listItemToJSX(doc: Document, node: ListItem): ReactNode {
-    return <li key={nodeKey(node)}>{stripParagraph(node).map((c) => astNodeToJSX(doc, c))}</li>
-}
-
-function blockquoteToJSX(doc: Document, node: Blockquote): ReactNode {
+function strongToJSX(doc: Document, node: SyntaxNode): ReactNode {
     return (
-        <blockquote key={nodeKey(node)}>
-            {stripParagraph(node).map((c) => astNodeToJSX(doc, c))}
-        </blockquote>
+        <strong key={nodeKey(node)}>
+            {collectChildren(doc, node, {
+                after: node.firstChild?.to,
+                before: node.lastChild?.from,
+            })}
+        </strong>
     )
 }
 
-function emphasisToJSX(doc: Document, node: Emphasis): ReactNode {
-    return <em key={nodeKey(node)}>{node.children.map((c) => astNodeToJSX(doc, c))}</em>
+function emphasisToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    return (
+        <em key={nodeKey(node)}>
+            {collectChildren(doc, node, {
+                after: node.firstChild?.to,
+                before: node.lastChild?.from,
+            })}
+        </em>
+    )
 }
 
-function deleteToJSX(doc: Document, node: Delete): ReactNode {
-    return <del key={nodeKey(node)}>{node.children.map((c) => astNodeToJSX(doc, c))}</del>
+function strikethroughToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    return (
+        <del key={nodeKey(node)}>
+            {collectChildren(doc, node, {
+                after: node.firstChild?.to,
+                before: node.lastChild?.from,
+            })}
+        </del>
+    )
 }
 
-function strongToJSX(doc: Document, node: Strong): ReactNode {
-    return <strong key={nodeKey(node)}>{node.children.map((c) => astNodeToJSX(doc, c))}</strong>
+function inlineCodeToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    return (
+        <code key={nodeKey(node)}>
+            {collectChildren(doc, node, {
+                after: node.firstChild?.to,
+                before: node.lastChild?.from,
+            })}
+        </code>
+    )
 }
 
-function inlineCodeToJSX(node: InlineCode): ReactNode {
-    return <code key={nodeKey(node)}>{node.value}</code>
-}
+function linkToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let children = node.getChildren("LinkMark")
 
-function linkToJSX(doc: Document, node: LinkNode): ReactNode {
-    let url = node.url
+    let url = ""
+    if (children.length > 2) {
+        let hrefFrom = children[2].to ?? node.from
+        let hrefTo = children[3]?.from ?? node.from
+
+        url = doc.text.substring(hrefFrom, hrefTo)
+    }
+
     if (url.startsWith("#")) {
         url = `#${doc.id}-${url.replace("#", "")}`
     }
@@ -268,184 +294,376 @@ function linkToJSX(doc: Document, node: LinkNode): ReactNode {
     let key = nodeKey(node)
 
     return (
-        <a
-            href={url}
-            title={node.title ?? undefined}
-            key={key}
-            rel="noreferrer noopener"
-            target={key as string}
-        >
-            {node.children.map((c) => astNodeToJSX(doc, c))}
+        <a href={url} key={key} rel="noreferrer noopener" target={key as string}>
+            {collectChildren(doc, node, { after: children[0].to, before: children[1].from })}
         </a>
     )
 }
 
-function autoTagLinkToJSX(doc: Document, node: AutoTagLink): ReactNode {
+function urlToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let url = doc.text.substring(node.from, node.to).trim()
+    if (node.parent?.type.name === "Link" || node.parent?.type.name === "Image") {
+        return url
+    }
+
+    let key = nodeKey(node)
+
+    return (
+        <a href={url} key={key} rel="noreferrer noopener" target={key as string}>
+            {url}
+        </a>
+    )
+}
+
+function tagLinkToJSX(doc: Document, node: SyntaxNode): ReactNode {
     let Link = doc.componentMap.Link ?? "a"
+    let tag = doc.text.substring(node.from, node.to)
     return (
         <Link
             screen="root"
-            params={{
-                filter: {
-                    tag: node.tag,
-                },
-            }}
+            params={{ filter: { tag } }}
             key={nodeKey(node)}
             className="tag-link"
             rel="tag"
         >
-            {node.children.map((c) => astNodeToJSX(doc, c))}
+            {tag}
         </Link>
     )
 }
 
-function imageToJSX(doc: Document, node: Image): ReactNode {
-    let Img = doc.componentMap.Image ?? "img"
-
-    let id = `${doc.id}-${idFromText(node.title || node.alt || node.url)}`
-
-    return (
-        <Suspense key={nodeKey(node)} fallback={<Loader />}>
-            <Img
-                id={id}
-                src={node.url}
-                alt={node.alt ?? node.url}
-                caption={node.title ?? undefined}
-            />
-        </Suspense>
-    )
-}
-
-function codeToJSX(doc: Document, node: CodeBlock): ReactNode {
-    let Code = doc.componentMap.Code ?? "pre"
+function footnoteRefToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let children = node.getChildren("FootnoteMark")
+    let identifier = doc.text.substring(children[0].from + 2, children[1].to - 1)
 
     return (
-        <Code key={nodeKey(node)} lang={node.lang ?? undefined} meta={node.meta ?? undefined}>
-            {node.value}
-        </Code>
-    )
-}
-
-function tableToJSX(doc: Document, node: Table): ReactNode {
-    if (node.children.length === 0) {
-        return <table key={nodeKey(node)} />
-    }
-
-    let [header, ...rows] = node.children
-
-    let alignments: AlignType[] = node.align || []
-
-    return (
-        <div key={nodeKey(node)} className="table-wrapper">
-            <table>
-                <thead>{tableRowToJSX(doc, header, alignments)}</thead>
-                <tbody>{rows.map((row) => tableRowToJSX(doc, row, alignments))}</tbody>
-            </table>
-        </div>
-    )
-}
-
-function tableRowToJSX(doc: Document, node: TableRow, alignments: AlignType[]): ReactNode {
-    return (
-        <tr key={nodeKey(node)}>
-            {node.children.map((c, i) => tableCellToJSX(doc, c, alignments[i]))}
-        </tr>
-    )
-}
-
-function tableCellToJSX(doc: Document, node: TableCell, alignment: AlignType): ReactNode {
-    return (
-        <td
-            key={nodeKey(node)}
-            className={clsx({
-                "text-left": alignment === "left",
-                "text-center": alignment === "center",
-                "text-right": alignment === "right",
-            })}
-        >
-            {node.children.map((c) => astNodeToJSX(doc, c))}
-        </td>
-    )
-}
-
-function footnoteDefinitionToJSX(doc: Document, node: FootnoteDefinition): ReactNode {
-    doc.footnotes.push(<FootnoteLinkItem doc={doc} node={node} />)
-    return null
-}
-
-function footnoteReferenceToJSX(doc: Document, node: FootnoteReference): ReactNode {
-    return (
-        <sup id={`fnref:${doc.id}-${node.identifier}`} key={nodeKey(node)}>
-            <a href={`#fn:${doc.id}-${node.identifier}`} role="doc-noteref">
-                {node.label}
+        <sup id={`fnref:${doc.id}-${identifier}`} key={nodeKey(node)}>
+            <a href={`#fn:${doc.id}-${identifier}`} role="doc-noteref">
+                {collectChildren(doc, node)}
             </a>
         </sup>
     )
 }
 
-function directiveToJSX(
-    doc: Document,
-    node: ContainerDirective | LeafDirective | TextDirective,
-): ReactNode {
-    let Directive = doc.directives[node.name]
-    if (!Directive) {
-        let Alert = doc.componentMap.Alert ?? "div"
-        return (
-            <Alert variant="danger" key={nodeKey(node)}>{`Unknown directive "${node.name}"`}</Alert>
-        )
+function footnoteDefToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let children = node.getChildren("FootnoteMark")
+    let identifier = doc.text.substring(children[0].from + 2, children[1].to - 2)
+
+    doc.footnotes.push(
+        <FootnoteLinkItem doc={doc} identifier={identifier} key={nodeKey(node)}>
+            {collectChildren(doc, node, {
+                after: children[1].to + 1,
+            })}
+        </FootnoteLinkItem>,
+    )
+    return null
+}
+
+function fencedCodeToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let Code = doc.componentMap.Code ?? "pre"
+
+    let codeInfo = ""
+    let codeInfoNode = node.getChild("CodeInfo")
+
+    if (codeInfoNode) {
+        codeInfo = doc.text.substring(codeInfoNode.from, codeInfoNode.to)
     }
 
-    let children = node.children.map((c) => astNodeToJSX(doc, c))
-    if (node.type === "leafDirective") {
-        children = [extractText(node.children).join("")]
+    let lang = ""
+
+    let langEndIndex = codeInfo.indexOf(" ")
+    if (langEndIndex !== -1) {
+        lang = codeInfo.substring(0, langEndIndex)
+        codeInfo = codeInfo.substring(langEndIndex + 1)
+    } else {
+        lang = codeInfo
+        codeInfo = ""
+    }
+
+    let childen = ""
+
+    let codeText = node.getChild("CodeText")
+    if (codeText) {
+        childen = doc.text.substring(codeText.from, codeText.to)
     }
 
     return (
-        <Directive {...(node.attributes ?? {})} key={nodeKey(node)}>
-            {children}
-        </Directive>
+        <Code key={nodeKey(node)} lang={lang} meta={codeInfo}>
+            {childen}
+        </Code>
     )
 }
 
-function stripParagraph(node: {
-    children: (BlockContent | DefinitionContent)[]
-}): (PhrasingContent | BlockContent | DefinitionContent)[] {
-    if (node.children.length === 1) {
-        let firstChild = node.children[0]
-        if (firstChild.type === "paragraph") {
-            return firstChild.children
+function imageToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let Img = doc.componentMap.Image ?? "img"
+
+    let children = node.getChildren("LinkMark")
+    let titleFrom = children[0].to
+    let titleTo = children[1].from
+
+    let alt = doc.text.substring(titleFrom ?? 0, titleTo ?? 0)
+
+    let src = ""
+    if (children.length > 2) {
+        let hrefFrom = children[2].to ?? node.from
+        let hrefTo = children[3]?.from ?? node.from
+
+        src = doc.text.substring(hrefFrom, hrefTo)
+    }
+
+    let id = `${doc.id}-${idFromText(alt || src)}`
+
+    return (
+        <Suspense key={nodeKey(node)} fallback={<Loader />}>
+            <Img id={id} src={src} alt={alt} />
+        </Suspense>
+    )
+}
+
+export type Alignment = "none" | "centre" | "left" | "right"
+
+function tableToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let alignmentNode = node.getChild("TableDelimiter", "TableHeader")
+    let alignmentText = alignmentNode
+        ? doc.text.substring(alignmentNode.from, alignmentNode.to).trim()
+        : ""
+    let alignmentSpecifiers = alignmentText.substring(1, alignmentText.length - 2).split("|")
+
+    let alignments: Alignment[] = []
+
+    for (let spec of alignmentSpecifiers) {
+        let trimmed = spec.trim()
+        let hasLeft = trimmed[0] === ":"
+        let hasRight = trimmed.at(-1) === ":"
+        if (!hasLeft && !hasRight) {
+            alignments.push("none")
+        }
+
+        if (hasLeft && hasRight) {
+            alignments.push("centre")
+            continue
+        }
+
+        if (hasLeft) {
+            alignments.push("left")
+            continue
+        }
+
+        alignments.push("right")
+    }
+
+    let currCol = 0
+    let cells: React.ReactNode[] = []
+    let rows: React.ReactNode[] = []
+    let header: React.ReactNode | null = null
+
+    node.cursor().iterate(
+        (c) => {
+            if (c.name === "Table") {
+                return
+            }
+
+            if (c.name === "TableCell") {
+                let children: React.ReactNode
+                if (!c.node.firstChild) {
+                    children = doc.text.substring(c.from, c.to)
+                } else {
+                    children = collectChildren(doc, c.node)
+                }
+                cells.push(
+                    <td
+                        key={nodeKey(c.node)}
+                        className={clsx({
+                            "text-left": alignments[currCol] === "left",
+                            "text-center": alignments[currCol] === "centre",
+                            "text-right": alignments[currCol] === "right",
+                        })}
+                    >
+                        {children}
+                    </td>,
+                )
+                return false
+            }
+        },
+        (c) => {
+            if (c.name === "TableCell") {
+                currCol++
+                return
+            }
+
+            if (c.name === "TableHeader") {
+                header = (
+                    <thead key={nodeKey(c.node)}>
+                        <tr>{cells}</tr>
+                    </thead>
+                )
+                cells = []
+                currCol = 0
+                return
+            }
+
+            if (c.name === "TableRow") {
+                rows.push(<tr key={nodeKey(c.node)}>{cells}</tr>)
+                cells = []
+                currCol = 0
+                return
+            }
+        },
+    )
+    return (
+        <div key={nodeKey(node)} className="table-wrapper">
+            <table>
+                {header}
+                <tbody>{rows}</tbody>
+            </table>
+        </div>
+    )
+}
+
+function bulletListToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    return <ul key={nodeKey(node)}>{collectChildren(doc, node)}</ul>
+}
+
+function orderedListToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    return <ol key={nodeKey(node)}>{collectChildren(doc, node)}</ol>
+}
+
+function listItemToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    return (
+        <li
+            key={nodeKey(node)}
+            className={clsx({
+                "task-list-item": node.firstChild?.nextSibling?.firstChild?.name === "TaskMarker",
+            })}
+        >
+            {collectChildren(doc, node, { stripParagraph: true })}
+        </li>
+    )
+}
+
+function taskItemToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    return collectChildren(doc, node, { stripParagraph: true })
+}
+
+function taskMarkerToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let isChecked = doc.text.substring(node.from + 1, node.to - 1) === "x"
+    let key = nodeKey(node) as string
+
+    return (
+        // biome-ignore lint/a11y/useSemanticElements: is valid,as per https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/
+        <div
+            key={key}
+            role="checkbox"
+            aria-checked={isChecked}
+            aria-readonly
+            tabIndex={0}
+            className="checkbox"
+        >
+            <CheckIcon weight="bold" />
+        </div>
+    )
+}
+
+function blockquoteToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    return <blockquote key={nodeKey(node)}>{collectChildren(doc, node)}</blockquote>
+}
+
+function customBlockToJSX(doc: Document, node: SyntaxNode): ReactNode {
+    let name = ""
+    let nameNode = node.getChild("CustomBlockName")
+
+    if (nameNode) {
+        name = doc.text.substring(nameNode.from, nameNode.to)
+    }
+
+    let argsNode = node.getChild("CustomBlockArgs")
+    let args: any = {}
+    if (argsNode) {
+        try {
+            args = parseCustomBlockArgs(doc.text.substring(argsNode.from, argsNode.to).trim())
+        } catch (err) {
+            let Alert = doc.componentMap.Alert ?? "div"
+            return (
+                <Alert variant="danger" key={nodeKey(node)}>
+                    {(err as Error).message}
+                </Alert>
+            )
         }
     }
 
-    return node.children
+    let start = node.getChild("CustomBlockStart")
+    let end = node.getChild("CustomBlockEnd")
+
+    let CustomBlock = name ? doc.customBlocks[name.trim()] : "div"
+    if (!CustomBlock) {
+        let Alert = doc.componentMap.Alert ?? "div"
+        return (
+            <Alert
+                variant="danger"
+                key={nodeKey(node)}
+            >{`Unknown custom block "${node.name}"`}</Alert>
+        )
+    }
+    return (
+        <CustomBlock {...args} key={nodeKey(node)}>
+            {collectChildren(doc, node, {
+                after: argsNode?.to ?? nameNode?.to ?? start?.to,
+                before: end?.from,
+            })}
+        </CustomBlock>
+    )
 }
 
-function extractText(content: PhrasingContent[]): string[] {
-    let strings: string[] = []
-    content.forEach((node) => {
-        switch (node.type) {
-            case "text":
-                strings.push(node.value)
-                return
-            case "inlineCode":
-                strings.push(node.value)
-                return
-            case "delete":
-                strings.push(...extractText(node.children))
-                return
-            case "strong":
-                strings.push(...extractText(node.children))
-                return
-            case "emphasis":
-                strings.push(...extractText(node.children))
-                return
-            case "link":
-                strings.push(...extractText(node.children))
-                return
-        }
-    })
+function collectChildren(
+    doc: Document,
+    node: SyntaxNode,
+    {
+        before = Number.MAX_SAFE_INTEGER,
+        after = -1,
+        stripParagraph,
+    }: { before?: number; after?: number; stripParagraph?: boolean } = {},
+): ReactNode[] {
+    let children: ReactNode[] = []
 
-    return strings
+    let from = node.from ?? after
+    let child: SyntaxNode | null = node.firstChild
+
+    while (child != null) {
+        if (child.to <= after) {
+            from = child.to
+            child = child.nextSibling
+            continue
+        }
+
+        if (child.from >= before) {
+            if (child.from !== from) {
+                appendToChildren(children, doc.text.substring(from, child.from))
+            }
+
+            break
+        }
+
+        if (child.from !== from) {
+            appendToChildren(children, doc.text.substring(from, child.from))
+        }
+
+        children.push(astNodeToJSX(doc, child, stripParagraph))
+
+        from = child.to
+        child = child.nextSibling
+    }
+
+    let to = before < Number.MAX_SAFE_INTEGER ? before : node.to
+    let lastChild = child ?? node.lastChild
+
+    if (lastChild && lastChild.to !== to && to < before) {
+        appendToChildren(children, doc.text.substring(lastChild.to, to))
+    }
+
+    return children
+}
+
+function nodeKey(node: SyntaxNode): Key {
+    return `${node.name}:${node.from}:${node.to}`
 }
 
 function idFromText(...fragements: string[]): string {
@@ -457,18 +675,26 @@ function idFromText(...fragements: string[]): string {
         .replaceAll(/[(\s\]\]]+/g, "_")
 }
 
-function nodeKey(node: Node): Key {
-    return `${node.position?.start.line}:${node.position?.start.column}-${node.position?.end.line}:${node.position?.end.column}`
+function appendToChildren(children: ReactNode[], node: ReactNode) {
+    if (typeof children.at(-1) === "string" && typeof node === "string") {
+        children[children.length - 1] += node
+    } else {
+        children.push(node)
+    }
 }
 
-function FootnoteLinkItem({ doc, node }: { doc: Document; node: FootnoteDefinition }) {
+function FootnoteLinkItem({
+    doc,
+    identifier,
+    children,
+}: React.PropsWithChildren<{ doc: Document; identifier: string }>) {
     let t = useT("components/Memo")
     return (
-        <li id={`fn:${doc.id}-${node.identifier}`} key={nodeKey(node)}>
-            {stripParagraph(node).map((c) => astNodeToJSX(doc, c))}
+        <li id={`fn:${doc.id}-${identifier}`}>
+            {children}
 
             <a
-                href={`#fnref:${doc.id}-${node.identifier}`}
+                href={`#fnref:${doc.id}-${identifier}`}
                 role="doc-backlink"
                 aria-label={t.FootnoteBackLink}
                 className="ml-1 p-1 relative top-0.5 inline-flex hover:text-primary-contrast hover:bg-primary rounded-sm"
@@ -477,4 +703,77 @@ function FootnoteLinkItem({ doc, node }: { doc: Document; node: FootnoteDefiniti
             </a>
         </li>
     )
+}
+
+let validArgChars = /[a-zA-Z0-9_]/
+
+function parseCustomBlockArgs(argsStr: string): Record<string, string> {
+    let args: Record<string, string> = {}
+    if (argsStr.length === 0) {
+        return args
+    }
+
+    let inQuotes = false
+    let isName = true
+    let currentName = ""
+    let currentVal = ""
+
+    for (let i = 0; i < argsStr.length; i++) {
+        if (isName && currentName.length === 0 && argsStr[i] === " ") {
+            continue
+        }
+
+        if (isName && argsStr[i] === "=") {
+            isName = false
+            continue
+        }
+
+        if (isName && !validArgChars.test(argsStr[i])) {
+            throw new Error(`invalid argument name: ${argsStr}`)
+        }
+
+        if (isName) {
+            currentName += argsStr[i]
+            continue
+        }
+
+        if (argsStr[i] === '"' && !inQuotes) {
+            inQuotes = true
+            continue
+        }
+
+        if (argsStr[i] === '"' && inQuotes) {
+            inQuotes = false
+            isName = true
+            args[currentName] = currentVal
+            currentName = ""
+            currentVal = ""
+            continue
+        }
+
+        if (inQuotes) {
+            currentVal += argsStr[i]
+            continue
+        }
+
+        if (argsStr[i] === " ") {
+            isName = true
+            args[currentName] = currentVal
+            currentName = ""
+            currentVal = ""
+            continue
+        }
+
+        currentVal += argsStr[i]
+    }
+
+    if (isName && inQuotes) {
+        throw new Error(`invalid arguments: ${argsStr}`)
+    }
+
+    if (currentName && currentVal) {
+        args[currentName] = currentVal
+    }
+
+    return args
 }

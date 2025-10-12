@@ -11,6 +11,7 @@ suite("ui/components/Markdown", () => {
     test("Markdown", async () => {
         let raw = `# Markdown Test\n #tag-1 #tag-2\n${generateRealisticBody()}`
 
+        // biome-ignore lint/correctness/useUniqueElementIds: it's a test
         let rendered = render(<Markdown id="test-memo-id">{raw}</Markdown>)
 
         await expect

@@ -1,5 +1,6 @@
 .memo {
     @apply overflow-x-auto flex flex-col;
+    --h1-size: var(--text-3xl);
 }
 
 .memo.is-editing {
@@ -101,5 +102,199 @@
         &.md {
             @apply hidden @md:flex order-3 w-full;
         }
+    }
+}
+
+.memo-content {
+    text-wrap: pretty;
+    overflow-wrap: break-word;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-semibold;
+        text-wrap: pretty;
+        margin-top: 1lh;
+
+        a {
+            @apply text-primary-extra-dark dark:text-primary-light;
+        }
+    }
+
+    a {
+        @apply text-primary hover:underline cursor-pointer;
+    }
+
+    h1 {
+        font-size: var(--h1-size);
+        line-height: calc(2.25 / var(--h1-size));
+        margin-top: 0;
+    }
+
+    h2 {
+        font-size: calc(var(--h1-size) - 0.25rem);
+        line-height: calc(2 / (var(--h1-size) - 0.25rem));
+    }
+
+    h3 {
+        font-size: calc(var(--h1-size) - 0.5rem);
+        line-height: calc(1.75 / (var(--h1-size) - 0.5rem));
+    }
+
+    h4 {
+        font-size: calc(var(--h1-size) - 0.75rem);
+        line-height: calc(1.75 / (var(--h1-size) - 0.75rem));
+    }
+
+    h5 {
+        @apply font-bold;
+    }
+
+    h6 {
+        @apply font-semibold underline;
+    }
+
+    ul {
+        list-style-type: disc;
+        margin-bottom: 1.1428571em;
+        padding-inline-start: 1.5714286em;
+    }
+
+    li {
+        margin-top: 0.2857143em;
+        margin-bottom: 0.2857143em;
+
+        & > p {
+            @apply my-0;
+        }
+
+        li > figure {
+            @apply my-0 inline-block;
+            vertical-align: text-top;
+
+            figcaption {
+                @apply py-0 my-0;
+            }
+        }
+    }
+
+    li.task-list-item {
+        list-style-type: none;
+        margin-inline-start: -1em;
+        .checkbox {
+            @apply inline-flex size-5 relative top-1 me-1 -ms-1;
+
+            &[aria-checked="true"] {
+                svg path {
+                    stroke-dashoffset: 0;
+                }
+            }
+        }
+    }
+
+    ol {
+        list-style-type: decimal;
+        margin-bottom: 1.1428571em;
+        padding-inline-start: 1.5714286em;
+    }
+
+    li ul,
+    li ol {
+        margin-bottom: 0;
+    }
+
+    blockquote {
+        @apply font-serif italic text-subtle-extra-dark border-l border-subtle-dark ps-4;
+        margin-top: 0.5lh;
+        margin-bottom: 0.5lh;
+    }
+
+    & > img,
+    .zoomable-image,
+    & > figure img {
+        max-height: 50dvh;
+    }
+
+    p {
+        margin-top: 0.5lh;
+        margin-bottom: 0.5lh;
+    }
+
+    hr {
+        margin-top: 2.8571429em;
+        margin-bottom: 2.8571429em;
+    }
+
+    .tag-link {
+        @apply cursor-pointer;
+    }
+
+    .table-wrapper {
+        @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6 w-full;
+        @apply border-subtle-extra-dark;
+        table {
+            margin: 0;
+            width: 100%;
+        }
+    }
+
+    table {
+        @apply border-collapse;
+    }
+
+    thead {
+        @apply font-semibold border-b border-subtle;
+    }
+
+    td {
+        @apply p-2 border-x border-subtle;
+        @apply border-subtle-extra-dark;
+
+        &:first-child {
+            @apply border-l-0;
+        }
+
+        &:last-child {
+            @apply border-r-0;
+        }
+    }
+
+    pre {
+        @apply overflow-x-auto p-4 rounded;
+        margin-top: 0.5lh;
+        margin-bottom: 1lh;
+
+        font-size: inherit;
+        code {
+            font-size: inherit;
+        }
+    }
+
+    :where(code):not(pre > code) {
+        @apply bg-surface-level-1;
+    }
+
+    .tag-link {
+        @apply cursor-pointer;
+    }
+
+    .footnotes {
+        @apply mt-4 border-t border-t-subtle;
+        clear: both;
+    }
+
+    @container (width < 25rem) {
+        --h1-size: var(--text-xl);
+    }
+
+    @container (width < 15rem) {
+        --h1-size: var(--text-lg);
+    }
+
+    @container (width < 10rem) {
+        --h1-size: var(--text-base);
     }
 }

@@ -69,10 +69,7 @@ export function useEditMemoScreenState() {
         nav.pop()
     }, [isLoading, error, startedRequest, nav.pop])
 
-    let currentPageParams = useStore(
-        stores.navigation.currentPage,
-        selectors.navigation.currentParams,
-    )
+    let currentPageParams = useStore(stores.navigation.currentParams)
 
     return {
         memo,

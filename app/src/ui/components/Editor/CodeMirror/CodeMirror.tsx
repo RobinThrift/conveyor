@@ -38,7 +38,7 @@ export function CodeMirror(props: CodeMirrorProps) {
     let ref = useRef<HTMLDivElement>(null)
 
     useCodeMirror({
-        ref: ref.current,
+        ref,
         ...props,
     })
 

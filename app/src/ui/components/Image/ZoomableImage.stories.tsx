@@ -31,7 +31,6 @@ export const Overview: Story = {
         className: "max-w-[500px]",
         src: faker.image.urlPicsumPhotos({ width: 1600, height: 1400 }),
         alt: faker.lorem.words(5),
-        caption: faker.lorem.sentences({ min: 2, max: 5 }),
     },
 }
 
@@ -59,7 +58,6 @@ export const InArticle: Story = {
                         })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
-                    caption={args.caption ?? faker.lorem.sentences({ min: 2, max: 5 })}
                 />
                 <p>{faker.lorem.paragraph()}</p>
                 <p>{faker.lorem.paragraph()}</p>
@@ -73,7 +71,6 @@ export const InArticle: Story = {
                         })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
-                    caption={args.caption ?? faker.lorem.sentences({ min: 2, max: 5 })}
                 />
                 <p>{faker.lorem.paragraph()}</p>
                 <ZoomableImage
@@ -86,7 +83,6 @@ export const InArticle: Story = {
                         })
                     }
                     alt={args.alt ?? faker.lorem.words(5)}
-                    caption={args.caption ?? faker.lorem.sentences({ min: 2, max: 5 })}
                 />
                 <p>{faker.lorem.paragraph()}</p>
             </article>

@@ -1,14 +1,13 @@
-import clsx from "clsx"
 import React, { useMemo } from "react"
 
 import { astToJSX, parse } from "@/lib/markdown"
 import { Alert } from "@/ui/components/Alert"
-import { Figure } from "@/ui/components/Figure"
 import { ArrowUDownLeftIcon } from "@/ui/components/Icons"
+import { ZoomableImage } from "@/ui/components/Image"
 import { Link } from "@/ui/components/Link"
 
 import { Code } from "./Code"
-import { directives } from "./directives"
+import { customBlocks } from "./customBlocks"
 
 export interface MarkdownProps {
     ref?: React.Ref<HTMLDivElement>
@@ -34,25 +33,21 @@ export function Markdown(props: MarkdownProps) {
             )
         }
 
-        return astToJSX(ast, props.id, {
+        return astToJSX(ast, props.id, props.children, {
             componentMap: {
                 Alert,
                 Link,
                 Code,
-                Image: Figure,
+                Image: ZoomableImage,
                 FootnoteReturnIcon: ArrowUDownLeftIcon,
             },
-            directives,
+            customBlocks,
         })
     }, [props.children, props.id])
 
     return (
         // biome-ignore lint/a11y/noStaticElementInteractions: this is intentional
-        <div
-            ref={props.ref}
-            className={clsx("markdown content", props.className)}
-            onDoubleClick={props.onDoubleClick}
-        >
+        <div ref={props.ref} className={props.className} onDoubleClick={props.onDoubleClick}>
             {parsed}
         </div>
     )

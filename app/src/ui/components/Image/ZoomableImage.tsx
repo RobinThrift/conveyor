@@ -1,21 +1,33 @@
 import clsx from "clsx"
-import React from "react"
+import React, { useContext } from "react"
 
 import { XIcon } from "@/ui/components/Icons"
 import { usePreventScroll } from "@/ui/hooks/usePreventScroll"
 import { useT } from "@/ui/i18n"
 
+import { Image } from "./Image"
 import { useDraggableZoomableImage, useZoomableImage } from "./useZoomableImage"
+import { ZoomableImageContext } from "./ZoomableImageContext"
 
 export interface ZoomableImageProps {
     className?: string
     id?: string
     alt: string
     src: string
-    caption?: string
 }
 
 export function ZoomableImage(props: ZoomableImageProps) {
+    let enabled = useContext(ZoomableImageContext) ?? true
+    if (!enabled) {
+        return <Image {...props} />
+    }
+
+    return <ZoomableImageInner {...props} />
+}
+
+ZoomableImage.Context = ZoomableImageContext
+
+function ZoomableImageInner(props: ZoomableImageProps) {
     let t = useT("components/ZoomableImage")
     let { ref, dialogRef, zoomedImgRef, imgRef, isZoomed, close, onClickZoom, img } =
         useZoomableImage(props)
@@ -67,7 +79,6 @@ const DraggableZoomableImage = React.memo(function DraggableZoomableImage({
 }: {
     alt: string
     src: string
-    caption?: string
     isLoading?: boolean
     style?: React.CSSProperties
 

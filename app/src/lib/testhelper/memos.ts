@@ -62,39 +62,44 @@ export function generateMockMemos() {
 
 export function generateFullTestContent(): string {
     return `# Markdown Content (Heading 1)
-${faker.lorem.lines({ min: 1, max: 10 })}
+${faker.lorem.lines({ min: 1, max: 10 }).replaceAll("\n", " ")}
 
-## Paragraphs (Heading 2)
-${faker.lorem.lines({ min: 1, max: 10 })}
+## Paragraphs (Heading 2) [with a link](https://github.com/RobinThrift/conveyor)
+${faker.lorem.lines({ min: 1, max: 10 }).replaceAll("\n", " ")}
 
 #tag-1 #tag/nesting
 
-${faker.lorem.lines({ min: 1, max: 10 })}
+${faker.lorem.lines({ min: 1, max: 10 }).replaceAll("\n", " ")}
 
 ### Lists (Heading 3)
 
 - this is an
-    - unordered list
+    - unordered list 
     - with some
-        - with nested items
-
+        - with nested items with a [link](https://github.com/RobinThrift/conveyor)
+        - and another
 - back to top level
+- and here's a [link](https://github.com/RobinThrift/conveyor)
 
 1. orderd list
-1. items
+1. items and a [link](https://github.com/RobinThrift/conveyor)
     - with nested regular
-    - list
+    - list including a [link](https://github.com/RobinThrift/conveyor)
     - items
 1. and ordered
     1. nested list
     1. items
 
+- [ ] a simple
+- [x] task list
+- [ ] with some items
+
 #### Blockquote (Heading 4)
-> ${faker.lorem.lines({ min: 1, max: 10 })}
+> ${faker.lorem.lines({ min: 1, max: 10 }).replaceAll("\n", " ")}
 
 And make note of the footnote[^fn1]
 
-[^fn1]: Very Important content here
+[^fn1]: **Very** important *content* here. With a [link]${faker.internet.url()}.
 
 ##### Text Styling (Heading 5)
 
@@ -102,9 +107,17 @@ This is some *emphasized* content and some **strong** content.
 This text will be \`monospaced\`... hopefully. ~~Scratch this.~~
 
 ###### Heading 6
-This is a [link](${faker.internet.url()}), an auto link (http://example.com) and an image will follow:
+This is a [link](${faker.internet.url()}), an auto link (http://example.com).  
+This an [*emphasized link*](${faker.internet.url()}) and a __[strong link](${faker.internet.url()})__.  
+More autolinks: *${faker.internet.url()}*, **${faker.internet.url()}**
 
-![image caption](${faker.image.urlPicsumPhotos({ height: 1500, width: 1800 })})
+This is a [broken]() link.
+
+Here's a couple of images:
+![image caption 1](${faker.image.urlPicsumPhotos({ height: 1500, width: 1800 })})
+![image caption 2](${faker.image.urlPicsumPhotos({ height: 1500, width: 1800 })})
+With some extra text inbetween
+![image caption 3](${faker.image.urlPicsumPhotos({ height: 1500, width: 1800 })})
 
 ***
 
@@ -123,20 +136,22 @@ ${generateCodeSnippet()}
 
 ${generateTable(3)}
 
-## Directives
+## Custom Blocks
 
-${generateOpenGraphDirective()}
-
-:::details{className="text-primary" summary="Collapsible"}
+/// details | summary="${faker.lorem.lines(1)}" className=text-primary
 ${faker.lorem.paragraph()}
-:::
+- this is 
+- a simple 
+- list thing
+///
 
+${generateLinkPreviewCustomBlock()}
 `
 }
 
 export function generateMemo({ title, tags }: { title: string; tags: string[] }) {
     if (faker.number.float({ min: 0, max: 10 }) > 9.5) {
-        return `${generateOpenGraphDirective()}
+        return `${generateLinkPreviewCustomBlock()}
 #${tags.join(" #")}`
     }
 
@@ -195,8 +210,16 @@ ${faker.lorem.paragraphs({ min: 1, max: 4 })}
     return b
 }
 
-export function generateOpenGraphDirective(): string {
-    return `::link-preview[https://github.com/RobinThrift/conveyor]{img="${faker.image.urlPicsumPhotos({ width: 1200, height: 600 })}" title="${faker.lorem.sentences(1)}" description="${faker.lorem.sentences({ min: 1, max: 3 })}"}`
+export function generateLinkPreviewCustomBlock(): string {
+    return `
+/// link-preview
+[${faker.lorem.sentences(1)}](https://github.com/RobinThrift/conveyor)
+
+![](${faker.image.urlPicsumPhotos({ width: 1200, height: 600 })})
+
+${faker.lorem.sentences({ min: 1, max: 3 })}
+///
+`
 }
 
 export function generateTable(rows = 3): string {
@@ -204,7 +227,10 @@ export function generateTable(rows = 3): string {
 | :----------- | :------------: | ------------: |
 ${new Array(rows)
     .fill(undefined)
-    .map((_, i) => `| Cell A${i}      | Cell B${i}        | Cell C${i}       |`)
+    .map(
+        (_, i) =>
+            `| _Cell_ A${i}      | Cell [B${i}](${faker.internet.url()})        | Cell **C${i}**       |`,
+    )
     .join("\n")}
 `
 }
@@ -351,7 +377,7 @@ done
 
 # Changing file extension
 for file in *.jpeg; do
-    mv -- "$file" "\${file%.jpeg\}.jpg"
+    mv -- "$file" "\${file%.jpeg}.jpg"
 done
 \`\`\``,
 

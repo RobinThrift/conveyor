@@ -35,24 +35,24 @@
     @apply block border border-danger-dark bg-danger text-danger-contrast;
 }
 
+.checkbox {
+    @apply flex size-6 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border border-subtle outline-hidden text-primary;
+    svg path {
+        stroke: currentColor;
+        fill: transparent;
+        stroke-width: 25px;
+        stroke-dasharray: 590;
+        stroke-dashoffset: 590;
+        transition: all 0.2s;
+    }
+}
+
 .checkbox-field {
     @apply flex items-center gap-2 cursor-pointer w-fit text-sm font-medium;
     @apply focus-visible:outline-primary focus-visible:outline-offset-0;
 
     &:has(:focus-visible) {
         @apply outline outline-primary outline-offset-2 rounded-sm;
-    }
-
-    .checkbox {
-        @apply flex size-6 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border border-subtle outline-hidden text-primary;
-        svg path {
-            stroke: currentColor;
-            fill: transparent;
-            stroke-width: 25px;
-            stroke-dasharray: 590;
-            stroke-dashoffset: 590;
-            transition: all 0.2s;
-        }
     }
 
     &:hover {

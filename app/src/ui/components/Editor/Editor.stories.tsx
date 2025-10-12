@@ -108,6 +108,7 @@ export const WithContent: Story = {
     args: {
         placeholder: "Placeholder text...",
         className: "h-full",
+        vimModeEnabled: true,
         memo: {
             id: "1235219",
             content: generateFullTestContent(),
@@ -131,7 +132,7 @@ export const WithContent: Story = {
         })(),
     },
     render: (args) => (
-        <div className="tablet:container mx-auto min-h-[100dvh] tablet:p-8 tablet:max-w-[80rem]">
+        <div className="tablet:container mx-auto h-screen tablet:p-8 tablet:max-w-[80rem] overflow-auto relative">
             <Editor {...args} />
         </div>
     ),

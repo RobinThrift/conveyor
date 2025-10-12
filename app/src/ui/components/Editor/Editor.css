@@ -1,4 +1,14 @@
 @import "./Toolbar.css";
+@import "./TextEditor.css";
+
+.editor-buttons {
+    @apply p-1 flex items-center justify-between gap-2 w-full relative -top-0.5;
+    height: 1.5lh;
+
+    &:has(button:only-child) {
+        @apply justify-end;
+    }
+}
 
 .editor {
     @apply flex flex-col bg-body;
@@ -25,129 +35,4 @@
     @apply appearance-none cursor-text;
     @apply flex items-start w-full min-h-full text-left p-3 grow;
     @apply text-subtle-dark font-mono text-[13px];
-}
-
-.editor-buttons {
-    @apply p-1 flex items-center justify-between gap-2 w-full relative -top-0.5;
-    height: 1.5lh;
-
-    &:has(button:only-child) {
-        @apply justify-end;
-    }
-}
-
-.text-editor {
-    @apply flex-1 overflow-auto;
-    width: 100%;
-    max-width: var(--editor-width, var(--memo-width, 100%));
-}
-
-.cm-editor {
-    @apply font-mono overflow-hidden;
-    background: var(--code-background);
-    color: var(--code-foreground);
-    font-size: var(--editor-font-size);
-}
-
-.cm-editor.cm-focused {
-    outline: none !important;
-}
-
-.cm-scroller {
-    @apply grow font-mono;
-
-    line-height: 1.7142857 !important;
-    --editor-font-size: 0.875rem;
-
-    padding-bottom: calc(100dvh - var(--vvp-h));
-
-    @container (max-width: 28rem) {
-        /* sm */
-        /* biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
-        --editor-font-size: 1rem !important;
-        /* biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
-        line-height: 1.75 !important;
-    }
-
-    @media (max-width: 768px) {
-        /* prevent zoom in on iPhones */
-        --editor-font-size: 16px !important;
-    }
-}
-
-.vim-enabled .cm-cursor {
-    width: 10px;
-    height: 15px;
-    background: color-mix(in srgb, var(--color-primary) 60%, transparent) !important;
-    outline: 1px solid color-mix(in srgb, var(--color-primary) 60%, transparent) !important;
-    border-left-color: transparent !important;
-}
-
-.cm-focused .cm-fat-cursor {
-    background: var(--color-primary) !important;
-    outline: 1px solid var(--color-primary) !important;
-}
-
-:not(.cm-focused) .cm-fat-cursor {
-    outline-color: var(--color-primary) !important;
-}
-
-.cm-placeholder {
-    color: var(--color-subtle-dark) !important;
-}
-
-.cm-heading {
-    color: var(--code-heading);
-}
-
-.cm-heading-1 {
-    color: var(--code-heading);
-    font-size: 1.7em;
-    font-weight: 700;
-}
-
-.cm-heading-2 {
-    color: var(--code-heading);
-    font-size: 1.4em;
-    font-weight: 700;
-}
-
-.cm-heading-3 {
-    color: var(--code-heading);
-    font-size: 1.28em;
-    font-weight: 700;
-}
-
-.cm-heading-4 {
-    font-weight: 700;
-    font-size: 1.42em;
-    color: var(--code-heading);
-}
-
-.cm-heading-5 {
-    font-weight: 700;
-    color: var(--code-heading);
-}
-
-.cm-heading-6 {
-    font-weight: 600;
-    color: var(--code-heading);
-}
-
-.tok-monospace {
-    @apply font-mono;
-}
-
-.tok-blockquote {
-    @apply italic;
-}
-
-.cm-hide-token {
-    .tok-meta {
-        font-size: 0px;
-    }
-
-    .tok-heading {
-        margin-right: -1rem;
-    }
 }

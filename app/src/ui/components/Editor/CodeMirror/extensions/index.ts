@@ -21,12 +21,15 @@ import {
 
 import type { AttachmentID } from "@/domain/Attachment"
 import type { Tag } from "@/domain/Tag"
+import { customBlocks } from "@/lib/markdown/extensions/blocks"
+import { footnotes } from "@/lib/markdown/extensions/footnotes"
+import { tagLinks } from "@/lib/markdown/extensions/tags"
 import type { AsyncResult } from "@/lib/result"
-
 import { attachments } from "./attachments"
 import { fileDropHandler } from "./fileDropHandler"
 import { inlineImages } from "./inlineImages"
 import { markdownDecorations } from "./markdownDecorations"
+import { tabIndent } from "./tabIndent"
 import { tagAutoComplete } from "./tagAutoComplete"
 import { theme } from "./theme"
 import { vim } from "./vim"
@@ -51,6 +54,7 @@ export const extensions = ({
     getAttachmentDataByID(id: AttachmentID): AsyncResult<{ data: Uint8Array }>
 }) => {
     let exts: Extension[] = [
+        vimModeEnabled ? vim() : [],
         keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...searchKeymap]),
         indentUnit.of(" ".repeat(4)),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
@@ -66,17 +70,21 @@ export const extensions = ({
         EditorView.lineWrapping,
         attachments({ transferAttachment }),
         fileDropHandler(),
-        markdown({ base: markdownLanguage, codeLanguages: languages }),
+        markdown({
+            base: markdownLanguage,
+            codeLanguages: languages,
+            extensions: [footnotes, tagLinks, customBlocks],
+        }),
         inlineImages(getAttachmentDataByID),
         markdownDecorations,
+        EditorView.contentAttributes.of({
+            spellcheck: "true",
+        }),
+        tabIndent,
     ]
 
     if (placeholder) {
         exts.push(placeholderExt(placeholder))
-    }
-
-    if (vimModeEnabled) {
-        exts.push(vim())
     }
 
     if (autocomplete?.tags) {

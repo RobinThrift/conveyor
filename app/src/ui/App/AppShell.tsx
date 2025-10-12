@@ -1,7 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from "react"
 
 import { AppHeaderProvider } from "@/ui/components/AppHeader"
-import { BuildInfo } from "@/ui/components/BuildInfo"
 import { Theme } from "@/ui/components/Theme"
 import { useCurrentPage } from "@/ui/navigation"
 import { ErrorScreen } from "@/ui/screens/ErrorScreen"
@@ -93,12 +92,7 @@ export function AppShell() {
         <Theme colourScheme={colourScheme} mode={mode}>
             <I18nProvider>
                 <AppHeaderProvider />
-                <main className="main">
-                    {pageComp}
-                    <footer className="app-footer">
-                        <BuildInfo />
-                    </footer>
-                </main>
+                <main className="main">{pageComp}</main>
             </I18nProvider>
         </Theme>
     )
