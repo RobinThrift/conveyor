@@ -20,6 +20,8 @@ const serverError = JSON.parse(
 )?.error
 
 async function main() {
+    registerSW({ immediate: true })
+
     let [, initErr] = await fromPromise(
         init({
             rootElement,
@@ -31,8 +33,6 @@ async function main() {
         ReactDOM.createRoot(rootElement).render(<PrettyError error={initErr} />)
         return
     }
-
-    registerSW({ immediate: true })
 }
 
 main()
