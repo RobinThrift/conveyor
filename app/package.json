@@ -61,7 +61,6 @@
         "@tauri-apps/plugin-store": "^2.2.0",
         "age-encryption": "^0.2.1",
         "clsx": "^2.1.1",
-        "immer": "^10.1.1",
         "nanoevents": "^9.1.0",
         "nanoid": "^5.1.5",
         "quill-delta": "^5.1.0",
