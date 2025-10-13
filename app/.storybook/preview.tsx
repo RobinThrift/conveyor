@@ -35,7 +35,7 @@ const preview: Preview = {
         },
 
         viewport: {
-            viewports: {
+            options: {
                 phone: {
                     name: "Phone",
                     styles: {
