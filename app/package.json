@@ -21,7 +21,7 @@
         "@types/react-dom": "^19.0.4",
         "@vite-pwa/assets-generator": "^1.0.0",
         "@vitejs/plugin-react-swc": "4.1.0",
-        "@vitest/browser": "^3.2.3",
+        "@vitest/browser": "3.2.4",
         "bippy": "^0.3.16",
         "culori": "^4.0.1",
         "jsondiffpatch": "^0.7.3",
@@ -37,8 +37,8 @@
         "typescript": "^5.8.2",
         "vite": "7.1.9",
         "vite-plugin-pwa": "^1.0.2",
-        "vitest": "^3.2.0",
-        "vitest-browser-react": "^1.0.0"
+        "vitest": "3.2.4",
+        "vitest-browser-react": "1.0.1"
     },
     "dependencies": {
         "@codemirror/autocomplete": "^6.18.6",
