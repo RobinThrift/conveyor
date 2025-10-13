@@ -17,7 +17,7 @@ export class TauriKVStoreContainer<Names extends string> implements KVStoreConta
                 : never
         } = {},
     ): TauriKVStore<Items, NotFoundError> {
-        let store = new LazyStore(`${name}.json`, { autoSave: true })
+        let store = new LazyStore(`${name}.json`, { autoSave: true, defaults: {} })
         this._stores.push(store)
         return new TauriKVStore(store, opts)
     }
