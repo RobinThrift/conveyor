@@ -20,7 +20,7 @@
         "@types/react": "^19.0.12",
         "@types/react-dom": "^19.0.4",
         "@vite-pwa/assets-generator": "^1.0.0",
-        "@vitejs/plugin-react-swc": "^3.11.0",
+        "@vitejs/plugin-react-swc": "4.1.0",
         "@vitest/browser": "^3.2.3",
         "bippy": "^0.3.16",
         "culori": "^4.0.1",
@@ -35,7 +35,7 @@
         "tailwindcss": "4.1.14",
         "tailwindcss-animate": "^1.0.7",
         "typescript": "^5.8.2",
-        "vite": "^7.0.0",
+        "vite": "7.1.9",
         "vite-plugin-pwa": "^1.0.2",
         "vitest": "^3.2.0",
         "vitest-browser-react": "^1.0.0"
