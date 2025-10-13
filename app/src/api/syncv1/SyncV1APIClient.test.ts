@@ -1,26 +1,23 @@
 import { HttpResponse, http } from "msw"
-import { setupWorker } from "msw/browser"
-import { assert, suite, test } from "vitest"
+import { assert, suite } from "vitest"
 
 import { BaseContext } from "@/lib/context"
 import { Ok } from "@/lib/result"
 import { assertOkResult } from "@/lib/testhelper/assertions"
+import { test } from "@/lib/testhelper/test"
 import { decodeText, encodeText } from "@/lib/textencoding"
 
 import { SyncV1APIClient } from "./SyncV1APIClient"
 
 suite("api/syncv1/SyncV1APIClient", async () => {
-    test("getFullSync", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, syncV1APIClient } = await setupSyncV1APIClientTest()
-
-        await setup()
+    test("getFullSync", async ({ onTestFinished, worker }) => {
+        let { ctx, cleanup, syncV1APIClient } = await setupSyncV1APIClientTest()
         onTestFinished(cleanup)
 
         let content = "THIS IS TOTALLY A DATABASE"
-
         let data = encodeText(content)
 
-        useMocks(
+        worker.use(
             http.get("/api/sync/v1/full", () => {
                 return new HttpResponse(new Uint8Array(data), {
                     status: 200,
@@ -32,16 +29,14 @@ suite("api/syncv1/SyncV1APIClient", async () => {
         assert.equal(decodeText(new Uint8Array(fetched)), content)
     })
 
-    test("uploadFullDB", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, syncV1APIClient } = await setupSyncV1APIClientTest()
-
-        await setup()
+    test("uploadFullDB", async ({ onTestFinished, worker }) => {
+        let { ctx, cleanup, syncV1APIClient } = await setupSyncV1APIClientTest()
         onTestFinished(cleanup)
 
         let content = "THIS IS TOTALLY A DATABASE"
         let data = encodeText(content)
 
-        useMocks(
+        worker.use(
             http.post("/api/sync/v1/full", async ({ request }) => {
                 assert.equal(decodeText(new Uint8Array(await request.arrayBuffer())), content)
                 return new HttpResponse(null, {
@@ -53,16 +48,14 @@ suite("api/syncv1/SyncV1APIClient", async () => {
         await assertOkResult(syncV1APIClient.uploadFullSyncData(ctx, data.buffer))
     })
 
-    test("uploadAttachment", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, syncV1APIClient } = await setupSyncV1APIClientTest()
-
-        await setup()
+    test("uploadAttachment", async ({ onTestFinished, worker }) => {
+        let { ctx, cleanup, syncV1APIClient } = await setupSyncV1APIClientTest()
         onTestFinished(cleanup)
 
         let content = "THIS IS TOTALLY A DATABASE"
         let data = encodeText(content)
 
-        useMocks(
+        worker.use(
             http.post("/api/sync/v1/attachments", async ({ request }) => {
                 assert.equal(
                     decodeText(
@@ -94,20 +87,11 @@ async function setupSyncV1APIClientTest() {
         tokenStorage: { getToken: () => Promise.resolve(Ok("TOKEN")) },
     })
 
-    let mockWorker = setupWorker()
-
     return {
         ctx,
-        setup: async () => {
-            await mockWorker.start({
-                quiet: true,
-            })
-        },
         cleanup: async () => {
             cancel()
-            mockWorker.stop()
         },
-        useMocks: ((...args) => mockWorker.use(...args)) as typeof mockWorker.use,
         syncV1APIClient,
     }
 }

@@ -43,8 +43,8 @@ export class APIError extends Error {
             return new APIError({
                 code: res.status,
                 type: `${res.status} ${res.statusText}`,
-                title: "error parsing request JSON",
-                detail: `${(e as Error).name}: ${(e as Error).message}`,
+                title: "error parsing response JSON",
+                detail: `${res.url.toString()}: ${(e as Error).name}: ${(e as Error).message}`,
             })
         }
     }

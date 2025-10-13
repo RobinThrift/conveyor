@@ -1,6 +1,5 @@
 import { HttpResponse, http } from "msw"
-import { setupWorker } from "msw/browser"
-import { assert, suite, test } from "vitest"
+import { assert, suite } from "vitest"
 
 import {
     PasswordChangeRequiredError,
@@ -11,21 +10,21 @@ import { BaseContext } from "@/lib/context"
 import { isErr } from "@/lib/errors"
 import { currentDateTime, isAfter } from "@/lib/i18n"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
+import { test } from "@/lib/testhelper/test"
 import { UnauthorizedError } from "../apiv1/APIError"
 import { AuthV1APIClient } from "./AuthV1APIClient"
 
 suite("api/syncv1/AuthV1APIClient", async () => {
-    test("getTokenUsingCredentials/valid", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
+    test("getTokenUsingCredentials/valid", async ({ onTestFinished, worker }) => {
+        let { ctx, cleanup, authV1APIClient } = await setupAuthV1APIClientTest()
 
-        await setup()
         onTestFinished(cleanup)
 
         let username = "test_user"
         let password = "passwd"
         let now = currentDateTime()
 
-        useMocks(
+        worker.use(
             http.post<never, { username: string; password: string; grant_type: "password" }>(
                 "/api/auth/v1/token",
                 async ({ request }) => {
@@ -61,16 +60,15 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         assert.isTrue(isAfter(token.refreshExpiresAt, token.expiresAt))
     })
 
-    test("getTokenUsingCredentials/invalid", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
+    test("getTokenUsingCredentials/invalid", async ({ onTestFinished, worker }) => {
+        let { ctx, cleanup, authV1APIClient } = await setupAuthV1APIClientTest()
 
-        await setup()
         onTestFinished(cleanup)
 
         let username = "test_user"
         let password = "incorrect_password"
 
-        useMocks(
+        worker.use(
             http.post<never, { refresh_token: string; grant_type: "password" }>(
                 "/api/auth/v1/token",
                 async ({ request }) => {
@@ -98,16 +96,15 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         assert.isTrue(isErr(err, UnauthorizedError))
     })
 
-    test("getTokenUsingCredentials/requiresChange", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
+    test("getTokenUsingCredentials/requiresChange", async ({ onTestFinished, worker }) => {
+        let { ctx, cleanup, authV1APIClient } = await setupAuthV1APIClientTest()
 
-        await setup()
         onTestFinished(cleanup)
 
         let username = "test_user"
         let password = "passwd"
 
-        useMocks(
+        worker.use(
             http.post<never, { username: string; password: string; grant_type: "password" }>(
                 "/api/auth/v1/token",
                 async ({ request }) => {
@@ -136,16 +133,15 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         assert.isTrue(isErr(err, PasswordChangeRequiredError))
     })
 
-    test("getTokenUsingRefreshToken/valid", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
+    test("getTokenUsingRefreshToken/valid", async ({ onTestFinished, worker }) => {
+        let { ctx, cleanup, authV1APIClient } = await setupAuthV1APIClientTest()
 
-        await setup()
         onTestFinished(cleanup)
 
         let refreshToken = "TEST_VALID_REFRESH_TOKEN"
         let now = currentDateTime()
 
-        useMocks(
+        worker.use(
             http.post<never, { refresh_token: string; grant_type: "refresh_token" }>(
                 "/api/auth/v1/token",
                 async ({ request }) => {
@@ -179,15 +175,14 @@ suite("api/syncv1/AuthV1APIClient", async () => {
         assert.isTrue(isAfter(token.refreshExpiresAt, token.expiresAt))
     })
 
-    test("getTokenUsingRefreshToken/invalid", async ({ onTestFinished }) => {
-        let { ctx, setup, cleanup, useMocks, authV1APIClient } = await setupAuthV1APIClientTest()
+    test("getTokenUsingRefreshToken/invalid", async ({ onTestFinished, worker }) => {
+        let { ctx, cleanup, authV1APIClient } = await setupAuthV1APIClientTest()
 
-        await setup()
         onTestFinished(cleanup)
 
         let refreshToken = "TEST_VALID_REFRESH_TOKEN"
 
-        useMocks(
+        worker.use(
             http.post<never, { refresh_token: string; grant_type: "refresh_token" }>(
                 "/api/auth/v1/token",
                 async ({ request }) => {
@@ -223,20 +218,11 @@ async function setupAuthV1APIClientTest() {
         baseURL: globalThis.location.href,
     })
 
-    let mockWorker = setupWorker()
-
     return {
         ctx,
-        setup: async () => {
-            await mockWorker.start({
-                quiet: true,
-            })
-        },
         cleanup: async () => {
             cancel()
-            mockWorker.stop()
         },
-        useMocks: ((...args) => mockWorker.use(...args)) as typeof mockWorker.use,
         authV1APIClient,
     }
 }
