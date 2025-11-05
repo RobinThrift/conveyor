@@ -1,0 +1,299 @@
+.memo-list-sidebar {
+    @apply overscroll-none flex flex-col border-surface-border rounded-2xl px-1 pt-1 shadow-xs;
+    max-width: var(--sidebar-width);
+    width: calc(var(--sidebar-width) - var(--spacing));
+    height: calc(var(--sidebar-height) - var(--spacing) * 2);
+
+    margin-top: calc(
+        max(env(safe-area-inset-top, 0px), var(--spacing) * 2) -
+        var(--spacing) *
+        2
+    );
+
+    hr {
+        @apply h-0 border-0 border-b border-surface-border hidden;
+    }
+
+    timeline-scope: --scroll;
+    animation: --scroll forwards;
+    animation-timeline: --scroll;
+    container-name: --scroll;
+
+    @media (min-width: 768px) {
+        @apply bg-body px-0 pt-0 elevation elevation-3;
+        position: fixed;
+        top: var(--spacing);
+        left: var(--spacing);
+        z-index: 10;
+
+        hr {
+            @apply block;
+        }
+    }
+
+    .btn {
+        @apply elevation-2;
+    }
+}
+
+.screens[data-active-stack="memos"] .settings-nav-button {
+    opacity: 0;
+
+    @media (min-width: 1024px) {
+        opacity: 1;
+    }
+}
+
+.memo-list-sidebar-header {
+    @apply bg-surface-level-2 border border-surface-border w-full rounded-2xl;
+
+    @media (min-width: 1024px) {
+        @apply border-0 border-b pt-0 bg-surface-level-1 rounded-b-none;
+    }
+}
+
+:root {
+    --settings-nav-button-z-index: 500;
+}
+
+/* biome-ignore lint/style/noDescendingSpecificity: I dunno */
+.memo-list-sidebar-header .settings-nav-button {
+    @apply fixed flex items-center justify-center shadow-xl h-11 w-11;
+    transition:
+        transform 100ms,
+        margin-left 100ms,
+        margin-right 100ms;
+    z-index: var(--settings-nav-button-z-index);
+    left: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
+    top: calc(
+        max(env(safe-area-inset-top, 0px), var(--spacing) * 2) -
+        var(--spacing) *
+        2
+    );
+
+    animation: settings-nav-button linear;
+    animation-timeline: scroll(root);
+    animation-range-end: 200px;
+    animation-fill-mode: both;
+
+    @media (min-width: 768px) {
+        @apply relative shadow-none aspect-square;
+        left: unset;
+        top: unset;
+        z-index: unset;
+        isolation: isolate;
+        animation: unset;
+    }
+}
+
+@keyframes settings-nav-button {
+    from {
+        top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 2));
+    }
+    to {
+        top: calc(
+            max(env(safe-area-inset-top, 0px), var(--spacing) * 4) -
+            var(--spacing) *
+            2
+        );
+    }
+}
+
+.memo-list-sidebar-header .memo-list-date-filter {
+    @apply px-2 pb-2 mt-12;
+
+    &.compact {
+        @apply ml-12 mt-0;
+    }
+
+    @media (min-width: 768px) {
+        @apply ml-0 mt-2;
+
+        &.compact {
+            @apply ml-0 mt-2;
+        }
+    }
+}
+
+.memo-list-sidebar-header-search-bar {
+    @apply flex mt-2 px-2 items-stretch gap-2;
+    width: calc(100% - var(--spacing) * 2);
+
+    .memo-list-filter-search {
+        @apply hidden;
+        @media (min-width: 768px) {
+            @apply flex flex-1;
+        }
+
+        .input-field {
+            width: 100%;
+        }
+    }
+}
+
+.memo-list-sidebar-tab-list {
+    @apply py-2 min-h-10 hidden;
+    max-height: 50%;
+    overflow: auto;
+    scrollbar-width: thin;
+    scroll-timeline: --scroll y;
+
+    @media (min-width: 1024px) {
+        @apply block;
+    }
+}
+
+.memo-list-sidebar-title {
+    @apply px-2 text-sm pb-1 text-neutral sticky top-0 backdrop-blur-sm;
+    @apply hidden;
+    @media (min-width: 1024px) {
+        @apply block;
+    }
+}
+
+.memo-list-sidebar-tab-list-items {
+    @apply w-full px-2 flex flex-col gap-y-1;
+
+    @container --scroll style(--scroll: 1) {
+        &::after {
+            @apply sticky -bottom-6 h-12 left-0 right-0 -mb-6 rounded-b-xl;
+            display: block;
+            pointer-events: none;
+            content: "";
+            width: 100%;
+            z-index: 100;
+            backdrop-filter: blur(2px);
+            mask-image: linear-gradient(to bottom, transparent 10%, black 50%);
+            background-image: linear-gradient(
+                to bottom,
+                transparent,
+                rgba(255, 255, 255, 1) 90%
+            );
+        }
+    }
+
+    .is-editing {
+        @apply italic;
+    }
+}
+
+.memo-list-sidebar-tab-list-item-close-btn {
+    @apply p-0.5 rounded-full text-primary;
+    visibility: hidden;
+
+    &:hover {
+        @apply bg-primary text-primary-contrast elevation elevation-2;
+    }
+
+    svg {
+        @apply size-3;
+    }
+}
+
+.memo-list-sidebar-tab-list-item-activate-btn {
+    @apply w-full text-left flex items-center gap-1 py-1 px-1 text-sm;
+
+    span {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    & > svg {
+        @apply size-4;
+    }
+
+    &[aria-selected="true"] {
+        @apply text-primary-contrast;
+    }
+
+    &:focus-visible {
+        @apply outline-0;
+    }
+}
+
+.memo-list-sidebar-tab-list-item {
+    @apply w-full flex items-center rounded-xl px-1 font-semibold;
+    justify-content: space-between;
+
+    &:hover,
+    &:has([aria-selected="true"]) {
+        .memo-list-sidebar-tab-list-item-close-btn {
+            visibility: visible;
+        }
+        .memo-list-sidebar-tab-list-item-activate-btn {
+            width: calc(100% - var(--spacing) * 5);
+        }
+    }
+
+    &:hover {
+        @apply bg-surface-level-2;
+    }
+
+    &:has([aria-selected="true"]) {
+        @apply bg-primary-light;
+
+        .memo-list-sidebar-tab-list-item-close-btn {
+            @apply text-primary-contrast;
+
+            &:hover {
+                @apply bg-surface-level-2 text-primary-dark elevation elevation-2;
+            }
+        }
+    }
+
+    &:has(button:focus-visible) {
+        @apply outline-2 outline-primary -outline-offset-2 rounded-xl;
+    }
+
+    @container --scroll style(--scroll: 1) {
+        &:last-child {
+            @apply -mb-6;
+        }
+    }
+}
+
+.memo-list-sidebar-tab-list-item-all-memos {
+    @apply text-primary-extra-dark;
+}
+
+.memo-list-sidebar-new-memo-btn {
+    @apply hidden;
+    @apply items-center justify-start text-sm gap-1 px-1 py-1 rounded-lg my-1 mx-1 bg-transparent shadow-none;
+    @media (min-width: 1024px) {
+        @apply flex;
+    }
+
+    & > svg {
+        @apply size-4;
+    }
+
+    &:hover {
+        @apply surface-level-1 elevation-1;
+        --glass-highlight: var(--btn-bg-hover);
+        --glass-shadow: var(--btn-border-color);
+        --color-surface-level-1: var(--btn-bg);
+    }
+
+    &:focus-visible {
+        @apply outline-2 outline-primary -outline-offset-2 rounded-xl;
+    }
+}
+
+.memo-list-sidebar .memo-list-state-filter {
+    @apply hidden mx-2 my-2;
+
+    @media (min-width: 1024px) {
+        @apply block;
+    }
+}
+
+.memo-list-sidebar > .memo-list-tag-filter {
+    @apply hidden;
+    --tag-tree-overflow-colour: var(--color-body-bg);
+
+    @media (min-width: 1024px) {
+        @apply block;
+    }
+}

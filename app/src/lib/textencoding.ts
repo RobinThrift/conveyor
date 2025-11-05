@@ -1,7 +1,7 @@
 const encoder = new TextEncoder()
 
-export function encodeText(input?: string): Uint8Array {
-    return encoder.encode(input)
+export function encodeText(input?: string): Uint8Array<ArrayBuffer> {
+    return encoder.encode(input) as Uint8Array<ArrayBuffer>
 }
 
 const decoder = new TextDecoder()

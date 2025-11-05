@@ -1,7 +1,6 @@
 import { appConfigDir } from "@tauri-apps/api/path"
 import { locale as loadLocale, platform } from "@tauri-apps/plugin-os"
 
-import { NavigationController } from "@/control/NavigationController"
 import { setEnv } from "@/env"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
@@ -10,7 +9,6 @@ import { TauriKVStoreContainer } from "@/external/tauri/TauriKVStore"
 import { TauriSQLite } from "@/external/tauri/TauriSQLite"
 import { BaseContext } from "@/lib/context"
 import { type DeviceSecureStorage, NoopDeviceSecureStorage } from "@/lib/DeviceSecureStorage"
-import { RemoteNavigationBackend } from "@/lib/navigation"
 
 import type { PlatformDependencies, PlatformInitArgs } from "./types"
 
@@ -49,9 +47,5 @@ export async function init({ fs }: PlatformInitArgs): Promise<PlatformDependenci
         crypto: new AgeCrypto(),
         keyValueContainer: kvContainer,
         deviceSecureStorage,
-        navigationBackend: new RemoteNavigationBackend(
-            self.postMessage.bind(self),
-            NavigationController.screenToStackMapping,
-        ),
     }
 }

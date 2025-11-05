@@ -1,10 +1,10 @@
 import { useStore } from "@tanstack/react-store"
 import React, { createContext, startTransition, useState } from "react"
+import { Temporal } from "temporal-polyfill"
 
 import { DEFAULT_SETTINGS } from "@/domain/Settings"
 import {
     fallback,
-    getLocalTimeZone,
     type Language,
     loadTranslation,
     type Region,
@@ -24,7 +24,7 @@ const DEFAULT_I18N_CONTEXT: I18nContext = {
     language: DEFAULT_SETTINGS.locale.language,
     region: DEFAULT_SETTINGS.locale.region,
     translations: fallback,
-    timeZone: getLocalTimeZone(),
+    timeZone: Temporal.Now.timeZoneId(),
 }
 
 export const i18nContext = createContext<I18nContext>(DEFAULT_I18N_CONTEXT)

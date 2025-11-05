@@ -1,0 +1,238 @@
+:root {
+    --mobile-tabbar-z-index: 500;
+}
+
+.mobile-tabbar-new-memo-btn,
+.mobile-tabbar-tag-filter-overflow-trigger {
+    @apply flex items-center justify-center surface-level-2 elevation-2;
+    @apply rounded-full size-12 p-2.5;
+    transition:
+        transform 100ms
+        linear(
+            0,
+            0.618 4.6%,
+            1.072 9.7%,
+            1.358 15.3%,
+            1.446 18.4%,
+            1.497 21.7%,
+            1.512 23.9%,
+            1.514 26.2%,
+            1.481 31.5%,
+            1.421 36.4%,
+            1.174 53.4%,
+            1.108 59.5%,
+            1.059 65.7%,
+            1.028 71.9%,
+            1.009 78.9%,
+            1
+        ),
+        margin-left 200ms
+        linear(
+            0,
+            -0.004 4.9%,
+            -0.02 9.4%,
+            -0.124 26.4%,
+            -0.126 30.5%,
+            -0.104 34.1%,
+            -0.027 38.8%,
+            0.108 43.1%,
+            0.299 47%,
+            0.817 55.2%,
+            0.97 59.1%,
+            1.071 63.4%,
+            1.118 67.7%,
+            1.127 72.6%,
+            1.108 77.2%,
+            1.019 90.7%,
+            1.004 95.2%,
+            1
+        ),
+        margin-right 200ms
+        linear(
+            0,
+            -0.004 4.9%,
+            -0.02 9.4%,
+            -0.124 26.4%,
+            -0.126 30.5%,
+            -0.104 34.1%,
+            -0.027 38.8%,
+            0.108 43.1%,
+            0.299 47%,
+            0.817 55.2%,
+            0.97 59.1%,
+            1.071 63.4%,
+            1.118 67.7%,
+            1.127 72.6%,
+            1.108 77.2%,
+            1.019 90.7%,
+            1.004 95.2%,
+            1
+        );
+
+    & > svg {
+        @apply size-5;
+    }
+}
+
+.mobile-tabbar-search-bar {
+    @apply flex-1;
+
+    .input-field .input {
+        @apply h-12 rounded-full surface-level-2 elevation-2;
+    }
+
+    .input-field .icon {
+        @apply text-text;
+    }
+}
+
+.mobile-tabbar {
+    @apply fixed flex gap-2 justify-between items-center;
+
+    left: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
+    right: max(env(safe-area-inset-right, 0px), calc(2 * var(--spacing)));
+    bottom: max(env(safe-area-inset-bottom, 0px), calc(2 * var(--spacing)));
+    z-index: var(--mobile-tabbar-z-index);
+    transition: opacity 120ms;
+    opacity: 1;
+
+    @media (min-width: 768px) {
+        @apply hidden;
+    }
+
+    &:has(input:focus) {
+        bottom: 0;
+        .mobile-tabbar-tag-filter-overflow-trigger {
+            transform: scale(0);
+            margin-left: calc(var(--spacing) * -12);
+        }
+
+        .mobile-tabbar-new-memo-btn {
+            transform: scale(0);
+            margin-left: calc(var(--spacing) * -12);
+        }
+
+        .mobile-tabbar-search-bar .input-field .input {
+            @apply bg-surface-level-2/95;
+        }
+    }
+}
+
+:root:has(.memo-tab-panel[aria-hidden="false"]) {
+    .mobile-tabbar {
+        pointer-events: none;
+    }
+}
+
+:root:has(.memo-tab-panel[aria-hidden="false"])
+    .dragging-memo-tab
+    .mobile-tabbar {
+    opacity: 1;
+    top: calc(-1 * var(--offset-top, 0px) + (85svh + var(--spacing) * 11));
+    height: min-content;
+    /* translate: 100% 0; */
+}
+
+.tag-tree-offcanvas-wrapper {
+    &:has(:popover-open)::before {
+        position: fixed;
+        content: "";
+        inset: 0;
+        z-index: 9999;
+    }
+
+    @media (min-width: 1024px) {
+        @apply hidden;
+    }
+}
+
+.tag-tree-offcanvas-trigger {
+    @apply aspect-square;
+    height: 100%;
+}
+
+.tag-tree-offcanvas {
+    @apply rounded-2xl pt-2 surface-level-1 elevation-2 flex-col;
+    margin: unset;
+    inset: unset;
+    top: calc(env(safe-area-inset-top, 0px) + 2 * var(--spacing));
+    bottom: max(env(safe-area-inset-bottom, 0px), calc(2 * var(--spacing)));
+    overflow: visible;
+    position: fixed;
+    height: auto;
+    width: 90svw;
+    z-index: 10000;
+    transition: right 250ms;
+
+    .memo-list-tag-filter {
+        @apply px-0 flex-1 rounded-2xl;
+        height: unset;
+        overscroll-behavior: none;
+        --tag-tree-overflow-colour: color-mix(
+            in srgb,
+            var(--color-surface-level-1) 20%,
+            transparent
+        );
+
+        .tag-tree-item {
+            @apply px-2 text-base;
+        }
+    }
+
+    &:popover-open {
+        @apply flex;
+        right: 0;
+    }
+
+    @starting-style {
+        &:popover-open {
+            right: -85svw;
+        }
+    }
+
+    &::backdrop {
+        pointer-events: all;
+        background-color: color-mix(
+            in srgb,
+            var(--color-modal-overlay-bg) 80%,
+            transparent
+        );
+        backdrop-filter: blur(2px);
+        opacity: 1;
+        transition: opacity 250ms;
+
+        @starting-style {
+            opacity: 0;
+        }
+    }
+
+    &[data-is-closing="true"] {
+        right: -85svw;
+
+        &::backdrop {
+            opacity: 0;
+        }
+    }
+}
+
+.tag-tree-offcanvas-header {
+    @apply flex items-center justify-between px-1 mb-2 relative;
+    z-index: 10000;
+}
+
+.tag-tree-offcanvas-drag-handle {
+    position: fixed;
+    left: -10svw;
+    top: 0;
+    width: 15svw;
+    height: 100%;
+    z-index: 9000;
+    touch-action: none;
+}
+
+:root:has(.tag-tree-offcanvas:popover-open) {
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
+    overflow: hidden !important;
+    /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
+    overscroll-behavior: contain !important;
+}

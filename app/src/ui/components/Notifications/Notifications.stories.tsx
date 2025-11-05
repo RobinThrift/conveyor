@@ -80,12 +80,12 @@ export const Overview: Story = {
         return (
             <div className="container mx-auto py-8">
                 <div className="flex gap-2">
-                    <Button onPress={onClickInfo}>Add Info Notification</Button>
-                    <Button onPress={onClickError} variant="danger">
+                    <Button onClick={onClickInfo}>Add Info Notification</Button>
+                    <Button onClick={onClickError} variant="danger">
                         Add Error Notification
                     </Button>
 
-                    <Button onPress={onClickRequiresAction}>
+                    <Button onClick={onClickRequiresAction}>
                         Add Notification that requires action
                     </Button>
                 </div>
@@ -157,7 +157,7 @@ export const Overview: Story = {
 
                         <div className="notification-buttons">
                             <Button variant="danger">Delete</Button>
-                            <Button outline>Cancel</Button>
+                            <Button>Cancel</Button>
                         </div>
                     </div>
                 </div>

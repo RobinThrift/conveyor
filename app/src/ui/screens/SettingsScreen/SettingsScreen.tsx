@@ -1,18 +1,15 @@
 /** biome-ignore-all lint/correctness/useUniqueElementIds: is guaranteed to be unique */
 
 import { useStore } from "@tanstack/react-store"
-import React, { type Key, useCallback } from "react"
-import {
-    Tab as AriaTab,
-    TabList as AriaTabList,
-    TabPanel as AriaTabPanel,
-    Tabs as AriaTabs,
-} from "react-aria-components"
+import clsx from "clsx"
+import React, { Activity, startTransition, useCallback, useEffect, useRef, useState } from "react"
 
+import { Button } from "@/ui/components/Button"
 import { Dialog } from "@/ui/components/Dialog"
 import {
-    CloudCheckIcon,
-    CloudSlashIcon,
+    CaretLeftIcon,
+    CloudActivatedIcon,
+    CloudDeactivatedIcon,
     DatabaseIcon,
     GlobeIcon,
     InfoIcon,
@@ -21,8 +18,8 @@ import {
 } from "@/ui/components/Icons"
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
-import { useCurrentPageParams, useNavigation } from "@/ui/navigation"
 import { selectors, stores } from "@/ui/stores"
+
 import { AboutTab } from "./AboutTab"
 import { APITokensTab } from "./APITokensTab"
 import { DataTab } from "./DataTab"
@@ -30,7 +27,6 @@ import { InterfaceSettingsTab } from "./InterfaceSettingsTab"
 import { LocaleSettingsTab } from "./LocaleSettingsTab"
 import { SyncSettingsTab } from "./SyncSettingsTab"
 import { useSettingsModalState } from "./useSettingsModalState"
-
 export function SettingsScreen() {
     let { isOpen, onClose } = useSettingsModalState()
 
@@ -45,20 +41,9 @@ export function SettingsScreen() {
 
 function SettingsScreenContent() {
     let t = useT("screens/Settings")
-    let isSyncEnabled = useStore(stores.sync.info, selectors.sync.isEnabled)
 
-    let isMobile = useIsMobile()
-
-    let nav = useNavigation()
-    let pageParams = useCurrentPageParams()
-    let tab = "tab" in pageParams ? pageParams.tab : "interface"
-
-    let onChangeTab = useCallback(
-        (tab: Key) => {
-            nav.updateParams({ tab: tab as string })
-        },
-        [nav.updateParams],
-    )
+    let { tabListRef, isSyncEnabled, activeTab, setActiveTab, focussed, onKeyDown } =
+        useSettingsScreenTabs()
 
     return (
         <div className="settings-screen">
@@ -66,65 +51,313 @@ function SettingsScreenContent() {
                 <h1>{t.Title}</h1>
             </Dialog.Title>
 
-            <AriaTabs
-                selectedKey={tab}
-                onSelectionChange={onChangeTab}
-                className="settings-tabs"
-                orientation={isMobile ? "horizontal" : "vertical"}
-            >
-                <AriaTabList aria-label={t.TabListLabel} className="settings-tab-list">
-                    <AriaTab id="interface" className="settings-tab-list-item">
-                        <PaletteIcon weight="fill" className="icon" />
+            <div className="settings-tabs">
+                <div
+                    role="tablist"
+                    aria-label={t.TabListLabel}
+                    className="settings-tab-list"
+                    aria-orientation="vertical"
+                    onKeyDown={onKeyDown}
+                    ref={tabListRef}
+                >
+                    <Tab
+                        index={0}
+                        activeTab={activeTab}
+                        focussed={focussed}
+                        setActiveTab={setActiveTab}
+                    >
+                        <PaletteIcon className="icon" aria-hidden="true" />
                         {t.TabLabelInterface}
-                    </AriaTab>
-                    <AriaTab id="lang-locale" className="settings-tab-list-item">
-                        <GlobeIcon weight="fill" className="icon" />
+                    </Tab>
+                    <Tab
+                        index={1}
+                        activeTab={activeTab}
+                        focussed={focussed}
+                        setActiveTab={setActiveTab}
+                    >
+                        <GlobeIcon className="icon" aria-hidden="true" />
                         {t.TabLabelLangLocale}
-                    </AriaTab>
-                    <AriaTab id="sync" className="settings-tab-list-item">
+                    </Tab>
+                    <Tab
+                        index={2}
+                        activeTab={activeTab}
+                        focussed={focussed}
+                        setActiveTab={setActiveTab}
+                    >
                         {isSyncEnabled ? (
-                            <CloudCheckIcon weight="fill" className="icon" />
+                            <CloudActivatedIcon className="icon" aria-hidden="true" />
                         ) : (
-                            <CloudSlashIcon weight="fill" className="icon" />
+                            <CloudDeactivatedIcon className="icon" aria-hidden="true" />
                         )}
                         {t.TabLabelSync}
-                    </AriaTab>
-                    {isSyncEnabled && (
-                        <AriaTab id="apitokens" className="settings-tab-list-item">
-                            <KeyIcon weight="fill" className="icon" />
-                            {t.TabLabelAPITokens}
-                        </AriaTab>
-                    )}
-                    <AriaTab id="data" className="settings-tab-list-item">
-                        <DatabaseIcon weight="fill" className="icon" />
+                    </Tab>
+                    <Tab
+                        index={3}
+                        activeTab={activeTab}
+                        focussed={focussed}
+                        setActiveTab={setActiveTab}
+                        isDisabled={!isSyncEnabled}
+                    >
+                        <KeyIcon className="icon" aria-hidden="true" />
+                        {t.TabLabelAPITokens}
+                    </Tab>
+                    <Tab
+                        index={4}
+                        activeTab={activeTab}
+                        focussed={focussed}
+                        setActiveTab={setActiveTab}
+                    >
+                        <DatabaseIcon className="icon" aria-hidden="true" />
                         {t.TabLabelData}
-                    </AriaTab>
-                    <AriaTab id="about" className="settings-tab-list-item">
-                        <InfoIcon weight="fill" className="icon" />
+                    </Tab>
+                    <Tab
+                        index={5}
+                        activeTab={activeTab}
+                        focussed={focussed}
+                        setActiveTab={setActiveTab}
+                    >
+                        <InfoIcon className="icon" aria-hidden="true" />
                         {t.TabLabelAbout}
-                    </AriaTab>
-                </AriaTabList>
-                <AriaTabPanel id="interface" className="settings-tab">
+                    </Tab>
+                </div>
+                <TabPanel index={0} activeTab={activeTab} setActiveTab={setActiveTab}>
                     <InterfaceSettingsTab />
-                </AriaTabPanel>
-                <AriaTabPanel id="lang-locale" className="settings-tab">
+                </TabPanel>
+                <TabPanel index={1} activeTab={activeTab} setActiveTab={setActiveTab}>
                     <LocaleSettingsTab />
-                </AriaTabPanel>
-                <AriaTabPanel id="sync" className="settings-tab">
+                </TabPanel>
+                <TabPanel index={2} activeTab={activeTab} setActiveTab={setActiveTab}>
                     <SyncSettingsTab />
-                </AriaTabPanel>
-                {isSyncEnabled && (
-                    <AriaTabPanel id="apitokens" className="settings-tab">
-                        <APITokensTab />
-                    </AriaTabPanel>
-                )}
-                <AriaTabPanel id="data" className="settings-tab">
+                </TabPanel>
+                <TabPanel index={3} activeTab={activeTab} setActiveTab={setActiveTab}>
+                    <APITokensTab />
+                </TabPanel>
+                <TabPanel index={4} activeTab={activeTab} setActiveTab={setActiveTab}>
                     <DataTab />
-                </AriaTabPanel>
-                <AriaTabPanel id="about" className="settings-tab">
+                </TabPanel>
+                <TabPanel index={5} activeTab={activeTab} setActiveTab={setActiveTab}>
                     <AboutTab />
-                </AriaTabPanel>
-            </AriaTabs>
+                </TabPanel>
+            </div>
         </div>
     )
+}
+
+const Tab = React.memo(function Tab({
+    children,
+    index,
+    isDisabled = false,
+    activeTab,
+    focussed,
+    setActiveTab,
+}: React.PropsWithChildren<{
+    index: number
+    isDisabled?: boolean
+    focussed?: number
+    activeTab?: SettingsTab
+    setActiveTab: (tab: SettingsTab) => void
+}>) {
+    let onClick = useCallback(() => {
+        setActiveTab(settingsTabs[index])
+    }, [index, setActiveTab])
+
+    let onKeyDown = useCallback(
+        (e: React.KeyboardEvent) => {
+            switch (e.code) {
+                case "Enter":
+                case "Space":
+                    setActiveTab(settingsTabs[index])
+                    e.stopPropagation()
+                    e.preventDefault()
+                    return
+            }
+        },
+        [index, setActiveTab],
+    )
+
+    return (
+        <button
+            type="button"
+            id={settingsTabs[index]}
+            className={clsx("settings-tab-list-item", { "has-focus": index === focussed })}
+            role="tab"
+            tabIndex={index === focussed ? 0 : -1}
+            aria-selected={activeTab === settingsTabs[index]}
+            aria-controls={`${settingsTabs[index]}-tabpanel`}
+            aria-disabled={isDisabled}
+            onClick={!isDisabled ? onClick : undefined}
+            onKeyDown={!isDisabled ? onKeyDown : undefined}
+        >
+            {children}
+        </button>
+    )
+})
+
+const TabPanel = React.memo(function TabPanel({
+    children,
+    index,
+    activeTab,
+    setActiveTab,
+}: React.PropsWithChildren<{
+    index: number
+    activeTab?: SettingsTab
+    setActiveTab: (tab?: SettingsTab) => void
+}>) {
+    let isActive = activeTab === settingsTabs[index]
+    let ref = useRef<HTMLDivElement | null>(null)
+    let onClickBack = useCallback(() => {
+        setActiveTab(undefined)
+    }, [setActiveTab])
+
+    useEffect(() => {
+        if (isActive) {
+            ref.current?.scrollIntoView({ behavior: "smooth" })
+        }
+    }, [isActive])
+
+    return (
+        <Activity mode={isActive ? "visible" : "hidden"}>
+            <div
+                id={`${settingsTabs[index]}-tabpanel`}
+                className="settings-tab"
+                role="tabpanel"
+                aria-labelledby={settingsTabs[index]}
+                aria-hidden={!isActive}
+                inert={!isActive}
+                ref={ref}
+            >
+                <Button
+                    className="settings-tab-back-btn"
+                    iconRight={<CaretLeftIcon />}
+                    aria-label="Back"
+                    onClick={onClickBack}
+                />
+
+                {children}
+            </div>
+        </Activity>
+    )
+})
+
+const settingsTabs = ["interface", "lang-locale", "sync", "apitokens", "data", "about"]
+const apiTokensTabIndex = 3
+
+type SettingsTab = (typeof settingsTabs)[number]
+
+function useSettingsScreenTabs() {
+    let isMobile = useIsMobile()
+    let tabListRef = useRef<HTMLDivElement | null>(null)
+    let isSyncEnabled = useStore(stores.sync.info, selectors.sync.isEnabled)
+    let [activeTab, _setActiveTab] = useState<SettingsTab | undefined>(
+        isMobile ? undefined : "interface",
+    )
+    let [focussed, _setFocussed] = useState<number>(0)
+
+    let setActiveTab = useCallback((tab?: SettingsTab) => {
+        let tabBtn = tabListRef.current?.querySelector(`[tabindex="0"]`)
+        if (!tab && tabBtn) {
+            tabBtn.addEventListener(
+                "focus",
+                () => {
+                    setTimeout(() => {
+                        startTransition(() => {
+                            _setFocussed(tab ? settingsTabs.indexOf(tab) : 0)
+                            _setActiveTab(tab)
+                        })
+                    }, 200)
+                },
+                { once: true },
+            )
+
+            tabBtn.scrollIntoView({ behavior: "smooth" })
+            ;(tabBtn as HTMLElement).focus({ preventScroll: true })
+        } else {
+            startTransition(() => {
+                _setFocussed(tab ? settingsTabs.indexOf(tab) : 0)
+                _setActiveTab(tab)
+            })
+        }
+    }, [])
+
+    let setFocussed = useCallback(
+        (index: number) => {
+            startTransition(() => {
+                _setFocussed((prev) => {
+                    let correctedIndex = index
+                    if (isSyncEnabled || correctedIndex !== apiTokensTabIndex) {
+                        document.getElementById(settingsTabs[correctedIndex])?.focus()
+                        return correctedIndex
+                    }
+
+                    if (prev > correctedIndex) {
+                        correctedIndex--
+                    } else {
+                        correctedIndex++
+                    }
+
+                    document.getElementById(settingsTabs[correctedIndex])?.focus()
+                    return correctedIndex
+                })
+            })
+        },
+        [isSyncEnabled],
+    )
+
+    let onKeyDown = useCallback(
+        (e: React.KeyboardEvent) => {
+            if (e.altKey || e.ctrlKey || e.metaKey) {
+                return
+            }
+
+            let handled = false
+            let target = e.target as HTMLElement
+            let tab = target.id as SettingsTab
+            if (!tab) {
+                return
+            }
+
+            switch (e.code) {
+                case "Enter":
+                case "Space":
+                    setActiveTab(tab)
+                    handled = true
+                    break
+
+                case "ArrowUp":
+                    setFocussed(Math.max(settingsTabs.indexOf(tab) - 1, 0))
+                    handled = true
+                    break
+
+                case "ArrowDown":
+                    setFocussed(Math.min(settingsTabs.indexOf(tab) + 1, settingsTabs.length - 1))
+                    handled = true
+                    break
+
+                case "Home":
+                    setFocussed(0)
+                    handled = true
+                    break
+
+                case "End":
+                    setFocussed(settingsTabs.length - 1)
+                    handled = true
+                    break
+            }
+
+            if (handled) {
+                e.stopPropagation()
+                e.preventDefault()
+            }
+        },
+        [setActiveTab, setFocussed],
+    )
+
+    return {
+        tabListRef,
+        isSyncEnabled,
+        activeTab,
+        setActiveTab,
+        focussed,
+        onKeyDown,
+    }
 }

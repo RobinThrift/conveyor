@@ -35,6 +35,7 @@ interface ComponentMap {
         caption?: string
     }>
     FootnoteReturnIcon?: React.ComponentType
+    TagLink?: React.ComponentType<{ tag: string; className?: string }>
 }
 
 type CustomBlocks = Record<string, React.ComponentType<React.PropsWithChildren>>
@@ -83,6 +84,7 @@ function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boo
     switch (cursor.type.name) {
         case "ATXHeading1":
             return headingToJSX(doc, cursor.node, 1)
+        case "SetextHeading2":
         case "ATXHeading2":
             return headingToJSX(doc, cursor.node, 2)
         case "ATXHeading3":
@@ -119,14 +121,13 @@ function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boo
             return linkToJSX(doc, cursor.node)
         case "URL":
             return urlToJSX(doc, cursor.node)
-        case "Autolink":
-            return urlToJSX(doc, cursor.node)
         case "TagLink":
             return tagLinkToJSX(doc, cursor.node)
         case "FootnoteRef":
             return footnoteRefToJSX(doc, cursor.node)
         case "FootnoteDef":
             return footnoteDefToJSX(doc, cursor.node)
+        case "CodeBlock":
         case "FencedCode":
             return fencedCodeToJSX(doc, cursor.node)
         case "Image":
@@ -139,6 +140,15 @@ function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boo
             return <br key={nodeKey(cursor.node)} />
         case "HorizontalRule":
             return <hr key={nodeKey(cursor.node)} />
+        case "Escape":
+        case "HTMLTag":
+        case "Subscript":
+            console.debug(
+                `need tohandle node ${cursor.type.name}:`,
+                doc.id,
+                doc.text.substring(cursor.from, cursor.to),
+            )
+            return null
         case "ListMark":
         case "QuoteMark":
         case "FootnoteMark":
@@ -319,19 +329,18 @@ function urlToJSX(doc: Document, node: SyntaxNode): ReactNode {
 }
 
 function tagLinkToJSX(doc: Document, node: SyntaxNode): ReactNode {
-    let Link = doc.componentMap.Link ?? "a"
-    let tag = doc.text.substring(node.from, node.to)
-    return (
-        <Link
-            screen="root"
-            params={{ filter: { tag } }}
-            key={nodeKey(node)}
-            className="tag-link"
-            rel="tag"
-        >
-            {tag}
-        </Link>
-    )
+    let TagLink = doc.componentMap.TagLink
+    let tag = doc.text.substring(node.from + 1, node.to)
+
+    if (!TagLink) {
+        return (
+            <span key={nodeKey(node)} className="tag-link">
+                #{tag}
+            </span>
+        )
+    }
+
+    return <TagLink tag={tag} key={nodeKey(node)} className="tag-link" />
 }
 
 function footnoteRefToJSX(doc: Document, node: SyntaxNode): ReactNode {
@@ -561,7 +570,7 @@ function taskMarkerToJSX(doc: Document, node: SyntaxNode): ReactNode {
             tabIndex={0}
             className="checkbox"
         >
-            <CheckIcon weight="bold" />
+            <CheckIcon />
         </div>
     )
 }

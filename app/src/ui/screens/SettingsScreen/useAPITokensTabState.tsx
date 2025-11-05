@@ -1,5 +1,6 @@
 import { useStore } from "@tanstack/react-store"
 import { useCallback, useEffect } from "react"
+import type { Temporal } from "temporal-polyfill"
 
 import { actions, selectors, stores } from "@/ui/stores"
 
@@ -20,7 +21,7 @@ export function useAPITokensTabState() {
 
     let loadNextPage = useCallback(() => actions.apitokens.nextPage(), [])
 
-    let createAPIToken = useCallback((req: { name: string; expiresAt: Date }) => {
+    let createAPIToken = useCallback((req: { name: string; expiresAt: Temporal.ZonedDateTime }) => {
         actions.apitokens.createAPIToken(req)
     }, [])
 

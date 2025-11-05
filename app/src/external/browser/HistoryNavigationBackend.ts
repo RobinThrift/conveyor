@@ -1,109 +1,130 @@
+import { queueTask } from "@/lib/microtask"
 import type {
     NavgationState,
     NavigationBackend,
     OnPop,
     OnPush,
-    OnReplace,
     Screens,
     ScreenToStackMapping,
 } from "@/lib/navigation"
 
 declare const __ENABLE_DEVTOOLS__: boolean
 
+type Route<S extends Screens, K extends keyof S = keyof S> = {
+    route: string
+    screen: K
+    stack: S[K]["stack"]
+    parseParams: (u: URL) => S[K]["params"]
+}
+
+type HistoryNavigationState<S extends Screens> = {
+    current: NavgationState<S>
+    prev: NavgationState<S>[]
+}
+
 export class HistoryNavigationBackend<
     S extends Screens,
     Params extends Record<keyof S, Record<string, unknown>>,
-    Restore extends Record<string, unknown>,
-> implements NavigationBackend<S, Restore>
+> implements NavigationBackend<S>
 {
-    private _onPush?: OnPush<S, Restore>
-    private _onPop?: OnPop<S, Restore>
-    private _onReplace?: OnReplace<S, Restore>
-    private _toURLParams?: (params: Params[keyof S]) => URLSearchParams
-    private _screenToURLMapping: ScreenToURLMapping<S>
-    private _urlToScreenMapping: URLToScreenMapping<S>
-    private _screenToStackMapping: ScreenToStackMapping<S>
+    private _routes: Route<S>[] = []
+    private _stacks: ScreenToStackMapping<S>
 
-    private _currentIndex = window.history.length
-    private readonly _initalLength = window.history.length
-
-    constructor({
-        screenToURLMapping,
-        urlToScreenMapping,
-        screenToStackMapping,
-        toURLParams,
-    }: {
-        screenToURLMapping: ScreenToURLMapping<S>
-        urlToScreenMapping: URLToScreenMapping<S>
-        screenToStackMapping: ScreenToStackMapping<S>
-        toURLParams?: (params: Params[keyof S]) => URLSearchParams
-    }) {
-        history.scrollRestoration = "manual"
-
-        this._screenToURLMapping = screenToURLMapping
-        this._toURLParams = toURLParams
-        this._urlToScreenMapping = urlToScreenMapping
-        this._screenToStackMapping = screenToStackMapping
-
-        window.addEventListener("popstate", (e: PopStateEvent) => {
-            if (!e.state) {
-                return
-            }
-            let { screen, params, index, stack, restore, _absoluteIndex } =
-                e.state as NavgationState<S, Restore> & { _absoluteIndex: number }
-
-            let lastIndex = this._currentIndex
-            this._currentIndex = _absoluteIndex
-            requestAnimationFrame(() => {
-                if (lastIndex < this._currentIndex) {
-                    this._onPush?.({ screen, params, index, stack, restore })
-                    if (__ENABLE_DEVTOOLS__) {
-                        requestAnimationFrame(() => {
-                            performance.mark("navigation:push", {
-                                detail: {
-                                    ...e.state,
-                                    url: window.location.href,
-                                },
-                            })
-                        })
-                    }
-                } else {
-                    this._onPop?.({ screen, params, index, stack, restore })
-
-                    if (__ENABLE_DEVTOOLS__) {
-                        requestAnimationFrame(() => {
-                            performance.mark("navigation:pop", {
-                                detail: {
-                                    ...e.state,
-                                    url: window.location.href,
-                                },
-                            })
-                        })
-                    }
-                }
-            })
-        })
+    private _events = {
+        pop: [] as OnPop<S>[],
+        push: [] as OnPush<S>[],
     }
 
-    init(state: NavgationState<S, Restore>): NavgationState<S, Restore> {
+    private get _currentState(): HistoryNavigationState<S> {
+        return { prev: [], ...(window.history.state ?? {}) }
+    }
+
+    // private _pushState(next: NavgationState<S>) {
+    //     let curr = this._currentState
+    //     window.history.state = {...curr, prev: [
+    //         curr.current,
+    //         curr.prev,
+    //     ]}
+    // }
+
+    constructor({
+        routes,
+    }: {
+        routes: Route<S>[]
+    }) {
+        this._routes = routes
+
+        this._stacks = {} as any
+        for (let r of routes) {
+            this._stacks[r.screen] = r.stack
+        }
+
+        history.scrollRestoration = "manual"
+        //
+        // window.addEventListener("popstate", (e: PopStateEvent) => {
+        //     if (!e.state) {
+        //         return
+        //     }
+        //
+        //     let { screen, params, stack } = e.state as NavgationState<S>
+        //
+        //     let lastIndex = this._currentIndex
+        //     requestAnimationFrame(() => {
+        //         if (lastIndex < this._currentIndex) {
+        //             this._triggerEvent("push", { screen, stack, params }, this._lastState)
+        //             if (__ENABLE_DEVTOOLS__) {
+        //                 requestAnimationFrame(() => {
+        //                     performance.mark("navigation:push", {
+        //                         detail: {
+        //                             ...e.state,
+        //                             url: window.location.href,
+        //                         },
+        //                     })
+        //                 })
+        //             }
+        //         } else {
+        //             this._triggerEvent("pop", { screen, stack, params }, this._lastState)
+        //
+        //             if (__ENABLE_DEVTOOLS__) {
+        //                 requestAnimationFrame(() => {
+        //                     performance.mark("navigation:pop", {
+        //                         detail: {
+        //                             ...e.state,
+        //                             url: window.location.href,
+        //                         },
+        //                     })
+        //                 })
+        //             }
+        //         }
+        //     })
+        // })
+    }
+
+    init(state: NavgationState<S>): NavgationState<S> {
         let currentURL = new URL(window.location.href)
-        let mapped = this._urlToScreenMapping(currentURL)
+        let mapped = this._mapURLToScreen(currentURL)
 
-        let initial: NavgationState<S, Restore> & { _absoluteIndex: number } = {
-            ...state,
-            _absoluteIndex: this._currentIndex,
+        let initial: HistoryNavigationState<S> = {
+            current: { ...state },
+            prev: [],
         }
-        let current = window.history.state as NavgationState<S, Restore>
+        let current = window.history.state as HistoryNavigationState<S>
         if (current) {
-            initial = { ...initial, ...current }
+            initial = {
+                current: {
+                    ...initial.current,
+                    ...current.current,
+                },
+                prev: current.prev || initial.prev,
+            }
         }
 
-        initial.screen = mapped?.screen ?? initial.screen
-        initial.stack = (mapped?.stack as unknown as typeof initial.stack) ?? initial.stack
+        initial.current.screen = mapped?.screen ?? initial.current.screen
+        initial.current.stack = mapped?.stack ?? initial.current.stack
 
         if (mapped?.params) {
-            initial.params = {
-                ...initial.params,
+            initial.current.params = {
+                ...initial.current.params,
                 ...mapped.params,
             }
         }
@@ -119,44 +140,27 @@ export class HistoryNavigationBackend<
             })
         }
 
-        return initial
+        return initial.current
     }
 
-    public get length(): number {
-        return this._currentIndex - this._initalLength
-    }
+    public push(next: Omit<NavgationState<S>, "stack">): NavgationState<S> {
+        let lastState = this._currentState
 
-    public push(
-        next: Omit<NavgationState<S, Restore>, "stack" | "index">,
-    ): NavgationState<S, Restore> {
-        let current = window.history.state ?? {}
-
-        let stack = this._screenToStackMapping[next.screen] as S[typeof next.screen]["stack"]
-
-        let nextScreen: NavgationState<S, Restore> & { _absoluteIndex: number } = {
+        let nextScreen: NavgationState<S> = {
             ...next,
-            restore: {},
-            index: stack === current.stack ? current.index + 1 : 0,
-            stack,
-            _absoluteIndex: this._currentIndex + 1,
+            stack: this._stacks[next.screen],
         }
+
+        let nextURL = this._nextURL(next.screen as string, next.params as Params[keyof S])
 
         window.history.replaceState(
             {
-                ...current,
-                restore: next.restore,
-            } satisfies NavgationState<S, Restore>,
+                current: nextScreen,
+                prev: [lastState.current, ...lastState.prev],
+            },
             "",
-            window.location.href,
+            nextURL,
         )
-
-        let nextURL = this.nextURL(
-            (this._screenToURLMapping[next.screen] ?? next.screen) as string,
-            next.params as Params[keyof S],
-        )
-
-        window.history.pushState(nextScreen, "", nextURL)
-        this._currentIndex++
 
         if (__ENABLE_DEVTOOLS__) {
             let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
@@ -173,16 +177,31 @@ export class HistoryNavigationBackend<
             })
         }
 
+        this._triggerEvent("push", nextScreen, lastState.current)
+
         return nextScreen
     }
 
-    public pop(n?: number): Promise<NavgationState<S, Restore>> {
-        let { promise, resolve } = Promise.withResolvers<NavgationState<S, Restore>>()
-        if (n) {
-            window.history.go(-n)
-        } else {
-            window.history.back()
-        }
+    public pop(): Promise<NavgationState<S>> {
+        let lastState = this._currentState
+
+        let nextScreen =
+            lastState.prev[0] ?? this._mapURLToScreen(new URL("/", window.location.href))
+        let nextURL = this._nextURL(
+            nextScreen.screen as string,
+            nextScreen.params as Params[keyof S],
+        )
+
+        let { promise, resolve } = Promise.withResolvers<NavgationState<S>>()
+
+        window.history.replaceState(
+            {
+                current: nextScreen,
+                prev: [...lastState.prev.slice(1)],
+            },
+            "",
+            nextURL,
+        )
 
         let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
         if (__ENABLE_DEVTOOLS__) {
@@ -190,12 +209,9 @@ export class HistoryNavigationBackend<
         }
 
         requestAnimationFrame(() => {
-            this._currentIndex = window.history.state._absoluteIndex
-            let state = window.history.state as NavgationState<S, Restore>
+            let state = this._currentState.current
 
             if (__ENABLE_DEVTOOLS__) {
-                let state = window.history.state as NavgationState<S, Restore>
-
                 performance.mark("navigation:pop", {
                     detail: {
                         ...state,
@@ -208,108 +224,73 @@ export class HistoryNavigationBackend<
             resolve(state)
         })
 
+        promise.then((nextScreen) => {
+            this._triggerEvent("pop", nextScreen, lastState.current)
+        })
+
         return promise
     }
 
-    public replace(
-        next: Omit<NavgationState<S, Restore>, "stack" | "index">,
-    ): NavgationState<S, Restore> {
-        let current = window.history.state ?? {}
-
-        let stack = this._screenToStackMapping[next.screen] as S[typeof next.screen]["stack"]
-
-        let nextScreen: NavgationState<S, Restore> & { _absoluteIndex: number } = {
-            screen: next.screen,
-            params: next.params,
-            restore: current?.restore ?? {},
-            index: stack === current.stack ? current.index + 1 : 0,
-            stack,
-            _absoluteIndex: this._currentIndex,
-        }
-
-        let nextURL = this.nextURL(
-            (this._screenToURLMapping[next.screen] ?? next.screen) as string,
-            next.params as Params[keyof S],
-        )
-
-        window.history.replaceState(nextScreen, "", nextURL)
-
-        if (__ENABLE_DEVTOOLS__) {
-            let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
-            Error.captureStackTrace(trace)
-            performance.mark("navigation:replace", {
-                detail: {
-                    ...nextScreen,
-                    url: nextURL.toString(),
-                    trace: trace.stack,
-                },
-            })
-        }
-
-        this._onReplace?.(nextScreen)
-
-        return nextScreen
-    }
-
-    addEventListener(event: "pop", handler: (next: NavgationState<S, Restore>) => void): () => void
-    addEventListener(
-        event: "push",
-        handler: (next: NavgationState<S, Restore>, prev?: NavgationState<S, Restore>) => void,
-    ): () => void
-    addEventListener(
-        event: "replace",
-        handler: (next: NavgationState<S, Restore>) => void,
-    ): () => void
-    addEventListener(
-        event: "pop" | "push" | "replace",
-        handler: (next: NavgationState<S, Restore>, prev?: NavgationState<S, Restore>) => void,
-    ): () => void {
-        switch (event) {
-            case "pop": {
-                let onPopState = (e: PopStateEvent) => {
-                    if (!e.state) {
-                        return
-                    }
-                    let { screen, params, index, stack, restore } = e.state as NavgationState<
-                        S,
-                        Restore
-                    >
-                    handler({ screen, params, index, stack, restore })
-                }
-                window.addEventListener("popstate", onPopState)
-                return () => window.removeEventListener("popstate", onPopState)
-            }
-            case "push": {
-                this._onPush = handler
-                return () => {
-                    this._onPush = undefined
-                }
-            }
-            case "replace": {
-                this._onReplace = handler
-                return () => {
-                    this._onReplace = undefined
-                }
-            }
-            default:
-                throw new Error(`unknown event ${event}`)
+    addEventListener(event: "pop", handler: OnPop<S>): () => void
+    addEventListener(event: "push", handler: OnPush<S>): () => void
+    addEventListener(event: "pop" | "push", handler: OnPop<S> | OnPush<S>): () => void {
+        this._events[event].push(handler)
+        return () => {
+            this._events[event] = this._events[event].filter((i) => handler !== i)
         }
     }
 
-    private nextURL(path: string, params: Params[keyof S]): URL {
+    private _triggerEvent(event: "pop", ...data: Parameters<OnPop<S>>): void
+    private _triggerEvent(event: "push", ...data: Parameters<OnPush<S>>): void
+    private _triggerEvent(
+        event: "pop" | "push",
+        ...data: Parameters<OnPop<S>> | Parameters<OnPush<S>>
+    ): void {
+        this._events[event].forEach((cb) => {
+            queueTask(() => cb(data[0], data[1]))
+        })
+    }
+
+    private _nextURL(screen: string, params: Params[keyof S]): URL {
+        let path = this._routes.find((r) => r.screen === screen)?.route ?? "/"
         let nextURL = new URL(path, window.location.href)
-        if (this._toURLParams) {
-            let asURLParams = this._toURLParams(params)
-            for (let [key, value] of asURLParams) {
-                nextURL.searchParams.set(key, value)
-            }
-        } else {
-            for (let key in params) {
+
+        for (let key in params) {
+            if (params[key] && Array.isArray(params[key])) {
+                nextURL.searchParams.set(key, `${params[key].join(",")}`)
+            } else if (params[key]) {
                 nextURL.searchParams.set(key, `${params[key]}`)
             }
         }
 
         return nextURL
+    }
+
+    private _mapURLToScreen(u: URL) {
+        for (let r of this._routes) {
+            if (u.pathname === r.route) {
+                return {
+                    screen: r.screen,
+                    stack: r.stack,
+                    params: r.parseParams(u),
+                }
+            }
+        }
+    }
+
+    public static screensToRoutes<S extends Screens, K extends keyof S = keyof S>(
+        screens: (
+            | [K, S[K]["stack"]]
+            | [K, S[K]["stack"], string]
+            | [K, S[K]["stack"], string | undefined, ((u: URL) => S[K]["params"]) | undefined]
+        )[],
+    ): Route<S>[] {
+        return screens.map(([sc, st, rt, pr]) => ({
+            route: rt ?? `/${sc as string}`,
+            screen: sc,
+            stack: st,
+            parseParams: pr ?? (() => ({}) as any),
+        }))
     }
 }
 

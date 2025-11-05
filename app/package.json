@@ -49,13 +49,12 @@
         "@fontsource-variable/inter": "^5.2.5",
         "@fontsource-variable/noto-serif-hk": "^5.2.5",
         "@fontsource/ibm-plex-mono": "^5.2.5",
-        "@internationalized/date": "^3.7.0",
         "@lezer/highlight": "^1.2.1",
         "@nanostores/i18n": "^1.0.0",
         "@phosphor-icons/react": "^2.1.7",
         "@replit/codemirror-vim": "^6.3.0",
         "@sqlite.org/sqlite-wasm": "^3.48.0-build4",
-        "@tanstack/react-store": "^0.7.1",
+        "@tanstack/react-store": "^0.8.0",
         "@tauri-apps/plugin-fs": "^2.3.0",
         "@tauri-apps/plugin-os": "^2.2.1",
         "@tauri-apps/plugin-store": "^2.2.0",
@@ -65,10 +64,9 @@
         "nanoid": "^5.1.5",
         "quill-delta": "^5.1.0",
         "react": "19.2.0",
-        "react-aria": "^3.38.1",
-        "react-aria-components": "^1.7.1",
         "react-dom": "19.2.0",
-        "react-json-tree": "^0.20.0"
+        "react-json-tree": "^0.20.0",
+        "temporal-polyfill": "^0.3.0"
     },
     "engines": {
         "node": ">=23.0.0"

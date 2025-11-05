@@ -8,8 +8,8 @@ export function generateMockAPITokens(n = 100): APIToken[] {
     for (let i = 0; i < n; i++) {
         apitokens.push({
             name: `Token_${i}`,
-            createdAt: now.subtract({ hours: i * 2 }).toDate("utc"),
-            expiresAt: now.add({ hours: 5 }).subtract({ days: i }).toDate("utc"),
+            createdAt: now.subtract({ hours: i * 2 }).withTimeZone("utc"),
+            expiresAt: now.add({ hours: 5 }).subtract({ days: i }).withTimeZone("utc"),
         })
     }
 

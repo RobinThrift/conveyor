@@ -1,12 +1,12 @@
 .dialog {
-    @apply fixed bg-surface-level-1 border shadow-lg text-text;
-    @apply border-subtle-extra-light dark:border-subtle-extra-dark;
+    @apply fixed shadow-xl rounded-xl p-4 surface-level-3 elevation-2;
     @apply focus:outline-hidden;
+    position-area: bottom center;
+    color: var(--color-text);
 
     overflow: hidden;
 
     top: calc(5svh + var(--nested-dialogs) * -3dvh);
-    left: 50%;
 
     width: 100%;
     max-width: none;
@@ -19,8 +19,7 @@
     --scale: calc(1 - 0.03 * var(--nested-dialogs));
     --backdrop-opacity: 1;
 
-    transform: translateX(-50%) translateY(var(--offset-top))
-        scale(var(--scale));
+    transform: translateY(var(--offset-top)) scale(var(--scale));
     transition:
         opacity 150ms,
         transform 250ms,
@@ -40,28 +39,29 @@
 
     @media (min-width: 768px) {
         @apply max-w-3xl;
-        --offset-top: calc(-50% + var(--nested-dialogs) * 3svh);
-        top: 50%;
+        position-area: center;
         width: 80svw;
         max-height: 85svh;
-        height: auto;
+        height: revert;
         /* biome-ignore lint/complexity/noImportantStyles: required for reset */
         padding-bottom: revert !important;
+        top: 0;
 
         @starting-style {
             opacity: 0;
-            --offset-top: calc(-50% + 3svh);
+            --offset-top: 0;
         }
 
         &[data-state="closing"] {
             opacity: 0;
-            --offset-top: calc(-50% + 3svh);
+            --offset-top: 0;
             --backdrop-opacity: 0;
         }
     }
 
     .dialog-description {
-        @apply text-sm text-subtle-extra-dark mb-2;
+        @apply text-neutral-extra-dark mb-2;
+        font-size: var(--sm-font-size);
     }
 
     .dialog-title + .dialog-description {
@@ -69,30 +69,24 @@
     }
 }
 
-/* @media (max-width: 767px) { */
-/*     :root { */
-/*         main, */
-/*         .appheader { */
-/*             transition: transform 200ms; */
-/*         } */
-/**/
-/*         &:has(.dialog.is-modal[open]) { */
-/*             main { */
-/*                 transform: scale(0.97) translate3D(0, -80px, 0); */
-/*             } */
-/*             .appheader { */
-/*                 transform: scale(0.97) translate3D(0, 10px, 0); */
-/*             } */
-/*         } */
-/**/
-/*         &:has(.dialog.is-modal[data-state="closing"]) { */
-/*             main, */
-/*             .appheader { */
-/*                 transform: scale(1) translate3D(0, 0, 0); */
-/*             } */
-/*         } */
-/*     } */
-/* } */
+.dialog .btn {
+    isolation: isolate;
+}
+
+.dialog-btns .btn,
+.dialog-close-btn {
+    &::before {
+        background-color: var(--btn-bg);
+        color: var(--btn-color);
+        border: 1px solid var(--btn-border-color);
+    }
+
+    &:hover {
+        &::before {
+            background-color: var(--btn-bg-hover);
+        }
+    }
+}
 
 .dialog.is-modal .dialog {
     /* biome-ignore lint/complexity/noImportantStyles: required for reset */
@@ -114,8 +108,9 @@
     }
 }
 
-.dialog-close {
-    @apply absolute right-1 top-1 inline-flex size-8 items-center justify-center p-0 rounded-full;
+.dialog-close-btn {
+    @apply absolute right-3 top-3 inline-flex size-8 items-center justify-center p-0 rounded-full;
+    @apply aspect-square h-11 w-11;
     @apply focus:outline-hidden focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset-2;
     z-index: 200;
 
@@ -126,10 +121,11 @@
 
 .dialog-title {
     @apply font-medium text-xl mb-2;
+    font-size: var(--h3-font-size);
 }
 
 .dialog-btns {
-    @apply flex gap-2 justify-end mt-6;
+    @apply flex gap-2 justify-end pt-6 pb-2;
 }
 
 .dialog-drag-handle {

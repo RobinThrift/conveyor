@@ -1,7 +1,9 @@
+import type { Temporal } from "temporal-polyfill"
+
 export interface APIToken {
     name: string
-    createdAt: Date
-    expiresAt: Date
+    createdAt: Temporal.ZonedDateTime
+    expiresAt: Temporal.ZonedDateTime
 }
 
 export interface APITokenList {

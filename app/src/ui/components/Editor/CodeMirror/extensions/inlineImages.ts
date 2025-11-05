@@ -1,10 +1,13 @@
 import { syntaxTree } from "@codemirror/language"
 import { type EditorState, type Extension, type Range, StateField } from "@codemirror/state"
 import { Decoration, type DecorationSet, EditorView, type Rect, WidgetType } from "@codemirror/view"
-import { type AttachmentID, attachmentIDFromURL } from "@/domain/Attachment"
+
+import { type AttachmentID, imageBlobToSrc, parseAttachmentURL } from "@/domain/Attachment"
 import type { AsyncResult } from "@/lib/result"
 
-type GetAttachmentDataByID = (id: AttachmentID) => AsyncResult<{ data: Uint8Array }>
+type GetAttachmentDataByID = (
+    id: AttachmentID,
+) => AsyncResult<{ data: Uint8Array<ArrayBuffer>; mime: string }>
 
 export const inlineImages = (getAttachmentDataByID: GetAttachmentDataByID): Extension => {
     return StateField.define<DecorationSet>({
@@ -84,10 +87,18 @@ class ImageWidget extends WidgetType {
                     view.requestMeasure()
                 }, 1000)
             },
-            { once: true },
+            { once: true, passive: true },
         )
 
-        let attachment = attachmentIDFromURL(this._src)
+        this._dom.addEventListener(
+            "error",
+            (err) => {
+                console.error("error loading image", err)
+            },
+            { once: true, passive: true },
+        )
+
+        let attachment = parseAttachmentURL(this._src)
         if (attachment?.attachmentID) {
             this._getAttachmentDataByID(attachment.attachmentID).then(([data, err]) => {
                 if (err) {
@@ -98,8 +109,7 @@ class ImageWidget extends WidgetType {
                 if (!this._dom || !data?.data) {
                     return
                 }
-
-                this._dom.src = URL.createObjectURL(new Blob([data?.data]))
+                this._dom.src = imageBlobToSrc(data)
             })
         } else {
             this._dom.src = this._src
@@ -108,10 +118,14 @@ class ImageWidget extends WidgetType {
         return this._dom
     }
 
-    coordsAt(dom: HTMLElement, pos: number, side: number): Rect | null {
-        console.log("side", side)
-        console.log("pos", pos)
-        console.log("dom", dom)
+    destroy(dom: HTMLElement): void {
+        let src = (dom as HTMLImageElement)?.src
+        if (src.startsWith("blob:")) {
+            URL.revokeObjectURL(src)
+        }
+    }
+
+    coordsAt(_dom: HTMLElement, _pos: number, _side: number): Rect | null {
         return null
     }
 }

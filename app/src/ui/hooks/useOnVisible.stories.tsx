@@ -21,17 +21,17 @@ export const Overview: Story = {
     render: (args) => {
         return (
             <article className="w-full flex flex-col items-center space-y-2">
-                <div className="h-[500px] w-[400px] bg-subtle" />
+                <div className="h-[500px] w-[400px] bg-neutral" />
                 <IsVisible {...args} />
-                <div className="h-[500px] w-[400px] bg-subtle" />
+                <div className="h-[500px] w-[400px] bg-neutral" />
                 <IsVisible {...args} />
-                <div className="h-[500px] w-[400px] bg-subtle" />
+                <div className="h-[500px] w-[400px] bg-neutral" />
                 <IsVisible {...args} />
-                <div className="h-[500px] w-[400px] bg-subtle" />
+                <div className="h-[500px] w-[400px] bg-neutral" />
                 <IsVisible {...args} />
-                <div className="h-[500px] w-[400px] bg-subtle" />
+                <div className="h-[500px] w-[400px] bg-neutral" />
                 <IsVisible {...args} />
-                <div className="h-[500px] w-[400px] bg-subtle" />
+                <div className="h-[500px] w-[400px] bg-neutral" />
                 <IsVisible {...args} />
             </article>
         )

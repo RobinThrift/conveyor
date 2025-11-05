@@ -108,7 +108,7 @@ const TagTreeItem = React.memo(
                         {item.count ? (
                             <span className="tag-tree-item-count">
                                 <span className="sr-only">{t.Count}</span>
-                                {` (${item.count})`}
+                                {item.count}
                             </span>
                         ) : null}
                     </span>
@@ -118,7 +118,7 @@ const TagTreeItem = React.memo(
                             className="tag-tree-item-expand-toggle-btn"
                             onClick={() => toggleExpandItem(item.tag)}
                         >
-                            <CaretRightIcon focusable={false} />
+                            <CaretRightIcon />
                         </div>
                     ) : null}
                 </div>
@@ -144,39 +144,3 @@ const TagTreeItem = React.memo(
         )
     },
 )
-
-// const TagTreeInner = React.memo(function TagTreeInner({
-//     tagTree,
-//     expandedIDs,
-//     selected,
-//     onAction,
-//     onSelectionChange,
-//     onExpandedChange,
-// }: Omit<TagTreeProps, "className" | "aria-hidden" | "tags">) {
-//     let selectedKeys = useMemo(() => (selected ? [selected] : []), [selected])
-//     let render = useCallback(function renderItem(item: TagTreeItem) {
-//         return (
-//             <TreeItem textValue={item.tag} className="tag-tree-item">
-//                 <TagTreeItemContent item={item} />
-//                 <Collection items={item.children}>{renderItem}</Collection>
-//             </TreeItem>
-//         )
-//     }, [])
-//
-//     return (
-//         <Tree
-//             aria-label="Tag tree"
-//             selectionMode="single"
-//             selectionBehavior="toggle"
-//             items={tagTree}
-//             expandedKeys={expandedIDs}
-//             selectedKeys={selectedKeys}
-//             onAction={onAction}
-//             onSelectionChange={onSelectionChange}
-//             onExpandedChange={onExpandedChange}
-//         >
-//             {render}
-//         </Tree>
-//     )
-// })
-//

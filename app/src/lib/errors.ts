@@ -35,7 +35,7 @@ export function isErr<ToCheck extends Error, Target extends { new (...a: any[]):
     let targetCode = CustomErrCode in target && (target[CustomErrCode] as string)
 
     if (!targetCode) {
-        return false
+        return value instanceof target
     }
 
     if (valueCode === targetCode) {

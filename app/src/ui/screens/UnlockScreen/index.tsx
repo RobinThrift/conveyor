@@ -1,7 +1,7 @@
-import { lazy } from "react"
+import { lazy, memo } from "react"
 
 export const UnlockScreen = lazy(() =>
     import("./UnlockScreen").then(({ UnlockScreen }) => ({
-        default: UnlockScreen,
+        default: memo(UnlockScreen),
     })),
 )

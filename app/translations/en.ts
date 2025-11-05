@@ -36,12 +36,24 @@ export const translations = {
         NewPasswordIsOldPassword: "New password can't be old password",
     },
 
-    "components/AppHeader": {
-        Settings: "Settings",
+    "components/Sidebar": {
+        SettingsLink: "Settings",
+        NewMemo: "New Memo",
+        Tags: "Tags",
+    },
+
+    "components/TabBar": {
+        NewMemo: "New Memo",
+        OverflowTitle: "Sidebar",
+        CloseOverflow: "Close",
+        OpenOffcanvasOverflow: "Open Sidebar",
+    },
+
+    "components/MemoTabPanel": {
+        Close: "Close",
     },
 
     "components/Memo": {
-        ShowMore: "Show More",
         FootnoteBackLink: "Jump back",
     },
 
@@ -75,6 +87,11 @@ export const translations = {
         Description: "There are new Memos available",
     },
 
+    "components/Toolbar": {
+        Extend: "Extend",
+        Collapse: "Collapse",
+    },
+
     "components/Editor": {
         Cancel: "Cancel",
         Save: "Save",
@@ -105,6 +122,7 @@ export const translations = {
     },
 
     "components/MemoListHeader": {
+        DefaultHeader: "All Memos in chronological order",
         Archived: "Archived memos",
         Deleted: "Deleted Memos",
         MemosForTag: "Memos tagged",
@@ -123,8 +141,16 @@ export const translations = {
     },
 
     "components/MemoListFilter/DatePicker": {
-        Label: "Filter Memos by Date",
+        Label: params(
+            "Memo date filter, gird is showing {minValue} to {maxValue}; currently selected date to filter by is: {selected}",
+        ),
+        NoSelection: "none",
         Today: "Today",
+        PreviousMonth: "Previous Month",
+        NextMonth: "Next Month",
+        PickMonth: "Pick Month",
+        PickYear: "Pick Year",
+        Expand: "Expand date picker grid",
     },
 
     "components/MemoListFilter/TagTreeFilter": {
@@ -198,10 +224,6 @@ export const translations = {
             "You private key will be encrypted using a separate cryptographic key that will be saved in the browser and marked as non-exrtractable.",
         ExplainerDeviceSecureStorageNative:
             "Your private key will be saved in your device's harware-backed secure storage element.",
-    },
-
-    "screens/SingleMemoScreen": {
-        Back: "Back",
     },
 
     "screens/Settings": {
@@ -315,9 +337,10 @@ export const translations = {
     },
 
     "screens/Settings/About": {
-        Title: "Conveyor",
+        Title: "About",
         VersionLabel: "Version:",
         PublishDateLabel: "Published on:",
+        IconLicenseLabel: "Icons:",
         ServerVersionLabel: "Server Version:",
         ServerPublishDateLabel: "Server Published on:",
         ServerGoVersionLabel: "Go Version:",

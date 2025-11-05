@@ -626,7 +626,9 @@ export function createColumnType(column?: Column, override?: Override): TypeNode
     }
 
     if (override?.type) {
-        return factory.createTypeReferenceNode(override?.type)
+        return factory.createTypeReferenceNode(
+            typeof override.type === "string" ? override.type : override.type.name,
+        )
     }
 
     let typ: TypeNode = factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)

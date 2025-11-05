@@ -51,7 +51,9 @@ export const extensions = ({
         filename: string
         data: Uint8Array
     }): Promise<void>
-    getAttachmentDataByID(id: AttachmentID): AsyncResult<{ data: Uint8Array }>
+    getAttachmentDataByID(
+        id: AttachmentID,
+    ): AsyncResult<{ data: Uint8Array<ArrayBuffer>; mime: string }>
 }) => {
     let exts: Extension[] = [
         vimModeEnabled ? vim() : [],

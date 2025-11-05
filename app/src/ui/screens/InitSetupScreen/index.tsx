@@ -1,7 +1,7 @@
-import { lazy } from "react"
+import { lazy, memo } from "react"
 
 export const InitSetupScreen = lazy(() =>
     import("./InitSetupScreen").then(({ InitSetupScreen }) => ({
-        default: InitSetupScreen,
+        default: memo(InitSetupScreen),
     })),
 )

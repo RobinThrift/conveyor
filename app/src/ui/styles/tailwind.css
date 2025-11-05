@@ -29,20 +29,6 @@
     --color-primary-extra-dark: var(--color-primary-extra-dark);
     --color-primary-contrast: var(--color-primary-contrast);
 
-    --color-info-extra-light: var(--color-info-extra-light);
-    --color-info-light: var(--color-info-light);
-    --color-info: var(--color-info);
-    --color-info-dark: var(--color-info-dark);
-    --color-info-extra-dark: var(--color-info-extra-dark);
-    --color-info-contrast: var(--color-info-contrast);
-
-    --color-success-extra-light: var(--color-success-extra-light);
-    --color-success-light: var(--color-success-light);
-    --color-success: var(--color-success);
-    --color-success-dark: var(--color-success-dark);
-    --color-success-extra-dark: var(--color-success-extra-dark);
-    --color-success-contrast: var(--color-success-contrast);
-
     --color-danger-extra-light: var(--color-danger-extra-light);
     --color-danger-light: var(--color-danger-light);
     --color-danger: var(--color-danger);
@@ -50,12 +36,12 @@
     --color-danger-extra-dark: var(--color-danger-extra-dark);
     --color-danger-contrast: var(--color-danger-contrast);
 
-    --color-subtle-extra-light: var(--color-subtle-extra-light);
-    --color-subtle-light: var(--color-subtle-light);
-    --color-subtle: var(--color-subtle);
-    --color-subtle-dark: var(--color-subtle-dark);
-    --color-subtle-extra-dark: var(--color-subtle-extra-dark);
-    --color-subtle-contrast: var(--color-subtle-contrast);
+    --color-neutral-extra-light: var(--color-neutral-extra-light);
+    --color-neutral-light: var(--color-neutral-light);
+    --color-neutral: var(--color-neutral);
+    --color-neutral-dark: var(--color-neutral-dark);
+    --color-neutral-extra-dark: var(--color-neutral-extra-dark);
+    --color-neutral-contrast: var(--color-neutral-contrast);
 
     --color-text: var(--color-text);
 
@@ -64,7 +50,199 @@
 
     --color-surface-level-1: var(--color-surface-level-1);
     --color-surface-level-2: var(--color-surface-level-2);
+    --color-surface-level-3: var(--color-surface-level-3);
     --color-surface-border: var(--color-surface-border);
 
     --text-base: 16px;
+}
+
+@utility elevation {
+    box-shadow: var(--shadow-elevation, 0 0 #0000);
+}
+
+@utility elevation-1 {
+    --shadow-elevation:
+        0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+@utility elevation-2 {
+    --shadow-elevation:
+        0 20px 25px -5px rgba(0 0 0 / 0.1), 0 8px 10px -6px rgba(0 0 0 / 0.1);
+}
+
+@utility elevation-3 {
+    --shadow-elevation:
+        2px 5px 20px 5px rgba(0 0 0 / 0.1), -2px -2px 5px rgba(0 0 0 / 0.1);
+    * {
+        --shadow-elevation: 0 0 #0000;
+    }
+}
+
+@utility surface-level-1 {
+    color: var(--surface-color, var(--color-text));
+    background-color: color-mix(
+        in srgb,
+        var(--color-surface-level-1) 70%,
+        transparent
+    );
+    backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow:
+        var(--shadow-elevation, 0 0 #0000),
+        inset 0 0 0 1px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 10%),
+            transparent
+        ),
+        inset 2px 2px 0px -2px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
+            transparent
+        ),
+        inset -2px -2px 0px -2px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
+            transparent
+        ),
+        inset -3px -8px 2px -8px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 60%),
+            transparent
+        );
+}
+
+@utility surface-level-2 {
+    color: var(--surface-color, var(--color-text));
+
+    box-shadow:
+        var(--shadow-elevation, 0 0 #0000),
+        inset 0 0 0 1px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 10%),
+            transparent
+        ),
+        inset 2px 3px 0px -2px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
+            transparent
+        ),
+        inset -2px -2px 0px -2px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
+            transparent
+        ),
+        inset -3px -8px 1px -7px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 60%),
+            transparent
+        ),
+        inset -0.3px -1px 4px 0px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 12%),
+            transparent
+        ),
+        inset -1.5px 2.5px 0px -2px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 20%),
+            transparent
+        ),
+        inset 0px 3px 4px -2px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 20%),
+            transparent
+        ),
+        inset 2px -6.5px 1px -4px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 10%),
+            transparent
+        );
+
+    backdrop-filter: blur(8px) saturate(1.8) brightness(1.2);
+    background-color: color-mix(
+        in srgb,
+        var(--color-surface-level-2) 50%,
+        transparent
+    );
+}
+
+@utility surface-level-3 {
+    --glass-highlight: var(--color-surface-level-3);
+    --glass-shadow: var(--color-surface-border);
+    color: var(--surface-color, var(--color-text));
+
+    box-shadow:
+        var(--shadow-elevation, 0 0 #0000),
+        inset 0 0 0 1px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 10%),
+            transparent
+        ),
+        inset 2px 3px 0px -1px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
+            transparent
+        ),
+        inset -2px -2px 0px -2px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
+            transparent
+        ),
+        inset -3px -8px 1px -6px
+        color-mix(
+            in oklch,
+            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 60%),
+            transparent
+        ),
+        inset -0.3px -1px 4px 0px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 12%),
+            transparent
+        ),
+        inset -1.5px 2.5px 0px -2px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 20%),
+            transparent
+        ),
+        inset 0px 3px 4px -2px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 20%),
+            transparent
+        ),
+        inset 2px -6.5px 1px -4px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 10%),
+            transparent
+        ),
+        0px 1px 5px 0px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 10%),
+            transparent
+        ),
+        0px 6px 16px 0px
+        color-mix(
+            in oklch,
+            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 8%),
+            transparent
+        );
+
+    background-color: var(--color-surface-level-3);
 }

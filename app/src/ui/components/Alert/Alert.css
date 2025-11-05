@@ -1,5 +1,5 @@
 .alert {
-    @apply border-2 my-2 flex gap-2 items-start;
+    @apply border-2 my-2 flex gap-2 items-start rounded-xl p-2 border-danger-extra-dark bg-danger-light text-danger-contrast;
 
     & > svg {
         @apply size-8;
@@ -13,17 +13,5 @@
         pre {
             @apply overflow-x-auto p-0 m-0 max-w-full me-8;
         }
-    }
-
-    &.info {
-        @apply border-primary-dark bg-primary-extra-light;
-    }
-
-    &.success {
-        @apply border-success-dark bg-success-light text-success-contrast;
-    }
-
-    &.danger {
-        @apply border-danger-dark bg-danger-light text-danger-contrast;
     }
 }

@@ -77,6 +77,8 @@ export class QueryTSFile {
             this.options = { overrides: [] }
         }
 
+        console.error(query.columns)
+
         query.columns
             .filter((c) => c.type?.name.toLowerCase() === "boolean")
             .forEach((c) => {
@@ -94,36 +96,50 @@ export class QueryTSFile {
                 })
             })
 
-        this.options?.overrides
-            ?.filter((o) => query.columns.find((c) => fullColumName(c) === o.column))
-            .filter((o) => o.to_sql?.import || o.from_sql?.import)
-            .forEach((o) => {
-                if (o.to_sql) {
-                    this.addImport(
-                        [
-                            factory.createImportSpecifier(
-                                false,
-                                undefined,
-                                factory.createIdentifier(o.to_sql.fn),
-                            ),
-                        ],
-                        o.to_sql.import,
-                    )
-                }
+        for (let override of this.options?.overrides ?? []) {
+            if (!query.columns.find((c) => fullColumName(c) === override.column)) {
+                continue
+            }
 
-                if (o.from_sql) {
-                    this.addImport(
-                        [
-                            factory.createImportSpecifier(
-                                false,
-                                undefined,
-                                factory.createIdentifier(o.from_sql.fn),
-                            ),
-                        ],
-                        o.from_sql.import,
-                    )
-                }
-            })
+            if (override.from_sql?.import) {
+                this.addImport(
+                    [
+                        factory.createImportSpecifier(
+                            false,
+                            undefined,
+                            factory.createIdentifier(override.from_sql.fn),
+                        ),
+                    ],
+                    override.from_sql.import,
+                )
+            }
+
+            if (override.to_sql?.import) {
+                this.addImport(
+                    [
+                        factory.createImportSpecifier(
+                            false,
+                            undefined,
+                            factory.createIdentifier(override.to_sql.fn),
+                        ),
+                    ],
+                    override.to_sql.import,
+                )
+            }
+
+            if (typeof override.type === "object" && override.type.import) {
+                this.addImport(
+                    [
+                        factory.createImportSpecifier(
+                            false,
+                            undefined,
+                            factory.createIdentifier(override.type.name),
+                        ),
+                    ],
+                    override.type.import,
+                )
+            }
+        }
 
         let funcName = query.name[0].toLowerCase() + query.name.slice(1)
         let queryTextVarName = `${funcName}Query`

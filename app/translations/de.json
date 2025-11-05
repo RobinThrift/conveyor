@@ -8,8 +8,21 @@
         "ModeDark": "Dunkel"
     },
 
-    "components/AppHeader": {
-        "Settings": "Einstellungen"
+    "components/Sidebar": {
+        "SettingsLink": "Einstellungen",
+        "NewMemo": "Neues Memo",
+        "Tags": "Tags"
+    },
+
+    "components/TabBar": {
+        "NewMemo": "Neues Memo",
+        "OverflowTitle": "Sidebar",
+        "CloseOverflow": "Schließen",
+        "OpenOffcanvasOverflow": "Sidebar öffnen"
+    },
+
+    "components/MemoTabPanel": {
+        "Close": "Schließen"
     },
 
     "components/AuthForm": {
@@ -38,7 +51,6 @@
     },
 
     "components/Memo": {
-        "ShowMore": "Alles Anzeigen",
         "FootnoteBackLink": "Zurück springen"
     },
 
@@ -72,6 +84,11 @@
         "Description": "Es sind neue Memos verfügbar"
     },
 
+    "components/Toolbar": {
+        "Extend": "Ausklappen",
+        "Collapse": "Einklappen"
+    },
+
     "components/Editor": {
         "Cancel": "Abbrechen",
         "Save": "Speichern",
@@ -102,6 +119,7 @@
     },
 
     "components/MemoListHeader": {
+        "DefaultHeader": "Alle Memos in chronologischer Reihenfolge",
         "Archived": "Archivierte memos",
         "Deleted": "Gelöschte Memos",
         "MemosForTag": "Memos mit dem Tag",
@@ -120,8 +138,14 @@
     },
 
     "components/MemoListFilter/DatePicker": {
-        "Label": "Memos für einen Tag suchen",
-        "Today": "Heute"
+        "Label": "Memo Datumsfilter, Kalendar zeigt {minValue} bis {maxValue}; aktueller Datumsfilter: {selected}",
+        "NoSelection": "keiner",
+        "Today": "Heute",
+        "PreviousMonth": "Vorheriger Monat",
+        "NextMonth": "Nächster Monat",
+        "PickMonth": "Monat Auswählen",
+        "PickYear": "Jahr Auswählen",
+        "Expand": "Kalendar Ausklappen"
     },
 
     "components/MemoListFilter/StateFilter": {
@@ -193,10 +217,6 @@
 
         "ExplainerDeviceSecureStorageWeb": "Der Schlüssel wird mit einem zweiten kryptographischem Schlüssel verschlüsselt, welcher vom Browser verwaltet wird und nicht auslesbar ist, und im lokalen permanenten Speicher des Browsers hinterlegt.",
         "ExplainerDeviceSecureStorageNative": "Der Schlüssel wird im sicheren Hardwareelement des Gerätes hinterlegt."
-    },
-
-    "screens/SingleMemoScreen": {
-        "Back": "Zurück"
     },
 
     "screens/Settings": {
@@ -311,6 +331,7 @@
         "Title": "Info",
         "VersionLabel": "Version:",
         "PublishDateLabel": "Veröffentlicht am:",
+        "IconLicenseLabel": "Icons:",
         "ServerVersionLabel": "Server Version:",
         "ServerPublishDateLabel": "Server Veröffentlicht on:",
         "ServerGoVersionLabel": "Go Version:",

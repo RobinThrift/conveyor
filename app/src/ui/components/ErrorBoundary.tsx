@@ -65,7 +65,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         }
 
         let fallback = this.props.fallback || (
-            <Alert variant="danger">
+            <Alert>
                 {this.state.error.name}: {this.state.error.message}
                 {this.state.error.stack && (
                     <pre>

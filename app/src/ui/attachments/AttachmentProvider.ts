@@ -18,7 +18,8 @@ export function useAttachment({
     | {
           id: AttachmentID
           isLoading: boolean
-          data?: Uint8Array
+          data?: Uint8Array<ArrayBuffer>
+          mime?: string
           error?: Error
       }
     | undefined {
@@ -58,13 +59,16 @@ export function useAttachment({
         id,
         isLoading,
         data: data?.data,
+        mime: data?.mime,
         error: status?.state === "error" ? status.error : undefined,
     }
 }
 
-export function useAttachmentLoader(): (id: AttachmentID) => AsyncResult<{ data: Uint8Array }> {
+export function useAttachmentLoader(): (
+    id: AttachmentID,
+) => AsyncResult<{ data: Uint8Array<ArrayBuffer>; mime: string }> {
     let getAttachmentDataByID = useCallback(
-        (id: AttachmentID): AsyncResult<{ data: Uint8Array }> => {
+        (id: AttachmentID): AsyncResult<{ data: Uint8Array<ArrayBuffer>; mime: string }> => {
             let status = selectors.attachments.getAttachmentState(id)(
                 stores.attachments.states.state,
             )
@@ -80,7 +84,8 @@ export function useAttachmentLoader(): (id: AttachmentID) => AsyncResult<{ data:
                 return Promise.resolve(Ok(data))
             }
 
-            let promise = Promise.withResolvers<Result<{ data: Uint8Array }>>()
+            let promise =
+                Promise.withResolvers<Result<{ data: Uint8Array<ArrayBuffer>; mime: string }>>()
 
             actions.attachments.loadAttachment(id)
 

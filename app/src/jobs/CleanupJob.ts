@@ -1,3 +1,5 @@
+import type { Temporal } from "temporal-polyfill"
+
 import type { ChangelogController } from "@/control/ChangelogController"
 import type { MemoController } from "@/control/MemoController"
 import type { MemoChangelogEntry } from "@/domain/Changelog"
@@ -72,7 +74,7 @@ export class CleanupJob implements Job {
     }
 
     private async *_listUnsyncedChangelogEntries(ctx: Context) {
-        let after: [number, Date] | undefined
+        let after: [number, Temporal.ZonedDateTime] | undefined
 
         while (true) {
             let [page, pageErr] = await this._changelogCtrl.listUnsyncedChangelogEntries(ctx, {

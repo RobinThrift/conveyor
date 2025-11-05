@@ -34,7 +34,7 @@ export function _Notification({
 
             <div className="notification-buttons">
                 {n.buttons?.map((btn) => (
-                    <div key={btn.ariaLabel}>
+                    <div key={btn["aria-label"]}>
                         <Button {...btn} />
                     </div>
                 ))}
@@ -72,10 +72,10 @@ export function _PermanentNotification({
                 {n.buttons?.map((btn) => (
                     <Button
                         {...btn}
-                        key={btn.ariaLabel}
-                        onPress={(e) => {
+                        key={btn["aria-label"]}
+                        onClick={(e) => {
                             onOpenChange(false)
-                            btn.onPress?.(e)
+                            btn.onClick?.(e)
                         }}
                     />
                 ))}

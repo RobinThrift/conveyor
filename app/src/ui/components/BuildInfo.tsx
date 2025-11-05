@@ -6,7 +6,7 @@ import { useBuildInfo } from "../hooks/useBuildInfo"
 export const BuildInfo = React.memo(function BuildInfo({ className }: { className?: string }) {
     let buildInfo = useBuildInfo()
     return (
-        <div className={clsx("text-sm text-subtle-dark dark:text-subtle", className)}>
+        <div className={clsx("text-sm text-neutral-dark dark:text-neutral", className)}>
             {buildInfo.version}@
             <a href={buildInfo.projectLink} className="hover:text-primary" target="_github">
                 {buildInfo.commitHash.substring(0, 7)}

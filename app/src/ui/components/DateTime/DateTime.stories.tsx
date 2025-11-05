@@ -1,5 +1,7 @@
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import React from "react"
+import { Temporal } from "temporal-polyfill"
 
 import "@/ui/styles/index.css"
 
@@ -22,14 +24,34 @@ export const Basic: Story = {
 }
 
 export const Relative: Story = {
-    args: {
-        date: faker.date.recent(),
-        relative: true,
+    render: (args) => {
+        let now = Temporal.Now.zonedDateTimeISO(Temporal.Now.timeZoneId())
+        return (
+            <div className="flex flex-col gap-2">
+                <DateTime {...args} date={now.subtract({ seconds: 2 })} relative />
+                <DateTime {...args} date={now.subtract({ seconds: 15 })} relative />
+
+                <DateTime {...args} date={now.subtract({ minutes: 1 })} relative />
+                <DateTime {...args} date={now.subtract({ minutes: 10 })} relative />
+                <DateTime {...args} date={now.subtract({ minutes: 59 })} relative />
+
+                <DateTime {...args} date={now.subtract({ hours: 1 })} relative />
+                <DateTime {...args} date={now.subtract({ hours: 2 })} relative />
+                <DateTime {...args} date={now.subtract({ hours: 23 })} relative />
+
+                <DateTime {...args} date={now.subtract({ hours: 23, minutes: 59 })} relative />
+
+                <DateTime {...args} date={now.subtract({ days: 1 })} relative />
+                <DateTime {...args} date={now.subtract({ days: 2 })} relative />
+                <DateTime {...args} date={now.subtract({ days: 3 })} relative />
+                <DateTime {...args} date={now.subtract({ days: 4 })} relative />
+            </div>
+        )
     },
 }
 
 export const InvalidDateTime: Story = {
     args: {
-        date: "123001235t8128" as any,
+        date: "abcdefghij" as any,
     },
 }

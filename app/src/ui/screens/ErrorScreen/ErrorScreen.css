@@ -22,7 +22,7 @@
         }
 
         p {
-            @apply text-subtle-dark text-xl dark:text-text;
+            @apply text-neutral-dark text-xl dark:text-text;
         }
     }
 }

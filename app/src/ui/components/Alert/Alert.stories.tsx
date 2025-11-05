@@ -21,9 +21,7 @@ export const Overview: Story = {
     render: (args) => {
         return (
             <div className="container mx-auto">
-                <Alert {...args} variant="info" />
-                <Alert {...args} variant="success" />
-                <Alert {...args} variant="danger" />
+                <Alert {...args} />
             </div>
         )
     },

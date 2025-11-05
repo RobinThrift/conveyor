@@ -1,0 +1,39 @@
+.editor-toolbar {
+    @apply fixed! elevation-2 left-4 right-4 rounded-full!;
+    z-index: 100;
+    bottom: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 2));
+
+    @media (min-width: 768px) {
+        @apply bottom-2;
+        right: unset;
+        left: unset;
+    }
+}
+
+.editor:has(:focus) .editor-toolbar {
+    --ios-keyboard-fix-start: calc(var(--toolbar-offset, 0px));
+    --ios-keyboard-fix-end: 0px;
+    animation: ios-keyboard-fix-down linear;
+    animation-timeline: scroll();
+    animation-range-end: calc(var(--toolbar-offset, 0px));
+    animation-fill-mode: both;
+
+    @media (min-width: 768px) {
+        animation: none;
+        bottom: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 2));
+
+        &.is-scrolling-up {
+            animation: none;
+        }
+    }
+}
+
+@keyframes ios-keyboard-fix-down {
+    from {
+        bottom: var(--ios-keyboard-fix-start);
+    }
+
+    to {
+        bottom: var(--ios-keyboard-fix-end);
+    }
+}

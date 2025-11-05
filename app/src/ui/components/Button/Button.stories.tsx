@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import React from "react"
+import React, { useRef } from "react"
 
-import { ArrowUpRightIcon, BinIcon, PlusIcon, SlidersIcon, UserIcon } from "@/ui/components/Icons"
+import { BinIcon, ClipboardIcon, SlidersIcon } from "@/ui/components/Icons"
 import "@/ui/styles/index.css"
 
 import { Button } from "./Button"
@@ -15,17 +15,14 @@ export default meta
 
 type Story = StoryObj<typeof Button>
 
-export const Basic: Story = {
+export const Overview: Story = {
     args: {
-        children: <>Button Text</>,
+        className: "elevation-2",
     },
-}
-
-export const Variants: Story = {
     render: (args) => {
         return (
-            <div className="space-y-4">
-                <div className="flex gap-4">
+            <div className="space-y-4 grid place-items-center place-content-center h-[80svh]">
+                <div className="flex gap-8">
                     <Button {...args} variant="regular">
                         Regular
                     </Button>
@@ -35,70 +32,14 @@ export const Variants: Story = {
                     <Button {...args} variant="danger">
                         Danger
                     </Button>
-                    <Button {...args} variant="success">
-                        Success
-                    </Button>
                 </div>
 
-                <div className="flex gap-4">
-                    <Button {...args} variant="regular" outline={true}>
-                        Outline Regular
-                    </Button>
-                    <Button {...args} variant="primary" outline={true}>
-                        Outline Primary
-                    </Button>
-                    <Button {...args} variant="danger" outline={true}>
-                        Outline Danger
-                    </Button>
-                    <Button {...args} variant="success" outline={true}>
-                        Outline Success
-                    </Button>
-                </div>
+                <h2 className="w-full text-xl font-semibold">Icons</h2>
+                <div className="flex items-start gap-8">
+                    <Button {...args} iconLeft={<ClipboardIcon />} />
+                    <Button {...args} iconLeft={<BinIcon />} />
 
-                <div className="flex gap-4">
-                    <Button {...args} variant="regular" plain={true}>
-                        Regular (Plain)
-                    </Button>
-                    <Button {...args} variant="primary" plain={true}>
-                        Primary (Plain)
-                    </Button>
-                    <Button {...args} variant="danger" plain={true}>
-                        Danger (Plain)
-                    </Button>
-                    <Button {...args} variant="success" plain={true}>
-                        Success (Plain)
-                    </Button>
-                </div>
-            </div>
-        )
-    },
-}
-
-export const Sizes: Story = {
-    render: (args) => {
-        return (
-            <div className="flex items-start gap-2">
-                <Button {...args} size="sm">
-                    Small (sm)
-                </Button>
-                <Button {...args} size="md">
-                    Regular (md)
-                </Button>
-                <Button {...args} size="lg">
-                    Large (lg)
-                </Button>
-            </div>
-        )
-    },
-}
-
-export const Icons: Story = {
-    render: (args) => {
-        return (
-            <div className="space-y-2">
-                <h3>Regular</h3>
-                <div className="flex items-start gap-2">
-                    <Button {...args} iconLeft={<UserIcon />}>
+                    <Button {...args} iconLeft={<SlidersIcon />}>
                         Icon Left
                     </Button>
                     <Button {...args} iconRight={<BinIcon />} variant="primary">
@@ -106,116 +47,26 @@ export const Icons: Story = {
                     </Button>
                     <Button
                         {...args}
-                        iconRight={<PlusIcon />}
+                        iconRight={<ClipboardIcon />}
                         iconLeft={<SlidersIcon />}
                         variant="danger"
                     >
                         Icon left and right
                     </Button>
-
-                    <Button
-                        {...args}
-                        iconRight={<PlusIcon />}
-                        aria-label="Icon Only"
-                        variant="success"
-                    />
                 </div>
 
-                <h3>Small</h3>
-                <div className="flex items-start gap-2">
-                    <Button {...args} iconLeft={<UserIcon />} size="sm">
-                        Icon Left
+                <h2 className="w-full text-xl font-semibold">Disabled</h2>
+                <div className="flex gap-8">
+                    <Button {...args} iconLeft={<ClipboardIcon />} disabled={true} />
+                    <Button {...args} iconLeft={<BinIcon />} disabled={true} />
+                    <Button {...args} variant="regular" disabled={true}>
+                        Regular
                     </Button>
-                    <Button {...args} iconRight={<BinIcon />} size="sm">
-                        Icon Right
+                    <Button {...args} variant="primary" disabled={true}>
+                        Primary
                     </Button>
-                    <Button {...args} iconRight={<PlusIcon />} iconLeft={<SlidersIcon />} size="sm">
-                        Icon left and right
-                    </Button>
-
-                    <Button {...args} iconRight={<PlusIcon />} aria-label="Icon Only" size="sm" />
-                </div>
-
-                <h3>Large</h3>
-                <div className="flex items-start gap-2">
-                    <Button {...args} iconLeft={<UserIcon />} size="lg">
-                        Icon Left
-                    </Button>
-                    <Button {...args} iconRight={<BinIcon />} size="lg">
-                        Icon Right
-                    </Button>
-                    <Button {...args} iconRight={<PlusIcon />} iconLeft={<SlidersIcon />} size="lg">
-                        Icon left and right
-                    </Button>
-
-                    <Button {...args} iconRight={<PlusIcon />} aria-label="Icon Only" size="lg" />
-                </div>
-
-                <h3>Plain</h3>
-                <div className="flex items-start gap-2">
-                    <Button {...args} iconRight={<BinIcon />} aria-label="Icon Only" plain={true} />
-                    <Button
-                        {...args}
-                        iconRight={<BinIcon />}
-                        aria-label="Icon Only"
-                        plain={true}
-                        variant="primary"
-                    />
-                    <Button
-                        {...args}
-                        iconRight={<BinIcon />}
-                        aria-label="Icon Only"
-                        plain={true}
-                        variant="danger"
-                    />
-                    <Button
-                        {...args}
-                        iconRight={<BinIcon />}
-                        aria-label="Icon Only"
-                        plain={true}
-                        variant="success"
-                    />
-                </div>
-
-                <h3>Outline</h3>
-                <div className="flex items-start gap-2">
-                    <Button
-                        {...args}
-                        iconRight={<ArrowUpRightIcon />}
-                        aria-label="Icon Only"
-                        outline
-                    >
-                        Goto Link
-                    </Button>
-
-                    <Button
-                        {...args}
-                        iconRight={<ArrowUpRightIcon />}
-                        aria-label="Icon Only"
-                        outline
-                        variant="primary"
-                    >
-                        Goto Link
-                    </Button>
-
-                    <Button
-                        {...args}
-                        iconRight={<ArrowUpRightIcon />}
-                        aria-label="Icon Only"
-                        outline
-                        variant="danger"
-                    >
-                        Goto Link
-                    </Button>
-
-                    <Button
-                        {...args}
-                        iconRight={<ArrowUpRightIcon />}
-                        aria-label="Icon Only"
-                        outline
-                        variant="success"
-                    >
-                        Goto Link
+                    <Button {...args} variant="danger" disabled={true}>
+                        Danger
                     </Button>
                 </div>
             </div>
@@ -223,57 +74,33 @@ export const Icons: Story = {
     },
 }
 
-export const States: Story = {
+export const Tooltips: Story = {
     args: {
-        isDisabled: true,
+        tooltip: "This is some tooltip content",
     },
     render: (args) => {
+        let ref = useRef<HTMLDialogElement | null>(null)
+
+        let onClick = () => {
+            ref.current?.showModal()
+        }
+
         return (
-            <div className="space-y-4">
-                <div className="flex gap-4">
-                    <Button {...args} variant="regular">
-                        Regular
-                    </Button>
-                    <Button {...args} variant="primary">
-                        Primary
-                    </Button>
-                    <Button {...args} variant="danger">
-                        Danger
-                    </Button>
-                    <Button {...args} variant="success">
-                        Success
-                    </Button>
-                </div>
+            <div className="w-full h-[100svh] flex items-center justify-center gap-20">
+                <Button {...args} onClick={onClick}>
+                    Button with a tooltip
+                </Button>
 
-                <div className="flex gap-4">
-                    <Button {...args} variant="regular" outline={true}>
-                        Outline Regular
-                    </Button>
-                    <Button {...args} variant="primary" outline={true}>
-                        Outline Primary
-                    </Button>
-                    <Button {...args} variant="danger" outline={true}>
-                        Outline Danger
-                    </Button>
-                    <Button {...args} variant="success" outline={true}>
-                        Outline Success
-                    </Button>
-                </div>
-
-                <div className="flex gap-4">
-                    <Button {...args} variant="regular" plain={true}>
-                        Regular (Plain)
-                    </Button>
-                    <Button {...args} variant="primary" plain={true}>
-                        Primary (Plain)
-                    </Button>
-                    <Button {...args} variant="danger" plain={true}>
-                        Danger (Plain)
-                    </Button>
-                    <Button {...args} variant="success" plain={true}>
-                        Success (Plain)
-                    </Button>
-                </div>
+                <dialog
+                    ref={ref}
+                    className="max-w-none max-h-none w-screen h-screen open:flex items-center justify-center"
+                >
+                    <div className="w-fit h-[30svh] items-center justify-center shadow-lg rounded-xl p-12 flex">
+                        <Button {...args} variant="primary">
+                            Button with a tooltip
+                        </Button>
+                    </div>
+                </dialog>
             </div>
         )
     },

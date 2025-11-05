@@ -3,7 +3,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 
 import type { Tag } from "@/domain/Tag"
+import { calendarDateTimeFromDate } from "@/lib/i18n"
 import { generateFullTestContent } from "@/lib/testhelper/memos"
+
 import "@/ui/styles/index.css"
 
 import { Editor } from "./Editor"
@@ -36,49 +38,13 @@ export const Overview: Story = {
         layout: "fullscreen",
     },
     args: {
-        placeholder: "Placeholder text...",
         memo: {
             id: "new",
             content: "",
             isArchived: false,
             isDeleted: false,
-            createdAt: faker.date.recent(),
-            updatedAt: faker.date.recent(),
-        },
-        tags: (() => {
-            let tags: Tag[] = []
-
-            for (let i = 0; i < 100; i++) {
-                tags.push({
-                    tag: `#${faker.word.noun()}/${faker.word.noun()}`,
-                    count: 0,
-                })
-            }
-
-            tags.sort()
-            return tags
-        })(),
-    },
-    render: (args) => (
-        <div className="tablet:container mx-auto min-h-screen tablet:p-8 tablet:max-w-[80rem]">
-            <Editor {...args} />
-        </div>
-    ),
-}
-
-export const Placeholder: Story = {
-    parameters: {
-        layout: "fullscreen",
-    },
-    args: {
-        placeholder: "Placeholder text...",
-        memo: {
-            id: "new",
-            content: "",
-            isArchived: false,
-            isDeleted: false,
-            createdAt: faker.date.recent(),
-            updatedAt: faker.date.recent(),
+            createdAt: calendarDateTimeFromDate(faker.date.recent()),
+            updatedAt: calendarDateTimeFromDate(faker.date.recent()),
         },
         tags: (() => {
             let tags: Tag[] = []
@@ -106,7 +72,6 @@ export const WithContent: Story = {
         layout: "fullscreen",
     },
     args: {
-        placeholder: "Placeholder text...",
         className: "h-full",
         vimModeEnabled: true,
         memo: {
@@ -114,8 +79,8 @@ export const WithContent: Story = {
             content: generateFullTestContent(),
             isArchived: false,
             isDeleted: false,
-            createdAt: faker.date.recent(),
-            updatedAt: faker.date.recent(),
+            createdAt: calendarDateTimeFromDate(faker.date.recent()),
+            updatedAt: calendarDateTimeFromDate(faker.date.recent()),
         },
         tags: (() => {
             let tags: Tag[] = []
@@ -132,7 +97,7 @@ export const WithContent: Story = {
         })(),
     },
     render: (args) => (
-        <div className="tablet:container mx-auto h-screen tablet:p-8 tablet:max-w-[80rem] overflow-auto relative">
+        <div className="tablet:container mx-auto min-h-screen tablet:p-8 tablet:max-w-[80rem] overflow-auto relative">
             <Editor {...args} />
         </div>
     ),

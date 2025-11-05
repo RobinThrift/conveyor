@@ -1,22 +1,24 @@
 .alert-dialog {
-    @apply fixed bg-surface-level-1 border shadow-lg text-text;
+    @apply fixed shadow-lg rounded-xl p-4;
     @apply max-w-3xl;
-    @apply border-subtle-extra-light dark:border-subtle-extra-dark;
     @apply focus:outline-hidden;
 
     overflow: hidden;
 
-    top: 50%;
-    left: 50%;
+    border: calc(var(--spacing) * 1) solid rgba(255 255 255 / 0.2);
+    backdrop-filter: blur(6px) saturate(2.8) brightness(1.25);
+    background: linear-gradient(hsl(0 0% 98%) 0 100%) padding-box;
 
-    width: 100%;
+    position-area: center;
+
+    width: 85svw;
     max-height: 85svh;
     height: fit-content;
 
     --scale: 1;
     --backdrop-opacity: 1;
 
-    transform: translateX(-50%) translateY(-50%) scale(var(--scale));
+    transform: scale(var(--scale));
     transition:
         opacity 150ms,
         transform 250ms;
@@ -29,7 +31,7 @@
 }
 
 .alert-dialog-description {
-    @apply text-sm text-subtle-extra-dark mb-2;
+    @apply text-sm text-neutral-extra-dark mb-2;
 }
 
 .alert-dialog-title + .alert-dialog-description {

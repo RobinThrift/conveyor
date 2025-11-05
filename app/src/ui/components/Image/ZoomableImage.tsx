@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { useContext } from "react"
+import React, { Activity, useContext } from "react"
 
 import { XIcon } from "@/ui/components/Icons"
 import { usePreventScroll } from "@/ui/hooks/usePreventScroll"
@@ -32,6 +32,10 @@ function ZoomableImageInner(props: ZoomableImageProps) {
     let { ref, dialogRef, zoomedImgRef, imgRef, isZoomed, close, onClickZoom, img } =
         useZoomableImage(props)
 
+    if (!props.src) {
+        return <div>{props.alt}</div>
+    }
+
     return (
         <div
             id={props.id}
@@ -56,18 +60,20 @@ function ZoomableImageInner(props: ZoomableImageProps) {
                 />
             </button>
 
-            <dialog ref={dialogRef} className="zoomed-img">
-                {isZoomed && (
-                    <DraggableZoomableImage
-                        {...props}
-                        src={img.src ?? props.src}
-                        isLoading={img.isLoading}
-                        style={img.style}
-                        close={close}
-                        ref={zoomedImgRef}
-                    />
-                )}
-            </dialog>
+            <Activity mode={img.isLoading ? "hidden" : "visible"}>
+                <dialog ref={dialogRef} className="zoomed-img">
+                    {isZoomed && (
+                        <DraggableZoomableImage
+                            {...props}
+                            src={img.src ?? props.src}
+                            isLoading={img.isLoading}
+                            style={img.style}
+                            close={close}
+                            ref={zoomedImgRef}
+                        />
+                    )}
+                </dialog>
+            </Activity>
         </div>
     )
 }

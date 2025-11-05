@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { useContext } from "react"
+import React, { Activity, useContext } from "react"
 
 import { Button, type ButtonProps } from "@/ui/components/Button"
 import { XIcon } from "@/ui/components/Icons"
@@ -59,39 +59,36 @@ export function DialogContent(props: DialogContentProps) {
             aria-describedby={dialogCtx.describedByID}
             style={{ "--nested-dialogs": 0 } as React.CSSProperties}
         >
-            {dialogCtx.isOpen && (
-                <React.Fragment>
-                    {withCloseButton && (
-                        <DialogCloseButton
-                            iconRight={<XIcon />}
-                            ariaLabel="Close"
-                            className="dialog-close"
-                            plain
-                        />
-                    )}
-
-                    {props.children}
-
-                    <div
-                        className="dialog-drag-handle"
-                        onPointerDown={onPointerDown}
-                        onPointerUp={onPointerCancel}
-                        onPointerMove={onPointerMove}
-                        onPointerCancel={onPointerCancel}
+            <Activity mode={dialogCtx.isOpen ? "visible" : "hidden"}>
+                {withCloseButton && (
+                    <DialogCloseButton
+                        iconRight={<XIcon />}
+                        aria-label="Close"
+                        className="dialog-close-btn"
                     />
-                </React.Fragment>
-            )}
+                )}
+
+                {props.children}
+
+                <div
+                    className="dialog-drag-handle"
+                    onPointerDown={onPointerDown}
+                    onPointerUp={onPointerCancel}
+                    onPointerMove={onPointerMove}
+                    onPointerCancel={onPointerCancel}
+                />
+            </Activity>
         </dialog>
     )
 }
 
-export function DialogTrigger(props: Omit<ButtonProps, "onPress">) {
+export function DialogTrigger(props: Omit<ButtonProps, "onClick">) {
     let dialogCtx = useContext(dialogContext)
     if (!dialogCtx) {
         throw new Error("<DialogTrigger> component called outside of <Dialog> component")
     }
 
-    return <Button {...props} onPress={dialogCtx.open} />
+    return <Button {...props} onClick={dialogCtx.open} />
 }
 
 export type DialogTitleProps = React.HTMLAttributes<HTMLDivElement>
@@ -135,7 +132,7 @@ export function DialogButtons({
     return <div className={clsx("dialog-btns", className)}>{children}</div>
 }
 
-export function DialogCloseButton({ className, ...props }: Omit<ButtonProps, "onPress">) {
+export function DialogCloseButton({ className, ...props }: Omit<ButtonProps, "onClick">) {
     let dialogCtx = useContext(dialogContext)
     if (!dialogCtx) {
         throw new Error("<DialogCloseButton> component called outside of <Dialog> component")
@@ -144,7 +141,7 @@ export function DialogCloseButton({ className, ...props }: Omit<ButtonProps, "on
         <Button
             {...props}
             className={clsx("dialog-close-btn", className)}
-            onPress={dialogCtx.close}
+            onClick={dialogCtx.close}
         />
     )
 }

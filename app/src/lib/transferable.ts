@@ -1,4 +1,4 @@
-import { CalendarDate } from "@internationalized/date"
+import { Temporal } from "temporal-polyfill"
 
 import { type Context, contextFromPlainObject, isContext } from "@/lib/context"
 
@@ -9,6 +9,10 @@ export function prepareForTransfer(value: any): { prepared: any; transferables: 
 
     if (isContext(value)) {
         return { prepared: (value as Context).toPlainObject(), transferables: [] }
+    }
+
+    if (isTemporalObject(value)) {
+        return { prepared: prepareTemporalObject(value), transferables: [] }
     }
 
     if (Array.isArray(value)) {
@@ -56,13 +60,8 @@ export function restoreTransferredValue<T>(value: any): T {
         return value as T
     }
 
-    if (
-        typeof value === "object" &&
-        "calendar" in value &&
-        typeof value.calendar === "object" &&
-        value.calendar.identifier
-    ) {
-        return new CalendarDate(value.year, value.month, value.day) as T
+    if (typeof value === "object" && "__type" in value && "value" in value) {
+        return restoreTemporalObject(value) as T
     }
 
     if (typeof value === "object") {
@@ -192,4 +191,48 @@ export function removeNonTransferable(value: any): any {
     }
 
     return value
+}
+
+type transferrableTemporalObject = {
+    __type: "Temporal.PlainDate" | "Temporal.PlainDateTime" | "Temporal.ZonedDateTime"
+    value: string
+}
+
+function prepareTemporalObject(
+    d: Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime,
+): transferrableTemporalObject {
+    let value = d.toJSON()
+
+    if (d instanceof Temporal.PlainDate) {
+        return { __type: "Temporal.PlainDate", value }
+    }
+
+    if (d instanceof Temporal.PlainDateTime) {
+        return { __type: "Temporal.PlainDateTime", value }
+    }
+
+    return { __type: "Temporal.ZonedDateTime", value }
+}
+
+function restoreTemporalObject(
+    d: transferrableTemporalObject,
+): Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime {
+    switch (d.__type) {
+        case "Temporal.PlainDate":
+            return Temporal.PlainDate.from(d.value)
+        case "Temporal.PlainDateTime":
+            return Temporal.PlainDateTime.from(d.value)
+        case "Temporal.ZonedDateTime":
+            return Temporal.ZonedDateTime.from(d.value)
+    }
+}
+
+function isTemporalObject(
+    d: any,
+): d is Temporal.PlainDate | Temporal.PlainDateTime | Temporal.ZonedDateTime {
+    return (
+        d instanceof Temporal.PlainDate ||
+        d instanceof Temporal.PlainDateTime ||
+        d instanceof Temporal.ZonedDateTime
+    )
 }

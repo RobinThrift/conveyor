@@ -75,9 +75,8 @@ export function registerEffects({
             })
 
             navCtrl.push({
-                screen: "root",
+                screen: "list",
                 params: {},
-                restore: { scrollOffsetTop: 0 },
             })
         },
         autoMount: true,
@@ -104,7 +103,7 @@ if (import.meta.hot) {
             return
         }
 
-        newModule.state.setState(status.state)
+        newModule.status.setState(status.state)
         newModule.error.setState(error.state)
     })
 }

@@ -1,3 +1,5 @@
+import type { Temporal } from "temporal-polyfill"
+
 import { CustomErrCode } from "@/lib/errors"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { Ok, type Result, wrapErr } from "@/lib/result"
@@ -7,9 +9,9 @@ export type PlaintextAuthTokenValue = string & { readonly "": unique symbol }
 export interface AuthToken {
     origin: string
     accessToken: PlaintextAuthTokenValue
-    expiresAt: Date
+    expiresAt: Temporal.ZonedDateTime
     refreshToken: PlaintextAuthTokenValue
-    refreshExpiresAt: Date
+    refreshExpiresAt: Temporal.ZonedDateTime
 }
 
 export class AuthTokenNotFoundError extends Error {
@@ -26,7 +28,7 @@ export class PasswordChangeRequiredError extends Error {
     }
 }
 
-const ErrAuthTokenFromJSON = new Error("error deserilising auth token from json")
+const ErrAuthTokenFromJSON = new Error("error deserialising auth token from json")
 export function authTokenFromJSON(raw: Uint8Array<ArrayBufferLike>): Result<AuthToken> {
     let [obj, deserializationErr] = jsonDeserialize<Record<string, unknown>>(raw)
     if (deserializationErr) {

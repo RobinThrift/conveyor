@@ -4,7 +4,13 @@ export interface Options {
 
 export interface Override {
     column: string
-    type?: string
+    type?:
+        | string
+        | {
+              name: string
+              import: string
+              optional?: boolean
+          }
     from_sql?: {
         fn: string
         import: string

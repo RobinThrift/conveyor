@@ -17,12 +17,6 @@ suite("ui/components/DateTime", () => {
 
         let rendered = render(<DateTime date={datetime} relative={true} />)
 
-        await expect.element(rendered.getByRole("button")).toHaveTextContent(/.* ago/)
-
-        await rendered.getByRole("button").click()
-
-        await expect.element(rendered.baseElement).toHaveTextContent(new RegExp(`${datetime.day}`))
-
-        await expect.element(rendered.baseElement).toHaveTextContent(new RegExp(`${datetime.year}`))
+        await expect.element(rendered.baseElement).toHaveTextContent(/.* ago/)
     })
 })

@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import React, { useState } from "react"
-
-import { Select } from "@/ui/components/Select"
+import React from "react"
 
 import * as Icons from "./index"
 
@@ -12,30 +10,11 @@ const meta: Meta = {
 export default meta
 type Story = StoryObj
 
-type IconWeight = "thin" | "light" | "regular" | "bold" | "fill" | "duotone"
-
 export const AllIcons: Story = {
     name: "Icons",
     render: () => {
-        let [weight, setWeight] = useState<IconWeight>("light")
-
         return (
             <div>
-                <Select
-                    name="weight"
-                    label="Weight"
-                    value={weight}
-                    className="w-fit mb-2"
-                    onChange={(k) => setWeight((k ?? "regular") as IconWeight)}
-                >
-                    <Select.Option value="thin">Thin</Select.Option>
-                    <Select.Option value="light">Light</Select.Option>
-                    <Select.Option value="regular">Regular</Select.Option>
-                    <Select.Option value="bold">Bold</Select.Option>
-                    <Select.Option value="fill">Fill</Select.Option>
-                    <Select.Option value="duotone">Duotone</Select.Option>
-                </Select>
-
                 <ul className="grid grid-cols-8">
                     {Object.keys(Icons).map((name) => {
                         /* biome-ignore lint/performance/noDynamicNamespaceImportAccess: this is just a test file */
@@ -46,7 +25,7 @@ export const AllIcons: Story = {
                                 key={name}
                             >
                                 <span className="text-sm">{name}</span>
-                                <Icon className="size-8" weight={weight} />
+                                <Icon className="size-8" />
                             </li>
                         )
                     })}

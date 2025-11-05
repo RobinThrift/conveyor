@@ -1,10 +1,10 @@
-import { http, type HttpHandler, HttpResponse, delay } from "msw"
+import { delay, type HttpHandler, HttpResponse, http } from "msw"
 
-import { generateMockAPITokens } from "../src/lib/testhelper/apitokens"
-import type { APIToken, APITokenList } from "../src/domain/APIToken"
 import type { CreateAPITokenRequest } from "../src/control/APITokenController"
+import type { APIToken, APITokenList } from "../src/domain/APIToken"
 import { currentDateTime } from "../src/lib/i18n/datetime"
 import { parseJSONDate } from "../src/lib/json"
+import { generateMockAPITokens } from "../src/lib/testhelper/apitokens"
 
 interface MockData {
     apitokens: (APIToken & { id: number })[]
@@ -34,12 +34,8 @@ export const mockAPI: HttpHandler[] = [
             return HttpResponse.json(
                 {
                     accessToken: "VALID_ACCESS_TOKEN",
-                    expiresAt: currentDateTime()
-                        .add({ hours: 1 })
-                        .toDate("utc"),
-                    refreshExpiresAt: currentDateTime()
-                        .add({ hours: 5 })
-                        .toDate("utc"),
+                    expiresAt: currentDateTime().add({ hours: 1 }).withTimeZone("utc"),
+                    refreshExpiresAt: currentDateTime().add({ hours: 5 }).withTimeZone("utc"),
                     refreshToken: "VALID_REFRESH_TOKEN",
                 },
                 {
@@ -64,19 +60,12 @@ export const mockAPI: HttpHandler[] = [
             })
         }
 
-        if (
-            body.grant_type === "refresh_token" &&
-            body.refresh_token === "VALID_REFRESH_TOKEN"
-        ) {
+        if (body.grant_type === "refresh_token" && body.refresh_token === "VALID_REFRESH_TOKEN") {
             return HttpResponse.json(
                 {
                     accessToken: "VALID_ACCESS_TOKEN",
-                    expiresAt: currentDateTime()
-                        .add({ hours: 1 })
-                        .toDate("utc"),
-                    refreshExpiresAt: currentDateTime()
-                        .add({ hours: 5 })
-                        .toDate("utc"),
+                    expiresAt: currentDateTime().add({ hours: 1 }).withTimeZone("utc"),
+                    refreshExpiresAt: currentDateTime().add({ hours: 5 }).withTimeZone("utc"),
                     refreshToken: "VALID_REFRESH_TOKEN",
                 },
                 {
@@ -202,14 +191,8 @@ export const mockAPI: HttpHandler[] = [
 
         let url = new URL(request.url)
 
-        let pageSize = Number.parseInt(
-            url.searchParams.get("page[size]") ?? "100",
-            10,
-        )
-        let after = Number.parseInt(
-            url.searchParams.get("page[after]") ?? "-1",
-            10,
-        )
+        let pageSize = Number.parseInt(url.searchParams.get("page[size]") ?? "100", 10)
+        let after = Number.parseInt(url.searchParams.get("page[after]") ?? "-1", 10)
 
         let apitokens: APIToken[] = []
         let take = after === -1
@@ -238,69 +221,55 @@ export const mockAPI: HttpHandler[] = [
         )
     }),
 
-    http.post<never, CreateAPITokenRequest>(
-        "/api/auth/v1/apitokens",
-        async ({ request }) => {
-            await delay(500)
+    http.post<never, CreateAPITokenRequest>("/api/auth/v1/apitokens", async ({ request }) => {
+        await delay(500)
 
-            let body = await request.json()
+        let body = await request.json()
 
-            let now = new Date()
-            let token: APIToken = {
-                name: body.name,
-                createdAt: now,
-                expiresAt: parseJSONDate(body.expiresAt as any),
-            }
+        let now = new Date()
+        let token: APIToken = {
+            name: body.name,
+            createdAt: now,
+            expiresAt: parseJSONDate(body.expiresAt as any),
+        }
 
-            mockData.apitokens = [
-                { id: mockData.apitokens.length, ...token },
-                ...mockData.apitokens,
-            ]
+        mockData.apitokens = [{ id: mockData.apitokens.length, ...token }, ...mockData.apitokens]
 
-            return HttpResponse.json(
-                { token: body.name },
-                {
-                    status: 201,
-                    headers: {
-                        "content-type": "application/json; charset=utf-8",
-                    },
+        return HttpResponse.json(
+            { token: body.name },
+            {
+                status: 201,
+                headers: {
+                    "content-type": "application/json; charset=utf-8",
                 },
-            )
-        },
-    ),
+            },
+        )
+    }),
 
-    http.delete<{ name: string }>(
-        "/api/auth/v1/apitokens/:name",
-        async ({ params }) => {
-            await delay(500)
+    http.delete<{ name: string }>("/api/auth/v1/apitokens/:name", async ({ params }) => {
+        await delay(500)
 
-            let index = mockData.apitokens.findIndex(
-                (a) => a.name === params.name,
-            )
-            if (index === -1) {
-                return new HttpResponse(null, {
-                    status: 204,
-                })
-            }
-
-            mockData.apitokens.splice(index, 1)
-
+        let index = mockData.apitokens.findIndex((a) => a.name === params.name)
+        if (index === -1) {
             return new HttpResponse(null, {
                 status: 204,
             })
-        },
-    ),
+        }
 
-    http.post<never, CreateAPITokenRequest>(
-        "/api/sync/v1/clients",
-        async ({ request }) => {
-            await delay(500)
+        mockData.apitokens.splice(index, 1)
 
-            await request.json()
+        return new HttpResponse(null, {
+            status: 204,
+        })
+    }),
 
-            return new HttpResponse(null, {
-                status: 201,
-            })
-        },
-    ),
+    http.post<never, CreateAPITokenRequest>("/api/sync/v1/clients", async ({ request }) => {
+        await delay(500)
+
+        await request.json()
+
+        return new HttpResponse(null, {
+            status: 201,
+        })
+    }),
 ]

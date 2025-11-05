@@ -66,7 +66,7 @@ export function ReactDevTools() {
                     key={`${event.name}-${timestamp}-${detail?.id}`}
                     className="p-4 hover:bg-surface-level-1"
                 >
-                    <div className="flex items-center justify-between w-full text-subtle-light font-mono text-sm">
+                    <div className="flex items-center justify-between w-full text-neutral-light font-mono text-sm">
                         <div className="flex items-center gap-1">
                             <span>
                                 {`${event.name.replace("react:", "")} (${detail?.id}): ${event.duration.toFixed(2)}ms`}
@@ -98,7 +98,7 @@ export function ReactDevTools() {
                     {isEnabled ? "Disable" : "Enable"}
                 </button>
             </header>
-            <ul className="divide-y divide-subtle">{items}</ul>
+            <ul className="divide-y divide-neutral">{items}</ul>
         </div>
     )
 }

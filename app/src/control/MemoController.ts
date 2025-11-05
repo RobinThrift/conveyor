@@ -1,3 +1,5 @@
+import type { Temporal } from "temporal-polyfill"
+
 import type { ChangelogEntry, MemoChangelogEntry, MemoContentChanges } from "@/domain/Changelog"
 import {
     ErrMemoNotFound,
@@ -82,7 +84,7 @@ export class MemoController {
             pagination,
             filter,
         }: {
-            pagination: Pagination<Date>
+            pagination: Pagination<Temporal.ZonedDateTime>
             filter?: Filter
         },
     ): AsyncResult<MemoList> {
@@ -390,7 +392,7 @@ export class MemoController {
 
 export interface CreateMemoRequest {
     content: string
-    createdAt?: Date
+    createdAt?: Temporal.ZonedDateTime
     id?: MemoID
 }
 
@@ -413,7 +415,7 @@ interface Repo {
             pagination,
             filter,
         }: {
-            pagination: Pagination<Date>
+            pagination: Pagination<Temporal.ZonedDateTime>
             filter?: ListMemosQuery
         },
     ): AsyncResult<MemoList>

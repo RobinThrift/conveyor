@@ -56,7 +56,6 @@ export function registerEffects({
             navCtrl.push({
                 screen: "setup",
                 params: {},
-                restore: { scrollOffsetTop: 0 },
             })
             actions.isReady()
             return
@@ -66,7 +65,6 @@ export function registerEffects({
             navCtrl.push({
                 screen: "unlock",
                 params: {},
-                restore: { scrollOffsetTop: 0 },
             })
             actions.isReady()
             return

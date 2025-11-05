@@ -1,39 +1,44 @@
 import clsx from "clsx"
-import React from "react"
-import { Checkbox as AriaCheckbox } from "react-aria-components"
+import React, { useCallback } from "react"
 
 import { CheckIcon } from "@/ui/components/Icons"
 
-export interface CheckboxProps {
+export interface CheckboxProps
+    extends Omit<React.ButtonHTMLAttributes<HTMLInputElement>, "onChange" | "type" | "value"> {
     ref?: React.Ref<HTMLLabelElement>
-    className?: string
     indicatorClassName?: string
     label: string
-    name: string
-    defaultChecked?: boolean
     value?: boolean
-    isDisabled?: boolean
     onChange?: (checked: boolean | "indeterminate") => void
 }
 
 export function Checkbox(props: CheckboxProps) {
+    let { className, indicatorClassName, ref, onChange, value, ...intrinsics } = props
+
+    let onChangeInput = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange?.(e.target.checked)
+        },
+        [onChange],
+    )
+
     return (
-        <AriaCheckbox
-            ref={props.ref}
-            id={props.name}
-            name={props.name}
-            defaultSelected={props.defaultChecked}
-            onChange={props.onChange}
-            isSelected={props.value}
-            isDisabled={props.isDisabled}
-            value={props.value?.toString()}
-            className={clsx("checkbox-field", props.className)}
-        >
+        <label className={clsx("checkbox-field", className)} ref={ref}>
+            <span className="sr-only">
+                <input
+                    tabIndex={0}
+                    type="checkbox"
+                    checked={value}
+                    onChange={onChangeInput}
+                    {...intrinsics}
+                />
+            </span>
+
             {props.label}
 
-            <div className={clsx("checkbox", props.indicatorClassName)}>
-                <CheckIcon weight="bold" />
+            <div className={clsx("checkbox", indicatorClassName)} aria-hidden="true">
+                <CheckIcon />
             </div>
-        </AriaCheckbox>
+        </label>
     )
 }

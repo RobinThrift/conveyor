@@ -24,7 +24,7 @@ export const StoreUnlockKeyCheckbox = React.memo(function StoreUnlockKeyCheckbox
                 key="store_key_checkbox"
                 name="store_key"
                 label={t.LabelDeviceSecureStorageWeb}
-                isDisabled={isDisabled}
+                disabled={isDisabled}
             />
         )
         text = t.ExplainerDeviceSecureStorageWeb
@@ -34,7 +34,7 @@ export const StoreUnlockKeyCheckbox = React.memo(function StoreUnlockKeyCheckbox
                 key="store_key_checkbox"
                 name="store_key"
                 label={t.LabelDeviceSecureStorageNative}
-                isDisabled={isDisabled}
+                disabled={isDisabled}
             />
         )
         text = t.ExplainerDeviceSecureStorageNative

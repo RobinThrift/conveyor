@@ -3,6 +3,8 @@ import { type RefObject, useEffect, useState, useSyncExternalStore } from "react
 export function useOnResize(ref: RefObject<HTMLElement | null>): {
     clientHeight: number
     scrollHeight: number
+    clientWidth: number
+    scrollWidth: number
 } {
     let [subscribe, setSubscribe] = useState<ReturnType<typeof _subscribe>>(() =>
         _subscribe(ref.current),
@@ -26,10 +28,20 @@ export function useOnResize(ref: RefObject<HTMLElement | null>): {
     return {
         clientHeight: ref.current?.clientHeight ?? 0,
         scrollHeight: ref.current?.scrollHeight ?? 0,
+        clientWidth: ref.current?.clientWidth ?? 0,
+        scrollWidth: ref.current?.scrollWidth ?? 0,
     }
 }
 
-let _snapshots = new WeakMap<Element, { clientHeight: number; scrollHeight: number }>()
+let _snapshots = new WeakMap<
+    Element,
+    {
+        clientHeight: number
+        scrollHeight: number
+        clientWidth: number
+        scrollWidth: number
+    }
+>()
 let _subscriber = new Set<() => void>()
 
 let _observer = new ResizeObserver((entries) => {
@@ -37,6 +49,8 @@ let _observer = new ResizeObserver((entries) => {
         _snapshots.set(entry.target, {
             clientHeight: entry.target.clientHeight,
             scrollHeight: entry.target.scrollHeight,
+            clientWidth: entry.target.clientWidth,
+            scrollWidth: entry.target.scrollWidth,
         })
     }
     _subscriber.values().forEach((cb) => cb())
@@ -53,6 +67,8 @@ function _subscribe(target?: HTMLElement | undefined | null) {
         _snapshots.set(target, {
             clientHeight: target.clientHeight ?? 0,
             scrollHeight: target.scrollHeight ?? 0,
+            clientWidth: target.clientWidth ?? 0,
+            scrollWidth: target.scrollWidth ?? 0,
         })
 
         return () => {
@@ -77,6 +93,8 @@ function _getSnapshot(target: HTMLElement | undefined | null) {
         _snapshot = {
             clientHeight: target.clientHeight ?? 0,
             scrollHeight: target.scrollHeight ?? 0,
+            clientWidth: target.clientWidth ?? 0,
+            scrollWidth: target.scrollWidth ?? 0,
         }
 
         _snapshots.set(target, _snapshot)

@@ -1,7 +1,8 @@
 import { useStore } from "@tanstack/react-store"
 import { createContext, useCallback, useContext } from "react"
 
-import type { NavigationController, Params, Restore, Screens } from "@/control/NavigationController"
+import type { NavigationController, Params, Screens } from "@/control/NavigationController"
+import type { NavgationState } from "@/lib/navigation"
 import { stores } from "@/ui/stores"
 
 const navContext = createContext<NavigationController | undefined>(undefined)
@@ -9,40 +10,25 @@ const navContext = createContext<NavigationController | undefined>(undefined)
 export const NavigationProvider = navContext.Provider
 
 export function useNavigation(): {
-    push: (screen: keyof Screens, params: Params[keyof Screens], restore: Restore) => void
+    push: (screen: keyof Screens, params: Params[keyof Screens]) => void
     pop: () => void
-    popStack: () => Promise<void>
-    updateParams: (params: Partial<Params[keyof Screens]>) => void
 } {
     let navCtrl = useContext(navContext)
     return {
         push: useCallback(
-            (screen, params, restore) => {
-                navCtrl?.push({ screen, params, restore })
+            (screen, params) => {
+                navCtrl?.push({ screen, params })
             },
             [navCtrl],
         ),
         pop: useCallback(() => navCtrl?.pop(), [navCtrl]),
-        popStack: useCallback(() => navCtrl?.popStack() ?? Promise.resolve(), [navCtrl]),
-        updateParams: useCallback(
-            (params: Partial<Params[keyof Screens]>) => {
-                navCtrl?.updateParams(params)
-            },
-            [navCtrl],
-        ),
     }
 }
 
-export function useCurrentPage(): {
-    name: keyof Screens
-    restore: Partial<Restore>
-} {
-    return useStore(stores.navigation.currentPage, (s) => ({
-        name: s.screen,
-        restore: s.restore,
-    }))
+export function useCurrentScreen(): NavgationState<Screens> {
+    return useStore(stores.navigation.currentScreen)
 }
 
-export function useCurrentPageParams(): Params[keyof Screens] {
-    return useStore(stores.navigation.currentParams)
+export function getScrollOffsetTop() {
+    return Math.ceil(window.visualViewport?.pageTop ?? window.scrollY)
 }

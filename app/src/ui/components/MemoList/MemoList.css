@@ -1,255 +1,322 @@
-.memo-list {
-    @apply gap-2 w-full;
+.memo-list-container::before {
+    @apply fixed top-0 left-0 right-0;
+    display: block;
+    pointer-events: none;
+    content: "";
+    width: 100%;
+    z-index: var(--mobile-top-fadeout-z-index);
+    height: var(--mobile-top-fadeout-height);
+
+    backdrop-filter: blur(2px);
+    mask-image: linear-gradient(to top, transparent 10%, black 50%);
+    background-image: linear-gradient(
+        to top,
+        transparent,
+        var(--color-body-bg) 70%
+    );
+    translate: 0
+        calc(
+            -1 *
+            var(--mobile-top-fadeout-height) *
+            2 +
+            env(safe-area-inset-bottom, 0px)
+        );
+
+    animation: mobile-top-fadeout linear;
+    animation-timeline: scroll(root);
+    animation-range-end: 200px;
+    animation-fill-mode: both;
+
+    @media (min-width: 768px) {
+        @apply hidden;
+    }
 }
 
-.memo-list .memo {
-    container: memo / inline-size;
+[inert] .memo-list-container::before {
+    position: sticky;
+    animation-timeline: view();
+    animation-range-end: 100vh;
+}
+
+.memo-list-items {
+    --gap: calc(var(--spacing) * 2);
+    --item-width: 100%;
+    --item-height: max-content;
+    --item-max-height: 50cqh;
+
     width: 100%;
 
-    .memo-header {
-        @apply items-center;
+    @container (width >= 768px) {
+        --item-height: 40cqh;
+        --item-max-height: none;
+        --item-width: calc(50% - var(--gap));
+
+        /* width: calc(100% + var(--gap) / 2); */
+        /* display: flex; */
+        /* flex-direction: row; */
+        /* flex-wrap: wrap; */
+        /* justify-content: flex-start; */
+        /* align-items: flex-start; */
+        /* gap: var(--gap) var(--gap); */
     }
 
-    .memo-header-actions {
-        @apply w-fit items-baseline;
-        order: 2;
+    @container (width >= 1024px) {
+        --item-width: calc(33.3% - var(--gap));
+        --item-height: 50cqh;
+    }
+
+    @container (width >= 1680px) {
+        --item-width: calc(20% - var(--gap));
+        --item-height: 45cqh;
+    }
+
+    @container (width >= 2100px) {
+        --item-width: calc(16.666667% - var(--gap));
+        --item-height: 40cqh;
+    }
+}
+
+.memo-list-item-group {
+    @apply mb-4;
+    display: flex;
+    gap: var(--gap) var(--gap);
+    flex-direction: column;
+
+    @container (width > 768px) {
+        @apply mt-0 mb-0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        /* display: contents; */
+    }
+}
+
+.memo-list .memo-list-item {
+    @apply p-2 flex-1 relative border-surface-border border-b;
+
+    flex-basis: var(--item-width);
+    max-width: var(--item-width);
+    overflow: hidden;
+    flex-grow: 1;
+    height: var(--item-height);
+    max-height: var(--item-max-height);
+    container: memo / inline-size;
+
+    @container (width >= 768px) {
+        @apply border-b-0 border-s px-4;
+
+        &:nth-of-type(1),
+        &:nth-of-type(3n + 1) {
+            @apply border-s-0;
+        }
+    }
+
+    @container (width >= 1680px) {
+        &:nth-of-type(3n + 1) {
+            @apply border-s;
+        }
+
+        &:nth-of-type(5n + 1) {
+            @apply border-s-0;
+        }
+    }
+
+    @container (width >= 2100px) {
+        &:nth-of-type(3n + 1),
+        &:nth-of-type(5n + 1) {
+            @apply border-s;
+        }
+
+        &:nth-of-type(6n + 1) {
+            @apply border-s-0;
+        }
+    }
+
+    .memo-header {
+        @apply pt-0;
+        display: block;
+    }
+
+    .memo-date {
+        display: block;
     }
 
     .memo-header h1 {
-        order: 1;
+        @apply flex-1 font-semibold;
+        font-size: var(--h2-font-size);
+
+        &::before {
+            content: "";
+            display: block;
+            float: right;
+            height: calc(var(--spacing) * 10);
+            width: calc(var(--spacing) * 10);
+        }
+
+        &::after {
+            content: "";
+            display: block;
+            clear: both;
+        }
     }
 
-    .memo-header .memo-date {
-        order: 3;
+    .memo-header a:has(time) {
+        @apply hover:underline;
     }
 
-    &:has(.memo-content > .link-preview:first-child) .link-preview {
-        @apply p-0 bg-transparent;
-        box-shadow: none;
-        width: calc(100%);
+    .memo-actions {
+        @apply flex absolute top-3 right-2 z-10 w-10;
 
-        .link-preview-title {
-            @apply px-0 pt-0;
+        .btn {
+            @apply text-sm relative elevation-2;
+            min-height: revert;
+            top: -2px;
         }
+    }
 
-        .link-preview-description {
-            @apply px-0;
-        }
+    .memo-header-meta {
+        @apply flex justify-between;
+    }
 
-        & + p {
-            @apply mt-0;
+    .memo-content {
+        @apply text-neutral!;
+
+        p a {
+            @apply text-primary/80;
         }
+    }
+
+    .show-more-blur-sizer {
+        @apply absolute bottom-0 left-0 right-0 top-0 pointer-events-none;
+        container: show-more-btn-sizer / size;
+    }
+
+    .show-more-blur {
+        @apply absolute bottom-0 left-0 right-0 h-20 pb-1 flex justify-center items-end text-2xl;
+        backdrop-filter: blur(2px);
+        mask-image: linear-gradient(to bottom, transparent -10%, black 80%);
+        background-image: linear-gradient(
+            to bottom,
+            transparent,
+            var(--color-body-bg) 10%
+        );
     }
 }
 
+.memo-list .memo-list-item.is-bookmark-form {
+    .memo-header {
+        @apply pb-0 -mb-2;
+    }
+
+    .memo-header h1 {
+        @apply h-fit text-sm;
+
+        a:hover {
+            @apply underline;
+        }
+    }
+
+    .show-more-blur-sizer {
+        display: none;
+    }
+
+    p {
+        display: none;
+    }
+
+    .link-preview + p {
+        display: block;
+    }
+
+    .link-preview {
+        @apply shadow-none bg-transparent p-0;
+    }
+
+    .link-preview-description {
+        @apply p-0;
+    }
+}
+
+:root {
+    --memo-list-day-z-index: 200;
+}
+
 .memo-list-day {
-    @apply sticky py-1 px-2 w-fit rounded-lg;
-    @apply text-subtle-dark;
-    @apply bg-body/80 xs:text-xl;
+    @apply sticky w-full flex items-center justify-center px-1;
+    pointer-events: none;
+    user-select: none;
+    height: min-content;
+    z-index: var(--memo-list-day-z-index);
+    top: calc(
+        var(--spacing) *
+        4 +
+        max(env(safe-area-inset-top, 0px), var(--spacing) * 2)
+    );
+    margin-top: calc(var(--spacing) * 4);
 
-    z-index: 200;
+    .memo-list-day-date {
+        @apply text-neutral-dark;
+        font-size: var(--sm-font-size);
+    }
 
-    top: calc(var(--spacing) * 2 + env(safe-area-inset-top, 0));
+    @media (min-width: 1024px) {
+        @apply ml-2 p-0;
+        top: calc(var(--spacing) * 3 + env(safe-area-inset-top, 0));
 
-    backdrop-filter: blur(4px);
-
-    .named-day-date {
-        @apply text-subtle-dark ms-1 text-xs sm:text-sm;
+        .memo-list-day-date {
+            @apply py-1 px-1.5 relative rounded-xl surface-level-2 elevation-2 w-fit;
+            font-size: var(--sm-font-size);
+            --glass-highlight: var(--btn-bg-hover);
+            --glass-shadow: var(--btn-border-color);
+            --color-surface-level-1: var(--btn-bg);
+        }
     }
 }
 
 .memo-list-day-divider {
-    @apply relative bg-subtle mb-8;
-    width: 100%;
-    height: 1px;
-    margin-top: -1rem;
-}
-
-.memo-list-day-group {
-    @apply pt-4;
-    &:nth-child(2) {
-        @apply pt-0;
-
-        .memo-list-day {
-            @apply -mt-8 mb-4;
-        }
-
-        .memo-list-day-divider {
-            @apply hidden;
-        }
-    }
-}
-
-.memo-list-day-group {
-    @apply flex-1 w-full mx-auto;
-}
-
-.memo-list-layout-select-positioner {
-    @apply relative h-8 max-w-3xl tablet:max-w-none;
-
-    .memo-list-layout-select {
-        @apply absolute right-0 top-0 h-8 max-w-fit;
-
-        .option-label {
-            @apply sr-only;
-        }
-    }
-}
-
-.memo-list.list-layout-single .memo-list-memos {
-    @apply flex flex-col gap-2 md:gap-4;
-    @apply lg:max-w-none lg:px-1;
-}
-
-.memo-list.list-layout-ultra-compact {
-    .memo-list-day-group {
-        width: 100%;
-    }
-
-    .memo-list-memos {
-        @apply flex flex-col gap-2 items-center max-w-none ps-8 relative w-full;
-
-        @apply lg:grid lg:grid-cols-3 lg:items-start lg:justify-start;
-
-        &::before {
-            @apply w-0.5 bg-body-contrast absolute -top-8 -bottom-8 left-2.5 rounded-lg dark:bg-primary-contrast/40;
-            display: block;
-            content: "";
-        }
-
-        .memo:first-of-type {
-            @apply mt-2;
-        }
-
-        .memo {
-            @apply max-w-6xl min-w-fit w-full;
-
-            &:nth-of-type(1),
-            &:nth-of-type(2),
-            &:nth-of-type(3) {
-                @apply lg:mt-1;
-            }
-        }
-
-        .memo:has(.memo-header h1) .markdown * {
-            display: none;
-        }
-
-        .memo:has(.memo-header h1) .markdown p:has(.tag-link) {
-            display: block;
-
-            a {
-                display: inline;
-            }
-        }
-    }
-
-    .memo-list-day-divider {
-        @apply hidden;
-    }
-
-    .memo-list-day {
-        @apply self-start bg-body-contrast/70 text-body;
-        @apply translate-x-8;
-
-        &::before {
-            @apply size-3 bg-body-contrast dark:bg-primary-contrast absolute -left-6 -ml-[3px] top-2.5 rounded-full z-10;
-            display: block;
-            content: "";
-        }
-    }
-}
-
-.memo-list.list-layout-masonry .memo-list-memos {
-    display: flex;
-    flex-flow: row wrap;
-    gap: 0.5rem;
-    align-content: space-between;
-    .memos-list-day-divider {
-        margin-top: -1rem;
-        @media (min-width: 768px) {
-            /* tablet */
-            margin-top: -1.2rem;
-        }
-
-        @media (min-width: 1400px) {
-            /* medium */
-            margin-top: calc(-1.6rem - 3px);
-        }
-
-        @media (min-width: 2100px) {
-            /* lg */
-            margin-top: calc(-2.5rem - 3px);
-        }
-    }
-
-    .memo {
-        width: calc(50% - 0.25rem);
-    }
-
-    .memo:nth-of-type(1) {
-        order: 1;
-        width: 100%;
-    }
-
-    .memo:nth-of-type(2n) {
-        order: 2;
-    }
-
-    .memo:nth-of-type(2n + 1) {
-        order: 2;
-    }
+    @apply hidden;
 
     @media (min-width: 768px) {
-        .memo:nth-of-type(1)::before {
-            display: none;
-        }
-    }
-
-    @media (min-width: 1024px) {
-        /* tablet */
-        .memo {
-            width: calc(50% - 0.3rem);
-        }
-
-        gap: 0.6rem;
-
-        .memo:nth-of-type(1) {
-            order: 1;
-            width: 100%;
-        }
-    }
-
-    @media (min-width: 1680px) {
-        /* md */
-        .memo {
-            width: calc(33% - 0.25rem);
-        }
-
-        gap: 1rem 0.6rem;
-
-        .memo:nth-of-type(1) {
-            order: 1;
-            width: 100%;
-        }
-        .memo:nth-of-type(3n) {
-            order: 2;
-            width: 33%;
-        }
-    }
-
-    @media (min-width: 2100px) {
-        /* lg */
-        @apply grid grid-cols-3;
-        gap: 2rem 1rem;
-        max-width: none;
-
-        .memo,
-        .memo:nth-of-type(3n) {
-            width: 100%;
-        }
+        @apply relative block border-t border-surface-border mx-2 w-full;
+        margin-top: calc(-1lh + 2px);
+        pointer-events: none;
+        user-select: none;
+        z-index: calc(var(--memo-list-day-z-index) - 1);
     }
 }
+
+.memo-list-item-group:nth-of-type(1) .memo-list-day-divider {
+    @apply hidden;
+}
+
+/* .memo-list-item-group:has(.memo:nth-of-type(5)) { */
+/*     @container (width > 768px) { */
+/*         width: 100%; */
+/*         display: flex; */
+/*         flex-direction: row; */
+/*         flex-wrap: wrap; */
+/*         justify-content: flex-start; */
+/*         align-items: flex-start; */
+/* --item-width: calc(50% - var(--gap)); */
+/*         gap: var(--gap) var(--gap); */
+/**/
+/*         .memo-list-day { */
+/*             @apply bg-transparent me-0 mt-2; */
+/*             width: 100%; */
+/*         } */
+/**/
+/*         .memo-list-day-date { */
+/*             @apply w-fit px-4; */
+/*         } */
+/*     } */
+/* } */
+/**/
+/* .memo-list-item-group:not(:has(.memo:nth-of-type(5))) { */
+/*     @container (width > 768px) { */
+/*         .memo-list-day { */
+/*             display: none; */
+/*         } */
+/*     } */
+/* } */
 
 .memo-list-reload-btn {
     @apply sticky flex flex-col gap-1 justify-center items-center w-fit;

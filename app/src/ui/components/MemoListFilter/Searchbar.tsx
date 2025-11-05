@@ -33,7 +33,7 @@ export function SearchBar(props: { className?: string }) {
                 type="search"
                 label={t.Label}
                 labelClassName="sr-only"
-                icon={<MagnifyingGlassIcon aria-hidden weight="duotone" />}
+                icon={<MagnifyingGlassIcon />}
                 onChange={onChangeDebounced}
                 defaultValue={queryFilter}
                 placeholder="Search Memos"

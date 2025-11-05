@@ -16,10 +16,10 @@ export function encodeToBase64(data: ArrayBuffer | Uint8Array<ArrayBufferLike>):
     return btoa(String.fromCharCode(...arr))
 }
 
-export function dataFromBase64(data: string): Result<Uint8Array<ArrayBufferLike>> {
+export function dataFromBase64(data: string): Result<Uint8Array<ArrayBuffer>> {
     if ("fromBase64" in Uint8Array && typeof Uint8Array.fromBase64 === "function") {
         try {
-            return Ok(Uint8Array.fromBase64(data) as Uint8Array<ArrayBufferLike>)
+            return Ok(Uint8Array.fromBase64(data) as Uint8Array<ArrayBuffer>)
         } catch (err) {
             return Err(err as Error)
         }

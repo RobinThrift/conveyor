@@ -1,6 +1,7 @@
 import { EditorSelection } from "@codemirror/state"
 import type { EditorView } from "@codemirror/view"
 
+import { imageBlobToSrc } from "@/domain/Attachment"
 import { newID } from "@/domain/ID"
 import { thumbhashFromFile } from "@/external/thumbhash"
 
@@ -18,7 +19,7 @@ export async function insertAttachment(
         id?: string
         filename: string
         mime: string
-        data: Uint8Array
+        data: Uint8Array<ArrayBuffer>
         from: number
     },
 ) {
@@ -26,15 +27,31 @@ export async function insertAttachment(
 
     let insertText = `[${filename}](attachment://${id})`
     if (isImg(mime)) {
+        let imgURL = id
+        let imgURLParams = new URLSearchParams()
+
         try {
-            let dd = new Uint8Array(data.byteLength)
-            dd.set(new Uint8Array(data))
-            let thumbhash = await thumbhashFromFile(new Blob([dd], { type: mime }))
-            insertText = `![${filename}](attachment://${id}?thumbhash=${thumbhash})`
+            let img = new Image()
+            img.src = imageBlobToSrc({ data, mime })
+            await img.decode()
+            imgURLParams.set("width", img.width.toString())
+            imgURLParams.set("height", img.height.toString())
+        } catch (err) {
+            console.error("error decoding image: ", err)
+        }
+
+        try {
+            let thumbhash = await thumbhashFromFile(new Blob([data], { type: mime }))
+            imgURLParams.set("thumbhash", thumbhash)
         } catch (err) {
             console.error("error generating thumbhash for image: ", err)
-            insertText = `![${filename}](attachment://${id})`
         }
+
+        if (imgURLParams.size !== 0) {
+            imgURL = `${id}?${imgURLParams.toString()}`
+        }
+
+        insertText = `![${filename}](attachment://${imgURL})`
     }
 
     if (from !== 0) {

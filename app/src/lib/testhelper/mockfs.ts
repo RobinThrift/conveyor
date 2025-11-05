@@ -3,9 +3,9 @@ import { type FS, FSNotFoundError } from "@/lib/fs"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
 
 export class MockFS implements FS {
-    private _files = new Map<string, ArrayBufferLike>()
+    private _files = new Map<string, ArrayBuffer>()
 
-    public async read(_: Context, filepath: string): AsyncResult<ArrayBufferLike> {
+    public async read(_: Context, filepath: string): AsyncResult<ArrayBuffer> {
         let contents = this._files.get(filepath)
         if (!contents) {
             return Err(new FSNotFoundError(filepath))
@@ -14,11 +14,7 @@ export class MockFS implements FS {
         return Ok(contents)
     }
 
-    public async write(
-        _: Context,
-        filepath: string,
-        content: ArrayBufferLike,
-    ): AsyncResult<number> {
+    public async write(_: Context, filepath: string, content: ArrayBuffer): AsyncResult<number> {
         this._files.set(filepath, content)
         return Ok(content.byteLength)
     }
@@ -33,7 +29,7 @@ export class MockFS implements FS {
     }
 
     public removeAllFiles() {
-        this._files = new Map<string, ArrayBufferLike>()
+        this._files = new Map<string, ArrayBuffer>()
     }
 
     public hasFile(path: string) {

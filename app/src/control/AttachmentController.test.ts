@@ -5,6 +5,7 @@ import { newID } from "@/domain/ID"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto/WebCryptoSha256Hasher"
 import { dataFromBase64 } from "@/lib/base64"
 import { BaseContext, type Context } from "@/lib/context"
+import { currentDateTime } from "@/lib/i18n"
 import { type AsyncResult, Err, Ok } from "@/lib/result"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 import { MockFS } from "@/lib/testhelper/mockfs"
@@ -12,7 +13,6 @@ import { SQLite } from "@/lib/testhelper/sqlite"
 import { encodeText } from "@/lib/textencoding"
 import { AttachmentRepo } from "@/storage/database/sqlite/AttachmentRepo"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
-
 import { AttachmentController } from "./AttachmentController"
 import { ChangelogController } from "./ChangelogController"
 
@@ -60,7 +60,7 @@ suite("control/AttachmentController", () => {
         assert.equal(entry.targetID, created.id)
         assert.deepEqual(entry.value, {
             created: {
-                contentType: "application/octet-stream",
+                contentType: "text/plain",
                 filepath:
                     "/42/b7/b6/55/29/e5/7d/b5/50/54/ae/81/79/dc/bc/34/d4/93/47/6d/33/c9/25/87/dd/72/a3/b4/69/df/b8/4b",
                 originalFilename: "test.txt",
@@ -164,7 +164,7 @@ suite("control/AttachmentController", () => {
                     targetID: id,
                     isSynced: false,
                     isApplied: false,
-                    timestamp: new Date(),
+                    timestamp: currentDateTime(),
                     value: {
                         created: {
                             contentType: "application/octet-stream",
@@ -198,7 +198,7 @@ async function attachmentCtrlTestSetup({
     remote,
 }: {
     remote?: {
-        getAttachmentDataByFilepath(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike>
+        getAttachmentDataByFilepath(ctx: Context, filepath: string): AsyncResult<ArrayBuffer>
     }
 } = {}) {
     let [ctx, cancel] = BaseContext.withCancel()

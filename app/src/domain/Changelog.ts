@@ -1,3 +1,5 @@
+import type { Temporal } from "temporal-polyfill"
+
 import type { KeyPaths, ValueAt } from "@/lib/getset"
 
 import type { Attachment, AttachmentID } from "./Attachment"
@@ -20,15 +22,15 @@ export interface ChangelogEntry<
     targetID: ID
     value: V
     isSynced: boolean
-    syncedAt?: Date
+    syncedAt?: Temporal.ZonedDateTime
     isApplied: boolean
-    appliedAt?: Date
-    timestamp: Date
+    appliedAt?: Temporal.ZonedDateTime
+    timestamp: Temporal.ZonedDateTime
 }
 
 export interface ChangelogEntryList {
     items: ChangelogEntry[]
-    next?: [number, Date]
+    next?: [number, Temporal.ZonedDateTime]
 }
 
 export type MemoChangelogEntry = ChangelogEntry<

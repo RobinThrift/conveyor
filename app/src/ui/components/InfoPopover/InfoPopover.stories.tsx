@@ -22,6 +22,5 @@ export const Overview: Story = {
 
     args: {
         children: faker.lorem.sentences({ min: 5, max: 10 }),
-        placement: "bottom",
     },
 }

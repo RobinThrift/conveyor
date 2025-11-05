@@ -10,16 +10,14 @@ import { Button } from "@/ui/components/Button"
 import { CheckIcon, XIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
 
+import { EditorToolbar } from "./EditorToolbar"
 import { TextEditor } from "./TextEditor"
-import { Toolbar } from "./Toolbar"
 import { useEditorState } from "./useEditorState"
 
 export interface EditorProps {
     className?: string
 
     vimModeEnabled?: boolean
-
-    placeholder: string
 
     tags: Tag[]
     memo: Memo
@@ -43,7 +41,7 @@ export function Editor(props: EditorProps) {
         useEditorState(props)
 
     return (
-        <article className="@container memo is-editing">
+        <article className="memo is-editing">
             <div
                 className={clsx("editor", props.className, {
                     "is-changed": isChanged,
@@ -51,24 +49,16 @@ export function Editor(props: EditorProps) {
             >
                 <div className="editor-buttons">
                     {props.onCancel && (
-                        <Button
-                            onPress={onCancel}
-                            variant="danger"
-                            outline
-                            aria-label={t.Cancel}
-                            iconLeft={<XIcon />}
-                        >
+                        <Button onClick={onCancel} variant="danger" iconLeft={<XIcon />}>
                             <span className="sr-only tablet:not-sr-only">{t.Cancel}</span>
                         </Button>
                     )}
 
                     <Button
                         aria-label={t.Save}
-                        onPress={onSave}
-                        plain
-                        outline
+                        onClick={onSave}
                         iconLeft={<CheckIcon />}
-                        isDisabled={!isChanged}
+                        disabled={!isChanged}
                     >
                         <span className="sr-only tablet:not-sr-only">{t.Save}</span>
                     </Button>
@@ -79,7 +69,6 @@ export function Editor(props: EditorProps) {
                     tags={props.tags}
                     content={content()}
                     autoFocus={props.autoFocus}
-                    placeholder={props.placeholder}
                     placeCursorAt={props.placeCursorAt}
                     vimModeEnabled={props.vimModeEnabled}
                     onChange={onChange}
@@ -87,7 +76,7 @@ export function Editor(props: EditorProps) {
                     onSave={onSave}
                     transferAttachment={props.transferAttachment}
                 >
-                    {(cmds) => <Toolbar {...cmds} />}
+                    {(cmds) => <EditorToolbar {...cmds} />}
                 </TextEditor>
 
                 <AlertDialog
@@ -102,7 +91,7 @@ export function Editor(props: EditorProps) {
                         </AlertDialog.Description>
 
                         <AlertDialog.Buttons>
-                            <Button variant="danger" onPress={confirmationDialog.discard}>
+                            <Button variant="danger" onClick={confirmationDialog.discard}>
                                 {t.DiscardChangesConfirmation}
                             </Button>
                             <AlertDialog.CancelButton>{t.Cancel}</AlertDialog.CancelButton>

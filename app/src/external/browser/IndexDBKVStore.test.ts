@@ -1,6 +1,7 @@
 import { afterAll, assert, suite, test } from "vitest"
 import { BaseContext } from "@/lib/context"
 
+import { isErr } from "@/lib/errors"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 import { encodeText } from "@/lib/textencoding"
 
@@ -178,7 +179,8 @@ suite("external/browser/IndexDBKVStore", { timeout: 5000 }, () => {
         let kv = container.getKVStore<never, NotFoundErr>("custom-not-found-error", { NotFoundErr })
 
         let err = await assertErrResult(kv.getItem(ctx, "not-found"))
-        assert.isTrue(err instanceof NotFoundErr)
+
+        assert.isTrue(isErr(err, NotFoundErr))
     })
 
     test("binary data", async ({ onTestFinished }) => {

@@ -73,22 +73,22 @@
         0.39817693887837285 0.14460868855639303 24.845093384078147
     );
 
-    --color-subtle-contrast: oklch(
+    --color-neutral-contrast: oklch(
         0.992026093379466 0.0005581063218213271 17.171223931878448
     );
-    --color-subtle-extra-light: oklch(
+    --color-neutral-extra-light: oklch(
         0.9438565163462329 0.003967215228361174 17.22791425964104
     );
-    --color-subtle-light: oklch(
+    --color-neutral-light: oklch(
         0.9276715427731007 0.005128163623542206 17.24967928696966
     );
-    --color-subtle: oklch(
+    --color-neutral: oklch(
         0.9081614300744106 0.006538793331993522 17.277294266496853
     );
-    --color-subtle-dark: oklch(
+    --color-neutral-dark: oklch(
         0.7618775735305486 0.017581371375011645 17.544899445711824
     );
-    --color-subtle-extra-dark: oklch(
+    --color-neutral-extra-dark: oklch(
         0.6053949499679728 0.03068515361037156 18.03228475088601
     );
 
@@ -192,22 +192,22 @@
         0.39817693887837285 0.14460868855639303 24.845093384078147
     );
 
-    --color-subtle-contrast: oklch(
+    --color-neutral-contrast: oklch(
         0.960348068317403 0.009220299539318664 199.7081395324
     );
-    --color-subtle-extra-light: oklch(
+    --color-neutral-extra-light: oklch(
         0.74695666294784 0.057259895177153415 198.96269602279045
     );
-    --color-subtle-light: oklch(
+    --color-neutral-light: oklch(
         0.6574360580367866 0.07144761217344692 198.73272725884746
     );
-    --color-subtle: oklch(
+    --color-neutral: oklch(
         0.5337042428662313 0.056708494317327884 198.7457488931094
     );
-    --color-subtle-dark: oklch(
+    --color-neutral-dark: oklch(
         0.4525265186200216 0.0469681942673666 198.7598719188097
     );
-    --color-subtle-extra-dark: oklch(
+    --color-neutral-extra-dark: oklch(
         0.3754442596398028 0.03763387975163922 198.7816983767967
     );
 
@@ -315,12 +315,12 @@
 .warm.dark {
     .memo-list-header {
         /* biome-ignore lint/complexity/noImportantStyles: is style override for colour scheme */
-        color: var(--color-subtle) !important;
+        color: var(--color-neutral) !important;
     }
 
     .memo-list-filter .date-picker .calendar-grid-header .calendar-grid-cell {
         /* biome-ignore lint/complexity/noImportantStyles: is style override for colour scheme */
-        color: var(--color-subtle-dark) !important;
+        color: var(--color-neutral-dark) !important;
     }
 
     .state-filter .state-filter-item {

@@ -1,91 +1,79 @@
+:root {
+    /* @link https://utopia.fyi/type/calculator/?c=360,16,1.2,1680,16,1.25,4,3,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+    --xxs-font-size: clamp(0.512rem, 0.5969rem + -0.0809vw, 0.5787rem);
+    --xs-font-size: clamp(0.64rem, 0.7093rem + -0.066cqi, 0.6944rem);
+    --sm-font-size: clamp(0.8rem, 0.8424rem + -0.0404cqi, 0.8333rem);
+
+    --base-font-size: 16px;
+
+    --h4-font-size: clamp(1.2rem, 1.1864rem + 0.0606cqi, 1.25rem);
+    --h3-font-size: clamp(1.44rem, 1.4066rem + 0.1485cqi, 1.5625rem);
+    --h2-font-size: clamp(1.728rem, 1.6666rem + 0.2729cqi, 1.9531rem);
+    --h1-font-size: clamp(2.0736rem, 1.9733rem + 0.4458cqi, 2.4414rem);
+}
+
 .memo {
-    @apply overflow-x-auto flex flex-col;
-    --h1-size: var(--text-3xl);
+    --max-content-width: auto;
+    @apply flex flex-col h-fit;
+    max-width: var(--max-content-width);
+}
+
+.memo .memo-header {
+    @apply flex flex-wrap py-2 px-1;
+
+    .btn {
+        @apply rounded-full aspect-square;
+    }
+
+    .memo-tab-panel-close-btn {
+        @apply aspect-square;
+        order: 1;
+    }
+
+    .memo-actions {
+        order: 3;
+    }
+
+    .memo-title {
+        @apply ml-1;
+        order: 4;
+        width: 100%;
+    }
+
+    .memo-date {
+        @apply flex-1 flex items-center justify-center;
+        order: 2;
+    }
+
+    @container (width >= 1224px) {
+        @apply justify-start;
+
+        .memo-actions {
+            @apply absolute right-3;
+        }
+
+        .memo-title {
+            @apply ml-0;
+            order: 3;
+            width: fit-content;
+            flex: 1;
+        }
+
+        .memo-date {
+            flex: unset;
+            display: block;
+            order: 4;
+        }
+    }
 }
 
 .memo.is-editing {
-    /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
-    max-height: max-content !important;
-    /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
-    overflow: auto !important;
+    min-height: 80cqh;
+    max-height: max-content;
+    overflow: auto;
 }
 
-.show-more-btn-sizer {
-    @apply absolute bottom-0 left-0 right-0 top-0 pointer-events-none hidden;
-    container: show-more-btn-sizer / size;
-}
-
-.show-more-btn {
-    @apply absolute bottom-0 left-0 right-0 h-16 pb-1 flex justify-center items-end text-2xl cursor-pointer pointer-events-auto;
-
-    @container (height < 79svh) {
-        display: none;
-    }
-}
-
-.memo.collapsible {
-    @apply overflow-hidden h-fit relative;
-    max-height: 80svh;
-
-    .show-more-btn-sizer {
-        @apply block;
-    }
-
-    &.is-expanded {
-        max-height: none;
-        /* biome-ignore lint/complexity/noImportantStyles: required */
-        overflow: auto !important;
-
-        .show-more-btn-sizer {
-            @apply hidden;
-        }
-    }
-}
-
-.memo-header {
-    @apply flex flex-wrap items-baseline mb-2 gap-x-2 gap-y-0 px-1;
-
-    h1 {
-        @apply flex-1 font-semibold text-3xl mb-2;
-
-        time {
-            font-size: inherit;
-        }
-
-        @container (width < 25rem) {
-            @apply text-xl;
-        }
-
-        @container (width < 15rem) {
-            @apply text-lg;
-        }
-
-        @container (width < 10rem) {
-            @apply text-base;
-        }
-
-        @media (min-width: 768px) {
-            @container (width < 20rem) {
-                @apply text-2xl;
-            }
-        }
-    }
-
-    a:hover {
-        @apply underline;
-    }
-}
-
-.memo-header-actions {
-    @apply flex flex-row-reverse w-full justify-between items-center h-10;
-}
-
-.memo-actions {
-    @apply float-right flex items-center;
-    height: 1lh;
-}
-
-.memo-header .memo-date {
+.memo .memo-date {
     @apply w-full flex items-center;
 
     button {
@@ -93,7 +81,8 @@
     }
 
     time {
-        @apply w-fit text-subtle-dark italic text-xs @sm:text-sm;
+        @apply w-fit text-neutral-dark italic;
+        font-size: var(--sm-font-size);
 
         &.sm {
             @apply @md:hidden col-span-3;
@@ -105,9 +94,38 @@
     }
 }
 
+.memo.no-title .memo-date {
+    time {
+        @apply text-inherit not-italic font-semibold;
+        font-size: var(--h4-font-size);
+    }
+}
+
+.memo-title {
+    @apply font-semibold;
+    text-wrap: pretty;
+    margin-top: 0;
+
+    a {
+        @apply text-primary-extra-dark dark:text-primary-light;
+    }
+
+    font-size: var(--h1-font-size);
+}
+
 .memo-content {
     text-wrap: pretty;
     overflow-wrap: break-word;
+    font-size: var(--base-font-size);
+
+    a {
+        @apply text-primary hover:underline cursor-pointer;
+    }
+
+    .tag-link {
+        @apply text-neutral-light cursor-pointer;
+        @apply hover:text-primary hover:underline;
+    }
 
     h1,
     h2,
@@ -124,29 +142,21 @@
         }
     }
 
-    a {
-        @apply text-primary hover:underline cursor-pointer;
-    }
-
     h1 {
-        font-size: var(--h1-size);
-        line-height: calc(2.25 / var(--h1-size));
+        font-size: var(--h1-font-size);
         margin-top: 0;
     }
 
     h2 {
-        font-size: calc(var(--h1-size) - 0.25rem);
-        line-height: calc(2 / (var(--h1-size) - 0.25rem));
+        font-size: var(--h2-font-size);
     }
 
     h3 {
-        font-size: calc(var(--h1-size) - 0.5rem);
-        line-height: calc(1.75 / (var(--h1-size) - 0.5rem));
+        font-size: var(--h3-font-size);
     }
 
     h4 {
-        font-size: calc(var(--h1-size) - 0.75rem);
-        line-height: calc(1.75 / (var(--h1-size) - 0.75rem));
+        font-size: var(--h4-font-size);
     }
 
     h5 {
@@ -207,7 +217,7 @@
     }
 
     blockquote {
-        @apply font-serif italic text-subtle-extra-dark border-l border-subtle-dark ps-4;
+        @apply font-serif italic text-neutral-extra-dark border-l border-neutral-dark ps-4;
         margin-top: 0.5lh;
         margin-bottom: 0.5lh;
     }
@@ -233,8 +243,8 @@
     }
 
     .table-wrapper {
-        @apply border border-subtle rounded-lg overflow-x-auto mt-4 mb-6 w-full;
-        @apply border-subtle-extra-dark;
+        @apply border border-neutral rounded-lg overflow-x-auto mt-4 mb-6 w-full;
+        @apply border-neutral-extra-dark;
         table {
             margin: 0;
             width: 100%;
@@ -246,12 +256,12 @@
     }
 
     thead {
-        @apply font-semibold border-b border-subtle;
+        @apply font-semibold border-b border-neutral;
     }
 
     td {
-        @apply p-2 border-x border-subtle;
-        @apply border-subtle-extra-dark;
+        @apply p-2 border-x border-neutral;
+        @apply border-neutral-extra-dark;
 
         &:first-child {
             @apply border-l-0;
@@ -282,19 +292,43 @@
     }
 
     .footnotes {
-        @apply mt-4 border-t border-t-subtle;
+        @apply mt-4 border-t border-t-neutral;
         clear: both;
     }
 
-    @container (width < 25rem) {
-        --h1-size: var(--text-xl);
+    sup {
+        font-size: var(--sm-font-size);
+    }
+}
+
+.memo-actions {
+    .memo-actions-lg {
+        @apply hidden;
     }
 
-    @container (width < 15rem) {
-        --h1-size: var(--text-lg);
+    .memo-actions-md {
+        @apply hidden;
+        @apply h-11;
+        .btn {
+            @apply py-0;
+        }
     }
 
-    @container (width < 10rem) {
-        --h1-size: var(--text-base);
+    .dropdown-menu-btn {
+        isolation: isolate;
+    }
+
+    @container (width >= 700px) {
+        .memo-actions-lg {
+            @apply flex;
+        }
+
+        .memo-actions-md {
+            @apply hidden;
+        }
+
+        .memo-actions-sm {
+            @apply hidden;
+        }
     }
 }

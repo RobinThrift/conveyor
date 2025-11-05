@@ -11,6 +11,9 @@ import { Dialog } from "./Dialog"
 const meta: Meta<typeof Dialog> = {
     title: "Components/Dialog",
     component: Dialog,
+    parameters: {
+        layout: "fullscreen",
+    },
 }
 
 export default meta
@@ -36,7 +39,7 @@ export const Overview: Story = {
                     ))}
 
                 <Dialog.Buttons>
-                    <Button variant="success" onPress={action("ok")}>
+                    <Button variant="primary" onClick={action("ok")}>
                         Ok
                     </Button>
                     <Dialog.CloseButton>Close</Dialog.CloseButton>
@@ -47,24 +50,14 @@ export const Overview: Story = {
 
     render(args) {
         return (
-            <main>
-                {faker.lorem
-                    .sentences(5)
-                    .split(".")
-                    .filter((sentence) => sentence.length !== 0)
-                    .map((sentence) => (
-                        <p key={sentence}>{sentence}.</p>
-                    ))}
+            <main className="w-screen h-screen flex flex-col items-center justify-center">
+                <div className="max-w-lg px-2 gap-2 flex flex-col">
+                    <p>{faker.lorem.sentences(5)}</p>
 
-                <Dialog {...args} />
+                    <Dialog {...args} />
 
-                {faker.lorem
-                    .sentences(5)
-                    .split(".")
-                    .filter((sentence) => sentence.length !== 0)
-                    .map((sentence) => (
-                        <p key={sentence}>{sentence}.</p>
-                    ))}
+                    <p>{faker.lorem.sentences(5)}</p>
+                </div>
             </main>
         )
     },
@@ -72,7 +65,8 @@ export const Overview: Story = {
 
 export const Design: Story = {
     args: {
-        defaultOpen: true,
+        open: true,
+        isModal: true,
         children: [
             <Dialog.Content key="content">
                 <Dialog.Title>Dialog Title</Dialog.Title>
@@ -87,11 +81,47 @@ export const Design: Story = {
                     ))}
 
                 <Dialog.Buttons>
-                    <Button variant="success">Ok</Button>
+                    <Button variant="primary">Ok</Button>
                     <Dialog.CloseButton>Close</Dialog.CloseButton>
                 </Dialog.Buttons>
             </Dialog.Content>,
         ],
+    },
+
+    render(args) {
+        return (
+            <main className="w-screen h-screen flex flex-col items-center justify-center">
+                <div className="max-w-lg px-2 gap-2 flex flex-col">
+                    <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                    <img
+                        src={faker.image.urlPicsumPhotos({
+                            width: 500,
+                            height: 340,
+                        })}
+                        alt="img 1"
+                    />
+                    <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                    <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                    <img
+                        src={faker.image.urlPicsumPhotos({
+                            width: 500,
+                            height: 340,
+                        })}
+                        alt="img 1"
+                    />
+                    <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                    <img
+                        src={faker.image.urlPicsumPhotos({
+                            width: 500,
+                            height: 340,
+                        })}
+                        alt="img 1"
+                    />
+                    <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                </div>
+                <Dialog {...args} />
+            </main>
+        )
     },
 }
 
@@ -115,7 +145,7 @@ export const Nested: Story = {
                                 ))}
 
                             <Dialog.Buttons>
-                                <Button variant="success" onPress={action("ok")}>
+                                <Button variant="primary" onClick={action("ok")}>
                                     Ok
                                 </Button>
                                 <Dialog.CloseButton>Close</Dialog.CloseButton>

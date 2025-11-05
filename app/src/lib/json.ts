@@ -1,4 +1,7 @@
-import { Err, fromThrowing, Ok, type Result, wrapErr } from "@/lib/result"
+import { Temporal } from "temporal-polyfill"
+
+import { calendarDateTimeFromDate } from "@/lib/i18n"
+import { fromThrowing, Ok, type Result, wrapErr } from "@/lib/result"
 import { decodeText } from "@/lib/textencoding"
 
 export function jsonDeserialize<R, V = unknown>(
@@ -22,35 +25,16 @@ export function jsonDeserialize<R, V = unknown>(
     return Ok(parsed)
 }
 
-export function parseJSONDate(raw: string): Result<Date> {
-    let [date, err] = fromThrowing(() => new Date(raw))
-    if (err) {
+export function parseJSONDate(raw: string): Result<Temporal.ZonedDateTime> {
+    let [date, err] = fromThrowing(() => Temporal.ZonedDateTime.from(raw))
+    if (!err) {
+        return Ok(date)
+    }
+
+    let [rfc3339Date, rfc3339err] = fromThrowing(() => new Date(raw))
+    if (rfc3339err) {
         return wrapErr`error parsing JSON date: '${raw}': ${err}`
     }
 
-    return Ok(date)
-}
-
-export function parseJSONDates<R extends object, K extends keyof R, V extends Record<K, unknown>>(
-    ...keys: K[]
-): (v: V) => Result<R> {
-    return (obj) => {
-        let parsed = {
-            ...obj,
-        } as any as R
-
-        for (let key of keys) {
-            if (obj[key]) {
-                continue
-            }
-            let [value, err] = parseJSONDate(obj[key] as string)
-            if (err) {
-                return Err(err)
-            }
-
-            parsed[key] = value as (typeof parsed)[typeof key]
-        }
-
-        return Ok(parsed as R)
-    }
+    return Ok(calendarDateTimeFromDate(rfc3339Date) as Temporal.ZonedDateTime)
 }

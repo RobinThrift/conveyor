@@ -1,23 +1,20 @@
 import type { BackendClient } from "@/backend/BackendClient"
 import type { NavigationController } from "@/control/NavigationController"
-import type { ListMemosQuery, MemoID } from "@/domain/Memo"
 
 import * as apitokens from "./apitokens"
 import * as attachments from "./attachments"
 import * as auth from "./auth"
 import * as backendStore from "./backend"
-import * as create from "./create"
 import * as jobs from "./jobs"
+import * as memoList from "./memoList"
 import * as memos from "./memos"
 import * as navigation from "./navigation"
 import * as settings from "./settings"
 import * as setup from "./setup"
-import * as single from "./single"
 import * as sync from "./sync"
 import * as tags from "./tags"
+import * as ui from "./ui"
 import * as unlock from "./unlock"
-
-export type { CreateMemoRequest } from "./create"
 
 export const stores = {
     apitokens: {
@@ -43,27 +40,18 @@ export const stores = {
         currentJob: jobs.currentJob,
     },
     memos: {
+        memos: memos.refs,
         list: {
-            memos: memos.memos,
-            nextPage: memos.nextPage,
-            filter: memos.filter,
-            state: memos.status,
-            error: memos.error,
-            isOutdated: memos.isOutdated,
-        },
-        single: {
-            memo: single.single,
-            status: single.status,
-            error: single.error,
-        },
-        create: {
-            status: create.status,
-            error: create.error,
+            items: memoList.listItems,
+            nextPage: memoList.nextPage,
+            filter: memoList.filter,
+            state: memoList.status,
+            error: memoList.error,
+            isOutdated: memoList.isOutdated,
         },
     },
     navigation: {
-        currentPage: navigation.currentPage,
-        currentParams: navigation.currentParams,
+        currentScreen: navigation.currentScreen,
     },
     settings: {
         values: settings.values,
@@ -85,6 +73,11 @@ export const stores = {
         state: tags.state,
         error: tags.error,
     },
+    ui: {
+        openMemos: ui.openMemos,
+        activeMemos: ui.activeMemos,
+        memoTabScrollOffsets: ui.memoTabScrollOffsets,
+    },
     unlock: {
         status: unlock.status,
         error: unlock.error,
@@ -97,25 +90,23 @@ export const actions = {
     auth: auth.actions,
     jobs: jobs.actions,
     memos: {
+        new: memos.actions.newMemo,
+        startEdit: memos.actions.startEdit,
+        cancelEdit: memos.actions.cancelEdit,
+        updateContent: memos.actions.updateContent,
+        delete: memos.actions.delete,
+        undelete: memos.actions.undelete,
+        setArchiveStatus: memos.actions.setArchiveStatus,
         list: {
-            ...memos.actions,
-            setFilter: (newFilter: Partial<ListMemosQuery>) => {
-                navigation.actions.updateParams({ filter: newFilter })
-            },
+            ...memoList.actions,
         },
-        single: {
-            ...single.actions,
-            setSingleID: (id: MemoID) => {
-                navigation.actions.updateParams({ memodID: id })
-            },
-        },
-        create: create.actions,
     },
     navigation: navigation.actions,
     settings: settings.actions,
     setup: setup.actions,
     sync: sync.actions,
     tags: tags.actions,
+    ui: ui.actions,
     unlock: unlock.actions,
 }
 
@@ -124,11 +115,11 @@ export const selectors = {
     attachments: attachments.selectors,
     jobs: jobs.selectors,
     memos: {
-        list: memos.selectors,
-        single: single.selectors,
-        create: create.selectors,
+        get: memos.selectors.get,
+        isEditing: memos.selectors.isEditing,
+        isNew: memos.selectors.ieNew,
+        list: memoList.selectors,
     },
-    navigation: navigation.selectors,
     settings: settings.selectors,
     setup: setup.selectors,
     sync: sync.selectors,
@@ -145,15 +136,15 @@ export function registerEffects({
     apitokens.registerEffects(backend)
     attachments.registerEffects(backend)
     auth.registerEffects(backend)
-    create.registerEffects(backend)
     jobs.registerEffects(backend)
     memos.registerEffects(backend)
+    memoList.registerEffects(backend)
     navigation.registerEffects(navCtrl)
     settings.registerEffects(backend)
     setup.registerEffects(backend)
-    single.registerEffects(backend)
     sync.registerEffects(backend)
     tags.registerEffects(backend)
+    ui.registerEffects(navCtrl)
     unlock.registerEffects({ backend, navCtrl })
     backendStore.registerEffects({ backend, navCtrl })
 }

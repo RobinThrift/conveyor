@@ -3,9 +3,9 @@ import { CustomErrCode, type ErrorCode } from "@/lib/errors"
 import type { AsyncResult } from "@/lib/result"
 
 export interface FS {
-    read(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike>
+    read(ctx: Context, filepath: string): AsyncResult<ArrayBuffer>
 
-    write(ctx: Context, filepath: string, content: ArrayBufferLike): AsyncResult<number>
+    write(ctx: Context, filepath: string, content: ArrayBuffer): AsyncResult<number>
 
     remove(ctx: Context, filepath: string): AsyncResult<void>
 

@@ -7,7 +7,11 @@
 }
 
 .input {
-    @apply text-text py-1 px-1;
+    @apply appearance-none bg-surface-level-1 border border-neutral-extra-light rounded-2xl ring ring-transparent text-text p-2;
+    @apply hover:border-neutral-dark;
+    @apply focus:ring-1 focus:outline-none focus:ring-primary-light;
+    @apply dark:border-neutral-extra-dark;
+
     width: 100%;
 
     &[data-invalid] {
@@ -20,7 +24,7 @@
 }
 
 .input-field .icon {
-    @apply text-subtle absolute inset-y-0 left-0 flex items-center p-1 pl-2;
+    @apply text-neutral absolute inset-y-0 left-0 flex items-center p-1 pl-2;
 }
 
 .input-field:has(input[data-invalid]) .icon {
@@ -32,18 +36,18 @@
 }
 
 .field-message {
-    @apply block border border-danger-dark bg-danger text-danger-contrast;
+    @apply block border border-danger-dark bg-danger text-danger-contrast rounded-2xl p-2;
 }
 
 .checkbox {
-    @apply flex size-6 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border border-subtle outline-hidden text-primary;
+    @apply flex size-6 appearance-none items-center justify-center rounded-sm bg-surface-level-1 border border-neutral outline-hidden text-primary;
+
     svg path {
         stroke: currentColor;
         fill: transparent;
-        stroke-width: 25px;
         stroke-dasharray: 590;
         stroke-dashoffset: 590;
-        transition: all 0.2s;
+        transition: stroke-dashoffset 0.2s;
     }
 }
 
@@ -61,7 +65,7 @@
         }
     }
 
-    &[data-selected] {
+    &:has(:checked) {
         .checkbox {
             svg path {
                 stroke-dashoffset: 0;
@@ -83,7 +87,7 @@
         @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
 
         &[data-unchecked] {
-            @apply border-subtle;
+            @apply border-neutral;
         }
 
         &[data-checked] {

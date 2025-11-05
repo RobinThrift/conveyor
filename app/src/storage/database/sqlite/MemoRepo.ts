@@ -1,4 +1,6 @@
 import { markdownLanguage } from "@codemirror/lang-markdown"
+import type { Temporal } from "temporal-polyfill"
+
 import { newID } from "@/domain/ID"
 import {
     ErrMemoNotFound,
@@ -11,16 +13,16 @@ import type { Pagination } from "@/domain/Pagination"
 import type { TagList } from "@/domain/Tag"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
+import { currentDateTime } from "@/lib/i18n"
 import { type AsyncResult, Err, fromPromise, Ok, wrapErr } from "@/lib/result"
 import { decodeText, encodeText } from "@/lib/textencoding"
 
 import * as queries from "./gen/memos_sql"
-import { calendarDateTimeToSQLite } from "./types/calendardatetime"
 import { prepareFTSQueryString } from "./types/ftsquery"
 
 export interface CreateMemoRequest {
     content: string
-    createdAt?: Date
+    createdAt?: Temporal.ZonedDateTime
     id?: MemoID
 }
 
@@ -67,7 +69,7 @@ export class MemoRepo {
             pagination,
             filter,
         }: {
-            pagination: Pagination<Date>
+            pagination: Pagination<Temporal.ZonedDateTime>
             filter?: ListMemosQuery
         },
     ): AsyncResult<MemoList> {
@@ -76,8 +78,8 @@ export class MemoRepo {
             content: Uint8Array<ArrayBufferLike>
             isArchived: boolean
             isDeleted: boolean
-            createdAt: Date
-            updatedAt: Date
+            createdAt: Temporal.ZonedDateTime
+            updatedAt: Temporal.ZonedDateTime
         }
 
         type Query = queries.ListMemosArgs & { search?: string; tag?: string }
@@ -94,12 +96,10 @@ export class MemoRepo {
             tag: filter?.tag,
 
             withCreatedAt: typeof filter?.exactDate !== "undefined",
-            createdAt: filter?.exactDate ? calendarDateTimeToSQLite(filter.exactDate) : undefined,
+            createdAt: filter?.exactDate,
 
             withCreatedAtOrOlder: typeof filter?.startDate !== "undefined",
-            createdAtOrOlder: filter?.startDate
-                ? calendarDateTimeToSQLite(filter.startDate)
-                : undefined,
+            createdAtOrOlder: filter?.startDate,
 
             withIsArchived: typeof filter?.isArchived !== "undefined",
             isArchived: filter?.isArchived ?? false,
@@ -155,7 +155,7 @@ export class MemoRepo {
                 {
                     publicId: memo.id ?? newID(),
                     content: encodeText(memo.content),
-                    createdAt: memo.createdAt ?? new Date(),
+                    createdAt: memo.createdAt ?? currentDateTime(),
                 },
                 ctx.signal,
             ),

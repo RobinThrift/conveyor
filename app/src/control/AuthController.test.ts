@@ -25,9 +25,11 @@ suite("control/AuthController", async () => {
                         return Ok<AuthToken>({
                             origin: "conveyor.dev",
                             accessToken: "MOCK_ACCESS_TOKEN" as PlaintextAuthTokenValue,
-                            expiresAt: currentDateTime().add({ hours: 5 }).toDate("utc"),
+                            expiresAt: currentDateTime().add({ hours: 5 }).withTimeZone("utc"),
                             refreshToken: "MOCK_REFRESH_TOKEN" as PlaintextAuthTokenValue,
-                            refreshExpiresAt: currentDateTime().add({ days: 30 }).toDate("utc"),
+                            refreshExpiresAt: currentDateTime()
+                                .add({ days: 30 })
+                                .withTimeZone("utc"),
                         })
                     }
 
@@ -68,9 +70,9 @@ suite("control/AuthController", async () => {
                     return Ok<AuthToken>({
                         origin: "conveyor.dev",
                         accessToken: refreshedAccessToken as PlaintextAuthTokenValue,
-                        expiresAt: now.add({ hours: 5 }).toDate("utc"),
+                        expiresAt: now.add({ hours: 5 }).withTimeZone("utc"),
                         refreshToken: refreshedRefreshToken as PlaintextAuthTokenValue,
-                        refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
+                        refreshExpiresAt: now.add({ days: 30 }).withTimeZone("utc"),
                     })
                 }
 
@@ -96,14 +98,14 @@ suite("control/AuthController", async () => {
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
-                expiresAt: now.add({ hours: 1 }).toDate("utc"),
+                expiresAt: now.add({ hours: 1 }).withTimeZone("utc"),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
-                refreshExpiresAt: now.add({ days: 2 }).toDate("utc"),
+                refreshExpiresAt: now.add({ days: 2 }).withTimeZone("utc"),
             })
 
             let token = await assertOkResult(authCtrl.getToken(ctx))
 
-            assert.deepEqual(token, validAccessToken)
+            assert.equal(token, validAccessToken)
         })
 
         test("expired token, valid refresh token", async ({ onTestFinished }) => {
@@ -115,9 +117,9 @@ suite("control/AuthController", async () => {
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
-                expiresAt: now.subtract({ hours: 5 }).toDate("utc"),
+                expiresAt: now.subtract({ hours: 5 }).withTimeZone("utc"),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
-                refreshExpiresAt: now.add({ days: 2 }).toDate("utc"),
+                refreshExpiresAt: now.add({ days: 2 }).withTimeZone("utc"),
             })
 
             let token = await assertOkResult(authCtrl.getToken(ctx))
@@ -134,9 +136,9 @@ suite("control/AuthController", async () => {
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
-                expiresAt: now.subtract({ hours: 5 }).toDate("utc"),
+                expiresAt: now.subtract({ hours: 5 }).withTimeZone("utc"),
                 refreshToken: validRefreshToken as PlaintextAuthTokenValue,
-                refreshExpiresAt: now.subtract({ days: 2 }).toDate("utc"),
+                refreshExpiresAt: now.subtract({ days: 2 }).withTimeZone("utc"),
             })
 
             await assertErrResult(authCtrl.getToken(ctx))
@@ -151,9 +153,9 @@ suite("control/AuthController", async () => {
             await storage.setItem(ctx, "conveyor.dev", {
                 origin: "conveyor.dev",
                 accessToken: validAccessToken as PlaintextAuthTokenValue,
-                expiresAt: now.subtract({ hours: 5 }).toDate("utc"),
+                expiresAt: now.subtract({ hours: 5 }).withTimeZone("utc"),
                 refreshToken: "INVALID_REFRESH_TOKEN" as PlaintextAuthTokenValue,
-                refreshExpiresAt: now.add({ days: 2 }).toDate("utc"),
+                refreshExpiresAt: now.add({ days: 2 }).withTimeZone("utc"),
             })
 
             await assertErrResult(authCtrl.getToken(ctx))

@@ -6,7 +6,7 @@
     }
 
     .icon {
-        @apply text-subtle-dark dark:text-subtle;
+        @apply text-neutral-dark dark:text-neutral;
     }
 
     &[aria-expanded="true"]
@@ -17,38 +17,70 @@
     }
 
     &[aria-selected="true"] > .tag-tree-item-content {
-        @apply bg-surface-level-2 shadow text-primary;
-        .tag-tree-item-count {
-            @apply text-primary;
+        @apply bg-primary-light text-primary-contrast;
+
+        .tag-tree-item-count,
+        .icon {
+            @apply text-primary-contrast;
         }
     }
 
     .tag-tree-item-children {
         @apply w-full ps-4;
+        transition:
+            filter 150ms,
+            height 150ms;
+        filter: blur(0px);
+        height: fit-content;
+        interpolate-size: allow-keywords;
+        overflow: hidden;
+
+        @starting-style {
+            filter: blur(4px);
+            height: 0px;
+        }
     }
 
     &:focus-visible {
         @apply outline-none;
         & > .tag-tree-item-content {
-            @apply outline outline-2 outline-primary-dark -outline-offset-3 text-primary;
+            @apply outline outline-2 outline-primary-dark outline-offset-1 bg-primary-light text-primary-contrast;
+            .tag-tree-item-count,
+            .icon {
+                @apply text-primary-contrast;
+            }
+        }
+    }
+
+    &[aria-expanded="true"] > ul {
+        position: relative;
+        &::after {
+            @apply block absolute bg-surface-border left-3 top-0 bottom-0;
+            content: "";
+            width: 1px;
         }
     }
 }
 
-/* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
 .tag-tree-item-content {
-    @apply w-full flex items-center cursor-pointer rounded-lg xs:hover:bg-surface-level-2 hover:shadow active:bg-subtle ps-2 pe-3 py-1;
-    @apply dark:xs:hover:bg-subtle-extra-dark;
+    @apply w-full flex items-center cursor-default rounded-xl xs:hover:bg-surface-level-1 ps-2 py-1;
 
-    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
+    &:active {
+        @apply bg-neutral-extra-light;
+    }
+
+    & > span {
+        @apply pe-3;
+    }
+
     .tag-tree-item-count {
-        @apply text-subtle-dark dark:text-subtle;
+        @apply text-neutral-dark;
+        display: none;
     }
 }
 
 .tag-tree-item-expand-toggle-btn {
-    @apply w-6 flex items-center justify-center hover:bg-inherit rounded-lg cursor-pointer py-0.5;
-    /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
+    @apply w-6 flex items-center justify-center hover:bg-inherit rounded-lg py-0.5 me-2;
     svg {
         transition: rotate 0.25s;
     }

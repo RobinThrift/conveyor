@@ -42,9 +42,8 @@ function ResetButton() {
     return (
         <Button
             variant="danger"
-            size="sm"
             className="absolute bottom-2 right-2 z-100"
-            onPress={() => {
+            onClick={() => {
                 stores.unlock.status.setState("locked")
                 stores.unlock.error.setState(undefined)
             }}

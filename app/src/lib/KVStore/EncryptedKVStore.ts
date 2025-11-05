@@ -8,12 +8,10 @@ import { encodeText } from "@/lib/textencoding"
 import type { KVStore } from "./KVStore"
 
 export class EncryptedKVStore<Items extends Record<string, unknown>> implements KVStore<Items> {
-    private _kv: KVStore<Record<keyof Items, ArrayBufferLike>>
+    private _kv: KVStore<Record<keyof Items, ArrayBuffer>>
     private _crypto: Encrypter & Decrypter
-    private _serialize: <K extends keyof Items>(d: Items[K]) => Uint8Array<ArrayBufferLike>
-    private _deserialize: <K extends keyof Items>(
-        raw: Uint8Array<ArrayBufferLike>,
-    ) => Result<Items[K]>
+    private _serialize: <K extends keyof Items>(d: Items[K]) => Uint8Array<ArrayBuffer>
+    private _deserialize: <K extends keyof Items>(raw: Uint8Array<ArrayBuffer>) => Result<Items[K]>
 
     constructor({
         kv,
@@ -21,10 +19,10 @@ export class EncryptedKVStore<Items extends Record<string, unknown>> implements 
         serialize,
         deserialize = jsonDeserialize,
     }: {
-        kv: KVStore<Record<keyof Items, ArrayBufferLike>>
+        kv: KVStore<Record<keyof Items, ArrayBuffer>>
         crypto: Encrypter & Decrypter
-        serialize?: <K extends keyof Items>(d: Items[K]) => Uint8Array<ArrayBufferLike>
-        deserialize?: <K extends keyof Items>(raw: Uint8Array<ArrayBufferLike>) => Result<Items[K]>
+        serialize?: <K extends keyof Items>(d: Items[K]) => Uint8Array<ArrayBuffer>
+        deserialize?: <K extends keyof Items>(raw: Uint8Array<ArrayBuffer>) => Result<Items[K]>
     }) {
         this._kv = kv
         this._crypto = crypto

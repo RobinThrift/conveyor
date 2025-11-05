@@ -1,38 +1,39 @@
-import React from "react"
+import React, { useMemo } from "react"
+import type { Temporal } from "temporal-polyfill"
 
+import { currentDateTime, differenceInCalendarDays, roundToNearestMinutes } from "@/lib/i18n"
 import { DateTime } from "@/ui/components/DateTime"
 import { useT } from "@/ui/i18n"
 
-export const DayHeader = React.memo(function DayHeader({
-    date,
-    diffToToday,
-}: {
-    date: Date
-    diffToToday: number
-}) {
+export const DayHeader = React.memo(function DayHeader({ date }: { date: Temporal.ZonedDateTime }) {
     let t = useT("components/MemoList/DayHeader")
-    let prefix = ""
-    if (diffToToday < 1) {
-        prefix = t.Today
-    } else if (diffToToday === 1) {
-        prefix = t.Yesterday
-    }
+    let prefix = useMemo(() => {
+        let now = roundToNearestMinutes(currentDateTime())
+        let diffToToday = differenceInCalendarDays(date.toPlainDate(), now.toPlainDate())
+        if (diffToToday < 1) {
+            return t.Today
+        } else if (diffToToday === 1) {
+            return t.Yesterday
+        }
+    }, [date, t.Today, t.Yesterday])
+
+    let formatted = <DateTime date={date} opts={{ dateStyle: "long" }} />
 
     if (prefix) {
-        return (
-            <h2 className="memo-list-day">
+        formatted = (
+            <>
                 {prefix}
-                <span className="named-day-date">
-                    (
-                    <DateTime date={date} opts={{ dateStyle: "medium" }} />)
-                </span>
-            </h2>
+                <span className="named-day-date">({formatted})</span>
+            </>
         )
     }
 
     return (
-        <h2 className="memo-list-day">
-            {prefix} <DateTime date={date} opts={{ dateStyle: "medium" }} />
-        </h2>
+        <>
+            <div className="memo-list-day">
+                <div className="memo-list-day-date">{formatted}</div>
+            </div>
+            <div className="memo-list-day-divider" aria-hidden="true" />
+        </>
     )
 })

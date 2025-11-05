@@ -76,7 +76,7 @@ export class AgeCrypto {
         return Ok(undefined)
     }
 
-    async encryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike> {
+    async encryptData(data: Uint8Array<ArrayBuffer>): AsyncResult<ArrayBuffer> {
         if (!this._initialised) {
             return Err(new Error("encryptData called before `init`"))
         }
@@ -86,10 +86,10 @@ export class AgeCrypto {
             return wrapErr`error encrypting data: ${err}`
         }
 
-        return Ok(encrypted.buffer)
+        return Ok(encrypted.buffer as ArrayBuffer)
     }
 
-    async decryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike> {
+    async decryptData(data: Uint8Array<ArrayBuffer>): AsyncResult<ArrayBuffer> {
         if (!this._initialised) {
             return Err(new Error("decryptData called before `init`"))
         }
@@ -99,7 +99,7 @@ export class AgeCrypto {
             return wrapErr`error decrypting data: ${err}`
         }
 
-        return Ok(decryped.buffer)
+        return Ok(decryped.buffer as ArrayBuffer)
     }
 
     async generatePrivateKey(): AsyncResult<AgePrivateCryptoKey> {

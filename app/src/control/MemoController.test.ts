@@ -1,3 +1,4 @@
+import { Temporal } from "temporal-polyfill"
 import { afterAll, assert, beforeAll, type OnTestFinishedHandler, suite, test, vi } from "vitest"
 
 import type { MemoChangelogEntry } from "@/domain/Changelog"
@@ -5,13 +6,7 @@ import { newID } from "@/domain/ID"
 import type { MemoID, MemoList } from "@/domain/Memo"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto/WebCryptoSha256Hasher"
 import { BaseContext, type Context } from "@/lib/context"
-import {
-    CalendarDateTime,
-    calendarDateTimeFromDate,
-    currentDateTime,
-    isAfter,
-    toCalendarDate,
-} from "@/lib/i18n"
+import { currentDateTime, isAfter, temporalToDate } from "@/lib/i18n"
 import { toPromise } from "@/lib/result"
 import { assertErrResult, assertOkResult } from "@/lib/testhelper/assertions"
 import { MockFS } from "@/lib/testhelper/mockfs"
@@ -29,7 +24,13 @@ suite("control/MemoController", () => {
     suite("Querying", async () => {
         let { memoCtrl, ctx, setup, cleanup } = await memoCtrlTestSetup()
 
-        let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0)
+        let now = Temporal.ZonedDateTime.from({
+            year: 2024,
+            month: 2,
+            day: 15,
+            hour: 12,
+            timeZone: "utc",
+        })
         let numMemos = 500
 
         let createdMemosIDs: MemoID[] = []
@@ -40,7 +41,7 @@ suite("control/MemoController", () => {
             for (let i = 0; i < numMemos * 1.5; i++) {
                 let [created, err] = await memoCtrl.createMemo(ctx, {
                     content: `# Test Memo ${i}\n With some more content for memo ${i}\n #tag-${i}d #parent/tag-${i + 1} #mod-two-is-${i % 2}`,
-                    createdAt: now.subtract({ hours: i }).toDate("utc"),
+                    createdAt: now.subtract({ hours: i }),
                 })
                 if (err) {
                     throw err
@@ -69,7 +70,7 @@ suite("control/MemoController", () => {
         afterAll(cleanup)
 
         test("List All Memos Paginated", async () => {
-            let lastMemoDate: Date | undefined
+            let lastMemoDate: Temporal.ZonedDateTime | undefined
             let lastMemoID: MemoID | undefined
             let total = 0
 
@@ -97,19 +98,24 @@ suite("control/MemoController", () => {
         test("Filter by exactDate", async () => {
             let list = await assertOkResult(
                 memoCtrl.listMemos(ctx, {
-                    filter: { exactDate: toCalendarDate(now) },
+                    filter: { exactDate: now.toPlainDate() },
                     pagination: { pageSize: numMemos },
                 }),
             )
 
             assert.equal(list.items.length, 13)
+            let expectedDate = now.toPlainDate().toString()
+
+            for (let item of list.items) {
+                assert.equal(item.createdAt.toPlainDate().toString(), expectedDate)
+            }
         })
 
         test("Filter by startDate", async () => {
-            let startDate = now.subtract({ hours: 24 })
+            let startDate = now.subtract({ hours: 24 }).toPlainDate()
             let list = await assertOkResult(
                 memoCtrl.listMemos(ctx, {
-                    filter: { startDate: toCalendarDate(startDate) },
+                    filter: { startDate },
                     pagination: { pageSize: numMemos },
                 }),
             )
@@ -143,12 +149,12 @@ suite("control/MemoController", () => {
 
         test("Filter by Multiple", async () => {
             let query = "# Test Memo 1*"
-            let startDate = now.subtract({ hours: 24 })
+            let startDate = now.subtract({ hours: 2 }).toPlainDate()
             let list = await assertOkResult(
                 memoCtrl.listMemos(ctx, {
                     filter: {
                         query,
-                        startDate: toCalendarDate(startDate),
+                        startDate,
                     },
                     pagination: { pageSize: numMemos },
                 }),
@@ -156,8 +162,8 @@ suite("control/MemoController", () => {
 
             assert.equal(
                 list.items.length,
-                107,
-                "107 => the first 4 that start with 1x and are before the min date",
+                111,
+                "111 => the first 4 that start with 1x and are before the min date",
             )
         })
 
@@ -179,7 +185,7 @@ suite("control/MemoController", () => {
         })
 
         test("List All Archived Paginated", async () => {
-            let lastMemoDate: Date | undefined
+            let lastMemoDate: Temporal.ZonedDateTime | undefined
             let lastMemoID: MemoID | undefined
             let total = 0
 
@@ -210,7 +216,7 @@ suite("control/MemoController", () => {
         })
 
         test("List All Deleted Paginated", async () => {
-            let lastMemoDate: Date | undefined
+            let lastMemoDate: Temporal.ZonedDateTime | undefined
             let lastMemoID: MemoID | undefined
             let total = 0
 
@@ -247,14 +253,20 @@ suite("control/MemoController", () => {
             let insertMemos = async (
                 ctx: Context,
                 memoCtrl: MemoController,
-                now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0),
+                now = Temporal.PlainDateTime.from({
+                    year: 2024,
+                    month: 2,
+                    day: 15,
+                    hour: 12,
+                    minute: 0,
+                }),
                 numMemos = 10,
             ) => {
                 let createdMemosIDs: MemoID[] = []
                 for (let i = 0; i < numMemos; i++) {
                     let [created, err] = await memoCtrl.createMemo(ctx, {
                         content: `# Test Memo ${i}\n With some more content for memo ${i}`,
-                        createdAt: now.subtract({ hours: i }).toDate("utc"),
+                        createdAt: now.subtract({ hours: i }).toZonedDateTime("utc"),
                     })
                     if (err) {
                         throw err
@@ -271,14 +283,20 @@ suite("control/MemoController", () => {
                 })
                 await setup()
 
-                let now = new Date(2024, 2, 15, 12, 0, 0, 0)
+                let now = Temporal.PlainDateTime.from({
+                    year: 2024,
+                    month: 2,
+                    day: 15,
+                    hour: 12,
+                    minute: 0,
+                })
                 let numMemos = 10
 
                 let content = "# Test Memo to Check Changelog\nMemo content here."
                 let created = await assertOkResult(
                     memoCtrl.createMemo(ctx, {
                         content,
-                        createdAt: now,
+                        createdAt: now.toZonedDateTime("utc"),
                     }),
                 )
                 assert.isDefined(created)
@@ -313,7 +331,13 @@ suite("control/MemoController", () => {
                 })
                 await setup()
 
-                let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
+                let now = Temporal.PlainDateTime.from({
+                    year: 2024,
+                    month: 2,
+                    day: 15,
+                    hour: 12,
+                    minute: 0,
+                })
                 let createdMemosIDs = await insertMemos(ctx, memoCtrl, now)
 
                 let result = await assertOkResult(memoCtrl.getMemo(ctx, createdMemosIDs[1]))
@@ -326,7 +350,13 @@ suite("control/MemoController", () => {
                 })
                 await setup()
 
-                let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
+                let now = Temporal.PlainDateTime.from({
+                    year: 2024,
+                    month: 2,
+                    day: 15,
+                    hour: 12,
+                    minute: 0,
+                })
                 await insertMemos(ctx, memoCtrl, now)
 
                 let error = await assertErrResult(memoCtrl.getMemo(ctx, "INVALID_ID"))
@@ -340,16 +370,20 @@ suite("control/MemoController", () => {
                 })
                 await setup()
 
-                let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
+                let now = Temporal.PlainDateTime.from({
+                    year: 2024,
+                    month: 2,
+                    day: 15,
+                    hour: 12,
+                    minute: 0,
+                })
                 let createdMemosIDs = await insertMemos(ctx, memoCtrl, now)
 
                 let memo = await assertOkResult(memoCtrl.getMemo(ctx, createdMemosIDs[2]))
                 memo.content = "Updated Content for Memo 2"
 
                 vi.useFakeTimers()
-                vi.setSystemTime(
-                    calendarDateTimeFromDate(memo.updatedAt).add({ hours: 1 }).toDate("utc"),
-                )
+                vi.setSystemTime(temporalToDate(memo.updatedAt.add({ hours: 1 })))
                 await assertOkResult(
                     memoCtrl.updateMemoContent(ctx, {
                         ...memo,
@@ -398,9 +432,7 @@ suite("control/MemoController", () => {
                 let memo = await assertOkResult(memoCtrl.getMemo(ctx, createdMemosIDs[5]))
 
                 vi.useFakeTimers()
-                vi.setSystemTime(
-                    calendarDateTimeFromDate(memo.updatedAt).add({ hours: 1 }).toDate("utc"),
-                )
+                vi.setSystemTime(temporalToDate(memo.updatedAt.add({ hours: 1 })))
                 await assertOkResult(
                     memoCtrl.updateMemoArchiveStatus(ctx, {
                         id: memo.id,
@@ -418,9 +450,7 @@ suite("control/MemoController", () => {
                 )
 
                 vi.useFakeTimers()
-                vi.setSystemTime(
-                    calendarDateTimeFromDate(memo.updatedAt).add({ hours: 1 }).toDate("utc"),
-                )
+                vi.setSystemTime(temporalToDate(memo.updatedAt.add({ hours: 1 })))
                 await assertOkResult(
                     memoCtrl.updateMemoArchiveStatus(ctx, {
                         id: memo.id,
@@ -466,7 +496,7 @@ suite("control/MemoController", () => {
 
                 let now = currentDateTime()
                 vi.useFakeTimers()
-                vi.setSystemTime(now.add({ hours: 1 }).toDate("utc"))
+                vi.setSystemTime(temporalToDate(now.add({ hours: 1 })))
                 await assertOkResult(memoCtrl.deleteMemo(ctx, created.id))
                 vi.useRealTimers()
 
@@ -476,7 +506,7 @@ suite("control/MemoController", () => {
                 assert.isTrue(isAfter(deleted.updatedAt, created.updatedAt))
 
                 vi.useFakeTimers()
-                vi.setSystemTime(now.add({ days: 40 }).toDate("utc"))
+                vi.setSystemTime(temporalToDate(now.add({ days: 40 })))
                 await assertOkResult(memoCtrl.cleanupDeletedMemos(ctx))
                 vi.useRealTimers()
 
@@ -495,9 +525,7 @@ suite("control/MemoController", () => {
                 let memo = await assertOkResult(memoCtrl.getMemo(ctx, createdMemosIDs[8]))
 
                 vi.useFakeTimers()
-                vi.setSystemTime(
-                    calendarDateTimeFromDate(memo.updatedAt).add({ hours: 1 }).toDate("utc"),
-                )
+                vi.setSystemTime(temporalToDate(memo.updatedAt.add({ hours: 1 })))
                 await assertOkResult(memoCtrl.deleteMemo(ctx, memo.id))
                 vi.useRealTimers()
 
@@ -534,13 +562,19 @@ suite("control/MemoController", () => {
             ctx: Context,
             memoCtrl: MemoController,
             numMemos = 10,
-            now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0),
+            now = Temporal.PlainDateTime.from({
+                year: 2024,
+                month: 2,
+                day: 15,
+                hour: 12,
+                minute: 0,
+            }),
         ) => {
             let createdMemosIDs: MemoID[] = []
             for (let i = 0; i < numMemos; i++) {
                 let [created, err] = await memoCtrl.createMemo(ctx, {
                     content: `# Test Memo ${i}\n With some more content for memo ${i} #tag-${i} #shared-tag`,
-                    createdAt: now.subtract({ hours: i }).toDate("utc"),
+                    createdAt: now.subtract({ hours: i }).toZonedDateTime("utc"),
                 })
                 if (err) {
                     throw err
@@ -722,7 +756,7 @@ suite("control/MemoController", () => {
             let created = await assertOkResult(
                 memoCtrl.createMemo(ctx, {
                     content,
-                    createdAt: new Date(),
+                    createdAt: currentDateTime().withTimeZone("utc"),
                 }),
             )
             assert.isDefined(created)
@@ -758,7 +792,12 @@ suite("control/MemoController", () => {
     })
 
     suite("applyChangelogEntries", async () => {
-        let now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0)
+        let now = Temporal.PlainDateTime.from({
+            year: 2024,
+            month: 2,
+            day: 15,
+            hour: 12,
+        })
 
         test("exisitng Memo", async ({ onTestFinished }) => {
             let { memoCtrl, ctx, setup, insertChangelogEntries } = await memoCtrlTestSetup({
@@ -769,7 +808,7 @@ suite("control/MemoController", () => {
             let { id } = await assertOkResult(
                 memoCtrl.createMemo(ctx, {
                     content: "# Test Memo 0\n With some more content for memo 0",
-                    createdAt: now.subtract({ hours: 1 }).toDate("utc"),
+                    createdAt: now.subtract({ hours: 1 }).toZonedDateTime("utc"),
                 }),
             )
 
@@ -813,14 +852,14 @@ suite("control/MemoController", () => {
                         targetID: newMemoID,
                         isSynced: false,
                         isApplied: false,
-                        timestamp: new Date(),
+                        timestamp: Temporal.Now.zonedDateTimeISO("utc"),
                         value: {
                             created: {
                                 content: "# Memo 1\nCreated using a changelog",
                                 isArchived: false,
                                 isDeleted: false,
-                                createdAt: now.toDate("utc"),
-                                updatedAt: now.toDate("utc"),
+                                createdAt: now.toZonedDateTime("utc"),
+                                updatedAt: now.toZonedDateTime("utc"),
                             },
                         },
                     },
@@ -847,7 +886,7 @@ Line 2 will be shortened
 Line 3 unchanged
 
 Line 4 unchanged`,
-                    createdAt: now.subtract({ hours: 1 }).toDate("utc"),
+                    createdAt: now.subtract({ hours: 1 }).toZonedDateTime("utc"),
                 }),
             )
 
@@ -949,9 +988,9 @@ async function memoCtrlTestSetup({
                 revision: i,
                 targetType: "memos",
                 isSynced: true,
-                syncedAt: now.subtract({ minutes: entries.length - i + 1 }).toDate("utc"),
+                syncedAt: now.subtract({ minutes: entries.length - i + 1 }).withTimeZone("utc"),
                 isApplied: false,
-                timestamp: now.subtract({ minutes: entries.length - i }).toDate("utc"),
+                timestamp: now.subtract({ minutes: entries.length - i }).withTimeZone("utc"),
             } satisfies MemoChangelogEntry
 
             toCreate.push(entry)

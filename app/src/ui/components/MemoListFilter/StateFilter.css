@@ -1,0 +1,27 @@
+.memo-list-state-filter {
+    .memo-list-state-filter-items {
+        @apply bg-surface-level-2 rounded-3xl p-1;
+        @apply grid auto-cols-auto grid-flow-col gap-2 items-center justify-stretch w-full;
+
+        .memo-list-state-filter-item {
+            @apply rounded-2xl relative;
+            @apply flex gap-2 items-center justify-center p-1 text-sm text-neutral-extra-dark;
+            isolation: isolate;
+
+            .icon {
+                transition: scale 150ms cubic-bezier(0.175, 0.885, 0.32, 2.2);
+            }
+
+            &:hover {
+                @apply bg-surface-level-3 elevation elevation-2;
+                .icon {
+                    scale: 1.15;
+                }
+            }
+
+            &[aria-checked="true"] {
+                @apply bg-primary text-primary-contrast;
+            }
+        }
+    }
+}

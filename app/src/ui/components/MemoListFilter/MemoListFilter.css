@@ -1,11 +1,18 @@
 @import "./TagTreeFilter.css";
 @import "./TagTree.css";
+@import "./DatePicker.css";
 
 .memo-list-filter {
-    @apply overscroll-none flex flex-col;
+    @apply xs:z-20 overscroll-none flex flex-col border border-surface-border rounded-2xl tablet:pt-2 tablet:space-y-2 shadow-xs bg-surface-level-2;
 
     .date-picker {
         @apply px-2 w-full text-sm;
+        /* @apply px-2 pt-1 text-sm mx-1; */
+        /* @apply rounded-2xl border border-surface-border; */
+        /* @apply inset-shadow-xs; */
+        /* @apply shadow-sm; */
+
+        /* width: calc(100% - var(--spacing) * 2); */
 
         .date-picker-header {
             @apply flex items-center justify-between mb-1;
@@ -28,7 +35,7 @@
         }
 
         .calendar-grid-header .calendar-grid-cell {
-            @apply text-center p-0 font-semibold text-xs text-subtle pointer-events-none;
+            @apply text-center p-0 font-semibold text-xs text-neutral pointer-events-none;
         }
 
         .calendar-grid-body .calendar-grid-cell {
@@ -39,7 +46,7 @@
             }
 
             &[data-outside-month] {
-                @apply text-subtle-light;
+                @apply text-neutral-light;
             }
 
             &.today span {
@@ -48,11 +55,11 @@
 
             &[data-disabled] {
                 span {
-                    @apply text-subtle-extra-light! cursor-default dark:text-subtle!;
+                    @apply text-neutral-extra-light! cursor-default dark:text-neutral!;
                 }
 
                 &:hover span {
-                    @apply bg-transparent text-subtle;
+                    @apply bg-transparent text-neutral;
                 }
             }
         }
@@ -86,7 +93,7 @@
         }
 
         .calendar-grid-header .calendar-grid-cell {
-            @apply text-xs;
+            @apply text-xs py-1 h-min;
         }
 
         .calendar-grid-body {
@@ -102,8 +109,8 @@
             }
 
             .calendar-grid-cell {
-                @apply border border-subtle-extra-light;
-                @apply dark:border-subtle-extra-dark;
+                @apply border border-neutral-extra-light;
+                @apply dark:border-neutral-extra-dark;
             }
         }
 
@@ -113,14 +120,14 @@
 
             /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
             &[data-outside-month] {
-                @apply text-subtle border-subtle-extra-light/20;
-                @apply dark:bg-subtle-extra-dark/20 dark:text-subtle-dark;
+                @apply text-neutral border-neutral-extra-light/20;
+                @apply dark:bg-neutral-extra-dark/20 dark:text-neutral-dark;
             }
 
             /* biome-ignore lint/style/noDescendingSpecificity: false positive due to nesting */
             &[data-disabled] {
-                @apply text-subtle-extra-light cursor-default bg-subtle-extra-light/10 border-subtle-extra-light/10;
-                @apply dark:text-subtle dark:bg-subtle-extra-dark/10 dark:border-subtle-extra-dark/10;
+                @apply text-neutral-extra-light cursor-default bg-neutral-extra-light/10 border-neutral-extra-light/10;
+                @apply dark:text-neutral dark:bg-neutral-extra-dark/10 dark:border-neutral-extra-dark/10;
             }
 
             &.today {
@@ -196,8 +203,8 @@
     @apply grid grid-cols-2 gap-1 items-center justify-stretch w-full mb-2;
 
     .state-filter-item {
-        @apply flex gap-2 items-center justify-center p-1 text-sm cursor-pointer text-subtle-extra-dark;
-        @apply dark:text-subtle-light;
+        @apply flex gap-2 items-center justify-center p-1 text-sm cursor-pointer text-neutral-extra-dark;
+        @apply dark:text-neutral-light;
 
         &:hover {
             @apply text-text;
@@ -205,16 +212,16 @@
 
         &[data-pressed] {
             @apply text-primary font-semibold;
-            @apply dark:text-primary-light dark:border-subtle;
+            @apply dark:text-primary-light dark:border-neutral;
         }
     }
 }
 
 .filter-offcanvas-trigger {
-    --btn-border-color: var(--color-subtle-dark);
+    --btn-border-color: var(--color-neutral-dark);
     --btn-bg: var(--color-text);
-    --btn-bg-active: var(--color-subtle-light);
-    @apply tablet:hidden -ms-1 size-10 ps-0! pe-0! focus:outline-0 focus-visible:outline-2 focus-visible:outline-subtle-dark;
+    --btn-bg-active: var(--color-neutral-light);
+    @apply tablet:hidden -ms-1 size-10 ps-0! pe-0! focus:outline-0 focus-visible:outline-2 focus-visible:outline-neutral-dark;
 
     .icon {
         @apply border-0! bg-transparent! items-center! p-0! justify-center;
@@ -222,8 +229,8 @@
 
     /* biome-ignore lint/style/noDescendingSpecificity: i dunno */
     &:hover {
-        --btn-bg: var(--color-subtle-extra-light);
-        --btn-border-color: var(--color-subtle-light);
+        --btn-bg: var(--color-neutral-extra-light);
+        --btn-border-color: var(--color-neutral-light);
     }
 
     /* biome-ignore lint/style/noDescendingSpecificity: i dunno */
@@ -272,9 +279,13 @@
     }
 }
 
+.memo-list-filter-search-desktop {
+    @apply hidden tablet:block bg-surface-level-1 border-b border-surface-border w-full p-2 rounded-t-2xl;
+}
+
 .memo-list-filter-search {
-    @apply flex-1;
-    @apply tablet:w-sm tablet:focus-within:w-lg tablet:transition-[width] tablet:duration-150;
+    /* @apply flex-1; */
+    /* @apply tablet:w-sm tablet:focus-within:w-lg tablet:transition-[width] tablet:duration-150; */
 
     @media (max-width: 1024px) {
         input {
@@ -339,18 +350,5 @@
 .appheader:has(.memo-list-filter-search.collapsible input:focus) {
     .memo-list-header {
         display: none;
-    }
-}
-
-.memo-list-filter .overflow-blur {
-    @apply relative hidden tablet:block;
-    pointer-events: none;
-
-    &::after {
-        @apply hidden absolute h-15 -top-17 tablet:block;
-        content: "";
-        width: calc(100% - var(--spacing) * 2);
-        backdrop-filter: blur(2px);
-        mask-image: linear-gradient(to bottom, transparent 10%, black 50%);
     }
 }

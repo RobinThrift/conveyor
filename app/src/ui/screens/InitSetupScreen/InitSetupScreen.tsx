@@ -98,13 +98,9 @@ function StepChooseStart({
     let t = useT("screens/InitSetup")
     return (
         <div className="flex flex-col gap-2">
-            <Button variant="primary" onPress={startNew} size="lg">
-                {t.NewButtonLabel}
-            </Button>
+            <Button onClick={startNew}>{t.NewButtonLabel}</Button>
 
-            <Button variant="primary" onPress={startFromRemote} size="lg">
-                {t.FromRemoteButtonLabel}
-            </Button>
+            <Button onClick={startFromRemote}>{t.FromRemoteButtonLabel}</Button>
         </div>
     )
 }
@@ -138,13 +134,9 @@ function StepChooseSyncMethod({
             </RadioGroup>
 
             <div className="flex gap-2 justify-between">
-                <Button variant="primary" onPress={back}>
-                    {t.BackButtonLabel}
-                </Button>
+                <Button onClick={back}>{t.BackButtonLabel}</Button>
 
-                <Button variant="primary" onPress={next} size="lg">
-                    {t.NextButtonLabel}
-                </Button>
+                <Button onClick={next}>{t.NextButtonLabel}</Button>
             </div>
         </div>
     )
@@ -173,7 +165,7 @@ function StepConfigureRemoteSync({
             />
 
             {error && (
-                <Alert variant="danger">
+                <Alert>
                     {error.name}: {error.message}
                     {error.stack && (
                         <pre>
@@ -183,9 +175,7 @@ function StepConfigureRemoteSync({
                 </Alert>
             )}
 
-            <Button variant="primary" onPress={back}>
-                {t.BackButtonLabel}
-            </Button>
+            <Button onClick={back}>{t.BackButtonLabel}</Button>
         </div>
     )
 }
@@ -218,16 +208,20 @@ function StepConfigureEncryption({
         [setValue],
     )
 
-    let generate = useCallback(() => {
-        generatePrivateCryptoKey().then(([key, err]) => {
-            if (err) {
-                setGnError(err)
-                return
-            }
+    let generate = useCallback(
+        (e: React.MouseEvent) => {
+            e.preventDefault()
+            generatePrivateCryptoKey().then(([key, err]) => {
+                if (err) {
+                    setGnError(err)
+                    return
+                }
 
-            setValue(key)
-        })
-    }, [generatePrivateCryptoKey, setValue])
+                setValue(key)
+            })
+        },
+        [generatePrivateCryptoKey, setValue],
+    )
 
     let onSubmit = useCallback(
         (e: React.FormEvent) => {
@@ -261,23 +255,19 @@ function StepConfigureEncryption({
             />
 
             {isNew && (
-                <Button variant="primary" onPress={generate}>
-                    {t.GenerateCandidatePrivateCryptoKeyLabel}
-                </Button>
+                <Button onClick={generate}>{t.GenerateCandidatePrivateCryptoKeyLabel}</Button>
             )}
 
             <div className="flex gap-2 justify-between">
-                <Button variant="primary" onPress={onClickBack}>
-                    {t.BackButtonLabel}
-                </Button>
+                <Button onClick={onClickBack}>{t.BackButtonLabel}</Button>
 
-                <Button variant="primary" type="submit" isDisabled={value().length === 0}>
+                <Button variant="primary" type="submit" disabled={value().length === 0}>
                     {t.NextButtonLabel}
                 </Button>
             </div>
 
             {genError && (
-                <Alert variant="danger">
+                <Alert>
                     {genError.name}: {genError.message}
                     {genError.stack && (
                         <pre>
@@ -288,7 +278,7 @@ function StepConfigureEncryption({
             )}
 
             {error && (
-                <Alert variant="danger">
+                <Alert>
                     {error.name}: {error.message}
                     {error.stack && (
                         <pre>
@@ -308,7 +298,7 @@ function StepSyncing({ error, back }: { error?: Error; back: () => void }) {
         <div className="min-h-[100px]">
             {error ? (
                 <>
-                    <Alert variant="danger">
+                    <Alert>
                         {error.name}: {error.message}
                         {error.stack && (
                             <pre>
@@ -317,9 +307,7 @@ function StepSyncing({ error, back }: { error?: Error; back: () => void }) {
                         )}
                     </Alert>
 
-                    <Button variant="primary" onPress={back}>
-                        {t.BackButtonLabel}
-                    </Button>
+                    <Button onClick={back}>{t.BackButtonLabel}</Button>
                 </>
             ) : (
                 <Loader />

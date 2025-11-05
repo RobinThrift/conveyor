@@ -4,25 +4,27 @@
         "body-bg-contrast": "#2b1b36",
         "surface-level-1": "#fcfbf8",
         "surface-level-2": "#f5f1f0",
+        "surface-level-3": "#f5f1f0",
         "surface-border": "#e5dfdf",
         "modal-overlay-bg": "#253c54",
         "text": "#2b1b36",
         "primary": "#243c55",
         "success": "#8EAA57",
         "danger": "#dc252e",
-        "subtle": "#e5dfdf"
+        "neutral": "#e5dfdf"
     },
     "dark": {
         "body-bg": "#243538",
         "body-bg-contrast": "#d3d6cf",
         "surface-level-1": "#273c3e",
         "surface-level-2": "#2f494b",
+        "surface-level-3": "#2f494b",
         "surface-border": "#427779",
         "modal-overlay-bg": "#6b7280",
         "text": "#d3d6cf",
         "primary": "#b25153",
         "success": "#8eaa57",
         "danger": "#dc252e",
-        "subtle": "#427779"
+        "neutral": "#427779"
     }
 }

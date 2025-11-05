@@ -34,20 +34,21 @@
 @import "../components/Markdown/Code.css" layer(components);
 @import "../components/Memo/Memo.css" layer(components);
 @import "../components/MemoList/MemoList.css" layer(components);
-@import "../components/MemoListFilter/MemoListFilter.css" layer(components);
+@import "../components/MemoListFilter/index.css" layer(components);
 @import "../components/Notifications/Notifications.css" layer(components);
+@import "../components/Toolbar/Toolbar.css" layer(components);
 @import "../components/Select/Select.css" layer(components);
-@import "../components/Tooltip/Tooltip.css" layer(components);
 @import "../App/App.css" layer(components);
-@import "../screens/EditMemoScreen/EditMemoScreen.css" layer(components);
 @import "../screens/ErrorScreen/ErrorScreen.css" layer(components);
 @import "../screens/InitSetupScreen/InitSetupScreen.css" layer(components);
-@import "../screens/MainScreen/MainScreen.css" layer(components);
-@import "../screens/MemoListScreen/MemoListScreen.css" layer(components);
-@import "../screens/NewMemoScreen/NewMemoScreen.css" layer(components);
+@import "../screens/ListScreen/ListScreen.css" layer(components);
+@import "../screens/MemoScreen/MemoScreen.css" layer(components);
 @import "../screens/SettingsScreen/SettingsScreen.css" layer(components);
-@import "../screens/SingleMemoScreen/SingleMemoScreen.css" layer(components);
 @import "../screens/UnlockScreen/UnlockScreen.css" layer(components);
+
+:root {
+    overscroll-behavior-x: none;
+}
 
 @media (min-width: 768px) {
     :root {
@@ -63,11 +64,9 @@
     }
 }
 
-:root::view-transition-old(*) {
-    display: none;
-}
-
-:root::view-transition-old(*),
-:root::view-transition-new(*) {
-    animation: none;
+@keyframes --scroll {
+    0%,
+    to {
+        --scroll: 1;
+    }
 }

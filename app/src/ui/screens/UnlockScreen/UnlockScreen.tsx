@@ -59,7 +59,7 @@ export function UnlockScreen() {
                     <StoreUnlockKeyCheckbox isDisabled={isDisabled} />
 
                     {error && (
-                        <Alert variant="danger">
+                        <Alert>
                             {error.name}: {error.message}
                             {error.stack && (
                                 <pre>
@@ -73,9 +73,8 @@ export function UnlockScreen() {
                         <Button
                             type="submit"
                             variant="primary"
-                            size="lg"
                             className="w-full"
-                            isDisabled={isDisabled}
+                            disabled={isDisabled}
                         >
                             {t.UnlockButton}
                         </Button>

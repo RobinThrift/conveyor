@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import React from "react"
 
 import "@/ui/styles/index.css"
 
@@ -17,4 +18,10 @@ export const CheckboxOverview: Story = {
     args: {
         label: "Basic Checkbox",
     },
+
+    render: (args) => (
+        <div className="flex flex-col items-center justify-center w-full h-screen">
+            <Checkbox {...args} />
+        </div>
+    ),
 }

@@ -1,3 +1,5 @@
+import type { Temporal } from "temporal-polyfill"
+
 import type { APITokenList } from "@/domain/APIToken"
 import type { Pagination } from "@/domain/Pagination"
 import type { Context } from "@/lib/context"
@@ -43,7 +45,7 @@ export class APITokenController {
 
 export interface CreateAPITokenRequest {
     name: string
-    expiresAt: Date
+    expiresAt: Temporal.ZonedDateTime
 }
 
 interface APITokenAPIClient {

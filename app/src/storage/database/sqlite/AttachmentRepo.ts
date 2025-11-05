@@ -3,7 +3,9 @@ import { newID } from "@/domain/ID"
 import type { MemoID } from "@/domain/Memo"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
+import { currentDateTime } from "@/lib/i18n"
 import { type AsyncResult, Err, fromPromise, Ok, wrapErr } from "@/lib/result"
+
 import * as queries from "./gen/attachments_sql"
 
 export class AttachmentRepo {
@@ -52,7 +54,7 @@ export class AttachmentRepo {
             id?: AttachmentID
         },
     ): AsyncResult<Attachment> {
-        let createdAt = new Date()
+        let createdAt = currentDateTime()
 
         let [created, err] = await fromPromise(
             queries.createAttachment(

@@ -1,4 +1,5 @@
 import type { Context } from "@/lib/context"
+import { createErrType } from "@/lib/errors"
 import type { KVStore, KVStoreContainer } from "@/lib/KVStore"
 import {
     type AsyncResult,
@@ -47,17 +48,18 @@ export class IndexDBKVStore<
         this.NotFoundErr = NotFoundErr
     }
 
+    public static ErrGetItem = createErrType("IndexDBKVStore", "error getting item")
     public async getItem<K extends keyof Items>(
         ctx: Context,
         key: K,
     ): AsyncResult<Items[K] | undefined> {
         let [item, err] = await this._db.get<Items[K]>(ctx, this._name, key as string)
         if (err) {
-            return wrapErr`error getting item: ${key}: ${err}`
+            return wrapErr`${new IndexDBKVStore.ErrGetItem()}: ${key}: ${err}`
         }
 
         if (!item && typeof this.NotFoundErr === "function") {
-            return Err(new this.NotFoundErr(key as string))
+            return wrapErr`${new IndexDBKVStore.ErrGetItem()}: ${new this.NotFoundErr(key as string)}`
         }
 
         if (!item) {
@@ -67,33 +69,48 @@ export class IndexDBKVStore<
         return this._instantiate(item.value as any)
     }
 
+    public static ErrSetItem = createErrType("IndexDBKVStore", "error setting item")
     public async setItem<K extends keyof Items>(
         ctx: Context,
         key: K,
         value: Items[K],
     ): AsyncResult<void> {
-        return this._db.insertOrUpdate(ctx, this._name, [
+        let [ok, err] = await this._db.insertOrUpdate(ctx, this._name, [
             {
                 key: key as string,
                 value,
             },
         ])
+
+        if (err) {
+            return wrapErr`${new IndexDBKVStore.ErrGetItem()}: ${err}`
+        }
+
+        return [ok, err]
     }
 
+    public static ErrRemoveItem = createErrType("IndexDBKVStore", "error removing item")
     public async removeItem<K extends keyof Items>(ctx: Context, key: K): AsyncResult<void> {
-        return this._db.delete(ctx, this._name, key as string)
+        let [ok, err] = await this._db.delete(ctx, this._name, key as string)
+
+        if (err) {
+            return wrapErr`${new IndexDBKVStore.ErrRemoveItem()}: ${err}`
+        }
+
+        return [ok, err]
     }
 
+    public static ErrClear = createErrType("IndexDBKVStore", "error clearing items")
     public async clear(ctx: Context): AsyncResult<void> {
         let [keys, err] = await this._db.listKeys(ctx, this._name)
         if (err) {
-            return wrapErr`error listing keys: ${err}`
+            return wrapErr`${new IndexDBKVStore.ErrClear()}: error listing keys: ${err}`
         }
 
         for (let key of keys) {
             let [_, deleteErr] = await this._db.delete(ctx, this._name, key)
             if (deleteErr) {
-                return wrapErr`error deleting item: ${key}: ${deleteErr}`
+                return wrapErr`${new IndexDBKVStore.ErrClear()}: ${new IndexDBKVStore.ErrRemoveItem()}: ${key}: ${deleteErr}`
             }
         }
 

@@ -1,3 +1,7 @@
+.code-block {
+    content-visibility: auto;
+}
+
 .tok-keyword {
     color: var(--code-keyword);
 }

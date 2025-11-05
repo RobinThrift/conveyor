@@ -29,7 +29,7 @@ AlertDialog.Icon = AlertDialogIcon
 
 export interface AlertDialogTriggerProps extends ButtonProps {}
 
-export function AlertDialogTrigger(props: Omit<ButtonProps, "onPress">) {
+export function AlertDialogTrigger(props: Omit<ButtonProps, "onClick">) {
     let alertDialogCtx = useContext(alertDialogContext)
     if (!alertDialogCtx) {
         throw new Error(
@@ -37,7 +37,7 @@ export function AlertDialogTrigger(props: Omit<ButtonProps, "onPress">) {
         )
     }
 
-    return <Button {...props} onPress={alertDialogCtx.open} />
+    return <Button {...props} onClick={alertDialogCtx.open} />
 }
 
 export type AlertDialogContentProps = {
@@ -118,7 +118,7 @@ export function AlertDialogButtons({
     return <div className={clsx("alert-dialog-btns", className)}>{children}</div>
 }
 
-export function AlertDialogCancelButton({ className, ...props }: Omit<ButtonProps, "onPress">) {
+export function AlertDialogCancelButton({ className, ...props }: Omit<ButtonProps, "onClick">) {
     let alertDialogCtx = useContext(alertDialogContext)
     if (!alertDialogCtx) {
         throw new Error(
@@ -136,7 +136,7 @@ export function AlertDialogCancelButton({ className, ...props }: Omit<ButtonProp
         <Button
             {...props}
             className={clsx("alert-dialog-close-btn", className)}
-            onPress={alertDialogCtx.close}
+            onClick={alertDialogCtx.close}
         >
             {children}
         </Button>

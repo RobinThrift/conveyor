@@ -1,5 +1,5 @@
 .select {
-    @apply px-2 py-1 bg-surface-level-1 min-w-fit cursor-pointer;
+    @apply ps-2 pe-4 py-2 w-full rounded-2xl -me-8;
     appearance: none;
 
     &:hover {
@@ -15,29 +15,25 @@
     }
 
     &[disabled] {
-        @apply text-subtle-dark bg-surface-level-2 cursor-default;
+        @apply text-neutral-dark bg-surface-level-2 cursor-default;
 
         &:hover {
-            @apply border-subtle;
+            @apply border-neutral;
         }
     }
 }
 
 .select-wrapper {
-    @apply w-fit;
-    display: grid;
-    grid-template-areas: "select";
-    grid-area: select;
-    align-items: center;
-
-    select {
-        grid-area: select;
-    }
+    @apply w-fit rounded-2xl flex items-center bg-surface-level-1 border border-neutral-extra-light;
+    @apply hover:border-neutral-dark;
 
     .select-arrow {
-        @apply me-2;
-        grid-area: select;
         justify-self: end;
+        pointer-events: none;
+    }
+
+    &:focus-visible {
+        @apply elevation-2;
     }
 }
 

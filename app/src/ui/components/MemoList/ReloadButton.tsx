@@ -13,8 +13,7 @@ export function ReloadButton({ reload }: { reload: () => void }) {
 
             <Button
                 className="shadow-md animate-in slide-in-from-top text-sm"
-                size="sm"
-                onPress={reload}
+                onClick={reload}
                 iconRight={<ArrowsClockwiseIcon />}
             >
                 {t.Label}

@@ -1,15 +1,10 @@
 import type { Preview } from "@storybook/react-vite"
 import { initialize, mswLoader } from "msw-storybook-addon"
 import { useEffect, useState, useTransition } from "react"
-
+import { Temporal } from "temporal-polyfill"
+import { fallback, loadTranslation, resolveTranslation } from "../src/lib/i18n"
 import { Theme } from "../src/ui/components/Theme"
-import { i18nContext, type I18nContext } from "../src/ui/i18n/context"
-import {
-    fallback,
-    getLocalTimeZone,
-    loadTranslation,
-    resolveTranslation,
-} from "../src/lib/i18n"
+import { type I18nContext, i18nContext } from "../src/ui/i18n/context"
 
 import { mockAPI } from "./mockapi"
 
@@ -112,22 +107,15 @@ const preview: Preview = {
                 language,
                 region,
                 translations: fallback,
-                timeZone: getLocalTimeZone(),
+                timeZone: Temporal.Now.timeZoneId(),
             })
 
             useEffect(() => {
-                if (
-                    i18nCtx.language !== language ||
-                    i18nCtx.region !== region
-                ) {
+                if (i18nCtx.language !== language || i18nCtx.region !== region) {
                     startTransition(async () => {
-                        let translationJSON = await loadTranslation(
-                            `${language}-${region}`,
-                        )
+                        let translationJSON = await loadTranslation(`${language}-${region}`)
 
-                        let translations:
-                            | ReturnType<typeof resolveTranslation>
-                            | undefined
+                        let translations: ReturnType<typeof resolveTranslation> | undefined
                         if (translationJSON) {
                             translations = resolveTranslation(
                                 `${language}-${region}`,

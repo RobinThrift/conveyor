@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
-import { action } from "storybook/actions"
+import { Temporal } from "temporal-polyfill"
 
 import { withMockBackend } from "@/lib/testhelper/storybook"
 import "@/ui/styles/index.css"
@@ -24,11 +24,6 @@ export const Basic: Story = {
     name: "Memo",
     args: {
         doubleClickToEdit: true,
-        actions: {
-            edit: action("edit"),
-            archive: action("archive"),
-            delete: action("delete"),
-        },
         memo: {
             id: "12345",
             content: `# Markdown Content (Heading 1)
@@ -117,8 +112,8 @@ ${faker.lorem.paragraph()}
 `,
             isArchived: false,
             isDeleted: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: Temporal.Now.zonedDateTimeISO(),
+            updatedAt: Temporal.Now.zonedDateTimeISO(),
         },
     },
     render: (args) => (

@@ -19,10 +19,7 @@ const ErrRemoveFile = createErrType("OPFSWorker", "error removing file")
 const ErrMkdir = createErrType("OPFSWorker", "error making directory")
 
 export const OPFSWorker = createWorker({
-    read: async (
-        ctx: Context,
-        { filepath }: { filepath: string },
-    ): AsyncResult<ArrayBufferLike> => {
+    read: async (ctx: Context, { filepath }: { filepath: string }): AsyncResult<ArrayBuffer> => {
         let [file, err] = await fromPromise(openFile(await _rootDir, filepath))
         if (err) {
             if (err instanceof DOMException && err.name === "NotFoundError") {
@@ -50,7 +47,7 @@ export const OPFSWorker = createWorker({
 
     write: async (
         ctx: Context,
-        { filepath, content }: { filepath: string; content: ArrayBufferLike },
+        { filepath, content }: { filepath: string; content: ArrayBuffer },
     ): AsyncResult<number> => {
         let file = await openFile(await _rootDir, filepath, true)
 

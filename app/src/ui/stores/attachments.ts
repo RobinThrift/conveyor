@@ -1,5 +1,6 @@
 import type { BackendClient } from "@/backend/BackendClient"
 import type { AttachmentID } from "@/domain/Attachment"
+import { mimeTypeForFilename } from "@/lib/mimeTypes"
 import { batch, createActions, createEffect, createStore } from "@/lib/store"
 
 type AttachmentState =
@@ -20,7 +21,7 @@ type AttachmentState =
 
 export const states = createStore<Record<AttachmentID, AttachmentState>>("attachments/states", {})
 export const attachments = createStore<
-    Record<AttachmentID, { filename: string; data: Uint8Array }>
+    Record<AttachmentID, { originalFilename: string; mime: string; data: Uint8Array<ArrayBuffer> }>
 >("attachments/attachments", {})
 
 export const actions = createActions({
@@ -36,12 +37,17 @@ export const actions = createActions({
         }))
     },
 
-    transferAttachment: (attachment: { id: AttachmentID; filename: string; data: Uint8Array }) => {
+    transferAttachment: (attachment: {
+        id: AttachmentID
+        filename: string
+        data: Uint8Array<ArrayBuffer>
+    }) => {
         batch(() => {
             attachments.setState((prev) => ({
                 ...prev,
                 [attachment.id]: {
-                    filename: attachment.filename,
+                    originalFilename: attachment.filename,
+                    mime: mimeTypeForFilename(attachment.filename),
                     data: attachment.data,
                 },
             }))
@@ -73,7 +79,7 @@ export function registerEffects(backend: BackendClient) {
             let transfers: Promise<any>[] = []
             for (let id in states.state) {
                 let { state } = states.state[id]
-                let { data, filename } = attachments.state[id] ?? {}
+                let { data, originalFilename } = attachments.state[id] ?? {}
                 if (state !== "transfer-requested") {
                     continue
                 }
@@ -82,7 +88,7 @@ export function registerEffects(backend: BackendClient) {
                     (async () => {
                         let [created, err] = await backend.attachments.createAttachment(ctx, {
                             id,
-                            filename,
+                            filename: originalFilename,
                             content: data.buffer,
                         })
                         if (err) {
@@ -101,7 +107,8 @@ export function registerEffects(backend: BackendClient) {
                             attachments.setState((prev) => ({
                                 ...prev,
                                 [created.id]: {
-                                    filename,
+                                    originalFilename,
+                                    mime: mimeTypeForFilename(originalFilename),
                                     data: new Uint8Array(created.data),
                                 },
                             }))
@@ -162,7 +169,8 @@ export function registerEffects(backend: BackendClient) {
                 attachments.setState((prev) => ({
                     ...prev,
                     [attachmentID]: {
-                        filename: attachment.attachment.filepath,
+                        originalFilename: attachment.attachment.originalFilename,
+                        mime: mimeTypeForFilename(attachment.attachment.originalFilename),
                         data: new Uint8Array(attachment.data),
                     },
                 }))

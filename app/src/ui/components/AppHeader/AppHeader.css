@@ -1,17 +1,21 @@
 :root {
-    --appheader-height: calc(var(--spacing) * 12);
+    /* --appheader-height: calc(var(--spacing) * 12); */
+    --appheader-height: 0;
+
+    @media (min-width: 768px) {
+        --appheader-height: 0px;
+    }
 }
 
 .appheader {
-    @apply flex items-center gap-2 tablet:gap-4 p-2 pt-0 tablet:fixed;
+    @apply flex items-center gap-2 tablet:gap-4 p-2 pt-0;
 
     z-index: 1000;
 
     margin-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
 
     @media (min-width: 768px) {
-        margin-top: 0;
-        padding-top: max(env(safe-area-inset-top, 0), calc(var(--spacing) * 2));
+        @apply hidden fixed mt-0 top-7 pt-0 left-1;
     }
 
     -webkit-app-region: drag;
@@ -22,16 +26,21 @@
     width: env(titlebar-area-width, 100%);
 }
 
+.appheader .sidebar-offset {
+    @apply -me-2;
+    width: var(--sidebar-width);
+}
+
 .appheader .btn.outline-btn {
-    @apply focus-visible:outline-2 focus-visible:outline-subtle-dark;
-    --btn-border-color: var(--color-subtle-extra-light);
-    --btn-bg: var(--color-subtle);
+    @apply focus-visible:outline-2 focus-visible:outline-neutral-dark;
+    --btn-border-color: var(--color-neutral-extra-light);
+    --btn-bg: var(--color-neutral);
 
     &:hover {
         @apply shadow-sm;
         --btn-bg: transparent;
-        --btn-color: var(--color-subtle-extra-dark);
-        --btn-border-color: var(--color-subtle-light);
+        --btn-color: var(--color-neutral-extra-dark);
+        --btn-border-color: var(--color-neutral-light);
     }
 }
 
@@ -45,7 +54,7 @@
 
 :root.dark .appheader .settings-nav-button {
     /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
-    border-color: var(--color-subtle) !important;
+    border-color: var(--color-neutral) !important;
 }
 
 body.platform-macos .appheader {
@@ -69,6 +78,14 @@ body.platform-macos .appheader {
 
         .appheader > * {
             display: none;
+        }
+    }
+}
+
+@media (max-width: 1439px) {
+    :root:has(.has-memo-list-sidebar) {
+        .appheader {
+            @apply top-10;
         }
     }
 }

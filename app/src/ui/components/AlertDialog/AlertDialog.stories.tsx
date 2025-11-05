@@ -32,7 +32,7 @@ export const Overview: Story = {
                 </AlertDialog.Description>
 
                 <AlertDialog.Buttons>
-                    <Button variant="danger" onPress={action("delete")}>
+                    <Button variant="danger" onClick={action("delete")}>
                         Delete
                     </Button>
                     <AlertDialog.CancelButton>Cancel</AlertDialog.CancelButton>

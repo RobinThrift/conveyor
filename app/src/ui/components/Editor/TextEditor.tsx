@@ -25,7 +25,6 @@ export interface TextEditorProps {
     content: string
     autoFocus?: boolean
     overrideKeybindings?: boolean
-    placeholder?: string
     placeCursorAt?: { x: number; y: number; snippet?: string }
 
     vimModeEnabled?: boolean
@@ -58,7 +57,6 @@ export function TextEditor(props: TextEditorProps) {
                 text={props.content}
                 onChange={props.onChange}
                 autoFocus={props.autoFocus}
-                placeholder={props.placeholder}
                 transferAttachment={props.transferAttachment}
             />
             {props.children(cmds)}

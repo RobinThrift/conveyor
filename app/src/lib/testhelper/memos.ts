@@ -50,8 +50,8 @@ export function generateMockMemos() {
             }),
             isArchived: i > 90 && i < 100,
             isDeleted: i > 100,
-            createdAt: now.subtract({ hours: i * 2 }).toDate("utc"),
-            updatedAt: now.subtract({ hours: i }).toDate("utc"),
+            createdAt: now.subtract({ hours: i * 2 }).withTimeZone("utc"),
+            updatedAt: now.subtract({ hours: i }).withTimeZone("utc"),
         }
 
         memos.push(memo)

@@ -1,14 +1,7 @@
 /** biome-ignore-all lint/correctness/useUniqueElementIds: is guaranteed to be unique */
 
 import clsx from "clsx"
-import React from "react"
-import {
-    Button as AriaButton,
-    Disclosure as AriaDisclosure,
-    DisclosureGroup as AriaDisclosureGroup,
-    DisclosurePanel as AriaDisclosurePanel,
-    Heading as AriaHeading,
-} from "react-aria-components"
+import React, { useCallback, useId, useMemo, useState } from "react"
 
 import type { SyncInfo } from "@/domain/SyncInfo"
 import { Alert } from "@/ui/components/Alert"
@@ -51,6 +44,11 @@ export function SyncSettingsTab() {
         changePassword,
     } = useSyncSettingsTabState()
 
+    let { expanded, setExpanded, itemIDs } = useSyncSettingsTabDisclosureGroup([
+        "setup",
+        "change-password",
+    ])
+
     return (
         <>
             <header>
@@ -79,53 +77,67 @@ export function SyncSettingsTab() {
             )}
 
             {showSetup && (
-                <AriaDisclosureGroup
-                    className="settings-disclosure-group"
-                    defaultExpandedKeys={!info.isEnabled ? ["setup"] : []}
-                >
-                    <AriaDisclosure id="setup" className="settings-disclosure-group-item">
-                        <AriaHeading className="settings-section-header">
-                            <AriaButton slot="trigger">
-                                <CaretDownIcon className="icon" />
+                <div className="settings-disclosure-group">
+                    <div id="setup" className="settings-disclosure-group-item">
+                        <header className="settings-section-header">
+                            <button
+                                className="settings-disclosure-group-toggle"
+                                type="button"
+                                aria-controls={itemIDs[0]}
+                                aria-expanded={expanded === itemIDs[0]}
+                                onClick={() => setExpanded(itemIDs[0])}
+                            >
+                                <CaretDownIcon className="icon" aria-hidden={true} />
                                 {tSetup.Title}
-                            </AriaButton>
-                        </AriaHeading>
-                        <AriaDisclosurePanel>
+                            </button>
+                        </header>
+                        <div
+                            id={itemIDs[0]}
+                            className="settings-disclosure-group-panel"
+                            inert={expanded !== itemIDs[0]}
+                        >
                             <SectionSetupSync
                                 setup={setup}
                                 authStatus={authStatus}
                                 authError={authError}
                                 changePassword={changePassword}
                             />
-                        </AriaDisclosurePanel>
-                    </AriaDisclosure>
+                        </div>
+                    </div>
 
                     {showPasswordChange && info.isEnabled && (
-                        <AriaDisclosure
-                            id="change-password"
-                            className="settings-disclosure-group-item"
-                        >
-                            <AriaHeading className="settings-section-header">
-                                <AriaButton slot="trigger">
-                                    <CaretDownIcon className="icon" />
+                        <div id="change-password" className="settings-disclosure-group-item">
+                            <header className="settings-section-header">
+                                <button
+                                    className="settings-disclosure-group-toggle"
+                                    type="button"
+                                    aria-controls={itemIDs[1]}
+                                    aria-expanded={expanded === itemIDs[1]}
+                                    onClick={() => setExpanded(itemIDs[1])}
+                                >
+                                    <CaretDownIcon className="icon" aria-hidden={true} />
                                     {tChangePassword.Title}
-                                </AriaButton>
-                            </AriaHeading>
-                            <AriaDisclosurePanel>
+                                </button>
+                            </header>
+                            <div
+                                id={itemIDs[0]}
+                                className="settings-disclosure-group-panel"
+                                inert={expanded !== itemIDs[1]}
+                            >
                                 <SectionChangePassword
                                     status={authStatus}
                                     error={authError}
                                     username={info.username}
                                     changePassword={changePassword}
                                 />
-                            </AriaDisclosurePanel>
-                        </AriaDisclosure>
+                            </div>
+                        </div>
                     )}
-                </AriaDisclosureGroup>
+                </div>
             )}
 
             {!info.isEnabled && status === "error" && error ? (
-                <Alert variant="danger">
+                <Alert>
                     {error.name}: {error.message}
                     {error.stack && (
                         <pre>
@@ -174,7 +186,7 @@ function SectionSyncInfo({
             )}
 
             {error && (
-                <Alert variant="danger">
+                <Alert>
                     {error.name}: {error.message}
                     {error.stack && (
                         <pre>
@@ -202,9 +214,8 @@ function SectionSyncInfo({
                     <div className="flex flex-col tablet:flex-col gap-2">
                         <Button
                             variant="primary"
-                            isDisabled={isLoading}
-                            size="sm"
-                            onPress={manualSync}
+                            disabled={isLoading}
+                            onClick={manualSync}
                             iconLeft={<ArrowsClockwiseIcon />}
                         >
                             {t.ManualSyncButtonLabel}
@@ -213,8 +224,7 @@ function SectionSyncInfo({
                         <AlertDialog>
                             <AlertDialog.Trigger
                                 variant="danger"
-                                isDisabled={isLoading}
-                                size="sm"
+                                disabled={isLoading}
                                 iconLeft={<CloudArrowUpIcon />}
                             >
                                 {t.ManualFullUploadButtonLabel}
@@ -234,7 +244,7 @@ function SectionSyncInfo({
                                 </AlertDialog.Description>
 
                                 <AlertDialog.Buttons>
-                                    <Button variant="danger" onPress={manualFullUpload}>
+                                    <Button variant="danger" onClick={manualFullUpload}>
                                         {t.ManualFullUploadButtonLabel}
                                     </Button>
                                     <AlertDialog.CancelButton />
@@ -245,8 +255,7 @@ function SectionSyncInfo({
                         <AlertDialog>
                             <AlertDialog.Trigger
                                 variant="danger"
-                                isDisabled={isLoading}
-                                size="sm"
+                                disabled={isLoading}
                                 iconRight={<CloudArrowDownIcon />}
                             >
                                 {t.ManualFullDownloadButtonLabel}
@@ -266,7 +275,7 @@ function SectionSyncInfo({
                                 </AlertDialog.Description>
 
                                 <AlertDialog.Buttons>
-                                    <Button variant="danger" onPress={manualFullDownload}>
+                                    <Button variant="danger" onClick={manualFullDownload}>
                                         {t.ManualFullDownloadButtonLabel}
                                     </Button>
                                     <AlertDialog.CancelButton />
@@ -322,4 +331,28 @@ function SectionChangePassword({
             changePassword={changePassword}
         />
     )
+}
+
+function useSyncSettingsTabDisclosureGroup(items: string[]) {
+    let baseID = useId()
+    let itemIDs = useMemo(() => {
+        let ids = []
+        for (let i = 0; i <= items.length; i++) {
+            ids.push(`${baseID}-${items[i]}`)
+        }
+
+        return ids
+    }, [baseID, items])
+
+    let [expanded, _setExpanded] = useState<string | undefined>(itemIDs[0] ?? undefined)
+
+    let setExpanded = useCallback((item: string) => {
+        _setExpanded((expanded) => (expanded === item ? undefined : item))
+    }, [])
+
+    return {
+        itemIDs,
+        expanded,
+        setExpanded,
+    }
 }

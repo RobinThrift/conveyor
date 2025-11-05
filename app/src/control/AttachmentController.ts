@@ -43,7 +43,7 @@ export class AttachmentController {
     public async getAttachmentDataByID(
         ctx: Context<{ db?: DBExec }>,
         id: AttachmentID,
-    ): AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }> {
+    ): AsyncResult<{ attachment: Attachment; data: ArrayBuffer }> {
         let [attachment, err] = await this._repo.getAttachment(ctx, id)
 
         if (err) {
@@ -60,7 +60,7 @@ export class AttachmentController {
 
         return Ok({
             attachment,
-            data,
+            data: data as ArrayBuffer,
         })
     }
 
@@ -80,7 +80,7 @@ export class AttachmentController {
     private async _getAttachmentDataFromRemote(
         ctx: Context,
         attachment: Attachment,
-    ): AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }> {
+    ): AsyncResult<{ attachment: Attachment; data: ArrayBuffer }> {
         if (!this._remote) {
             return Err(new Error("no remote fallback set"))
         }
@@ -121,9 +121,9 @@ export class AttachmentController {
         attachment: {
             id?: AttachmentID
             filename: string
-            content: ArrayBufferLike
+            content: ArrayBuffer
         },
-    ): AsyncResult<{ id: AttachmentID; data: ArrayBufferLike }> {
+    ): AsyncResult<{ id: AttachmentID; data: ArrayBuffer }> {
         return this._transactioner.inTransaction(ctx, async (ctx) =>
             this._createAttachment(ctx, attachment),
         )
@@ -138,9 +138,9 @@ export class AttachmentController {
         }: {
             id?: AttachmentID
             filename: string
-            content: ArrayBufferLike
+            content: ArrayBuffer
         },
-    ): AsyncResult<{ id: AttachmentID; data: ArrayBufferLike }> {
+    ): AsyncResult<{ id: AttachmentID; data: ArrayBuffer }> {
         let [attachment, writeErr] = await this._writeAttachment(ctx, content)
         if (writeErr) {
             return Err(writeErr)
@@ -278,10 +278,10 @@ export class AttachmentController {
 
     private async _writeAttachment(
         ctx: Context,
-        content: ArrayBufferLike,
+        content: ArrayBuffer,
     ): AsyncResult<{
         sizeBytes: number
-        sha256: Uint8Array<ArrayBufferLike>
+        sha256: Uint8Array<ArrayBuffer>
         filepath: string
     }> {
         let ab = new ArrayBuffer(content.byteLength)
@@ -351,7 +351,7 @@ interface Repo {
 }
 
 interface Hasher {
-    sum(data: BufferSource): AsyncResult<ArrayBufferLike>
+    sum(data: BufferSource): AsyncResult<ArrayBuffer>
 }
 
 interface Changelog {
@@ -362,7 +362,7 @@ interface Changelog {
 }
 
 interface RemoteAttachmentStorage {
-    getAttachmentDataByFilepath(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike>
+    getAttachmentDataByFilepath(ctx: Context, filepath: string): AsyncResult<ArrayBuffer>
 }
 
 const attachmentPattern = /\[.*?\]\(attachment:\/\/(?<id>[A-Za-z0-9_-]{21}).*?\)/g

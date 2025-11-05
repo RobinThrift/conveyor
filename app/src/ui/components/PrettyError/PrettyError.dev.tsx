@@ -12,7 +12,7 @@ type PrettyErrorProps = {
 export function PrettyError({ error, className }: PrettyErrorProps) {
     return (
         <div className={clsx("container mx-auto flex flex-col items-center", className)}>
-            <Alert variant="danger" className="w-full">
+            <Alert className="w-full">
                 {error.name}: {error.message}
             </Alert>
 

@@ -1,14 +1,80 @@
 .settings-dialog {
-    @apply border border-subtle-extra-light dark:border-subtle-extra-dark p-0!;
+    @apply border border-1 border-surface-border p-0!;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-timeline: --mobile-settings-title;
+    scroll-timeline-axis: inline;
 
-    .dialog-close {
-        @apply right-2 top-3 xs:right-3;
+    .dialog-close-btn {
+        @apply left-2 top-2 elevation-2;
+    }
+
+    .dialog-title {
+        @apply p-1 xs:mb-0 text-center fixed left-0 right-0;
+        h1 {
+            @apply mb-0 p-2 w-full text-3xl xs:p-4 xs:py-3;
+        }
+
+        animation: mobile-settings-title-fade-out linear;
+        animation-timeline: --mobile-settings-title;
+        animation-fill-mode: both;
+    }
+
+    .settings-tab-back-btn {
+        @apply absolute left-1 top-1 rounded-full aspect-square h-11 w-11 p-0;
+        z-index: 200;
     }
 
     @media (min-width: 768px) {
         @apply max-w-6xl;
         width: 100%;
         height: 80svh;
+        max-height: 800px;
+
+        overflow: hidden;
+        scroll-snap-type: unset;
+        scroll-timeline: unset;
+        scroll-timeline-axis: unset;
+
+        .dialog-title {
+            @apply sr-only;
+        }
+
+        .settings-tab-back-btn {
+            @apply hidden;
+        }
+
+        .dialog-close-btn {
+            @apply size-8;
+        }
+    }
+}
+
+@keyframes mobile-settings-title-fade-out {
+    from {
+        translate: 0 0;
+        filter: blur(0px);
+        opacity: 1;
+    }
+
+    to {
+        translate: -50% 0;
+        filter: blur(40px);
+        opacity: 0;
+    }
+}
+
+@keyframes mobile-settings-title-fade-in {
+    from {
+        translate: 50% 0;
+        filter: blur(40px);
+        opacity: 0;
+    }
+
+    to {
+        translate: 0 0;
+        filter: blur(0px);
+        opacity: 1;
     }
 }
 
@@ -18,90 +84,82 @@
     inherits: false;
 }
 
-.settings-dialog:has(.is-syncing) {
-    overflow: visible;
-    overscroll-behavior: contain;
-    &::before {
-        @apply rounded-2xl inset-0 border-2 border-primary;
-        display: block;
-        content: "";
-        position: absolute;
-        pointer-events: none;
-        animation: sync-rotate-border 5s linear infinite;
-        mask:
-            conic-gradient(#000 0 0) content-box,
-            linear-gradient(
-                var(--sync-indicator-angle),
-                #0000 30%,
-                #000 40% 60%,
-                #0000 70%
-            )
-            subtract,
-            conic-gradient(#000 0 0) padding-box;
-    }
-}
-
-@keyframes sync-rotate-border {
-    from {
-        --sync-indicator-angle: 0deg;
-    }
-
-    to {
-        --sync-indicator-angle: 360deg;
-    }
-}
-
 .settings-screen {
     @apply h-full flex flex-col relative;
-    h1 {
-        @apply w-full text-3xl p-3 xs:p-5 xs:py-4 relative;
-    }
 }
 
 .settings-tabs {
-    @apply flex flex-col xs:flex-row flex-1 border-t max-h-full overflow-hidden;
-    @apply border-subtle-extra-light dark:border-subtle-extra-dark;
+    @apply flex-1 h-full;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 100% 100%;
+    grid-template-rows: 1fr;
+
+    @media (min-width: 768px) {
+        @apply flex flex-row p-1 overflow-hidden;
+    }
 }
 
 .settings-tab-list {
-    @apply w-fit p-2 flex items-center space-x-2 overflow-auto max-w-full xs:max-w-none;
-    @apply xs:border-r xs:block xs:flex-col xs:space-y-2;
-    @apply border-subtle-extra-light dark:border-subtle-extra-dark;
+    @apply flex flex-col relative px-2 pt-16;
+    width: 100%;
+    scroll-snap-align: start;
+
+    &::after {
+        @apply bg-surface-level-2 rounded-xl block content-[""] absolute -z-1 inset-2 top-16 bottom-14;
+    }
+
+    @media (min-width: 768px) {
+        @apply pt-14 pe-2 rounded-xl py-2 gap-2 surface-level-1 elevation-3 -me-1;
+        width: fit-content;
+        scroll-snap-align: unset;
+
+        &::after {
+            @apply hidden;
+        }
+    }
 }
 
 .settings-tab-list-item {
-    @apply flex items-center gap-2 cursor-pointer py-1 px-1 border-b-3 border-transparent min-w-fit;
-    @apply xs:px-3 xs:border-0 xs:rounded-lg;
+    @apply flex items-center py-4 px-2 w-full gap-2 rounded-xl;
 
     .icon {
-        @apply text-subtle;
+        @apply text-neutral;
     }
 
     &:hover {
-        @apply border-b-3 border-primary-light text-primary;
-        @apply xs:bg-primary-light xs:text-primary-contrast xs:border-0;
+        @apply bg-primary-light text-primary-contrast;
 
         .icon {
-            @apply text-primary;
-            @apply xs:text-primary-contrast;
+            @apply text-primary-contrast;
         }
     }
 
-    &[data-selected] {
-        @apply border-b-3 border-primary text-primary;
-        @apply xs:bg-primary-light xs:text-primary-contrast xs:border-0;
-        .icon {
-            @apply text-primary;
-            @apply xs:text-primary-contrast;
+    &[aria-disabled="true"] {
+        @apply hidden;
+    }
+
+    @media (min-width: 768px) {
+        @apply py-2 px-3 py-1;
+        &[aria-selected="true"] {
+            @apply bg-primary text-primary-contrast;
+            .icon {
+                @apply text-primary-contrast;
+            }
         }
     }
 }
 
 .settings-tab {
-    @apply pt-2 pb-12 px-2 xs:px-4 space-y-4 flex-1 relative overflow-auto flex-1;
+    @apply pt-2 pb-12 px-2 xs:px-4 flex-1 relative overflow-auto flex-1 rounded-xl mt-1 xs:mt-0 mx-2 xs:mx-0;
+    width: 100%;
+    scroll-snap-align: start;
 
     h2 {
-        @apply flex gap-2 items-center w-full text-2xl font-semibold;
+        @apply text-center text-2xl font-semibold pb-2;
+        animation: mobile-settings-title-fade-in linear;
+        animation-timeline: --mobile-settings-title;
+        animation-fill-mode: both;
     }
 
     .select-input {
@@ -116,40 +174,70 @@
         }
     }
 
-    .checkbox-field {
-        @apply flex justify-between items-center p-2 gap-2 rounded-lg shadow h-fit;
-        @apply bg-surface-level-1 text-text border w-full;
-        @apply border-subtle-extra-light dark:border-subtle-extra-dark;
+    .input-field {
+        @apply grid grid-cols-6 gap-y-2;
 
         label {
-            @apply flex-1;
+            @apply col-span-2 mb-0;
+            place-items: center;
         }
 
-        &:hover {
-            @apply shadow-lg border-primary;
+        .input {
+            @apply col-span-4;
         }
 
-        .checkbox {
-            @apply rounded-full;
+        .btn {
+            @apply col-start-6;
         }
 
-        &[data-selected] {
-            @apply border-primary-dark bg-primary text-primary-contrast;
-
-            .checkbox {
-                @apply border-primary-dark;
+        @media (min-width: 768px) {
+            label {
+                @apply col-span-1;
             }
+
+            .input {
+                @apply col-span-5;
+            }
+        }
+    }
+
+    hr {
+        @apply border-surface-border my-0.5 mx-4;
+    }
+
+    .checkbox-field {
+        @apply w-full flex justify-between items-center p-2 gap-2;
+    }
+
+    @media (min-width: 768px) {
+        @apply ps-4 p-2;
+        scroll-snap-align: unset;
+        width: auto;
+
+        h2 {
+            @apply text-left;
         }
     }
 }
 
+.settings-section {
+    @apply bg-surface-level-2 rounded-xl p-2;
+    margin-top: calc(var(--spacing) * 4);
+
+    &:has(.settings-section-header) {
+        margin-top: calc(1.5lh + var(--spacing) * 4);
+    }
+}
+
 .settings-section-header {
-    @apply flex gap-2 items-center w-full text-xl mb-2.5;
+    @apply flex gap-2 items-center w-full text-xl relative;
+    top: -1.5lh;
+    margin-bottom: -1lh;
 }
 
 .settings-disclosure-group-item {
-    h3 button {
-        @apply flex items-center gap-2 cursor-pointer;
+    .settings-disclosure-group-toggle {
+        @apply flex items-center gap-2;
 
         .icon {
             transition: transform 200ms;
@@ -161,13 +249,20 @@
             }
         }
     }
+
+    .settings-disclosure-group-panel[inert] {
+        @apply hidden;
+    }
 }
 
 .api-tokens-list {
-    @apply border border-subtle-extra-light rounded bg-surface-level-2 divide-y divide-subtle-extra-light;
+    @apply p-1 bg-surface-level-1 rounded-lg border border-surface-border relative;
 
     .api-token {
-        @apply p-2 flex items-center justify-between;
+        @apply p-2 flex items-end justify-between gap-2 bg-surface-level-2 rounded-lg border border-surface-border mb-1 shadow-xs;
+        &:hover {
+            @apply shadow-md;
+        }
     }
 
     .api-token-info {
@@ -180,7 +275,7 @@
 
     .api-token-expires-at,
     .api-token-created-at {
-        @apply text-sm text-subtle-dark;
+        @apply text-sm text-neutral-dark;
         span:first-child {
             @apply me-1;
         }
@@ -204,24 +299,28 @@
 }
 
 .theme-selection-items {
-    @apply bg-surface-level-2 rounded-3xl;
-    @apply grid auto-cols-auto grid-flow-col gap-1 items-center justify-stretch w-full;
+    @apply bg-surface-level-3 rounded-3xl p-1;
+    @apply grid auto-cols-auto grid-flow-col gap-2 items-center justify-stretch w-full;
 }
 
 .theme-selection-item {
-    @apply rounded-2xl border border-surface-level-2;
-    @apply flex gap-2 items-center justify-center p-1 text-sm cursor-pointer text-subtle-extra-dark;
-    @apply dark:text-subtle-light;
+    @apply rounded-2xl relative;
+    @apply flex gap-2 items-center justify-center p-1 text-sm;
+    @apply text-neutral-extra-dark dark:text-neutral-extra-light;
+
+    .icon {
+        transition: scale 150ms cubic-bezier(0.175, 0.885, 0.32, 2.2);
+    }
 
     &:hover {
-        @apply text-text;
-        @apply bg-surface-level-1 border-subtle-extra-light;
+        @apply bg-surface-level-1;
+        .icon {
+            scale: 1.15;
+        }
     }
 
     &[aria-checked="true"] {
-        @apply text-primary font-semibold;
-        @apply bg-surface-level-1 border-subtle-extra-light;
-        @apply dark:text-primary-light dark:border-subtle;
+        @apply bg-primary text-primary-contrast;
     }
 }
 
@@ -237,7 +336,7 @@
 
 :root::view-transition-new(theme-mode-transition) {
     /* biome-ignore lint/complexity/noImportantStyles: must be overriden like this */
-    animation: theme-mode-transition 250ms linear !important;
+    animation: theme-mode-transition 500ms cubic-bezier(0.8, -0.4, 0.5, 1) !important;
     animation-delay: 10ms;
     pointer-events: none;
 }

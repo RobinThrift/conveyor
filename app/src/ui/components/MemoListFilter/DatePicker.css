@@ -1,0 +1,152 @@
+.memo-list-date-filter-calendar-header {
+    @apply flex items-center justify-between gap-1 pb-2;
+}
+
+.memo-list-date-filter-calendar-nav-buttons {
+    @apply flex items-center gap-1;
+    .btn {
+        @apply p-1;
+        isolation: isolate;
+
+        &:disabled {
+            @apply p-0.5;
+        }
+    }
+}
+
+.memo-list-date-filter-calendar-dropdowns select {
+    @apply text-sm rounded-md py-0.5 px-0.5;
+
+    &:focus-visible {
+        @apply outline-2 outline-offset-1 outline-primary;
+    }
+
+    &:hover {
+        @apply bg-neutral-extra-light;
+    }
+}
+
+.memo-list-date-filter-calendar-footer {
+    @apply flex items-center gap-2 pt-2;
+}
+
+.memo-list-date-filter-today-btn {
+    @apply text-sm;
+    align-self: flex-end;
+    isolation: isolate;
+}
+
+.memo-list-date-filter-expand-btn {
+    @apply flex-1;
+    /* biome-ignore lint/complexity/noImportantStyles: will change later */
+    aspect-ratio: unset !important;
+
+    &::before {
+        /* biome-ignore lint/complexity/noImportantStyles: will change later */
+        aspect-ratio: unset !important;
+    }
+}
+
+.memo-list-date-filter-calendar-grid-header {
+    @apply pb-1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.memo-list-date-filter-calendar-grid-header-cell {
+    @apply text-center cursor-default select-none text-neutral-extra-dark font-semibold text-sm;
+}
+
+.memo-list-date-filter-calendar-grid-body-cells {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.memo-list-date-filter-calendar-grid-body-cell {
+    @apply cursor-default select-none;
+
+    & > div {
+        @apply flex items-center justify-center aspect-square rounded-full;
+    }
+
+    &:hover > div {
+        @apply surface-level-1 elevation-1;
+    }
+
+    &.today > div {
+        @apply decoration-primary underline underline-offset-2 decoration-2;
+    }
+
+    &.focussed > div {
+        @apply outline-2 outline-offset-2 outline-primary;
+    }
+
+    &[aria-selected="true"] > div {
+        @apply surface-level-1 elevation-1;
+        --glass-highlight: var(--btn-primary-bg-hover);
+        --glass-shadow: var(--btn-primary-border-color);
+        --color-surface-level-1: var(--btn-primary-bg);
+    }
+
+    &[aria-disabled="true"] > div {
+        @apply text-neutral-extra-light;
+
+        &:hover {
+            @apply bg-inherit shadow-none border-transparent;
+        }
+    }
+
+    &.is-outside-of-month > div {
+        @apply text-neutral-light;
+    }
+}
+
+.memo-list-date-filter.compact {
+    .memo-list-date-filter-calendar-footer {
+        @apply pt-0;
+    }
+
+    .memo-list-date-filter-calendar-grid-header {
+        @apply pb-0;
+    }
+
+    .memo-list-date-filter-calendar-header {
+        @apply hidden;
+    }
+
+    .memo-list-date-filter-calendar-grid-header-cell {
+        font-size: var(--xs-font-size);
+        @apply text-neutral-light;
+    }
+
+    .memo-list-date-filter-calendar-grid-body {
+        overflow-x: auto;
+        overflow-y: visible;
+        overscroll-behavior: none;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: thin;
+    }
+
+    .memo-list-date-filter-calendar-grid-body-cells {
+        @apply py-1;
+        grid-template-columns: repeat(calc(7 * 5), calc(100% / 7));
+    }
+
+    .memo-list-date-filter-calendar-grid-body-cell {
+        scroll-snap-align: center;
+        place-items: center;
+        & > div {
+            @apply h-8;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .memo-list-date-filter-calendar-grid-header-cell {
+            @apply text-xs;
+        }
+
+        .memo-list-date-filter-calendar-header {
+            @apply flex;
+        }
+    }
+}

@@ -1,3 +1,4 @@
+import { Temporal } from "temporal-polyfill"
 import { assert, type OnTestFinishedHandler, suite, test } from "vitest"
 
 import { AttachmentController } from "@/control/AttachmentController"
@@ -8,7 +9,7 @@ import { newID } from "@/domain/ID"
 import type { MemoID } from "@/domain/Memo"
 import { WebCryptoSha256Hasher } from "@/external/browser/crypto/WebCryptoSha256Hasher"
 import { BaseContext, type Context } from "@/lib/context"
-import { CalendarDateTime, currentDateTime } from "@/lib/i18n"
+import { currentDateTime } from "@/lib/i18n"
 import { toPromise } from "@/lib/result"
 import { assertOkResult } from "@/lib/testhelper/assertions"
 import { MockFS } from "@/lib/testhelper/mockfs"
@@ -101,7 +102,7 @@ async function cleanupJobTestSetup({
                 targetType: "memos",
                 isSynced: false,
                 isApplied: true,
-                timestamp: now.subtract({ minutes: entries.length - i }).toDate("utc"),
+                timestamp: now.subtract({ minutes: entries.length - i }).withTimeZone("utc"),
             } satisfies MemoChangelogEntry
 
             toCreate.push(entry)
@@ -115,13 +116,19 @@ async function cleanupJobTestSetup({
     let insertMemos = async (
         ctx: Context,
         numMemos: number,
-        now = new CalendarDateTime(2024, 2, 15, 12, 0, 0, 0),
+        now = Temporal.PlainDateTime.from({
+            year: 2024,
+            month: 2,
+            day: 15,
+            hour: 12,
+            minute: 0,
+        }),
     ) => {
         let createdMemosIDs: MemoID[] = []
         for (let i = 0; i < numMemos; i++) {
             let [created, err] = await memoCtrl.createMemo(ctx, {
                 content: `# Test Memo ${i}\n With some more content for memo ${i}`,
-                createdAt: now.subtract({ hours: i }).toDate("utc"),
+                createdAt: now.subtract({ hours: i }).toZonedDateTime("utc"),
             })
             if (err) {
                 throw err

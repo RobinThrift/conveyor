@@ -4,6 +4,7 @@ import type { SettingChangelogEntry } from "@/domain/Changelog"
 import { newID } from "@/domain/ID"
 import { DEFAULT_SETTINGS } from "@/domain/Settings"
 import { BaseContext } from "@/lib/context"
+import { currentDateTime } from "@/lib/i18n"
 import { assertOkResult } from "@/lib/testhelper/assertions"
 import { SQLite } from "@/lib/testhelper/sqlite"
 import { ChangelogRepo } from "@/storage/database/sqlite/ChangelogRepo"
@@ -122,7 +123,7 @@ suite("control/SettingsController", async () => {
                     targetID: "locale.language",
                     isSynced: false,
                     isApplied: false,
-                    timestamp: new Date(),
+                    timestamp: currentDateTime(),
                     value: {
                         value: "de",
                     },

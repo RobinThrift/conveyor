@@ -1,9 +1,16 @@
-.main {
-    @apply sm:flex-1;
-    padding-bottom: calc(var(--spacing) * 14);
+.screens {
+    @apply sm:flex-1 sm:flex sm:flex-col;
 
-    @media (min-width: 1024px) {
-        padding-bottom: calc(var(--spacing) * 4);
+    --pt: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 2));
+    --pb: max(env(safe-area-inset-bottom, 0px), calc(var(--spacing) * 2));
+    --pr: max(env(safe-area-inset-right, 0px), calc(var(--spacing) * 2));
+    --pl: max(env(safe-area-inset-right, 0px), calc(var(--spacing) * 2));
+
+    @media (min-width: 768px) {
+        --pt: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 1));
+        --pb: max(env(safe-area-inset-bottom, 0px), calc(var(--spacing) * 1));
+        --pr: max(env(safe-area-inset-right, 0px), calc(var(--spacing) * 1));
+        --pl: max(env(safe-area-inset-right, 0px), calc(var(--spacing) * 1));
     }
 }
 
@@ -108,8 +115,11 @@
 }
 
 :root::view-transition-new(autounlock-transition) {
-    /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
-    animation: autounlock-transition 250ms linear !important;
+    display: none;
+}
+
+:root::view-transition-new(autounlock-transition) {
+    animation: autounlock-transition 250ms linear;
     animation-delay: 10ms;
     animation-fill-mode: both;
     pointer-events: none;
@@ -130,4 +140,56 @@
             0% 0%,
             100% 0;
     }
+}
+
+:root {
+    --mobile-top-fadeout-z-index: 20;
+    --mobile-top-fadeout-height: calc(
+        var(--spacing) *
+        20 +
+        env(safe-area-inset-top, 0px) *
+        3
+    );
+    --mobile-top-fadeout-to-adjust: 0px;
+
+    /* &:has(.memo-tab-panel[aria-hidden="false"]) { */
+    /*     --mobile-top-fadeout-height: calc( */
+    /*         var(--spacing) * */
+    /*         40 + */
+    /*         env(safe-area-inset-top, 0px) * */
+    /*         3 */
+    /*     ); */
+    /* } */
+}
+
+@keyframes mobile-top-fadeout {
+    from {
+        height: 0;
+        margin-bottom: 0;
+        translate: 0
+            calc(
+                -1 *
+                var(--mobile-top-fadeout-height) *
+                2 +
+                env(safe-area-inset-top, 0px) +
+                var(--mobile-top-fadeout-to-adjust, 0px)
+            );
+    }
+
+    to {
+        height: var(--mobile-top-fadeout-height);
+        translate: 0
+            calc(
+                -1 *
+                env(safe-area-inset-top, 1px) +
+                var(--mobile-top-fadeout-to-adjust, 0px)
+            );
+        margin-bottom: calc(-1 * var(--mobile-top-fadeout-height));
+    }
+}
+
+@property --memo-tab-back-progress {
+    syntax: "<percentage>";
+    initial-value: 0%;
+    inherits: true;
 }

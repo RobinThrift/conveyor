@@ -40,7 +40,7 @@ export class OPFS implements FS {
         this._worker.terminate()
     }
 
-    public async read(ctx: Context, filepath: string): AsyncResult<ArrayBufferLike> {
+    public async read(ctx: Context, filepath: string): AsyncResult<ArrayBuffer> {
         let [_ready, readyErr] = await this._ready
         if (readyErr) {
             return Err(readyErr)
@@ -51,11 +51,7 @@ export class OPFS implements FS {
         })
     }
 
-    public async write(
-        ctx: Context,
-        filepath: string,
-        content: ArrayBufferLike,
-    ): AsyncResult<number> {
+    public async write(ctx: Context, filepath: string, content: ArrayBuffer): AsyncResult<number> {
         let [_ready, readyErr] = await this._ready
         if (readyErr) {
             return Err(readyErr)

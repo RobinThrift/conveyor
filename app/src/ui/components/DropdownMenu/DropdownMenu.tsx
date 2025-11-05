@@ -1,21 +1,21 @@
 import clsx from "clsx"
-import React from "react"
-import {
-    Menu as AriaMenu,
-    MenuItem as AriaMenuItem,
-    MenuTrigger as AriaMenuTrigger,
-    type MenuTriggerProps as AriaMenuTriggerProps,
-    Popover as AriaPopover,
-    Text as AriaText,
-} from "react-aria-components"
+import React, { useCallback, useContext, useEffect } from "react"
 
-import { Button, type ButtonProps } from "@/ui/components//Button"
+import { Button, type ButtonProps } from "@/ui/components/Button"
 import { CaretDownIcon } from "@/ui/components/Icons"
+import { type DropdownMenuItem as DropdownMenuItemT, dropdownMenuContext } from "./context"
 
-export type DropdownMenuProps = AriaMenuTriggerProps
+import { useDropdownMenu } from "./useDropdownMenu"
+
+export type DropdownMenuProps = {
+    open?: boolean
+    preventFocusOnPress?: boolean
+    children: React.ReactNode | React.ReactNode[]
+}
 
 export function DropdownMenu(props: DropdownMenuProps) {
-    return <AriaMenuTrigger {...props} />
+    let ctx = useDropdownMenu({ preventFocusOnPress: props.preventFocusOnPress })
+    return <dropdownMenuContext.Provider value={ctx}>{props.children}</dropdownMenuContext.Provider>
 }
 
 DropdownMenu.Trigger = DropdownMenuTrigger
@@ -24,13 +24,74 @@ DropdownMenu.Item = DropdownMenuItem
 DropdownMenu.ItemLabel = DropdownMenuItemLabel
 DropdownMenu.ItemDescription = DropdownMenuItemDescription
 
-export type DropdownMenuTriggerProps = ButtonProps
+export type DropdownMenuTriggerProps = Omit<
+    ButtonProps,
+    "popoverTargetAction" | "popoverTarget" | "onClick" | "onKeyDown" | "preventFocusOnPress"
+>
 
 export function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
+    let dropdownMenuCtx = useContext(dropdownMenuContext)
+    let preventFocusOnPress = dropdownMenuCtx?.preventFocusOnPress ?? false
+
+    let onKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLButtonElement>) => {
+            switch (e.code) {
+                case "Space":
+                case "Enter":
+                    e.preventDefault()
+                    dropdownMenuCtx?.focusFirstItem()
+                    dropdownMenuCtx?.open(e.target as HTMLElement)
+                    break
+                case "ArrowDown":
+                    e.preventDefault()
+                    dropdownMenuCtx?.focusFirstItem()
+                    dropdownMenuCtx?.open(e.target as HTMLElement)
+                    break
+                case "ArrowUp":
+                    e.preventDefault()
+                    dropdownMenuCtx?.focusLastItem()
+                    dropdownMenuCtx?.open(e.target as HTMLElement)
+                    break
+            }
+        },
+        [dropdownMenuCtx?.open, dropdownMenuCtx?.focusFirstItem, dropdownMenuCtx?.focusLastItem],
+    )
+
+    let onPointerDown = useCallback(
+        (e: React.PointerEvent<HTMLButtonElement>) => {
+            if (!e.pointerType) {
+                return
+            }
+
+            if (dropdownMenuCtx) {
+                dropdownMenuCtx.preventFocus.current = true
+            }
+
+            e.preventDefault()
+            e.stopPropagation()
+        },
+        [dropdownMenuCtx],
+    )
+
+    if (!dropdownMenuCtx) {
+        throw new Error(
+            "<DropdownMenuTrigger> component called outside of <DropdownMenu> component",
+        )
+    }
+
     return (
         <Button
             {...props}
-            className={clsx("dropdown-menu-btn", props.className)}
+            id={dropdownMenuCtx.labelledByID}
+            onPointerDown={preventFocusOnPress ? onPointerDown : undefined}
+            popoverTargetAction="toggle"
+            popoverTarget={dropdownMenuCtx.targetID}
+            onKeyDown={onKeyDown}
+            className={clsx(
+                "dropdown-menu-btn",
+                { "is-open": dropdownMenuCtx.isOpen },
+                props.className,
+            )}
             iconRight={props.iconRight ?? <CaretDownIcon />}
         />
     )
@@ -39,24 +100,83 @@ export function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
 export interface DropdownMenuItemsProps {
     className?: string
     children: React.ReactNode | React.ReactNode[]
-    size?: "sm" | "md"
 }
 
 export function DropdownMenuItems(props: DropdownMenuItemsProps) {
+    let dropdownMenuCtx = useContext(dropdownMenuContext)
+    if (!dropdownMenuCtx) {
+        throw new Error("<DropdownMenuItems> component called outside of <DropdownMenu> component")
+    }
+
+    useEffect(() => {
+        let items: DropdownMenuItemT[] = []
+
+        React.Children.forEach(props.children, (c) => {
+            if (typeof c !== "object") {
+                return
+            }
+
+            let el = c as React.ReactElement<DropdownMenuItemProps>
+            if (el.type === DropdownMenuItem) {
+                items.push({ id: el.props.id, isDisabled: el.props.isDisabled ?? false })
+            }
+        })
+
+        dropdownMenuCtx.setItems(items)
+    }, [props.children, dropdownMenuCtx.setItems])
+
+    let onKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLUListElement>) => {
+            switch (e.code) {
+                case "Space":
+                case "Enter":
+                    e.preventDefault()
+                    dropdownMenuCtx?.activateFocussed()
+                    break
+                case "ArrowUp":
+                    e.preventDefault()
+                    dropdownMenuCtx?.focusPrevItem()
+                    break
+                case "ArrowDown":
+                    e.preventDefault()
+                    dropdownMenuCtx?.focusNextItem()
+                    break
+            }
+        },
+        [
+            dropdownMenuCtx?.activateFocussed,
+            dropdownMenuCtx?.focusPrevItem,
+            dropdownMenuCtx?.focusNextItem,
+        ],
+    )
+
     return (
-        <AriaPopover offset={0}>
-            <AriaMenu
-                className={clsx("dropdown-menu-list", props.size, props.className)}
-                selectionMode="none"
+        <div
+            className="dropdown-menu-popover"
+            id={dropdownMenuCtx.targetID}
+            ref={dropdownMenuCtx.popover}
+            popover="auto"
+            role="presentation"
+            onBeforeToggle={dropdownMenuCtx.onBeforeToggle}
+        >
+            <ul
+                // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: follows the best pracices example
+                role="menu"
+                aria-labelledby={dropdownMenuCtx.labelledByID}
+                tabIndex={-1}
+                aria-activedescendant={dropdownMenuCtx.focussed}
+                className={clsx("dropdown-menu-list", props.className)}
+                onKeyDown={onKeyDown}
             >
                 {props.children}
-            </AriaMenu>
-        </AriaPopover>
+            </ul>
+        </div>
     )
 }
 
 export interface DropdownMenuItemProps {
     children: React.ReactNode | React.ReactNode[]
+    id: string
     className?: string
 
     destructive?: boolean
@@ -65,19 +185,56 @@ export interface DropdownMenuItemProps {
     action: () => void
 }
 
-export function DropdownMenuItem(props: DropdownMenuItemProps) {
+export function DropdownMenuItem({ isDisabled = false, ...props }: DropdownMenuItemProps) {
+    let dropdownMenuCtx = useContext(dropdownMenuContext)
+    if (!dropdownMenuCtx) {
+        throw new Error("<DropdownMenuItem> component called outside of <DropdownMenu> component")
+    }
+
+    let onClick = useCallback(
+        (e: React.PointerEvent<HTMLLIElement>) => {
+            e.stopPropagation()
+            e.preventDefault()
+
+            requestAnimationFrame(() => {
+                dropdownMenuCtx.close()
+                props.action()
+            })
+        },
+        [dropdownMenuCtx.close, props.action],
+    )
+
+    let onKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLElement>) => {
+            if (e.code === "Space" || e.code === "Enter") {
+                dropdownMenuCtx.close()
+                props.action()
+            }
+        },
+        [dropdownMenuCtx.close, props.action],
+    )
+
     return (
-        <AriaMenuItem
-            onAction={props.action}
+        <li
+            // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: follows the best pracices example
+            role="menuitem"
+            id={props.id}
+            onMouseEnter={!isDisabled ? dropdownMenuCtx.onMouseEnterItem : undefined}
+            onClick={!isDisabled ? onClick : undefined}
+            onKeyDown={!isDisabled ? onKeyDown : undefined}
+            tabIndex={-1}
+            aria-disabled={isDisabled}
             className={clsx(
                 "dropdown-menu-item",
-                { destructive: props.destructive },
+                {
+                    "has-focus": dropdownMenuCtx.focussed === props.id,
+                    destructive: props.destructive,
+                },
                 props.className,
             )}
-            isDisabled={props.isDisabled}
         >
             {props.children}
-        </AriaMenuItem>
+        </li>
     )
 }
 
@@ -89,10 +246,14 @@ export interface DropdownMenuItemLabelProps {
 
 export function DropdownMenuItemLabel(props: DropdownMenuItemLabelProps) {
     return (
-        <AriaText slot="label" className="dropdown-menu-item-label">
-            {props.icon && props.icon}
+        <span slot="label" className="dropdown-menu-item-label">
+            {props.icon && (
+                <span className="icon" aria-hidden="true">
+                    {props.icon}
+                </span>
+            )}
             {props.children}
-        </AriaText>
+        </span>
     )
 }
 
@@ -103,8 +264,8 @@ export interface DropdownMenuItemDescriptionProps {
 
 export function DropdownMenuItemDescription(props: DropdownMenuItemDescriptionProps) {
     return (
-        <AriaText slot="description" className={clsx("description", props.className)}>
+        <span slot="description" className={clsx("description", props.className)}>
             {props.children}
-        </AriaText>
+        </span>
     )
 }

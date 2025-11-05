@@ -1,3 +1,4 @@
+import type { Temporal } from "temporal-polyfill"
 import { assert, suite, test } from "vitest"
 
 import type { AccountKey } from "@/domain/AccountKey"
@@ -15,7 +16,7 @@ import { WebCryptoSha256Hasher } from "@/external/browser/crypto/WebCryptoSha256
 import { dataFromBase64, encodeToBase64 } from "@/lib/base64"
 import { BaseContext, type Context } from "@/lib/context"
 import type { Decrypter, Encrypter } from "@/lib/crypto"
-import { currentDateTime, roundToNearestMinutes } from "@/lib/i18n"
+import { currentDateTime, roundToNearestMinutes, temporalToDate } from "@/lib/i18n"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import { type AsyncResult, Err, Ok, toPromise, wrapErr } from "@/lib/result"
@@ -107,8 +108,8 @@ suite("control/SyncController", async () => {
                 value: { value: true },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(currentDateTime().subtract({ minutes: 5 })).toDate(
-                    "utc",
+                timestamp: roundToNearestMinutes(
+                    currentDateTime().withTimeZone("utc").subtract({ minutes: 5 }),
                 ),
             } satisfies SettingChangelogEntry,
             {
@@ -120,8 +121,8 @@ suite("control/SyncController", async () => {
                 value: { value: "light" },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(currentDateTime().subtract({ minutes: 5 })).toDate(
-                    "utc",
+                timestamp: roundToNearestMinutes(
+                    currentDateTime().withTimeZone("utc").subtract({ minutes: 5 }),
                 ),
             } satisfies SettingChangelogEntry,
             {
@@ -141,8 +142,8 @@ suite("control/SyncController", async () => {
                 },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(currentDateTime().subtract({ minutes: 5 })).toDate(
-                    "utc",
+                timestamp: roundToNearestMinutes(
+                    currentDateTime().withTimeZone("utc").subtract({ minutes: 5 }),
                 ),
             } satisfies AttachmentChangelogEntry,
         ]
@@ -156,8 +157,8 @@ suite("control/SyncController", async () => {
                 value: { value: "dark" },
                 isSynced: false,
                 isApplied: true,
-                timestamp: roundToNearestMinutes(currentDateTime().add({ minutes: 5 })).toDate(
-                    "utc",
+                timestamp: roundToNearestMinutes(
+                    currentDateTime().withTimeZone("utc").add({ minutes: 5 }),
                 ),
             } satisfies SettingChangelogEntry,
         ]
@@ -239,11 +240,11 @@ async function setupSyncControllerTest({
 }: {
     dbPath?: string
     syncAPI?: {
-        getFullSync?: (ctx: Context) => AsyncResult<ArrayBufferLike>
-        uploadFullSyncData?: (ctx: Context, data: ArrayBufferLike) => AsyncResult<void>
+        getFullSync?: (ctx: Context) => AsyncResult<ArrayBuffer>
+        uploadFullSyncData?: (ctx: Context, data: ArrayBuffer) => AsyncResult<void>
         listChangelogEntries?: (
             ctx: Context,
-            since?: Date,
+            since?: Temporal.ZonedDateTime,
         ) => AsyncResult<EncryptedChangelogEntry[]>
         uploadChangelogEntries?: (
             ctx: Context,
@@ -253,7 +254,7 @@ async function setupSyncControllerTest({
             ctx: Context,
             attachment: {
                 filepath: string
-                data: Uint8Array<ArrayBufferLike>
+                data: Uint8Array<ArrayBuffer>
             },
         ) => AsyncResult<void>
         registerClient?: (ctx: Context, syncClient: { clientID: string }) => AsyncResult<void>
@@ -376,7 +377,7 @@ async function encryptChangeLogEntries(
         encrytpedEntries.push({
             syncClientID: clientID,
             data: encodeToBase64(new Uint8Array(encrypted)),
-            timestamp: entry.timestamp,
+            timestamp: temporalToDate(entry.timestamp),
         })
     }
 

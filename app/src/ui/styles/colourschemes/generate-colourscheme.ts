@@ -4,7 +4,7 @@ import { converter, formatCss, type Hsl } from "culori"
 
 const variants = ["DEFAULT", "light", "extra-light", "dark", "extra-dark", "contrast"]
 
-const requireVariants = ["primary", "success", "danger", "subtle"]
+const requireVariants = ["primary", "success", "danger", "neutral"]
 
 type RequireVariants = (typeof requireVariants)[number]
 
@@ -15,6 +15,7 @@ type BaseColours = {
     "body-bg-contrast": string
     "surface-level-1": string
     "surface-level-2": string
+    "surface-level-3": string
     "surface-border": string
     text: string
     "modal-overlay-bg": string
@@ -46,6 +47,8 @@ async function main(file: string) {
             "surface-level-1": formatCss(toOKLCH(colours["surface-level-1"]))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
             "surface-level-2": formatCss(toOKLCH(colours["surface-level-2"]))!,
+            // biome-ignore lint/style/noNonNullAssertion: will never be undefined
+            "surface-level-3": formatCss(toOKLCH(colours["surface-level-3"]))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined
             "surface-border": formatCss(toOKLCH(colours["surface-border"]))!,
             // biome-ignore lint/style/noNonNullAssertion: will never be undefined

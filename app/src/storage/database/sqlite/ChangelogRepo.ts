@@ -1,3 +1,5 @@
+import type { Temporal } from "temporal-polyfill"
+
 import type {
     ChangelogEntry,
     ChangelogEntryID,
@@ -6,8 +8,8 @@ import type {
 } from "@/domain/Changelog"
 import type { Context } from "@/lib/context"
 import type { DBExec } from "@/lib/database"
+import { parseJSONDate } from "@/lib/json"
 import { type AsyncResult, fromPromise, Ok, wrapErr } from "@/lib/result"
-
 import * as queries from "./gen/changelog_sql"
 
 export class ChangelogRepo {
@@ -49,7 +51,7 @@ export class ChangelogRepo {
         }: {
             pagination: {
                 pageSize: number
-                after?: [number, Date]
+                after?: [number, Temporal.ZonedDateTime]
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -83,7 +85,7 @@ export class ChangelogRepo {
         }: {
             pagination: {
                 pageSize: number
-                after?: [number, Date]
+                after?: [number, Temporal.ZonedDateTime]
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -169,8 +171,10 @@ function changelogEntryRowChangelogEntry(row: queries.ListUnsyncedChangesRow): C
     let value = JSON.parse(row.value)
 
     if (row.targetType === "memos" && "created" in value) {
-        value.created.createdAt = new Date(value.created.createdAt)
-        value.created.updatedAt = new Date(value.created.updatedAt)
+        let [createdAt] = parseJSONDate(value.created.createdAt)
+        value.created.createdAt = createdAt
+        let [updatedAt] = parseJSONDate(value.created.updatedAt)
+        value.created.updatedAt = updatedAt
     }
 
     return {

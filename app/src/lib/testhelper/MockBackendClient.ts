@@ -58,7 +58,7 @@ export class MockBackendClient {
     }: {
         mockAttachments?: Record<
             string,
-            () => AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>
+            () => AsyncResult<{ attachment: Attachment; data: ArrayBuffer }>
         >
     }) {
         this._db = new SQLite()
@@ -203,11 +203,11 @@ export class MockBackendClient {
 class MockAttachmentController extends AttachmentController {
     private _mocks: Record<
         string,
-        () => AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>
+        () => AsyncResult<{ attachment: Attachment; data: ArrayBuffer }>
     > = {}
 
     public setMocks(
-        mocks: Record<string, () => AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>>,
+        mocks: Record<string, () => AsyncResult<{ attachment: Attachment; data: ArrayBuffer }>>,
     ) {
         this._mocks = mocks
     }
@@ -215,7 +215,7 @@ class MockAttachmentController extends AttachmentController {
     public getAttachmentDataByID(
         ctx: Context<{ db?: DBExec }>,
         id: AttachmentID,
-    ): AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }> {
+    ): AsyncResult<{ attachment: Attachment; data: ArrayBuffer }> {
         return this._mocks[id]?.() ?? super.getAttachmentDataByID(ctx, id)
     }
 }

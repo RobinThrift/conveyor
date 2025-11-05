@@ -1,5 +1,7 @@
+import type { Temporal } from "temporal-polyfill"
+
 import { createErrType } from "@/lib/errors"
-import { type CalendarDate, calendarDateToISO8601String, parseDateISO8601 } from "@/lib/i18n"
+import { parseDateISO8601 } from "@/lib/i18n"
 
 export type MemoID = string
 
@@ -8,20 +10,20 @@ export interface Memo {
     content: string
     isArchived: boolean
     isDeleted: boolean
-    createdAt: Date
-    updatedAt: Date
+    createdAt: Temporal.ZonedDateTime
+    updatedAt: Temporal.ZonedDateTime
 }
 
 export interface MemoList {
     items: Memo[]
-    next?: Date
+    next?: Temporal.ZonedDateTime
 }
 
 export interface ListMemosQuery {
     tag?: string
     query?: string
-    exactDate?: CalendarDate
-    startDate?: CalendarDate
+    exactDate?: Temporal.PlainDate
+    startDate?: Temporal.PlainDate
     isArchived?: boolean
     isDeleted?: boolean
 }
@@ -35,40 +37,6 @@ export interface FilterQueryParams {
     "op[created_at]"?: string
     "filter[is_deleted]"?: string
     "filter[is_archived]"?: string
-}
-
-export function filterFromQuery(query: FilterQueryParams): ListMemosQuery {
-    let filter: ListMemosQuery = {}
-
-    if (query["filter[tag]"]) {
-        filter.tag = query["filter[tag]"]
-    }
-
-    if (query["filter[content]"]) {
-        filter.query = query["filter[content]"]
-    }
-
-    if (query["filter[is_deleted]"] === "true") {
-        filter.isDeleted = true
-    }
-
-    if (query["filter[is_archived]"] === "true") {
-        filter.isArchived = true
-    }
-
-    let createdAt = query["filter[created_at]"]
-    if (!createdAt) {
-        return filter
-    }
-
-    let opCreatedAt = query["op[created_at]"]
-    if (opCreatedAt && opCreatedAt === "<=") {
-        filter.startDate = parseDateISO8601(createdAt)
-    } else {
-        filter.exactDate = parseDateISO8601(createdAt)
-    }
-
-    return filter
 }
 
 export function filterFromSearchParams(query: URLSearchParams): ListMemosQuery {
@@ -129,11 +97,11 @@ function addFilterToSearchParams(searchParams: URLSearchParams, filter: ListMemo
     }
 
     if (filter.exactDate) {
-        searchParams.set("filter[created_at]", calendarDateToISO8601String(filter.exactDate))
+        searchParams.set("filter[created_at]", filter.exactDate.toJSON())
     }
 
     if (filter.startDate) {
-        searchParams.set("filter[created_at]", calendarDateToISO8601String(filter.startDate))
+        searchParams.set("filter[created_at]", filter.startDate.toJSON())
         searchParams.set("op[created_at]", "<=")
     }
 

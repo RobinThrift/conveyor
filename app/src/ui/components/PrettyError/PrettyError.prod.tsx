@@ -9,7 +9,7 @@ type PrettyErrorProps = {
 
 export function PrettyError({ className, error }: PrettyErrorProps) {
     return (
-        <Alert variant="danger" className={className}>
+        <Alert className={className}>
             {error.name}: {error.message}
             {error.stack && (
                 <pre>

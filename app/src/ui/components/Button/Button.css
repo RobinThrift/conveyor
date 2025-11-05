@@ -1,42 +1,72 @@
 .btn {
-    @apply gap-2 cursor-pointer;
-
-    background-color: var(--btn-bg);
+    @apply flex items-center justify-center gap-2 py-1 px-2.5 relative rounded-2xl;
     color: var(--btn-color);
-    border: 1px solid var(--btn-border-color);
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+
+    &::before {
+        @apply block absolute content-[""] inset-0  rounded-2xl surface-level-1;
+        transition-property: border-radius, inset;
+        transition-duration: 150ms;
+        transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 2.2);
+        pointer-events: none;
+        z-index: -1;
+        --glass-highlight: var(--btn-border-color);
+        --color-surface-level-1: var(--btn-bg);
+        --surface-color: var(--btn-color);
+    }
 
     .icon {
-        @apply size-4 flex items-center justify-center;
+        transition: scale 150ms cubic-bezier(0.175, 0.885, 0.32, 2.2);
     }
 
     &:hover {
-        background-color: var(--btn-bg-hover);
+        &::before {
+            @apply -inset-0.5 rounded-2xl;
+        }
+
+        .icon {
+            scale: 1.15;
+        }
     }
 
     &:focus-visible {
+        @apply rounded-xl;
         outline-style: solid;
         outline-color: var(--btn-bg-active);
-        outline-width: 1px;
-        outline-offset: 1px;
+        outline-width: 2px;
+        outline-offset: 2px;
     }
 
     &:active {
-        background-color: var(--btn-bg-active);
+        &::before {
+            background-color: color-mix(
+                in srgb,
+                var(--btn-bg-active, var(--btn-bg)) 80%,
+                transparent
+            );
+            @apply -inset-1 rounded-2xl;
+        }
+    }
+
+    &.icon-only,
+    &.icon-only::before {
+        @apply aspect-square rounded-full;
     }
 
     &:disabled {
-        @apply cursor-default;
-        background-color: color-mix(in srgb, var(--btn-bg) 80%, transparent);
-        color: color-mix(in srgb, var(--btn-color) 80%, transparent);
-        border-color: color-mix(
-            in srgb,
-            var(--btn-border-color) 70%,
-            transparent
-        );
+        background-color: color-mix(in srgb, var(--btn-bg) 20%, transparent);
+        color: color-mix(in srgb, var(--btn-color) 60%, transparent);
+        border: 1px solid
+            color-mix(in srgb, var(--btn-border-color) 30%, transparent);
+
+        &::before {
+            @apply hidden;
+        }
+
+        &:hover {
+            .icon {
+                scale: unset;
+            }
+        }
     }
 }
 
@@ -46,34 +76,6 @@
     --btn-border-color: var(--btn-primary-border-color);
     --btn-bg-hover: var(--btn-primary-bg-hover);
     --btn-bg-active: var(--btn-primary-bg-active);
-
-    &.plain {
-        --btn-bg-hover: var(--color-primary-light);
-        --btn-bg-active: var(--color-primary);
-        --btn-color: var(--color-primary-contrast);
-
-        &:active {
-            --btn-color: var(--color-primary-contrast);
-        }
-    }
-}
-
-.btn.success {
-    --btn-bg: var(--btn-success-bg);
-    --btn-color: var(--btn-success-color);
-    --btn-border-color: var(--btn-success-border-color);
-    --btn-bg-hover: var(--btn-success-bg-hover);
-    --btn-bg-active: var(--btn-success-bg-active);
-
-    &.plain {
-        --btn-bg-hover: var(--color-success-light);
-        --btn-bg-active: var(--color-success);
-        --btn-color: var(--color-success-contrast);
-
-        &:active {
-            --btn-color: var(--color-success-contrast);
-        }
-    }
 }
 
 .btn.danger {
@@ -82,103 +84,54 @@
     --btn-border-color: var(--btn-danger-border-color);
     --btn-bg-hover: var(--btn-danger-bg-hover);
     --btn-bg-active: var(--btn-danger-bg-active);
-
-    &.plain {
-        --btn-bg-hover: var(--color-danger-light);
-        --btn-bg-active: var(--color-danger);
-        --btn-color: var(--color-danger-contrast);
-
-        &:active {
-            --btn-color: var(--color-danger-contrast);
-        }
-    }
 }
 
-.btn.outline-btn {
-    background-color: transparent;
-    color: var(--btn-bg);
-    border: 1px solid var(--btn-border-color);
+.btn-grp {
+    @apply flex items-center justify-center gap-2 py-1 px-2.5 rounded-2xl surface-level-2;
 
-    &:hover {
-        background-color: var(--btn-bg);
-        color: var(--btn-color);
-        border-color: var(--btn-border-color);
+    .btn::before {
+        display: none;
     }
 
-    &:active {
-        background-color: var(--btn-bg-active);
-    }
-
-    &:disabled {
-        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
-        background-color: transparent !important;
-        color: color-mix(in srgb, var(--btn-border-color) 50%, transparent);
-        border-color: color-mix(
-            in srgb,
-            var(--btn-border-color) 30%,
-            transparent
-        );
-    }
-}
-
-.dark .btn.regular.outline-btn {
-    --btn-border-color: var(--color-text);
-    --btn-bg: var(--color-text);
-
-    &:hover {
-        --btn-bg: var(--btn-regular-bg);
-    }
-}
-
-.btn.plain {
-    --btn-bg-hover: var(--color-subtle);
-    --btn-color: var(--color-text);
-    --btn-bg-active: var(--color-subtle-dark);
-    background-color: transparent;
-    border-color: transparent;
-    color: inherit;
-
-    &:hover {
+    .btn:hover {
         background-color: var(--btn-bg-hover);
-        color: var(--btn-regular-color);
+        color: var(--btn-color);
     }
 
-    &:active {
+    .btn:active {
         background-color: var(--btn-bg-active);
+        color: var(--color-body-bg);
     }
 
-    &:disabled {
-        /* biome-ignore lint/complexity/noImportantStyles: must be overriden */
-        background-color: transparent !important;
-        color: inherit;
-        opacity: 0.5;
+    .btn.danger {
+        --btn-color: var(--btn-danger-bg);
     }
 }
 
-.btn.icon-only {
-    min-height: 2rem;
-}
+.tooltip {
+    @apply py-1 px-2 select-none rounded-xl text-xs elevation-2 surface-level-2;
 
-.btn.sm {
-    @apply gap-1 py-0.5 px-2 text-sm;
+    margin: unset;
+    inset: unset;
+    top: 5px;
+    justify-self: anchor-center;
+    min-width: anchor-size(width);
+    width: max-content;
+    position-area: bottom center;
 
-    & > svg {
-        @apply size-3;
+    transition:
+        opacity 150ms cubic-bezier(0, 0.72, 0.74, 1),
+        transform 150ms cubic-bezier(0, 0.72, 0.74, 1);
+
+    &:popover-open {
+        opacity: 1;
+        transform: scale(1);
     }
 
-    &.icon-only {
-        min-height: 1.5rem;
-    }
-}
-
-.btn.lg {
-    @apply text-lg font-semibold;
-
-    & > svg {
-        @apply size-6;
-    }
-
-    &.icon-only {
-        min-height: 2.2rem;
+    @starting-style {
+        &:popover-open {
+            opacity: 0.95;
+            transform: scale(0.95);
+        }
     }
 }

@@ -41,28 +41,18 @@ export function InterfaceSettingsTab() {
             </header>
 
             <div className="settings-section">
-                <Form
-                    className="input-field sm:mb-0 md:grid grid-cols-6 space-y-1 sm:space-y-0 lg:gap-2"
-                    action={displayNameFormAction}
-                >
-                    <label
-                        htmlFor="account.name"
-                        className="flex items-center mt-4 sm:mt-0 font-semibold text-sm"
-                    >
+                <Form className="input-field" action={displayNameFormAction}>
+                    <label htmlFor="account.name" className="">
                         {t.NameInputLabel}
                     </label>
                     <input
                         type="text"
                         name="account.name"
-                        className="input py-1.5 px-1.5 col-span-5 lg:col-span-4"
+                        className="input"
                         defaultValue={displayName}
                         required
                     />
-                    <Button
-                        variant="primary"
-                        type="submit"
-                        className="mt-1 col-start-6 lg:py-1 lg:mt-0"
-                    >
+                    <Button variant="primary" type="submit">
                         {t.NameInputSaveLabel}
                     </Button>
                 </Form>
@@ -83,20 +73,21 @@ export function InterfaceSettingsTab() {
                     {t.SectionControls}
                 </h3>
 
-                <div className="grid xs:grid-cols-2 gap-2 tablet:gap-4">
-                    <Checkbox
-                        label={t.LabelEnableVimKeybindings}
-                        name="controls.vim"
-                        value={controls.vim}
-                        onChange={onChangeControlVim}
-                    />
-                    <Checkbox
-                        label={t.LabelEnableDoubleClickToEdit}
-                        name="controls.doubleClickEdit"
-                        value={controls.doubleClickToEdit}
-                        onChange={onChangeControlDoubleClickToEdit}
-                    />
-                </div>
+                <Checkbox
+                    label={t.LabelEnableVimKeybindings}
+                    name="controls.vim"
+                    value={controls.vim}
+                    onChange={onChangeControlVim}
+                />
+
+                <hr />
+
+                <Checkbox
+                    label={t.LabelEnableDoubleClickToEdit}
+                    name="controls.doubleClickEdit"
+                    value={controls.doubleClickToEdit}
+                    onChange={onChangeControlDoubleClickToEdit}
+                />
             </div>
         </>
     )
@@ -207,7 +198,7 @@ function ThemeSelection() {
                             setMode("auto")
                         }}
                     >
-                        <SunHorizonIcon />
+                        <SunHorizonIcon className="icon" aria-hidden="true" />
                         {tColours.ModeAuto}
                     </button>
 
@@ -222,7 +213,7 @@ function ThemeSelection() {
                             setMode("light")
                         }}
                     >
-                        <SunIcon />
+                        <SunIcon className="icon" aria-hidden="true" />
                         {tColours.ModeLight}
                     </button>
 
@@ -237,7 +228,7 @@ function ThemeSelection() {
                             setMode("dark")
                         }}
                     >
-                        <MoonIcon />
+                        <MoonIcon className="icon" aria-hidden="true" />
                         {tColours.ModeDark}
                     </button>
                 </div>

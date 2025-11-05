@@ -11,10 +11,9 @@ export function AboutTab() {
         <div className="flex flex-col h-full">
             <header className="text-center">
                 <h2 className="block">{t.Title}</h2>
-                <span className="block">{buildInfo.version}</span>
             </header>
 
-            <div className="settings-section flex-1 flex flex-col justify-between">
+            <div className="settings-section">
                 <dl>
                     <div className="flex gap-2">
                         <dt>{t.VersionLabel}</dt>
@@ -37,7 +36,9 @@ export function AboutTab() {
 
                     {buildInfo.server && (
                         <>
+                            <hr />
                             <div className="flex gap-2">
+                                memolistitem
                                 <dt>{t.ServerVersionLabel}</dt>
                                 <dd className="font-semibold">
                                     {buildInfo.server.version}
@@ -56,9 +57,24 @@ export function AboutTab() {
                         </>
                     )}
                 </dl>
+            </div>
 
+            <div className="settings-section">
+                <div className="flex gap-2">
+                    <dt>{t.IconLicenseLabel}</dt>
+                    <dd className="font-semibold">
+                        <a href="https://github.com/saoudi-h/solar-icons">Solar Icons</a>
+                        CC BY 4.0 by{" "}
+                        <a href="https://www.figma.com/community/file/1166831539721848736">
+                            480 Design
+                        </a>
+                    </dd>
+                </div>
+            </div>
+
+            <div className="flex-1 flex justify-center items-end">
                 <a
-                    className="block text-center text-primary hover:underline text-xs"
+                    className="block text-center text-primary hover:underline text-xs mt-2"
                     target="_github"
                     href={buildInfo.projectLink}
                 >

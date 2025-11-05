@@ -14,7 +14,7 @@ suite("lib/KVStore/EncryptedKVStore", () => {
     afterAll(() => cancel())
 
     test("crud", async () => {
-        let backingKV = new TestInMemKVStore<Record<"a" | "b", ArrayBufferLike>>()
+        let backingKV = new TestInMemKVStore<Record<"a" | "b", ArrayBuffer>>()
 
         let crypto = new AgeCrypto()
         await crypto.init(await toPromise(crypto.generatePrivateKey()))

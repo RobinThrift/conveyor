@@ -18,7 +18,9 @@ sql:
         type: "Uint8Array<ArrayBufferLike>"
 
       - column: memos.created_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -27,7 +29,9 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: memos.updated_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -45,7 +49,9 @@ sql:
         type: "boolean"
 
       - column: memos_fts.created_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -54,7 +60,9 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: memos_fts.updated_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -63,7 +71,9 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: tags.created_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -72,7 +82,9 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: tags.updated_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -84,7 +96,9 @@ sql:
         type: "Uint8Array<ArrayBufferLike>"
 
       - column: attachments.created_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -93,7 +107,9 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: changelog.timestamp
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -103,7 +119,10 @@ sql:
 
 
       - column: changelog.applied_at
-        type: "Date | undefined"
+        type: 
+          name: "ZonedDateTime"
+          optional: true
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -112,7 +131,10 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: changelog.synced_at
-        type: "Date | undefined"
+        type: 
+          name: "ZonedDateTime"
+          optional: true
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -121,7 +143,9 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: changelog.created_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -130,7 +154,10 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: chlg_page_after_date
-        type: "Date | undefined"
+        type: 
+          name: "ZonedDateTime"
+          optional: true
+          import: "temporal-polyfill"
         to_sql:
           fn: "dateToSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -146,13 +173,18 @@ sql:
           fn: "JSON.stringify"
 
       - column: page_after
-        type: "Date | undefined"
+        type: 
+          name: "ZonedDateTime"
+          optional: true
+          import: "temporal-polyfill"
         to_sql:
           fn: "dateToSQLite"
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: auth_token.expires_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"
@@ -161,7 +193,9 @@ sql:
           import: "@/storage/database/sqlite/types/datetime"
 
       - column: auth_token.refresh_expires_at
-        type: "Date"
+        type: 
+          name: "ZonedDateTime"
+          import: "temporal-polyfill"
         from_sql:
           fn: "dateFromSQLite"
           import: "@/storage/database/sqlite/types/datetime"

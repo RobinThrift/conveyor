@@ -29,7 +29,7 @@ export const InitSetup: Story = {
         let nav = useNavigation()
 
         useEffect(() => {
-            nav.push("setup", {}, { scrollOffsetTop: 0 })
+            nav.push("setup", {})
         }, [nav.push])
 
         useEffect(() => {

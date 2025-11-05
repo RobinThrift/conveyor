@@ -1,4 +1,3 @@
-import { NavigationController } from "@/control/NavigationController"
 import { setEnv } from "@/env"
 import { AgeCrypto } from "@/external/age/AgeCrypto"
 import { IndexedDBKVStoreContainer } from "@/external/browser/IndexDBKVStore"
@@ -7,7 +6,6 @@ import { SQLite } from "@/external/browser/sqlite"
 import { WebCryptoDeviceSecureStorage } from "@/external/browser/WebCryptoDeviceSecureStorage"
 import { BaseContext } from "@/lib/context"
 import { type DeviceSecureStorage, NoopDeviceSecureStorage } from "@/lib/DeviceSecureStorage"
-import { RemoteNavigationBackend } from "@/lib/navigation"
 import { toPromise } from "@/lib/result"
 import type { KVStores, PlatformDependencies, PlatformInitArgs } from "./types"
 
@@ -34,7 +32,7 @@ export async function init({ fs, db }: PlatformInitArgs): Promise<PlatformDepend
         (IndexedDBKVStoreContainer<KVStores>).open(
             ctx,
             "conveyor",
-            ["setup", "auth", "sync", "setup"],
+            ["auth", "sync", "setup", "ui"],
             2,
         ),
     )
@@ -47,10 +45,6 @@ export async function init({ fs, db }: PlatformInitArgs): Promise<PlatformDepend
         crypto: new AgeCrypto(),
         keyValueContainer: indexedDBKVStoreContainer,
         deviceSecureStorage,
-        navigationBackend: new RemoteNavigationBackend(
-            self.postMessage.bind(self),
-            NavigationController.screenToStackMapping,
-        ),
     }
 }
 

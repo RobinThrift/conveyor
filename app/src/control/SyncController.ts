@@ -1,3 +1,4 @@
+import type { Temporal } from "temporal-polyfill"
 import { type AccountKey, PrimaryAccountKeyName } from "@/domain/AccountKey"
 import { ATTACHMENT_BASE_DIR } from "@/domain/Attachment"
 import type {
@@ -17,6 +18,7 @@ import type { DBExec, Transactioner } from "@/lib/database"
 import { Second } from "@/lib/duration"
 import { createErrType } from "@/lib/errors"
 import { type FS, join } from "@/lib/fs"
+import { calendarDateTimeFromDate, temporalToDate } from "@/lib/i18n"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import type { SingleItemKVStore } from "@/lib/KVStore/SingleItemKVStore"
 import { type AsyncResult, all, Err, Ok, wrapErr } from "@/lib/result"
@@ -141,7 +143,7 @@ export class SyncController {
         return this._transactioner.inTransaction(ctx, async (ctx) => {
             let [_, fetchRemoteEntriesErr] = await this._fetchChangelogEntries(
                 ctx,
-                info.lastSyncedAt,
+                info.lastSyncedAt ? calendarDateTimeFromDate(info.lastSyncedAt) : undefined,
             )
             if (fetchRemoteEntriesErr) {
                 return Err(fetchRemoteEntriesErr)
@@ -238,7 +240,7 @@ export class SyncController {
         let entryIDs = [] as ChangelogEntryID[]
 
         let hasNextPage = true
-        let after: [number, Date] | undefined
+        let after: [number, Temporal.ZonedDateTime] | undefined
         while (hasNextPage) {
             let [page, pageErr] = await this._changelog.listUnapplidChangelogEntries(ctx, {
                 pagination: {
@@ -305,7 +307,10 @@ export class SyncController {
         "SyncController",
         "error fetching changelog entries from sync server",
     )
-    private async _fetchChangelogEntries(ctx: Context, since?: Date): AsyncResult<void> {
+    private async _fetchChangelogEntries(
+        ctx: Context,
+        since?: Temporal.ZonedDateTime,
+    ): AsyncResult<void> {
         let [encrytpedEntries, fetchErr] = await this._syncAPIClient.listChangelogEntries(
             ctx,
             since,
@@ -333,7 +338,7 @@ export class SyncController {
     )
     private async _uploadChangelogEntries(ctx: Context): AsyncResult<void> {
         let hasNextPage = true
-        let after: [number, Date] | undefined
+        let after: [number, Temporal.ZonedDateTime] | undefined
         while (hasNextPage) {
             let [page, pageErr] = await this._changelog.listUnsyncedChangelogEntries(ctx, {
                 pagination: {
@@ -423,7 +428,7 @@ export class SyncController {
             encrytpedEntries.push({
                 syncClientID: clientID,
                 data: encodeToBase64(new Uint8Array(encrypted)),
-                timestamp: entry.timestamp,
+                timestamp: temporalToDate(entry.timestamp),
             })
         }
 
@@ -517,15 +522,18 @@ export class SyncController {
 interface SyncAPIClient {
     setBaseURL(baseURL: string): void
     registerClient(ctx: Context, syncClient: { clientID: string }): AsyncResult<void>
-    getFullSync(ctx: Context): AsyncResult<ArrayBufferLike>
-    uploadFullSyncData(ctx: Context, data: ArrayBufferLike): AsyncResult<void>
-    listChangelogEntries(ctx: Context, since?: Date): AsyncResult<EncryptedChangelogEntry[]>
+    getFullSync(ctx: Context): AsyncResult<ArrayBuffer>
+    uploadFullSyncData(ctx: Context, data: ArrayBuffer): AsyncResult<void>
+    listChangelogEntries(
+        ctx: Context,
+        since?: Temporal.ZonedDateTime,
+    ): AsyncResult<EncryptedChangelogEntry[]>
     uploadChangelogEntries(ctx: Context, entries: EncryptedChangelogEntry[]): AsyncResult<void>
     uploadAttachment(
         ctx: Context,
         attachment: {
             filepath: string
-            data: Uint8Array<ArrayBufferLike>
+            data: Uint8Array<ArrayBuffer>
         },
     ): AsyncResult<void>
 }
@@ -564,7 +572,7 @@ interface Changelog {
         args: {
             pagination: {
                 pageSize: number
-                after?: [number, Date]
+                after?: [number, Temporal.ZonedDateTime]
             }
         },
     ): AsyncResult<ChangelogEntryList>
@@ -574,7 +582,7 @@ interface Changelog {
         args: {
             pagination: {
                 pageSize: number
-                after?: [number, Date]
+                after?: [number, Temporal.ZonedDateTime]
             }
         },
     ): AsyncResult<ChangelogEntryList>

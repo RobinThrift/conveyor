@@ -2,7 +2,7 @@
 @import "../styles/tailwind.css";
 
 .devtools {
-    @apply fixed inset-0 overscroll-contain pointer-events-none flex items-center justify-center tablet:justify-end;
+    @apply hidden inset-0 overscroll-contain pointer-events-none flex items-center justify-center tablet:justify-end;
     z-index: 100000;
 
     &.is-open {
@@ -50,7 +50,7 @@
     box-shadow: var(--surface-box-shadow);
 
     &:hover {
-        @apply bg-surface-level-1 border-subtle-light shadow;
+        @apply bg-surface-level-1 border-neutral-light shadow;
     }
 }
 
@@ -106,7 +106,7 @@
     @apply p-2 flex gap-2 items-center justify-end border border-surface-border rounded-lg bg-surface-level-1/80 sticky top-0 backdrop-blur-sm shadow h-12;
 
     input {
-        @apply border border-subtle rounded-lg flex-1 py-1 px-2 bg-surface-level-1;
+        @apply border border-neutral rounded-lg flex-1 py-1 px-2 bg-surface-level-1;
     }
 }
 
@@ -133,11 +133,11 @@
 }
 
 .devtools-entry-list-item-timing {
-    @apply flex items-center justify-between w-full font-mono text-xs text-subtle-extra-dark;
+    @apply flex items-center justify-between w-full font-mono text-xs text-neutral-extra-dark;
 }
 
 .devtools-entry-list-item-additional-info {
-    @apply flex items-center justify-between w-full font-mono text-xs text-subtle-extra-dark;
+    @apply flex items-center justify-between w-full font-mono text-xs text-neutral-extra-dark;
 }
 
 .devtools-entry-list-item-details {
@@ -155,7 +155,7 @@
 }
 
 .devtools-span-gantt-item-name {
-    @apply pr-2 border-r border-subtle text-sm font-mono py-2 cursor-pointer;
+    @apply pr-2 border-r border-neutral text-sm font-mono py-2 cursor-pointer;
     width: 30%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -211,7 +211,7 @@
 }
 
 .devtools-stack-trace-location-file {
-    @apply text-subtle-extra-dark;
+    @apply text-neutral-extra-dark;
 }
 
 .jsondiffpatch-delta {
@@ -234,7 +234,8 @@ ul.jsondiffpatch-delta {
 .jsondiffpatch-added .jsondiffpatch-value pre,
 .jsondiffpatch-modified .jsondiffpatch-right-value pre,
 .jsondiffpatch-textdiff-added {
-    @apply bg-success text-success-contrast;
+    background-color: green;
+    color: white;
 }
 
 .jsondiffpatch-deleted .jsondiffpatch-property-name,
@@ -246,7 +247,7 @@ ul.jsondiffpatch-delta {
 }
 
 .jsondiffpatch-unchanged {
-    @apply text-subtle-light hidden;
+    @apply text-neutral-light hidden;
 }
 
 .jsondiffpatch-unchanged {

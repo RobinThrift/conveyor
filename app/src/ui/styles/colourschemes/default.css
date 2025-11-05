@@ -2,18 +2,18 @@
     --font-monospace: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
     --editor-font-size: 16px;
 
-    --color-body-bg: oklch(1 0 0);
+    /* LIGHT */
+    --color-body-bg: oklch(1 0 none);
     --color-body-bg-contrast: oklch(
-        0.16270890479030045 0.010526898777742726 294.36951261965186
+        0.8121176004264726 0.0055486795366074875 286.2754413828527
     );
+    --color-surface-level-1: oklch(0.9821176395629414 0 none);
+    --color-surface-level-2: oklch(0.9761 0 0);
+    --color-surface-level-3: oklch(1 0 none);
+    --color-surface-border: oklch(0.934 0 0);
     --color-text: oklch(
         0.33376242597354233 0.03149811465277374 287.10370894961204
     );
-
-    --color-surface-level-1: oklch(0.9821 0 0);
-    --color-surface-level-2: oklch(1 0 0);
-    --color-surface-border: oklch(0.9461 0 0);
-
     --color-modal-overlay-bg: oklch(
         0.3493298443199242 0.027958668146576125 279.2651679991495
     );
@@ -75,79 +75,69 @@
         0.29742957065359416 0.09621651199542848 28.809620744149292
     );
 
-    --color-subtle-contrast: oklch(
+    --color-neutral-contrast: oklch(
         0.9529244319390684 0.0024576818828963764 261.3495634464626
     );
-    --color-subtle-extra-light: oklch(
+    --color-neutral-extra-light: oklch(
         0.9132536644486704 0.004556686470444329 261.34906281405074
     );
-    --color-subtle-light: oklch(
+    --color-neutral-light: oklch(
         0.6304028019150232 0.02056738168333245 261.31301259165616
     );
-    --color-subtle: oklch(
+    --color-neutral: oklch(
         0.5291941012967329 0.020696331000106195 261.2976631359558
     );
-    --color-subtle-dark: oklch(
+    --color-neutral-dark: oklch(
         0.4560965693859672 0.01735983607247956 261.30029507434676
     );
-    --color-subtle-extra-dark: oklch(
+    --color-neutral-extra-dark: oklch(
         0.2856602835945519 0.009470984066512492 261.31184646774017
     );
 
-    --btn-regular-bg: var(--color-body-bg-contrast);
-    --btn-regular-bg-hover: color-mix(
-        in srgb,
-        var(--btn-regular-bg) 90%,
-        white
-    );
-    --btn-regular-bg-active: color-mix(
-        in srgb,
-        var(--btn-regular-bg) 70%,
-        black
-    );
-    --btn-regular-border-color: color-mix(
-        in srgb,
-        var(--btn-regular-bg) 50%,
-        black
-    );
-    --btn-regular-color: var(--color-body);
+    --btn-bg: var(--color-surface-level-1);
+    --btn-bg-hover: var(--color-neutral-extra-light);
+    --btn-bg-active: var(--color-neutral-extra-light);
+    --btn-border-color: var(--color-neutral-extra-light);
+    --btn-color: var(--color-text);
 
-    --btn-bg: var(--btn-regular-bg);
-    --btn-bg-hover: var(--btn-regular-bg-hover);
-    --btn-bg-active: var(--btn-regular-bg-active);
-    --btn-border-color: var(--btn-regular-border-color);
-    --btn-color: var(--btn-regular-color);
-
-    --btn-primary-bg: var(--color-primary);
-    --btn-primary-bg-hover: var(--color-primary-dark);
-    --btn-primary-bg-active: var(--color-primary-extra-dark);
-    --btn-primary-border-color: var(--color-primary-dark);
+    --btn-primary-bg: var(--color-primary-dark);
+    --btn-primary-bg-hover: var(--color-primary);
+    --btn-primary-bg-active: var(--color-primary-dark);
+    --btn-primary-border-color: var(--color-primary-extra-light);
     --btn-primary-color: var(--color-primary-contrast);
 
-    --btn-success-bg: var(--color-success);
-    --btn-success-bg-hover: var(--color-success-dark);
-    --btn-success-bg-active: var(--color-success-extra-dark);
-    --btn-success-border-color: var(--color-success-dark);
-    --btn-success-color: var(--color-primary-contrast);
-
     --btn-danger-bg: var(--color-danger);
-    --btn-danger-bg-hover: var(--color-danger-dark);
-    --btn-danger-bg-active: var(--color-danger-extra-dark);
-    --btn-danger-border-color: var(--color-danger-dark);
+    --btn-danger-bg-hover: var(--color-danger-extra-light);
+    --btn-danger-bg-active: var(--color-danger-dark);
+    --btn-danger-border-color: var(--color-danger-light);
     --btn-danger-color: var(--color-danger-contrast);
+
+    --glass-hightlight-intensity: 0.5;
+    --glass-shadow-intensity: 0.8;
+
+    --glass-highlight: var(--color-surface-level-2);
+    --glass-shadow: var(--color-surface-border);
 }
 
 .dark {
-    --color-body-bg: oklch(0.23929237775790413 0 none);
-    --color-body-bg-contrast: oklch(0.9791293560100793 0 none);
-
-    --color-text: oklch(0.9791293560100793 0 none);
-
-    --color-surface-level-1: oklch(0.305191278401601 0 none);
-    --color-surface-level-2: oklch(0.3863 0.0235 265.69);
-    --color-surface-border: oklch(0.214 0.0274 265.08);
-
-    --color-modal-overlay-bg: oklch(0.23929237775790413 0 none);
+    --color-body-bg: oklch(0 0 none);
+    --color-body-bg-contrast: oklch(
+        0.23991459451341274 0.007752981964964102 274.6164943534163
+    );
+    --color-surface-level-1: oklch(0.1912512996316179 0 none);
+    --color-surface-level-2: oklch(
+        0.22685894259247644 0.0019088282100796796 286.246512289289
+    );
+    --color-surface-level-3: oklch(
+        0.29025526441416916 0.005396977622741286 286.058681282055
+    );
+    --color-surface-border: oklch(
+        0.3293398417127451 0.0017376050306777008 286.30383762572905
+    );
+    --color-text: oklch(1.0000000000000002 0 none);
+    --color-modal-overlay-bg: oklch(
+        0.23991459451341274 0.007752981964964102 274.6164943534163
+    );
 
     --color-primary-contrast: oklch(
         0.9567699023017434 0.006947286903899158 215.94121834431942
@@ -172,7 +162,7 @@
         0.9764403987561733 0.017899958843892904 140.14550272504582
     );
     --color-success-extra-light: oklch(
-        0.9016935319255218 0.07689883699170709 140.0792849796396
+        0.9531171818425724 0.03595785572151465 140.12445262473696
     );
     --color-success-light: oklch(
         0.8152276871628413 0.1477321045134907 140.0661294243009
@@ -184,14 +174,14 @@
         0.700814368037119 0.19728877539269774 140.45108726042812
     );
     --color-success-extra-dark: oklch(
-        0.5650958772846122 0.15634897526096317 140.4080530832152
+        0.4206495788575725 0.11229982816301451 140.3343026240954
     );
 
     --color-danger-contrast: oklch(
         0.9514761292073936 0.01862944957095012 23.048424972168515
     );
     --color-danger-extra-light: oklch(
-        0.800245019527713 0.08525950819175038 24.26672491293
+        0.9033682647596444 0.03830189485273601 23.327855041347483
     );
     --color-danger-light: oklch(
         0.629573511206021 0.1800710874555857 27.929740628458894
@@ -203,33 +193,32 @@
         0.47784972218479466 0.16704086118803413 29.378309628453206
     );
     --color-danger-extra-dark: oklch(
-        0.3948215842047008 0.13480662707511173 29.2092526875912
+        0.29742957065359416 0.09621651199542848 28.809620744149292
     );
 
-    --color-subtle-contrast: oklch(0.9695514631549106 0 none);
-    --color-subtle-extra-light: oklch(0.8767110099126372 0 none);
-    --color-subtle-light: oklch(0.7407445034213674 0 none);
-    --color-subtle: oklch(0.6762720783634917 0 none);
-    --color-subtle-dark: oklch(0.5721705162728314 0 none);
-    --color-subtle-extra-dark: oklch(0.47406349026815725 0 none);
+    --color-neutral-contrast: oklch(
+        0.9533769981791013 0.0009364860271697715 286.38183601049474
+    );
+    --color-neutral-extra-light: oklch(
+        0.9140859067755436 0.0017354811170507119 286.36523280010283
+    );
+    --color-neutral-light: oklch(
+        0.6251430187998572 0.008002459416565348 286.16592160628215
+    );
+    --color-neutral: oklch(
+        0.5290581789799875 0.007784533284869123 286.1306119922891
+    );
+    --color-neutral-dark: oklch(
+        0.4498542694954821 0.006424204552064013 286.1386190876261
+    );
+    --color-neutral-extra-dark: oklch(
+        0.28722767612010475 0.003591889158692337 286.17136941953794
+    );
 
-    --btn-primary-bg: var(--color-primary);
-    --btn-primary-bg-hover: var(--color-primary-dark);
-    --btn-primary-bg-active: var(--color-primary-extra-dark);
-    --btn-primary-border-color: var(--color-primary-dark);
-    --btn-primary-color: var(--color-primary-contrast);
+    --btn-bg: var(--color-surface-level-3);
 
-    --btn-success-bg: var(--color-success);
-    --btn-success-bg-hover: var(--color-success-dark);
-    --btn-success-bg-active: var(--color-success-extra-dark);
-    --btn-success-border-color: var(--color-success-dark);
-    --btn-success-color: var(--color-primary-contrast);
-
-    --btn-danger-bg: var(--color-danger);
-    --btn-danger-bg-hover: var(--color-danger-dark);
-    --btn-danger-bg-active: var(--color-danger-extra-dark);
-    --btn-danger-border-color: var(--color-danger-dark);
-    --btn-danger-color: var(--color-danger-contrast);
+    --glass-highlight: rgba(255 255 255 / 0.5);
+    --glass-shadow: var(--color-surface-border);
 }
 
 /* Code */

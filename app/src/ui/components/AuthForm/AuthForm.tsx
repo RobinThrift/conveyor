@@ -70,7 +70,7 @@ export function AuthForm(props: AuthFormProps) {
                 />
 
                 <div className="flex justify-end items-center mt-2">
-                    <Button variant="primary" type="submit" isDisabled={isLoading}>
+                    <Button variant="primary" type="submit" disabled={isLoading}>
                         {t.AuthenticateButtonLabel}
                     </Button>
                 </div>

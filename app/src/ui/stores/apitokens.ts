@@ -1,3 +1,5 @@
+import type { Temporal } from "temporal-polyfill"
+
 import type { BackendClient } from "@/backend/BackendClient"
 import type { APIToken } from "@/domain/APIToken"
 import { goBackOnePage } from "@/domain/Pagination"
@@ -29,7 +31,7 @@ export const error = createStore<Error | undefined>("apitokens/error", undefined
 export const createRequet = createStore<
     | {
           name: string
-          expiresAt: Date
+          expiresAt: Temporal.ZonedDateTime
           state: "requested"
       }
     | {
@@ -104,7 +106,7 @@ export const actions = createActions({
         })
     },
 
-    createAPIToken: (token: { name: string; expiresAt: Date }) => {
+    createAPIToken: (token: { name: string; expiresAt: Temporal.ZonedDateTime }) => {
         createRequet.setState({
             state: "requested",
             name: token.name,

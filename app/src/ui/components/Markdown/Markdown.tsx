@@ -8,6 +8,7 @@ import { Link } from "@/ui/components/Link"
 
 import { Code } from "./Code"
 import { customBlocks } from "./customBlocks"
+import { TagLink } from "./TagLink"
 
 export interface MarkdownProps {
     ref?: React.Ref<HTMLDivElement>
@@ -22,7 +23,7 @@ export function Markdown(props: MarkdownProps) {
         let [ast, err] = parse(props.children)
         if (err) {
             return (
-                <Alert variant="danger">
+                <Alert>
                     {err.name}: {err.message}
                     {err.stack && (
                         <pre>
@@ -40,6 +41,7 @@ export function Markdown(props: MarkdownProps) {
                 Code,
                 Image: ZoomableImage,
                 FootnoteReturnIcon: ArrowUDownLeftIcon,
+                TagLink,
             },
             customBlocks,
         })

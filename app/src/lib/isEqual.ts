@@ -1,4 +1,5 @@
-import { CalendarDate } from "@internationalized/date"
+import { Temporal } from "temporal-polyfill"
+
 import { isPlainObject } from "./isPlainObject"
 import { isPrimitive } from "./isPrimitive"
 
@@ -44,20 +45,54 @@ export function isEqual(a: any, b: any): boolean {
         )
     }
 
-    if (type === "CalendarDate") {
-        return a.compare(b) === 0
+    if (type === "Temporal.PlainDate") {
+        return Temporal.PlainDate.compare(a, b) === 0
+    }
+
+    if (type === "Temporal.PlainDateTime") {
+        return Temporal.PlainDateTime.compare(a, b) === 0
+    }
+
+    if (type === "Temporal.ZonedDateTime") {
+        return Temporal.ZonedDateTime.compare(a, b) === 0
     }
 
     throw new Error("Unreachable")
 }
 
 function getType(value: any) {
-    if (isPrimitive(value)) return "primitive"
-    if (Array.isArray(value)) return "array"
-    if (value instanceof Map) return "map"
-    if (value instanceof Date) return "date"
-    if (isPlainObject(value)) return "plainObject"
-    if (value instanceof CalendarDate) return "CalendarDate"
+    if (isPrimitive(value)) {
+        return "primitive"
+    }
+
+    if (Array.isArray(value)) {
+        return "array"
+    }
+
+    if (value instanceof Map) {
+        return "map"
+    }
+
+    if (value instanceof Date) {
+        return "date"
+    }
+
+    if (isPlainObject(value)) {
+        return "plainObject"
+    }
+
+    if (value instanceof Temporal.PlainDate) {
+        return "Temporal.PlainDate"
+    }
+
+    if (value instanceof Temporal.PlainDateTime) {
+        return "Temporal.PlainDateTime"
+    }
+
+    if (value instanceof Temporal.ZonedDateTime) {
+        return "Temporal.ZonedDateTime"
+    }
+
     throw new Error(
         `deeply comparing an instance of type ${value.constructor?.name} is not supported.`,
     )

@@ -32,6 +32,19 @@ export async function fromAsyncFn<T, Fn extends () => Promise<T>, E extends Erro
     }
 }
 
+export function mapResult<A, B, AErr extends Error = Error, BErr extends Error = AErr>(
+    r: Result<A, AErr>,
+    fn: (a: A) => B,
+    fnErr?: (aErr: AErr) => BErr,
+): Result<B, BErr> {
+    let [v, err] = r
+    if (err) {
+        return Err(fnErr?.(err) || (err as unknown as BErr))
+    }
+
+    return Ok(fn(v))
+}
+
 export function Ok<T, E extends Error = Error>(value: PromiseLike<T>): AsyncResult<T, E>
 export function Ok<T, E extends Error = Error>(value: T): Result<T, E>
 export function Ok<T extends undefined, E extends Error = Error>(value?: T): Result<T, E>

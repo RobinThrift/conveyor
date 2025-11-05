@@ -1,3 +1,5 @@
+import type { Temporal } from "temporal-polyfill"
+
 import type { APIToken, APITokenList } from "@/domain/APIToken"
 import type { Pagination } from "@/domain/Pagination"
 import type { Context } from "@/lib/context"
@@ -99,7 +101,7 @@ export class APITokensV1APIClient {
         )
 
         if (deserializationErr) {
-            return wrapErr`${new APITokensV1APIClient.ErrListAPITokens()} (${this._baseURL}): error deserilising data: ${deserializationErr}`
+            return wrapErr`${new APITokensV1APIClient.ErrListAPITokens()} (${this._baseURL}): error deserialising data: ${deserializationErr}`
         }
 
         return Ok(tokens)
@@ -139,7 +141,7 @@ export class APITokensV1APIClient {
 
         let [token, deserializationErr] = jsonDeserialize<{ token: string }>(await res.text())
         if (deserializationErr) {
-            return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()} (${this._baseURL}): error deserilising data: ${deserializationErr}`
+            return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()} (${this._baseURL}): error deserialising data: ${deserializationErr}`
         }
 
         return Ok(token)
@@ -206,5 +208,5 @@ interface TokenStorage {
 
 export interface CreateAPITokenRequest {
     name: string
-    expiresAt: Date
+    expiresAt: Temporal.ZonedDateTime
 }

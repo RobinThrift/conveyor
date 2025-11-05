@@ -22,12 +22,12 @@ export class EncryptedRemoteAttachmentFetcher {
     public async getAttachmentDataByFilepath(
         ctx: Context,
         filepath: string,
-    ): AsyncResult<ArrayBufferLike> {
+    ): AsyncResult<ArrayBuffer> {
         let [data, err] = await this._syncAPIClient.getAttachmentDataByFilepath(ctx, filepath)
         if (err) {
             return Err(err)
         }
 
-        return this._decrypter.decryptData(new Uint8Array(data))
+        return this._decrypter.decryptData(new Uint8Array(data) as Uint8Array<ArrayBuffer>)
     }
 }

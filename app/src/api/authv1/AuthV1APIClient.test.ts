@@ -36,9 +36,9 @@ suite("api/syncv1/AuthV1APIClient", async () => {
                     return HttpResponse.json(
                         {
                             accessToken: "MOCK_ACCESS_TOKEN",
-                            expiresAt: now.add({ hours: 1 }).toDate("utc"),
+                            expiresAt: now.add({ hours: 1 }).withTimeZone("utc"),
                             refreshToken: "MOCK_REFRESH_TOKEN",
-                            refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
+                            refreshExpiresAt: now.add({ days: 30 }).withTimeZone("utc"),
                         },
                         { status: 201 },
                     )
@@ -152,9 +152,9 @@ suite("api/syncv1/AuthV1APIClient", async () => {
                     return HttpResponse.json(
                         {
                             accessToken: "MOCK_ACCESS_TOKEN",
-                            expiresAt: now.add({ hours: 1 }).toDate("utc"),
+                            expiresAt: now.add({ hours: 1 }).withTimeZone("utc"),
                             refreshToken: "MOCK_REFRESH_TOKEN",
-                            refreshExpiresAt: now.add({ days: 30 }).toDate("utc"),
+                            refreshExpiresAt: now.add({ days: 30 }).withTimeZone("utc"),
                         },
                         { status: 201 },
                     )

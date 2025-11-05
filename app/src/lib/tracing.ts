@@ -124,7 +124,14 @@ export function startSpan<Ctx extends Context>(
 
         end() {
             let mark = performance.mark(`${name}:end`, {
-                detail: toPlainSpan(this),
+                detail: {
+                    ...toPlainSpan(this),
+                    devtools: {
+                        dataType: "track-entry",
+                        track: this.name,
+                        trackGroup: "Spans",
+                    },
+                },
             })
             this.endTime = mark.startTime.valueOf()
         },

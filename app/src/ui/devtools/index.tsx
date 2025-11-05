@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import React, { Suspense, startTransition, useCallback, useEffect, useRef, useState } from "react"
 
-import { FlaskIcon, XIcon } from "../components/Icons"
+import { DevToolsIcon, XIcon } from "../components/Icons"
 import { Loader } from "../components/Loader"
 import { NavDevTool } from "./NavDevTool"
 // import { FPSMeter } from "./FPSMeter"
@@ -81,7 +81,7 @@ export function DevTools() {
                 onClick={() => setIsOpen(true)}
                 tabIndex={0}
             >
-                <FlaskIcon />
+                <DevToolsIcon />
             </button>
 
             {isOpen && (

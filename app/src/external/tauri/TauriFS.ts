@@ -18,7 +18,7 @@ export class TauriFS implements FS {
         )
     }
 
-    public async read(_ctx: Context, filepath: string): AsyncResult<ArrayBufferLike> {
+    public async read(_ctx: Context, filepath: string): AsyncResult<ArrayBuffer> {
         let [_, readyErr] = await this._ready
         if (readyErr) {
             return Err(readyErr)
@@ -36,11 +36,7 @@ export class TauriFS implements FS {
         return Ok(data.buffer)
     }
 
-    public async write(
-        _ctx: Context,
-        filepath: string,
-        content: ArrayBufferLike,
-    ): AsyncResult<number> {
+    public async write(_ctx: Context, filepath: string, content: ArrayBuffer): AsyncResult<number> {
         let [_r, readyErr] = await this._ready
         if (readyErr) {
             return Err(readyErr)

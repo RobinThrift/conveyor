@@ -1,38 +1,39 @@
-@import "./Toolbar.css";
+@import "./EditorToolbar.css";
 @import "./TextEditor.css";
 
 .editor-buttons {
-    @apply p-1 flex items-center justify-between gap-2 w-full relative -top-0.5;
-    height: 1.5lh;
+    @apply p-1 pt-2 flex items-center justify-between gap-2 w-full;
+    /* margin-top: env(safe-area-inset-top, 0px); */
+
+    .btn {
+        @apply aspect-square rounded-full  h-11;
+        isolation: isolate;
+
+        &::before {
+            @apply rounded-full;
+        }
+
+        @media (min-width: 768px) {
+            @apply rounded-2xl;
+            aspect-ratio: unset;
+
+            &::before {
+                @apply rounded-2xl;
+            }
+        }
+    }
 
     &:has(button:only-child) {
         @apply justify-end;
     }
-}
 
-.editor {
-    @apply flex flex-col bg-body;
-    @apply dark:border-subtle-extra-dark;
-
-    @media (min-width: 768px) {
-        position: relative;
-
-        .editor-toolbar {
-            order: 1;
-        }
-
-        .editor-buttons {
-            order: 2;
-        }
-
-        .text-editor {
-            order: 3;
-        }
+    @container (width >= 700px) {
+        @apply absolute left-2 right-2 top-2;
+        width: auto;
+        margin-top: 0;
     }
 }
 
-.placeholder-btn {
-    @apply appearance-none cursor-text;
-    @apply flex items-start w-full min-h-full text-left p-3 grow;
-    @apply text-subtle-dark font-mono text-[13px];
+.editor {
+    @apply flex flex-col flex-1;
 }

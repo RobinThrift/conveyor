@@ -4,9 +4,6 @@ import type { Context } from "@/lib/context"
 import { CustomErrCode, isErr } from "@/lib/errors"
 import { batch, createActions, createEffect, createStore } from "@/lib/store"
 
-import * as create from "./create"
-import * as single from "./single"
-
 export const list = createStore<Tag[]>("tags/list", [])
 
 export const state = createStore<undefined | "done" | "loading" | "error">("tags/state", undefined)
@@ -90,28 +87,28 @@ export function registerEffects(backend: BackendClient) {
         autoMount: true,
     })
 
-    createEffect("tags/memoCreated", {
-        fn: async () => {
-            actions.setRequiresReload()
-        },
-        deps: [create.lastCreatedMemo],
-        precondition: () => create.status.state === "done",
-        eager: false,
-        autoMount: true,
-    })
+    // createEffect("tags/memoCreated", {
+    //     fn: async () => {
+    //         actions.setRequiresReload()
+    //     },
+    //     deps: [create.lastCreatedMemo],
+    //     precondition: () => create.status.state === "done",
+    //     eager: false,
+    //     autoMount: true,
+    // })
 
-    createEffect("tags/memoUpdated", {
-        fn: async () => {
-            actions.setRequiresReload()
-        },
-        deps: [single.updateRequest, single.status],
-        precondition: () =>
-            typeof single.updateRequest === "undefined" &&
-            single.status.prevState === "loading" &&
-            single.status.state === "done",
-        eager: false,
-        autoMount: true,
-    })
+    // createEffect("tags/memoUpdated", {
+    //     fn: async () => {
+    //         actions.setRequiresReload()
+    //     },
+    //     deps: [single.updateRequest, single.status],
+    //     precondition: () =>
+    //         typeof single.updateRequest === "undefined" &&
+    //         single.status.prevState === "loading" &&
+    //         single.status.state === "done",
+    //     eager: false,
+    //     autoMount: true,
+    // })
 }
 
 if (import.meta.hot) {

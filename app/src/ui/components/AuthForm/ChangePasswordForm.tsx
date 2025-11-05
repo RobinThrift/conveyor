@@ -100,7 +100,7 @@ export function ChangePasswordForm(props: ChangePasswordFormProps) {
             />
 
             <div className="flex justify-end items-center mt-2">
-                <Button type="submit" isDisabled={isLoading}>
+                <Button type="submit" disabled={isLoading}>
                     {t.ChangePasswordButtonLabel}
                 </Button>
             </div>

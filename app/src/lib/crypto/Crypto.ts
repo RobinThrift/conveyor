@@ -1,11 +1,11 @@
 import type { AsyncResult } from "@/lib/result"
 
 export interface Encrypter {
-    encryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike>
+    encryptData(data: Uint8Array<ArrayBuffer>): AsyncResult<ArrayBuffer>
 }
 
 export interface Decrypter {
-    decryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike>
+    decryptData(data: Uint8Array<ArrayBuffer>): AsyncResult<ArrayBuffer>
 }
 
 export type PlaintextPrivateKey = string & { readonly "": unique symbol }

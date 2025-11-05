@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import React from "react"
 
@@ -5,6 +6,7 @@ import { Button } from "@/ui/components/Button"
 
 import "@/ui/styles/index.css"
 
+import clsx from "clsx"
 import { useMemo } from "storybook/internal/preview-api"
 import defaultCSS from "./default.css?inline"
 
@@ -67,82 +69,210 @@ export const Colours: Story = {
         return (
             <div className="flex flex-col gap-10">
                 <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2 border border-subtle rounded-lg flex gap-2 flex-wrap w-fit">
+                    <div className="p-2 border border-neutral rounded-lg flex gap-2 flex-wrap w-fit">
                         {swatches}
                     </div>
 
-                    <div className="p-2 border border-subtle rounded-lg grid grid-cols-4 gap-2 w-full">
+                    <div className="p-2 border border-neutral rounded-lg grid grid-cols-3 gap-2 w-full">
                         <Button variant="regular">Regular</Button>
                         <Button variant="primary">Primary</Button>
                         <Button variant="danger">Danger</Button>
-                        <Button variant="success">Success</Button>
-
-                        <Button variant="regular" outline={true}>
-                            Outline Regular
-                        </Button>
-                        <Button variant="primary" outline={true}>
-                            Outline Primary
-                        </Button>
-                        <Button variant="danger" outline={true}>
-                            Outline Danger
-                        </Button>
-                        <Button variant="success" outline={true}>
-                            Outline Success
-                        </Button>
-
-                        <Button variant="regular" plain={true}>
-                            Regular (Plain)
-                        </Button>
-                        <Button variant="primary" plain={true}>
-                            Primary (Plain)
-                        </Button>
-                        <Button variant="danger" plain={true}>
-                            Danger (Plain)
-                        </Button>
-                        <Button variant="success" plain={true}>
-                            Success (Plain)
-                        </Button>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 dark">
-                    <div className="p-2 border border-subtle rounded-lg flex gap-2 flex-wrap w-fit bg-body">
+                    <div className="p-2 border border-neutral rounded-lg flex gap-2 flex-wrap w-fit bg-body">
                         {swatches}
                     </div>
 
-                    <div className="p-2 border border-subtle rounded-lg grid grid-cols-4 gap-2 w-full bg-body">
+                    <div className="p-2 border border-neutral rounded-lg grid grid-cols-3 gap-2 w-full bg-body">
                         <Button variant="regular">Regular</Button>
                         <Button variant="primary">Primary</Button>
                         <Button variant="danger">Danger</Button>
-                        <Button variant="success">Success</Button>
-
-                        <Button variant="regular" outline={true}>
-                            Outline Regular
-                        </Button>
-                        <Button variant="primary" outline={true}>
-                            Outline Primary
-                        </Button>
-                        <Button variant="danger" outline={true}>
-                            Outline Danger
-                        </Button>
-                        <Button variant="success" outline={true}>
-                            Outline Success
-                        </Button>
-
-                        <Button variant="regular" plain={true}>
-                            Regular (Plain)
-                        </Button>
-                        <Button variant="primary" plain={true}>
-                            Primary (Plain)
-                        </Button>
-                        <Button variant="danger" plain={true}>
-                            Danger (Plain)
-                        </Button>
-                        <Button variant="success" plain={true}>
-                            Success (Plain)
-                        </Button>
                     </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg">
+                        <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                            <img
+                                alt="img-1"
+                                src={faker.image.urlPicsumPhotos({
+                                    width: 600,
+                                    height: 400,
+                                })}
+                            />
+
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                            <img
+                                alt="img-2"
+                                src={faker.image.urlPicsumPhotos({
+                                    width: 600,
+                                    height: 400,
+                                })}
+                            />
+
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                        </div>
+
+                        <div className="surface-level-1 p-2 rounded-2xl elevation-1 absolute left-25 right-25 top-50 -translate-y-1/2">
+                            <h3>Surface Level 1</h3>
+                            {faker.lorem.sentences({ min: 5, max: 10 })}
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg dark bg-body text-text">
+                        <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                            <img
+                                alt="img-1"
+                                src={faker.image.urlPicsumPhotos({
+                                    width: 600,
+                                    height: 400,
+                                })}
+                            />
+
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                            <img
+                                alt="img-2"
+                                src={faker.image.urlPicsumPhotos({
+                                    width: 600,
+                                    height: 400,
+                                })}
+                            />
+
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                        </div>
+
+                        <div className="surface-level-1 p-2 rounded-2xl absolute left-25 top-50 right-25 -translate-y-1/2">
+                            <h3>Surface Level 1</h3>
+                            {faker.lorem.sentences({ min: 5, max: 10 })}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg">
+                        <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                            <img
+                                alt="img-1"
+                                src={faker.image.urlPicsumPhotos({
+                                    width: 600,
+                                    height: 400,
+                                })}
+                            />
+
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                            <img
+                                alt="img-2"
+                                src={faker.image.urlPicsumPhotos({
+                                    width: 600,
+                                    height: 400,
+                                })}
+                            />
+
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                        </div>
+
+                        <div className="surface-level-2 p-2 rounded-2xl absolute left-25 right-25 top-50 -translate-y-1/2">
+                            <h3>Surface Level 2</h3>
+                            {faker.lorem.sentences({ min: 5, max: 10 })}
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg dark bg-body text-text">
+                        <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                            <img
+                                alt="img-1"
+                                src={faker.image.urlPicsumPhotos({
+                                    width: 600,
+                                    height: 400,
+                                })}
+                            />
+
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                            <img
+                                alt="img-2"
+                                src={faker.image.urlPicsumPhotos({
+                                    width: 600,
+                                    height: 400,
+                                })}
+                            />
+
+                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                        </div>
+
+                        <div className="surface-level-2 p-2 rounded-2xl absolute left-25 top-50 right-25 -translate-y-1/2">
+                            <h3>Surface Level 2 2</h3>
+                            {faker.lorem.sentences({ min: 5, max: 10 })}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    },
+}
+
+export const Surfaces: Story = {
+    render: () => {
+        let surfaceLevels = ["1", "2", "3"]
+
+        return (
+            <div className="flex flex-col gap-10">
+                {surfaceLevels.map((level) => (
+                    <div key={level} className="grid grid-cols-2 gap-2">
+                        {[undefined, "dark"].map((mode) => (
+                            <div
+                                key={mode}
+                                className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg"
+                            >
+                                <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
+                                    <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                                    <img
+                                        alt="img-1"
+                                        src={faker.image.urlPicsumPhotos({
+                                            width: 600,
+                                            height: 400,
+                                        })}
+                                    />
+
+                                    <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+
+                                    <img
+                                        alt="img-2"
+                                        src={faker.image.urlPicsumPhotos({
+                                            width: 600,
+                                            height: 400,
+                                        })}
+                                    />
+
+                                    <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
+                                </div>
+
+                                <div
+                                    className={clsx(
+                                        mode,
+                                        `surface-level-${level}`,
+                                        "p-2 rounded-2xl elevation-1 absolute left-25 right-25 top-50 -translate-y-1/2",
+                                    )}
+                                >
+                                    <h3>Surface Level {level}</h3>
+                                    {faker.lorem.sentences({ min: 5, max: 10 })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ))}
             </div>
         )
     },

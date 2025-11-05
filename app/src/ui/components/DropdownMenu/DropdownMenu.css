@@ -1,45 +1,86 @@
-.dropdown-menu-btn[data-pressed] {
-    background-color: var(--btn-bg-active);
-    color: var(--btn-color);
+.dropdown-menu-btn.is-open {
+    position: relative;
+    &::before {
+        background-color: color-mix(
+            in srgb,
+            var(--btn-bg-active, var(--btn-bg)) 20%,
+            transparent
+        );
+    }
+}
+
+.dropdown-menu-popover {
+    @apply absolute p-1 overflow-visible rounded-2xl surface-level-2 elevation-2;
+    inset: auto;
+    margin: 0;
+    top: anchor(top);
+    justify-self: anchor-center;
+    min-width: anchor-size(width);
+    position-area: bottom center;
+    position-try-fallbacks:
+        --dropdown-menu-list,
+        bottom span-left,
+        top;
+
+    transition:
+        opacity 150ms cubic-bezier(0, 0.72, 0.74, 1),
+        transform 150ms cubic-bezier(0, 0.72, 0.74, 1);
+
+    &:popover-open {
+        opacity: 1;
+        transform: scale(1);
+        translate: 0 0;
+    }
+
+    @starting-style {
+        &:popover-open {
+            opacity: 0.95;
+            transform: scale(0.45);
+            translate: 0 -50%;
+        }
+    }
 }
 
 .dropdown-menu-list {
-    @apply p-1 overflow-auto rounded-md bg-surface-level-1 shadow-lg;
-    @apply border border-surface-border;
-    z-index: 9999;
+    @apply rounded-xl space-y-1;
 
-    min-width: var(--radix-dropdown-menu-trigger-width);
-
-    &[data-state="open"] {
-        @apply animate-in fade-in zoom-in-95;
-    }
-
-    &[data-state="closed"] {
-        @apply animate-out fade-out zoom-out-95;
+    &:focus-visible {
+        @apply outline-2 outline-primary outline-offset-4;
     }
 }
 
 .dropdown-menu-item {
-    @apply w-full rounded-md px-3 py-2 box-border outline-hidden text-sm;
-    @apply cursor-pointer;
+    @apply w-full rounded-xl px-3 py-2 box-border outline-hidden text-sm select-none;
 
     min-width: max-content;
+    transition: scale 150ms cubic-bezier(0.175, 0.885, 0.32, 2.2);
 
-    &:hover,
-    &:focus,
-    &[data-focused] {
-        @apply bg-surface-level-2 text-text;
+    .icon {
+        transition: scale 150ms cubic-bezier(0.175, 0.885, 0.32, 2.2);
+    }
+
+    &:focus-visible,
+    &.has-focus,
+    &:not([aria-disabled="true"]):hover {
+        @apply surface-level-1;
+        --glass-highlight: var(--btn-bg-hover);
+        --glass-shadow: var(--btn-border-color);
+        --color-surface-level-1: var(--btn-bg);
+        scale: 1.01;
+        .icon {
+            scale: 1.15;
+        }
     }
 
     &:active {
-        @apply bg-primary text-white;
+        @apply bg-primary text-primary-contrast;
     }
 
-    &[data-disabled] {
+    &[aria-disabled="true"] {
         @apply opacity-40 cursor-default;
 
         &:hover {
-            @apply bg-transparent text-text;
+            @apply border-transparent text-text;
         }
 
         &:active {
@@ -48,43 +89,24 @@
     }
 
     .description {
-        @apply opacity-50 text-xs;
+        @apply opacity-80 text-xs;
     }
 }
 
 .dropdown-menu-item.destructive {
-    @apply text-danger-extra-dark;
-    @apply dark:text-danger;
+    @apply bg-danger-extra-light text-danger-dark;
 
-    &:hover {
-        @apply bg-danger text-danger-contrast;
-        @apply dark:bg-danger-extra-light;
-
-        .description {
-            @apply text-danger-contrast;
-        }
+    &:focus-visible,
+    &.has-focus,
+    &:not([aria-disabled="true"]):hover {
+        @apply text-danger-extra-dark;
+        --glass-highlight: var(--color-danger-extra-light);
+        --glass-shadow: var(--color-danger-extra-dark);
+        --color-surface-level-1: var(--color-danger-light);
     }
 
-    &:active {
-        @apply bg-danger text-white;
-
-        .description {
-            @apply text-white;
-        }
-    }
-
-    &[data-disabled] {
-        @apply opacity-30 hover:bg-transparent hover:text-danger-extra-dark;
-
-        .description {
-            @apply text-danger-dark;
-            @apply dark:text-danger-extra-light;
-        }
-    }
-
-    .description {
-        @apply text-danger-dark;
-        @apply dark:text-danger-extra-light;
+    &[aria-disabled="true"] {
+        @apply opacity-50 bg-danger-extra-light text-danger-extra-dark;
     }
 }
 
@@ -93,5 +115,13 @@
 }
 
 .dropdown-menu-item-label {
-    @apply flex items-center gap-2;
+    @apply flex items-center gap-2 min-w-25;
+}
+
+@position-try --dropdown-menu-list {
+    inset: unset;
+    margin: unset;
+    bottom: calc(anchor(top) + 3px);
+    justify-self: anchor-start;
+    position-area: none;
 }

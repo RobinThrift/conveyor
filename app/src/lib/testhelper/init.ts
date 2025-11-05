@@ -1,10 +1,5 @@
 import type { BackendClient } from "@/backend/BackendClient"
-import {
-    NavigationController,
-    type Params,
-    type Restore,
-    type Screens,
-} from "@/control/NavigationController"
+import { NavigationController, type Params, type Screens } from "@/control/NavigationController"
 import type { Attachment } from "@/domain/Attachment"
 import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
 import type { AsyncResult } from "@/lib/result"
@@ -16,7 +11,7 @@ export type InitOpts = {
     generateMockData?: boolean
     mockAttachments?: Record<
         string,
-        () => AsyncResult<{ attachment: Attachment; data: ArrayBufferLike }>
+        () => AsyncResult<{ attachment: Attachment; data: ArrayBuffer }>
     >
 }
 
@@ -30,11 +25,32 @@ export async function init({ generateMockData, mockAttachments }: InitOpts) {
     }
 
     let navCtrl = new NavigationController({
-        backend: new HistoryNavigationBackend<Screens, Params, Restore>({
-            toURLParams: NavigationController.toURLParams,
-            screenToURLMapping: NavigationController.screenToURLMapping,
-            urlToScreenMapping: NavigationController.urlToScreenMapping,
-            screenToStackMapping: NavigationController.screenToStackMapping,
+        backend: new HistoryNavigationBackend<Screens, Params>({
+            routes: HistoryNavigationBackend.screensToRoutes([
+                ["list", "main", "/"],
+                ["unlock", "main"],
+                ["setup", "main"],
+                ["settings", "settings"],
+                [
+                    "memos",
+                    "memos",
+                    undefined,
+                    (u: URL) => {
+                        let params: Params["memos"] = { ids: [] }
+                        let editPosition = u.searchParams.get("editPosition")
+                        if (editPosition) {
+                            params.editPosition = JSON.parse(decodeURIComponent(editPosition))
+                        }
+
+                        let ids = u.searchParams.get("memo")
+                        if (ids) {
+                            params.ids = ids.split(",")
+                        }
+
+                        return params
+                    },
+                ],
+            ]),
         }),
     })
 

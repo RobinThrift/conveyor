@@ -1,5 +1,5 @@
 .link-preview {
-    @apply inline-block rounded-2xl p-2 bg-surface-level-1 shadow-lg h-min;
+    @apply inline-block rounded-2xl p-2 bg-surface-level-1 shadow-lg h-min w-full;
     transition: box-shadow 200ms;
 
     .preview-img {

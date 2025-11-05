@@ -1,6 +1,9 @@
+import { Temporal } from "temporal-polyfill"
+
 import type { EncryptedChangelogEntry } from "@/domain/Changelog"
 import type { Context } from "@/lib/context"
 import { createErrType } from "@/lib/errors"
+import { temporalToDate } from "@/lib/i18n"
 import { parseJSONDate } from "@/lib/json"
 import {
     type AsyncResult,
@@ -69,7 +72,7 @@ export class SyncV1APIClient {
         "SyncV1APIClient",
         "error fetching full DB from sync server",
     )
-    public async getFullSync(ctx: Context): AsyncResult<ArrayBufferLike> {
+    public async getFullSync(ctx: Context): AsyncResult<ArrayBuffer> {
         let [req, createReqErr] = await this._createBaseRequest(ctx, "GET", "/api/sync/v1/full")
         if (createReqErr) {
             return wrapErr`${new SyncV1APIClient.ErrGetFullSync()}: ${createReqErr}`
@@ -108,7 +111,7 @@ export class SyncV1APIClient {
     private async _downloadDBFromLocation(
         ctx: Context,
         location: string,
-    ): AsyncResult<ArrayBufferLike> {
+    ): AsyncResult<ArrayBuffer> {
         let [req, createReqErr] = await this._createBaseRequest(ctx, "GET", location)
         if (createReqErr) {
             return Err(createReqErr)
@@ -140,7 +143,7 @@ export class SyncV1APIClient {
         "SyncV1APIClient",
         "error uploading all data to sync server",
     )
-    public async uploadFullSyncData(ctx: Context, data: ArrayBufferLike): AsyncResult<void> {
+    public async uploadFullSyncData(ctx: Context, data: ArrayBuffer): AsyncResult<void> {
         let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "POST",
@@ -174,12 +177,26 @@ export class SyncV1APIClient {
     )
     public async listChangelogEntries(
         ctx: Context,
-        since?: Date,
+        since?: Temporal.ZonedDateTime,
     ): AsyncResult<EncryptedChangelogEntry[]> {
+        let sinceParam = JSON.stringify(
+            temporalToDate(
+                since ??
+                    Temporal.ZonedDateTime.from({
+                        year: 2000,
+                        day: 1,
+                        month: 1,
+                        timeZone: "utc",
+                    }),
+            ),
+        )
+
+        sinceParam = sinceParam.substring(1, sinceParam.length - 1)
+
         let [req, createReqErr] = await this._createBaseRequest(
             ctx,
             "GET",
-            `/api/sync/v1/changes?since=${JSON.parse(JSON.stringify(since ?? new Date(2000, 0, 1)))}`,
+            `/api/sync/v1/changes?since=${sinceParam}`,
         )
         if (createReqErr) {
             return wrapErr`${new SyncV1APIClient.ErrListChangelogEntries()} (${this._baseURL}): ${createReqErr}`
@@ -250,7 +267,7 @@ export class SyncV1APIClient {
         ctx: Context,
         attachment: {
             filepath: string
-            data: Uint8Array<ArrayBufferLike>
+            data: Uint8Array<ArrayBuffer>
         },
     ): AsyncResult<void> {
         let [req, createReqErr] = await this._createBaseRequest(
@@ -291,7 +308,7 @@ export class SyncV1APIClient {
     public async getAttachmentDataByFilepath(
         ctx: Context,
         filepath: string,
-    ): AsyncResult<ArrayBufferLike> {
+    ): AsyncResult<ArrayBuffer> {
         let [req, createReqErr] = await this._createBaseRequest(ctx, "GET", `/blobs${filepath}`)
         if (createReqErr) {
             return wrapErr`${new SyncV1APIClient.ErrGetAttachmentDataByFilepath()} (${this._baseURL}): ${filepath}: ${createReqErr}`
@@ -355,7 +372,7 @@ function parseEncryptedChangelogEntryJSON(raw: string): Result<EncryptedChangelo
             entries.push({
                 syncClientID: obj.syncClientID,
                 data: obj.data,
-                timestamp: timestamp,
+                timestamp: temporalToDate(timestamp),
             })
         }
 
@@ -363,7 +380,7 @@ function parseEncryptedChangelogEntryJSON(raw: string): Result<EncryptedChangelo
     })
 }
 
-async function compressData(data: Uint8Array<ArrayBufferLike>) {
+async function compressData(data: Uint8Array<ArrayBuffer>) {
     let stream = new ReadableStream({
         start(controller) {
             controller.enqueue(data)
@@ -383,7 +400,7 @@ async function streamToBlob(reader: ReadableStreamDefaultReader): Promise<Blob> 
     return reader.read().then(async function read({
         done,
         value,
-    }: ReadableStreamReadResult<Uint8Array>): Promise<Blob> {
+    }: ReadableStreamReadResult<Uint8Array<ArrayBuffer>>): Promise<Blob> {
         if (done) {
             return new Blob(chunks)
         }

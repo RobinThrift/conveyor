@@ -47,15 +47,14 @@ function DataJobs() {
                     <Button
                         variant="primary"
                         className="w-fit"
-                        size="sm"
-                        isDisabled={isRunning || !isReady}
-                        onPress={startCleanupJob}
+                        disabled={isRunning || !isReady}
+                        onClick={startCleanupJob}
                     >
                         {isRunning ? t.RunningLabel : t.RunLabel}
                     </Button>
 
                     {cleanupJob?.error ? (
-                        <Alert variant="danger">
+                        <Alert>
                             {cleanupJob?.error.name}: {cleanupJob?.error.message}
                             {cleanupJob?.error.stack && (
                                 <pre>
@@ -65,6 +64,8 @@ function DataJobs() {
                         </Alert>
                     ) : undefined}
                 </li>
+
+                <hr />
 
                 <ExportJob />
             </ul>
@@ -112,14 +113,13 @@ function ExportJob() {
                     variant="primary"
                     type="submit"
                     className="w-fit"
-                    size="sm"
-                    isDisabled={isRunning || !isReady}
+                    disabled={isRunning || !isReady}
                 >
                     {isRunning ? t.RunningLabel : t.RunLabel}
                 </Button>
 
                 {jobState?.error ? (
-                    <Alert variant="danger">
+                    <Alert>
                         {jobState?.error.name}: {jobState?.error.message}
                         {jobState?.error.stack && (
                             <pre>

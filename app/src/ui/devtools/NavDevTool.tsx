@@ -138,7 +138,6 @@ const NavEntryDetails = React.memo(function NavEntryDetails({ entry }: { entry: 
                 <StackTrace
                     stack={entry.trace}
                     filterFrames={(frame) =>
-                        !frame.fileName.endsWith("@react-aria") &&
                         !frame.fileName.endsWith("src/lib/store.ts") &&
                         !frame.fileName.includes("@tanstack/store") &&
                         !(

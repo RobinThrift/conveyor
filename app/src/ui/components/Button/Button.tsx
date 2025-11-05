@@ -1,20 +1,13 @@
 import clsx from "clsx"
-import React from "react"
-import { Button as AriaButton, type ButtonProps as AriaButtonProps } from "react-aria-components"
+import React, { useCallback, useId } from "react"
 
-export type { PressEvent } from "react-aria"
-
-export interface ButtonProps extends AriaButtonProps {
-    className?: string
-    children?: React.ReactNode | undefined
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    ref?: React.Ref<HTMLButtonElement>
     iconLeft?: React.ReactNode
     iconRight?: React.ReactNode
-    size?: "sm" | "md" | "lg"
-    variant?: "regular" | "primary" | "success" | "danger"
-    outline?: boolean
-    plain?: boolean
-    ariaLabel?: string
-    ref?: React.Ref<HTMLButtonElement>
+    variant?: "regular" | "primary" | "danger"
+    tooltip?: React.ReactElement | React.ReactElement[] | string
+    preventFocusOnPress?: boolean
 }
 
 export function Button(props: ButtonProps) {
@@ -23,35 +16,110 @@ export function Button(props: ButtonProps) {
         children,
         iconLeft,
         iconRight,
-        size = "md",
         variant,
-        outline,
-        plain,
-        ariaLabel,
+        ref,
+        preventFocusOnPress,
         ...intrinsics
     } = props
 
+    let tooltipID = useId()
+
+    intrinsics.onMouseOver = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            props.onMouseOver?.(e)
+            let target = e.target as HTMLElement
+            if (target.tagName !== "BUTTON") {
+                target = target.closest("button") as HTMLElement
+            }
+            // @ts-expect-error: in newer api version
+            document.getElementById(tooltipID)?.showPopover({ source: target })
+        },
+        [tooltipID, props.onMouseOver],
+    )
+
+    intrinsics.onMouseLeave = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            props.onMouseLeave?.(e)
+            document.getElementById(tooltipID)?.hidePopover()
+        },
+        [tooltipID, props.onMouseLeave],
+    )
+
+    intrinsics.onFocus = useCallback(
+        (e: React.FocusEvent<HTMLButtonElement, Element>) => {
+            props.onFocus?.(e)
+            let target = e.target as HTMLElement
+            if (target.tagName !== "BUTTON") {
+                target = target.closest("button") as HTMLElement
+            }
+            // @ts-expect-error: in newer api version
+            document.getElementById(tooltipID)?.showPopover({ source: target })
+        },
+        [tooltipID, props.onFocus],
+    )
+
+    intrinsics.onBlur = useCallback(
+        (e: React.FocusEvent<HTMLButtonElement, Element>) => {
+            props.onBlur?.(e)
+            document.getElementById(tooltipID)?.hidePopover()
+        },
+        [tooltipID, props.onBlur],
+    )
+
+    intrinsics.onPointerDown = useCallback(
+        (e: React.PointerEvent<HTMLButtonElement>) => {
+            props.onPointerDown?.(e)
+
+            if (preventFocusOnPress) {
+                props.onClick?.(e)
+                e.preventDefault()
+            }
+        },
+        [props.onPointerDown, props.onClick, preventFocusOnPress],
+    )
+
+    intrinsics.onClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+            if (preventFocusOnPress) {
+                e.preventDefault()
+            } else {
+                props.onClick?.(e)
+            }
+        },
+        [props.onClick, preventFocusOnPress],
+    )
+
     return (
-        <AriaButton
-            {...intrinsics}
-            ref={props.ref}
-            aria-label={ariaLabel}
-            className={clsx(
-                "btn",
-                variant,
-                {
-                    sm: size === "sm",
-                    lg: size === "lg",
-                    "icon-only": !children,
-                    "outline-btn": outline,
-                    plain: plain,
-                },
-                className,
+        <>
+            <button
+                {...intrinsics}
+                ref={ref}
+                className={clsx(
+                    "btn",
+                    variant,
+                    {
+                        "icon-only": !children,
+                    },
+                    className,
+                )}
+            >
+                {iconLeft ? (
+                    <span className="icon" aria-hidden="true">
+                        {iconLeft}
+                    </span>
+                ) : null}
+                {children}
+                {iconRight ? (
+                    <span className="icon" aria-hidden="true">
+                        {iconRight}
+                    </span>
+                ) : null}
+            </button>
+            {props.tooltip && (
+                <div id={tooltipID} className="tooltip" popover="hint">
+                    {props.tooltip}
+                </div>
             )}
-        >
-            {iconLeft ? <span className="icon">{iconLeft}</span> : null}
-            {children}
-            {iconRight ? <span className="icon">{iconRight}</span> : null}
-        </AriaButton>
+        </>
     )
 }

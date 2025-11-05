@@ -5,7 +5,6 @@ import { useOnVisible } from "@/ui/hooks/useOnVisible"
 
 export function useMemoState(props: {
     memo: Memo
-    collapsible?: boolean
     doubleClickToEdit?: boolean
     forceRender?: boolean
     actions?: {
@@ -16,7 +15,7 @@ export function useMemoState(props: {
     let ref = useRef<HTMLDivElement | null>(null)
     let isVisible = useOnVisible(ref, { ratio: 0.1 })
     let { title, body } = splitContent(props.memo.content)
-    let [isExpanded, setIsExpanded] = useState(!props.collapsible)
+    let [isExpanded, setIsExpanded] = useState(false)
     let [shouldRender, setShouldRender] = useState(forceRender || isVisible)
 
     let onDoubleClick = useMemo(() => {

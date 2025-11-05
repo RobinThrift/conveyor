@@ -1,6 +1,6 @@
 import { startTransition, useEffect, useMemo, useState } from "react"
 
-import { attachmentIDFromURL } from "@/domain/Attachment"
+import { imageBlobToSrc, parseAttachmentURL } from "@/domain/Attachment"
 import { thumbhashToDataURL } from "@/external/thumbhash"
 import { useAttachment } from "@/ui/attachments"
 
@@ -11,6 +11,8 @@ export function useImageState({
     ref: React.RefObject<HTMLImageElement | null>
     src: string
     style?: React.CSSProperties
+    width?: number
+    height?: number
 }) {
     let attachment = useMemo(() => parseImgURL(props.src), [props.src])
     let attachmentData = useAttachment({ id: attachment?.attachmentID, ref })
@@ -22,7 +24,9 @@ export function useImageState({
             return undefined
         }
 
-        return URL.createObjectURL(new Blob([new Uint8Array(attachmentData?.data)]))
+        return attachmentData.data && attachmentData.mime
+            ? imageBlobToSrc({ data: attachmentData.data, mime: attachmentData.mime })
+            : undefined
     }, [attachmentData])
 
     let src = attachment ? (attachmentURL ?? hash) : props.src
@@ -40,11 +44,17 @@ export function useImageState({
 
         return () => {
             ref.current?.removeEventListener("load", onload)
+
+            if (src?.startsWith("blob:")) {
+                URL.revokeObjectURL(src)
+            }
         }
-    })
+    }, [attachment, attachmentURL, ref.current, src])
 
     let style = {
         minWidth: hash && !attachmentURL ? "200px" : undefined,
+        "--img-original-width": attachment?.width ? `${attachment?.width}px` : undefined,
+        "--img-original-height": attachment?.height ? `${attachment?.height}px` : undefined,
         ...(props.style ?? {}),
     }
 
@@ -52,11 +62,15 @@ export function useImageState({
         src,
         isLoading,
         style,
+        width: attachment?.width,
+        height: attachment?.height,
     }
 }
 
-function parseImgURL(src: string): { attachmentID: string; thumbhash?: string } | undefined {
-    let attachment = attachmentIDFromURL(src)
+function parseImgURL(
+    src: string,
+): { attachmentID: string; thumbhash?: string; width?: number; height?: number } | undefined {
+    let attachment = parseAttachmentURL(src)
     if (!attachment) {
         return
     }

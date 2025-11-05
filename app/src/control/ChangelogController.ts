@@ -1,3 +1,5 @@
+import { Temporal } from "temporal-polyfill"
+
 import type { ChangelogEntry, ChangelogEntryID, ChangelogEntryList } from "@/domain/Changelog"
 import { newID } from "@/domain/ID"
 import type { Context } from "@/lib/context"
@@ -32,7 +34,7 @@ export class ChangelogController {
                 ...entry,
                 id: newID(),
                 source: this._sourceName,
-                timestamp: new Date(),
+                timestamp: Temporal.Now.zonedDateTimeISO(),
             }),
         )
     }
@@ -58,7 +60,7 @@ export class ChangelogController {
         args: {
             pagination: {
                 pageSize: number
-                after?: [number, Date]
+                after?: [number, Temporal.ZonedDateTime]
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -72,7 +74,7 @@ export class ChangelogController {
         args: {
             pagination: {
                 pageSize: number
-                after?: [number, Date]
+                after?: [number, Temporal.ZonedDateTime]
             }
         },
     ): AsyncResult<ChangelogEntryList> {
@@ -125,7 +127,7 @@ interface Repo {
         args: {
             pagination: {
                 pageSize: number
-                after?: [number, Date]
+                after?: [number, Temporal.ZonedDateTime]
             }
         },
     ): AsyncResult<ChangelogEntryList>
@@ -135,7 +137,7 @@ interface Repo {
         args: {
             pagination: {
                 pageSize: number
-                after?: [number, Date]
+                after?: [number, Temporal.ZonedDateTime]
             }
         },
     ): AsyncResult<ChangelogEntryList>

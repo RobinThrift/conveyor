@@ -80,7 +80,7 @@ export function mimeTypeForFilename(filename: string): string {
     if (dotindex === -1) {
         return mimeTypesByExtension[filename as any] || "application/octet-stream"
     }
-    return mimeTypesByExtension[filename.substring(dotindex)] || "application/octet-stream"
+    return mimeTypesByExtension[filename.substring(dotindex + 1)] || "application/octet-stream"
 }
 
 export function extensionForMimeType(mime: string): string {

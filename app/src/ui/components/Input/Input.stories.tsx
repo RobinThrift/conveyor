@@ -4,7 +4,7 @@ import React from "react"
 import "@/ui/styles/index.css"
 import { Button } from "@/ui/components/Button"
 import { Form } from "@/ui/components/Form"
-import { CodeIcon, UserIcon } from "@/ui/components/Icons"
+import { CodeIcon, KeyIcon } from "@/ui/components/Icons"
 
 import { Input } from "./Input"
 
@@ -34,7 +34,7 @@ export const WithError: Story = {
         message: "InputError",
         messages: { InputError: "Translated Error Message" },
         defaultValue: "invalid",
-        icon: <UserIcon />,
+        icon: <KeyIcon />,
     },
     render: (args) => (
         <Form className="container mx-auto max-w-[300px]">
@@ -48,13 +48,13 @@ export const WithValidation: Story = {
         label: "Required Field",
         description: "Hit Enter to trigger validation",
         messages: { "Invalid/Empty": "Please enter a value" },
-        icon: <UserIcon />,
+        icon: <KeyIcon />,
         required: true,
     },
     render: (args) => (
         <Form className="container mx-auto max-w-[300px]">
             <Input {...args} />
-            <Button size="sm" type="reset" className="mt-5">
+            <Button type="reset" className="mt-5">
                 Reset
             </Button>
         </Form>

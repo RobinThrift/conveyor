@@ -60,11 +60,11 @@ export class CryptoController {
         return Ok(undefined)
     }
 
-    public async encryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike> {
+    public async encryptData(data: Uint8Array<ArrayBuffer>): AsyncResult<ArrayBuffer> {
         return this._crypto.encryptData(data)
     }
 
-    public async decryptData(data: Uint8Array<ArrayBufferLike>): AsyncResult<ArrayBufferLike> {
+    public async decryptData(data: Uint8Array<ArrayBuffer>): AsyncResult<ArrayBuffer> {
         return this._crypto.decryptData(data)
     }
 }

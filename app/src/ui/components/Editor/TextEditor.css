@@ -7,9 +7,10 @@
 
 .cm-editor {
     @apply overflow-hidden;
-    background: var(--code-background);
+    background: transparent;
     color: var(--code-foreground);
     font-size: var(--editor-font-size);
+    height: 100%;
 }
 
 .cm-editor.cm-focused {
@@ -26,24 +27,11 @@
 
 .cm-scroller {
     @apply grow font-sans!;
+    /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
+    overflow: visible !important;
+    height: 100%;
 
     padding-bottom: calc(100dvh - var(--vvp-h));
-
-    /* line-height: 1.7142857 !important; */
-    /* --editor-font-size: 0.875rem; */
-
-    /* @container (max-width: 28rem) { */
-    /* sm */
-    /* -biome-ignore lint/suspicious/noDuplicateCustomProperties: false positive due to nesting */
-    /* --editor-font-size: 1rem !important; */
-    /* -biome-ignore lint/suspicious/noDuplicateProperties: false positive due to nesting */
-    /* line-height: 1.75 !important; */
-    /* } */
-
-    /* @media (max-width: 768px) { */
-    /* prevent zoom in on iPhones */
-    /* --editor-font-size: 16px !important; */
-    /* } */
 }
 
 .vim-enabled .cm-cursor {
@@ -75,7 +63,7 @@
 
 .cm-placeholder {
     /* biome-ignore lint/complexity/noImportantStyles: required */
-    color: var(--color-subtle-dark) !important;
+    color: var(--color-neutral-dark) !important;
 }
 
 .cm-line:has(.cm-heading-1),
@@ -100,25 +88,21 @@
 }
 
 .cm-line:has(.cm-heading-1) {
-    line-height: calc(2.25 / var(--h1-size));
-    font-size: var(--h1-size);
+    font-size: var(--h1-font-size);
     /* biome-ignore lint/complexity/noImportantStyles: required */
     padding-top: 0 !important;
 }
 
 .cm-line:has(.cm-heading-2) {
-    font-size: calc(var(--h1-size) - 0.25rem);
-    line-height: calc(2 / (var(--h1-size) - 0.25rem));
+    font-size: var(--h2-font-size);
 }
 
 .cm-line:has(.cm-heading-3) {
-    font-size: calc(var(--h1-size) - 0.5rem);
-    line-height: calc(1.75 / (var(--h1-size) - 0.5rem));
+    font-size: var(--h3-font-size);
 }
 
 .cm-line:has(.cm-heading-4) {
-    font-size: calc(var(--h1-size) - 0.75rem);
-    line-height: calc(1.75 / (var(--h1-size) - 0.75rem));
+    font-size: var(--h4-font-size);
 }
 
 .cm-heading-5 {
@@ -134,11 +118,11 @@
 }
 
 .tok-blockquote {
-    @apply font-serif italic text-subtle;
+    @apply font-serif italic text-neutral;
 }
 
 .cm-line:has(.tok-blockquote) {
-    @apply border-l border-subtle-dark ps-4!;
+    @apply border-l border-neutral-dark ps-4!;
     text-indent: -3px;
     margin-top: 0.5lh;
     margin-bottom: 0.5lh;
@@ -244,7 +228,7 @@
     color: var(--code-background);
 
     &::after {
-        @apply bg-subtle-dark;
+        @apply bg-neutral-dark;
         content: "";
         position: absolute;
         top: 50%;

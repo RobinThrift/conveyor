@@ -16,8 +16,6 @@ export interface CodeMirrorProps {
     autoFocus?: boolean
     placeCursorAt?: { x: number; y: number; snippet?: string }
 
-    placeholder?: string
-
     autocomplete?: {
         tags?: Tag[]
     }

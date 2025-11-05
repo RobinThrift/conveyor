@@ -65,24 +65,15 @@ export function useDialog(props: {
             return
         }
 
-        let closeDialog = () => {
+        dialog.dataset.state = "closing"
+        dialog.inert = true
+
+        Promise.all(dialog.getAnimations().map((a) => a.finished)).finally(() => {
             delete dialog.dataset.state
             dialog.inert = false
             dialog.close()
             setIsOpen(false)
-        }
-
-        requestAnimationFrame(() => {
-            let animation = dialog.getAnimations().at(0)
-            if (animation) {
-                animation.finished.then(closeDialog)
-            } else {
-                closeDialog()
-            }
         })
-
-        dialog.dataset.state = "closing"
-        dialog.inert = true
     }, [isOpen])
 
     useEffect(() => {

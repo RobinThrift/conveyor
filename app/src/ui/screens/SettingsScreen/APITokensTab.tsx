@@ -1,5 +1,7 @@
-import React, { useCallback } from "react"
-import { GridList as AriaGridList, GridListItem as AriaGridListItem } from "react-aria-components"
+/** biome-ignore-all lint/a11y/useFocusableInteractive: follows best practices */
+/** biome-ignore-all lint/a11y/useSemanticElements: follow best practices */
+import React, { useCallback, useState } from "react"
+import type { Temporal } from "temporal-polyfill"
 
 import type { APIToken } from "@/domain/APIToken"
 import { currentDateTime } from "@/lib/i18n"
@@ -11,7 +13,6 @@ import { CaretLeftIcon, CaretRightIcon } from "@/ui/components/Icons"
 import { Input } from "@/ui/components/Input"
 import { Loader } from "@/ui/components/Loader"
 import { Select } from "@/ui/components/Select"
-import { Tooltip } from "@/ui/components/Tooltip"
 import { useStateGetter } from "@/ui/hooks/useStateGetter"
 import { useT } from "@/ui/i18n"
 import { useAPITokensTabState } from "./useAPITokensTabState"
@@ -39,7 +40,7 @@ export function APITokensTab() {
             </header>
 
             <div className="settings-section relative mt-4">
-                {error && <Alert variant="danger">{error.message}</Alert>}
+                {error && <Alert>{error.message}</Alert>}
 
                 {lastCreatedValue && <LastCreatedAPIToken value={lastCreatedValue} />}
 
@@ -73,7 +74,7 @@ function CreateNewAPIToken({
     onSubmit: create,
 }: {
     isLoading: boolean
-    onSubmit: (token: { name: string; expiresAt: Date }) => void
+    onSubmit: (token: { name: string; expiresAt: Temporal.ZonedDateTime }) => void
 }) {
     let t = useT("screens/Settings/APITokens/New")
 
@@ -120,7 +121,7 @@ function CreateNewAPIToken({
 
             create({
                 name: name(),
-                expiresAt: expiresAt.toDate("utc"),
+                expiresAt: expiresAt,
             })
         },
         [create, name, expiresIn],
@@ -165,7 +166,7 @@ function CreateNewAPIToken({
                     </Select>
                 </div>
 
-                <Button type="submit" variant="primary" isDisabled={isLoading}>
+                <Button type="submit" variant="primary" disabled={isLoading}>
                     {t.ButtonLabel}
                 </Button>
             </div>
@@ -211,24 +212,50 @@ function APITokensList({
 }) {
     let t = useT("screens/Settings/APITokens/List")
 
+    let { focussedRow, focussedColumn, onKeyDown } = useAPITokensList(tokens.length)
+
     return (
         <div className="api-tokens-section">
-            <AriaGridList className="api-tokens-list" aria-label={t.Title}>
-                {tokens.map((token) => (
-                    <AriaGridListItem key={token.name} className="api-token" textValue={token.name}>
-                        <div className="api-token-info">
-                            <span className="api-token-name" id={`api-token-label-${token.name}`}>
+            <div className="api-tokens-list" aria-label={t.Title} role="grid" onKeyDown={onKeyDown}>
+                {tokens.map((token, i) => (
+                    <div
+                        id={`api-token-row-${i}`}
+                        key={token.name}
+                        role="row"
+                        className="api-token"
+                        aria-label={token.name}
+                        aria-rowindex={i}
+                        tabIndex={i === focussedRow ? 0 : -1}
+                    >
+                        <div className="api-token-info" role="presentation">
+                            <span
+                                className="api-token-name"
+                                id={`api-token-label-${token.name}`}
+                                role="gridcell"
+                                aria-colindex={1}
+                                tabIndex={i === focussedRow && focussedColumn === 1 ? 0 : -1}
+                            >
                                 <span className="sr-only">{t.LabelName}</span>
                                 {token.name}
                             </span>
-                            <span className="api-token-expires-at">
+                            <span
+                                className="api-token-expires-at"
+                                role="gridcell"
+                                aria-colindex={2}
+                                tabIndex={i === focussedRow && focussedColumn === 2 ? 0 : -1}
+                            >
                                 <span id={`${token.name}-expires-at`}>{t.LabelExpires}:</span>
                                 <DateTime
                                     aria-labelledby={`${token.name}-expires-at`}
                                     date={token.expiresAt}
                                 />
                             </span>
-                            <span className="api-token-created-at">
+                            <span
+                                className="api-token-created-at"
+                                role="gridcell"
+                                aria-colindex={3}
+                                tabIndex={i === focussedRow && focussedColumn === 3 ? 0 : -1}
+                            >
                                 <span id={`${token.name}-created-at`}>{t.LabelCreated}:</span>
                                 <DateTime
                                     aria-labelledby={`${token.name}-created-at`}
@@ -238,31 +265,112 @@ function APITokensList({
                             </span>
                         </div>
 
-                        <Button variant="danger" size="sm" onPress={() => onDelete(token.name)}>
+                        <Button
+                            variant="danger"
+                            onClick={() => onDelete(token.name)}
+                            role="gridcell"
+                            aria-colindex={4}
+                            tabIndex={i === focussedRow && focussedColumn === 4 ? 0 : -1}
+                        >
                             {t.DeleteButton}
                         </Button>
-                    </AriaGridListItem>
+                    </div>
                 ))}
-            </AriaGridList>
+            </div>
 
             <div className="flex gap-2 mt-2 justify-end">
-                <Tooltip content={t.PrevPage}>
-                    <Button
-                        iconLeft={<CaretLeftIcon />}
-                        onPress={prevPage}
-                        size="sm"
-                        isDisabled={!hasPreviousPage}
-                    />
-                </Tooltip>
-                <Tooltip content={t.NextPage}>
-                    <Button
-                        iconLeft={<CaretRightIcon />}
-                        onPress={nextPage}
-                        size="sm"
-                        isDisabled={!hasNextPage}
-                    />
-                </Tooltip>
+                <Button
+                    iconLeft={<CaretLeftIcon />}
+                    onClick={prevPage}
+                    disabled={!hasPreviousPage}
+                    tooltip={t.PrevPage}
+                />
+                <Button
+                    iconLeft={<CaretRightIcon />}
+                    onClick={nextPage}
+                    disabled={!hasNextPage}
+                    tooltip={t.NextPage}
+                />
             </div>
         </div>
     )
+}
+
+const numCols = 4
+
+function useAPITokensList(numItems: number) {
+    let [focussedRow, _setFocussedRow] = useState<number>(0)
+    let [focussedColumn, _setFocussedColumn] = useState<number>(0)
+
+    let setFocussedRow = useCallback((i: number) => {
+        _setFocussedRow(i)
+        _setFocussedColumn(0)
+        document.getElementById(`api-token-row-${i}`)?.focus()
+    }, [])
+
+    let setFocussedColumn = useCallback(
+        (i: number) => {
+            _setFocussedColumn(i)
+            ;(
+                document
+                    .getElementById(`api-token-row-${focussedRow}`)
+                    ?.querySelector(`[aria-colindex="${i}"]`) as HTMLElement
+            )?.focus()
+        },
+        [focussedRow],
+    )
+
+    let onKeyDown = useCallback(
+        (e: React.KeyboardEvent) => {
+            if (e.altKey || e.ctrlKey || e.metaKey) {
+                return
+            }
+
+            let handled = false
+
+            switch (e.code) {
+                case "ArrowUp":
+                    setFocussedRow(Math.max(focussedRow - 1, 0))
+                    handled = true
+                    break
+
+                case "ArrowDown":
+                    setFocussedRow(Math.min(focussedRow + 1, numItems - 1))
+                    handled = true
+                    break
+
+                case "ArrowLeft":
+                    setFocussedColumn(Math.max(focussedColumn - 1, 1))
+                    handled = true
+                    break
+
+                case "ArrowRight":
+                    setFocussedColumn(Math.min(focussedColumn + 1, numCols))
+                    handled = true
+                    break
+
+                case "Home":
+                    setFocussedRow(0)
+                    handled = true
+                    break
+
+                case "End":
+                    setFocussedRow(numItems - 1)
+                    handled = true
+                    break
+            }
+
+            if (handled) {
+                e.stopPropagation()
+                e.preventDefault()
+            }
+        },
+        [focussedRow, setFocussedRow, focussedColumn, setFocussedColumn, numItems],
+    )
+
+    return {
+        focussedRow,
+        focussedColumn,
+        onKeyDown,
+    }
 }

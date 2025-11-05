@@ -1,3 +1,3 @@
 import { toggleAround } from "./toggleAround"
 
-export const toggleBold = toggleAround("*")
+export const toggleBold = toggleAround("**")

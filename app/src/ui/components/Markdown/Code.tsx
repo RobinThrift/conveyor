@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import React, { useMemo, useRef } from "react"
 
 import { useOnVisible } from "@/ui/hooks/useOnVisible"
@@ -41,7 +42,7 @@ export const Code = React.memo(function Code({
                 backgroundColor: "var(--code-background)",
                 color: "var(--code-foreground)",
             }}
-            className={className}
+            className={clsx("code-block", className)}
         >
             {highlighted}
         </pre>
