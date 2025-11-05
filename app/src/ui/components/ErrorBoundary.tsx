@@ -1,6 +1,7 @@
 import React from "react"
+
 import { isEqual } from "@/lib/isEqual"
-import { Alert } from "./Alert"
+import { Alert } from "@/ui/components/Alert"
 
 export type ErrorBoundaryProps = React.PropsWithChildren<{
     fallback?: React.ReactNode | ((error: Error, info: React.ErrorInfo) => React.ReactNode)
@@ -33,16 +34,16 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     }
 
     static getDerivedStateFromError(error: Error) {
-        return { error }
+        return { didCatch: true, error }
     }
 
-    // componentDidCatch(error: Error, info: React.ErrorInfo) {
-    //     this.setState({
-    //         didCatch: true,
-    //         error,
-    //         info,
-    //     })
-    // }
+    componentDidCatch(error: Error, info: React.ErrorInfo) {
+        this.setState({
+            didCatch: true,
+            error,
+            info,
+        })
+    }
 
     private reset() {
         this.setState(initState)
