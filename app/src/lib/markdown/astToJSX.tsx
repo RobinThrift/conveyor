@@ -119,6 +119,8 @@ function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boo
             return linkToJSX(doc, cursor.node)
         case "URL":
             return urlToJSX(doc, cursor.node)
+        case "Autolink":
+            return urlToJSX(doc, cursor.node)
         case "TagLink":
             return tagLinkToJSX(doc, cursor.node)
         case "FootnoteRef":
