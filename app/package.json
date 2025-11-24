@@ -26,7 +26,7 @@
         "culori": "^4.0.1",
         "jsondiffpatch": "^0.7.3",
         "lightningcss": "1.30.2",
-        "msw": "2.11.5",
+        "msw": "2.12.3",
         "msw-storybook-addon": "2.0.6",
         "playwright": "^1.52.0",
         "storybook": "9.1.10",
