@@ -144,6 +144,7 @@ function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boo
         case "FootnoteMark":
         case "HeaderMark":
         case "CustomBlockEnd":
+        case "Escape":
             return null
     }
 
