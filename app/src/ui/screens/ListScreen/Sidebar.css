@@ -271,8 +271,6 @@
 
     &:hover {
         @apply surface-level-1 elevation-1;
-        --glass-highlight: var(--btn-bg-hover);
-        --glass-shadow: var(--btn-border-color);
         --color-surface-level-1: var(--btn-bg);
     }
 

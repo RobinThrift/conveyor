@@ -83,8 +83,6 @@
 
     &[aria-selected="true"] > div {
         @apply surface-level-1 elevation-1;
-        --glass-highlight: var(--btn-primary-bg-hover);
-        --glass-shadow: var(--btn-primary-border-color);
         --color-surface-level-1: var(--btn-primary-bg);
     }
 

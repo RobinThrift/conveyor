@@ -2,8 +2,8 @@
     "light": {
         "body-bg": "#ffffff",
         "body-bg-contrast": "#c1c1c5",
-        "surface-level-1": "#fefefe",
-        "surface-level-2": "#e8e8e9",
+        "surface-level-1": "#f8f8f8",
+        "surface-level-2": "#f8f8f8",
         "surface-level-3": "#ffffff",
         "surface-border": "#e9e9e9",
         "modal-overlay-bg": "#373949",

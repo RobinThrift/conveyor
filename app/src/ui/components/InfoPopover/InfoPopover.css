@@ -15,7 +15,7 @@
 }
 
 .info-popover {
-    @apply absolute p-1 overflow-visible rounded-md bg-surface-level-2 elevation-2;
+    @apply absolute p-1 overflow-visible rounded-md surface-level-2 elevation-2;
     margin: 0;
     inset: auto;
     top: calc(anchor(bottom) + 5px);

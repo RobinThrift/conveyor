@@ -59,19 +59,6 @@
         transition: scale 150ms cubic-bezier(0.175, 0.885, 0.32, 2.2);
     }
 
-    &:focus-visible,
-    &.has-focus,
-    &:not([aria-disabled="true"]):hover {
-        @apply surface-level-1;
-        --glass-highlight: var(--btn-bg-hover);
-        --glass-shadow: var(--btn-border-color);
-        --color-surface-level-1: var(--btn-bg);
-        scale: 1.01;
-        .icon {
-            scale: 1.15;
-        }
-    }
-
     &:active {
         @apply bg-primary text-primary-contrast;
     }
@@ -93,15 +80,23 @@
     }
 }
 
+.dropdown-menu-list:focus-visible .dropdown-menu-item.has-focus,
+.dropdown-menu-item:not([aria-disabled="true"]):hover {
+    @apply surface-level-1;
+    --color-surface-level-1: var(--btn-bg);
+    scale: 1.01;
+    .icon {
+        scale: 1.15;
+    }
+}
+
 .dropdown-menu-item.destructive {
-    @apply bg-danger-extra-light text-danger-dark;
+    @apply text-danger;
 
     &:focus-visible,
     &.has-focus,
     &:not([aria-disabled="true"]):hover {
         @apply text-danger-extra-dark;
-        --glass-highlight: var(--color-danger-extra-light);
-        --glass-shadow: var(--color-danger-extra-dark);
         --color-surface-level-1: var(--color-danger-light);
     }
 

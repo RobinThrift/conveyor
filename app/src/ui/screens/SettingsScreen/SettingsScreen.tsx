@@ -45,6 +45,10 @@ function SettingsScreenContent() {
     let { tabListRef, isSyncEnabled, activeTab, setActiveTab, focussed, onKeyDown } =
         useSettingsScreenTabs()
 
+    let onClickBack = useCallback(() => {
+        setActiveTab(undefined)
+    }, [setActiveTab])
+
     return (
         <div className="settings-screen">
             <Dialog.Title>
@@ -52,6 +56,13 @@ function SettingsScreenContent() {
             </Dialog.Title>
 
             <div className="settings-tabs">
+                <Button
+                    className="settings-tab-back-btn"
+                    iconRight={<CaretLeftIcon />}
+                    aria-label="Back"
+                    onClick={onClickBack}
+                />
+
                 <div
                     role="tablist"
                     aria-label={t.TabListLabel}
@@ -120,22 +131,22 @@ function SettingsScreenContent() {
                         {t.TabLabelAbout}
                     </Tab>
                 </div>
-                <TabPanel index={0} activeTab={activeTab} setActiveTab={setActiveTab}>
+                <TabPanel index={0} activeTab={activeTab}>
                     <InterfaceSettingsTab />
                 </TabPanel>
-                <TabPanel index={1} activeTab={activeTab} setActiveTab={setActiveTab}>
+                <TabPanel index={1} activeTab={activeTab}>
                     <LocaleSettingsTab />
                 </TabPanel>
-                <TabPanel index={2} activeTab={activeTab} setActiveTab={setActiveTab}>
+                <TabPanel index={2} activeTab={activeTab}>
                     <SyncSettingsTab />
                 </TabPanel>
-                <TabPanel index={3} activeTab={activeTab} setActiveTab={setActiveTab}>
+                <TabPanel index={3} activeTab={activeTab}>
                     <APITokensTab />
                 </TabPanel>
-                <TabPanel index={4} activeTab={activeTab} setActiveTab={setActiveTab}>
+                <TabPanel index={4} activeTab={activeTab}>
                     <DataTab />
                 </TabPanel>
-                <TabPanel index={5} activeTab={activeTab} setActiveTab={setActiveTab}>
+                <TabPanel index={5} activeTab={activeTab}>
                     <AboutTab />
                 </TabPanel>
             </div>
@@ -197,17 +208,12 @@ const TabPanel = React.memo(function TabPanel({
     children,
     index,
     activeTab,
-    setActiveTab,
 }: React.PropsWithChildren<{
     index: number
     activeTab?: SettingsTab
-    setActiveTab: (tab?: SettingsTab) => void
 }>) {
     let isActive = activeTab === settingsTabs[index]
     let ref = useRef<HTMLDivElement | null>(null)
-    let onClickBack = useCallback(() => {
-        setActiveTab(undefined)
-    }, [setActiveTab])
 
     useEffect(() => {
         if (isActive) {
@@ -226,13 +232,6 @@ const TabPanel = React.memo(function TabPanel({
                 inert={!isActive}
                 ref={ref}
             >
-                <Button
-                    className="settings-tab-back-btn"
-                    iconRight={<CaretLeftIcon />}
-                    aria-label="Back"
-                    onClick={onClickBack}
-                />
-
                 {children}
             </div>
         </Activity>

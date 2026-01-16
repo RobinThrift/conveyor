@@ -79,170 +79,133 @@
 }
 
 @utility surface-level-1 {
+    --color-surface-level-1-border: color-mix(
+        in oklch,
+        color-mix(in oklch, var(--color-surface-level-1) 20%, white) 60%,
+        transparent
+    );
+    --surface-level-1-highlight: color-mix(
+        in oklch,
+        color-mix(in oklch, var(--color-surface-level-1) 10%, white)
+            var(--glass-hightlight-intensity, 50%),
+        transparent
+    );
+    --surface-level-1-glow: color-mix(
+        in oklch,
+        color-mix(in oklch, var(--color-surface-level-1) 40%, white) 90%,
+        transparent
+    );
+    --surface-level-1-glow-size: 0px;
+
     color: var(--surface-color, var(--color-text));
+
     background-color: color-mix(
-        in srgb,
+        in oklch,
         var(--color-surface-level-1) 70%,
         transparent
     );
-    backdrop-filter: blur(18px) saturate(1.5);
+    border: 0px solid var(--color-surface-level-1-border);
     box-shadow:
         var(--shadow-elevation, 0 0 #0000),
-        inset 0 0 0 1px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 10%),
-            transparent
-        ),
-        inset 2px 2px 0px -2px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
-            transparent
-        ),
-        inset -2px -2px 0px -2px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
-            transparent
-        ),
-        inset -3px -8px 2px -8px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 60%),
-            transparent
+        inset 0 0 var(--surface-level-1-glow-size) var(--surface-level-1-glow),
+        inset 0px 0px 4px 2px var(--surface-level-1-highlight);
+
+    backdrop-filter: blur(25px) saturate(1.8);
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border-radius: inherit;
+        background: linear-gradient(
+            to left top,
+            color-mix(in oklch, var(--color-surface-level-1) 50%, transparent)
+                0%,
+            rgba(255, 255, 255, 0) 50%
         );
+        z-index: 1;
+    }
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border-radius: inherit;
+        background: linear-gradient(
+            to bottom,
+            color-mix(in oklch, var(--color-surface-level-1) 30%, transparent)
+                0%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        z-index: 1;
+    }
 }
 
 @utility surface-level-2 {
-    color: var(--surface-color, var(--color-text));
-
-    box-shadow:
-        var(--shadow-elevation, 0 0 #0000),
-        inset 0 0 0 1px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 10%),
-            transparent
-        ),
-        inset 2px 3px 0px -2px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
-            transparent
-        ),
-        inset -2px -2px 0px -2px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
-            transparent
-        ),
-        inset -3px -8px 1px -7px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 60%),
-            transparent
-        ),
-        inset -0.3px -1px 4px 0px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 12%),
-            transparent
-        ),
-        inset -1.5px 2.5px 0px -2px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 20%),
-            transparent
-        ),
-        inset 0px 3px 4px -2px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 20%),
-            transparent
-        ),
-        inset 2px -6.5px 1px -4px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 10%),
-            transparent
-        );
-
-    backdrop-filter: blur(8px) saturate(1.8) brightness(1.2);
-    background-color: color-mix(
-        in srgb,
-        var(--color-surface-level-2) 50%,
+    --color-surface-level-2-border: color-mix(
+        in oklch,
+        var(--color-surface-level-2) 40%,
+        white
+    );
+    --surface-level-2-highlight: color-mix(
+        in oklch,
+        color-mix(in oklch, var(--color-surface-level-2) 80%, white)
+            var(--glass-hightlight-intensity, 40%),
         transparent
     );
+    --surface-level-2-glow: color-mix(
+        in oklch,
+        color-mix(in oklch, var(--color-surface-level-2) 40%, white) 90%,
+        transparent
+    );
+
+    color: var(--surface-color, var(--color-text));
+    backdrop-filter: blur(8px) saturate(150%);
+    background-color: color-mix(
+        in oklch,
+        var(--color-surface-level-2) 5%,
+        transparent
+    );
+    border: 1px solid
+        color-mix(
+            in oklch,
+            var(--color-surface-level-2-border) 20%,
+            transparent
+        );
+    box-shadow:
+        var(--shadow-elevation, 0 0 #0000),
+        inset 0 0 var(--surface-level-2-glow-size, 20px)
+        var(--surface-level-2-glow),
+        inset 0px 0px 4px 2px var(--surface-level-2-highlight);
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border-radius: inherit;
+        background: linear-gradient(
+            to left top,
+            color-mix(in oklch, var(--color-surface-level-2) 50%, transparent)
+                0%,
+            rgba(255, 255, 255, 0) 50%
+        );
+        z-index: 1;
+    }
 }
 
 @utility surface-level-3 {
-    --glass-highlight: var(--color-surface-level-3);
-    --glass-shadow: var(--color-surface-border);
     color: var(--surface-color, var(--color-text));
-
-    box-shadow:
-        var(--shadow-elevation, 0 0 #0000),
-        inset 0 0 0 1px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 10%),
-            transparent
-        ),
-        inset 2px 3px 0px -1px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
-            transparent
-        ),
-        inset -2px -2px 0px -2px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 80%),
-            transparent
-        ),
-        inset -3px -8px 1px -6px
-        color-mix(
-            in oklch,
-            var(--glass-highlight) calc(var(--glass-hightlight-intensity) * 60%),
-            transparent
-        ),
-        inset -0.3px -1px 4px 0px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 12%),
-            transparent
-        ),
-        inset -1.5px 2.5px 0px -2px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 20%),
-            transparent
-        ),
-        inset 0px 3px 4px -2px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 20%),
-            transparent
-        ),
-        inset 2px -6.5px 1px -4px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 10%),
-            transparent
-        ),
-        0px 1px 5px 0px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 10%),
-            transparent
-        ),
-        0px 6px 16px 0px
-        color-mix(
-            in oklch,
-            var(--glass-shadow) calc(var(--glass-shadow-intensity) * 8%),
-            transparent
-        );
-
     background-color: var(--color-surface-level-3);
 }

@@ -5,9 +5,11 @@
 
     overflow: hidden;
 
-    border: calc(var(--spacing) * 1) solid rgba(255 255 255 / 0.2);
+    border: calc(var(--spacing) * 1) solid
+        color-mix(in oklch, var(--color-surface-level-3) 20%, transparent);
     backdrop-filter: blur(6px) saturate(2.8) brightness(1.25);
-    background: linear-gradient(hsl(0 0% 98%) 0 100%) padding-box;
+    background: linear-gradient(var(--color-surface-level-1) 0 100%) padding-box;
+    color: var(--surface-color);
 
     position-area: center;
 
@@ -31,7 +33,7 @@
 }
 
 .alert-dialog-description {
-    @apply text-sm text-neutral-extra-dark mb-2;
+    @apply text-sm mb-2;
 }
 
 .alert-dialog-title + .alert-dialog-description {

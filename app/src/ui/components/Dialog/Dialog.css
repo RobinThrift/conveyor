@@ -73,21 +73,6 @@
     isolation: isolate;
 }
 
-.dialog-btns .btn,
-.dialog-close-btn {
-    &::before {
-        background-color: var(--btn-bg);
-        color: var(--btn-color);
-        border: 1px solid var(--btn-border-color);
-    }
-
-    &:hover {
-        &::before {
-            background-color: var(--btn-bg-hover);
-        }
-    }
-}
-
 .dialog.is-modal .dialog {
     /* biome-ignore lint/complexity/noImportantStyles: required for reset */
     --backdrop-opacity: 0 !important;

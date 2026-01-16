@@ -91,132 +91,6 @@ export const Colours: Story = {
                         <Button variant="danger">Danger</Button>
                     </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                    <div className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg">
-                        <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-
-                            <img
-                                alt="img-1"
-                                src={faker.image.urlPicsumPhotos({
-                                    width: 600,
-                                    height: 400,
-                                })}
-                            />
-
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-
-                            <img
-                                alt="img-2"
-                                src={faker.image.urlPicsumPhotos({
-                                    width: 600,
-                                    height: 400,
-                                })}
-                            />
-
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-                        </div>
-
-                        <div className="surface-level-1 p-2 rounded-2xl elevation-1 absolute left-25 right-25 top-50 -translate-y-1/2">
-                            <h3>Surface Level 1</h3>
-                            {faker.lorem.sentences({ min: 5, max: 10 })}
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg dark bg-body text-text">
-                        <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-
-                            <img
-                                alt="img-1"
-                                src={faker.image.urlPicsumPhotos({
-                                    width: 600,
-                                    height: 400,
-                                })}
-                            />
-
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-
-                            <img
-                                alt="img-2"
-                                src={faker.image.urlPicsumPhotos({
-                                    width: 600,
-                                    height: 400,
-                                })}
-                            />
-
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-                        </div>
-
-                        <div className="surface-level-1 p-2 rounded-2xl absolute left-25 top-50 right-25 -translate-y-1/2">
-                            <h3>Surface Level 1</h3>
-                            {faker.lorem.sentences({ min: 5, max: 10 })}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                    <div className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg">
-                        <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-
-                            <img
-                                alt="img-1"
-                                src={faker.image.urlPicsumPhotos({
-                                    width: 600,
-                                    height: 400,
-                                })}
-                            />
-
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-
-                            <img
-                                alt="img-2"
-                                src={faker.image.urlPicsumPhotos({
-                                    width: 600,
-                                    height: 400,
-                                })}
-                            />
-
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-                        </div>
-
-                        <div className="surface-level-2 p-2 rounded-2xl absolute left-25 right-25 top-50 -translate-y-1/2">
-                            <h3>Surface Level 2</h3>
-                            {faker.lorem.sentences({ min: 5, max: 10 })}
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-2 relative p-2 border border-neutral rounded-lg dark bg-body text-text">
-                        <div className="flex flex-col gap-2 relative h-[400px] overflow-auto">
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-
-                            <img
-                                alt="img-1"
-                                src={faker.image.urlPicsumPhotos({
-                                    width: 600,
-                                    height: 400,
-                                })}
-                            />
-
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-
-                            <img
-                                alt="img-2"
-                                src={faker.image.urlPicsumPhotos({
-                                    width: 600,
-                                    height: 400,
-                                })}
-                            />
-
-                            <p>{faker.lorem.sentences({ min: 5, max: 10 })}</p>
-                        </div>
-
-                        <div className="surface-level-2 p-2 rounded-2xl absolute left-25 top-50 right-25 -translate-y-1/2">
-                            <h3>Surface Level 2 2</h3>
-                            {faker.lorem.sentences({ min: 5, max: 10 })}
-                        </div>
-                    </div>
-                </div>
             </div>
         )
     },
@@ -263,11 +137,11 @@ export const Surfaces: Story = {
                                     className={clsx(
                                         mode,
                                         `surface-level-${level}`,
-                                        "p-2 rounded-2xl elevation-1 absolute left-25 right-25 top-50 -translate-y-1/2",
+                                        "p-2 rounded-2xl elevation-1 absolute left-[30%] w-[40%] top-50 -translate-y-1/2",
                                     )}
                                 >
                                     <h3>Surface Level {level}</h3>
-                                    {faker.lorem.sentences({ min: 5, max: 10 })}
+                                    {faker.lorem.sentences({ min: 10, max: 15 })}
                                 </div>
                             </div>
                         ))}

@@ -265,8 +265,6 @@
         .memo-list-day-date {
             @apply py-1 px-1.5 relative rounded-xl surface-level-2 elevation-2 w-fit;
             font-size: var(--sm-font-size);
-            --glass-highlight: var(--btn-bg-hover);
-            --glass-shadow: var(--btn-border-color);
             --color-surface-level-1: var(--btn-bg);
         }
     }
