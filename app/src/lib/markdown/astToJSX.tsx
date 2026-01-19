@@ -154,6 +154,7 @@ function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boo
         case "FootnoteMark":
         case "HeaderMark":
         case "CustomBlockEnd":
+            return null
     }
 
     throw new Error(`unknown node type ${cursor.type.name}`)
