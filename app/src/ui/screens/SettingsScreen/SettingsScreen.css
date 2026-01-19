@@ -70,7 +70,8 @@
             animation: unset;
         }
 
-        .settings-tab-back-btn .icon, .dialog-close-btn .icon {
+        .settings-tab-back-btn .icon,
+        .dialog-close-btn .icon {
             animation: unset;
         }
     }

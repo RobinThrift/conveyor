@@ -29,7 +29,6 @@
         z-index: calc(var(--overflow-mask-z) + 1);
     }
 
-
     @media (min-width: 1024px) {
         --overflow-mask-height: 50px;
     }
