@@ -199,13 +199,13 @@
     z-index: var(--memo-list-day-z-index);
     top: calc(
         var(--spacing) *
-        4 +
+        2 +
         max(env(safe-area-inset-top, 0px), var(--spacing) * 2)
     );
     margin-top: calc(var(--spacing) * 4);
 
     .memo-list-day-date {
-        @apply text-neutral-dark;
+        @apply text-neutral-dark dark:text-neutral-light;
         font-size: var(--sm-font-size);
     }
 

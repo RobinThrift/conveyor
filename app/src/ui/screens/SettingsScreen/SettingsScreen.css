@@ -1,9 +1,3 @@
-@property --mobile-settings-btn-icon-blur {
-    syntax: "<length>";
-    initial-value: 10px;
-    inherits: true;
-}
-
 .settings-dialog {
     @apply border border-1 border-surface-border p-0!;
     overflow-x: auto;
@@ -17,9 +11,10 @@
         animation-timeline: --mobile-settings-title;
         animation-fill-mode: both;
 
-        --mobile-settings-btn-icon-blur: 0px;
         .icon {
-            filter: blur(var(--mobile-settings-btn-icon-blur));
+            animation: mobile-settings-btn-icon-blur linear;
+            animation-timeline: --mobile-settings-title;
+            animation-fill-mode: both;
         }
     }
 
@@ -31,13 +26,12 @@
         animation-fill-mode: both;
         left: calc(var(--spacing) * 2);
         opacity: 0;
-        /* filter: blur(10px); */
         pointer-events: none;
 
-        --mobile-settings-btn-icon-blur: 10px;
-
         .icon {
-            filter: blur(var(--mobile-settings-btn-icon-blur));
+            animation: mobile-settings-btn-icon-blur linear reverse;
+            animation-timeline: --mobile-settings-title;
+            animation-fill-mode: both;
         }
     }
 
@@ -75,14 +69,16 @@
             @apply size-8;
             animation: unset;
         }
+
+        .settings-tab-back-btn .icon, .dialog-close-btn .icon {
+            animation: unset;
+        }
     }
 }
 
 @keyframes mobile-settings-close-btn {
     from {
         left: calc(var(--spacing) * 2);
-        /* filter: blur(0px); */
-        --mobile-settings-btn-icon-blur: 0px;
         opacity: 1;
         pointer-events: auto;
     }
@@ -90,8 +86,6 @@
     to {
         left: calc(var(--spacing) * 2 + 100%);
         opacity: 0;
-        /* filter: blur(10px); */
-        --mobile-settings-btn-icon-blur: 10px;
         pointer-events: none;
     }
 }
@@ -100,17 +94,23 @@
     from {
         left: calc(var(--spacing) * 2);
         opacity: 0;
-        /* filter: blur(10px); */
-        --mobile-settings-btn-icon-blur: 10px;
         pointer-events: none;
     }
 
     to {
         left: calc(var(--spacing) * 3 + 100%);
-        /* filter: blur(0px); */
-        --mobile-settings-btn-icon-blur: 0px;
         opacity: 1;
         pointer-events: auto;
+    }
+}
+
+@keyframes mobile-settings-btn-icon-blur {
+    from {
+        filter: blur(0px);
+    }
+
+    to {
+        filter: blur(20px);
     }
 }
 

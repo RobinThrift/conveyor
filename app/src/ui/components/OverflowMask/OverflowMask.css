@@ -1,9 +1,7 @@
 .overflow-mask {
     @apply fixed left-0 right-0 pointer-events-none overflow-hidden;
-    --overflow-mask-height: 100px;
-    --overflow-mask-final-opacity: 60%;
 
-    height: var(--overflow-mask-height);
+    height: var(--overflow-mask-height, 100px);
     z-index: var(--overflow-mask-z);
 }
 
@@ -17,6 +15,7 @@
 
 .dark .overflow-mask {
     --overflow-mask-final-opacity: 80%;
+    --overflow-mask-top-gradient-end: 10%;
 }
 
 .overflow-mask-item {
@@ -42,7 +41,8 @@
     @apply inset-x-0;
 
     background-image: linear-gradient(
-        color-mix(in oklch, var(--color-body-bg) 100%, transparent) 1%,
+        to bottom,
+        var(--color-body-bg) var(--overflow-mask-top-gradient-end, 1%),
         transparent 100%
     );
 }
@@ -54,7 +54,7 @@
         transparent 0%,
         color-mix(
                 in oklch,
-                var(--color-body-bg) var(--overflow-mask-final-opacity),
+                var(--color-body-bg) var(--overflow-mask-final-opacity, 60%),
                 transparent
             )
             100%

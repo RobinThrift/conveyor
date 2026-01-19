@@ -29,6 +29,11 @@
         z-index: calc(var(--overflow-mask-z) + 1);
     }
 
+
+    @media (min-width: 1024px) {
+        --overflow-mask-height: 50px;
+    }
+
     &:has(.memo-list-tab-panel[aria-hidden="true"]) {
         top: calc(
             calc(
@@ -49,7 +54,7 @@
             margin-top: 0;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             pointer-events: unset;
             top: unset;
             width: unset;

@@ -1,6 +1,7 @@
 import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
-import React, { Activity, startTransition, useCallback, useEffect, useRef } from "react"
+import React, { Activity, startTransition, useCallback, useEffect, useMemo, useRef } from "react"
+import type { Temporal } from "temporal-polyfill"
 
 import type { MemoContentChanges } from "@/domain/Changelog"
 import type { MemoID, Memo as MemoT } from "@/domain/Memo"
@@ -73,10 +74,7 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
                         <Memo memo={memo}>
                             {({ id, title, createdAt, body, onDoubleClick }) => (
                                 <>
-                                    <div aria-hidden="true" className="memo-title-mobile-float">
-                                        <MemoDate createdAt={createdAt} />
-                                        {title && <span>{title}</span>}
-                                    </div>
+                                    <MemoTitleMobileFloat createdAt={createdAt} title={title} />
                                     <MemoHeader>
                                         <CloseMemoTabPanelButton memoID={memoID} />
                                         {title && (
@@ -104,6 +102,44 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
         </Activity>
     )
 }
+
+const maxMobileTitleLength = 45
+
+const MemoTitleMobileFloat = React.memo(function MemoTitleMobileFloat({
+    createdAt,
+    title,
+}: {
+    createdAt: Temporal.ZonedDateTime
+    title?: string
+}) {
+    let trimmed = useMemo(() => {
+        if (!title) {
+            return
+        }
+
+        if (title.length < maxMobileTitleLength) {
+            return title
+        }
+
+        let trimmed = title.substring(0, maxMobileTitleLength)
+
+        let lastSpace = trimmed.lastIndexOf(" ")
+        if (lastSpace === -1) {
+            return trimmed
+        }
+
+        trimmed = trimmed.substring(0, lastSpace)
+
+        return `${trimmed}...`
+    }, [title])
+
+    return (
+        <div aria-hidden="true" className="memo-title-mobile-float">
+            <MemoDate createdAt={createdAt} />
+            {trimmed && <span>{trimmed}</span>}
+        </div>
+    )
+})
 
 function CloseMemoTabPanelButton({ memoID }: { memoID: MemoID }) {
     let t = useT("components/MemoTabPanel")
@@ -199,7 +235,7 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
         let animation: Animation | undefined
 
         let onPointerDown = (e: PointerEvent) => {
-            if (e.pointerType !== "touch" || !e.isPrimary || e.pageX > 15) {
+            if (e.pointerType !== "touch" || !e.isPrimary || e.pageX > 30) {
                 return
             }
 

@@ -205,8 +205,8 @@
         0.28722767612010475 0.003591889158692337 286.17136941953794
     );
 
-    --glass-hightlight-intensity: 20%;
-    --surface-level-2-glow-size: 5px;
+    --glass-hightlight-intensity: 10%;
+    --surface-level-2-glow-size: 3px;
 }
 
 /* Code */

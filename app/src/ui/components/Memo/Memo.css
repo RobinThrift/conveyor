@@ -41,7 +41,7 @@
     }
 
     .memo-date {
-        @apply flex-1 flex items-center justify-center;
+        @apply flex-1 flex items-center;
         order: 2;
     }
 
@@ -49,7 +49,7 @@
         @apply justify-start;
 
         .memo-actions {
-            @apply absolute right-3;
+            @apply fixed right-3;
         }
 
         .memo-title {
@@ -76,21 +76,9 @@
 .memo .memo-date {
     @apply w-full flex items-center;
 
-    button {
-        display: contents;
-    }
-
     time {
-        @apply w-fit text-neutral-dark italic;
+        @apply w-fit text-neutral-dark dark:text-neutral-extra-light italic;
         font-size: var(--sm-font-size);
-
-        &.sm {
-            @apply @md:hidden col-span-3;
-        }
-
-        &.md {
-            @apply hidden @md:flex order-3 w-full;
-        }
     }
 }
 

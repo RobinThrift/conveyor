@@ -96,11 +96,18 @@
 .dialog-close-btn {
     @apply absolute right-3 top-3 inline-flex size-8 items-center justify-center p-0 rounded-full;
     @apply aspect-square h-11 w-11;
-    @apply focus:outline-hidden focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset-2;
     z-index: 200;
 
     & > svg {
         @apply size-4;
+    }
+
+    &:focus-visible {
+        @apply outline-2 outline-offset-2 outline-primary;
+    }
+
+    &:focus {
+        @apply outline-none;
     }
 }
 

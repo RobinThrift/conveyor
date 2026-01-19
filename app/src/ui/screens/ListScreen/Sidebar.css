@@ -19,7 +19,7 @@
     animation-timeline: --scroll;
     container-name: --scroll;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
         @apply bg-body px-0 pt-0 elevation elevation-3;
         position: fixed;
         top: var(--spacing);
@@ -76,7 +76,7 @@
     animation-range-end: 200px;
     animation-fill-mode: both;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
         @apply relative shadow-none aspect-square;
         left: unset;
         top: unset;
@@ -106,7 +106,7 @@
         @apply ml-12 mt-0;
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
         @apply ml-0 mt-2;
 
         &.compact {
@@ -121,7 +121,7 @@
 
     .memo-list-filter-search {
         @apply hidden;
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             @apply flex flex-1;
         }
 

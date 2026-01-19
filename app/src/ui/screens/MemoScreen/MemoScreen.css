@@ -1,12 +1,19 @@
 .memo-screen {
     @apply hidden flex-1 relative;
     --overflow-mask-z: 100;
-    --overflow-mask-height: 130px;
 
     min-height: calc(100svh - var(--pt) - var(--pb));
+    padding-top: calc(var(--spacing) * 1.5);
 
     @media (min-width: 768px) {
         margin-left: calc(var(--sidebar-width) + var(--spacing) * 1);
+    }
+}
+
+.memo-screen-oveflow-mask {
+    --overflow-mask-height: calc(env(safe-area-inset-top, 0px) + 4lh);
+    @media (min-width: 768px) {
+        --overflow-mask-height: calc(env(safe-area-inset-top, 0px) + 1lh);
     }
 }
 
@@ -14,7 +21,7 @@
     @apply fixed;
     width: 15vw;
     left: -5vw;
-    z-index: 10;
+    z-index: 200;
     touch-action: none;
     top: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 10);
     bottom: calc(env(safe-area-inset-bottom, 0px) + var(--spacing) * 10);
@@ -37,6 +44,10 @@
     width: 100%;
     min-height: calc(100vh - env(safe-area-inset-bottom, 0px));
     container: memo-tab-panel / size;
+
+    &:focus {
+        @apply outline-none;
+    }
 
     &:focus-visible {
         @apply outline-3 outline-offset-0 outline-primary rounded-2xl;
@@ -105,13 +116,16 @@
     }
 
     .memo-tab-panel-close-btn {
+        @apply fixed;
+        top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 2));
         order: 1;
         .btn {
             @apply aspect-square h-11 w-11 elevation-2;
         }
 
         @container (width >= 1224px) {
-            @apply absolute left-2;
+            top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 4));
+            left: calc(var(--sidebar-width) + var(--spacing) * 3);
 
             .btn {
                 @apply h-11 w-11;
@@ -120,17 +134,13 @@
         }
     }
 
-    .memo-actions-lg .btn,
-    .memo-tab-panel-close-btn {
-        animation: mobile-memo-title-actions linear;
-        animation-timeline: scroll(root);
-        animation-range-end: 200px;
-        animation-fill-mode: both;
-
-        transition: filter 150ms linear;
+    .memo-actions .btn .icon,
+    .memo-tab-panel-close-btn .icon {
+        transition: filter 200ms linear;
+        transition-delay: 100ms;
         filter: blur(0px);
         @starting-style {
-            filter: blur(20px);
+            filter: blur(10px);
         }
 
         @container (width >= 1224px) {
@@ -141,15 +151,16 @@
     }
 
     .memo-title-mobile-float {
-        text-align: center;
+        @apply ml-14;
         position: fixed;
-        top: calc(env(safe-area-inset-top, 0px) + 1lh);
+        top: calc(env(safe-area-inset-top, 0px) + 1lh + var(--spacing) * 1.5);
         left: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
         right: max(env(safe-area-inset-right, 0px), calc(2 * var(--spacing)));
         z-index: calc(var(--overflow-mask-z) + 1);
         pointer-events: none;
 
         & > span {
+            @apply mr-28;
             display: block;
             font-size: var(--base-font-size);
             font-weight: bold;
@@ -159,12 +170,12 @@
             animation-timeline: scroll(root);
             animation-range-end: 200px;
             animation-fill-mode: both;
+            height: 2lh;
         }
 
         .memo-date {
             font-size: var(--xs-font-size);
             width: 100%;
-            place-content: center;
             filter: blur(10px);
             opacity: 0;
             animation: mobile-memo-title-float linear;
@@ -176,6 +187,14 @@
         @container (width >= 768px) {
             @apply hidden;
         }
+    }
+}
+
+.memo-tab-panel .memo-header .memo-date {
+    @apply pb-3 ml-14;
+
+    @container (width >= 768px) {
+        @apply ml-0 pb-0;
     }
 }
 
@@ -199,20 +218,6 @@
     }
 }
 
-@keyframes mobile-memo-title-actions {
-    from {
-        translate: 0 0;
-        transform: scale(1);
-        filter: blur(0px);
-    }
-
-    to {
-        translate: 0 -50%;
-        transform: scale(0);
-        filter: blur(40px);
-    }
-}
-
 .memo-tab-panel-memo .editor {
     @apply flex items-center;
     min-height: calc(100% - (var(--spacing)));
@@ -227,7 +232,8 @@
 }
 
 .memo-screen .memo-actions {
-    @apply elevation-2;
+    @apply elevation-2 fixed right-2;
+    top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 2));
     z-index: calc(var(--overflow-mask-z) + 1);
 
     @container (width >= 320px) {
@@ -241,6 +247,8 @@
     }
 
     @container (width >= 700px) {
+        top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 4));
+
         .memo-actions-lg {
             @apply flex;
         }
@@ -255,7 +263,10 @@
     }
 }
 
-.memo-screen .memo-header {
+.memo-screen .memo-header .memo-tab-panel-close-btn,
+.memo-screen .memo-header .memo-actions,
+.memo-screen .memo-header .memo-date,
+.memo-screen .editor-buttons {
     z-index: calc(var(--overflow-mask-z) + 1);
 }
 
@@ -428,7 +439,6 @@
 :root::view-transition-new(close-memo-tab-closed) {
     display: none;
     animation: none;
-    /* mix-blend-mode: unset; */
 }
 
 @keyframes close-memo-tab-list-screen {
