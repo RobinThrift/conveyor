@@ -142,52 +142,6 @@
     }
 }
 
-:root {
-    --mobile-top-fadeout-z-index: 20;
-    --mobile-top-fadeout-height: calc(
-        var(--spacing) *
-        20 +
-        env(safe-area-inset-top, 0px) *
-        3
-    );
-    --mobile-top-fadeout-to-adjust: 0px;
-
-    /* &:has(.memo-tab-panel[aria-hidden="false"]) { */
-    /*     --mobile-top-fadeout-height: calc( */
-    /*         var(--spacing) * */
-    /*         40 + */
-    /*         env(safe-area-inset-top, 0px) * */
-    /*         3 */
-    /*     ); */
-    /* } */
-}
-
-@keyframes mobile-top-fadeout {
-    from {
-        height: 0;
-        margin-bottom: 0;
-        translate: 0
-            calc(
-                -1 *
-                var(--mobile-top-fadeout-height) *
-                2 +
-                env(safe-area-inset-top, 0px) +
-                var(--mobile-top-fadeout-to-adjust, 0px)
-            );
-    }
-
-    to {
-        height: var(--mobile-top-fadeout-height);
-        translate: 0
-            calc(
-                -1 *
-                env(safe-area-inset-top, 1px) +
-                var(--mobile-top-fadeout-to-adjust, 0px)
-            );
-        margin-bottom: calc(-1 * var(--mobile-top-fadeout-height));
-    }
-}
-
 @property --memo-tab-back-progress {
     syntax: "<percentage>";
     initial-value: 0%;

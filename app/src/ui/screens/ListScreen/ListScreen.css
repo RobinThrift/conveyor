@@ -7,7 +7,7 @@
 
     @media (min-width: 1024px) {
         --sidebar-width: 300px;
-        --sidebar-height: calc(100svh - var(--appheader-height, 0px));
+        --sidebar-height: 100svh;
     }
 
     @media (min-width: 1680px) {
@@ -22,6 +22,12 @@
 .list-screen {
     @apply flex flex-col relative;
     transition: top 1ms;
+    --overflow-mask-z: 100;
+    --overflow-mask-height: 130px;
+
+    .memo-list-sidebar {
+        z-index: calc(var(--overflow-mask-z) + 1);
+    }
 
     &:has(.memo-list-tab-panel[aria-hidden="true"]) {
         top: calc(
@@ -41,7 +47,6 @@
 
         .memo-list-sidebar {
             margin-top: 0;
-            z-index: calc(var(--mobile-top-fadeout-z-index) + 1);
         }
 
         @media (min-width: 768px) {
@@ -54,6 +59,10 @@
             opacity: unset;
         }
     }
+}
+
+.screens[data-active-stack="memos"] .list-screen-overflow-mask {
+    @apply hidden;
 }
 
 .dragging-memo-tab .list-screen:has(.memo-list-tab-panel[aria-hidden="true"]) {
@@ -89,10 +98,7 @@
 
 .memo-list-tab-panel {
     .memo-list {
-        @apply bg-surface-level-2;
-
         @media (min-width: 1024px) {
-            background-color: unset;
             --pt: max(env(safe-area-inset-top, 0px), calc(var(--spacing)));
         }
     }

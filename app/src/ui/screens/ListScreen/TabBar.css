@@ -98,6 +98,10 @@
 
     @media (min-width: 768px) {
         @apply hidden;
+
+        .mobile-tabbar-overflow-mask {
+            @apply hidden;
+        }
     }
 
     &:has(input:focus) {
@@ -118,6 +122,10 @@
     }
 }
 
+.screens[data-active-stack="memos"] .mobile-tabbar-overflow-mask {
+    @apply hidden;
+}
+
 :root:has(.memo-tab-panel[aria-hidden="false"]) {
     .mobile-tabbar {
         pointer-events: none;
@@ -130,7 +138,6 @@
     opacity: 1;
     top: calc(-1 * var(--offset-top, 0px) + (85svh + var(--spacing) * 11));
     height: min-content;
-    /* translate: 100% 0; */
 }
 
 .tag-tree-offcanvas-wrapper {

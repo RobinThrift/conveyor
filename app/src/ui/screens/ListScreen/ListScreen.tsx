@@ -2,8 +2,8 @@ import { useStore } from "@tanstack/react-store"
 import React, { startTransition, useEffect, useRef, useState } from "react"
 
 import { MemoList } from "@/ui/components/MemoList"
+import { OverFlowMask } from "@/ui/components/OverflowMask"
 import { stores } from "@/ui/stores"
-
 import { Sidebar } from "./Sidebar"
 import { TabBar } from "./TabBar"
 import { memoListTabID } from "./TabList"
@@ -24,9 +24,7 @@ export function ListScreen() {
                 setOffsetTop(ref.current?.getBoundingClientRect().top ?? 0)
             })
 
-            // requestAnimationFrame(() => {
             window.scrollTo({ top: offsetScrollTop, behavior: "instant" })
-            // })
         }
     }, [isActive])
 
@@ -43,6 +41,8 @@ export function ListScreen() {
             </div>
 
             <TabBar />
+
+            <OverFlowMask className="list-screen-overflow-mask" dir="top" />
         </div>
     )
 }

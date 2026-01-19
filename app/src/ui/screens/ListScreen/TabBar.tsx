@@ -12,6 +12,7 @@ import React, {
 import { HashIcon, NotePencilIcon, XIcon } from "@/ui/components/Icons"
 import { SearchBar } from "@/ui/components/MemoListFilter/Searchbar"
 import { TagTreeFilter } from "@/ui/components/MemoListFilter/TagTreeFilter"
+import { OverFlowMask } from "@/ui/components/OverflowMask"
 import { usePreventScroll } from "@/ui/hooks/usePreventScroll"
 import { useT } from "@/ui/i18n"
 import { getScrollOffsetTop } from "@/ui/navigation"
@@ -19,13 +20,17 @@ import { actions } from "@/ui/stores"
 
 export function TabBar() {
     return (
-        <div className="mobile-tabbar">
-            <SidebarOffcanvasOverflow />
+        <>
+            <OverFlowMask className="mobile-tabbar-overflow-mask" />
 
-            <SearchBar className="mobile-tabbar-search-bar" />
+            <div className="mobile-tabbar">
+                <SidebarOffcanvasOverflow />
 
-            <NewMemoButton />
-        </div>
+                <SearchBar className="mobile-tabbar-search-bar" />
+
+                <NewMemoButton />
+            </div>
+        </>
     )
 }
 

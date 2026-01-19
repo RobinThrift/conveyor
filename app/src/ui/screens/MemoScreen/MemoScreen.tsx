@@ -16,6 +16,7 @@ import {
     MemoHeader,
     MemoTitle,
 } from "@/ui/components/Memo"
+import { OverFlowMask } from "@/ui/components/OverflowMask"
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
 import { actions, selectors, stores } from "@/ui/stores"
@@ -97,6 +98,8 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
                 </div>
 
                 <div ref={ref} className="memo-screen-drag-handle" />
+
+                <OverFlowMask className="memo-screen-oveflow-mask" dir="top" />
             </div>
         </Activity>
     )
@@ -104,27 +107,6 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
 
 function CloseMemoTabPanelButton({ memoID }: { memoID: MemoID }) {
     let t = useT("components/MemoTabPanel")
-    // let onClick = useCallback(() => {
-    //     let durationMs = 120
-    //     document.body.classList.add("dragging-memo-tab")
-    //
-    //     let animation = document.body.animate(
-    //         [{ "--memo-tab-back-progress": "0%" }, { "--memo-tab-back-progress": "100%" }],
-    //         {
-    //             duration: durationMs,
-    //             fill: "forwards",
-    //             composite: "add",
-    //         },
-    //     )
-    //
-    //     animation.finished.finally(() => {
-    //         document.body.classList.remove("dragging-memo-tab")
-    //         animation.cancel()
-    //         requestAnimationFrame(() => {
-    //             actions.ui.closeMemo(memoID)
-    //         })
-    //     })
-    // }, [memoID])
 
     let isMobile = useIsMobile()
     let onClick = useCallback(() => {

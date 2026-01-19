@@ -1,0 +1,77 @@
+.overflow-mask {
+    @apply fixed left-0 right-0 pointer-events-none overflow-hidden;
+    --overflow-mask-height: 100px;
+    --overflow-mask-final-opacity: 60%;
+
+    height: var(--overflow-mask-height);
+    z-index: var(--overflow-mask-z);
+}
+
+.overflow-mask.top {
+    @apply top-0;
+}
+
+.overflow-mask.bottom {
+    @apply bottom-0;
+}
+
+.dark .overflow-mask {
+    --overflow-mask-final-opacity: 80%;
+}
+
+.overflow-mask-item {
+    @apply absolute top-0 left-0 w-full h-full;
+}
+
+.overflow-mask.top .overflow-mask-item:nth-child(1) {
+    @apply mask-b-from-70% mask-b-to-100%;
+    backdrop-filter: blur(1px);
+}
+
+.overflow-mask.top.overflow-mask-item:nth-child(2) {
+    @apply mask-b-from-50% mask-b-to-75%;
+    backdrop-filter: blur(4px);
+}
+
+.overflow-mask.top.overflow-mask-item:nth-child(3) {
+    @apply mask-b-from-20% mask-b-to-55%;
+    backdrop-filter: blur(10px);
+}
+
+.overflow-mask.top .overflow-mask-item:nth-child(4) {
+    @apply inset-x-0;
+
+    background-image: linear-gradient(
+        color-mix(in oklch, var(--color-body-bg) 100%, transparent) 1%,
+        transparent 100%
+    );
+}
+
+.overflow-mask.bottom .overflow-mask-item:nth-child(1) {
+    @apply inset-x-0;
+
+    background-image: linear-gradient(
+        transparent 0%,
+        color-mix(
+                in oklch,
+                var(--color-body-bg) var(--overflow-mask-final-opacity),
+                transparent
+            )
+            100%
+    );
+}
+
+.overflow-mask.bottom .overflow-mask-item:nth-child(2) {
+    @apply mask-t-from-20% mask-t-to-55%;
+    backdrop-filter: blur(10px);
+}
+
+.overflow-mask.bottom .overflow-mask-item:nth-child(3) {
+    @apply mask-t-from-50% mask-t-to-75%;
+    backdrop-filter: blur(4px);
+}
+
+.overflow-mask.bottom .overflow-mask-item:nth-child(4) {
+    @apply mask-t-from-70% mask-t-to-100%;
+    backdrop-filter: blur(1px);
+}
