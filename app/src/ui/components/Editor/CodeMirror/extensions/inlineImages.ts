@@ -61,6 +61,8 @@ class ImageWidget extends WidgetType {
     private readonly _src: string
     private readonly _getAttachmentDataByID: GetAttachmentDataByID
     private _dom?: HTMLImageElement
+    private _attachment: ReturnType<typeof parseAttachmentURL>
+    private _estimatedHeight: number = -1
 
     constructor({
         src,
@@ -69,28 +71,33 @@ class ImageWidget extends WidgetType {
         super()
         this._src = src
         this._getAttachmentDataByID = getAttachmentDataByID
+        this._attachment = parseAttachmentURL(src)
+        this._estimatedHeight = this._attachment?.height ?? -1
+    }
+
+    public get estimatedHeight(): number {
+        console.log("estimatedHeight", this._estimatedHeight)
+        return this._estimatedHeight
     }
 
     eq(widget: WidgetType): boolean {
         return this._src === (widget as ImageWidget)._src
     }
 
-    toDOM(view: EditorView) {
-        this._dom = document.createElement("img")
-        this._dom.className = "cm-img"
-        this._dom.setAttribute("aria-hidden", "true")
+    updateDOM(dom: HTMLElement, _: EditorView): boolean {
+        dom = document.createElement("img")
+        dom.className = "cm-img"
+        dom.setAttribute("aria-hidden", "true")
 
-        this._dom.addEventListener(
+        dom.addEventListener(
             "load",
             () => {
-                setTimeout(() => {
-                    view.requestMeasure()
-                }, 1000)
+                this._estimatedHeight = this._dom?.height ?? -1
             },
             { once: true, passive: true },
         )
 
-        this._dom.addEventListener(
+        dom.addEventListener(
             "error",
             (err) => {
                 console.error("error loading image", err)
@@ -98,9 +105,8 @@ class ImageWidget extends WidgetType {
             { once: true, passive: true },
         )
 
-        let attachment = parseAttachmentURL(this._src)
-        if (attachment?.attachmentID) {
-            this._getAttachmentDataByID(attachment.attachmentID).then(([data, err]) => {
+        if (this._attachment?.attachmentID) {
+            this._getAttachmentDataByID(this._attachment.attachmentID).then(([data, err]) => {
                 if (err) {
                     console.error(err)
                     return
@@ -112,9 +118,15 @@ class ImageWidget extends WidgetType {
                 this._dom.src = imageBlobToSrc(data)
             })
         } else {
-            this._dom.src = this._src
+            ;(dom as HTMLImageElement).src = this._src
         }
 
+        return true
+    }
+
+    toDOM(view: EditorView) {
+        this._dom = document.createElement("img")
+        this.updateDOM(this._dom, view)
         return this._dom
     }
 
