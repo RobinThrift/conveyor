@@ -17,7 +17,6 @@
 
 @import "../components/Alert/Alert.css" layer(components);
 @import "../components/AlertDialog/AlertDialog.css" layer(components);
-@import "../components/AppHeader/AppHeader.css" layer(components);
 @import "../components/AuthForm/AuthForm.css" layer(components);
 @import "../components/Button/Button.css" layer(components);
 @import "../components/ConveyorBeltText/ConveyorBeltText.css" layer(components);
