@@ -25,6 +25,10 @@
     touch-action: none;
     top: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 10);
     bottom: calc(env(safe-area-inset-bottom, 0px) + var(--spacing) * 10);
+
+    @media (min-width: 768px) {
+        @apply hidden;
+    }
 }
 
 .memo-screen:has(.memo.is-editing) .memo-screen-drag-handle {
