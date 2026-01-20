@@ -222,6 +222,27 @@
     }
 }
 
+.memo .toc {
+    @apply hidden border-s border-surface-border ps-2;
+    top: calc(max(env(safe-area-inset-top, 0px), var(--spacing) * 4) + 10dvh);
+    right: calc(max(env(safe-area-inset-right, 0px), var(--spacing) * 4));
+
+    .toc-item .toc-items {
+        padding-inline-start: calc(
+            var(--spacing) *
+            (var(--toc-indent-level, 0) + 2)
+        );
+    }
+
+    .toc-item a:hover {
+        @apply text-primary;
+    }
+
+    @container (width >= 1550px) {
+        @apply fixed block;
+    }
+}
+
 .memo-tab-panel-memo .editor {
     @apply flex items-center;
     min-height: calc(100% - (var(--spacing)));

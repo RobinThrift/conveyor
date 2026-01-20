@@ -9,6 +9,7 @@ import { useAttachmentTransferer } from "@/ui/attachments"
 import { Button } from "@/ui/components/Button"
 import { Editor } from "@/ui/components/Editor"
 import { XIcon } from "@/ui/components/Icons"
+import { TOC } from "@/ui/components/Markdown/TOC"
 import {
     Memo,
     MemoActionsDropdown,
@@ -89,6 +90,7 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
                                     <MemoBody id={id} onDoubleClick={onDoubleClick}>
                                         {body}
                                     </MemoBody>
+                                    <TOC document={body} id={id} />
                                 </>
                             )}
                         </Memo>

@@ -5,6 +5,7 @@ import type { Params, Screens } from "@/control/NavigationController"
 import { CheckIcon } from "@/ui/components/Icons"
 import { Loader } from "@/ui/components/Loader"
 import { useT } from "@/ui/i18n"
+import { collectText, idFromText } from "./utils"
 
 interface Document {
     id: string
@@ -170,7 +171,7 @@ function headingToJSX(doc: Document, node: SyntaxNode, level: number): ReactNode
     }
 
     let key = nodeKey(node)
-    let id = `${doc.id}-${idFromText(doc.text.substring(node.from, node.to))}`
+    let id = `${doc.id}-${idFromText(collectText(node, doc.text))}`
     switch (level) {
         case 1:
             return (
@@ -675,15 +676,6 @@ function collectChildren(
 
 function nodeKey(node: SyntaxNode): Key {
     return `${node.name}:${node.from}:${node.to}`
-}
-
-function idFromText(...fragements: string[]): string {
-    return fragements
-        .join("-")
-        .normalize()
-        .toLowerCase()
-        .replaceAll(/\)+/g, "")
-        .replaceAll(/[(\s\]\]]+/g, "_")
 }
 
 function appendToChildren(children: ReactNode[], node: ReactNode) {

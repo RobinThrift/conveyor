@@ -72,7 +72,8 @@
                 "**/src/i18n/translations/**/*",
                 "**/src/storage/database/sqlite/gen/**/*",
                 "**/src/storage/database/sqlite/sqlc-plugin/proto/**/*",
-                "**/src/ui/styles/colourschemes/generate-colourscheme.ts"
+                "**/src/ui/styles/colourschemes/generate-colourscheme.ts",
+                "**/src/ui/components/Markdown/TOC.tsx"
             ],
             "linter": {
                 "rules": {
