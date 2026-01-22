@@ -9,7 +9,7 @@ import React, {
     useState,
 } from "react"
 
-import { HashIcon, NotePencilIcon, XIcon } from "@/ui/components/Icons"
+import { CheckIcon, HashIcon, NotePencilIcon } from "@/ui/components/Icons"
 import { SearchBar } from "@/ui/components/MemoListFilter/Searchbar"
 import { TagTreeFilter } from "@/ui/components/MemoListFilter/TagTreeFilter"
 import { OverFlowMask } from "@/ui/components/OverflowMask"
@@ -52,7 +52,7 @@ function NewMemoButton() {
 
 function SidebarOffcanvasOverflow() {
     let t = useT("components/TabBar")
-    let { targetID, ref, isOpen, dragRef, closeOffCanvas } = useSidebarOffcanvasOverflow()
+    let { targetID, ref, isOpen, closeOffCanvas } = useSidebarOffcanvasOverflow()
 
     return (
         <div className="mobile-tabbar-tag-filter-overflow-wrapper">
@@ -71,17 +71,16 @@ function SidebarOffcanvasOverflow() {
                     <div className="tag-tree-offcanvas-header">
                         <button
                             type="button"
-                            className="tag-tree-offcanvas-close-btn btn icon-only"
+                            className="tag-tree-offcanvas-close-btn btn icon-only primary"
                             onClick={closeOffCanvas}
                         >
-                            <XIcon aria-hidden="true" />
+                            <CheckIcon aria-hidden="true" className="icon" />
                             <span className="sr-only">{t.CloseOverflow}</span>
                         </button>
                     </div>
 
                     <TagTreeFilter />
                 </Activity>
-                <div className="tag-tree-offcanvas-drag-handle" ref={dragRef} />
             </div>
         </div>
     )
@@ -93,7 +92,6 @@ function useSidebarOffcanvasOverflow() {
     usePreventScroll({ isDisabled: !isOpen })
 
     let ref = useRef<HTMLDivElement | null>(null)
-    let dragRef = useRef<HTMLDivElement | null>(null)
     let targetID = useId()
 
     let [isClosing, setIsClosing] = useMemo(
@@ -128,7 +126,9 @@ function useSidebarOffcanvasOverflow() {
                         setIsOpen(false)
                     })
                     requestAnimationFrame(() => {
-                        el.hidePopover()
+                        requestAnimationFrame(() => {
+                            el.hidePopover()
+                        })
                     })
                 })
             }
@@ -155,132 +155,10 @@ function useSidebarOffcanvasOverflow() {
         }
     })
 
-    useEffect(() => {
-        if (!dragRef.current) {
-            return
-        }
-
-        let startingOffsetX = 0
-        let isDragging = false
-        let lastPointerX = -1
-        let velocity = 0
-        let width = 0
-        let durationMs = 250
-        let animFrame: ReturnType<typeof requestAnimationFrame> | undefined
-        let animation: Animation | undefined
-
-        let updatePos = () => {
-            if (!animation || !isDragging) {
-                return
-            }
-
-            let translateBy = lastPointerX - startingOffsetX
-            let progress = translateBy / Math.max(width, 1)
-            animation.currentTime = progress * durationMs
-
-            animFrame = requestAnimationFrame(updatePos)
-        }
-
-        let onPointerDown = (e: PointerEvent) => {
-            isDragging = true
-            lastPointerX = e.clientX
-            ;(e.target as HTMLDivElement).setPointerCapture(e.pointerId)
-
-            if (!ref.current) {
-                return
-            }
-
-            if (animFrame) {
-                cancelAnimationFrame(animFrame)
-            }
-
-            let rect = ref.current.getBoundingClientRect()
-            startingOffsetX = e.clientX
-            width = rect.width
-            animation = ref.current.animate(
-                [
-                    {
-                        transform: "translateX(0)",
-                        "--backdrop-opacity": "100%",
-                    },
-                    {
-                        transform: `translateX(${rect.width}px)`,
-                        "--backdrop-opacity": 0,
-                    },
-                ],
-                { duration: durationMs, fill: "forwards" },
-            )
-            animation.pause()
-
-            animFrame = requestAnimationFrame(updatePos)
-        }
-
-        let onPointerCancel = (e: PointerEvent) => {
-            if (!isDragging || !ref.current || !animation) {
-                return
-            }
-
-            if (animFrame) {
-                cancelAnimationFrame(animFrame)
-            }
-
-            isDragging = false
-            ;(e.target as HTMLDivElement).releasePointerCapture(e.pointerId)
-
-            let translateBy = lastPointerX - startingOffsetX
-            let progress = translateBy / Math.max(width, 1)
-            animation.currentTime = progress * durationMs
-
-            if (progress > 0.7 || (progress > 0.5 && velocity > 0) || velocity > 27) {
-                setIsClosing(true)
-                animation.addEventListener(
-                    "finish",
-                    () => {
-                        animation = undefined
-                        startingOffsetX = 0
-                        isDragging = false
-                        lastPointerX = -1
-                        velocity = 0
-                        width = 0
-                    },
-                    { once: true },
-                )
-                animation.play()
-            } else {
-                if (animation.currentTime < 0.1) {
-                    animation.currentTime = 0.1
-                }
-                animation.reverse()
-            }
-        }
-
-        let onPointerMove = (e: PointerEvent) => {
-            if (!isDragging || !ref.current || !animation) {
-                return
-            }
-
-            velocity = e.clientX - lastPointerX
-            lastPointerX = e.clientX
-        }
-
-        dragRef.current?.addEventListener("pointerdown", onPointerDown)
-        dragRef.current?.addEventListener("pointermove", onPointerMove)
-        dragRef.current?.addEventListener("pointerup", onPointerCancel)
-        dragRef.current?.addEventListener("pointercancel", onPointerCancel)
-
-        return () => {
-            dragRef.current?.removeEventListener("pointerdown", onPointerDown)
-            dragRef.current?.removeEventListener("pointermove", onPointerMove)
-            dragRef.current?.removeEventListener("pointerup", onPointerCancel)
-            dragRef.current?.removeEventListener("pointercancel", onPointerCancel)
-        }
-    }, [setIsClosing])
-
     return {
         targetID,
         ref,
         isOpen,
-        dragRef,
         closeOffCanvas,
     }
 }

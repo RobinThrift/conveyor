@@ -157,23 +157,62 @@
     }
 }
 
-.tag-tree-offcanvas-trigger {
+.mobile-tabbar-tag-filter-overflow-trigger {
     @apply aspect-square;
     height: 100%;
+    opacity: 1;
+    transition: opacity 100ms;
+
+    .icon {
+        filter: blur(0px);
+        transition: filter 200ms 300ms;
+    }
+}
+
+:root:has(.tag-tree-offcanvas:popover-open)
+    .mobile-tabbar-tag-filter-overflow-trigger {
+    opacity: 0;
+
+    .icon {
+        filter: blur(10px);
+    }
+}
+
+:root:has(.tag-tree-offcanvas[data-is-closing="true"])
+    .mobile-tabbar-tag-filter-overflow-trigger {
+    opacity: 1;
+    .icon {
+        filter: blur(10px);
+    }
 }
 
 .tag-tree-offcanvas {
-    @apply rounded-2xl pt-2 surface-level-1 elevation-2 flex-col;
+    @apply rounded-2xl pt-2 surface-level-2 elevation-1 flex-col;
     margin: unset;
     inset: unset;
-    top: calc(env(safe-area-inset-top, 0px) + 2 * var(--spacing));
-    bottom: max(env(safe-area-inset-bottom, 0px), calc(2 * var(--spacing)));
-    overflow: visible;
+    overflow: clip;
     position: fixed;
-    height: auto;
-    width: 90svw;
     z-index: 10000;
-    transition: right 250ms;
+    transition-property: height, width, opacity, border-radius;
+    transition-duration: 400ms, 300ms, 150ms, 200ms;
+    transition-delay: 0ms, 0ms, 0ms, 100ms;
+    transition-timing-function: linear(
+        0,
+        0.012 0.9%,
+        0.05 2%,
+        0.411 9.2%,
+        0.517 11.8%,
+        0.611 14.6%,
+        0.694 17.7%,
+        0.765 21.1%,
+        0.824 24.8%,
+        0.872 28.9%,
+        0.91 33.4%,
+        0.939 38.4%,
+        0.977 50.9%,
+        0.994 68.4%,
+        1
+    );
 
     .memo-list-tag-filter {
         @apply px-0 flex-1 rounded-2xl;
@@ -190,14 +229,39 @@
         }
     }
 
+    top: anchor(bottom);
+    left: anchor(left);
+    translate: 0 -100%;
+
+    .tag-tree-offcanvas-close-btn {
+        opacity: 1;
+        transition: opacity 200ms 100ms;
+    }
+
     &:popover-open {
-        @apply flex;
-        right: 0;
+        @apply flex pt-2 rounded-2xl;
+        height: 80svh;
+        width: 95svw;
+        opacity: 1;
+
+        .tag-tree-offcanvas-close-btn {
+            opacity: 1;
+        }
     }
 
     @starting-style {
         &:popover-open {
-            right: -85svw;
+            @apply pt-0;
+            border-radius: 100%;
+            width: anchor-size(width);
+            height: anchor-size(height);
+            top: anchor(bottom);
+            left: anchor(left);
+            opacity: 0;
+
+            .tag-tree-offcanvas-close-btn {
+                opacity: 0;
+            }
         }
     }
 
@@ -208,8 +272,7 @@
             var(--color-modal-overlay-bg) 80%,
             transparent
         );
-        backdrop-filter: blur(2px);
-        opacity: 1;
+        opacity: 0.2;
         transition: opacity 250ms;
 
         @starting-style {
@@ -218,7 +281,16 @@
     }
 
     &[data-is-closing="true"] {
-        right: -85svw;
+        @apply pt-2;
+        border-radius: 100%;
+        width: anchor-size(width);
+        height: anchor-size(height);
+        transition-delay: 0ms, 0ms, 350ms, 200ms;
+        opacity: 0;
+
+        .tag-tree-offcanvas-close-btn {
+            opacity: 0;
+        }
 
         &::backdrop {
             opacity: 0;
@@ -227,18 +299,8 @@
 }
 
 .tag-tree-offcanvas-header {
-    @apply flex items-center justify-between px-1 mb-2 relative;
+    @apply flex items-center justify-end px-1 mb-2 relative;
     z-index: 10000;
-}
-
-.tag-tree-offcanvas-drag-handle {
-    position: fixed;
-    left: -10svw;
-    top: 0;
-    width: 15svw;
-    height: 100%;
-    z-index: 9000;
-    touch-action: none;
 }
 
 :root:has(.tag-tree-offcanvas:popover-open) {
