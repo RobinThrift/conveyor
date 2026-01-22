@@ -3,7 +3,6 @@
     --overflow-mask-z: 100;
 
     min-height: calc(100svh - var(--pt) - var(--pb));
-    padding-top: calc(var(--spacing) * 1.5);
 
     @media (min-width: 768px) {
         margin-left: calc(var(--sidebar-width) + var(--spacing) * 1);
@@ -96,12 +95,11 @@
 }
 
 .memo-tab-panel-memo {
-    @apply bg-body py-0 border border-surface-border shadow-xs flex-1;
+    @apply bg-body rounded-2xl shadow-xs flex-1 rounded-2xl;
     @apply flex justify-center;
-    padding-top: env(safe-area-inset-top, 0px);
 
     @media (min-width: 768px) {
-        @apply rounded-2xl pt-0;
+        @apply pt-0 border border-surface-border;
     }
 
     @container (width >= 1024px) {
@@ -114,6 +112,7 @@
     height: auto;
     min-height: calc(100cqh - var(--spacing) * 8);
     --max-content-width: 1024px;
+    padding-top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 3));
 
     .memo-content {
         @apply px-2;

@@ -7,6 +7,12 @@
 
 .overflow-mask.top {
     @apply top-0;
+
+    height: 0;
+    animation: overflow-mask-reveal-top linear;
+    animation-timeline: scroll(root);
+    animation-range-end: 200px;
+    animation-fill-mode: both;
 }
 
 .overflow-mask.bottom {
@@ -74,4 +80,14 @@
 .overflow-mask.bottom .overflow-mask-item:nth-child(4) {
     @apply mask-t-from-70% mask-t-to-100%;
     backdrop-filter: blur(1px);
+}
+
+@keyframes overflow-mask-reveal-top {
+    from {
+        height: 0;
+    }
+
+    to {
+        height: var(--overflow-mask-height, 100px);
+    }
 }

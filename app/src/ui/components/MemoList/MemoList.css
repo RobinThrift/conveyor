@@ -1,54 +1,63 @@
 .memo-list-items {
-    --gap: calc(var(--spacing) * 2);
-    --item-width: 100%;
-    --item-height: max-content;
-    --item-max-height: 50cqh;
-
     width: 100%;
-
-    @container (width >= 768px) {
-        --item-height: 40cqh;
-        --item-max-height: none;
-        --item-width: calc(50% - var(--gap));
-    }
-
-    @container (width >= 1024px) {
-        --item-width: calc(33.3% - var(--gap));
-        --item-height: 50cqh;
-    }
-
-    @container (width >= 1680px) {
-        --item-width: calc(20% - var(--gap));
-        --item-height: 45cqh;
-    }
-
-    @container (width >= 2100px) {
-        --item-width: calc(16.666667% - var(--gap));
-        --item-height: 40cqh;
-    }
 }
 
 .memo-list-item-group {
     @apply mb-4;
-    display: flex;
-    gap: var(--gap) var(--gap);
-    flex-direction: column;
+    --gap-x: calc(var(--spacing) * 2);
+    --gap-y: calc(var(--spacing) * 2);
+    --item-max-height: 50cqh;
+    display: grid;
+    gap: var(--gap-y) var(--gap-x);
+    width: 100%;
 
-    @container (width > 768px) {
-        @apply mt-0 mb-0;
-        flex-direction: row;
-        flex-wrap: wrap;
+    @container (width >= 768px) {
+        grid-auto-columns: 50%;
+        --item-max-height: 40cqh;
+
+        .memo-list-day,
+        .memo-list-day-divider {
+            grid-column: span 2;
+        }
+    }
+
+    @container (width >= 1024px) {
+        grid-auto-columns: 33.3%;
+        --item-max-height: 50cqh;
+
+        .memo-list-day,
+        .memo-list-day-divider {
+            grid-column: span 3;
+        }
+    }
+
+    @container (width >= 1680px) {
+        grid-auto-columns: 20%;
+        --item-max-height: 45cqh;
+        --gap-y: calc(var(--spacing) * 4);
+
+        .memo-list-day,
+        .memo-list-day-divider {
+            grid-column: span 5;
+        }
+    }
+
+    @container (width >= 2100px) {
+        grid-auto-columns: 16.66%;
+        --item-max-height: 40cqh;
+
+        .memo-list-day,
+        .memo-list-day-divider {
+            grid-column: span 6;
+        }
     }
 }
 
 .memo-list .memo-list-item {
     @apply p-2 flex-1 relative border-surface-border border-b;
 
-    flex-basis: var(--item-width);
-    max-width: var(--item-width);
     overflow: hidden;
-    flex-grow: 1;
-    height: var(--item-height);
+    height: 100%;
     max-height: var(--item-max-height);
     container: memo / inline-size;
 
@@ -202,7 +211,7 @@
         2 +
         max(env(safe-area-inset-top, 0px), var(--spacing) * 2)
     );
-    margin-top: calc(var(--spacing) * 4);
+    margin-top: calc(var(--spacing) * 1);
 
     .memo-list-day-date {
         @apply text-neutral-dark dark:text-neutral-light;

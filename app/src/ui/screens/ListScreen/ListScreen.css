@@ -49,10 +49,6 @@
         opacity: 0;
         pointer-events: none;
 
-        .memo-list-sidebar {
-            margin-top: 0;
-        }
-
         @media (min-width: 1024px) {
             pointer-events: unset;
             top: unset;
@@ -66,11 +62,17 @@
 }
 
 .screens[data-active-stack="memos"] .list-screen-overflow-mask {
-    @apply hidden;
+    opacity: 0;
+    animation: none;
 }
 
 .dragging-memo-tab .list-screen:has(.memo-list-tab-panel[aria-hidden="true"]) {
     opacity: 1;
+
+    .list-screen-overflow-mask {
+        opacity: 1;
+        top: calc(-1 * var(--offset-top));
+    }
 }
 
 .list-screen-content {

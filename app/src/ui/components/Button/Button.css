@@ -1,6 +1,7 @@
 .btn {
     @apply flex items-center justify-center gap-2 py-1 px-2.5 relative rounded-2xl;
     color: var(--btn-color);
+    user-select: none;
 
     &::before {
         @apply block absolute content-[""] inset-0 rounded-2xl surface-level-1 elevation-2;

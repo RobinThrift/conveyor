@@ -44,6 +44,19 @@
     }
 }
 
+.list-screen:has(.memo-list-tab-panel[aria-hidden="true"]) .memo-list-sidebar {
+    margin-top: calc(
+        env(safe-area-inset-top, calc(var(--spacing) * 2)) +
+        var(--spacing) *
+        2
+    );
+}
+
+.dragging-memo-tab .screens[data-active-stack="memos"] .settings-nav-button {
+    opacity: 1;
+    translate: 0 calc(-1 * var(--offset-top) + var(--spacing) * 2);
+}
+
 .memo-list-sidebar-header {
     @apply bg-surface-level-2 border border-surface-border w-full rounded-2xl;
 
@@ -66,15 +79,10 @@
     z-index: var(--settings-nav-button-z-index);
     left: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
     top: calc(
-        max(env(safe-area-inset-top, 0px), var(--spacing) * 2) -
+        max(env(safe-area-inset-top, 0px), var(--spacing) * 4) -
         var(--spacing) *
         2
     );
-
-    animation: settings-nav-button linear;
-    animation-timeline: scroll(root);
-    animation-range-end: 200px;
-    animation-fill-mode: both;
 
     @media (min-width: 1024px) {
         @apply relative shadow-none aspect-square;
@@ -83,19 +91,6 @@
         z-index: unset;
         isolation: isolate;
         animation: unset;
-    }
-}
-
-@keyframes settings-nav-button {
-    from {
-        top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 2));
-    }
-    to {
-        top: calc(
-            max(env(safe-area-inset-top, 0px), var(--spacing) * 4) -
-            var(--spacing) *
-            2
-        );
     }
 }
 
