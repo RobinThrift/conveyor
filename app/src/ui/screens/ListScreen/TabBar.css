@@ -163,6 +163,7 @@
     opacity: 1;
     transition: opacity 100ms;
 
+    /* biome-ignore lint/style/noDescendingSpecificity: false positive */
     .icon {
         filter: blur(0px);
         transition: filter 200ms 300ms;

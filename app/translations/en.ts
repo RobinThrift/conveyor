@@ -57,6 +57,10 @@ export const translations = {
         FootnoteBackLink: "Jump back",
     },
 
+    "components/Memo/TOC": {
+        Label: "Table of Contents",
+    },
+
     "components/Memo/Actions": {
         Edit: "Edit",
         Archive: "Archive",

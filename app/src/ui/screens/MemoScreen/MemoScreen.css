@@ -222,23 +222,76 @@
 }
 
 .memo .toc {
-    @apply hidden border-s border-surface-border ps-2;
+    @apply hidden fixed;
     top: calc(max(env(safe-area-inset-top, 0px), var(--spacing) * 4) + 10dvh);
     right: calc(max(env(safe-area-inset-right, 0px), var(--spacing) * 4));
+    max-width: 100px;
 
-    .toc-item .toc-items {
-        padding-inline-start: calc(
-            var(--spacing) *
-            (var(--toc-indent-level, 0) + 2)
-        );
+    .toc-item {
+        width: 100%;
+        a {
+            @apply mb-1 block rounded-2xl;
+            background-color: var(--color-neutral-extra-light);
+            color: var(--color-neutral-extra-light);
+            height: var(--spacing);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: calc(100% / (var(--toc-indent-level, 1) + 1));
+            justify-self: end;
+            transition:
+                height 100ms 50ms,
+                width 100ms;
+
+            &.active {
+                background-color: var(--color-primary-light);
+                color: var(--color-primary-light);
+            }
+        }
     }
 
-    .toc-item a:hover {
-        @apply text-primary;
+    &:hover {
+        @apply surface-level-2 elevation-2 px-3 py-2 rounded-2xl;
+        animation: memo-toc-desktop-hover-show 150ms linear;
+        animation-fill-mode: forwards;
+
+        .toc-item .toc-items {
+            padding-inline-start: calc(
+                var(--spacing) *
+                (var(--toc-indent-level, 0) + 2)
+            );
+        }
+
+        .toc-item a {
+            background-color: unset;
+            color: unset;
+            height: 1lh;
+            width: 100%;
+
+            &:hover {
+                color: var(--color-primary-light);
+            }
+
+            &.active {
+                color: var(--color-primary-dark);
+            }
+        }
     }
 
-    @container (width >= 1550px) {
-        @apply fixed block;
+    @container (width >= 1200px) {
+        @apply block;
+    }
+}
+
+@keyframes memo-toc-desktop-hover-show {
+    from {
+        opacity: 0;
+        max-width: 100px;
+    }
+
+    to {
+        opacity: 1;
+        max-width: 300px;
     }
 }
 

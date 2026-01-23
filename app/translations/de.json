@@ -54,6 +54,10 @@
         "FootnoteBackLink": "Zurück springen"
     },
 
+    "components/Memo/TOC": {
+        "Label": "Inhalt"
+    },
+
     "components/Memo/Actions": {
         "Edit": "Bearbeiten",
         "Archive": "Archivieren",

@@ -87,10 +87,10 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
                                         <MemoDate createdAt={createdAt} />
                                         <MemoActionsDropdown memo={memo} />
                                     </MemoHeader>
+                                    <TOC document={body} id={id} />
                                     <MemoBody id={id} onDoubleClick={onDoubleClick}>
                                         {body}
                                     </MemoBody>
-                                    <TOC document={body} id={id} />
                                 </>
                             )}
                         </Memo>
