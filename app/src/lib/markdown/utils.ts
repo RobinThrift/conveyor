@@ -5,8 +5,8 @@ export function idFromText(...fragements: string[]): string {
         .join("-")
         .normalize()
         .toLowerCase()
-        .replaceAll(/[()[]+/g, "")
-        .replaceAll(/[\s\]]+/g, "_")
+        .replaceAll(/[()[`]+/g, "")
+        .replaceAll(/[\W]+/giv, "_")
 }
 
 export function collectText(

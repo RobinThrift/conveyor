@@ -65,7 +65,7 @@ export function buildTOC({
             }
 
             let label = collectText(cursor.node, document)
-            let id = `${documentID}-${idFromText(label)}`
+            let id = `memo-${documentID}-${idFromText(label)}`
 
             let item = { level, label, id, items: [] }
 
