@@ -1,6 +1,6 @@
 import React, { useMemo } from "react"
 
-import { astToJSX, parse } from "@/lib/markdown"
+import { astToJSX, type ComponentMap, parse } from "@/lib/markdown"
 import { Alert } from "@/ui/components/Alert"
 import { ArrowUDownLeftIcon } from "@/ui/components/Icons"
 import { ZoomableImage } from "@/ui/components/Image"
@@ -16,6 +16,7 @@ export interface MarkdownProps {
     className?: string
     id: string
     onDoubleClick?: React.MouseEventHandler<HTMLDivElement>
+    componentMap?: Pick<ComponentMap, "Heading">
 }
 
 export function Markdown(props: MarkdownProps) {
@@ -42,10 +43,11 @@ export function Markdown(props: MarkdownProps) {
                 Image: ZoomableImage,
                 FootnoteReturnIcon: ArrowUDownLeftIcon,
                 TagLink,
+                ...(props.componentMap ?? {}),
             },
             customBlocks,
         })
-    }, [props.children, props.id])
+    }, [props.children, props.id, props.componentMap])
 
     return (
         // biome-ignore lint/a11y/noStaticElementInteractions: this is intentional

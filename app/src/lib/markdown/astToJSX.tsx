@@ -15,7 +15,7 @@ interface Document {
     customBlocks: CustomBlocks
 }
 
-interface ComponentMap {
+export type ComponentMap = {
     Alert?: React.ComponentType<React.PropsWithChildren<{ variant: "danger" }>>
     Code?: React.ComponentType<{
         lang?: string
@@ -36,6 +36,7 @@ interface ComponentMap {
         caption?: string
     }>
     FootnoteReturnIcon?: React.ComponentType
+    Heading?: React.ComponentType<React.PropsWithChildren<{ id: string; level: number }>>
     TagLink?: React.ComponentType<{ tag: string; className?: string }>
 }
 
@@ -171,7 +172,17 @@ function headingToJSX(doc: Document, node: SyntaxNode, level: number): ReactNode
     }
 
     let key = nodeKey(node)
-    let id = `${doc.id}-${idFromText(collectText(node, doc.text))}`
+    let id = `memo-${doc.id}-${idFromText(collectText(node, doc.text))}`
+
+    let Heading = doc.componentMap.Heading
+    if (Heading) {
+        return (
+            <Heading key={key} id={id} level={level}>
+                {children}
+            </Heading>
+        )
+    }
+
     switch (level) {
         case 1:
             return (

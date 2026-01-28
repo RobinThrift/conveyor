@@ -1,10 +1,11 @@
 import clsx from "clsx"
-import React, { startTransition, useMemo, useRef } from "react"
+import React, { startTransition, useCallback, useMemo, useRef } from "react"
 import type { Temporal } from "temporal-polyfill"
 
 import type { MemoID, Memo as MemoT } from "@/domain/Memo"
 import { DateTime } from "@/ui/components/DateTime"
 import { ErrorBoundary } from "@/ui/components/ErrorBoundary"
+import { CaretDownIcon } from "@/ui/components/Icons"
 import { Markdown } from "@/ui/components/Markdown"
 
 export type MemoProps = {
@@ -81,11 +82,83 @@ export const MemoBody = React.memo(function MemBody({
         <div className="memo-content">
             {title && <h1>{title}</h1>}
             <ErrorBoundary resetOn={[id]}>
-                <Markdown id={id} onDoubleClick={onDoubleClick}>
+                <Markdown id={id} onDoubleClick={onDoubleClick} componentMap={{ Heading }}>
                     {children}
                 </Markdown>
             </ErrorBoundary>
         </div>
+    )
+})
+
+const Heading = React.memo(function Heading({
+    level,
+    id,
+    children,
+}: React.PropsWithChildren<{ id: string; level: number }>) {
+    let H = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
+    let ref = useRef<HTMLHeadingElement | null>(null)
+
+    let onClick = useCallback(() => {
+        requestAnimationFrame(() => {
+            let parent = ref.current?.parentElement
+            if (!parent || !ref.current) {
+                return
+            }
+
+            let level = Number.parseInt(ref.current.tagName.substring(1), 10)
+            let children = Array.from(parent.childNodes)
+            let start = false
+
+            let isHidden = ref.current.classList.contains("is-hiding")
+
+            for (let c of children) {
+                if (!start && c === ref.current) {
+                    start = true
+                    continue
+                }
+
+                if (!start) {
+                    continue
+                }
+
+                if (c instanceof HTMLHeadingElement) {
+                    let checkLevel = Number.parseInt(c.tagName.substring(1), 10)
+                    c.classList.remove("is-hiding")
+                    if (checkLevel <= level) {
+                        console.log(c)
+                        break
+                    }
+                }
+
+                let el = c as HTMLElement
+
+                if (el.classList.contains("footnotes")) {
+                    continue
+                }
+
+                if (isHidden) {
+                    el.classList.remove("hidden")
+                } else {
+                    el.classList.add("hidden")
+                }
+            }
+
+            ref.current.classList.toggle("is-hiding")
+        })
+    }, [])
+
+    return (
+        <H id={id} ref={ref}>
+            <button
+                type="button"
+                className="memo-heading-collapse-button"
+                tabIndex={-1}
+                onClick={onClick}
+            >
+                <CaretDownIcon className="icon" />
+            </button>
+            {children}
+        </H>
     )
 })
 

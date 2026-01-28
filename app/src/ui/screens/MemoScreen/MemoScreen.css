@@ -201,6 +201,42 @@
     }
 }
 
+.memo h2:has(.memo-heading-collapse-button),
+.memo h3:has(.memo-heading-collapse-button),
+.memo h4:has(.memo-heading-collapse-button),
+.memo h5:has(.memo-heading-collapse-button),
+.memo h6:has(.memo-heading-collapse-button) {
+    @apply flex items-center;
+
+    &:hover {
+        .memo-heading-collapse-button {
+            opacity: 1;
+            transition-delay: 0ms;
+        }
+    }
+
+    &.is-hiding .icon {
+        @apply -rotate-90;
+    }
+}
+
+.memo-heading-collapse-button {
+    @apply rounded-full flex items-center justify-center p-1 size-8 -ml-10 mr-2 select-none;
+    opacity: 0;
+    transition: opacity 100ms 200ms linear;
+
+    .icon {
+        @apply size-5;
+        transition: rotate 100ms;
+    }
+
+    &:hover {
+        @apply text-primary;
+        opacity: 1;
+        transition-delay: 0ms;
+    }
+}
+
 @keyframes mobile-memo-title-float {
     0% {
         opacity: 0;
