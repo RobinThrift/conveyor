@@ -41,7 +41,7 @@ export function TOC({
 function TOCItem({ item }: { item: TOCItemT }) {
     return (
         <li className="toc-item">
-            <a href={`#${item.id}`} data-heading-id={item.id}>
+            <a href={`#${item.id}`} data-heading-id={item.id} title={item.label}>
                 {item.label}
             </a>
             {item.items.length > 0 ? (
@@ -90,7 +90,6 @@ function useTOCState(toc: TOCItemT[]) {
 
                 ref.current?.querySelectorAll(".toc-item>a")?.forEach((el) => {
                     let anchor = el as HTMLElement
-                    console.log("anchor", anchor.dataset)
                     if (anchor.dataset.headingId === currentHeading?.id) {
                         anchor.classList.add("active")
                     } else {
