@@ -5,7 +5,7 @@ import clsx from "clsx"
 import React, { useCallback, useMemo, useState } from "react"
 import { Temporal } from "temporal-polyfill"
 
-import { currentDate, isSameMonth } from "@/lib/i18n"
+import { currentDate, isSameMonthOfYear } from "@/lib/i18n"
 import { Button } from "@/ui/components/Button"
 import { CaretDownIcon, CaretLeftIcon, CaretRightIcon } from "@/ui/components/Icons"
 import { useTimedMemo } from "@/ui/hooks/useTimedMemo"
@@ -44,13 +44,18 @@ export const DatePicker = React.memo(function DatePicker({ className }: DatePick
         setExpanded((c) => !c)
     }, [])
 
+    // biome-ignore lint/style/noNonNullAssertion: can never be not null
+    let first = rows.at(0)?.at(0)!
+    // biome-ignore lint/style/noNonNullAssertion: can never be not null
+    let last = rows.at(-1)?.at(-1)!
+
     return (
         <div className={clsx("memo-list-date-filter", { compact: !expanded }, className)}>
             <div
                 className="memo-list-date-filter-calendar"
                 aria-label={t.Label({
-                    minValue: formatDateTime(rows[0][0], { dateStyle: "medium" }),
-                    maxValue: formatDateTime(rows[4][6], { dateStyle: "medium" }),
+                    minValue: formatDateTime(first, { dateStyle: "medium" }),
+                    maxValue: formatDateTime(last, { dateStyle: "medium" }),
                     selected: selectedDate
                         ? formatDateTime(selectedDate, { dateStyle: "medium" })
                         : t.NoSelection,
@@ -164,13 +169,13 @@ const CalendarHeader = React.memo(function CalendarHeader({
                     iconLeft={<CaretLeftIcon />}
                     aria-label={t.PreviousMonth}
                     onClick={onClickPrevMonthBtn}
-                    disabled={isSameMonth(minValue, showingMonth)}
+                    disabled={isSameMonthOfYear(minValue, showingMonth)}
                 />
                 <Button
                     iconLeft={<CaretRightIcon />}
                     aria-label={t.NextMonth}
                     onClick={onClickNextMonthBtn}
-                    disabled={isSameMonth(maxValue, showingMonth)}
+                    disabled={isSameMonthOfYear(maxValue, showingMonth)}
                 />
             </div>
         </header>
@@ -382,7 +387,7 @@ const CalendarGridBodyCell = React.memo(function CalendarGridBodyCell({
     return (
         <div
             className={clsx("memo-list-date-filter-calendar-grid-body-cell", {
-                "is-outside-of-month": !isSameMonth(showingMonth, date),
+                "is-outside-of-month": !isSameMonthOfYear(showingMonth, date),
                 "has-focus": isFocussed,
                 today: Temporal.PlainDate.compare(maxValue, date) === 0,
             })}
@@ -465,6 +470,11 @@ function useDatePicker() {
 
     let [focussed, _setFocussed] = useState<Temporal.PlainDate>(today)
 
+    // biome-ignore lint/style/noNonNullAssertion: can never be not null
+    let first = rows.at(0)?.at(0)!
+    // biome-ignore lint/style/noNonNullAssertion: can never be not null
+    let last = rows.at(-1)?.at(-1)!
+
     let setFocussed = useCallback(
         (next: Temporal.PlainDate) => {
             if (Temporal.PlainDateTime.compare(next, today) > 0) {
@@ -475,8 +485,8 @@ function useDatePicker() {
                 return
             }
 
-            let minShown = rows[0][0]
-            let maxShown = rows[4][6]
+            let minShown = first
+            let maxShown = last
 
             if (
                 Temporal.PlainDateTime.compare(next, minShown) < 0 ||
@@ -489,10 +499,10 @@ function useDatePicker() {
             requestAnimationFrame(() => {
                 let el = document.getElementById(`${next.month}-${next.day}`)
                 el?.focus()
-                el?.scrollIntoView()
+                el?.scrollIntoView({ inline: "center", block: "nearest" })
             })
         },
-        [today, minValue, rows],
+        [today, minValue, first, last],
     )
 
     let updateShowingMonth = useCallback(
@@ -525,16 +535,16 @@ function useDatePicker() {
                     next = date.add({ days: 1 })
                     break
                 case "home":
-                    next = rows[0][0]
+                    next = first
                     break
                 case "end":
-                    next = rows[4][6]
+                    next = last
                     break
             }
 
             setFocussed(next)
         },
-        [setFocussed, rows[0][0], rows[4][6]],
+        [setFocussed, first, last],
     )
 
     let setSelectedDate = useCallback(

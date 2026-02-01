@@ -92,11 +92,11 @@ export function isSameDay(
     return a.since(b).abs().days === 0
 }
 
-export function isSameMonth(
+export function isSameMonthOfYear(
     a: Temporal.PlainDate | Temporal.PlainDateTime,
     b: Temporal.PlainDate | Temporal.PlainDateTime,
 ): boolean {
-    return a.month === b.month
+    return a.month === b.month && a.year === b.year
 }
 
 export function temporalToDate(

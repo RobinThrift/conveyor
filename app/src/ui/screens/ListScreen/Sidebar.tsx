@@ -1,5 +1,6 @@
 import React, { useCallback } from "react"
 
+import { ErrorBoundary } from "@/ui/components/ErrorBoundary"
 import { NotePencilIcon } from "@/ui/components/Icons"
 import { DatePicker } from "@/ui/components/MemoListFilter/DatePicker"
 import { SearchBar } from "@/ui/components/MemoListFilter/Searchbar"
@@ -17,27 +18,29 @@ export function Sidebar() {
 
     return (
         <div className="memo-list-sidebar">
-            <div className="memo-list-sidebar-header">
-                <div className="memo-list-sidebar-header-search-bar">
-                    <SettingsLink />
+            <ErrorBoundary resetOn={[]}>
+                <div className="memo-list-sidebar-header">
+                    <div className="memo-list-sidebar-header-search-bar">
+                        <SettingsLink />
 
-                    <SearchBar />
+                        <SearchBar />
+                    </div>
+
+                    <DatePicker />
                 </div>
 
-                <DatePicker />
-            </div>
+                <TabList />
 
-            <TabList />
+                <NewMemoButton />
 
-            <NewMemoButton />
+                <hr />
 
-            <hr />
+                <h2 className="memo-list-sidebar-title mt-2">{t.Tags}</h2>
 
-            <h2 className="memo-list-sidebar-title mt-2">{t.Tags}</h2>
+                <TagTreeFilter />
 
-            <TagTreeFilter />
-
-            <StateFilter />
+                <StateFilter />
+            </ErrorBoundary>
         </div>
     )
 }
