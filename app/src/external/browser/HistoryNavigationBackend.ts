@@ -60,44 +60,6 @@ export class HistoryNavigationBackend<
         }
 
         history.scrollRestoration = "manual"
-        //
-        // window.addEventListener("popstate", (e: PopStateEvent) => {
-        //     if (!e.state) {
-        //         return
-        //     }
-        //
-        //     let { screen, params, stack } = e.state as NavgationState<S>
-        //
-        //     let lastIndex = this._currentIndex
-        //     requestAnimationFrame(() => {
-        //         if (lastIndex < this._currentIndex) {
-        //             this._triggerEvent("push", { screen, stack, params }, this._lastState)
-        //             if (__ENABLE_DEVTOOLS__) {
-        //                 requestAnimationFrame(() => {
-        //                     performance.mark("navigation:push", {
-        //                         detail: {
-        //                             ...e.state,
-        //                             url: window.location.href,
-        //                         },
-        //                     })
-        //                 })
-        //             }
-        //         } else {
-        //             this._triggerEvent("pop", { screen, stack, params }, this._lastState)
-        //
-        //             if (__ENABLE_DEVTOOLS__) {
-        //                 requestAnimationFrame(() => {
-        //                     performance.mark("navigation:pop", {
-        //                         detail: {
-        //                             ...e.state,
-        //                             url: window.location.href,
-        //                         },
-        //                     })
-        //                 })
-        //             }
-        //         }
-        //     })
-        // })
     }
 
     init(state: NavgationState<S>): NavgationState<S> {
