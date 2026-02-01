@@ -46,15 +46,14 @@
 
 .list-screen:has(.memo-list-tab-panel[aria-hidden="true"]) .memo-list-sidebar {
     margin-top: calc(
-        env(safe-area-inset-top, calc(var(--spacing) * 2)) +
+        env(safe-area-inset-top, var(--spacing) * 2) -
         var(--spacing) *
         2
     );
 }
 
-.dragging-memo-tab .screens[data-active-stack="memos"] .settings-nav-button {
-    opacity: 1;
-    translate: 0 calc(-1 * var(--offset-top) + var(--spacing) * 2);
+.topbar[data-active-stack="memos"] .settings-nav-button {
+    display: none;
 }
 
 .memo-list-sidebar-header {
@@ -65,24 +64,13 @@
     }
 }
 
-:root {
-    --settings-nav-button-z-index: 500;
-}
-
 /* biome-ignore lint/style/noDescendingSpecificity: I dunno */
 .memo-list-sidebar-header .settings-nav-button {
-    @apply fixed flex items-center justify-center shadow-xl h-11 w-11;
+    @apply flex items-center justify-center shadow-xl h-11 w-11;
     transition:
         transform 100ms,
         margin-left 100ms,
         margin-right 100ms;
-    z-index: var(--settings-nav-button-z-index);
-    left: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
-    top: calc(
-        max(env(safe-area-inset-top, 0px), var(--spacing) * 4) -
-        var(--spacing) *
-        2
-    );
 
     @media (min-width: 1024px) {
         @apply relative shadow-none aspect-square;

@@ -128,7 +128,7 @@ export class HistoryNavigationBackend<
             let trace: { stack: typeof Error.prototype.stack } = { stack: "" }
             Error.captureStackTrace(trace)
 
-            requestAnimationFrame(() => {
+            queueTask(() => {
                 performance.mark("navigation:push", {
                     detail: {
                         ...nextScreen,

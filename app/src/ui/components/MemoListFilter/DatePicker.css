@@ -63,10 +63,10 @@
 }
 
 .memo-list-date-filter-calendar-grid-body-cell {
-    @apply cursor-default select-none;
+    @apply cursor-default select-none flex justify-center;
 
     & > div {
-        @apply flex items-center justify-center aspect-square rounded-full;
+        @apply flex items-center justify-center size-10 rounded-full;
     }
 
     &:hover > div {
@@ -131,10 +131,11 @@
     }
 
     .memo-list-date-filter-calendar-grid-body-cell {
+        @apply flex items-center justify-center;
         scroll-snap-align: center;
         place-items: center;
         & > div {
-            @apply h-8;
+            @apply size-8;
         }
     }
 

@@ -143,7 +143,11 @@
 }
 
 @property --memo-tab-back-progress {
-    syntax: "<percentage>";
-    initial-value: 0%;
-    inherits: true;
+    syntax: "<number>";
+    initial-value: 0;
+    inherits: false;
+}
+
+.memo-tab-back-progress-target {
+    --memo-tab-back-progress: 0;
 }

@@ -7,7 +7,7 @@
     @apply flex items-center justify-center surface-level-2 elevation-2;
     @apply rounded-full size-12 p-2.5;
     transition:
-        transform 100ms
+        transform 300ms
         linear(
             0,
             0.618 4.6%,
@@ -26,7 +26,7 @@
             1.009 78.9%,
             1
         ),
-        margin-left 200ms
+        margin-left 400ms
         linear(
             0,
             -0.004 4.9%,
@@ -47,7 +47,7 @@
             1.004 95.2%,
             1
         ),
-        margin-right 200ms
+        margin-right 400ms
         linear(
             0,
             -0.004 4.9%,
@@ -101,8 +101,6 @@
     right: max(env(safe-area-inset-right, 0px), calc(2 * var(--spacing)));
     bottom: max(env(safe-area-inset-bottom, 0px), calc(2 * var(--spacing)));
     z-index: var(--mobile-tabbar-z-index);
-    transition: opacity 120ms;
-    opacity: 1;
 
     @media (min-width: 768px) {
         @apply hidden;
@@ -126,22 +124,36 @@
     }
 }
 
-.screens[data-active-stack="memos"] .mobile-tabbar-overflow-mask {
-    @apply hidden;
-}
+.screens[data-active-stack="memos"] {
+    .mobile-tabbar-overflow-mask {
+        visibility: hidden;
+        animation: none;
+        top: calc(
+            -1 *
+            var(--offset-top, 0px) +
+            (100svh - var(--overflow-mask-height, 100px))
+        );
+        height: var(--overflow-mask-height, 100px);
+    }
 
-:root:has(.memo-tab-panel[aria-hidden="false"]) {
     .mobile-tabbar {
+        position: absolute;
         pointer-events: none;
+        height: min-content;
+        bottom: 0;
+        top: calc(
+            -1 *
+            var(--offset-top, 0px) +
+            (85vh + var(--spacing) * 12) -
+            2px
+        );
     }
 }
 
 :root:has(.memo-tab-panel[aria-hidden="false"])
     .dragging-memo-tab
-    .mobile-tabbar {
-    opacity: 1;
-    top: calc(-1 * var(--offset-top, 0px) + (85svh + var(--spacing) * 11));
-    height: min-content;
+    .mobile-tabbar-overflow-mask {
+    visibility: visible;
 }
 
 .tag-tree-offcanvas-wrapper {

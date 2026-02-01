@@ -1,0 +1,102 @@
+:root {
+    --topbar-z-index: 500;
+}
+
+@property --memo-tab-back-progress-topbar-icons {
+    syntax: "<length>";
+    initial-value: 0px;
+    inherits: true;
+}
+
+.topbar {
+    @apply fixed flex items-center justify-between;
+    z-index: var(--topbar-z-index);
+    top: calc(max(env(safe-area-inset-top, 0px), var(--spacing) * 4));
+    left: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
+    right: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
+}
+
+.dragging-memo-tab .topbar {
+    --memo-tab-back-progress-topbar-icons: calc(
+        var(--memo-tab-back-progress) *
+        10px
+    );
+
+    .btn .icon {
+        transition: none;
+        filter: blur(var(--memo-tab-back-progress-topbar-icons));
+    }
+}
+
+.mobile-open-memo-transition,
+.mobile-close-memo-transition {
+    .topbar .btn {
+        view-transition-name: match-element;
+        view-transition-class: mobile-open-memo-transition-topbar-btn;
+    }
+
+    /* biome-ignore lint/style/noDescendingSpecificity: false positive for this use case */
+    .topbar .btn .icon {
+        view-transition-name: match-element;
+        view-transition-class: mobile-open-memo-transition-topbar-btn-icon;
+    }
+
+    @media (min-width: 768px) {
+        .topbar .btn {
+            view-transition-name: unset;
+            view-transition-class: unset;
+        }
+
+        /* biome-ignore lint/style/noDescendingSpecificity: false positive for this use case */
+        .topbar .btn .icon {
+            view-transition-name: unset;
+            view-transition-class: unset;
+        }
+    }
+}
+
+:root::view-transition-old(.mobile-open-memo-transition-topbar-btn) {
+    display: none;
+    mix-blend-mode: none;
+}
+
+:root::view-transition-old(.mobile-open-memo-transition-topbar-btn) {
+    display: block;
+    mix-blend-mode: none;
+    @media (min-width: 768px) {
+        display: none;
+    }
+}
+
+:root::view-transition-old(.mobile-open-memo-transition-topbar-btn-icon) {
+    display: block;
+    mix-blend-mode: none;
+    animation: mobile-open-memo-transition-topbar-btn-icon 200ms linear both;
+
+    @media (min-width: 768px) {
+        display: none;
+    }
+}
+
+:root::view-transition-new(.mobile-open-memo-transition-topbar-btn-icon) {
+    display: block;
+    mix-blend-mode: none;
+    animation: mobile-open-memo-transition-topbar-btn-icon 250ms linear both
+        reverse;
+
+    @media (min-width: 768px) {
+        display: none;
+    }
+}
+
+@keyframes mobile-open-memo-transition-topbar-btn-icon {
+    from {
+        filter: blur(0px);
+        /* opacity: 1; */
+    }
+
+    to {
+        filter: blur(5px);
+        /* opacity: 0; */
+    }
+}

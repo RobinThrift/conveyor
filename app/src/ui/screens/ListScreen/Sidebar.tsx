@@ -6,6 +6,7 @@ import { DatePicker } from "@/ui/components/MemoListFilter/DatePicker"
 import { SearchBar } from "@/ui/components/MemoListFilter/Searchbar"
 import { StateFilter } from "@/ui/components/MemoListFilter/StateFilter"
 import { TagTreeFilter } from "@/ui/components/MemoListFilter/TagTreeFilter"
+import { TopBar } from "@/ui/components/TopBar"
 import { useT } from "@/ui/i18n"
 import { getScrollOffsetTop } from "@/ui/navigation"
 import { actions } from "@/ui/stores"
@@ -21,7 +22,9 @@ export function Sidebar() {
             <ErrorBoundary resetOn={[]}>
                 <div className="memo-list-sidebar-header">
                     <div className="memo-list-sidebar-header-search-bar">
-                        <SettingsLink />
+                        <TopBar>
+                            <SettingsLink />
+                        </TopBar>
 
                         <SearchBar />
                     </div>

@@ -30,7 +30,7 @@ export function ListScreen() {
 
     return (
         <div
-            className="screen list-screen"
+            className="screen list-screen memo-tab-back-progress-target"
             style={{ "--offset-top": `${-offsetScrollTop + offsetTop}px` } as React.CSSProperties}
             ref={ref}
         >

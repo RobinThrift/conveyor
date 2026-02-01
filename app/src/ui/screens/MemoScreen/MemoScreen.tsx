@@ -19,6 +19,7 @@ import {
     MemoTitle,
 } from "@/ui/components/Memo"
 import { OverFlowMask } from "@/ui/components/OverflowMask"
+import { TopBar } from "@/ui/components/TopBar"
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
 import { actions, selectors, stores } from "@/ui/stores"
@@ -61,7 +62,9 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
     return (
         <Activity mode={isActive ? "visible" : "hidden"}>
             <div
-                className={clsx("memo-tab-panel", { hidden: !isActive })}
+                className={clsx("memo-tab-panel memo-tab-back-progress-target", {
+                    hidden: !isActive,
+                })}
                 tabIndex={isActive ? 0 : -1}
                 role="tabpanel"
                 id={`tab-panel-${memo.id}`}
@@ -77,7 +80,10 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
                                 <>
                                     <MemoTitleMobileFloat createdAt={createdAt} title={title} />
                                     <MemoHeader>
-                                        <CloseMemoTabPanelButton memoID={memoID} />
+                                        <TopBar>
+                                            <CloseMemoTabPanelButton memoID={memoID} />
+                                        </TopBar>
+
                                         {title && (
                                             <MemoTitle>
                                                 <span>{title}</span>
@@ -85,7 +91,9 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
                                         )}
 
                                         <MemoDate createdAt={createdAt} />
-                                        <MemoActionsDropdown memo={memo} />
+                                        <TopBar>
+                                            <MemoActionsDropdown memo={memo} />
+                                        </TopBar>
                                     </MemoHeader>
                                     <TOC document={body} id={id} />
                                     <MemoBody id={id} onDoubleClick={onDoubleClick}>
@@ -149,13 +157,13 @@ function CloseMemoTabPanelButton({ memoID }: { memoID: MemoID }) {
     let isMobile = useIsMobile()
     let onClick = useCallback(() => {
         if (isMobile) {
-            document.documentElement.classList.add("close-memo-tab-transition")
+            document.documentElement.classList.add("mobile-close-memo-transition")
             document
                 .startViewTransition(() => {
                     actions.ui.closeMemo(memoID)
                 })
                 .finished.then(() =>
-                    document.documentElement.classList.remove("close-memo-tab-transition"),
+                    document.documentElement.classList.remove("mobile-close-memo-transition"),
                 )
         } else {
             requestAnimationFrame(() => {
@@ -227,6 +235,11 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
             return
         }
 
+        let animTargets = document.querySelectorAll(".memo-tab-back-progress-target")
+        if (!animTargets) {
+            return
+        }
+
         let isDragging = false
         let startX = -1
         let distanceThreshold = 0.4
@@ -234,7 +247,12 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
         let screenWidth = -1
         let cancelTimeout: ReturnType<typeof setTimeout> | undefined
 
-        let animation: Animation | undefined
+        let animations: Animation[] = []
+
+        let cancelAnimations = () => {
+            animations.forEach((a) => a.cancel())
+            animations = []
+        }
 
         let onPointerDown = (e: PointerEvent) => {
             if (e.pointerType !== "touch" || !e.isPrimary || e.pageX > 30) {
@@ -258,19 +276,20 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
                 document.body.classList.add("dragging-memo-tab")
             })
 
-            animation?.cancel()
+            cancelAnimations()
 
-            animation = document.body.animate(
-                [{ "--memo-tab-back-progress": "0%" }, { "--memo-tab-back-progress": "100%" }],
-                {
-                    duration: durationMs,
-                    fill: "forwards",
-                    composite: "add",
-                },
-            )
-            animation.pause()
+            animations = Array.from(animTargets).map((el) => {
+                let a = el.animate(
+                    [{ "--memo-tab-back-progress": "0" }, { "--memo-tab-back-progress": "1" }],
+                    {
+                        duration: durationMs,
+                    },
+                )
+                a.pause()
+                return a
+            })
 
-            animation.finished.finally(() => {
+            animations.at(0)?.finished.finally(() => {
                 document.body.classList.remove("dragging-memo-tab")
             })
         }
@@ -280,18 +299,17 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
 
             if (isDragging) {
                 if (progress <= distanceThreshold) {
-                    animation?.reverse()
+                    animations.forEach((a) => a.reverse())
                 } else {
-                    animation?.play()
-                    animation?.finished.then(() => {
+                    animations.forEach((a) => a.play())
+                    animations.at(0)?.finished.finally(() => {
                         closeMemo()
                     })
                 }
             }
 
-            if (!isDragging && animation) {
-                animation.cancel()
-                animation = undefined
+            if (!isDragging && animations) {
+                cancelAnimations()
             }
 
             isDragging = false
@@ -316,7 +334,7 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
         }
 
         let onPointerMove = (e: PointerEvent) => {
-            if (!isDragging || !animation) {
+            if (!isDragging || !animations) {
                 return
             }
 
@@ -325,7 +343,9 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
 
             let progress = (e.pageX - startX) / Math.max(screenWidth, 1)
 
-            animation.currentTime = progress * durationMs
+            animations.forEach((a) => {
+                a.currentTime = progress * durationMs
+            })
 
             clearTimeout(cancelTimeout)
             cancelTimeout = undefined
@@ -337,7 +357,7 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
         el.addEventListener("pointercancel", onPointerCancel)
 
         return () => {
-            animation?.cancel()
+            cancelAnimations()
             el.removeEventListener("pointerdown", onPointerDown)
             el.removeEventListener("pointermove", onPointerMove)
             el.removeEventListener("pointerup", onPointerUp)

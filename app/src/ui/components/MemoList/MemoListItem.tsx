@@ -28,7 +28,7 @@ export function MemoListItem(props: MemoListItemProps) {
 
     let onPointerDown = useCallback(() => {
         if (isMobile) {
-            document.documentElement.classList.add("memo-tab-transition")
+            document.documentElement.classList.add("mobile-open-memo-transition")
         }
     }, [isMobile])
 
@@ -40,12 +40,14 @@ export function MemoListItem(props: MemoListItemProps) {
             let scrollOffsetTop = getScrollOffsetTop()
 
             if (isMobile) {
+                document.documentElement.classList.add("mobile-open-memo-transition")
+
                 document
                     .startViewTransition(() => {
                         actions.ui.openMemo(memo.id, scrollOffsetTop)
                     })
                     .finished.then(() =>
-                        document.documentElement.classList.remove("memo-tab-transition"),
+                        document.documentElement.classList.remove("mobile-open-memo-transition"),
                     )
             } else {
                 requestAnimationFrame(() => {
@@ -98,9 +100,7 @@ export function MemoListItem(props: MemoListItemProps) {
                 </Markdown>
             </ErrorBoundary>
 
-            <div className="show-more-blur-sizer">
-                <div className="show-more-blur" />
-            </div>
+            <div className="show-more-blur" />
         </article>
     )
 }

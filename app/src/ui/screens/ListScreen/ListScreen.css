@@ -21,7 +21,6 @@
 
 .list-screen {
     @apply flex flex-col relative;
-    transition: top 1ms;
     --overflow-mask-z: 100;
     --overflow-mask-height: 130px;
 
@@ -34,19 +33,10 @@
     }
 
     &:has(.memo-list-tab-panel[aria-hidden="true"]) {
-        top: calc(
-            calc(
-                env(safe-area-inset-top, calc(var(--spacing) * 2)) -
-                var(--spacing) *
-                2
-            ) +
-            var(--offset-top, 0px)
-        );
+        top: calc(var(--offset-top, 0px));
         width: 100svw;
-        translate: min(calc(var(--memo-tab-back-progress, 0%) * 0.5 - 50%), 0%);
         z-index: -1;
         position: fixed;
-        opacity: 0;
         pointer-events: none;
 
         @media (min-width: 1024px) {
@@ -62,16 +52,24 @@
 }
 
 .screens[data-active-stack="memos"] .list-screen-overflow-mask {
-    opacity: 0;
     animation: none;
+    top: calc(
+        (-1 * var(--offset-top, 0px)) +
+        (var(--overflow-mask-height, 100px) / 2) -
+        env(safe-area-inset-top, 0px) -
+        5px
+    );
+    height: var(--overflow-mask-height, 100px);
 }
 
 .dragging-memo-tab .list-screen:has(.memo-list-tab-panel[aria-hidden="true"]) {
-    opacity: 1;
+    translate: min(
+        calc((var(--memo-tab-back-progress, 0) * 100%) * 0.5 - 50%),
+        0%
+    );
 
     .list-screen-overflow-mask {
-        opacity: 1;
-        top: calc(-1 * var(--offset-top));
+        visibility: visible;
     }
 }
 
@@ -91,10 +89,7 @@
 
 .dragging-memo-tab .screens[data-active-stack="memos"] .list-screen-content {
     @apply block;
-}
-
-.dragging-memo-tab .all-memos-tab-panel {
-    opacity: 1;
+    min-height: 100vh;
 }
 
 .memo-list-container {

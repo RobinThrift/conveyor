@@ -2,7 +2,7 @@
     @apply hidden flex-1 relative;
     --overflow-mask-z: 100;
 
-    min-height: calc(100svh - var(--pt) - var(--pb));
+    min-height: 100dvh;
 
     @media (min-width: 768px) {
         margin-left: calc(var(--sidebar-width) + var(--spacing) * 1);
@@ -45,7 +45,12 @@
 .memo-tab-panel {
     @apply flex flex-col relative;
     width: 100%;
-    min-height: calc(100vh - env(safe-area-inset-bottom, 0px));
+    /* This weird calc is required, otherwise the swipe back animation doesn't seem to work... */
+    min-height: calc(
+        100dvh -
+        env(safe-area-inset-bottom, 0px) +
+        env(safe-area-inset-bottom, 0px)
+    );
     container: memo-tab-panel / size;
 
     &:focus {
@@ -55,25 +60,6 @@
     &:focus-visible {
         @apply outline-3 outline-offset-0 outline-primary rounded-2xl;
     }
-
-    animation: memo-open-from-right 120ms
-        linear(
-            0,
-            0.012 0.9%,
-            0.05 2%,
-            0.411 9.2%,
-            0.517 11.8%,
-            0.611 14.6%,
-            0.694 17.7%,
-            0.765 21.1%,
-            0.824 24.8%,
-            0.872 28.9%,
-            0.91 33.4%,
-            0.939 38.4%,
-            0.977 50.9%,
-            0.994 68.4%,
-            1
-        );
 
     @media (min-width: 768px) {
         animation: unset;
@@ -86,7 +72,7 @@
 
 .dragging-memo-tab .memo-tab-panel {
     @apply shadow-xl;
-    translate: var(--memo-tab-back-progress, 0%) 0;
+    translate: calc(var(--memo-tab-back-progress, 0) * 100%) 0;
     touch-action: none;
 }
 
@@ -113,6 +99,10 @@
     min-height: calc(100cqh - var(--spacing) * 8);
     --max-content-width: 1024px;
     padding-top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 3));
+    padding-bottom: max(
+        env(safe-area-inset-bottom, 0px),
+        calc(var(--spacing) * 3)
+    );
 
     .memo-content {
         @apply px-2;
@@ -133,22 +123,6 @@
             .btn {
                 @apply h-11 w-11;
                 aspect-ratio: unset;
-            }
-        }
-    }
-
-    .memo-actions .btn .icon,
-    .memo-tab-panel-close-btn .icon {
-        transition: filter 200ms linear;
-        transition-delay: 100ms;
-        filter: blur(0px);
-        @starting-style {
-            filter: blur(10px);
-        }
-
-        @container (width >= 1224px) {
-            @starting-style {
-                filter: blur(0px);
             }
         }
     }
@@ -376,6 +350,46 @@
     }
 }
 
+:root {
+    --mobile-open-memo-transition-duration: 350ms;
+    --mobile-open-memo-transition-easing: linear(
+        0,
+        0.012 0.9%,
+        0.05 2%,
+        0.411 9.2%,
+        0.517 11.8%,
+        0.611 14.6%,
+        0.694 17.7%,
+        0.765 21.1%,
+        0.824 24.8%,
+        0.872 28.9%,
+        0.91 33.4%,
+        0.939 38.4%,
+        0.977 50.9%,
+        0.994 68.4%,
+        1
+    );
+
+    --mobile-close-memo-transition-duration: 200ms;
+    --mobile-close-memo-transition-easing: linear(
+        0,
+        0.012 0.9%,
+        0.05 2%,
+        0.411 9.2%,
+        0.517 11.8%,
+        0.611 14.6%,
+        0.694 17.7%,
+        0.765 21.1%,
+        0.824 24.8%,
+        0.872 28.9%,
+        0.91 33.4%,
+        0.939 38.4%,
+        0.977 50.9%,
+        0.994 68.4%,
+        1
+    );
+}
+
 .memo-screen .memo-header .memo-tab-panel-close-btn,
 .memo-screen .memo-header .memo-actions,
 .memo-screen .memo-header .memo-date,
@@ -383,78 +397,58 @@
     z-index: calc(var(--overflow-mask-z) + 1);
 }
 
-.memo-tab-transition {
-    view-transition-name: memo-tab-reveal;
+.mobile-open-memo-transition {
+    .list-screen {
+        view-transition-name: mobile-open-memo-transition-list;
+    }
 
     .memo-tab-panel[aria-hidden="false"] {
-        view-transition-name: memo-tab;
+        view-transition-name: mobile-open-memo-transition-memo;
     }
 
     @media (min-width: 768px) {
-        view-transition-name: unset;
+        .list-screen {
+            view-transition-name: unset;
+        }
+
         .memo-tab-panel[aria-hidden="false"] {
             view-transition-name: unset;
         }
     }
 }
 
-:root::view-transition-old(memo-tab-reveal) {
+:root::view-transition-old(mobile-open-memo-transition-list) {
     display: block;
-    animation: memo-open-to-left 150ms
-        linear(
-            0,
-            0.012 0.9%,
-            0.05 2%,
-            0.411 9.2%,
-            0.517 11.8%,
-            0.611 14.6%,
-            0.694 17.7%,
-            0.765 21.1%,
-            0.824 24.8%,
-            0.872 28.9%,
-            0.91 33.4%,
-            0.939 38.4%,
-            0.977 50.9%,
-            0.994 68.4%,
-            1
-        )
-        both;
+
+    animation-name: mobile-open-memo-transition-list;
+    animation-duration: calc(var(--mobile-open-memo-transition-duration) * 1.5);
+    animation-timing-function: var(--mobile-open-memo-transition-easing);
+    animation-fill-mode: both;
+
     @media (min-width: 768px) {
         display: none;
     }
 }
 
-:root::view-transition-new(memo-tab-reveal) {
+:root::view-transition-new(mobile-open-memo-transition-list) {
     display: none;
 }
 
-:root::view-transition-new(memo-tab) {
-    animation: memo-open-from-right 150ms
-        linear(
-            0,
-            0.012 0.9%,
-            0.05 2%,
-            0.411 9.2%,
-            0.517 11.8%,
-            0.611 14.6%,
-            0.694 17.7%,
-            0.765 21.1%,
-            0.824 24.8%,
-            0.872 28.9%,
-            0.91 33.4%,
-            0.939 38.4%,
-            0.977 50.9%,
-            0.994 68.4%,
-            1
-        );
+:root::view-transition-new(mobile-open-memo-transition-memo) {
+    @apply shadow-xl;
+    animation-name: mobile-open-memo-transition-memo;
+    animation-duration: var(--mobile-open-memo-transition-duration);
+    animation-timing-function: var(--mobile-open-memo-transition-easing);
+    animation-fill-mode: forwards;
+
     @media (min-width: 768px) {
         display: none;
     }
 }
 
-@keyframes memo-open-from-right {
+@keyframes mobile-open-memo-transition-memo {
     from {
-        translate: 100% 0;
+        translate: 100vw 0;
     }
 
     to {
@@ -462,99 +456,78 @@
     }
 }
 
-@keyframes memo-open-to-left {
+@keyframes mobile-open-memo-transition-list {
     from {
         translate: 0 0;
     }
 
     to {
-        translate: -50% 0;
+        translate: -50vw 0;
     }
 }
 
-.close-memo-tab-transition {
-    view-transition-name: close-memo-tab-list-screen;
+.mobile-close-memo-transition {
+    .list-screen {
+        view-transition-name: mobile-close-memo-transition-list;
+    }
 
     .memo-tab-panel[aria-hidden="false"] {
-        view-transition-name: close-memo-tab-closed;
+        view-transition-name: mobile-close-memo-transition-memo;
     }
 
     @media (min-width: 768px) {
-        view-transition-name: unset;
+        .list-screen {
+            view-transition-name: unset;
+        }
+
         .memo-tab-panel[aria-hidden="false"] {
             view-transition-name: unset;
         }
     }
 }
 
-:root::view-transition-group(close-memo-tab-list-screen) {
+:root::view-transition-group(mobile-close-memo-transition-list) {
     animation: none;
 }
 
-:root::view-transition-old(close-memo-tab-list-screen) {
+:root::view-transition-old(mobile-close-memo-transition-list) {
     display: none;
     animation: none;
-    /* mix-blend-mode: unset; */
 }
 
-:root::view-transition-new(close-memo-tab-list-screen) {
-    animation: close-memo-tab-list-screen 120ms
-        linear(
-            0,
-            0.012 0.9%,
-            0.05 2%,
-            0.411 9.2%,
-            0.517 11.8%,
-            0.611 14.6%,
-            0.694 17.7%,
-            0.765 21.1%,
-            0.824 24.8%,
-            0.872 28.9%,
-            0.91 33.4%,
-            0.939 38.4%,
-            0.977 50.9%,
-            0.994 68.4%,
-            1
-        )
-        both;
+:root::view-transition-new(mobile-close-memo-transition-list) {
+    animation-name: mobile-close-memo-transition-list;
+    animation-duration: calc(
+        var(--mobile-close-memo-transition-duration) *
+        1.5
+    );
+    animation-timing-function: var(--mobile-close-memo-transition-easing);
+    animation-fill-mode: both;
 
     @media (min-width: 768px) {
         display: none;
     }
 }
 
-:root::view-transition-old(close-memo-tab-closed) {
-    animation: close-memo-tab-closed 150ms
-        linear(
-            0,
-            0.012 0.9%,
-            0.05 2%,
-            0.411 9.2%,
-            0.517 11.8%,
-            0.611 14.6%,
-            0.694 17.7%,
-            0.765 21.1%,
-            0.824 24.8%,
-            0.872 28.9%,
-            0.91 33.4%,
-            0.939 38.4%,
-            0.977 50.9%,
-            0.994 68.4%,
-            1
-        )
-        both;
+:root::view-transition-old(mobile-close-memo-transition-memo) {
+    animation-name: mobile-close-memo-transition-memo;
+    animation-duration: calc(
+        var(--mobile-close-memo-transition-duration) *
+        1.5
+    );
+    animation-timing-function: var(--mobile-close-memo-transition-easing);
 
     @media (min-width: 768px) {
         display: none;
     }
 }
 
-:root::view-transition-new(close-memo-tab-closed) {
+:root::view-transition-new(mobile-close-memo-transition-memo) {
     display: none;
     animation: none;
 }
 
-@keyframes close-memo-tab-list-screen {
+@keyframes mobile-close-memo-transition-list {
     0% {
         translate: -50% 0;
     }
@@ -564,7 +537,7 @@
     }
 }
 
-@keyframes close-memo-tab-closed {
+@keyframes mobile-close-memo-transition-memo {
     from {
         translate: 0 0;
     }
