@@ -7,6 +7,7 @@ import { SearchBar } from "@/ui/components/MemoListFilter/Searchbar"
 import { StateFilter } from "@/ui/components/MemoListFilter/StateFilter"
 import { TagTreeFilter } from "@/ui/components/MemoListFilter/TagTreeFilter"
 import { TopBar } from "@/ui/components/TopBar"
+import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
 import { getScrollOffsetTop } from "@/ui/navigation"
 import { actions } from "@/ui/stores"
@@ -16,6 +17,7 @@ import { TabList } from "./TabList"
 
 export function Sidebar() {
     let t = useT("components/Sidebar")
+    let isMobile = useIsMobile()
 
     return (
         <div className="memo-list-sidebar">
@@ -40,7 +42,7 @@ export function Sidebar() {
 
                 <h2 className="memo-list-sidebar-title mt-2">{t.Tags}</h2>
 
-                <TagTreeFilter />
+                {!isMobile && <TagTreeFilter />}
 
                 <StateFilter />
             </ErrorBoundary>

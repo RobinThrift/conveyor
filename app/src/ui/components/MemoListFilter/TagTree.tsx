@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { useId } from "react"
+import React, { useEffect, useId } from "react"
 
 import { CaretRightIcon, HashIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
@@ -22,6 +22,16 @@ export function TagTree({ className }: TagTreeProps) {
         focussed,
     } = useTagTree()
     let firstTag = tagTree.at(0)?.segment
+
+    useEffect(() => {
+        if (!currentTagFilter) {
+            return
+        }
+
+        requestAnimationFrame(() => {
+            document.getElementById(currentTagFilter)?.scrollIntoView({ behavior: "instant" })
+        })
+    }, [currentTagFilter])
 
     return (
         <ul

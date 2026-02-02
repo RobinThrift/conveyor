@@ -1,3 +1,5 @@
+import { useStore } from "@tanstack/react-store"
+import clsx from "clsx"
 import React, {
     Activity,
     startTransition,
@@ -16,7 +18,7 @@ import { OverFlowMask } from "@/ui/components/OverflowMask"
 import { usePreventScroll } from "@/ui/hooks/usePreventScroll"
 import { useT } from "@/ui/i18n"
 import { getScrollOffsetTop } from "@/ui/navigation"
-import { actions } from "@/ui/stores"
+import { actions, stores } from "@/ui/stores"
 
 export function TabBar() {
     return (
@@ -52,13 +54,16 @@ function NewMemoButton() {
 
 function SidebarOffcanvasOverflow() {
     let t = useT("components/TabBar")
+    let hasActiveTagFilter = useStore(stores.memos.list.filter, (s) => typeof s.tag !== "undefined")
     let { targetID, ref, isOpen, closeOffCanvas } = useSidebarOffcanvasOverflow()
 
     return (
         <div className="mobile-tabbar-tag-filter-overflow-wrapper">
             <button
                 type="button"
-                className="mobile-tabbar-tag-filter-overflow-trigger"
+                className={clsx("mobile-tabbar-tag-filter-overflow-trigger", {
+                    "has-active-tag-filter": hasActiveTagFilter,
+                })}
                 popoverTargetAction="toggle"
                 popoverTarget={targetID}
             >

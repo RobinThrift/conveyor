@@ -186,7 +186,7 @@
         var(--surface-level-2-glow),
         inset 0px 0px 4px 2px var(--surface-level-2-highlight);
 
-    &::before {
+    &::after {
         content: "";
         position: absolute;
         top: 0;
