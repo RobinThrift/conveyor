@@ -232,38 +232,44 @@
 }
 
 .memo .toc {
-    @apply hidden fixed;
-    top: calc(max(env(safe-area-inset-top, 0px), var(--spacing) * 4) + 10dvh);
-    right: calc(max(env(safe-area-inset-right, 0px), var(--spacing) * 4));
-    max-width: 100px;
+    @apply fixed;
 
-    .toc-item {
-        width: 100%;
-        a {
-            @apply mb-1 block rounded-2xl;
-            background-color: var(--color-neutral-extra-light);
-            color: var(--color-neutral-extra-light);
-            height: var(--spacing);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: calc(100% / (var(--toc-indent-level, 1) + 1));
-            justify-self: end;
-            transition:
-                height 100ms 50ms,
-                width 100ms;
+    margin: unset;
+    inset: unset;
+    overflow: clip;
+    z-index: 10000;
+    transition-property: height, width, opacity, border-radius;
+    transition-duration: 400ms, 300ms, 150ms, 200ms;
+    transition-delay: 0ms, 0ms, 0ms, 100ms;
+    transition-timing-function: linear(
+        0,
+        0.012 0.9%,
+        0.05 2%,
+        0.411 9.2%,
+        0.517 11.8%,
+        0.611 14.6%,
+        0.694 17.7%,
+        0.765 21.1%,
+        0.824 24.8%,
+        0.872 28.9%,
+        0.91 33.4%,
+        0.939 38.4%,
+        0.977 50.9%,
+        0.994 68.4%,
+        1
+    );
 
-            &.active {
-                background-color: var(--color-primary-light);
-                color: var(--color-primary-light);
-            }
-        }
-    }
+    top: anchor(bottom);
+    right: anchor(right);
+    translate: 0 -100%;
+    interpolate-size: allow-keywords;
 
-    &:hover {
-        @apply surface-level-2 elevation-2 px-3 py-2 rounded-2xl;
-        animation: memo-toc-desktop-hover-show 150ms linear;
-        animation-fill-mode: forwards;
+    &:popover-open {
+        @apply p-2 rounded-2xl surface-level-2 elevation-1;
+        min-height: 20svh;
+        height: min-content;
+        width: 95svw;
+        opacity: 1;
 
         .toc-item .toc-items {
             padding-inline-start: calc(
@@ -273,23 +279,122 @@
         }
 
         .toc-item a {
-            background-color: unset;
-            color: unset;
-            height: 1lh;
-            width: 100%;
-
-            &:hover {
-                color: var(--color-primary-light);
-            }
+            @apply h-8 px-2 flex items-center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
 
             &.active {
-                color: var(--color-primary-dark);
+                @apply rounded-xl;
+                background-color: var(--color-primary);
+                color: var(--color-primary-contrast);
             }
+        }
+    }
+
+    @starting-style {
+        &:popover-open {
+            @apply pt-0;
+            border-radius: 100%;
+            width: anchor-size(width);
+            height: anchor-size(height);
+            top: anchor(bottom);
+            left: anchor(left);
+            opacity: 0;
+        }
+    }
+
+    &::backdrop {
+        pointer-events: all;
+        background-color: color-mix(
+            in srgb,
+            var(--color-modal-overlay-bg) 80%,
+            transparent
+        );
+        opacity: 0.2;
+        transition: opacity 250ms;
+
+        @starting-style {
+            opacity: 0;
         }
     }
 
     @container (width >= 1200px) {
         @apply block;
+        top: calc(
+            max(env(safe-area-inset-top, 0px), var(--spacing) * 4) +
+            10dvh
+        );
+        right: calc(max(env(safe-area-inset-right, 0px), var(--spacing) * 4));
+        max-width: 100px;
+        left: unset;
+        translate: unset;
+        transition: unset;
+
+        .toc-item {
+            width: 100%;
+            a {
+                @apply mb-1 block rounded-2xl;
+                background-color: var(--color-neutral-extra-light);
+                color: var(--color-neutral-extra-light);
+                height: var(--spacing);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: calc(100% / (var(--toc-indent-level, 1) + 1));
+                justify-self: end;
+                transition:
+                    height 100ms 50ms,
+                    width 100ms;
+
+                &.active {
+                    background-color: var(--color-primary-light);
+                    color: var(--color-primary-light);
+                }
+            }
+        }
+
+        &:hover {
+            @apply surface-level-2 elevation-2 px-3 py-2 rounded-2xl;
+            animation: memo-toc-desktop-hover-show 150ms linear;
+            animation-fill-mode: forwards;
+
+            .toc-item .toc-items {
+                padding-inline-start: calc(
+                    var(--spacing) *
+                    (var(--toc-indent-level, 0) + 2)
+                );
+            }
+
+            .toc-item a {
+                background-color: unset;
+                color: unset;
+                height: 1lh;
+                width: 100%;
+
+                &:hover {
+                    color: var(--color-primary-light);
+                }
+
+                &.active {
+                    color: var(--color-primary-dark);
+                }
+            }
+        }
+    }
+}
+
+.memo-screen .toc-mobile-trigger {
+    @apply fixed flex items-center justify-center surface-level-2 elevation-2;
+    @apply rounded-full size-10 p-2.5;
+
+    bottom: calc(max(env(safe-area-inset-bottom, 0px), var(--spacing) * 4));
+    right: calc(max(env(safe-area-inset-right, 0px), var(--spacing) * 2));
+    z-index: var(--mobile-tabbar-z-index);
+
+    & > svg {
+        @apply size-5;
+        filter: drop-shadow(1px 1px 3px var(--color-body-bg-contrast));
     }
 }
 

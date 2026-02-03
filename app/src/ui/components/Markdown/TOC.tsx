@@ -1,8 +1,10 @@
 import clsx from "clsx"
-import React, { type CSSProperties, useEffect, useMemo, useRef } from "react"
+import React, { type CSSProperties, useEffect, useId, useMemo, useRef } from "react"
 
 import { buildTOC, parse, type TOCItem as TOCItemT } from "@/lib/markdown"
 import { useT } from "@/ui/i18n"
+import { LinesIcon } from "../Icons"
+import { useIsMobile } from "@/ui/hooks/useIsMobile"
 
 export function TOC({
     className,
@@ -13,6 +15,8 @@ export function TOC({
     document: string
     id: string
 }) {
+    let targetID = useId()
+    let isMobile = useIsMobile()
     let t = useT("components/Memo/TOC")
     let toc = useMemo(() => {
         let [ast, _] = parse(document)
@@ -25,16 +29,34 @@ export function TOC({
 
     let { ref } = useTOCState(toc ?? [])
 
-    if (!toc) {
+    if (!toc || toc.length < 2) {
         return
     }
 
     return (
-        <ol ref={ref} className={clsx("toc", className)} aria-label={t.Label}>
-            {toc.map((item) => (
-                <TOCItem key={item.id} item={item} />
-            ))}
-        </ol>
+        <>
+            <button
+                type="button"
+                className="toc-mobile-trigger"
+                popoverTargetAction="toggle"
+                popoverTarget={targetID}
+            >
+                <LinesIcon aria-hidden="true" />
+                <span className="sr-only">{t.Label}</span>
+            </button>
+
+            <ol
+                ref={ref}
+                className={clsx("toc", className)}
+                aria-label={t.Label}
+                id={targetID}
+                popover={isMobile ? "auto" : undefined}
+            >
+                {toc.map((item) => (
+                    <TOCItem key={item.id} item={item} />
+                ))}
+            </ol>
+        </>
     )
 }
 
