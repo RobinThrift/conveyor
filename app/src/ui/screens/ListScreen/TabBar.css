@@ -72,6 +72,7 @@
 
     & > svg {
         @apply size-5;
+        filter: drop-shadow(1px 1px 3px var(--color-body-bg-contrast));
     }
 }
 
@@ -80,6 +81,15 @@
 
     .input-field .input {
         @apply h-12 rounded-full bg-transparent border-none shadow-none;
+
+        &::placeholder {
+            text-shadow: 0px 0px 5px
+                color-mix(
+                    in srgb,
+                    var(--color-body-bg-contrast) 80%,
+                    transparent
+                );
+        }
     }
 
     .input-field .relative {
@@ -88,12 +98,13 @@
 
     .input-field .icon {
         @apply text-text z-10;
+        filter: drop-shadow(1px 1px 3px var(--color-body-bg-contrast));
     }
 }
 
 .mobile-tabbar-overflow-mask {
     --overflow-mask-z: calc(var(--memo-list-day-z-index) + 1);
-    --overflow-mask-height: 80px;
+    --overflow-mask-height: calc(80px + env(safe-area-inset-bottom, 0px));
 
     @media (min-width: 768px) {
         @apply hidden;
@@ -143,6 +154,7 @@
     }
 
     .mobile-tabbar {
+        visibility: hidden;
         position: absolute;
         pointer-events: none;
         height: min-content;
@@ -156,10 +168,11 @@
     }
 }
 
-:root:has(.memo-tab-panel[aria-hidden="false"])
-    .dragging-memo-tab
-    .mobile-tabbar-overflow-mask {
-    visibility: visible;
+:root:has(.memo-tab-panel[aria-hidden="false"]) .dragging-memo-tab {
+    .mobile-tabbar-overflow-mask,
+    .mobile-tabbar {
+        visibility: visible;
+    }
 }
 
 .tag-tree-offcanvas-wrapper {
@@ -212,6 +225,7 @@
 
 .tag-tree-offcanvas {
     @apply rounded-2xl pt-2 surface-level-2 elevation-1 flex-col;
+    --surface-level-2-bg-strength: 50%;
     margin: unset;
     inset: unset;
     overflow: clip;

@@ -21,8 +21,12 @@
         inset: 0;
         pointer-events: none;
         border-radius: inherit;
-        backdrop-filter: blur(32px) saturate(3000%);
-        mask: radial-gradient(ellipse, transparent 50%, white 100%);
+        backdrop-filter: blur(48px) saturate(3000%);
+        mask: radial-gradient(
+            ellipse closest-corner,
+            transparent 50%,
+            white 180%
+        );
     }
 
     .icon {

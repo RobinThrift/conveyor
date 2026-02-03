@@ -1,6 +1,6 @@
 import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
-import React, { useCallback, useMemo } from "react"
+import React, { startTransition, useCallback, useMemo } from "react"
 import type { Temporal } from "temporal-polyfill"
 
 import type { MemoID } from "@/domain/Memo"
@@ -8,7 +8,6 @@ import { DateTime } from "@/ui/components/DateTime"
 import { ErrorBoundary } from "@/ui/components/ErrorBoundary"
 import { Markdown } from "@/ui/components/Markdown"
 import { MemoActionsDropdown } from "@/ui/components/Memo/MemoActionsDropdown"
-import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { getScrollOffsetTop } from "@/ui/navigation"
 import { actions, selectors, stores } from "@/ui/stores"
 
@@ -19,18 +18,11 @@ export type MemoListItemProps = {
 
 export function MemoListItem(props: MemoListItemProps) {
     let memo = useStore(stores.memos.memos, selectors.memos.get(props.memoID))
-    let isMobile = useIsMobile()
 
     let { body, title, isBookmarkForm } = useMemo(
         () => summarise(memo.content.trim(), 20),
         [memo.content],
     )
-
-    let onPointerDown = useCallback(() => {
-        if (isMobile) {
-            document.documentElement.classList.add("mobile-open-memo-transition")
-        }
-    }, [isMobile])
 
     let openMemo = useCallback(
         (e: React.MouseEvent) => {
@@ -39,23 +31,11 @@ export function MemoListItem(props: MemoListItemProps) {
 
             let scrollOffsetTop = getScrollOffsetTop()
 
-            if (isMobile) {
-                document.documentElement.classList.add("mobile-open-memo-transition")
-
-                document
-                    .startViewTransition(() => {
-                        actions.ui.openMemo(memo.id, scrollOffsetTop)
-                    })
-                    .finished.then(() =>
-                        document.documentElement.classList.remove("mobile-open-memo-transition"),
-                    )
-            } else {
-                requestAnimationFrame(() => {
-                    actions.ui.openMemo(memo.id, scrollOffsetTop)
-                })
-            }
+            startTransition(() => {
+                actions.ui.openMemo(memo.id, scrollOffsetTop)
+            })
         },
-        [memo.id, isMobile],
+        [memo.id],
     )
 
     return (
@@ -72,21 +52,13 @@ export function MemoListItem(props: MemoListItemProps) {
                     <>
                         <MemoListItemDate createdAt={memo.createdAt} />
                         <h1>
-                            <a
-                                href={`/memos?memo=${memo.id}`}
-                                onClick={openMemo}
-                                onPointerDown={onPointerDown}
-                            >
+                            <a href={`/memos?memo=${memo.id}`} onClick={openMemo}>
                                 {title}
                             </a>
                         </h1>
                     </>
                 ) : (
-                    <a
-                        href={`/memos?memo=${memo.id}`}
-                        onClick={openMemo}
-                        onPointerDown={onPointerDown}
-                    >
+                    <a href={`/memos?memo=${memo.id}`} onClick={openMemo}>
                         <MemoListItemDate createdAt={memo.createdAt} />
                     </a>
                 )}

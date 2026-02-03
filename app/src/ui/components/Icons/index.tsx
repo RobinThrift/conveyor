@@ -344,6 +344,33 @@ export const LinkIcon = React.memo(function LinkIcon(props: { className?: string
     )
 })
 
+export const LinesIcon = React.memo(function LinkIcon(props: { className?: string }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            height="1rem"
+            width="1rem"
+            fill="none"
+            {...props}
+        >
+            <path
+                d="M20 7L4 7"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            ></path>
+            <path
+                d="M15 12L4 12"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            ></path>
+            <path d="M9 17H4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
+        </svg>
+    )
+})
+
 export const NotePencilIcon = React.memo(function NotePencilIcon(props: { className?: string }) {
     return (
         <svg

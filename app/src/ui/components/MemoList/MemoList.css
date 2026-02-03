@@ -221,6 +221,20 @@
             @apply py-1 px-1.5 relative rounded-xl surface-level-2 elevation-2 w-fit;
             font-size: var(--sm-font-size);
             --color-surface-level-1: var(--btn-bg);
+
+            &::before {
+                content: "";
+                position: absolute;
+                inset: 1px;
+                pointer-events: none;
+                border-radius: inherit;
+                backdrop-filter: blur(48px) saturate(5000%);
+                mask: radial-gradient(
+                    ellipse closest-corner,
+                    transparent 50%,
+                    white 180%
+                );
+            }
         }
     }
 }

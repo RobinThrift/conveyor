@@ -84,6 +84,7 @@
     &[aria-selected="true"] > div {
         @apply surface-level-1 elevation-1;
         --color-surface-level-1: var(--btn-primary-bg);
+        --surface-color: var(--btn-primary-color);
     }
 
     &[aria-disabled="true"] > div {

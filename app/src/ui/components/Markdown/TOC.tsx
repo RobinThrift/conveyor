@@ -2,9 +2,9 @@ import clsx from "clsx"
 import React, { type CSSProperties, useEffect, useId, useMemo, useRef } from "react"
 
 import { buildTOC, parse, type TOCItem as TOCItemT } from "@/lib/markdown"
+import { useIsMobile } from "@/ui/hooks/useIsMobile"
 import { useT } from "@/ui/i18n"
 import { LinesIcon } from "../Icons"
-import { useIsMobile } from "@/ui/hooks/useIsMobile"
 
 export function TOC({
     className,

@@ -80,13 +80,23 @@
     }
 }
 
-.dropdown-menu-list:focus-visible .dropdown-menu-item.has-focus,
-.dropdown-menu-item:not([aria-disabled="true"]):hover {
+.dropdown-menu-list:focus-visible .dropdown-menu-item.has-focus {
     @apply surface-level-1;
     --color-surface-level-1: var(--btn-bg);
     scale: 1.01;
     .icon {
         scale: 1.15;
+    }
+}
+
+@media not (hover: none) {
+    .dropdown-menu-item:not([aria-disabled="true"]):hover {
+        @apply surface-level-1;
+        --color-surface-level-1: var(--btn-bg);
+        scale: 1.01;
+        .icon {
+            scale: 1.15;
+        }
     }
 }
 

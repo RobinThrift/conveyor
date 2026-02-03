@@ -35,7 +35,16 @@
 }
 
 .memo-screen:has([aria-hidden="false"]) {
-    @apply block;
+    @apply block shadow-xl;
+    animation-name: mobile-open-memo-transition-memo;
+    animation-duration: var(--mobile-open-memo-transition-duration);
+    animation-timing-function: var(--mobile-open-memo-transition-easing);
+    animation-fill-mode: forwards;
+
+    @media (min-width: 768px) {
+        @apply shadow-none;
+        animation: none;
+    }
 }
 
 .open-memo-tab-panels {
@@ -62,7 +71,7 @@
     }
 
     @media (min-width: 768px) {
-        animation: unset;
+        @apply rounded-2xl;
         translate: unset;
         padding-top: var(--pt);
         padding-bottom: var(--pb);
@@ -71,9 +80,20 @@
 }
 
 .dragging-memo-tab .memo-tab-panel {
-    @apply shadow-xl;
-    translate: calc(var(--memo-tab-back-progress, 0) * 100%) 0;
+    left: calc(var(--memo-tab-back-progress, 0) * 100%);
     touch-action: none;
+    .memo-tab-panel-memo {
+        @apply rounded-2xl shadow-xl;
+        transition-duration: 100ms;
+    }
+
+    .memo-title-mobile-float {
+        translate: calc(var(--memo-tab-back-progress, 0) * 100cqw) 0;
+    }
+
+    @media (min-width: 768px) {
+        @apply rounded-2xl;
+    }
 }
 
 :root:has(.dragging-memo-tab) {
@@ -81,11 +101,21 @@
 }
 
 .memo-tab-panel-memo {
-    @apply bg-body rounded-2xl shadow-xs flex-1 rounded-2xl;
+    @apply bg-body flex-1;
     @apply flex justify-center;
 
+    transition: border-radius 100ms linear;
+    transition-duration: calc(
+        var(--mobile-open-memo-transition-duration) *
+        1.5
+    );
+
+    @starting-style {
+        @apply rounded-2xl;
+    }
+
     @media (min-width: 768px) {
-        @apply pt-0 border border-surface-border;
+        @apply pt-0 border border-surface-border rounded-2xl;
     }
 
     @container (width >= 1024px) {
@@ -502,72 +532,13 @@
     z-index: calc(var(--overflow-mask-z) + 1);
 }
 
-.mobile-open-memo-transition {
-    .list-screen {
-        view-transition-name: mobile-open-memo-transition-list;
-    }
-
-    .memo-tab-panel[aria-hidden="false"] {
-        view-transition-name: mobile-open-memo-transition-memo;
-    }
-
-    @media (min-width: 768px) {
-        .list-screen {
-            view-transition-name: unset;
-        }
-
-        .memo-tab-panel[aria-hidden="false"] {
-            view-transition-name: unset;
-        }
-    }
-}
-
-:root::view-transition-old(mobile-open-memo-transition-list) {
-    display: block;
-
-    animation-name: mobile-open-memo-transition-list;
-    animation-duration: calc(var(--mobile-open-memo-transition-duration) * 1.5);
-    animation-timing-function: var(--mobile-open-memo-transition-easing);
-    animation-fill-mode: both;
-
-    @media (min-width: 768px) {
-        display: none;
-    }
-}
-
-:root::view-transition-new(mobile-open-memo-transition-list) {
-    display: none;
-}
-
-:root::view-transition-new(mobile-open-memo-transition-memo) {
-    @apply shadow-xl;
-    animation-name: mobile-open-memo-transition-memo;
-    animation-duration: var(--mobile-open-memo-transition-duration);
-    animation-timing-function: var(--mobile-open-memo-transition-easing);
-    animation-fill-mode: forwards;
-
-    @media (min-width: 768px) {
-        display: none;
-    }
-}
-
 @keyframes mobile-open-memo-transition-memo {
     from {
-        translate: 100vw 0;
+        left: 100vw;
     }
 
     to {
-        translate: 0 0;
-    }
-}
-
-@keyframes mobile-open-memo-transition-list {
-    from {
-        translate: 0 0;
-    }
-
-    to {
-        translate: -50vw 0;
+        left: 0;
     }
 }
 
@@ -578,6 +549,10 @@
 
     .memo-tab-panel[aria-hidden="false"] {
         view-transition-name: mobile-close-memo-transition-memo;
+    }
+
+    .memo-tab-panel-memo {
+        @apply rounded-2xl shadow-xl;
     }
 
     @media (min-width: 768px) {

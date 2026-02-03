@@ -39,7 +39,15 @@
         position: fixed;
         pointer-events: none;
 
+        animation-name: mobile-open-memo-transition-list;
+        animation-duration: calc(
+            var(--mobile-open-memo-transition-duration) *
+            1.5
+        );
+        animation-timing-function: var(--mobile-open-memo-transition-easing);
+
         @media (min-width: 1024px) {
+            animation: none;
             pointer-events: unset;
             top: unset;
             width: unset;
@@ -60,6 +68,10 @@
         5px
     );
     height: var(--overflow-mask-height, 100px);
+
+    @media (min-width: 1024px) {
+        display: none;
+    }
 }
 
 .dragging-memo-tab .list-screen:has(.memo-list-tab-panel[aria-hidden="true"]) {
@@ -77,9 +89,16 @@
     @apply hidden flex-1;
 
     min-height: calc(100svh - var(--pt) - var(--pb));
+    transition-behavior: allow-discrete;
+    transition-property: display;
+    transition-duration: calc(
+        var(--mobile-open-memo-transition-duration) *
+        1.5
+    );
 
     @media (min-width: 768px) {
         margin-left: calc(var(--sidebar-width) + var(--spacing) * 1);
+        transition: unset;
     }
 }
 
@@ -102,5 +121,15 @@
         @media (min-width: 1024px) {
             --pt: max(env(safe-area-inset-top, 0px), calc(var(--spacing)));
         }
+    }
+}
+
+@keyframes mobile-open-memo-transition-list {
+    from {
+        translate: 0 0;
+    }
+
+    to {
+        translate: -50vw 0;
     }
 }

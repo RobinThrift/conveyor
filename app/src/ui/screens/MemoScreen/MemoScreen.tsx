@@ -144,7 +144,7 @@ const MemoTitleMobileFloat = React.memo(function MemoTitleMobileFloat({
     }, [title])
 
     return (
-        <div aria-hidden="true" className="memo-title-mobile-float">
+        <div aria-hidden="true" className="memo-title-mobile-float memo-tab-back-progress-target">
             <MemoDate createdAt={createdAt} />
             {trimmed && <span>{trimmed}</span>}
         </div>

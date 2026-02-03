@@ -149,6 +149,12 @@
     }
 }
 
+@property --surface-level-2-bg-strength {
+    syntax: "<percentage>";
+    initial-value: 5%;
+    inherits: false;
+}
+
 @utility surface-level-2 {
     --color-surface-level-2-border: color-mix(
         in oklch,
@@ -166,12 +172,13 @@
         color-mix(in oklch, var(--color-surface-level-2) 40%, white) 90%,
         transparent
     );
+    --surface-level-2-bg-strength: 5%;
 
     color: var(--surface-color, var(--color-text));
     backdrop-filter: blur(8px) saturate(150%);
     background-color: color-mix(
         in oklch,
-        var(--color-surface-level-2) 5%,
+        var(--color-surface-level-2) var(--surface-level-2-bg-strength),
         transparent
     );
     border: 1px solid

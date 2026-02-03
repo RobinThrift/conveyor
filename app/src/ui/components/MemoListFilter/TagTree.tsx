@@ -29,7 +29,9 @@ export function TagTree({ className }: TagTreeProps) {
         }
 
         requestAnimationFrame(() => {
-            document.getElementById(currentTagFilter)?.scrollIntoView({ behavior: "instant" })
+            document
+                .getElementById(currentTagFilter)
+                ?.scrollIntoView({ behavior: "instant", block: "nearest" })
         })
     }, [currentTagFilter])
 
