@@ -14,15 +14,17 @@
     font-size: var(--editor-font-size);
 
     *::selection {
-        /* color: var(--code-selection-foreground); */
-        /* background: var(--code-selection-background); */
+        /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
         color: var(--color-primary-contrast) !important;
+        /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
         background-color: var(--color-primary) !important;
     }
 
     .tok-fenced-code *::selection,
     .tok-fenced-code::selection {
+        /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
         color: var(--code-selection-foreground) !important;
+        /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
         background: var(--code-selection-background) !important;
     }
 }
