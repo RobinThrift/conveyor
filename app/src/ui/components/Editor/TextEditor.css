@@ -12,6 +12,19 @@
     background: transparent;
     color: var(--code-foreground);
     font-size: var(--editor-font-size);
+
+    *::selection {
+        /* color: var(--code-selection-foreground); */
+        /* background: var(--code-selection-background); */
+        color: var(--color-primary-contrast) !important;
+        background-color: var(--color-primary) !important;
+    }
+
+    .tok-fenced-code *::selection,
+    .tok-fenced-code::selection {
+        color: var(--code-selection-foreground) !important;
+        background: var(--code-selection-background) !important;
+    }
 }
 
 .cm-editor.cm-focused {
@@ -134,21 +147,21 @@
         font-size: 0px;
     }
 }
-.cm-hide-token .cm-heading-1 {
+.cm-hide-token:first-child .cm-heading-1 {
     margin-right: -0.5rem;
 }
 
-.cm-hide-token .cm-heading-2,
-.cm-hide-token .cm-heading-3 {
+.cm-hide-token:first-child .cm-heading-2,
+.cm-hide-token:first-child .cm-heading-3 {
     margin-right: -0.4rem;
 }
 
-.cm-hide-token .cm-heading-4 {
+.cm-hide-token:first-child .cm-heading-4 {
     margin-right: -0.3rem;
 }
 
-.cm-hide-token .cm-heading-5,
-.cm-hide-token .cm-heading-6 {
+.cm-hide-token:first-child .cm-heading-5,
+.cm-hide-token:first-child .cm-heading-6 {
     margin-right: -0.2rem;
 }
 
@@ -165,13 +178,13 @@
 }
 
 .cm-line.tok-fenced-code-mark {
-    @apply rounded-t font-mono pt-4!;
+    @apply rounded-t-lg font-mono pt-4!;
     background-color: var(--code-background);
     color: var(--code-foreground);
 }
 
 .cm-line.tok-fenced-code-end-mark {
-    @apply rounded-b font-mono pb-4!;
+    @apply rounded-b-lg font-mono pb-4!;
     background-color: var(--code-background);
     color: var(--code-foreground);
 }

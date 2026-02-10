@@ -36,17 +36,14 @@ const themeExtension = EditorView.theme({
         height: "100% !important",
     },
 
-    "&.cm-focused .cm-selectionBackground, & .cm-line::selection, &.cm-focused .cm-content ::selection, .cm-content ::selection":
-        {
-            color: "var(--code-selection-foreground) !important",
-            background: "var(--code-selection-background) !important",
-            opacity: 1,
-        },
+    "& .cm-selectionMatch": {
+        background:
+            "color-mix(in oklch, var(--code-selection-background) 20%, transparent) !important",
+    },
 
     "& .cm-selectionBackground": {
-        color: "var(--code-selection-foreground) !important",
-        background: "var(--code-selection-background) !important",
-        opacity: 0.5,
+        background: "transparent",
+        opacity: 0.0,
     },
 })
 
