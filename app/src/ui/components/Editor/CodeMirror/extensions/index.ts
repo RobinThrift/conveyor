@@ -25,7 +25,9 @@ import { customBlocks } from "@/lib/markdown/extensions/blocks"
 import { footnotes } from "@/lib/markdown/extensions/footnotes"
 import { tagLinks } from "@/lib/markdown/extensions/tags"
 import type { AsyncResult } from "@/lib/result"
+
 import { attachments } from "./attachments"
+import { codeblocks } from "./codeblocks"
 import { fileDropHandler } from "./fileDropHandler"
 import { inlineImages } from "./inlineImages"
 import { markdownDecorations } from "./markdownDecorations"
@@ -77,6 +79,7 @@ export const extensions = ({
             codeLanguages: languages,
             extensions: [footnotes, tagLinks, customBlocks],
         }),
+        codeblocks(),
         inlineImages(getAttachmentDataByID),
         markdownDecorations,
         EditorView.contentAttributes.of({
