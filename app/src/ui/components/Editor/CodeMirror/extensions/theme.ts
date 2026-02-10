@@ -2,6 +2,8 @@ import { HighlightStyle, syntaxHighlighting, type TagStyle } from "@codemirror/l
 import { EditorView } from "@codemirror/view"
 import { classHighlighter, tags as t } from "@lezer/highlight"
 
+import { TagLinkTag } from "@/lib/markdown/extensions/tags"
+
 let styles: TagStyle[] = [
     { tag: t.heading, class: "cm-heading" },
     { tag: t.heading1, class: "cm-heading-1" },
@@ -10,6 +12,10 @@ let styles: TagStyle[] = [
     { tag: t.heading4, class: "cm-heading-4" },
     { tag: t.heading5, class: "cm-heading-5" },
     { tag: t.heading6, class: "cm-heading-6" },
+    {
+        tag: TagLinkTag,
+        class: "tok-tag-link",
+    },
 ]
 
 const themeExtension = EditorView.theme({

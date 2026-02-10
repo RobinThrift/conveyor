@@ -1,12 +1,14 @@
-import { tags as t } from "@lezer/highlight"
+import { Tag, tags as t } from "@lezer/highlight"
 import type { MarkdownConfig } from "@lezer/markdown"
 
 const TagLinkType = "TagLink"
 
 const isWordChar = /\w+/
 
+export const TagLinkTag = Tag.define("tok-tag-link", t.link)
+
 export const tagLinks: MarkdownConfig = {
-    defineNodes: [{ name: "TagLink", style: t.link }],
+    defineNodes: [{ name: "TagLink", style: TagLinkTag }],
     parseInline: [
         {
             name: "TagNote",

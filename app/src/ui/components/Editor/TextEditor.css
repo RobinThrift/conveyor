@@ -194,6 +194,11 @@
     @apply text-primary hover:underline;
 }
 
+.tok-link.tok-tag-link {
+    @apply text-neutral-light cursor-pointer;
+    @apply hover:text-primary hover:underline;
+}
+
 .cm-line:has(.tok-heading) + .cm-line.tok-paragraph {
     /* biome-ignore lint/complexity/noImportantStyles: required */
     padding-top: 0.5lh !important;
