@@ -76,7 +76,6 @@ class ImageWidget extends WidgetType {
     }
 
     public get estimatedHeight(): number {
-        console.log("estimatedHeight", this._estimatedHeight)
         return this._estimatedHeight
     }
 
