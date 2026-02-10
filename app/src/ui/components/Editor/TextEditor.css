@@ -3,6 +3,8 @@
     width: 100%;
     max-width: var(--editor-width, var(--memo-width, 100%));
     --code-foreground: var(--color-text);
+    flex-direction: column;
+    align-items: stretch;
 }
 
 .cm-editor {
@@ -10,7 +12,6 @@
     background: transparent;
     color: var(--code-foreground);
     font-size: var(--editor-font-size);
-    height: 100%;
 }
 
 .cm-editor.cm-focused {

@@ -68,9 +68,8 @@
 }
 
 .memo.is-editing {
-    min-height: 80cqh;
-    max-height: max-content;
-    overflow: auto;
+    min-height: 100%;
+    overflow: hidden;
 }
 
 .memo .memo-date {

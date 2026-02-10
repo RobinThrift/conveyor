@@ -61,7 +61,7 @@ export const Overview: Story = {
         })(),
     },
     render: (args) => (
-        <div className="tablet:container mx-auto min-h-screen tablet:p-8 tablet:max-w-[80rem]">
+        <div className="memo-tab-panel-memo">
             <Editor {...args} />
         </div>
     ),
