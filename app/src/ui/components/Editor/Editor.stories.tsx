@@ -97,7 +97,7 @@ export const WithContent: Story = {
         })(),
     },
     render: (args) => (
-        <div className="tablet:container mx-auto min-h-screen tablet:p-8 tablet:max-w-[80rem] overflow-auto relative">
+        <div className="memo-tab-panel-memo">
             <Editor {...args} />
         </div>
     ),

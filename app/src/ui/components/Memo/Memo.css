@@ -259,8 +259,9 @@
         }
     }
 
-    pre {
-        @apply overflow-x-auto p-4 rounded;
+    pre,
+    .code-block {
+        @apply overflow-x-auto p-4 rounded-lg shadow-sm;
         margin-top: 0.5lh;
         margin-bottom: 1lh;
 
