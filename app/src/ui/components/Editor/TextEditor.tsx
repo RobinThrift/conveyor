@@ -33,6 +33,10 @@ export interface TextEditorProps {
     onSave: () => void
     onCancel: () => void
 
+    autocomplete?: {
+        tags?: Tag[]
+    }
+
     transferAttachment(attachment: {
         id: AttachmentID
         filename: string
@@ -54,6 +58,7 @@ export function TextEditor(props: TextEditorProps) {
                 })}
                 onCreateEditor={onCreateEditor}
                 vimModeEnabled={props.vimModeEnabled}
+                autocomplete={props.autocomplete}
                 text={props.content}
                 onChange={props.onChange}
                 autoFocus={props.autoFocus}

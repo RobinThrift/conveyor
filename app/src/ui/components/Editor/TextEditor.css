@@ -1,12 +1,12 @@
 .text-editor {
-    @apply flex-1 overflow-auto;
+    @apply flex-1 flex overflow-hidden;
     width: 100%;
     max-width: var(--editor-width, var(--memo-width, 100%));
     --code-foreground: var(--color-text);
 }
 
 .cm-editor {
-    @apply overflow-hidden;
+    @apply flex-1;
     background: transparent;
     color: var(--code-foreground);
     font-size: var(--editor-font-size);
@@ -256,4 +256,32 @@
 .tok-custom-block-name {
     @apply font-mono;
     color: var(--code-name);
+}
+
+.text-editor-autocomplete {
+    @apply p-1 rounded-xl elevation-3 surface-level-2;
+
+    transition:
+        opacity 150ms cubic-bezier(0, 0.72, 0.74, 1),
+        transform 150ms cubic-bezier(0, 0.72, 0.74, 1);
+
+    &:popover-open {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    @starting-style {
+        &:popover-open {
+            opacity: 0.95;
+            transform: scale(0.95);
+        }
+    }
+}
+
+.text-editor-autocomplete-item {
+    @apply w-full rounded-xl px-2! py-1! box-border outline-hidden text-sm select-none;
+
+    &[aria-selected="true"] {
+        @apply bg-primary! text-primary-contrast!;
+    }
 }

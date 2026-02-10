@@ -74,6 +74,7 @@ export function Editor(props: EditorProps) {
                     onChange={onChange}
                     onCancel={onCancel}
                     onSave={onSave}
+                    autocomplete={{ tags: props.tags }}
                     transferAttachment={props.transferAttachment}
                 >
                     {(cmds) => <EditorToolbar {...cmds} />}
