@@ -189,6 +189,21 @@
     @apply rounded-b-lg font-mono pb-4!;
     background-color: var(--code-background);
     color: var(--code-foreground);
+    anchor-name: --fenced-code-end-mark;
+
+    &::after {
+        @apply rounded-lg shadow-sm;
+        content: "";
+        z-index: -2;
+        position: absolute;
+        display: block;
+        left: anchor(var(--code-fence-start) left);
+        right: anchor(var(--code-fence-start) right);
+        top: anchor(var(--code-fence-start) top);
+        bottom: anchor(--fenced-code-end-mark bottom);
+        position-anchor: var(--code-fence-start), --fenced-code-end-mark;
+        pointer-events: none;
+    }
 }
 
 .cm-img {
