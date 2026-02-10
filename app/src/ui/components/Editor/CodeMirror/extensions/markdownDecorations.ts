@@ -164,11 +164,18 @@ function buildDecorations(state: EditorState) {
             }
 
             if (cursor.name === "Link") {
-                decorations.add(
-                    cursor.from,
-                    cursor.to,
-                    Decoration.mark({ class: "cm-hide-token md-link" }),
-                )
+                let classes = "md-link"
+
+                let link = state.sliceDoc(cursor.from, cursor.to)
+                let urlStart = link.indexOf("](")
+                let text = link.substring(1, urlStart)
+                let href = link.substring(urlStart + 2, link.length - 1)
+
+                if (link.length > 4 && text.length > 1 && href.length > 1) {
+                    classes += " cm-hide-token"
+                }
+
+                decorations.add(cursor.from, cursor.to, Decoration.mark({ class: classes }))
 
                 return
             }
@@ -252,15 +259,16 @@ function buildDecorations(state: EditorState) {
             }
 
             if (cursor.name === "Link") {
-                let href = state.sliceDoc(cursor.from, cursor.to)
-                let urlStart = href.indexOf("](")
-                if (urlStart !== 1 && href[urlStart + 2] !== "^") {
+                let link = state.sliceDoc(cursor.from, cursor.to)
+                let urlStart = link.indexOf("](")
+                let href = link.substring(urlStart + 2, link.length - 1)
+                if (href.length > 1 && href[0] !== "^") {
                     decorations.add(
                         cursor.to,
                         cursor.to,
                         Decoration.widget({
                             widget: new LinkWidget({
-                                href: href.substring(urlStart + 2, href.length - 1),
+                                href: link.substring(urlStart + 2, link.length - 1),
                             }),
                         }),
                     )
