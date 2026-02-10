@@ -1,6 +1,13 @@
 import { syntaxTree } from "@codemirror/language"
-import { type EditorState, type RangeSet, RangeSetBuilder, StateField } from "@codemirror/state"
+import {
+    type EditorState,
+    type RangeSet,
+    RangeSetBuilder,
+    StateField,
+    type Text,
+} from "@codemirror/state"
 import { Decoration, EditorView, WidgetType } from "@codemirror/view"
+import type { SyntaxNode } from "@lezer/common"
 
 export const markdownDecorations = StateField.define<RangeSet<Decoration>>({
     create(state) {
@@ -54,7 +61,11 @@ function buildDecorations(state: EditorState) {
                 return
             }
 
-            if (cursor.name === "Paragraph" && cursor.node.parent?.type.name === "Document") {
+            if (
+                cursor.name === "Paragraph" &&
+                cursor.node.parent?.type.name === "Document" &&
+                !isSameLineAsPrevSibling(state.doc, cursor.node)
+            ) {
                 let line = state.doc.lineAt(cursor.from).from
                 decorations.add(
                     line,
@@ -289,4 +300,15 @@ class LinkWidget extends WidgetType {
 
         return this._dom
     }
+}
+
+function isSameLineAsPrevSibling(doc: Text, node: SyntaxNode): boolean {
+    if (!node.prevSibling) {
+        return false
+    }
+
+    let prevSiblingLine = doc.lineAt(node.prevSibling.from).from
+    let ownLine = doc.lineAt(node.from).from
+
+    return prevSiblingLine === ownLine
 }

@@ -1,13 +1,7 @@
 import { autocompletion, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete"
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
-import {
-    bracketMatching,
-    defaultHighlightStyle,
-    indentOnInput,
-    indentUnit,
-    syntaxHighlighting,
-} from "@codemirror/language"
+import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language"
 import { languages } from "@codemirror/language-data"
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search"
 import type { Extension } from "@codemirror/state"
@@ -61,7 +55,6 @@ export const extensions = ({
         vimModeEnabled ? vim() : [],
         keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...searchKeymap]),
         indentUnit.of(" ".repeat(4)),
-        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         bracketMatching(),
         closeBrackets(),
         indentOnInput(),
