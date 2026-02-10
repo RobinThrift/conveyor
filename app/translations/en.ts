@@ -110,6 +110,7 @@ export const translations = {
         TextFormattingBold: "Bold",
         TextFormattingItalic: "Italic",
         TextFormattingMonospace: "Monospace",
+        InsertCodeBlock: "Insert Code Block",
         InsertLink: "Insert Link",
     },
 

@@ -13,6 +13,7 @@ export type ToolbarCommands = {
     toggleItalics: () => void
     toggleMonospace: () => void
     insertLink: () => void
+    insertCodeBlock: () => void
 
     copyToClipboard: () => void
     pasteFromClipboard: (items: PasteItem[]) => void

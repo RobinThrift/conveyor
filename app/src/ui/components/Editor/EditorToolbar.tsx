@@ -5,6 +5,7 @@ import { decodeText } from "@/lib/textencoding"
 import { DropdownMenu } from "@/ui/components/DropdownMenu"
 import {
     ClipboardIcon,
+    CodeBlockIcon,
     CodeIcon,
     CopyIcon,
     LinkIcon,
@@ -29,6 +30,7 @@ export function EditorToolbar({
     toggleItalics,
     toggleMonospace,
     insertLink,
+    insertCodeBlock,
     copyToClipboard: copy,
     pasteFromClipboard: paste,
 }: ToolbarCommands) {
@@ -55,6 +57,12 @@ export function EditorToolbar({
                     label={t.TextFormattingMonospace}
                     action={toggleMonospace}
                     icon={<CodeIcon />}
+                />
+
+                <ToolbarButton
+                    label={t.InsertCodeBlock}
+                    action={insertCodeBlock}
+                    icon={<CodeBlockIcon />}
                 />
 
                 <ToolbarButton label={t.InsertLink} action={insertLink} icon={<LinkIcon />} />

@@ -107,7 +107,8 @@
         "TextFormattingBold": "Fettgedruckt",
         "TextFormattingItalic": "Kursiv",
         "TextFormattingMonospace": "Monospace",
-        "InsertLink": "Link einfügren"
+        "InsertCodeBlock": "Code Block einfügen",
+        "InsertLink": "Link einfügen"
     },
 
     "components/DateTime": {

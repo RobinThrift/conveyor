@@ -6,6 +6,7 @@ import type { Tag } from "@/domain/Tag"
 import * as eventbus from "@/ui/eventbus"
 import {
     copyToClipboard,
+    insertCodeBlock,
     type PasteItem,
     pasteFromClipboard,
     toggleBold,
@@ -83,6 +84,7 @@ export function useTextEditorState(opts: {
                     wrapAsLink(cmView.current)
                     cmView.current.focus()
                 },
+                insertCodeBlock: () => cmView.current && insertCodeBlock(cmView.current),
                 copyToClipboard: () => {
                     if (!cmView.current) {
                         return
