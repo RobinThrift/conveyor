@@ -26,8 +26,6 @@ export const markdownDecorations = StateField.define<RangeSet<Decoration>>({
 function buildDecorations(state: EditorState) {
     let decorations = new RangeSetBuilder<Decoration>()
 
-    let codeFenceID = 0
-
     syntaxTree(state).iterate({
         enter: (cursor) => {
             if (cursor.name === "CustomBlockStart" || cursor.name === "CustomBlockEnd") {
@@ -91,16 +89,15 @@ function buildDecorations(state: EditorState) {
             }
 
             if (cursor.name === "CodeMark" && cursor.node.parent?.name === "FencedCode") {
-                let id = `fenced-code-mark-${codeFenceID}`
+                let id = `fenced-code-mark-${cursor.node.parent?.from}`
                 let style = ""
                 let classes = "tok-fenced-code-mark"
 
                 if (cursor.node.prevSibling?.name === "CodeText") {
                     classes = "tok-fenced-code-end-mark"
-                    style = `--code-fence-start: --${id}`
-                    codeFenceID++
+                    style = `--code-fence-start: --${id}-start; --code-fence-end: --${id}-end; anchor-name: --${id}-end;`
                 } else {
-                    style = `anchor-name: --${id};`
+                    style = `anchor-name: --${id}-start;`
                 }
 
                 decorations.add(
