@@ -84,7 +84,6 @@ class ImageWidget extends WidgetType {
     }
 
     updateDOM(dom: HTMLElement, _: EditorView): boolean {
-        dom = document.createElement("img")
         dom.className = "cm-img"
         dom.setAttribute("aria-hidden", "true")
 
@@ -125,6 +124,7 @@ class ImageWidget extends WidgetType {
 
     toDOM(view: EditorView) {
         this._dom = document.createElement("img")
+        this._dom.setAttribute("contenteditable", "false")
         this.updateDOM(this._dom, view)
         return this._dom
     }
