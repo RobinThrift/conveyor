@@ -36,4 +36,6 @@
 
 .editor {
     @apply flex flex-col flex-1;
+
+    margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 50cqh);
 }
