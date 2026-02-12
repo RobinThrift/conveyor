@@ -78,7 +78,6 @@ export async function insertAttachment(
         ],
         changes: {
             from,
-            to: view.state.selection.main.to || undefined,
             insert: insertText,
         },
         selection: EditorSelection.cursor(to),

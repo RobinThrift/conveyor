@@ -19,7 +19,7 @@ const fileDropHandlerExt = ViewPlugin.fromClass(
                 y: e.clientY,
             })
 
-            if (!pos) {
+            if (pos === null) {
                 return
             }
 
