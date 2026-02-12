@@ -51,7 +51,7 @@ export async function insertAttachment(
             imgURL = `${id}?${imgURLParams.toString()}`
         }
 
-        insertText = `![${filename}](attachment://${imgURL})`
+        insertText = `![](attachment://${imgURL})`
     }
 
     if (from !== 0) {
