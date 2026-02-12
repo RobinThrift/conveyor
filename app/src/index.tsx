@@ -20,7 +20,7 @@ const serverError = JSON.parse(
 )?.error
 
 async function main() {
-    registerSW({ immediate: true })
+    setupServiceWorker()
 
     let [, initErr] = await fromPromise(
         init({
@@ -32,6 +32,57 @@ async function main() {
         console.error(initErr)
         ReactDOM.createRoot(rootElement).render(<PrettyError error={initErr} />)
         return
+    }
+}
+
+const swUpdateIntervalMS = 60 * 60 * 1000
+
+async function setupServiceWorker() {
+    let update = registerSW({
+        immediate: true,
+        onNeedRefresh: () => {
+            console.log("service worker need refresh")
+        },
+        onOfflineReady: () => {
+            console.log("service worker is offline ready")
+        },
+        onRegisterError: (err) => {
+            console.error(`error registering service worker`, err)
+        },
+
+        onRegisteredSW(swURL, r) {
+            if (!r) {
+                return
+            }
+
+            setInterval(async () => {
+                if (r.installing) {
+                    return
+                }
+
+                if (!navigator.onLine) {
+                    return
+                }
+
+                let res = await fetch(swURL, {
+                    cache: "no-store",
+                    headers: {
+                        cache: "no-store",
+                        "cache-control": "no-cache",
+                    },
+                })
+
+                if (res?.status === 200) {
+                    await r.update()
+                }
+            }, swUpdateIntervalMS)
+        },
+    })
+
+    try {
+        await update()
+    } catch (e) {
+        console.error("error updating service worker", e)
     }
 }
 

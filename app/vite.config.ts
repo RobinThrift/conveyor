@@ -59,7 +59,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                 registerType: "autoUpdate",
                 injectRegister: "auto",
                 manifest: false,
-                scope: "/assets/",
+                scope: "/",
                 workbox: {
                     globPatterns: ["**/*.{js,css,svg,png,woff2,wasm}"],
                     navigateFallback: null,
