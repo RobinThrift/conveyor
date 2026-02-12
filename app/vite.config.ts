@@ -64,6 +64,16 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                     globPatterns: ["**/*.{js,css,svg,png,woff2,wasm}"],
                     navigateFallback: null,
                     maximumFileSizeToCacheInBytes: 3000000, // 3MiB
+                    runtimeCaching: [
+                        {
+                            urlPattern: /\/$/,
+                            handler: "StaleWhileRevalidate",
+                        },
+                        {
+                            urlPattern: /index.html/,
+                            handler: "StaleWhileRevalidate",
+                        },
+                    ],
                 },
             }),
         ],
