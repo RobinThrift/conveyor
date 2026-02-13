@@ -11,8 +11,6 @@ export type OnPop<S extends Screens> = (
     prev?: NavgationState<S>,
 ) => void
 
-// export type OnReplace<S extends Screens> = (current: NavgationState<S>) => void
-
 export interface NavigationBackend<S extends Screens> {
     init(state: NavgationState<S>): NavgationState<S>
 
@@ -20,11 +18,7 @@ export interface NavigationBackend<S extends Screens> {
 
     pop(): Promise<NavgationState<S>>
 
-    // replace(next: Omit<NavgationState<Screens>, "stack">): NavgationState<S>
-
     addEventListener(event: "push", handler: (next: NavgationState<S>) => void): () => void
 
     addEventListener(event: "pop", handler: (next: NavgationState<S>) => void): () => void
-
-    // addEventListener(event: "replace", handler: (next: NavgationState<S>) => void): () => void
 }

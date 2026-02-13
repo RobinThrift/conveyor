@@ -39,14 +39,6 @@ export class HistoryNavigationBackend<
         return { prev: [], ...(window.history.state ?? {}) }
     }
 
-    // private _pushState(next: NavgationState<S>) {
-    //     let curr = this._currentState
-    //     window.history.state = {...curr, prev: [
-    //         curr.current,
-    //         curr.prev,
-    //     ]}
-    // }
-
     constructor({
         routes,
     }: {
