@@ -67,7 +67,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
 
                     runtimeCaching: [
                         {
-                            urlPattern: /\/manifest.json$/,
+                            urlPattern: /\/manifest.json/,
                             handler: "StaleWhileRevalidate",
                         },
                         {
@@ -91,7 +91,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                             handler: "StaleWhileRevalidate",
                         },
                         {
-                            urlPattern: /.*\.workbox-window.prod*.\.js$/,
+                            urlPattern: /.*\.workbox-window\.prod.*/,
                             handler: "StaleWhileRevalidate",
                         },
                     ],
