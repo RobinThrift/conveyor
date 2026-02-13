@@ -122,7 +122,6 @@ Vim.mapCommand("\0sa<character>", "action", "_addAround", [], {
 })
 
 Vim.defineAction("replaceArround", (cm, params) => {
-    console.log("replaceArround", params)
     if (!params.selectedCharacter) {
         return
     }

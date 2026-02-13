@@ -125,7 +125,6 @@ const Heading = React.memo(function Heading({
                     let checkLevel = Number.parseInt(c.tagName.substring(1), 10)
                     c.classList.remove("is-hiding")
                     if (checkLevel <= level) {
-                        console.log(c)
                         break
                     }
                 }
