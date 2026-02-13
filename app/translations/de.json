@@ -340,7 +340,8 @@
         "ServerVersionLabel": "Server Version:",
         "ServerPublishDateLabel": "Server Veröffentlicht on:",
         "ServerGoVersionLabel": "Go Version:",
-        "ChangelogLink": "Changelog"
+        "ChangelogLink": "Changelog",
+        "UpdateButton": "Update"
     },
 
     "screens/Settings/Data": {

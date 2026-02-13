@@ -2,7 +2,8 @@ import type { BackendClient } from "@/backend/BackendClient"
 import { NavigationController, type Params, type Screens } from "@/control/NavigationController"
 import type { Attachment } from "@/domain/Attachment"
 import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBackend"
-import type { AsyncResult } from "@/lib/result"
+import { type AsyncResult, Ok } from "@/lib/result"
+import type { Updater } from "@/lib/Updater"
 import * as stores from "@/ui/stores"
 
 import { MockBackendClient } from "./MockBackendClient"
@@ -54,7 +55,23 @@ export async function init({ generateMockData, mockAttachments }: InitOpts) {
         }),
     })
 
-    stores.registerEffects({ backend: backend as unknown as BackendClient, navCtrl })
+    stores.registerEffects({
+        backend: backend as unknown as BackendClient,
+        navCtrl,
+        updater: new MockUpdater(),
+    })
 
     backend.emitEvent("init/autoUnlock", { isSetup: false })
+}
+
+class MockUpdater implements Updater {
+    public hasUpdate = false
+
+    async update(): AsyncResult<void> {
+        return Ok()
+    }
+
+    addEventListener(_event: "updateAvailable", _handler: () => void): () => void {
+        return () => {}
+    }
 }

@@ -1,7 +1,10 @@
-import React from "react"
-
+import { useStore } from "@tanstack/react-store"
+import React, { useCallback } from "react"
+import { Alert } from "@/ui/components/Alert"
+import { Button } from "@/ui/components/Button"
 import { useBuildInfo } from "@/ui/hooks/useBuildInfo"
 import { useT } from "@/ui/i18n"
+import { actions, stores } from "@/ui/stores"
 
 export function AboutTab() {
     let t = useT("screens/Settings/About")
@@ -29,6 +32,9 @@ export function AboutTab() {
                             </a>
                         </dd>
                     </div>
+
+                    <Update />
+
                     <div className="flex gap-2">
                         <dt>{t.PublishDateLabel}</dt>
                         <dd className="font-semibold">{buildInfo.commitDate}</dd>
@@ -38,7 +44,6 @@ export function AboutTab() {
                         <>
                             <hr />
                             <div className="flex gap-2">
-                                memolistitem
                                 <dt>{t.ServerVersionLabel}</dt>
                                 <dd className="font-semibold">
                                     {buildInfo.server.version}
@@ -81,6 +86,35 @@ export function AboutTab() {
                     {buildInfo.projectLink.replace("https://", "")}
                 </a>
             </div>
+        </div>
+    )
+}
+
+function Update() {
+    let t = useT("screens/Settings/About")
+    let needsUpdate = useStore(stores.sw.needsUpdate)
+    let updateErr = useStore(stores.sw.updateErr)
+
+    let onClick = useCallback(() => {
+        actions.sw.triggerUpdate()
+    }, [])
+
+    if (!needsUpdate && !updateErr) {
+        return null
+    }
+
+    return (
+        <div className="mt-2 mb-4">
+            {needsUpdate && (
+                <Button variant="primary" onClick={onClick}>
+                    {t.UpdateButton}
+                </Button>
+            )}
+            {updateErr && (
+                <Alert>
+                    <pre>{updateErr.toString()}</pre>
+                </Alert>
+            )}
         </div>
     )
 }

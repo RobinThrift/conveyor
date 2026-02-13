@@ -56,8 +56,8 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             tailwindcss(),
             react({ devTarget: "es2024" }),
             VitePWA({
-                registerType: "autoUpdate",
-                injectRegister: "auto",
+                registerType: "prompt",
+                injectRegister: false,
                 manifest: false,
                 scope: "/",
                 workbox: {
@@ -79,6 +79,10 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                             handler: "StaleWhileRevalidate",
                         },
                         {
+                            urlPattern: /\/settings/,
+                            handler: "StaleWhileRevalidate",
+                        },
+                        {
                             urlPattern: /index.html/,
                             handler: "StaleWhileRevalidate",
                         },
@@ -91,7 +95,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
                             handler: "StaleWhileRevalidate",
                         },
                         {
-                            urlPattern: /.*\.workbox-window\.prod.*/,
+                            urlPattern: /.*workbox-window\.prod.*/,
                             handler: "StaleWhileRevalidate",
                         },
                     ],

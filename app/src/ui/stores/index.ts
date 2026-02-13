@@ -1,5 +1,6 @@
 import type { BackendClient } from "@/backend/BackendClient"
 import type { NavigationController } from "@/control/NavigationController"
+import type { Updater } from "@/lib/Updater"
 
 import * as apitokens from "./apitokens"
 import * as attachments from "./attachments"
@@ -11,6 +12,7 @@ import * as memos from "./memos"
 import * as navigation from "./navigation"
 import * as settings from "./settings"
 import * as setup from "./setup"
+import * as sw from "./sw"
 import * as sync from "./sync"
 import * as tags from "./tags"
 import * as ui from "./ui"
@@ -63,6 +65,10 @@ export const stores = {
         selectedOptions: setup.selectedOptions,
         error: setup.error,
     },
+    sw: {
+        needsUpdate: sw.needsUpdate,
+        updateErr: sw.updateErr,
+    },
     sync: {
         status: sync.status,
         info: sync.info,
@@ -104,6 +110,7 @@ export const actions = {
     navigation: navigation.actions,
     settings: settings.actions,
     setup: setup.actions,
+    sw: sw.actions,
     sync: sync.actions,
     tags: tags.actions,
     ui: ui.actions,
@@ -129,9 +136,11 @@ export const selectors = {
 export function registerEffects({
     backend,
     navCtrl,
+    updater,
 }: {
     backend: BackendClient
     navCtrl: NavigationController
+    updater: Updater
 }) {
     apitokens.registerEffects(backend)
     attachments.registerEffects(backend)
@@ -142,6 +151,7 @@ export function registerEffects({
     navigation.registerEffects(navCtrl)
     settings.registerEffects(backend)
     setup.registerEffects(backend)
+    sw.registerEffects(updater)
     sync.registerEffects(backend)
     tags.registerEffects(backend)
     ui.registerEffects(navCtrl)

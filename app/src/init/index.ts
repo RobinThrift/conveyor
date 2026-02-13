@@ -4,6 +4,7 @@ import { HistoryNavigationBackend } from "@/external/browser/HistoryNavigationBa
 import * as stores from "@/ui/stores"
 
 import { initNavigation } from "./navigation"
+import { setupServiceWorker } from "./sw"
 import { initUI } from "./ui"
 
 export async function init({
@@ -45,7 +46,9 @@ export async function init({
         }),
     })
 
-    stores.registerEffects({ backend, navCtrl })
+    let updater = await setupServiceWorker()
+
+    stores.registerEffects({ backend, navCtrl, updater })
 
     initUI({
         rootElement,
