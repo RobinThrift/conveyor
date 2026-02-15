@@ -367,21 +367,33 @@ const CalendarGridBodyCell = React.memo(function CalendarGridBodyCell({
 
             switch (e.code) {
                 case "ArrowUp":
+                    e.preventDefault()
+                    e.stopPropagation()
                     onFocuseRelative("up", date)
                     break
                 case "ArrowDown":
+                    e.preventDefault()
+                    e.stopPropagation()
                     onFocuseRelative("down", date)
                     break
                 case "ArrowLeft":
+                    e.preventDefault()
+                    e.stopPropagation()
                     onFocuseRelative("left", date)
                     break
                 case "ArrowRight":
+                    e.preventDefault()
+                    e.stopPropagation()
                     onFocuseRelative("right", date)
                     break
                 case "Home":
+                    e.preventDefault()
+                    e.stopPropagation()
                     onFocuseRelative("home", date)
                     break
                 case "End":
+                    e.preventDefault()
+                    e.stopPropagation()
                     onFocuseRelative("end", date)
                     break
                 case "Space":
