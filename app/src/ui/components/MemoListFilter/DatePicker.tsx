@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/a11y/useSemanticElements: same as above */
 import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Temporal } from "temporal-polyfill"
 
 import { currentDate, isSameMonthOfYear } from "@/lib/i18n"
@@ -43,6 +43,17 @@ export const DatePicker = React.memo(function DatePicker({ className }: DatePick
     let toggleExpanded = useCallback(() => {
         setExpanded((c) => !c)
     }, [])
+
+    useEffect(() => {
+        if (expanded) {
+            return
+        }
+
+        if (today === focussed) {
+            let el = document.getElementById(`${today.month}-${today.day}`)
+            el?.scrollIntoView({ inline: "center", block: "nearest" })
+        }
+    }, [expanded, today, focussed])
 
     // biome-ignore lint/style/noNonNullAssertion: can never be not null
     let first = rows.at(0)?.at(0)!
