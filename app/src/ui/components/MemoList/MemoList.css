@@ -60,6 +60,8 @@
     height: 100%;
     max-height: var(--item-max-height);
     container: memo / inline-size;
+    content-visibility: auto;
+    contain-intrinsic-size: var(--item-max-height);
 
     @container (width >= 768px) {
         @apply border-b-0 border-s px-4;
