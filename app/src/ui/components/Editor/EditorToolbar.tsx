@@ -23,8 +23,6 @@ import { useT } from "@/ui/i18n"
 import type { PasteItem } from "./commands"
 import type { ToolbarCommands } from "./TextEditor"
 
-const resetPosition = "0px"
-
 export function EditorToolbar({
     toggleBold,
     toggleItalics,
@@ -164,7 +162,7 @@ function PasteMenu({ pasteFromClipboard }: Pick<ToolbarCommands, "pasteFromClipb
                 aria-label="Paste"
                 className="toolbar-btn"
             />
-            <DropdownMenu.Items>
+            <DropdownMenu.Items isFixed>
                 <DropdownMenu.Item id={`paste-plain-text-${useId()}`} action={pastePlain}>
                     <DropdownMenu.ItemLabel>Paste Plain Text</DropdownMenu.ItemLabel>
                 </DropdownMenu.Item>
@@ -181,96 +179,100 @@ function useToolbarPosition(ref: React.RefObject<HTMLDivElement | null>) {
     let [initViewportHeight] = useState(() => window.visualViewport!.height)
 
     useEffect(() => {
+        let toolbarEl = ref.current
+        if (!toolbarEl) {
+            return
+        }
+
         // biome-ignore lint/style/noNonNullAssertion: this must be set
-        let evtTarget = window.visualViewport!
-        let lastPageTop = evtTarget.pageTop
+        let viewport = window.visualViewport!
+
+        let viewPortHeight = viewport.height
+
         let raf: ReturnType<typeof requestAnimationFrame> | undefined
 
-        let onResize = (e: Event) => {
-            if (!ref.current) {
+        let scrollDir = 1
+        let scrollDistance = 0
+        let lastScrollPos = 0
+
+        toolbarEl.style.removeProperty("--offset-top")
+        let rect = toolbarEl.getBoundingClientRect()
+
+        let update = () => {
+            let pageTop = viewport.pageTop
+            if (viewPortHeight >= initViewportHeight) {
+                scrollDistance = 0
+                lastScrollPos = 0
+                toolbarEl.style.removeProperty("--offset-top")
+                raf = requestAnimationFrame(update)
                 return
             }
 
+            let lastScrollDir = scrollDir
+            if (pageTop !== lastScrollPos && (lastScrollPos < pageTop || pageTop <= 0)) {
+                scrollDir = 1
+            } else if (pageTop !== lastScrollPos && pageTop < lastScrollPos) {
+                scrollDir = -1
+            }
+
+            if (lastScrollDir !== scrollDir) {
+                scrollDistance = 0
+            } else {
+                scrollDistance += Math.abs(pageTop - lastScrollPos)
+            }
+            lastScrollPos = pageTop
+
+            if (scrollDir === 1) {
+                toolbarEl.style.setProperty(
+                    "--offset-top",
+                    `calc(${Math.min(viewPortHeight + pageTop, initViewportHeight)}px - env(safe-area-inset-bottom, 0px) - var(--correction-factor-scroll-down))`,
+                )
+                toolbarEl.style.translate = "unset"
+            } else if (scrollDir === -1) {
+                toolbarEl.style.setProperty(
+                    "--offset-top",
+                    `calc(${CSS.px(Math.round(viewPortHeight))} + max(0px, ${CSS.px(
+                        Math.round(initViewportHeight - viewPortHeight - scrollDistance),
+                    )}) - ${rect.height}px - env(safe-area-inset-bottom, 0px) + var(--correction-factor-scroll-up))`,
+                )
+            }
+
+            raf = requestAnimationFrame(update)
+        }
+
+        let onResize = (e: Event) => {
             let { height, pageTop } = e.target as VisualViewport
+
             if (pageTop < 0) {
                 return
             }
 
+            if (Math.round(viewPortHeight) === Math.round(height)) {
+                return
+            }
+
             if (raf) {
                 cancelAnimationFrame(raf)
             }
 
-            raf = requestAnimationFrame(() => {
-                if (pageTop < initViewportHeight) {
-                    setToolbarOffset(
-                        ref.current,
-                        `${Math.max(Math.floor(initViewportHeight - height), 0)}px`,
-                    )
-                }
-            })
-        }
+            viewPortHeight = height
 
-        let onScroll = (e: Event) => {
-            if (!ref.current) {
-                return
+            if (pageTop > height) {
+                scrollDir = -1
+                scrollDistance = 0
+                lastScrollPos = pageTop
             }
 
-            let { pageTop } = e.target as VisualViewport
-            let prevPageTop = lastPageTop
-            lastPageTop = pageTop
-
-            if (
-                pageTop < 0 ||
-                (typeof document.scrollingElement?.scrollHeight === "undefined"
-                    ? true
-                    : pageTop > document.scrollingElement.scrollHeight)
-            ) {
-                return
-            }
-
-            let dirIsUp = prevPageTop > pageTop
-
-            if (prevPageTop === pageTop) {
-                return
-            }
-
-            if (dirIsUp) {
-                if (raf) {
-                    cancelAnimationFrame(raf)
-                }
-
-                requestAnimationFrame(() => {
-                    ref.current?.classList.add("is-scrolling-up")
-                })
-            } else {
-                if (raf) {
-                    cancelAnimationFrame(raf)
-                }
-
-                requestAnimationFrame(() => {
-                    ref.current?.classList.remove("is-scrolling-up")
-                })
+            if (viewPortHeight < initViewportHeight) {
+                raf = requestAnimationFrame(update)
             }
         }
 
-        evtTarget.addEventListener("resize", onResize, { passive: true })
-        evtTarget.addEventListener("scroll", onScroll, { passive: true })
+        viewport.addEventListener("resize", onResize, { passive: true })
 
         return () => {
-            evtTarget.removeEventListener("resize", onResize)
-            evtTarget.removeEventListener("scroll", onScroll)
-
-            if (raf) {
-                cancelAnimationFrame(raf)
-            }
+            raf && cancelAnimationFrame(raf)
+            viewport.removeEventListener("resize", onResize)
         }
     }, [ref.current, initViewportHeight])
-}
-
-function setToolbarOffset(el: HTMLElement | null, offset: string = resetPosition) {
-    if (!el) {
-        return
-    }
-
-    el.style.setProperty("--toolbar-offset", offset)
 }

@@ -100,6 +100,7 @@ export function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
 export interface DropdownMenuItemsProps {
     className?: string
     children: React.ReactNode | React.ReactNode[]
+    isFixed?: boolean
 }
 
 export function DropdownMenuItems(props: DropdownMenuItemsProps) {
@@ -152,7 +153,7 @@ export function DropdownMenuItems(props: DropdownMenuItemsProps) {
 
     return (
         <div
-            className="dropdown-menu-popover"
+            className={clsx("dropdown-menu-popover", { fixed: props.isFixed })}
             id={dropdownMenuCtx.targetID}
             ref={dropdownMenuCtx.popover}
             popover="auto"
