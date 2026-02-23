@@ -1,4 +1,4 @@
-import { autocompletion, closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete"
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete"
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language"
@@ -21,12 +21,14 @@ import { tagLinks } from "@/lib/markdown/extensions/tags"
 import type { AsyncResult } from "@/lib/result"
 
 import { attachments } from "./attachments"
+import { autocomplete as autocompletion } from "./autocomplete"
 import { codeblocks } from "./codeblocks"
+import { customBlockAutocompleteSource, customBlocksKeymap } from "./customBlocks"
 import { fileDropHandler } from "./fileDropHandler"
 import { inlineImages } from "./inlineImages"
 import { markdownDecorations } from "./markdownDecorations"
 import { tabIndent } from "./tabIndent"
-import { tagAutoComplete } from "./tagAutoComplete"
+import { tagAutoCompleteSource } from "./tagAutoComplete"
 import { theme } from "./theme"
 import { vim } from "./vim"
 
@@ -53,7 +55,13 @@ export const extensions = ({
 }) => {
     let exts: Extension[] = [
         vimModeEnabled ? vim() : [],
-        keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...searchKeymap]),
+        keymap.of([
+            ...closeBracketsKeymap,
+            ...historyKeymap,
+            ...searchKeymap,
+            ...customBlocksKeymap,
+            ...defaultKeymap,
+        ]),
         indentUnit.of(" ".repeat(4)),
         bracketMatching(),
         closeBrackets(),
@@ -61,7 +69,6 @@ export const extensions = ({
         highlightSelectionMatches(),
         drawSelection(),
         dropCursor(),
-        autocompletion(),
         history(),
         theme,
         EditorView.lineWrapping,
@@ -72,6 +79,13 @@ export const extensions = ({
             codeLanguages: languages,
             extensions: [footnotes, tagLinks, customBlocks],
         }),
+        markdownLanguage.data.of({
+            closeBrackets: {
+                brackets: ["(", "[", "{", "'", `"`, "`"],
+                before: ")]}:;>",
+                stringPrefixes: [],
+            },
+        }),
         codeblocks(),
         inlineImages(getAttachmentDataByID),
         markdownDecorations,
@@ -79,14 +93,14 @@ export const extensions = ({
             spellcheck: "true",
         }),
         tabIndent,
+        autocompletion([
+            tagAutoCompleteSource(autocomplete?.tags),
+            customBlockAutocompleteSource(),
+        ]),
     ]
 
     if (placeholder) {
         exts.push(placeholderExt(placeholder))
-    }
-
-    if (autocomplete?.tags) {
-        exts.push(tagAutoComplete(autocomplete.tags))
     }
 
     return exts
