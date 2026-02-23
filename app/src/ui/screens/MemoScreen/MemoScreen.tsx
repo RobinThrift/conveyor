@@ -1,6 +1,6 @@
 import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
-import React, { Activity, startTransition, useCallback, useEffect, useMemo, useRef } from "react"
+import React, { Activity, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { Temporal } from "temporal-polyfill"
 
 import type { MemoContentChanges } from "@/domain/Changelog"
@@ -78,23 +78,13 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
                         <Memo memo={memo}>
                             {({ id, title, createdAt, body, onDoubleClick }) => (
                                 <>
-                                    <MemoTitleMobileFloat createdAt={createdAt} title={title} />
-                                    <MemoHeader>
-                                        <TopBar>
-                                            <CloseMemoTabPanelButton memoID={memoID} />
-                                        </TopBar>
-
-                                        {title && (
-                                            <MemoTitle>
-                                                <span>{title}</span>
-                                            </MemoTitle>
-                                        )}
-
-                                        <MemoDate createdAt={createdAt} />
-                                        <TopBar>
-                                            <MemoActionsDropdown memo={memo} />
-                                        </TopBar>
-                                    </MemoHeader>
+                                    <TopBar>
+                                        <CloseMemoTabPanelButton memoID={memoID} />
+                                    </TopBar>
+                                    <TopBar>
+                                        <MemoActionsDropdown memo={memo} />
+                                    </TopBar>
+                                    <FloatingMemoTitle createdAt={createdAt} title={title} />
                                     <TOC document={body} id={id} />
                                     <MemoBody id={id} onDoubleClick={onDoubleClick}>
                                         {body}
@@ -115,13 +105,65 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
 
 const maxMobileTitleLength = 45
 
-const MemoTitleMobileFloat = React.memo(function MemoTitleMobileFloat({
+const FloatingMemoTitle = React.memo(function FloatingMemoTitle({
     createdAt,
     title,
 }: {
     createdAt: Temporal.ZonedDateTime
     title?: string
 }) {
+    let [isVisible, setIsVisible] = useState(true)
+    let [targetRect, setTargetRect] = useState({ top: 0, height: 0, width: 0 })
+
+    let targetRef = useRef<null | HTMLHeadingElement>(null)
+    let triggerRef = useRef<null | HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (!targetRef.current) {
+            return
+        }
+
+        let observer = new ResizeObserver((entries) => {
+            let top = entries[0].contentRect.top
+            let rect = entries[0].borderBoxSize[0]
+
+            setTargetRect({
+                top,
+                width: rect.inlineSize,
+                height: rect.blockSize,
+            })
+
+            observer.disconnect()
+        })
+
+        observer.observe(targetRef.current)
+
+        return () => {
+            observer.disconnect()
+        }
+    }, [])
+
+    useEffect(() => {
+        if (!triggerRef.current || !targetRef.current) {
+            return
+        }
+
+        let observer = new IntersectionObserver(
+            (entries: IntersectionObserverEntry[]) => {
+                setIsVisible(entries[0].intersectionRatio > 0)
+            },
+            {
+                threshold: [0.0, 0.05],
+            },
+        )
+
+        observer.observe(triggerRef.current)
+
+        return () => {
+            observer.disconnect()
+        }
+    }, [])
+
     let trimmed = useMemo(() => {
         if (!title) {
             return
@@ -144,10 +186,34 @@ const MemoTitleMobileFloat = React.memo(function MemoTitleMobileFloat({
     }, [title])
 
     return (
-        <div aria-hidden="true" className="memo-title-mobile-float memo-tab-back-progress-target">
-            <MemoDate createdAt={createdAt} />
-            {trimmed && <span>{trimmed}</span>}
-        </div>
+        <>
+            <div
+                ref={triggerRef}
+                aria-hidden="true"
+                className="memo-title-float-trigger"
+                style={{
+                    top: CSS.px(targetRect.top).toString(),
+                    width: CSS.px(targetRect.width).toString(),
+                    height: CSS.px(targetRect.height).toString(),
+                }}
+            />
+
+            <MemoHeader
+                ref={targetRef}
+                style={{
+                    width: !isVisible ? CSS.px(targetRect.width).toString() : "",
+                    height: !isVisible ? CSS.px(targetRect.height).toString() : "",
+                }}
+            >
+                {title && (
+                    <MemoTitle className={clsx({ "is-floating": !isVisible })}>
+                        {isVisible ? title : trimmed}
+                    </MemoTitle>
+                )}
+
+                <MemoDate createdAt={createdAt} className={clsx({ "is-floating": !isVisible })} />
+            </MemoHeader>
+        </>
     )
 })
 
@@ -216,11 +282,13 @@ function MemoEditor(props: {
     )
 }
 
+const velocityThreshold = 16
+
 function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean }) {
     let ref = useRef<HTMLDivElement | null>(null)
 
     let closeMemo = useCallback(() => {
-        startTransition(() => {
+        requestAnimationFrame(() => {
             actions.ui.closeMemo(memoID)
         })
     }, [memoID])
@@ -243,8 +311,10 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
         let isDragging = false
         let startX = -1
         let distanceThreshold = 0.4
-        let durationMs = 250
+        let durationMs = 300
         let screenWidth = -1
+        let velocity = 0
+        let lastPointerX = 0
         let cancelTimeout: ReturnType<typeof setTimeout> | undefined
 
         let animations: Animation[] = []
@@ -255,7 +325,8 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
         }
 
         let onPointerDown = (e: PointerEvent) => {
-            if (e.pointerType !== "touch" || !e.isPrimary || e.pageX > 30) {
+            // if (e.pointerType !== "touch" || !e.isPrimary || e.pageX > 30) {
+            if (e.pageX > 30) {
                 return
             }
 
@@ -269,10 +340,17 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
 
             isDragging = true
             startX = e.pageX
+            velocity = 0
+            lastPointerX = 0
 
             screenWidth = window.visualViewport?.width ?? window.innerWidth
+            let scrollTop = window.visualViewport?.pageTop ?? window.pageYOffset
 
             requestAnimationFrame(() => {
+                document.body.style.setProperty(
+                    "--dragging-memo-tab-scroll-top",
+                    CSS.px(scrollTop).toString(),
+                )
                 document.body.classList.add("dragging-memo-tab")
             })
 
@@ -283,6 +361,7 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
                     [{ "--memo-tab-back-progress": "0" }, { "--memo-tab-back-progress": "1" }],
                     {
                         duration: durationMs,
+                        easing: "linear",
                     },
                 )
                 a.pause()
@@ -291,6 +370,7 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
 
             animations.at(0)?.finished.finally(() => {
                 document.body.classList.remove("dragging-memo-tab")
+                document.body.style.removeProperty("--dragging-memo-tab-scroll-top")
             })
         }
 
@@ -300,6 +380,14 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
             if (isDragging) {
                 if (progress <= distanceThreshold) {
                     animations.forEach((a) => a.reverse())
+                } else if (velocity >= velocityThreshold) {
+                    animations.forEach((a) => {
+                        a.playbackRate = Math.min(5, durationMs / (screenWidth / velocity))
+                        a.play()
+                    })
+                    animations.at(0)?.finished.finally(() => {
+                        closeMemo()
+                    })
                 } else {
                     animations.forEach((a) => a.play())
                     animations.at(0)?.finished.finally(() => {
@@ -315,6 +403,8 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
             isDragging = false
             startX = -1
             screenWidth = -1
+            velocity = 0
+            lastPointerX = 0
 
             clearTimeout(cancelTimeout)
             cancelTimeout = undefined
@@ -342,6 +432,8 @@ function useMemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boole
             e.preventDefault()
 
             let progress = (e.pageX - startX) / Math.max(screenWidth, 1)
+            velocity = Math.abs(e.pageX - lastPointerX)
+            lastPointerX = e.pageX
 
             animations.forEach((a) => {
                 a.currentTime = progress * durationMs

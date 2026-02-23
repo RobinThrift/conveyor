@@ -11,6 +11,7 @@
 
 .memo-screen-oveflow-mask {
     --overflow-mask-height: calc(env(safe-area-inset-top, 0px) + 4lh);
+    translate: 0 var(--dragging-memo-tab-scroll-top, 0);
     @media (min-width: 768px) {
         --overflow-mask-height: calc(env(safe-area-inset-top, 0px) + 1lh);
     }
@@ -39,7 +40,6 @@
     animation-name: mobile-open-memo-transition-memo;
     animation-duration: var(--mobile-open-memo-transition-duration);
     animation-timing-function: var(--mobile-open-memo-transition-easing);
-    animation-fill-mode: forwards;
 
     @media (min-width: 768px) {
         @apply shadow-none;
@@ -80,15 +80,11 @@
 }
 
 .dragging-memo-tab .memo-tab-panel {
-    left: calc(var(--memo-tab-back-progress, 0) * 100%);
+    translate: calc(var(--memo-tab-back-progress, 0) * 100%) 0;
     touch-action: none;
     .memo-tab-panel-memo {
         @apply rounded-2xl shadow-xl;
         transition-duration: 100ms;
-    }
-
-    .memo-title-mobile-float {
-        translate: calc(var(--memo-tab-back-progress, 0) * 100cqw) 0;
     }
 
     @media (min-width: 768px) {
@@ -157,43 +153,49 @@
         }
     }
 
-    .memo-title-mobile-float {
-        @apply ml-14;
-        position: fixed;
-        top: calc(env(safe-area-inset-top, 0px) + 1lh + var(--spacing) * 1.5);
-        left: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
-        right: max(env(safe-area-inset-right, 0px), calc(2 * var(--spacing)));
+    .memo-title-float-trigger {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    .memo-header:has(.is-floating) {
+        position: sticky;
+        align-content: flex-start;
+        top: max(env(safe-area-inset-top, 0px), calc(2 * var(--spacing)));
         z-index: calc(var(--overflow-mask-z) + 1);
         pointer-events: none;
+        padding: 0;
+    }
 
-        & > span {
-            @apply mr-28;
-            display: block;
-            font-size: var(--base-font-size);
-            font-weight: bold;
-            filter: blur(10px);
-            opacity: 0;
-            animation: mobile-memo-title-float linear;
-            animation-timeline: scroll(root);
-            animation-range-end: 200px;
-            animation-fill-mode: both;
-            height: 2lh;
-        }
+    .memo-title.is-floating {
+        font-size: var(--base-font-size);
+        font-weight: bold;
+        animation: mobile-memo-title-float 250ms 50ms linear both;
+        padding-left: max(
+            env(safe-area-inset-left, 0px),
+            calc(12 * var(--spacing))
+        );
+        padding-right: max(
+            env(safe-area-inset-right, 0px),
+            calc(12 * var(--spacing))
+        );
+    }
 
-        .memo-date {
+    .memo-date.is-floating {
+        time {
             font-size: var(--xs-font-size);
-            width: 100%;
-            filter: blur(10px);
-            opacity: 0;
-            animation: mobile-memo-title-float linear;
-            animation-timeline: scroll(root);
-            animation-range-end: 200px;
-            animation-fill-mode: both;
+            animation: mobile-memo-title-float 250ms linear both;
         }
 
-        @container (width >= 768px) {
-            @apply hidden;
-        }
+        padding-bottom: 0;
+        padding-right: max(
+            env(safe-area-inset-right, 0px),
+            calc(12 * var(--spacing))
+        );
     }
 }
 
@@ -244,19 +246,20 @@
 @keyframes mobile-memo-title-float {
     0% {
         opacity: 0;
-        translate: 0 2lh;
+        translate: 0 0.5lh;
         filter: blur(10px);
     }
 
     50% {
         opacity: 0;
-        translate: 0 2lh;
+        translate: 0 0.5lh;
         filter: blur(10px);
     }
 
     to {
         opacity: 1;
-        translate: 0 calc(-1 * env(safe-area-inset-top, 2lh) / 2);
+        /* translate: 0 calc(-1 * env(safe-area-inset-top, 2lh) / 2); */
+        translate: 0 0;
         filter: blur(0px);
     }
 }
@@ -486,7 +489,7 @@
 }
 
 :root {
-    --mobile-open-memo-transition-duration: 350ms;
+    --mobile-open-memo-transition-duration: 450ms;
     --mobile-open-memo-transition-easing: linear(
         0,
         0.012 0.9%,
@@ -534,11 +537,11 @@
 
 @keyframes mobile-open-memo-transition-memo {
     from {
-        left: 100vw;
+        translate: 100vw 0;
     }
 
     to {
-        left: 0;
+        translate: 0;
     }
 }
 

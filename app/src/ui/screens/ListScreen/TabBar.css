@@ -148,6 +148,7 @@
         top: calc(
             -1 *
             var(--offset-top, 0px) +
+            env(safe-area-inset-top, 0px) +
             (100svh - var(--overflow-mask-height, 100px))
         );
         height: var(--overflow-mask-height, 100px);
@@ -163,7 +164,7 @@
             -1 *
             var(--offset-top, 0px) +
             (85vh + var(--spacing) * 12) -
-            2px
+            3px
         );
     }
 }

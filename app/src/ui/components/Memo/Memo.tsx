@@ -41,23 +41,43 @@ export const Memo = React.memo(function Memo(props: MemoProps) {
     )
 })
 
-export const MemoHeader = React.memo(function MemoTitle({ children }: React.PropsWithChildren) {
-    return <header className="memo-header">{children}</header>
+export const MemoHeader = React.memo(function MemoTitle({
+    children,
+    ref,
+    style,
+}: React.PropsWithChildren<{ ref?: React.Ref<HTMLElement>; style?: React.CSSProperties }>) {
+    return (
+        <header className="memo-header" style={style} ref={ref}>
+            {children}
+        </header>
+    )
 })
 
-export const MemoTitle = React.memo(function MemoTitle({ children }: React.PropsWithChildren) {
-    return <h1 className="memo-title">{children}</h1>
+export const MemoTitle = React.memo(function MemoTitle({
+    children,
+    className,
+    ref,
+}: React.PropsWithChildren<{ className?: string; ref?: React.Ref<HTMLHeadingElement> }>) {
+    return (
+        <h1 ref={ref} className={clsx("memo-title", className)}>
+            {children}
+        </h1>
+    )
 })
 
 export function MemoDate({
+    className,
     createdAt,
     relative = false,
+    ref,
 }: {
+    className?: string
     createdAt: Temporal.ZonedDateTime
     relative?: boolean
+    ref?: React.Ref<HTMLDivElement>
 }) {
     return (
-        <div className="memo-date">
+        <div ref={ref} className={clsx("memo-date", className)}>
             <DateTime
                 date={createdAt}
                 relative={relative}
