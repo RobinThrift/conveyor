@@ -13,10 +13,10 @@ export function DataTab() {
 
     return (
         <div className="h-full space-y-4">
-            <div>
+            <header className="settings-tab-header">
                 <h2 className="block">{t.Title}</h2>
                 <small className="settings-tab-description">{t.Description}</small>
-            </div>
+            </header>
 
             <DataJobs />
         </div>

@@ -12,8 +12,8 @@ export function AboutTab() {
 
     return (
         <div className="flex flex-col h-full">
-            <header className="text-center">
-                <h2 className="block">{t.Title}</h2>
+            <header className="settings-tab-header">
+                <h2>{t.Title}</h2>
             </header>
 
             <div className="settings-section">

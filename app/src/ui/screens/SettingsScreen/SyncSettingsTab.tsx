@@ -51,7 +51,7 @@ export function SyncSettingsTab() {
 
     return (
         <>
-            <header>
+            <header className="settings-tab-header">
                 <h2>{t.Title}</h2>
                 <small className="settings-tab-description">{t.Description}</small>
             </header>

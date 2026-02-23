@@ -2,7 +2,15 @@
 
 import { useStore } from "@tanstack/react-store"
 import clsx from "clsx"
-import React, { Activity, startTransition, useCallback, useEffect, useRef, useState } from "react"
+import React, {
+    Activity,
+    startTransition,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react"
 
 import { Button } from "@/ui/components/Button"
 import { Dialog } from "@/ui/components/Dialog"
@@ -251,32 +259,49 @@ function useSettingsScreenTabs() {
         isMobile ? undefined : "interface",
     )
     let [focussed, _setFocussed] = useState<number>(0)
+    // biome-ignore lint/correctness/useExhaustiveDependencies: required fro Safari sometimes
+    let scrollParent = useMemo(
+        () => (tabListRef.current ? findScrollParent(tabListRef.current) : undefined),
+        [tabListRef.current],
+    )
 
-    let setActiveTab = useCallback((tab?: SettingsTab) => {
-        let tabBtn = tabListRef.current?.querySelector(`[tabindex="0"]`)
-        if (!tab && tabBtn) {
-            tabBtn.addEventListener(
-                "focus",
-                () => {
-                    setTimeout(() => {
-                        startTransition(() => {
-                            _setFocussed(tab ? settingsTabs.indexOf(tab) : 0)
-                            _setActiveTab(tab)
-                        })
-                    }, 200)
-                },
-                { once: true },
-            )
-
-            tabBtn.scrollIntoView({ behavior: "smooth" })
-            ;(tabBtn as HTMLElement).focus({ preventScroll: true })
-        } else {
-            startTransition(() => {
-                _setFocussed(tab ? settingsTabs.indexOf(tab) : 0)
-                _setActiveTab(tab)
-            })
+    useEffect(() => {
+        if (!scrollParent) {
+            return
         }
-    }, [])
+
+        let onScrollEnd = (e: Event) => {
+            let el = e.target as HTMLElement
+            if (el.scrollLeft === 0) {
+                _setActiveTab(undefined)
+
+                let tabBtn = tabListRef.current?.querySelector(`[tabindex="0"]`)
+                ;(tabBtn as HTMLElement)?.focus({ preventScroll: true })
+            }
+        }
+
+        scrollParent.addEventListener("scrollend", onScrollEnd, { passive: true })
+
+        return () => {
+            scrollParent?.removeEventListener("scrollend", onScrollEnd)
+        }
+    }, [scrollParent])
+
+    let setActiveTab = useCallback(
+        (tab?: SettingsTab) => {
+            let tabBtn = tabListRef.current?.querySelector(`[tabindex="0"]`)
+            if (!tab && tabBtn) {
+                scrollParent?.scroll({ top: 0, left: 0, behavior: "smooth" })
+                ;(tabBtn as HTMLElement).focus({ preventScroll: true })
+            } else {
+                startTransition(() => {
+                    _setFocussed(tab ? settingsTabs.indexOf(tab) : 0)
+                    _setActiveTab(tab)
+                })
+            }
+        },
+        [scrollParent],
+    )
 
     let setFocussed = useCallback(
         (index: number) => {
@@ -359,4 +384,18 @@ function useSettingsScreenTabs() {
         focussed,
         onKeyDown,
     }
+}
+
+function findScrollParent(node: HTMLElement): HTMLElement | undefined {
+    let parent = node.parentElement
+    if (!parent) {
+        return
+    }
+
+    let style = window.getComputedStyle(parent)
+    if (/auto/.test(style.overflow)) {
+        return parent
+    }
+
+    return findScrollParent(parent)
 }
