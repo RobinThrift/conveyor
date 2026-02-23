@@ -6,16 +6,21 @@
 
     overflow: hidden;
 
-    top: calc(5svh + var(--nested-dialogs) * -3dvh);
+    top: calc(
+        5svh -
+        env(safe-area-inset-bottom, 0px) +
+        var(--nested-dialogs) *
+        -3dvh
+    );
 
     width: 100%;
     max-width: none;
     max-height: none;
-    height: 95svh;
+    height: calc(95svh + env(safe-area-inset-bottom, 0px));
     /* biome-ignore lint/complexity/noImportantStyles: required for reset later */
     padding-bottom: 5svh !important;
 
-    --offset-top: calc(env(safe-area-inset-top, 0px) / 2);
+    --offset-top: calc(env(safe-area-inset-top, 0px));
     --scale: calc(1 - 0.03 * var(--nested-dialogs));
     --backdrop-opacity: 1;
 
@@ -129,6 +134,8 @@
     height: 2.5lh;
     touch-action: none;
     z-index: 100;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 :root:has(.dialog.is-modal) {

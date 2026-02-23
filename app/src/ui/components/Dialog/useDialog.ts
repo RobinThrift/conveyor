@@ -189,6 +189,9 @@ function useNesting(ref: React.RefObject<HTMLDialogElement | null>) {
         )
     }, [existingCtx?.ref.current, ref.current])
 }
+
+const velocityThreshold = 16
+
 export function useDialogDragHandle({
     ref,
     ...props
@@ -274,7 +277,7 @@ export function useDialogDragHandle({
             if (
                 progress > 0.7 ||
                 (progress > 0.5 && velocity.current > 0) ||
-                velocity.current > 27
+                velocity.current > velocityThreshold
             ) {
                 animation.current.addEventListener(
                     "finish",
