@@ -99,12 +99,12 @@
 }
 
 .dialog-close-btn {
-    @apply absolute right-3 top-3 inline-flex size-8 items-center justify-center p-0 rounded-full;
-    @apply aspect-square h-11 w-11;
+    @apply absolute right-3 top-3 inline-flex size-8 items-center justify-center p-0 rounded-full size-11;
+    @apply aspect-square;
     z-index: 200;
 
-    & > svg {
-        @apply size-4;
+    .icon {
+        @apply size-5;
     }
 
     &:focus-visible {
@@ -117,7 +117,7 @@
 }
 
 .dialog-title {
-    @apply font-medium text-xl mb-2;
+    @apply font-medium text-xl xs:mb-2 mb-5;
     font-size: var(--h3-font-size);
 }
 

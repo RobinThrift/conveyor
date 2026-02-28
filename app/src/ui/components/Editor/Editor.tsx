@@ -9,7 +9,7 @@ import { AlertDialog } from "@/ui/components/AlertDialog"
 import { Button } from "@/ui/components/Button"
 import { CheckIcon, XIcon } from "@/ui/components/Icons"
 import { useT } from "@/ui/i18n"
-
+import { TopBar } from "../TopBar"
 import { EditorToolbar } from "./EditorToolbar"
 import { TextEditor } from "./TextEditor"
 import { useEditorState } from "./useEditorState"
@@ -47,22 +47,24 @@ export function Editor(props: EditorProps) {
                     "is-changed": isChanged,
                 })}
             >
-                <div className="editor-buttons">
-                    {props.onCancel && (
-                        <Button onClick={onCancel} variant="danger" iconLeft={<XIcon />}>
-                            <span className="sr-only tablet:not-sr-only">{t.Cancel}</span>
-                        </Button>
-                    )}
+                <TopBar>
+                    <div className="editor-buttons">
+                        {props.onCancel && (
+                            <Button onClick={onCancel} variant="danger" iconLeft={<XIcon />}>
+                                <span className="sr-only tablet:not-sr-only">{t.Cancel}</span>
+                            </Button>
+                        )}
 
-                    <Button
-                        aria-label={t.Save}
-                        onClick={onSave}
-                        iconLeft={<CheckIcon />}
-                        disabled={!isChanged}
-                    >
-                        <span className="sr-only tablet:not-sr-only">{t.Save}</span>
-                    </Button>
-                </div>
+                        <Button
+                            aria-label={t.Save}
+                            onClick={onSave}
+                            iconLeft={<CheckIcon />}
+                            disabled={!isChanged}
+                        >
+                            <span className="sr-only tablet:not-sr-only">{t.Save}</span>
+                        </Button>
+                    </div>
+                </TopBar>
 
                 <TextEditor
                     id={props.memo.id}

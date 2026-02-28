@@ -11,9 +11,17 @@
 .topbar {
     @apply fixed flex items-center justify-between;
     z-index: var(--topbar-z-index);
-    top: calc(max(env(safe-area-inset-top, 0px), var(--spacing) * 4));
+    top: calc(max(env(safe-area-inset-top, 0px), var(--spacing) * 3));
     left: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
     right: max(env(safe-area-inset-left, 0px), calc(2 * var(--spacing)));
+
+    .btn {
+        @apply size-11;
+
+        .icon {
+            @apply size-4.5;
+        }
+    }
 }
 
 .dragging-memo-tab .topbar {
@@ -35,7 +43,6 @@
         view-transition-class: mobile-open-memo-transition-topbar-btn;
     }
 
-    /* biome-ignore lint/style/noDescendingSpecificity: false positive for this use case */
     .topbar .btn .icon {
         view-transition-name: match-element;
         view-transition-class: mobile-open-memo-transition-topbar-btn-icon;
@@ -47,7 +54,6 @@
             view-transition-class: unset;
         }
 
-        /* biome-ignore lint/style/noDescendingSpecificity: false positive for this use case */
         .topbar .btn .icon {
             view-transition-name: unset;
             view-transition-class: unset;

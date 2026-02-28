@@ -25,7 +25,7 @@
     }
 
     .settings-tab-back-btn {
-        @apply fixed left-2 top-2 rounded-full aspect-square h-11 w-11 p-0;
+        @apply fixed left-2 top-2 rounded-full aspect-square p-0 size-11;
         z-index: 200;
         animation: mobile-settings-back-btn linear;
         animation-timeline: --mobile-settings-title;
@@ -35,6 +35,7 @@
         pointer-events: none;
 
         .icon {
+            @apply size-6;
             animation: mobile-settings-btn-icon-blur linear reverse;
             animation-timeline: --mobile-settings-title;
             animation-fill-mode: both;
@@ -88,7 +89,7 @@
 
 @keyframes mobile-settings-close-btn {
     from {
-        left: calc(var(--spacing) * 2);
+        /* left: calc(var(--spacing) * 2); */
         opacity: 1;
         pointer-events: auto;
     }
@@ -175,12 +176,12 @@
 }
 
 .settings-tab-list {
-    @apply flex flex-col relative px-2 pt-16;
+    @apply flex flex-col relative px-2 pt-18;
     width: 100%;
     scroll-snap-align: start;
 
     &::after {
-        @apply bg-surface-level-2 rounded-xl block content-[""] absolute -z-1 inset-2 top-16;
+        @apply bg-surface-level-2 rounded-xl block content-[""] absolute -z-1 inset-2 top-18;
         bottom: env(safe-area-inset-bottom, calc(var(--spacing) * 4));
     }
 

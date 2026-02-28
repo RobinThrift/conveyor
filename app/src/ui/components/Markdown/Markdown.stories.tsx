@@ -273,13 +273,11 @@ spec:
     ),
 }
 
-export const CustomBlocks: Story = {
-    name: "Custom Blocks",
+export const CustomBlocksLinkPreview: Story = {
+    name: "Custom Blocks/Link Preview",
     args: {
         id: "storybook",
         children: `
-# Custom Blocks
-
 /// link-preview
 [GitHub - RobinThrift/conveyor](https://github.com/RobinThrift/conveyor/)
 
@@ -287,15 +285,37 @@ export const CustomBlocks: Story = {
 
 Contribute to RobinThrift/conveyor development by creating an account on GitHub.
 ///
+`,
+    },
+    render: (args) => (
+        <div className="container mx-auto">
+            <Markdown {...args} />
+        </div>
+    ),
+}
 
-
-#tag-a #tab-b
-
+export const CustomBlocksDetails: Story = {
+    name: "Custom Blocks/Details",
+    args: {
+        id: "storybook",
+        children: `
 /// details | className="text-primary" summary="Collapsible"
 ${faker.lorem.paragraph()}
 /// 
+`,
+    },
+    render: (args) => (
+        <div className="container mx-auto">
+            <Markdown {...args} />
+        </div>
+    ),
+}
 
-
+export const CustomBlocksUnknown: Story = {
+    name: "Custom Blocks/Unknown",
+    args: {
+        id: "storybook",
+        children: `
 /// unkown-custom-block
 ${faker.lorem.paragraph()}
 ///

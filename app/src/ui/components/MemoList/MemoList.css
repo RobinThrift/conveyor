@@ -3,7 +3,7 @@
 }
 
 .memo-list-item-group {
-    @apply mb-4;
+    @apply mb-4 relative;
     --gap-x: calc(var(--spacing) * 2);
     --gap-y: calc(var(--spacing) * 2);
     --item-max-height: 50cqh;
@@ -54,7 +54,7 @@
 }
 
 .memo-list .memo-list-item {
-    @apply p-2 flex-1 relative border-surface-border border-b;
+    @apply p-2 flex-1 relative border-b;
 
     overflow: hidden;
     height: 100%;
@@ -63,12 +63,22 @@
     content-visibility: auto;
     contain-intrinsic-size: var(--item-max-height);
 
-    @container (width >= 768px) {
-        @apply border-b-0 border-s px-4;
+    border-color: color-mix(
+        in oklch,
+        var(--color-neutral-extra-light) 40%,
+        transparent
+    );
+
+    @media (width >= 768px) {
+        @apply pr-2 border-b-0 border-s px-4;
 
         &:nth-of-type(1),
         &:nth-of-type(3n + 1) {
             @apply border-s-0;
+        }
+
+        &::after {
+            @apply hidden;
         }
     }
 
@@ -126,12 +136,16 @@
     }
 
     .memo-actions {
-        @apply flex absolute top-3 right-2 z-10 w-10;
+        @apply flex absolute top-3 right-4 z-10 w-10;
 
         .btn {
             @apply text-sm relative elevation-2;
             min-height: revert;
             top: -2px;
+        }
+
+        @container (width >= 768px) {
+            @apply right-2;
         }
     }
 
@@ -156,6 +170,59 @@
             transparent,
             var(--color-body-bg) 10%
         );
+    }
+}
+
+.memo-list-item-group:has(.memo-list-item:nth-of-type(3)) .memo-list-item {
+    @apply pl-3;
+
+    .memo-date {
+        &::before {
+            @apply absolute content-[""] block h-0.5 left-0 rounded-l-full w-2.5 text-xs;
+            top: calc(1.25lh + 1px);
+            background: var(--color-neutral-light);
+        }
+    }
+
+    &::after {
+        @apply w-1 content-[""] block -bottom-2 left-0 text-xs;
+        position: absolute;
+        z-index: 10;
+        top: calc(0.75lh - var(--spacing) * 2 + 1px);
+        --size-v: calc(var(--spacing) * 0.25);
+        --size-i: calc(var(--spacing) * 4);
+        --pip-color: color-mix(
+            in oklch,
+            var(--color-neutral-light) 40%,
+            transparent
+        );
+        background: repeating-linear-gradient(
+            180deg,
+            var(--pip-color) 0px,
+            var(--pip-color) var(--size-v),
+            transparent var(--size-v),
+            transparent var(--size-i)
+        );
+    }
+
+    &:nth-of-type(1)::after {
+        top: calc(1.75lh - var(--spacing) * 2 + 1px);
+    }
+
+    &:last-child::after {
+        bottom: calc(100% - 1.75lh - var(--spacing) * 2 + 1px);
+    }
+
+    @media (width >= 768px) {
+        @apply pl-2;
+
+        .memo-date::before {
+            @apply hidden;
+        }
+
+        &::after {
+            @apply hidden;
+        }
     }
 }
 
@@ -208,7 +275,7 @@
         4 +
         max(env(safe-area-inset-top, 0px), var(--spacing) * 2)
     );
-    margin-top: calc(var(--spacing) * 1);
+    margin-top: calc(var(--spacing) * 2);
 
     .memo-list-day-date {
         @apply text-neutral-dark dark:text-neutral-light;

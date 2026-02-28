@@ -71,7 +71,7 @@
 
 /* biome-ignore lint/style/noDescendingSpecificity: I dunno */
 .memo-list-sidebar-header .settings-nav-button {
-    @apply flex items-center justify-center shadow-xl h-11 w-11;
+    @apply flex items-center justify-center shadow-xl;
     transition:
         transform 100ms,
         margin-left 100ms,

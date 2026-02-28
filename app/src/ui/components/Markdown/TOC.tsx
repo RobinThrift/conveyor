@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import React, { type CSSProperties, useEffect, useId, useMemo, useRef } from "react"
+import React, { type CSSProperties, useCallback, useEffect, useId, useMemo, useRef } from "react"
 
 import { buildTOC, parse, type TOCItem as TOCItemT } from "@/lib/markdown"
 import { useIsMobile } from "@/ui/hooks/useIsMobile"
@@ -61,9 +61,22 @@ export function TOC({
 }
 
 function TOCItem({ item }: { item: TOCItemT }) {
+    let onClick = useCallback(
+        (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+            e.preventDefault()
+            let target = document.getElementById(item.id)
+            if (!target) {
+                return
+            }
+
+            target.scrollIntoView({ block: "start" })
+        },
+        [item.id],
+    )
+
     return (
         <li className="toc-item">
-            <a href={`#${item.id}`} data-heading-id={item.id} title={item.label}>
+            <a href={`#${item.id}`} data-heading-id={item.id} title={item.label} onClick={onClick}>
                 {item.label}
             </a>
             {item.items.length > 0 ? (

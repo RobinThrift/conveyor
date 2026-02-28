@@ -99,6 +99,7 @@
 .memo-tab-panel-memo {
     @apply bg-body flex-1;
     @apply flex justify-center;
+    anchor-name: --memo-tab-panel;
 
     transition: border-radius 100ms linear;
     transition-duration: calc(
@@ -117,6 +118,19 @@
     @container (width >= 1024px) {
         @apply px-4 pt-0;
     }
+
+    &:has(.is-editing) {
+        padding-top: max(
+            env(safe-area-inset-top, 0px),
+            calc(var(--spacing) * 15)
+        );
+    }
+
+    @media (min-width: 768px) {
+        &:has(.is-editing) {
+            padding-top: unset;
+        }
+    }
 }
 
 .memo-tab-panel-memo .memo {
@@ -124,7 +138,7 @@
     height: auto;
     min-height: calc(100cqh - var(--spacing) * 8);
     --max-content-width: 1024px;
-    padding-top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 3));
+    padding-top: max(env(safe-area-inset-top, 0px), calc(var(--spacing) * 18));
     padding-bottom: max(
         env(safe-area-inset-bottom, 0px),
         calc(var(--spacing) * 3)
@@ -169,6 +183,10 @@
         z-index: calc(var(--overflow-mask-z) + 1);
         pointer-events: none;
         padding: 0;
+
+        @media (min-width: 768px) {
+            position: static;
+        }
     }
 
     .memo-title.is-floating {
@@ -177,11 +195,11 @@
         animation: mobile-memo-title-float 250ms 50ms linear both;
         padding-left: max(
             env(safe-area-inset-left, 0px),
-            calc(12 * var(--spacing))
+            calc(16 * var(--spacing))
         );
         padding-right: max(
             env(safe-area-inset-right, 0px),
-            calc(12 * var(--spacing))
+            calc(16 * var(--spacing))
         );
     }
 
@@ -197,10 +215,18 @@
             calc(12 * var(--spacing))
         );
     }
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        scroll-margin-top: calc(18 * var(--spacing));
+    }
 }
 
 .memo-tab-panel .memo-header .memo-date {
-    @apply pb-3 ml-14;
+    @apply pb-3 ml-16;
 
     @container (width >= 768px) {
         @apply ml-0 pb-0;
@@ -419,7 +445,7 @@
 
 .memo-screen .toc-mobile-trigger {
     @apply fixed flex items-center justify-center surface-level-2 elevation-2;
-    @apply rounded-full size-10 p-2.5;
+    @apply rounded-full size-12 p-2.5;
 
     bottom: calc(max(env(safe-area-inset-bottom, 0px), var(--spacing) * 4));
     right: calc(max(env(safe-area-inset-right, 0px), var(--spacing) * 2));

@@ -50,7 +50,7 @@ export function MemoActionsDropdown({ memo }: { memo: Memo }) {
                         aria-label="More memo actions"
                         iconRight={<DotsThreeVerticalIcon />}
                     />
-                    <DropdownMenu.Items>
+                    <DropdownMenu.Items isFixed>
                         <DropdownMenu.Item
                             id={useId()}
                             action={toggleArchived}
@@ -80,7 +80,7 @@ export function MemoActionsDropdown({ memo }: { memo: Memo }) {
                     iconRight={<DotsThreeVerticalIcon />}
                     className="memo-actions-sm"
                 />
-                <DropdownMenu.Items>
+                <DropdownMenu.Items isFixed>
                     <DropdownMenu.Item id={useId()} action={edit} className="memo-actions-edit-btn">
                         <DropdownMenu.ItemLabel icon={<PencilIcon />}>
                             {t.Edit}
