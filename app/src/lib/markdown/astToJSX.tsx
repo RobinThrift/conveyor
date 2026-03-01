@@ -17,6 +17,12 @@ interface Document {
 
 export type ComponentMap = {
     Alert?: React.ComponentType<React.PropsWithChildren<{ variant: "danger" }>>
+    Attachment?: React.ComponentType<{
+        className?: string
+        id?: string
+        src: string
+        title?: string
+    }>
     Code?: React.ComponentType<{
         lang?: string
         meta?: string
@@ -316,6 +322,22 @@ function linkToJSX(doc: Document, node: SyntaxNode): ReactNode {
     }
 
     let key = nodeKey(node)
+
+    let isAttachment = url.startsWith("attachment://")
+
+    let Attachment = doc.componentMap.Attachment
+    if (Attachment && isAttachment) {
+        let titleFrom = children[0].to
+        let titleTo = children[1].from
+
+        return (
+            <Attachment
+                src={url}
+                key={key}
+                title={doc.text.substring(titleFrom ?? 0, titleTo ?? 0)}
+            />
+        )
+    }
 
     return (
         <a href={url} key={key} rel="noreferrer noopener" target={key as string}>

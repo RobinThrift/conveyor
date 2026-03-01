@@ -16,7 +16,7 @@ export function useImageState({
 }) {
     let attachment = useMemo(() => parseImgURL(props.src), [props.src])
     let attachmentData = useAttachment({ id: attachment?.attachmentID, ref })
-    let hash = attachment?.thumbhash
+    let hash = attachment?.metadata.thumbhash
     let [isLoading, setIsLoading] = useState(true)
 
     let attachmentURL = useMemo(() => {
@@ -53,8 +53,12 @@ export function useImageState({
 
     let style = {
         minWidth: hash && !attachmentURL ? "200px" : undefined,
-        "--img-original-width": attachment?.width ? `${attachment?.width}px` : undefined,
-        "--img-original-height": attachment?.height ? `${attachment?.height}px` : undefined,
+        "--img-original-width": attachment?.metadata.width
+            ? `${attachment?.metadata.width}px`
+            : undefined,
+        "--img-original-height": attachment?.metadata.height
+            ? `${attachment?.metadata.height}px`
+            : undefined,
         ...(props.style ?? {}),
     }
 
@@ -62,22 +66,22 @@ export function useImageState({
         src,
         isLoading,
         style,
-        width: attachment?.width,
-        height: attachment?.height,
+        width: attachment?.metadata.width,
+        height: attachment?.metadata.height,
     }
 }
 
-function parseImgURL(
-    src: string,
-): { attachmentID: string; thumbhash?: string; width?: number; height?: number } | undefined {
+type ImgMetadata = { thumbhash?: string; width?: number; height?: number }
+
+function parseImgURL(src: string): { attachmentID: string; metadata: ImgMetadata } | undefined {
     let attachment = parseAttachmentURL(src)
     if (!attachment) {
         return
     }
 
     let thumbhash: string | undefined
-    if (attachment.thumbhash) {
-        let [dataURL, thErr] = thumbhashToDataURL(attachment.thumbhash)
+    if (attachment.metadata.thumbhash) {
+        let [dataURL, thErr] = thumbhashToDataURL(attachment.metadata.thumbhash)
         if (thErr) {
             console.error(thErr)
         } else {
@@ -87,6 +91,14 @@ function parseImgURL(
 
     return {
         ...attachment,
-        thumbhash,
+        metadata: {
+            width: attachment.metadata.width
+                ? Number.parseInt(attachment.metadata.width, 10)
+                : undefined,
+            height: attachment.metadata.height
+                ? Number.parseInt(attachment.metadata.height, 10)
+                : undefined,
+            thumbhash: thumbhash ? thumbhash : undefined,
+        },
     }
 }

@@ -2,6 +2,7 @@ import React, { useMemo } from "react"
 
 import { astToJSX, type ComponentMap, parse } from "@/lib/markdown"
 import { Alert } from "@/ui/components/Alert"
+import { Attachment } from "@/ui/components/Attachment"
 import { ArrowUDownLeftIcon } from "@/ui/components/Icons"
 import { ZoomableImage } from "@/ui/components/Image"
 import { Link } from "@/ui/components/Link"
@@ -38,6 +39,7 @@ export function Markdown(props: MarkdownProps) {
         return astToJSX(ast, props.id, props.children, {
             componentMap: {
                 Alert,
+                Attachment: Attachment,
                 Link,
                 Code,
                 Image: ZoomableImage,

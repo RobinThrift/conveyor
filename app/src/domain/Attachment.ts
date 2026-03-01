@@ -24,9 +24,7 @@ export const ATTACHMENT_BASE_DIR = "attachments"
 
 export function parseAttachmentURL(
     src: string,
-):
-    | { attachmentID: string; thumbhash?: string | null; width?: number; height?: number }
-    | undefined {
+): { attachmentID: string; metadata: Record<string, string> } | undefined {
     let u: URL
     try {
         u = new URL(src)
@@ -38,14 +36,9 @@ export function parseAttachmentURL(
         return
     }
 
-    let width = u.searchParams.get("width")
-    let height = u.searchParams.get("height")
-
     return {
         attachmentID: u.hostname || u.pathname,
-        thumbhash: u.searchParams.get("thumbhash"),
-        width: width ? Number.parseInt(width, 10) : undefined,
-        height: height ? Number.parseInt(height, 10) : undefined,
+        metadata: Object.fromEntries(u.searchParams.entries()),
     }
 }
 

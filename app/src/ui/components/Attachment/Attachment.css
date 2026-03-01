@@ -1,0 +1,3 @@
+.attachment:has(.attachment-video) {
+    @apply flex items-center justify-center;
+}

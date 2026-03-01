@@ -211,7 +211,8 @@
 
     & > img,
     .zoomable-image,
-    & > figure img {
+    & > figure img,
+    .attachment-video {
         max-height: 50dvh;
     }
 
