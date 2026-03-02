@@ -19,6 +19,7 @@
         "@types/node": "^24.0.0",
         "@types/react": "19.2.2",
         "@types/react-dom": "19.2.1",
+        "@types/three": "^0.183.1",
         "@vite-pwa/assets-generator": "1.0.1",
         "@vitejs/plugin-react-swc": "4.1.0",
         "@vitest/browser": "3.2.4",
@@ -66,7 +67,8 @@
         "react": "19.2.0",
         "react-dom": "19.2.0",
         "react-json-tree": "^0.20.0",
-        "temporal-polyfill": "^0.3.0"
+        "temporal-polyfill": "^0.3.0",
+        "three": "^0.183.2"
     },
     "engines": {
         "node": ">=23.0.0"

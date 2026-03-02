@@ -5,8 +5,8 @@ import { parseAttachmentURL } from "@/domain/Attachment"
 import { useAttachment } from "@/ui/attachments"
 import { Alert } from "@/ui/components/Alert"
 import { Loader } from "@/ui/components/Loader"
-
-import { VideoAttachment } from "./Video"
+import { ModelAttachment } from "./viewers/ModelAttachment"
+import { VideoAttachment } from "./viewers/VideoAttachment"
 
 export type AttachmentProps = {
     className?: string
@@ -30,6 +30,10 @@ export const Attachment = React.memo(function Attachment(props: AttachmentProps)
 
         if (attachment.mime?.startsWith("video")) {
             return <VideoAttachment attachment={attachment} />
+        }
+
+        if (attachment.mime?.startsWith("model")) {
+            return <ModelAttachment attachment={attachment} />
         }
 
         return <AttachmentLink attachment={attachment} title={props.title} />

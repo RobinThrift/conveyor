@@ -1,26 +1,35 @@
 /** biome-ignore-all lint/a11y/useMediaCaption: is provided by the user */
-import React, { useMemo } from "react"
-
-import type { AttachmentID } from "@/domain/Attachment"
+import React, { useEffect, useState } from "react"
 
 export function VideoAttachment({
     attachment,
 }: {
     attachment: {
-        metadata: Record<string, string>
-        id: AttachmentID
-        isLoading: boolean
         data?: Uint8Array<ArrayBuffer>
         mime?: string
-        error?: Error
+        originalFilename?: string
     }
 }) {
-    let src = useMemo(() => {
+    let [src, setSrc] = useState(() => {
         let data = attachment.data
         if (!data) {
             return
         }
         return URL.createObjectURL(new Blob([data]))
+    })
+
+    useEffect(() => {
+        let data = attachment.data
+        if (!data) {
+            return
+        }
+
+        let objURL = URL.createObjectURL(new Blob([data]))
+        setSrc(objURL)
+
+        return () => {
+            URL.revokeObjectURL(objURL)
+        }
     }, [attachment.data])
 
     return (

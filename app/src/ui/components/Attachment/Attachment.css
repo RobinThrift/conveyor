@@ -1,3 +1,9 @@
+@import "./Viewers/ModelAttachment/ModelAttachment.css";
+
+.attachment {
+    content-visibility: auto;
+}
+
 .attachment:has(.attachment-video) {
     @apply flex items-center justify-center;
 }

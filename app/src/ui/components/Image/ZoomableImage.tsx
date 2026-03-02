@@ -53,7 +53,7 @@ function ZoomableImageInner(props: ZoomableImageProps) {
                     src={img.src}
                     alt={props.alt}
                     loading="lazy"
-                    className={clsx("zoomable-image", {
+                    className={clsx("content-auto zoomable-image", {
                         "animate-pulse": img.isLoading,
                     })}
                     style={img.style}

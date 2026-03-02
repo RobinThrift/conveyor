@@ -26,6 +26,7 @@ export const Image = React.memo(function Image(props: ImageProps) {
             loading={props.loading ?? "lazy"}
             onError={props.onError}
             className={clsx(
+                "content-auto",
                 {
                     "animate-pulse": isLoading,
                     "is-loading": isLoading,

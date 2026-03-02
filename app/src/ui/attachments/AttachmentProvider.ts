@@ -1,9 +1,8 @@
 import { useStore } from "@tanstack/react-store"
-import { type RefObject, useCallback, useEffect, useRef } from "react"
+import { type RefObject, useCallback, useEffect, useState } from "react"
 
 import type { AttachmentID } from "@/domain/Attachment"
 import { type AsyncResult, Err, Ok, type Result } from "@/lib/result"
-import { useOnVisible } from "@/ui/hooks/useOnVisible"
 import { actions, selectors, stores } from "@/ui/stores"
 
 export function useAttachment({
@@ -19,6 +18,7 @@ export function useAttachment({
           id: AttachmentID
           isLoading: boolean
           data?: Uint8Array<ArrayBuffer>
+          originalFilename?: string
           mime?: string
           error?: Error
       }
@@ -29,11 +29,39 @@ export function useAttachment({
         selectors.attachments.isAttachmentLoading(id),
     )
     let data = useStore(stores.attachments.attachments, selectors.attachments.getAttachmentData(id))
-    let fbRef = useRef(null)
 
-    let isVisible = useOnVisible(ref || fbRef, {
-        ratio: 0.2,
-    })
+    let [isVisible, setIsVisible] = useState(!loadOnVisible)
+
+    useEffect(() => {
+        let el = ref?.current
+        if (!el) {
+            return
+        }
+
+        let onContentVisibilityAutoStateChange = (e: Event) => {
+            let evt = e as ContentVisibilityAutoStateChangeEvent
+            if (!evt.skipped) {
+                setIsVisible(true)
+                el.removeEventListener(
+                    "conrentvisibilityautostatechange",
+                    onContentVisibilityAutoStateChange,
+                )
+            }
+        }
+
+        el.addEventListener(
+            "contentvisibilityautostatechange",
+            onContentVisibilityAutoStateChange,
+            { passive: true },
+        )
+
+        return () => {
+            el.removeEventListener(
+                "contentvisibilityautostatechange",
+                onContentVisibilityAutoStateChange,
+            )
+        }
+    }, [ref?.current])
 
     useEffect(() => {
         if (!id) {
@@ -60,6 +88,7 @@ export function useAttachment({
         isLoading,
         data: data?.data,
         mime: data?.mime,
+        originalFilename: data?.originalFilename,
         error: status?.state === "error" ? status.error : undefined,
     }
 }

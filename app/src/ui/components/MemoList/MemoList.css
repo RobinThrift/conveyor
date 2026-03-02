@@ -159,6 +159,19 @@
         p a {
             @apply text-primary/80;
         }
+
+        .attachment {
+            @apply hidden;
+
+            &:nth-of-type(1),
+            &:nth-of-type(2) {
+                @apply flex;
+            }
+        }
+
+        .attachment-video {
+            max-height: calc(var(--item-max-height) - 10cqh);
+        }
     }
 
     .show-more-blur {
@@ -245,6 +258,10 @@
 
     p {
         display: none;
+    }
+
+    .link-preview-title {
+        @apply ps-1;
     }
 
     .link-preview + p {

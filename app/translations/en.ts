@@ -74,6 +74,11 @@ export const translations = {
         UpdatedAt: "Updated at",
     },
 
+    "components/Memo/Attachments/Viewers/ModelAttachment": {
+        Download: "Download",
+        ControlShowGrid: "Show Grid",
+    },
+
     "components/MemoList/DayHeader": {
         Today: "Today",
         Yesterday: "Yesterday",

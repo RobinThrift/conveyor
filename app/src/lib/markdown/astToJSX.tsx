@@ -234,6 +234,10 @@ function paragraphtoJSX(doc: Document, node: SyntaxNode, stripParagraph?: boolea
         return doc.text.substring(node.from, node.to).trim()
     }
 
+    if (node.firstChild?.name === "Link" && node.firstChild.to === node.lastChild?.to) {
+        return <React.Fragment key={nodeKey(node)}>{collectChildren(doc, node)}</React.Fragment>
+    }
+
     if (stripParagraph) {
         return <React.Fragment key={nodeKey(node)}>{collectChildren(doc, node)}</React.Fragment>
     }

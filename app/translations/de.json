@@ -71,6 +71,11 @@
         "UpdatedAt": "Verändert am"
     },
 
+    "components/Memo/Attachments/Viewers/ModelAttachment": {
+        "Download": "Herunterladen",
+        "ControlShowGrid": "Raster Anzeigen"
+    },
+
     "components/MemoList/DayHeader": {
         "Today": "Heute",
         "Yesterday": "Gestern"

@@ -217,10 +217,21 @@ function manualChunks(
         return `markdown`
     }
 
+    let threeJS = /three/
+    if (threeJS.test(id)) {
+        return `threejs`
+    }
+
     let migrations = /app\/src\/storage\/database\/sqlite\/migrations\/([\da-z_]+)/
     matches = migrations.exec(id)
     if (matches) {
         return `migrations/${matches[1]}`
+    }
+
+    let modelViewer = /app\/src\/ui\/components\/Attachment\/viewers\/([\dA-Za-z_]+)/
+    matches = modelViewer.exec(id)
+    if (matches) {
+        return `viewers/${matches[1]}`
     }
 }
 

@@ -56,6 +56,10 @@
     --text-base: 16px;
 }
 
+@utility content-auto {
+    content-visibility: auto;
+}
+
 @utility elevation {
     box-shadow: var(--shadow-elevation, 0 0 #0000);
 }

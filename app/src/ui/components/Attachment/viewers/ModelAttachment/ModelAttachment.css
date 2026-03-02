@@ -1,0 +1,32 @@
+.attachment-model {
+    @apply relative flex;
+    width: 100%;
+
+    canvas {
+        @apply rounded-lg shadow-md border border-neutral-extra-light;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+    }
+
+    .alert {
+        @apply absolute self-center left-4 right-2;
+    }
+
+    .attachment-model-controls {
+        @apply absolute place-self-start surface-level-2 elevation-1 right-2 top-2 p-2 rounded-xl text-xs z-1;
+
+        .checkbox-field {
+            @apply text-xs;
+            user-select: none;
+        }
+    }
+
+    .attachment-model-info {
+        @apply absolute surface-level-2 elevation-1 left-2 bottom-2 p-2 rounded-xl text-xs flex gap-1 z-1;
+        user-select: none;
+
+        a:hover {
+            @apply text-primary;
+        }
+    }
+}

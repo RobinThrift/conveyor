@@ -25,7 +25,7 @@ export function Figure(props: FigureProps) {
             <figure
                 id={props.id}
                 ref={ref}
-                className={clsx("figure", { "is-zoomed": isZoomed }, props.className)}
+                className={clsx("figure content-auto", { "is-zoomed": isZoomed }, props.className)}
             >
                 <button
                     type="button"

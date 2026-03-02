@@ -72,7 +72,17 @@ class ImageWidget extends WidgetType {
         this._src = src
         this._getAttachmentDataByID = getAttachmentDataByID
         this._attachment = parseAttachmentURL(src)
-        this._estimatedHeight = this._attachment?.height ?? -1
+        this._estimatedHeight = -1
+
+        let heightMeta = this._attachment?.metadata.height
+        if (heightMeta) {
+            try {
+                let height = Number.parseInt(heightMeta, 10)
+                this._estimatedHeight = height ?? -1
+            } catch {
+                // do nothing
+            }
+        }
     }
 
     public get estimatedHeight(): number {
