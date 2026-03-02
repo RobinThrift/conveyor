@@ -1,4 +1,4 @@
-@import "./Viewers/ModelAttachment/ModelAttachment.css";
+@import "./viewers/ModelAttachment/ModelAttachment.css";
 
 .attachment {
     content-visibility: auto;
