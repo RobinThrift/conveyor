@@ -31,7 +31,7 @@
 @import "../components/Input/Input.css" layer(components);
 @import "../components/LinkPreview/LinkPreview.css" layer(components);
 @import "../components/Loader/Loader.css" layer(components);
-@import "../components/Markdown/Code.css" layer(components);
+@import "../components/Markdown/Markdown.css" layer(components);
 @import "../components/Memo/Memo.css" layer(components);
 @import "../components/MemoList/MemoList.css" layer(components);
 @import "../components/MemoListFilter/index.css" layer(components);

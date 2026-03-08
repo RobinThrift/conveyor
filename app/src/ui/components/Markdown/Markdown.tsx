@@ -9,6 +9,7 @@ import { Link } from "@/ui/components/Link"
 
 import { Code } from "./Code"
 import { customBlocks } from "./customBlocks"
+import { MermaidDiagram } from "./MermaidDiagram"
 import { TagLink } from "./TagLink"
 
 export interface MarkdownProps {
@@ -42,6 +43,9 @@ export function Markdown(props: MarkdownProps) {
                 Attachment: Attachment,
                 Link,
                 Code,
+                Diagrams: {
+                    Mermaid: MermaidDiagram,
+                },
                 Image: ZoomableImage,
                 FootnoteReturnIcon: ArrowUDownLeftIcon,
                 TagLink,

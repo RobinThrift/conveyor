@@ -1,0 +1,2982 @@
+:root {
+    --color-mermaid-bg: unset;
+    --color-mermaid-text: var(--color-text);
+
+    --color-mermaid-line: var(--color-text);
+
+    --color-mermaid-primary: var(--color-primary);
+    --color-mermaid-primary-text: var(--color-primary-light);
+    --color-mermaid-primary-border: var(--color-primary-dark);
+
+    --color-mermaid-secondary: var(--color-success);
+    --color-mermaid-secondary-text: var(--color-success-light);
+    --color-mermaid-secondary-border: var(--color-success-dark);
+
+    --color-mermaid-tertiary: var(--color-danger);
+    --color-mermaid-tertiary-text: var(--color-danger-light);
+    --color-mermaid-tertiary-border: var(--color-danger-dark);
+
+    --color-mermaid-main-bg: var(--color-surface-level-3);
+
+    --color-mermaid-node-bg: var(--color-surface-level-1);
+    --color-mermaid-node-border: var(--color-surface-border);
+    --color-mermaid-node-text: var(--color-text);
+
+    --color-mermaid-edge-label-bg: var(--color-surface-level-2);
+
+    --color-mermaid-note-bg: var(--color-surface-level-3);
+    --color-mermaid-note-boder: var(--color-surface-border);
+
+    --color-mermaid-state-label: var(--color-text);
+
+    --color-mermaid-cluster-bg: var(--color-surface-level-1);
+    --color-mermaid-cluster-border: var(--color-surface-border);
+
+    --color-mermaid-actor-bg: var(--color-surface-level-1);
+    --color-mermaid-actor-border: var(--color-surface-border);
+    --color-mermaid-actor-text: var(--color-text);
+    --color-mermaid-actor-line: var(--color-text);
+
+    --color-mermaid-signal: var(--color-text);
+}
+
+.mermaid-diagram-wrapper {
+    @apply flex flex-col items-center justify-center content-auto;
+
+    .mermaid-diagram {
+        @apply flex flex-col items-center justify-center;
+        width: 100cqw;
+        max-width: var(--breakpoint-tablet);
+    }
+
+    .mermaid-diagram svg {
+        .label-container {
+            rx: 0.5rem;
+        }
+    }
+}
+
+.mermaid-diagram-wrapper .mermaid-diagram {
+    font-family: inherit;
+    font-size: inherit;
+    fill: var(--color-mermaid-text);
+
+    .error-icon {
+        fill: var(--color-mermaid-error-bg, var(--color-mermaid-tertiary));
+    }
+
+    .error-text {
+        fill: var(
+            --color-mermaid-error-text,
+            var(--color-mermaid-tertiary-text)
+        );
+        stroke: var(
+            --color-mermaid-error-text,
+            var(--color-mermaid-tertiary-text)
+        );
+    }
+
+    .edge-thickness-normal {
+        stroke-width: 1px;
+    }
+
+    .edge-thickness-thick {
+        stroke-width: 3.5px;
+    }
+
+    .edge-pattern-solid {
+        stroke-dasharray: 0;
+    }
+
+    .edge-thickness-invisible {
+        stroke-width: 0;
+        fill: none;
+    }
+
+    .edge-pattern-dashed {
+        stroke-dasharray: 3;
+    }
+
+    .edge-pattern-dotted {
+        stroke-dasharray: 2;
+    }
+
+    .marker {
+        fill: var(--color-mermaid-line);
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .marker.cross {
+        stroke: var(--color-mermaid-line);
+    }
+
+    .label,
+    .label text .label span {
+        color: var(
+            --color-mermaid-node-text,
+            var(--color-mermaid-primary-text)
+        );
+    }
+
+    .cluster-label text {
+        fill: var(--color-mermaid-title, var(--color-mermaid-tertiary-text));
+    }
+
+    .cluster-label span {
+        color: var(--color-mermaid-title, var(--color-mermaid-tertiary-text));
+    }
+
+    .cluster-label span p {
+        background-color: transparent;
+    }
+
+    .label-icon {
+        display: inline-block;
+        height: 1em;
+        overflow: visible;
+        vertical-align: -0.125em;
+    }
+
+    .node .label-icon path {
+        fill: currentColor;
+        stroke: revert;
+        stroke-width: revert;
+    }
+
+    .note {
+        rx: 0.5rem;
+        stroke: var(--color-mermaid-note-boder);
+        fill: var(--color-mermaid-note-bg);
+    }
+
+    .noteText,
+    .noteText > tspan {
+        fill: var(--color-mermaid-note-text);
+        stroke: none;
+    }
+
+    div.mermaidTooltip {
+        position: absolute;
+        text-align: center;
+        max-width: 200px;
+        padding: 2px;
+        font-family: inherit;
+        font-size: 12px;
+        background: var(--color-mermaid-tertiary);
+        border: 1px solid var(--color-mermaid-tertiary-border);
+        border-radius: 2px;
+        pointer-events: none;
+        z-index: 100;
+    }
+}
+
+.mermaid-diagram-wrapper .flowchart-v2 {
+    .node rect,
+    .node circle,
+    .node ellipse,
+    .node polygon,
+    .node path {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1px;
+    }
+
+    .node .label,
+    .image-shape .label,
+    .icon-shape .label {
+        text-anchor: middle;
+        text-align: center;
+        text {
+            text-anchor: middle;
+        }
+    }
+
+    .node.clickable {
+        cursor: pointer;
+    }
+
+    .root .anchor path {
+        fill: var(--color-mermaid-line);
+        stroke-width: 0;
+        stroke: var(--color-mermaid-line);
+    }
+
+    .arrowheadPath {
+        fill: var(--color-mermaid-arrowhead);
+    }
+
+    .edgePath .path {
+        stroke: var(--color-mermaid-line);
+        stroke-width: 2px;
+    }
+
+    .flowchart-link {
+        stroke: var(--color-mermaid-line);
+        fill: none;
+    }
+
+    .edgeLabel {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        text-align: center;
+    }
+
+    .edgeLabel p {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .edgeLabel rect {
+        opacity: 0.5;
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        fill: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .labelBkg {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .cluster rect {
+        fill: var(--color-mermaid-cluster-bg, var(--color-mermaid-tertiary));
+        stroke: var(
+            --color-mermaid-cluster-border,
+            var(--color-mermaid-tertiary-border)
+        );
+        stroke-width: 1px;
+    }
+
+    .cluster text,
+    .cluster span,
+    .cluster p {
+        fill: var(--color-mermaid-title, var(--color-mermaid-tertiary-text));
+    }
+
+    .flowchartTitleText {
+        text-anchor: middle;
+        font-size: 18px;
+        fill: var(--color-mermaid-text);
+    }
+
+    rect.text {
+        fill: none;
+        stroke-width: 0;
+    }
+
+    .icon-shape,
+    .image-shape {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        text-align: center;
+    }
+
+    .icon-shape p,
+    .image-shape p {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        padding: 2px;
+    }
+
+    .icon-shape rect,
+    .image-shape rect {
+        opacity: 0.5;
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        fill: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .flowchartTitleText {
+        text-anchor: middle;
+        font-size: 18px;
+        fill: var(--color-mermaid-text);
+    }
+
+    .flowchart-label text {
+        text-anchor: middle;
+    }
+}
+
+.mermaid-diagram-wrapper .classDiagram {
+    g.classGroup text {
+        fill: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke: none;
+        font-family: inherit;
+        font-size: 10px;
+    }
+
+    g.classGroup text .title {
+        font-weight: bolder;
+    }
+
+    .nodeLabel,
+    .edgeLabel {
+        color: var(--color-mermaid-class-text, var(--color-mermaid-text));
+    }
+
+    .edgeLabel .label rect {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+    }
+
+    .label text {
+        fill: var(--color-mermaid-class-text, var(--color-mermaid-text));
+    }
+
+    .labelBkg {
+        background: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+    }
+
+    .edgeLabel .label span {
+        background: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+    }
+
+    .classTitle {
+        font-weight: bolder;
+    }
+
+    .node rect,
+    .node circle,
+    .node ellipse,
+    .node polygon,
+    .node path {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1px;
+    }
+
+    .divider {
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1;
+    }
+
+    g.clickable {
+        cursor: pointer;
+    }
+
+    g.classGroup rect {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+    }
+
+    g.classGroup line {
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1;
+    }
+
+    .classLabel .box {
+        stroke: none;
+        stroke-width: 0;
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        opacity: 0.5;
+    }
+
+    .classLabel .label {
+        fill: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        font-size: 10px;
+    }
+
+    .relation {
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+        fill: none;
+    }
+
+    .dashed-line {
+        stroke-dasharray: 3;
+    }
+
+    .dotted-line {
+        stroke-dasharray: 1 2;
+    }
+
+    .composition {
+        fill: var(--color-mermaid-line);
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .composition {
+        fill: var(--color-mermaid-line);
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .dependency {
+        fill: var(--color-mermaid-line);
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .dependency {
+        fill: var(--color-mermaid-line);
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .extension {
+        fill: transparent;
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .extension {
+        fill: transparent;
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .aggregation {
+        fill: transparent;
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .aggregation {
+        fill: transparent;
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .lollipop {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .lollipop {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .edgeTerminals {
+        font-size: 11px;
+        line-height: initial;
+    }
+
+    .classTitleText {
+        text-anchor: middle;
+        font-size: 18px;
+        fill: var(--color-mermaid-text);
+    }
+
+    .label-icon {
+        display: inline-block;
+        height: 1em;
+        overflow: visible;
+        vertical-align: -0.125em;
+    }
+}
+
+.mermaid-diagram-wrapper .er {
+    .entityBox {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+    }
+
+    .relationshipLabelBox {
+        fill: var(--color-mermaid-tertiary);
+        opacity: 0.7;
+        background-color: var(--color-mermaid-tertiary);
+    }
+
+    .relationshipLabelBox rect {
+        opacity: 0.5;
+    }
+
+    .labelBkg {
+        background-color: var(--color-mermaid-tertiary);
+    }
+
+    .edgeLabel .label {
+        fill: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        font-size: 14px;
+    }
+
+    .label {
+        font-family: inherit;
+        color: var(
+            --color-mermaid-node-text,
+            var(--color-mermaid-primary-text)
+        );
+    }
+
+    .edge-pattern-dashed {
+        stroke-dasharray: 8, 8;
+    }
+
+    .node rect,
+    .node circle,
+    .node ellipse,
+    .node polygon {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1px;
+    }
+
+    .relationshipLine {
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+        fill: none;
+    }
+
+    .marker {
+        fill: none;
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+}
+
+.mermaid-diagram-wrapper .sequence {
+    .actor {
+        rx: 0.5rem;
+        stroke: var(
+            --color-mermaid-actor-border,
+            var(--color-mermaid-primary-border)
+        );
+        fill: var(--color-mermaid-actor-bg, var(--color-mermaid-main-bg));
+    }
+
+    text.actor > tspan {
+        fill: var(
+            --color-mermaid-actor-text,
+            var(--color-mermaid-primary-text)
+        );
+        stroke: none;
+    }
+
+    .actor-line {
+        stroke: var(
+            --color-mermaid-actor-line,
+            var(--color-mermaid-actor-border)
+        );
+    }
+
+    .innerArc {
+        stroke-width: 1.5;
+        stroke-dasharray: none;
+    }
+
+    .messageLine0 {
+        stroke-width: 1.5;
+        stroke-dasharray: none;
+        stroke: var(--color-mermaid-signal, var(--color-mermaid-text));
+    }
+
+    .messageLine1 {
+        stroke-width: 1.5;
+        stroke-dasharray: 2, 2;
+        stroke: var(--color-mermaid-signal, var(--color-mermaid-text));
+    }
+
+    #arrowhead path {
+        fill: var(--color-mermaid-signal, var(--color-mermaid-text));
+        stroke: var(--color-mermaid-signal, var(--color-mermaid-text));
+    }
+
+    .sequenceNumber {
+        fill: var(--color-mermaid-sequence, var(--color-mermaid-line));
+    }
+
+    #sequencenumber {
+        fill: var(--color-mermaid-signal, var(--color-mermaid-text));
+    }
+
+    #crosshead path {
+        fill: var(--color-mermaid-signal, var(--color-mermaid-text));
+        stroke: var(--color-mermaid-signal, var(--color-mermaid-text));
+    }
+
+    .messageText {
+        fill: var(--color-mermaid-signal-text, var(--color-mermaid-text));
+        stroke: none;
+    }
+
+    .labelBox {
+        stroke: var(
+            --color-mermaid-label-box-border,
+            var(--color-mermaid-actor-border)
+        );
+        fill: var(--color-mermaid-label-box-bg, var(--color-mermaid-actor-bg));
+    }
+
+    .labelText,
+    .labelText > tspan {
+        fill: var(
+            --color-mermaid-label-box-text,
+            var(--color-mermaid-actor-text)
+        );
+        stroke: none;
+    }
+
+    .loopText,
+    .loopText > tspan {
+        fill: var(--color-mermaid-loop-text, var(--color-mermaid-actor-text));
+        stroke: none;
+    }
+
+    .loopLine {
+        stroke-width: 2px;
+        stroke-dasharray: 2, 2;
+        stroke: var(
+            --color-mermaid-label-box-border,
+            var(--color-mermaid-actor-border)
+        );
+        fill: var(
+            --color-mermaid-label-box-border,
+            var(--color-mermaid-actor-border)
+        );
+    }
+
+    .activation0 {
+        fill: var(
+            --color-mermaid-activation-bg,
+            var(--color-mermaid-secondary)
+        );
+        stroke: var(
+            --color-mermaid-activation-border,
+            color-mix(in oklch, var(--color-mermaid-secondary) 90%, black)
+        );
+    }
+
+    .activation1 {
+        fill: var(--color-mermaid-activation-bg, var(--color-mermaid-tertiary));
+        stroke: var(
+            --color-mermaid-activation-border,
+            color-mix(in oklch, var(--color-mermaid-tertiary) 90%, black)
+        );
+    }
+
+    .activation2 {
+        fill: var(--color-mermaid-activation-bg, blue);
+        stroke: var(
+            --color-mermaid-activation-border,
+            color-mix(in oklch, blue 90%, black)
+        );
+    }
+
+    .actorPopupMenu {
+        position: absolute;
+    }
+
+    .actorPopupMenuPanel {
+        position: absolute;
+        fill: var(--color-mermaid-actor-bg, var(--color-mermaid-main-bg));
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
+    }
+
+    .actor-man line {
+        stroke: var(
+            --color-mermaid-actor-border,
+            var(--color-mermaid-primary-border)
+        );
+        fill: var(--color-mermaid-actor-bg, var(--color-mermaid-main-bg));
+    }
+
+    .actor-man circle,
+    line {
+        stroke: var(
+            --color-mermaid-actor-border,
+            var(--color-mermaid-primary-border)
+        );
+        fill: var(--color-mermaid-actor-bg, var(--color-mermaid-main-bg));
+        stroke-width: 2px;
+    }
+}
+
+.mermaid-diagram-wrapper .mermaid-diagram.stateDiagram {
+    defs #statediagram-barbEnd {
+        fill: var(--color-mermaid-transition, var(--color-mermaid-line));
+        stroke: var(--color-mermaid-transition, var(--color-mermaid-line));
+    }
+
+    g.stateGroup text {
+        fill: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke: none;
+        font-size: 10px;
+    }
+
+    g.stateGroup text {
+        fill: var(--color-mermaid-text);
+        stroke: none;
+        font-size: 10px;
+    }
+
+    g.stateGroup .state-title {
+        font-weight: bolder;
+        fill: var(
+            --color-mermaid-state-label,
+            var(--color-mermaid-state-bg, var(--color-mermaid-primary-text))
+        );
+    }
+
+    g.stateGroup rect {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+    }
+
+    g.stateGroup line {
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .transition {
+        stroke: var(--color-mermaid-transition, var(--color-mermaid-line));
+        stroke-width: 1;
+        fill: none;
+    }
+
+    .stateGroup .composit {
+        fill: var(--color-mermaid-bg);
+        border-bottom: 1px;
+    }
+
+    .stateGroup .alt-composit {
+        fill: #e0e0e0;
+        border-bottom: 1px;
+    }
+
+    .state-note {
+        stroke: var(--color-mermaid-note-boder);
+        fill: var(--color-mermaid-note-bg);
+    }
+
+    .state-note text {
+        fill: var(--color-mermaid-note-text);
+        stroke: none;
+        font-size: 10px;
+    }
+
+    .stateLabel .box {
+        stroke: none;
+        stroke-width: 0;
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        opacity: 0.5;
+    }
+
+    .edgeLabel .label rect {
+        fill: var(--color-mermaid-label-bg, var(--color-mermaid-state-bg));
+        opacity: 0.5;
+    }
+
+    .edgeLabel {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        text-align: center;
+    }
+
+    .edgeLabel p {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .edgeLabel rect {
+        opacity: 0.5;
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        fill: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .edgeLabel .label text {
+        fill: var(--color-mermaid-transition-label, var(--color-mermaid-text));
+    }
+
+    .label div .edgeLabel {
+        color: var(--color-mermaid-transition-label, var(--color-mermaid-text));
+    }
+
+    .stateLabel text {
+        fill: var(
+            --color-mermaid-state-label,
+            var(--color-mermaid-state-bg, var(--color-mermaid-primary-text))
+        );
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    .node circle.state-start {
+        fill: var(--color-mermaid-line);
+        stroke: var(--color-mermaid-line);
+    }
+
+    .node .fork-join {
+        fill: var(--color-mermaid-line);
+        stroke: var(--color-mermaid-line);
+    }
+
+    .node circle.state-end {
+        fill: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke: var(--color-mermaid-bg);
+        stroke-width: 1.5;
+    }
+
+    .end-state-inner {
+        fill: var(
+            --color-mermaid-composite-bg,
+            var(--color-mermaid-bg, var(--color-mermaid-tertiary))
+        );
+        stroke-width: 1.5;
+    }
+
+    .node rect {
+        fill: var(--color-mermaid-state-bg, var(--color-mermaid-main-bg));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1px;
+    }
+
+    .node polygon {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1px;
+    }
+
+    #statediagram-barbEnd {
+        fill: var(--color-mermaid-line);
+    }
+
+    .statediagram-cluster rect {
+        fill: var(
+            --color-mermaid-composite-title-bg,
+            var(--color-mermaid-main-bg)
+        );
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1px;
+    }
+
+    .cluster-label,
+    .nodeLabel {
+        color: var(
+            --color-mermaid-state-label,
+            var(--color-mermaid-state-bg, var(--color-mermaid-primary-text))
+        );
+    }
+
+    .statediagram-cluster rect.outer {
+        rx: 5px;
+        ry: 5px;
+    }
+
+    .statediagram-state .divider {
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+    }
+
+    .statediagram-state .title-state {
+        rx: 5px;
+        ry: 5px;
+    }
+
+    .statediagram-cluster.statediagram-cluster .inner {
+        fill: var(
+            --color-mermaid-composite-bg,
+            var(--color-mermaid-bg, var(--color-mermaid-tertiary))
+        );
+    }
+
+    .statediagram-cluster.statediagram-cluster-alt .inner {
+        fill: var(--color-mermaid-alt-bg, var(--color-mermaid-tertiary));
+    }
+
+    .statediagram-cluster .inner {
+        rx: 0;
+        ry: 0;
+    }
+
+    .statediagram-state rect.basic {
+        rx: 5px;
+        ry: 5px;
+    }
+
+    .statediagram-state rect.divider {
+        stroke-dasharray: 10, 10;
+        fill: var(--color-mermaid-alt-bg, var(--color-mermaid-tertiary));
+    }
+
+    .note-edge {
+        stroke-dasharray: 5;
+    }
+
+    .statediagram-note rect {
+        fill: var(--color-mermaid-note-bg);
+        stroke: var(--color-mermaid-note-boder);
+        stroke-width: 1px;
+        rx: 0;
+        ry: 0;
+    }
+
+    .statediagram-note rect {
+        fill: var(--color-mermaid-note-bg);
+        stroke: var(--color-mermaid-note-boder);
+        stroke-width: 1px;
+        rx: 0;
+        ry: 0;
+    }
+
+    .statediagram-note text {
+        fill: var(--color-mermaid-note-text);
+    }
+
+    .statediagram-note .nodeLabel {
+        color: var(--color-mermaid-note-text);
+    }
+
+    .statediagram .edgeLabel {
+        color: red;
+    }
+
+    #dependencyStart,
+    #dependencyEnd {
+        fill: var(--color-mermaid-line);
+        stroke: var(--color-mermaid-line);
+        stroke-width: 1;
+    }
+
+    .statediagramTitleText {
+        text-anchor: middle;
+        font-size: 18px;
+        fill: var(--color-mermaid-text);
+    }
+}
+
+.mermaid-diagram-wrapper .block {
+    .label text,
+    .label span,
+    .label p {
+        fill: var(--color-mermaid-node-text, var(--color-mermaid-primary-text));
+        color: var(
+            --color-mermaid-node-text,
+            var(--color-mermaid-primary-text)
+        );
+    }
+
+    .node rect,
+    .node circle,
+    .node ellipse,
+    .node polygon,
+    .node path {
+        fill: var(--color-mermaid-main-bg, var(--color-mermaid-primary));
+        stroke: var(
+            --color-mermaid-node-border,
+            var(--color-mermaid-primary-border)
+        );
+        stroke-width: 1px;
+    }
+
+    .node .label {
+        text-align: center;
+    }
+
+    .node.clickable {
+        cursor: pointer;
+    }
+
+    .arrowheadPath {
+        fill: var(--color-mermaid-arrowhead);
+    }
+
+    .edgePath .path {
+        stroke: var(--color-mermaid-line);
+        stroke-width: 2px;
+    }
+
+    .flowchart-link {
+        stroke: var(--color-mermaid-line);
+        fill: none;
+    }
+
+    .edgeLabel {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        text-align: center;
+    }
+
+    .edgeLabel rect {
+        opacity: 0.5;
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        fill: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .labelBkg {
+        background-color: var(
+            --color-mermaid-edge-label-bg,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .node .cluster {
+        fill: var(--color-mermaid-cluster-bg, var(--color-mermaid-tertiary));
+        stroke: var(
+            --color-mermaid-cluster-border,
+            var(--color-mermaid-tertiary-border)
+        );
+        box-shadow:
+            rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+            rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+        stroke-width: 1px;
+    }
+}
+
+.mermaid-diagram-wrapper .mermaid-diagram.mindmap {
+    .edge {
+        stroke-width: 3;
+    }
+
+    .disabled,
+    .disabled circle,
+    .disabled text {
+        fill: lightgray;
+    }
+
+    .disabled text {
+        fill: #efefef;
+    }
+
+    --color-mermaid-section-0: var(
+        --color-mermaid-color-scale-1,
+        var(--color-mermaid-secondary)
+    );
+
+    .section-0 rect,
+    .section-0 path,
+    .section-0 circle,
+    .section-0 polygon,
+    .section-0 path {
+        fill: var(--color-mermaid-section-0);
+    }
+
+    .section-0 text {
+        fill: var(
+            --color-mermaid-color-scale-label-1,
+            oklch(from var(--color-mermaid-section-0) round(1.21 - L) 0 0)
+        );
+    }
+
+    .section-0 span {
+        color: var(
+            --color-mermaid-color-scale-label-1,
+            oklch(from var(--color-mermaid-section-0) round(1.21 - L) 0 0)
+        );
+    }
+
+    .node-icon-0 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-1,
+            oklch(from var(--color-mermaid-section-0) round(1.21 - L) 0 0)
+        );
+    }
+
+    .section-edge-0 {
+        stroke: var(
+            --color-mermaid-color-scale-1,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .edge-depth-0 {
+        stroke-width: 14;
+    }
+
+    .section-0 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-1: var(
+        --color-mermaid-color-scale-2,
+        var(--color-mermaid-tertiary)
+    );
+
+    .section-1 rect,
+    .section-1 path,
+    .section-1 circle,
+    .section-1 polygon,
+    .section-1 path {
+        fill: var(--color-mermaid-section-1);
+    }
+
+    .section-1 text {
+        fill: var(
+            --color-mermaid-color-scale-label-2,
+            oklch(from var(--color-mermaid-section-1) round(1.21 - L) 0 0)
+        );
+    }
+
+    .section-1 span {
+        color: var(
+            --color-mermaid-color-scale-label-2,
+            oklch(from var(--color-mermaid-section-1) round(1.21 - L) 0 0)
+        );
+    }
+
+    .node-icon-1 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-2,
+            oklch(from var(--color-mermaid-section-1) round(1.21 - L) 0 0)
+        );
+    }
+
+    .section-edge-1 {
+        stroke: var(
+            --color-mermaid-color-scale-2,
+            var(--color-mermaid-tertiary)
+        );
+    }
+
+    .edge-depth-1 {
+        stroke-width: 11;
+    }
+
+    .section-1 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-2: var(
+        --color-mermaid-color-scale-3,
+        hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+    );
+
+    --color-mermaid-section-2-label: var(
+        --color-mermaid-color-scale-label-3,
+        oklch(from var(--color-mermaid-section-2) round(1.21 - L) 0 0)
+    );
+
+    .section-2 rect,
+    .section-2 path,
+    .section-2 circle,
+    .section-2 polygon,
+    .section-2 path {
+        fill: var(--color-mermaid-section-2);
+    }
+
+    .section-2 text {
+        fill: var(--color-mermaid-section-2-label);
+    }
+
+    .section-2 span {
+        color: var(--color-mermaid-section-2-label);
+    }
+
+    .node-icon-2 {
+        font-size: 40px;
+        color: var(--color-mermaid-section-2-label);
+    }
+
+    .section-edge-2 {
+        stroke: var(
+            --color-mermaid-color-scale-3,
+            hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+        );
+    }
+
+    .edge-depth-2 {
+        stroke-width: 8;
+    }
+
+    .section-2 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-3: var(
+        --color-mermaid-color-scale-4,
+        hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+    );
+
+    --color-mermaid-section-3-label: var(
+        --color-mermaid-color-scale-label-4,
+        oklch(from var(--color-mermaid-section-3) round(1.21 - L) 0 0)
+    );
+
+    .section-3 rect,
+    .section-3 path,
+    .section-3 circle,
+    .section-3 polygon,
+    .section-3 path {
+        fill: var(--color-mermaid-section-3);
+    }
+
+    .section-3 text {
+        fill: var(--color-mermaid-section-3-label);
+    }
+
+    .section-3 span {
+        color: var(--color-mermaid-section-3-label);
+    }
+
+    .node-icon-3 {
+        font-size: 40px;
+        color: var(--color-mermaid-section-3-label);
+    }
+
+    .section-edge-3 {
+        stroke: var(--color-mermaid-section-3);
+    }
+
+    .edge-depth-3 {
+        stroke-width: 5;
+    }
+
+    .section-3 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-4: var(
+        --color-mermaid-color-scale-5,
+        hsl(from var(--color-mermaid-primary) calc(h + 90) s l)
+    );
+
+    --color-mermaid-section-4-label: var(
+        --color-mermaid-color-scale-label-5,
+        oklch(from var(--color-mermaid-section-4) round(1.21 - L) 0 0)
+    );
+
+    .section-4 rect,
+    .section-4 path,
+    .section-4 circle,
+    .section-4 polygon,
+    .section-4 path {
+        fill: var(--color-mermaid-section-4);
+    }
+
+    .section-4 text {
+        fill: var(--color-mermaid-section-4-label);
+    }
+
+    .section-4 span {
+        color: var(--color-mermaid-section-4-label);
+    }
+
+    .node-icon-4 {
+        font-size: 40px;
+        color: var(--color-mermaid-section-4-label);
+    }
+
+    .section-edge-4 {
+        stroke: var(--color-mermaid-section-4);
+    }
+
+    .edge-depth-4 {
+        stroke-width: 2;
+    }
+
+    .section-4 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-5: var(
+        --color-mermaid-color-scale-6,
+        hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+    );
+
+    --color-mermaid-section-5-label: var(
+        --color-mermaid-color-scale-label-6,
+        oklch(from var(--color-mermaid-section-5) round(1.21 - L) 0 0)
+    );
+
+    .section-5 rect,
+    .section-5 path,
+    .section-5 circle,
+    .section-5 polygon,
+    .section-5 path {
+        fill: var(--color-mermaid-section-5);
+    }
+
+    .section-5 text {
+        fill: var(--color-mermaid-section-5-label);
+    }
+
+    .section-5 span {
+        color: var(--color-mermaid-section-5-label);
+    }
+
+    .node-icon-5 {
+        font-size: 40px;
+        color: var(--color-mermaid-section-5-label);
+    }
+
+    .section-edge-5 {
+        stroke: var(--color-mermaid-section-5);
+    }
+
+    .edge-depth-5 {
+        stroke-width: -1;
+    }
+
+    .section-5 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-6: var(
+        --color-mermaid-color-scale-7,
+        hsl(from var(--color-mermaid-primary) calc(h + 150) s l)
+    );
+
+    --color-mermaid-section-6-label: var(
+        --color-mermaid-color-scale-label-7,
+        oklch(from var(--color-mermaid-section-6) round(1.21 - L) 0 0)
+    );
+
+    .section-6 rect,
+    .section-6 path,
+    .section-6 circle,
+    .section-6 polygon,
+    .section-6 path {
+        fill: var(--color-mermaid-section-6);
+    }
+
+    .section-6 text {
+        fill: var(--color-mermaid-section-6-label);
+    }
+
+    .section-6 span {
+        color: var(--color-mermaid-section-6-label);
+    }
+
+    .node-icon-6 {
+        font-size: 40px;
+        color: var(--color-mermaid-section-6-label);
+    }
+
+    .section-edge-6 {
+        stroke: var(--color-mermaid-section-6);
+    }
+
+    .edge-depth-6 {
+        stroke-width: -4;
+    }
+
+    .section-6 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-7: var(
+        --color-mermaid-color-scale-8,
+        hsl(from var(--color-mermaid-primary) calc(h + 210) s l)
+    );
+
+    --color-mermaid-section-7-label: var(
+        --color-mermaid-color-scale-label-8,
+        oklch(from var(--color-mermaid-section-7) round(1.21 - L) 0 0)
+    );
+
+    .section-7 rect,
+    .section-7 path,
+    .section-7 circle,
+    .section-7 polygon,
+    .section-7 path {
+        fill: var(--color-mermaid-section-7);
+    }
+
+    .section-7 text {
+        fill: var(--color-mermaid-section-7-label);
+    }
+
+    .section-7 span {
+        color: var(--color-mermaid-section-7-label);
+    }
+
+    .node-icon-7 {
+        font-size: 40px;
+        color: var(--color-mermaid-section-7-label);
+    }
+
+    .section-edge-7 {
+        stroke: var(--color-mermaid-section-7);
+    }
+
+    .edge-depth-7 {
+        stroke-width: -7;
+    }
+
+    .section-7 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-8: var(
+        --color-mermaid-color-scale-9,
+        hsl(from var(--color-mermaid-primary) calc(h + 270) s l)
+    );
+
+    --color-mermaid-section-8-label: var(
+        --color-mermaid-color-scale-label-9,
+        oklch(from var(--color-mermaid-section-8) round(1.21 - L) 0 0)
+    );
+
+    .section-8 rect,
+    .section-8 path,
+    .section-8 circle,
+    .section-8 polygon,
+    .section-8 path {
+        fill: var(--color-mermaid-section-8);
+    }
+
+    .section-8 text {
+        fill: var(--color-mermaid-section-8-label);
+    }
+
+    .section-8 span {
+        color: var(--color-mermaid-section-8-label);
+    }
+
+    .node-icon-8 {
+        font-size: 40px;
+        color: var(--color-mermaid-section-8-label);
+    }
+
+    .section-edge-8 {
+        stroke: var(--color-mermaid-section-8-label);
+    }
+
+    .edge-depth-8 {
+        stroke-width: -10;
+    }
+
+    .section-8 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-9: var(
+        --color-mermaid-color-scale-10,
+        hsl(from var(--color-mermaid-primary) calc(h + 300) s l)
+    );
+
+    --color-mermaid-section-9-label: var(
+        --color-mermaid-color-scale-label-9,
+        oklch(from var(--color-mermaid-section-9) round(1.21 - L) 0 0)
+    );
+
+    .section-9 rect,
+    .section-9 path,
+    .section-9 circle,
+    .section-9 polygon,
+    .section-9 path {
+        fill: var(--color-mermaid-section-9);
+    }
+
+    .section-9 text {
+        fill: var(--color-mermaid-section-9-label);
+    }
+
+    .section-9 span {
+        color: var(--color-mermaid-section-9-label);
+    }
+
+    .node-icon-9 {
+        font-size: 40px;
+        color: var(--color-mermaid-section-9-label);
+    }
+
+    .section-edge-9 {
+        stroke: var(--color-mermaid-section-9-label);
+    }
+
+    .edge-depth-9 {
+        stroke-width: -13;
+    }
+
+    .section-9 line {
+        stroke: undefined;
+        stroke-width: 3;
+    }
+
+    --color-mermaid-section-root: var(
+        --color-mermaid-git-0,
+        var(--color-mermaid-primary)
+    );
+
+    --color-mermaid-section-root-label: var(
+        --color-mermaid-git-branch-label-0,
+        oklch(from var(--color-mermaid-section-root) round(1.21 - L) 0 0)
+    );
+
+    .section-root rect,
+    .section-root path,
+    .section-root circle,
+    .section-root polygon {
+        fill: var(--color-mermaid-git-0, var(--color-mermaid-primary));
+    }
+
+    .section-root text {
+        fill: var(--color-mermaid-section-root-label);
+    }
+
+    .section-root span {
+        color: var(--color-mermaid-section-root-label);
+    }
+
+    .icon-container {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .edge {
+        fill: none;
+    }
+}
+
+.mermaid-diagram-wrapper .mermaid-diagram.packet {
+    .packetByte {
+        font-size: 10px;
+    }
+
+    .packetByte.start {
+        fill: black;
+    }
+
+    .packetByte.end {
+        fill: black;
+    }
+
+    .packetLabel {
+        fill: black;
+        font-size: 12px;
+    }
+
+    .packetTitle {
+        fill: black;
+        font-size: 14px;
+    }
+
+    .packetBlock {
+        stroke: black;
+        stroke-width: 1;
+        fill: #efefef;
+    }
+}
+
+.mermaid-diagram-wrapper .mermaid-diagram.gitGraph {
+    .commit-id,
+    .commit-msg,
+    .branch-label {
+        fill: lightgrey;
+        color: lightgrey;
+    }
+
+    .branch-label0 {
+        fill: var(
+            --color-mermaid-git-branch-label-0,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-git-branch-label,
+                        var(--color-mermaid-text)
+                    )
+                    round(1.21 - L) 0 0
+            )
+        );
+    }
+
+    .commit0 {
+        stroke: var(--color-mermaid-git-0, var(--color-mermaid-primary));
+        fill: var(--color-mermaid-git-0, var(--color-mermaid-primary));
+    }
+
+    .commit-highlight0 {
+        stroke: var(
+            --color-mermaid-git-inverted-0,
+            hsl(
+                from var(--color-mermaid-git-0, var(--color-mermaid-primary))
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+        fill: var(
+            --color-mermaid-git-inverted-0,
+            hsl(
+                from var(--color-mermaid-git-0, var(--color-mermaid-primary))
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+    }
+
+    .label0 {
+        fill: var(--color-mermaid-git-0, var(--color-mermaid-primary));
+    }
+
+    .arrow0 {
+        stroke: var(--color-mermaid-git-0, var(--color-mermaid-primary));
+    }
+
+    .branch-label1 {
+        fill: var(
+            --color-mermaid-git-branch-label-1,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-git-branch-label,
+                        var(--color-mermaid-text)
+                    )
+                    round(1.21 - L) 0 0
+            )
+        );
+    }
+
+    .commit1 {
+        stroke: var(--color-mermaid-git-1, var(--color-mermaid-secondary));
+        fill: var(--color-mermaid-git-1, var(--color-mermaid-secondary));
+    }
+
+    .commit-highlight1 {
+        stroke: var(
+            --color-mermaid-git-inverted-1,
+            hsl(
+                from var(--color-mermaid-git-1, var(--color-mermaid-secondary))
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+        fill: var(
+            --color-mermaid-git-inverted-1,
+            hsl(
+                from var(--color-mermaid-git-1, var(--color-mermaid-secondary))
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+    }
+
+    .label1 {
+        fill: var(--color-mermaid-git-1, var(--color-mermaid-secondary));
+    }
+
+    .arrow1 {
+        stroke: var(--color-mermaid-git-1, var(--color-mermaid-secondary));
+    }
+
+    .branch-label2 {
+        fill: var(
+            --color-mermaid-git-branch-label-2,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-git-branch-label,
+                        var(--color-mermaid-text)
+                    )
+                    round(1.21 - L) 0 0
+            )
+        );
+    }
+
+    .commit2 {
+        stroke: var(--color-mermaid-git-2, var(--color-mermaid-tertiary));
+        fill: var(--color-mermaid-git-2, var(--color-mermaid-tertiary));
+    }
+
+    .commit-highlight2 {
+        stroke: var(
+            --color-mermaid-git-inverted-2,
+            hsl(
+                from var(--color-mermaid-git-2, var(--color-mermaid-tertiary))
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+        fill: var(
+            --color-mermaid-git-inverted-2,
+            hsl(
+                from var(--color-mermaid-git-2, var(--color-mermaid-tertiary))
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+    }
+
+    .label2 {
+        fill: var(--color-mermaid-git-2, var(--color-mermaid-tertiary));
+    }
+
+    .arrow2 {
+        stroke: var(--color-mermaid-git-2, var(--color-mermaid-tertiary));
+    }
+
+    .branch-label3 {
+        fill: var(
+            --color-mermaid-git-branch-label-3,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-git-branch-label,
+                        var(--color-mermaid-text)
+                    )
+                    round(1.21 - L) 0 0
+            )
+        );
+    }
+
+    .commit3 {
+        stroke: var(
+            --color-mermaid-git-3,
+            hsl(from var(--color-mermaid-primary) calc(h - 30) s l)
+        );
+        fill: var(
+            --color-mermaid-git-3,
+            hsl(from var(--color-mermaid-primary) calc(h - 30) s l)
+        );
+    }
+
+    .commit-highlight3 {
+        stroke: var(
+            --color-mermaid-git-inverted-3,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-3,
+                        hsl(from var(--color-mermaid-primary) calc(h - 30) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+        fill: var(
+            --color-mermaid-git-inverted-3,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-3,
+                        hsl(from var(--color-mermaid-primary) calc(h - 30) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+    }
+
+    .label3 {
+        fill: var(
+            --color-mermaid-git-3,
+            hsl(from var(--color-mermaid-primary) calc(h - 30) s l)
+        );
+    }
+
+    .arrow3 {
+        stroke: var(
+            --color-mermaid-git-3,
+            hsl(from var(--color-mermaid-primary) calc(h - 30) s l)
+        );
+    }
+
+    .branch-label4 {
+        fill: var(
+            --color-mermaid-git-branch-label-4,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-git-branch-label,
+                        var(--color-mermaid-text)
+                    )
+                    round(1.21 - L) 0 0
+            )
+        );
+    }
+
+    .commit4 {
+        stroke: var(
+            --color-mermaid-git-4,
+            hsl(from var(--color-mermaid-primary) calc(h - 60) s l)
+        );
+        fill: var(
+            --color-mermaid-git-4,
+            hsl(from var(--color-mermaid-primary) calc(h - 60) s l)
+        );
+    }
+
+    .commit-highlight4 {
+        stroke: var(
+            --color-mermaid-git-inverted-4,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-4,
+                        hsl(from var(--color-mermaid-primary) calc(h - 60) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+        fill: var(
+            --color-mermaid-git-inverted-4,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-4,
+                        hsl(from var(--color-mermaid-primary) calc(h - 60) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+    }
+
+    .label4 {
+        fill: var(
+            --color-mermaid-git-4,
+            hsl(from var(--color-mermaid-primary) calc(h - 60) s l)
+        );
+    }
+
+    .arrow4 {
+        stroke: var(
+            --color-mermaid-git-4,
+            hsl(from var(--color-mermaid-primary) calc(h - 60) s l)
+        );
+    }
+
+    .branch-label5 {
+        fill: var(
+            --color-mermaid-git-branch-label-5,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-git-branch-label,
+                        var(--color-mermaid-text)
+                    )
+                    round(1.21 - L) 0 0
+            )
+        );
+    }
+
+    .commit5 {
+        stroke: var(
+            --color-mermaid-git-5,
+            hsl(from var(--color-mermaid-primary) calc(h - 90) s l)
+        );
+        fill: var(
+            --color-mermaid-git-5,
+            hsl(from var(--color-mermaid-primary) calc(h - 90) s l)
+        );
+    }
+
+    .commit-highlight5 {
+        stroke: var(
+            --color-mermaid-git-inverted-5,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-5,
+                        hsl(from var(--color-mermaid-primary) calc(h - 90) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+        fill: var(
+            --color-mermaid-git-inverted-5,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-5,
+                        hsl(from var(--color-mermaid-primary) calc(h - 90) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+    }
+
+    .label5 {
+        fill: var(
+            --color-mermaid-git-5,
+            hsl(from var(--color-mermaid-primary) calc(h - 90) s l)
+        );
+    }
+
+    .arrow5 {
+        stroke: var(
+            --color-mermaid-git-5,
+            hsl(from var(--color-mermaid-primary) calc(h - 90) s l)
+        );
+    }
+
+    .branch-label6 {
+        fill: var(
+            --color-mermaid-git-branch-label-6,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-git-branch-label,
+                        var(--color-mermaid-text)
+                    )
+                    round(1.21 - L) 0 0
+            )
+        );
+    }
+
+    .commit6 {
+        stroke: var(
+            --color-mermaid-git-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+        fill: var(
+            --color-mermaid-git-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+    }
+
+    .commit-highlight6 {
+        stroke: var(
+            --color-mermaid-git-inverted-6,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-6,
+                        hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+        fill: var(
+            --color-mermaid-git-inverted-6,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-6,
+                        hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+    }
+
+    .label6 {
+        fill: var(
+            --color-mermaid-git-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+    }
+
+    .arrow6 {
+        stroke: var(
+            --color-mermaid-git-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+    }
+
+    .branch-label7 {
+        fill: var(
+            --color-mermaid-git-branch-label-7,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-git-branch-label,
+                        var(--color-mermaid-text)
+                    )
+                    round(1.21 - L) 0 0
+            )
+        );
+    }
+
+    .commit7 {
+        stroke: var(
+            --color-mermaid-git-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+        fill: var(
+            --color-mermaid-git-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+    }
+
+    .commit-highlight7 {
+        stroke: var(
+            --color-mermaid-git-inverted-7,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-7,
+                        hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+        fill: var(
+            --color-mermaid-git-inverted-7,
+            hsl(
+                from
+                    var(
+                        --color-mermaid-git-7,
+                        hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+                    )
+                    calc(h - 180) s calc(100 - l)
+            )
+        );
+    }
+
+    .label7 {
+        fill: var(
+            --color-mermaid-git-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+    }
+
+    .arrow7 {
+        stroke: var(
+            --color-mermaid-git-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+    }
+
+    .branch {
+        stroke-width: 1;
+        stroke: var(--color-mermaid-line);
+        stroke-dasharray: 2;
+    }
+
+    .commit-label {
+        font-size: var(--mermaid-git-commit-label-font-size, 10px);
+        fill: var(
+            --color-mermaid-git-commit-label-text,
+            oklch(from var(--color-mermaid-secondary-text) round(1.21 - L) 0 0)
+        );
+    }
+
+    .commit-label-bkg {
+        font-size: var(--mermaid-git-commit-label-font-size, 10px);
+        fill: var(
+            --color-mermaid-git-commit-label-bg,
+            var(--color-mermaid-secondary)
+        );
+        opacity: 0.5;
+    }
+
+    .tag-label {
+        font-size: var(--mermaid-git-tag-label-font-size, 10px);
+        fill: var(
+            --color-mermaid-git-tag-label-text,
+            var(--color-mermaid-primary-text)
+        );
+    }
+
+    .tag-label-bkg {
+        fill: var(
+            --color-mermaid-git-tag-label-bg,
+            var(--color-mermaid-primary)
+        );
+        stroke: var(
+            --color-mermaid-git-tag-label-border,
+            var(--color-mermaid-primary-border)
+        );
+    }
+
+    .tag-hole {
+        fill: var(--color-mermaid-text);
+    }
+
+    .commit-merge {
+        stroke: var(--color-mermaid-primary);
+        fill: var(--color-mermaid-primary);
+    }
+
+    .commit-reverse {
+        stroke: var(--color-mermaid-primary);
+        fill: var(--color-mermaid-primary);
+        stroke-width: 3;
+    }
+
+    .commit-highlight-inner {
+        stroke: var(--color-mermaid-primary);
+        fill: var(--color-mermaid-primary);
+    }
+
+    .arrow {
+        stroke-width: 8;
+        stroke-linecap: round;
+        fill: none;
+    }
+
+    .gitTitleText {
+        text-anchor: middle;
+        font-size: 18px;
+        fill: var(--color-mermaid-text);
+    }
+}
+
+.mermaid-diagram-wrapper .mermaid-diagram.pie {
+    .pieCircle {
+        stroke: var(--color-mermaid-pie-stroke, black);
+        stroke-width: var(--mermaid-pie-stroke-width, 2px);
+        opacity: var(--mermaid-pie-opacity, 0.7);
+    }
+
+    .pieOuterCircle {
+        stroke: var(--color-mermaid-pie-outer-stroke, black);
+        stroke-width: var(--mermaid-pie-outer-stroke-width, 2px);
+        fill: none;
+    }
+
+    .pieTitleText {
+        text-anchor: middle;
+        font-size: var(--mermaid-pie-title-text-size, 25px);
+        fill: var(--color-mermaid-title-text);
+        font-family: inherit;
+    }
+
+    .slice {
+        font-family: inherit;
+        fill: var(--color-mermaid-pie-section-text);
+        font-size: var(--mermaid-pie-section-text-size, 17px);
+    }
+
+    .legend text {
+        fill: var(--color-mermaid-pie-legend-text);
+        font-family: inherit;
+        font-size: var(--color-mermaid-pie-legend-text-size);
+    }
+}
+
+.mermaid-diagram-wrapper .mermaid-diagram.radar {
+    .radarTitle {
+        font-size: inherit;
+        color: var(--color-mermaid-title, var(--color-mermaid-tertiary-text));
+        dominant-baseline: hanging;
+        text-anchor: middle;
+    }
+
+    .radarAxisLine {
+        stroke: var(--color-mermaid-radar-axis, var(--color-mermaid-line));
+        stroke-width: var(--mermaid-radar-axis-stroke-width, 2);
+    }
+
+    .radarAxisLabel {
+        dominant-baseline: middle;
+        text-anchor: middle;
+        font-size: var(--mermaid-radar-axis-label-text-size, 12) px;
+        color: var(--color-mermaid-radar-axis, var(--color-mermaid-line));
+    }
+
+    .radarGraticule {
+        fill: var(--color-mermaid-radar-graticule, #dedede);
+        fill-opacity: var(--mermaid-radar-graticule-opacity, 0.3);
+        stroke: var(--color-mermaid-radar-graticule, #dedede);
+        stroke-width: var(--mermaid-radar-graticule-stroke-width, 1);
+    }
+
+    .radarLegendText {
+        text-anchor: start;
+        font-size: var(--mermaid-radar-axis-legend-text-size, 12) px;
+        dominant-baseline: hanging;
+    }
+
+    .radarCurve-0 {
+        color: var(--color-mermaid-color-scale-0, var(--color-mermaid-primary));
+        fill: var(--color-mermaid-color-scale-0, var(--color-mermaid-primary));
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-0,
+            var(--color-mermaid-primary)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-0 {
+        fill: var(--color-mermaid-color-scale-0, var(--color-mermaid-primary));
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-0,
+            var(--color-mermaid-primary)
+        );
+    }
+
+    .radarCurve-1 {
+        color: var(
+            --color-mermaid-color-scale-1,
+            var(--color-mermaid-secondary)
+        );
+        fill: var(
+            --color-mermaid-color-scale-1,
+            var(--color-mermaid-secondary)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-1,
+            var(--color-mermaid-secondary)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-1 {
+        fill: var(
+            --color-mermaid-color-scale-1,
+            var(--color-mermaid-secondary)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-1,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .radarCurve-2 {
+        color: var(
+            --color-mermaid-color-scale-2,
+            var(--color-mermaid-tertiary)
+        );
+        fill: var(--color-mermaid-color-scale-2, var(--color-mermaid-tertiary));
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-2,
+            var(--color-mermaid-tertiary)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-2 {
+        fill: var(--color-mermaid-color-scale-2, var(--color-mermaid-tertiary));
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-2,
+            var(--color-mermaid-tertiary)
+        );
+    }
+
+    .radarCurve-3 {
+        color: var(
+            --color-mermaid-color-scale-3,
+            hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+        );
+        fill: var(
+            --color-mermaid-color-scale-3,
+            hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-3,
+            hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-3 {
+        fill: var(
+            --color-mermaid-color-scale-3,
+            hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-3,
+            hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+        );
+    }
+
+    .radarCurve-4 {
+        color: var(
+            --color-mermaid-color-scale-4,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+        fill: var(
+            --color-mermaid-color-scale-4,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-4,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-4 {
+        fill: var(
+            --color-mermaid-color-scale-4,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-4,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+    }
+
+    .radarCurve-5 {
+        color: var(
+            --color-mermaid-color-scale-5,
+            hsl(from var(--color-mermaid-primary) calc(h + 90) s l)
+        );
+        fill: var(
+            --color-mermaid-color-scale-5,
+            hsl(from var(--color-mermaid-primary) calc(h + 90) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-5,
+            hsl(from var(--color-mermaid-primary) calc(h + 90) s l)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-5 {
+        fill: var(
+            --color-mermaid-color-scale-5,
+            hsl(from var(--color-mermaid-primary) calc(h + 90) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-5,
+            hsl(from var(--color-mermaid-primary) calc(h + 90) s l)
+        );
+    }
+
+    .radarCurve-6 {
+        color: var(
+            --color-mermaid-color-scale-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+        fill: var(
+            --color-mermaid-color-scale-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-6 {
+        fill: var(
+            --color-mermaid-color-scale-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+    }
+
+    .radarCurve-7 {
+        color: var(
+            --color-mermaid-color-scale-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 150) s l)
+        );
+        fill: var(
+            --color-mermaid-color-scale-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 150) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 150) s l)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-7 {
+        fill: var(
+            --color-mermaid-color-scale-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 150) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 150) s l)
+        );
+    }
+
+    .radarCurve-8 {
+        color: var(
+            --color-mermaid-color-scale-8,
+            hsl(from var(--color-mermaid-primary) calc(h + 210) s l)
+        );
+        fill: var(
+            --color-mermaid-color-scale-8,
+            hsl(from var(--color-mermaid-primary) calc(h + 210) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-8,
+            hsl(from var(--color-mermaid-primary) calc(h + 210) s l)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-8 {
+        fill: var(
+            --color-mermaid-color-scale-8,
+            hsl(from var(--color-mermaid-primary) calc(h + 210) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-8,
+            hsl(from var(--color-mermaid-primary) calc(h + 210) s l)
+        );
+    }
+
+    .radarCurve-9 {
+        color: var(
+            --color-mermaid-color-scale-9,
+            hsl(from var(--color-mermaid-primary) calc(h + 270) s l)
+        );
+        fill: var(
+            --color-mermaid-color-scale-9,
+            hsl(from var(--color-mermaid-primary) calc(h + 270) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-9,
+            hsl(from var(--color-mermaid-primary) calc(h + 270) s l)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-9 {
+        fill: var(
+            --color-mermaid-color-scale-9,
+            hsl(from var(--color-mermaid-primary) calc(h + 270) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-9,
+            hsl(from var(--color-mermaid-primary) calc(h + 270) s l)
+        );
+    }
+
+    .radarCurve-10 {
+        color: var(
+            --color-mermaid-color-scale-10,
+            hsl(from var(--color-mermaid-primary) calc(h + 300) s l)
+        );
+        fill: var(
+            --color-mermaid-color-scale-10,
+            hsl(from var(--color-mermaid-primary) calc(h + 300) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-10,
+            hsl(from var(--color-mermaid-primary) calc(h + 300) s l)
+        );
+        stroke-width: var(--mermaid-radar-curve-stroke-width, 2);
+    }
+
+    .radarLegendBox-10 {
+        fill: var(
+            --color-mermaid-color-scale-10,
+            hsl(from var(--color-mermaid-primary) calc(h + 300) s l)
+        );
+        fill-opacity: var(--mermaid-radar-curve-opacity, 0.5);
+        stroke: var(
+            --color-mermaid-color-scale-10,
+            hsl(from var(--color-mermaid-primary) calc(h + 300) s l)
+        );
+    }
+}
+
+.mermaid-diagram-wrapper .mermaid-diagram.timeline {
+    .edge {
+        stroke-width: 3;
+    }
+
+    .section-root rect,
+    .section-root path,
+    .section-root circle {
+        fill: undefined;
+    }
+
+    .section-root text {
+        fill: undefined;
+    }
+
+    .icon-container {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .edge {
+        fill: none;
+    }
+
+    .eventWrapper {
+        filter: brightness(120%);
+    }
+
+    .lineWrapper line {
+        stroke: var(
+            --color-mermaid-line,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .disabled,
+    .disabled circle,
+    .disabled text {
+        fill: lightgray;
+    }
+
+    .disabled text {
+        fill: #efefef;
+    }
+
+    .section--1 rect,
+    .section--1 path,
+    .section--1 circle,
+    .section--1 path {
+        fill: var(--color-mermaid-color-scale-0, var(--color-mermaid-primary));
+    }
+
+    .section--1 text {
+        fill: var(
+            --color-mermaid-color-scale-label-0,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-color-scale-0,
+                        var(--color-mermaid-primary) round(1.21 - L) 0 0
+                    )
+            )
+        );
+    }
+
+    .node-icon--1 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-0,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge--1 {
+        stroke: var(
+            --color-mermaid-color-scale-0,
+            var(--color-mermaid-primary)
+        );
+    }
+
+    .edge-depth--1 {
+        stroke-width: 17;
+    }
+
+    .section-0 rect,
+    .section-0 path,
+    .section-0 circle,
+    .section-0 path {
+        fill: var(
+            --color-mermaid-color-scale-1,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .section-0 text {
+        fill: var(
+            --color-mermaid-color-scale-label-1,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-color-scale-1,
+                        var(--color-mermaid-secondary) round(1.21 - L) 0 0
+                    )
+            )
+        );
+    }
+
+    .node-icon-0 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-1,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge-0 {
+        stroke: var(
+            --color-mermaid-color-scale-1,
+            var(--color-mermaid-secondary)
+        );
+    }
+
+    .edge-depth-0 {
+        stroke-width: 14;
+    }
+
+    .section-1 rect,
+    .section-1 path,
+    .section-1 circle,
+    .section-1 path {
+        fill: var(--color-mermaid-color-scale-2, var(--color-mermaid-tertiary));
+    }
+
+    .section-1 text {
+        fill: var(
+            --color-mermaid-color-scale-label-2,
+            oklch(
+                from
+                    var(
+                        --color-mermaid-color-scale-2,
+                        var(--color-mermaid-tertiary) round(1.21 - L) 0 0
+                    )
+            )
+        );
+    }
+
+    .node-icon-1 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-2,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge-1 {
+        stroke: var(
+            --color-mermaid-color-scale-2,
+            var(--color-mermaid-tertiary)
+        );
+    }
+
+    .edge-depth-1 {
+        stroke-width: 11;
+    }
+
+    .section-2 rect,
+    .section-2 path,
+    .section-2 circle,
+    .section-2 path {
+        fill: var(
+            --color-mermaid-color-scale-3,
+            hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+        );
+    }
+
+    .section-2 text {
+        fill: var(
+            --color-mermaid-color-scale-label-3,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .node-icon-2 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-3,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge-2 {
+        stroke: var(
+            --color-mermaid-color-scale-3,
+            hsl(from var(--color-mermaid-primary) calc(h + 30) s l)
+        );
+    }
+
+    .edge-depth-2 {
+        stroke-width: 8;
+    }
+
+    --color-mermaid-section-3: var(
+        --color-mermaid-color-scale-4,
+        hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+    );
+
+    .section-3 rect,
+    .section-3 path,
+    .section-3 circle,
+    .section-3 path {
+        fill: var(--color-mermaid-section-3);
+    }
+
+    .section-3 text {
+        fill: var(
+            --color-mermaid-color-scale-label-4,
+            oklch(from var(--color-mermaid-section-3) round(1.21 - L) 0 0)
+        );
+    }
+
+    .node-icon-3 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-4,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge-3 {
+        stroke: var(
+            --color-mermaid-color-scale-4,
+            hsl(from var(--color-mermaid-primary) calc(h + 60) s l)
+        );
+    }
+
+    .edge-depth-3 {
+        stroke-width: 5;
+    }
+
+    .section-4 rect,
+    .section-4 path,
+    .section-4 circle,
+    .section-4 path {
+        fill: var(
+            --color-mermaid-color-scale-5,
+            hsl(from var(--color-mermaid-primary) calc(h + 90) s l)
+        );
+    }
+
+    .section-4 text {
+        fill: var(
+            --color-mermaid-color-scale-label-5,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .node-icon-4 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-5,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge-4 {
+        stroke: var(
+            --color-mermaid-color-scale-5,
+            hsl(from var(--color-mermaid-primary) calc(h + 90) s l)
+        );
+    }
+
+    .edge-depth-4 {
+        stroke-width: 2;
+    }
+
+    .section-5 rect,
+    .section-5 path,
+    .section-5 circle,
+    .section-5 path {
+        fill: var(
+            --color-mermaid-color-scale-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+    }
+
+    .section-5 text {
+        fill: var(
+            --color-mermaid-color-scale-label-6,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .node-icon-5 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-6,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge-5 {
+        stroke: var(
+            --color-mermaid-color-scale-6,
+            hsl(from var(--color-mermaid-primary) calc(h + 120) s l)
+        );
+    }
+
+    .edge-depth-5 {
+        stroke-width: -1;
+    }
+
+    .section-6 rect,
+    .section-6 path,
+    .section-6 circle,
+    .section-6 path {
+        fill: var(
+            --color-mermaid-color-scale-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 150) s l)
+        );
+    }
+
+    .section-6 text {
+        fill: var(
+            --color-mermaid-color-scale-label-7,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .node-icon-6 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-7,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge-6 {
+        stroke: var(
+            --color-mermaid-color-scale-7,
+            hsl(from var(--color-mermaid-primary) calc(h + 150) s l)
+        );
+    }
+
+    .edge-depth-6 {
+        stroke-width: -4;
+    }
+
+    .section-7 rect,
+    .section-7 path,
+    .section-7 circle,
+    .section-7 path {
+        fill: var(
+            --color-mermaid-color-scale-8,
+            hsl(from var(--color-mermaid-primary) calc(h + 210) s l)
+        );
+    }
+
+    .section-7 text {
+        fill: var(
+            --color-mermaid-color-scale-label-8,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .node-icon-7 {
+        font-size: 40px;
+        color: var(
+            --color-mermaid-color-scale-label-8,
+            var(
+                --color-mermaid-color-scale-label-color,
+                var(--color-mermaid-label-text)
+            )
+        );
+    }
+
+    .section-edge-7 {
+        stroke: var(
+            --color-mermaid-color-scale-8,
+            hsl(from var(--color-mermaid-primary) calc(h + 210) s l)
+        );
+    }
+
+    .edge-depth-7 {
+        stroke-width: -7;
+    }
+}

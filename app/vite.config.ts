@@ -207,19 +207,44 @@ function manualChunks(
         return `codemirror/lang-${matches[1]}`
     }
 
-    let codemirror = /codemirror/
-    if (codemirror.test(id)) {
-        return `codemirror`
+    if (/codemirror/.test(id)) {
+        return "codemirror"
     }
 
-    let libMarkdown = /lib\/markdown/
-    if (libMarkdown.test(id)) {
-        return `markdown`
+    if (/lib\/markdown/.test(id)) {
+        return "markdown"
     }
 
-    let threeJS = /three/
-    if (threeJS.test(id)) {
-        return `threejs`
+    if (/three/.test(id)) {
+        return "threejs"
+    }
+
+    if (/dagre/.test(id)) {
+        return "mermaid/dagre"
+    }
+
+    if (/cose-bilkent/.test(id)) {
+        return "mermaid/cose-bilkent"
+    }
+
+    if (/d3/.test(id)) {
+        return "mermaid/d3"
+    }
+
+    let mermaidParser = /mermaid.*\/parser\/([a-zA-Z0-9-_]+)/
+    matches = mermaidParser.exec(id)
+    if (matches) {
+        return `mermaid/parser-${matches[1]}`
+    }
+
+    let mermaidDiagram = /mermaid.*\/diagrams\/([a-zA-Z0-9-_]+)/
+    matches = mermaidDiagram.exec(id)
+    if (matches) {
+        return `mermaid/diagram-${matches[1]}`
+    }
+
+    if (/mermaid|roughjs|dompurify/.test(id)) {
+        return "mermaid"
     }
 
     let migrations = /app\/src\/storage\/database\/sqlite\/migrations\/([\da-z_]+)/

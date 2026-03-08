@@ -28,6 +28,11 @@ export type ComponentMap = {
         meta?: string
         children: string
     }>
+    Diagrams?: {
+        Mermaid: React.ComponentType<{
+            children: string
+        }>
+    }
     Link?: React.ComponentType<
         React.AnchorHTMLAttributes<any> & {
             screen?: keyof Screens
@@ -435,8 +440,17 @@ function fencedCodeToJSX(doc: Document, node: SyntaxNode): ReactNode {
         childen = doc.text.substring(codeText.from, codeText.to)
     }
 
+    let key = nodeKey(node)
+
+    if (lang.toLowerCase() === "mermaid") {
+        let Mermaid = doc.componentMap.Diagrams?.Mermaid
+        if (Mermaid) {
+            return <Mermaid key={key}>{childen}</Mermaid>
+        }
+    }
+
     return (
-        <Code key={nodeKey(node)} lang={lang} meta={codeInfo}>
+        <Code key={key} lang={lang} meta={codeInfo}>
             {childen}
         </Code>
     )
