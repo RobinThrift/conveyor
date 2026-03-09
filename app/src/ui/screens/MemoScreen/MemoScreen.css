@@ -378,45 +378,37 @@
         }
     }
 
-    @container (width >= 1200px) {
+    @container (width >= 1400px) {
         @apply block;
         top: calc(
             max(env(safe-area-inset-top, 0px), var(--spacing) * 4) +
             10dvh
         );
         right: calc(max(env(safe-area-inset-right, 0px), var(--spacing) * 4));
-        max-width: 100px;
+        max-width: 200px;
         left: unset;
         translate: unset;
         transition: unset;
 
         .toc-item {
             width: 100%;
+
             a {
-                @apply mb-1 block rounded-2xl;
-                background-color: var(--color-neutral-extra-light);
-                color: var(--color-neutral-extra-light);
-                height: var(--spacing);
+                @apply mb-1 block;
+                color: var(--color-neutral-light);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                width: calc(100% / (var(--toc-indent-level, 1) + 1));
-                justify-self: end;
-                transition:
-                    height 100ms 50ms,
-                    width 100ms;
+                transition: color 150ms;
 
-                &.active {
-                    background-color: var(--color-primary-light);
+                &:hover {
                     color: var(--color-primary-light);
                 }
-            }
-        }
 
-        &:hover {
-            @apply surface-level-2 elevation-2 px-3 py-2 rounded-2xl;
-            animation: memo-toc-desktop-hover-show 150ms linear;
-            animation-fill-mode: forwards;
+                &.active {
+                    color: var(--color-primary);
+                }
+            }
 
             .toc-item .toc-items {
                 padding-inline-start: calc(
@@ -424,15 +416,14 @@
                     (var(--toc-indent-level, 0) + 2)
                 );
             }
+        }
 
+        &:hover {
             .toc-item a {
-                background-color: unset;
-                color: unset;
-                height: 1lh;
-                width: 100%;
+                color: var(--color-text);
 
                 &:hover {
-                    color: var(--color-primary-light);
+                    color: var(--color-primary);
                 }
 
                 &.active {
@@ -454,6 +445,10 @@
     & > svg {
         @apply size-5;
         filter: drop-shadow(1px 1px 3px var(--color-body-bg-contrast));
+    }
+
+    @container (width >= 1400px) {
+        @apply hidden;
     }
 }
 
