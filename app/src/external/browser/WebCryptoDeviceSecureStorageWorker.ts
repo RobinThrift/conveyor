@@ -222,7 +222,10 @@ async function generateECDHLocalCryptoKey(): AsyncResult<CryptoKeyPair> {
 
 const IV_LEN = 12
 
-async function encryptData(keyPair: CryptoKeyPair, data: Uint8Array): Promise<ArrayBuffer> {
+async function encryptData(
+    keyPair: CryptoKeyPair,
+    data: Uint8Array<ArrayBuffer>,
+): Promise<ArrayBuffer> {
     let iv = generateIV()
     let key = await deriveKey(keyPair)
 

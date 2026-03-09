@@ -96,7 +96,7 @@ async function setupSyncV1APIClientTest() {
     }
 }
 
-async function decompressData(stream: ReadableStream<Uint8Array<ArrayBufferLike>>) {
+async function decompressData(stream: ReadableStream<Uint8Array<ArrayBuffer>>) {
     let { readable, writable } = new TransformStream()
     stream.pipeThrough(new DecompressionStream("gzip")).pipeTo(writable)
 
@@ -107,7 +107,7 @@ async function decompressData(stream: ReadableStream<Uint8Array<ArrayBufferLike>
     let blob = await reader.read().then(async function read({
         done,
         value,
-    }: ReadableStreamReadResult<Uint8Array>): Promise<Blob> {
+    }: ReadableStreamReadResult<Uint8Array<ArrayBuffer>>): Promise<Blob> {
         if (done) {
             return new Blob(chunks)
         }
