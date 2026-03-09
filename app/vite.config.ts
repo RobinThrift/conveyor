@@ -36,20 +36,38 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         },
 
         resolve: {
-            alias: {
-                "@": path.resolve(__dirname, "./src"),
-                "@translations": path.resolve(__dirname, "./translations"),
-                "@sqlite.org/sqlite-wasm": path.resolve(
-                    __dirname,
-                    "src/external/sqlite-wasm/build",
-                ),
-                "decode-named-character-reference": path.resolve(
-                    __dirname,
-                    "node_modules",
-                    "decode-named-character-reference",
-                    "index.js",
-                ),
-            },
+            alias: [
+                { find: "@", replacement: path.resolve(__dirname, "./src") },
+                { find: "@translations", replacement: path.resolve(__dirname, "./translations") },
+                {
+                    find: "@sqlite.org/sqlite-wasm",
+                    replacement: path.resolve(__dirname, "src/external/sqlite-wasm/build"),
+                },
+                {
+                    find: "decode-named-character-reference",
+                    replacement: path.resolve(
+                        __dirname,
+                        "node_modules",
+                        "decode-named-character-reference",
+                        "index.js",
+                    ),
+                },
+                {
+                    find: /langium\/(.*)/,
+                    replacement: path.resolve(__dirname, "node_modules", "langium", "$1"),
+                },
+                {
+                    find: /.*(uri-utils|lsp|vscode-languageserver-protocol|vscode-jsonrpc).*/,
+                    replacement: path.resolve(
+                        __dirname,
+                        "node_modules",
+                        "@robinthrift",
+                        "minimal-mermaid",
+                        "build",
+                        "langium.js",
+                    ),
+                },
+            ],
         },
 
         plugins: [
@@ -152,7 +170,8 @@ export default defineConfig(async (config): Promise<UserConfig> => {
             emptyOutDir: true,
             assetsDir: "",
             sourcemap: config.mode === "development" ? "inline" : false,
-            minify: config.mode !== "development",
+            // minify: config.mode !== "development",
+            minify: false,
             cssMinify: "lightningcss",
 
             reportCompressedSize: false,
@@ -219,32 +238,9 @@ function manualChunks(
         return "threejs"
     }
 
-    if (/dagre/.test(id)) {
-        return "mermaid/dagre"
-    }
-
-    if (/cose-bilkent/.test(id)) {
-        return "mermaid/cose-bilkent"
-    }
-
-    if (/d3/.test(id)) {
-        return "mermaid/d3"
-    }
-
-    let mermaidParser = /mermaid.*\/parser\/([a-zA-Z0-9-_]+)/
-    matches = mermaidParser.exec(id)
-    if (matches) {
-        return `mermaid/parser-${matches[1]}`
-    }
-
-    let mermaidDiagram = /mermaid.*\/diagrams\/([a-zA-Z0-9-_]+)/
-    matches = mermaidDiagram.exec(id)
-    if (matches) {
-        return `mermaid/diagram-${matches[1]}`
-    }
-
-    if (/mermaid|roughjs|dompurify/.test(id)) {
-        return "mermaid"
+    let mermaidPkg = mermaidPackageName(id)
+    if (mermaidPkg) {
+        return mermaidPkg
     }
 
     let migrations = /app\/src\/storage\/database\/sqlite\/migrations\/([\da-z_]+)/
@@ -298,4 +294,30 @@ async function exec(cmd: string): Promise<string> {
     })
 
     return promise
+}
+
+function mermaidPackageName(id: string): string | undefined {
+    if (/cose/.test(id)) {
+        return "mermaid/layouts-cose"
+    }
+
+    if (/chevrotain|cytoscape|dagre|layout-algorithms/.test(id)) {
+        return "mermaid/layouts"
+    }
+
+    if (/lodash-es/.test(id)) {
+        return "mermaid/deps-lodash"
+    }
+
+    if (/d3|dompurify|rough|langium/.test(id)) {
+        return "mermaid/deps"
+    }
+
+    if (/langium/.test(id)) {
+        return "mermaid/langium"
+    }
+
+    if (/mermaid/.test(id)) {
+        return "mermaid"
+    }
 }
