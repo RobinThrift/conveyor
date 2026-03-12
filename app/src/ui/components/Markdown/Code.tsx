@@ -10,12 +10,14 @@ export const Code = React.memo(function Code({
     lang,
     hightlightedLines: hightlightLines,
     meta,
+    pos,
 }: {
     className?: string
     children: string
     lang?: string
     hightlightedLines?: number[]
     meta?: string
+    pos?: number
 }) {
     let ref = useRef(null)
     let isVisible = useOnVisible(ref, { ratio: 0.1 })
@@ -43,6 +45,7 @@ export const Code = React.memo(function Code({
                 color: "var(--code-foreground)",
             }}
             className={clsx("code-block", className)}
+            data-pos={pos}
         >
             {highlighted}
         </pre>

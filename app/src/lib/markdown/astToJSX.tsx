@@ -10,6 +10,7 @@ import { collectText, idFromText } from "./utils"
 interface Document {
     id: string
     text: string
+    offset: number
     footnotes: React.ReactNode[]
     componentMap: ComponentMap
     customBlocks: CustomBlocks
@@ -22,15 +23,18 @@ export type ComponentMap = {
         id?: string
         src: string
         title?: string
+        pos?: number
     }>
     Code?: React.ComponentType<{
         lang?: string
         meta?: string
         children: string
+        pos?: number
     }>
     Diagrams?: {
         Mermaid: React.ComponentType<{
             children: string
+            pos?: number
         }>
     }
     Link?: React.ComponentType<
@@ -45,10 +49,13 @@ export type ComponentMap = {
         alt: string
         src: string
         caption?: string
+        pos?: number
     }>
     FootnoteReturnIcon?: React.ComponentType
-    Heading?: React.ComponentType<React.PropsWithChildren<{ id: string; level: number }>>
-    TagLink?: React.ComponentType<{ tag: string; className?: string }>
+    Heading?: React.ComponentType<
+        React.PropsWithChildren<{ id: string; level: number; pos?: number }>
+    >
+    TagLink?: React.ComponentType<{ tag: string; className?: string; pos?: number }>
 }
 
 type CustomBlocks = Record<string, React.ComponentType<React.PropsWithChildren>>
@@ -57,11 +64,12 @@ export function astToJSX(
     ast: Tree,
     documentID: string,
     document: string,
-    opts: { componentMap?: ComponentMap; customBlocks?: CustomBlocks } = {},
+    opts: { offset?: number; componentMap?: ComponentMap; customBlocks?: CustomBlocks } = {},
 ): ReactNode[] {
     let doc: Document = {
         id: documentID,
         text: document,
+        offset: opts.offset ?? 0,
         footnotes: [],
         componentMap: opts.componentMap ?? {},
         customBlocks: opts.customBlocks ?? {},
@@ -150,9 +158,9 @@ function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boo
         case "CustomBlock":
             return customBlockToJSX(doc, cursor.node)
         case "HardBreak":
-            return <br key={nodeKey(cursor.node)} />
+            return <br key={nodeKey(cursor.node)} data-pos={cursor.node.from + doc.offset} />
         case "HorizontalRule":
-            return <hr key={nodeKey(cursor.node)} />
+            return <hr key={nodeKey(cursor.node)} data-pos={cursor.node.from + doc.offset} />
         case "Escape":
         case "HTMLTag":
         case "Subscript":
@@ -189,46 +197,51 @@ function headingToJSX(doc: Document, node: SyntaxNode, level: number): ReactNode
     let Heading = doc.componentMap.Heading
     if (Heading) {
         return (
-            <Heading key={key} id={id} level={level}>
+            <Heading key={key} id={id} level={level} pos={node.from + doc.offset}>
                 {children}
             </Heading>
         )
     }
 
+    let props = {
+        id,
+        pos: (node.firstChild?.from ?? node.from) + doc.offset,
+    }
+
     switch (level) {
         case 1:
             return (
-                <h1 key={key} id={id}>
+                <h1 {...props} key={key}>
                     {children}
                 </h1>
             )
         case 2:
             return (
-                <h2 key={key} id={id}>
+                <h2 {...props} key={key}>
                     {children}
                 </h2>
             )
         case 3:
             return (
-                <h3 key={key} id={id}>
+                <h3 {...props} key={key}>
                     {children}
                 </h3>
             )
         case 4:
             return (
-                <h4 key={key} id={id}>
+                <h4 {...props} key={key}>
                     {children}
                 </h4>
             )
         case 5:
             return (
-                <h5 key={key} id={id}>
+                <h5 {...props} key={key}>
                     {children}
                 </h5>
             )
         case 6:
             return (
-                <h6 key={key} id={id}>
+                <h6 {...props} key={key}>
                     {children}
                 </h6>
             )
@@ -249,12 +262,20 @@ function paragraphtoJSX(doc: Document, node: SyntaxNode, stripParagraph?: boolea
     }
 
     if (!node.firstChild) {
-        return <p key={nodeKey(node)}>{doc.text.substring(node.from, node.to).trim()}</p>
+        return (
+            <p key={nodeKey(node)} data-pos={node.from + doc.offset}>
+                {doc.text.substring(node.from, node.to).trim()}
+            </p>
+        )
     }
 
     let images = node.getChildren("Image")
     if (images.length === 0) {
-        return <p key={nodeKey(node)}>{collectChildren(doc, node)}</p>
+        return (
+            <p key={nodeKey(node)} data-pos={node.from + doc.offset}>
+                {collectChildren(doc, node)}
+            </p>
+        )
     }
 
     let nodes: React.ReactNode[] = []
@@ -263,7 +284,11 @@ function paragraphtoJSX(doc: Document, node: SyntaxNode, stripParagraph?: boolea
 
     for (let image of images) {
         let children = collectChildren(doc, node, { before: image.from, after })
-        nodes.push(<p key={`${nodeKey(node)}-${i}`}>{children}</p>)
+        nodes.push(
+            <p key={`${nodeKey(node)}-${i}`} data-pos={node.from + doc.offset}>
+                {children}
+            </p>,
+        )
         nodes.push(imageToJSX(doc, image))
         after = image.to
         i++
@@ -345,12 +370,19 @@ function linkToJSX(doc: Document, node: SyntaxNode): ReactNode {
                 src={url}
                 key={key}
                 title={doc.text.substring(titleFrom ?? 0, titleTo ?? 0)}
+                pos={node.from + doc.offset}
             />
         )
     }
 
     return (
-        <a href={url} key={key} rel="noreferrer noopener" target={key as string}>
+        <a
+            href={url}
+            key={key}
+            rel="noreferrer noopener"
+            target={key as string}
+            data-pos={node.from + doc.offset}
+        >
             {collectChildren(doc, node, { after: children[0].to, before: children[1].from })}
         </a>
     )
@@ -451,7 +483,7 @@ function fencedCodeToJSX(doc: Document, node: SyntaxNode): ReactNode {
     }
 
     return (
-        <Code key={key} lang={lang} meta={codeInfo}>
+        <Code key={key} lang={lang} meta={codeInfo} pos={node.from + doc.offset}>
             {childen}
         </Code>
     )
@@ -478,7 +510,7 @@ function imageToJSX(doc: Document, node: SyntaxNode): ReactNode {
 
     return (
         <Suspense key={nodeKey(node)} fallback={<Loader />}>
-            <Img id={id} src={src} alt={alt} />
+            <Img id={id} src={src} alt={alt} pos={node.from + doc.offset} />
         </Suspense>
     )
 }
@@ -541,6 +573,7 @@ function tableToJSX(doc: Document, node: SyntaxNode): ReactNode {
                             "text-center": alignments[currCol] === "centre",
                             "text-right": alignments[currCol] === "right",
                         })}
+                        data-pos={c.node.from}
                     >
                         {children}
                     </td>,
@@ -556,7 +589,7 @@ function tableToJSX(doc: Document, node: SyntaxNode): ReactNode {
 
             if (c.name === "TableHeader") {
                 header = (
-                    <thead key={nodeKey(c.node)}>
+                    <thead key={nodeKey(c.node)} data-pos={c.node.from + doc.offset}>
                         <tr>{cells}</tr>
                     </thead>
                 )
@@ -566,7 +599,11 @@ function tableToJSX(doc: Document, node: SyntaxNode): ReactNode {
             }
 
             if (c.name === "TableRow") {
-                rows.push(<tr key={nodeKey(c.node)}>{cells}</tr>)
+                rows.push(
+                    <tr key={nodeKey(c.node)} data-pos={c.node.from + doc.offset}>
+                        {cells}
+                    </tr>,
+                )
                 cells = []
                 currCol = 0
                 return
@@ -574,7 +611,7 @@ function tableToJSX(doc: Document, node: SyntaxNode): ReactNode {
         },
     )
     return (
-        <div key={nodeKey(node)} className="table-wrapper">
+        <div key={nodeKey(node)} className="table-wrapper" data-pos={node.from + doc.offset}>
             <table>
                 {header}
                 <tbody>{rows}</tbody>
@@ -598,6 +635,7 @@ function listItemToJSX(doc: Document, node: SyntaxNode): ReactNode {
             className={clsx({
                 "task-list-item": node.firstChild?.nextSibling?.firstChild?.name === "TaskMarker",
             })}
+            data-pos={node.from}
         >
             {collectChildren(doc, node, { stripParagraph: true })}
         </li>
@@ -628,7 +666,11 @@ function taskMarkerToJSX(doc: Document, node: SyntaxNode): ReactNode {
 }
 
 function blockquoteToJSX(doc: Document, node: SyntaxNode): ReactNode {
-    return <blockquote key={nodeKey(node)}>{collectChildren(doc, node)}</blockquote>
+    return (
+        <blockquote key={nodeKey(node)} data-pos={node.from}>
+            {collectChildren(doc, node)}
+        </blockquote>
+    )
 }
 
 function customBlockToJSX(doc: Document, node: SyntaxNode): ReactNode {

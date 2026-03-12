@@ -13,6 +13,7 @@ export type AttachmentProps = {
     id?: string
     src: string
     title?: string
+    pos?: number
 }
 
 export const Attachment = React.memo(function Attachment(props: AttachmentProps) {
@@ -40,7 +41,12 @@ export const Attachment = React.memo(function Attachment(props: AttachmentProps)
     }, [attachment, props.title])
 
     return (
-        <div className={clsx("attachment", props.className)} id={props.id} ref={ref}>
+        <div
+            className={clsx("attachment", props.className)}
+            id={props.id}
+            ref={ref}
+            data-pos={props.pos}
+        >
             <Suspense fallback={<Loader />}>{comp}</Suspense>
         </div>
     )

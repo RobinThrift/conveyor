@@ -3,10 +3,11 @@
 
 .editor-buttons {
     @apply p-1 pt-2 flex items-center justify-between gap-2 w-full;
+    pointer-events: none;
 
     .btn {
-        @apply aspect-square rounded-full  h-11;
-        isolation: isolate;
+        @apply aspect-square rounded-full h-11;
+        pointer-events: auto;
 
         &::before {
             @apply rounded-full;
@@ -27,12 +28,11 @@
     }
 
     @container (width >= 700px) {
-        @apply fixed top-2;
-        left: calc(anchor(left) + var(--spacing) * 2);
-        right: calc(anchor(right) - var(--spacing) * 2);
+        position: fixed;
+        left: calc(var(--sidebar-width) + var(--spacing) * 2);
+        right: calc(var(--spacing) * 2);
+        top: calc(var(--spacing) * 2);
         width: auto;
-        margin-top: 0;
-        position-anchor: --memo-tab-panel;
     }
 }
 

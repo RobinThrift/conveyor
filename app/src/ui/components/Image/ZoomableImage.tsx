@@ -14,6 +14,7 @@ export interface ZoomableImageProps {
     id?: string
     alt: string
     src: string
+    pos?: number
 }
 
 export function ZoomableImage(props: ZoomableImageProps) {
@@ -41,6 +42,7 @@ function ZoomableImageInner(props: ZoomableImageProps) {
             id={props.id}
             ref={ref}
             className={clsx("zoomable-image-wrapper", { "is-zoomed": isZoomed }, props.className)}
+            data-pos={props.pos}
         >
             <button
                 type="button"

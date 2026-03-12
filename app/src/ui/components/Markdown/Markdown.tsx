@@ -15,6 +15,7 @@ import { TagLink } from "./TagLink"
 export interface MarkdownProps {
     ref?: React.Ref<HTMLDivElement>
     children: string
+    offset?: number
     className?: string
     id: string
     onDoubleClick?: React.MouseEventHandler<HTMLDivElement>
@@ -38,9 +39,10 @@ export function Markdown(props: MarkdownProps) {
         }
 
         return astToJSX(ast, props.id, props.children, {
+            offset: props.offset,
             componentMap: {
                 Alert,
-                Attachment: Attachment,
+                Attachment,
                 Link,
                 Code,
                 Diagrams: {
@@ -53,7 +55,7 @@ export function Markdown(props: MarkdownProps) {
             },
             customBlocks,
         })
-    }, [props.children, props.id, props.componentMap])
+    }, [props.children, props.offset, props.id, props.componentMap])
 
     return (
         // biome-ignore lint/a11y/noStaticElementInteractions: this is intentional

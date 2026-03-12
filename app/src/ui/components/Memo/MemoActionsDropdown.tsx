@@ -116,7 +116,7 @@ export function MemoActionsDropdown({ memo }: { memo: Memo }) {
 function useMemoActionsDropdown(memo: Memo) {
     return {
         edit: useCallback(() => {
-            actions.memos.startEdit(memo.id)
+            actions.memos.startEdit(memo.id, findStartEditPosition())
             actions.ui.openMemo(memo.id)
         }, [memo.id]),
 
@@ -131,5 +131,58 @@ function useMemoActionsDropdown(memo: Memo) {
                 actions.memos.delete(memo.id)
             }
         }, [memo.id, memo.isDeleted]),
+    }
+}
+
+function findStartEditPosition() {
+    let viewport = {
+        width: window.visualViewport?.width ?? window.screen.width,
+        pageTop: window.visualViewport?.pageTop ?? window.scrollY,
+    }
+
+    let memoBoundingBox = document
+        .querySelector(`.memo-tab-panel[aria-hidden="false"] .memo-tab-panel-memo`)
+        ?.getBoundingClientRect()
+
+    let posX = memoBoundingBox ? memoBoundingBox.x + memoBoundingBox.width / 2 : viewport.width / 2
+    let posY = 10
+
+    let caret = document.caretPositionFromPoint(posX, posY)
+
+    if (!caret) {
+        return {
+            pageTop: viewport.pageTop,
+        }
+    }
+
+    let pos = findParentPos(caret.offsetNode.parentElement)
+
+    let snippet = caret.offsetNode.textContent
+
+    return {
+        pageTop: viewport.pageTop,
+        snippet: snippet?.split("\n")[0].trim(),
+        pos: typeof pos !== "undefined" ? pos + caret.offset : undefined,
+    }
+}
+
+function findParentPos(el?: HTMLElement | null): number | undefined {
+    if (el?.classList.contains("memo-content") || el?.classList.contains("memo-tab-panel-memo")) {
+        return
+    }
+
+    if (!el) {
+        return
+    }
+
+    let pos = el.dataset.pos
+    if (!pos) {
+        return findParentPos(el.parentElement)
+    }
+
+    try {
+        return Number.parseInt(pos, 10)
+    } catch {
+        return
     }
 }

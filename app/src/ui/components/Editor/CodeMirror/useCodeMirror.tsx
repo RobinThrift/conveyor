@@ -1,5 +1,4 @@
-import { SearchCursor } from "@codemirror/search"
-import { Annotation, type ChangeSet, EditorState } from "@codemirror/state"
+import { type ChangeSet, EditorState } from "@codemirror/state"
 import { EditorView, type ViewUpdate } from "@codemirror/view"
 import { type RefObject, useEffect, useMemo, useRef } from "react"
 
@@ -11,11 +10,10 @@ import { extensions } from "./extensions"
 
 export function useCodeMirror({
     ref,
-    id,
     text,
     autoFocus,
-    placeCursorAt,
     autocomplete,
+    placeCursorAt,
     vimModeEnabled,
     onCreateEditor,
     onChange,
@@ -23,15 +21,15 @@ export function useCodeMirror({
 }: {
     ref: RefObject<HTMLDivElement | null>
 
-    id: string
     text: string
 
     autoFocus?: boolean
-    placeCursorAt?: { x: number; y: number; snippet?: string }
 
     autocomplete?: {
         tags?: Tag[]
     }
+
+    placeCursorAt?: { x?: number; y?: number; snippet?: string; pageTop?: number; pos?: number }
 
     vimModeEnabled?: boolean
 
@@ -69,14 +67,6 @@ export function useCodeMirror({
             return
         }
 
-        if (editorState.current) {
-            return () => {
-                editorView.current?.destroy()
-                editorState.current = undefined
-                editorView.current = undefined
-            }
-        }
-
         editorState.current = EditorState.create({
             doc: text,
             extensions: [
@@ -90,67 +80,53 @@ export function useCodeMirror({
             ],
         })
 
+        let { scrollTo, selection } = positionCursor(placeCursorAt)
+
         editorView.current = new EditorView({
             state: editorState.current,
             parent: ref.current,
+            selection: selection ? { anchor: selection } : undefined,
+            scrollTo,
         })
-        onCreateEditor?.(editorView.current)
 
-        if (!placeCursorAt) {
-            return
-        }
-
-        let pos: number | null = null
-        if (placeCursorAt.snippet) {
-            let cursor = new SearchCursor(
-                editorState.current.doc,
-                placeCursorAt.snippet,
-                editorView.current.posAtCoords(placeCursorAt, false) ?? 0,
-                editorState.current.doc.length,
-                (x) => x.toLowerCase(),
-            )
-
-            pos = cursor.next().value?.from
-        }
-
-        if (!pos || pos === -1) {
-            pos = editorView.current.posAtCoords(placeCursorAt, false)
-        }
-
-        if (pos) {
+        if (selection) {
             editorView.current.dispatch({
-                selection: {
-                    anchor: pos,
-                },
-                scrollIntoView: true,
+                selection: { anchor: selection },
             })
         }
-    }, [ref.current, editorState])
+        onCreateEditor?.(editorView.current)
+
+        return () => {
+            editorView.current?.destroy()
+            editorState.current = undefined
+            editorView.current = undefined
+        }
+    }, [])
 
     useEffect(() => {
         if (autoFocus && editorView.current) {
             editorView.current.focus()
         }
     }, [autoFocus])
+}
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: this is intentional
-    useEffect(() => {
-        if (text === undefined) {
-            return
+function positionCursor(placeCursorAt?: {
+    x?: number
+    y?: number
+    snippet?: string
+    pageTop?: number
+    pos?: number
+}): { selection?: number; scrollTo?: ReturnType<typeof EditorView.scrollIntoView> } {
+    if (!placeCursorAt) {
+        return {}
+    }
+
+    if (placeCursorAt.pos) {
+        return {
+            selection: placeCursorAt.pos,
+            scrollTo: EditorView.scrollIntoView(placeCursorAt.pos, { y: "start", yMargin: 20 }),
         }
+    }
 
-        if (!editorView.current) {
-            return
-        }
-
-        let currText = editorState.current?.doc.toString() ?? ""
-        if (text === currText) {
-            return
-        }
-
-        editorView.current?.dispatch({
-            changes: { from: 0, to: currText.length, insert: text },
-            annotations: [Annotation.define<boolean>().of(true)],
-        })
-    }, [id])
+    return {}
 }

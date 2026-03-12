@@ -26,7 +26,7 @@ export interface TextEditorProps {
     content: string
     autoFocus?: boolean
     overrideKeybindings?: boolean
-    placeCursorAt?: { x: number; y: number; snippet?: string }
+    placeCursorAt?: { x?: number; y?: number; snippet?: string; pageTop?: number; pos?: number }
 
     vimModeEnabled?: boolean
 
@@ -58,6 +58,7 @@ export function TextEditor(props: TextEditorProps) {
                     "vim-enabled ": props.vimModeEnabled,
                 })}
                 onCreateEditor={onCreateEditor}
+                placeCursorAt={props.placeCursorAt}
                 vimModeEnabled={props.vimModeEnabled}
                 autocomplete={props.autocomplete}
                 text={props.content}

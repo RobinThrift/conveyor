@@ -23,7 +23,7 @@ export interface EditorProps {
     memo: Memo
 
     autoFocus?: boolean
-    placeCursorAt?: { x: number; y: number; snippet?: string }
+    placeCursorAt?: { x?: number; y?: number; snippet?: string }
 
     onSave: (memo: Memo, changeset: MemoContentChanges) => void
     onCancel?: () => void

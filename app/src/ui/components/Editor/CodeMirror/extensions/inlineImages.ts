@@ -78,7 +78,8 @@ class ImageWidget extends WidgetType {
         if (heightMeta) {
             try {
                 let height = Number.parseInt(heightMeta, 10)
-                this._estimatedHeight = height ?? -1
+                let vpHeight = window.visualViewport?.height ?? window.screen.height
+                this._estimatedHeight = Math.min(height ?? -1, vpHeight / 2)
             } catch {
                 // do nothing
             }
@@ -90,17 +91,19 @@ class ImageWidget extends WidgetType {
     }
 
     eq(widget: WidgetType): boolean {
-        return this._src === (widget as ImageWidget)._src
+        return this._src !== "" && this._src === (widget as ImageWidget)._src
     }
 
     updateDOM(dom: HTMLElement, _: EditorView): boolean {
         dom.className = "cm-img"
         dom.setAttribute("aria-hidden", "true")
+        dom.style.height = CSS.px(this._estimatedHeight).toString()
 
         dom.addEventListener(
             "load",
             () => {
-                this._estimatedHeight = this._dom?.height ?? -1
+                dom.style.height = "auto"
+                this._estimatedHeight = this._dom?.getBoundingClientRect().height ?? -1
             },
             { once: true, passive: true },
         )

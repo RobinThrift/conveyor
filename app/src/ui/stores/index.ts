@@ -124,6 +124,7 @@ export const selectors = {
     memos: {
         get: memos.selectors.get,
         isEditing: memos.selectors.isEditing,
+        startEditAt: memos.selectors.startEditAt,
         isNew: memos.selectors.ieNew,
         list: memoList.selectors,
     },

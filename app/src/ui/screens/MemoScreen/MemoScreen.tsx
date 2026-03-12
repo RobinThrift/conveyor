@@ -46,6 +46,7 @@ export function MemoScreen() {
 function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean }) {
     let memo = useStore(stores.memos.memos, selectors.memos.get(memoID))
     let isEditing = useStore(stores.memos.memos, selectors.memos.isEditing(memoID))
+    let startEditAt = useStore(stores.memos.memos, selectors.memos.startEditAt(memoID))
     let offsetScrollTop = useStore(
         stores.ui.memoTabScrollOffsets,
         (s) => s[memoID]?.scrollOffsetTop ?? 0,
@@ -73,10 +74,10 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
             >
                 <div className="memo-tab-panel-memo">
                     {isEditing ? (
-                        <MemoEditor memo={memo} />
+                        <MemoEditor memo={memo} placeCursorAt={startEditAt} />
                     ) : (
                         <Memo memo={memo}>
-                            {({ id, title, createdAt, body, onDoubleClick }) => (
+                            {({ id, title, createdAt, body, offset, onDoubleClick }) => (
                                 <>
                                     <TopBar>
                                         <CloseMemoTabPanelButton memoID={memoID} />
@@ -86,7 +87,7 @@ function MemoTabPanel({ memoID, isActive }: { memoID: MemoID; isActive: boolean 
                                     </TopBar>
                                     <FloatingMemoTitle createdAt={createdAt} title={title} />
                                     <TOC document={body} id={id} />
-                                    <MemoBody id={id} onDoubleClick={onDoubleClick}>
+                                    <MemoBody id={id} onDoubleClick={onDoubleClick} offset={offset}>
                                         {body}
                                     </MemoBody>
                                 </>
@@ -247,7 +248,7 @@ function CloseMemoTabPanelButton({ memoID }: { memoID: MemoID }) {
 
 function MemoEditor(props: {
     memo: MemoT
-    placeCursorAt?: { x: number; y: number; snippet?: string }
+    placeCursorAt?: { x?: number; y?: number; snippet?: string }
 }) {
     let tags = useStore(stores.tags.tags)
     let isNew = useStore(stores.memos.memos, selectors.memos.isNew(props.memo.id))

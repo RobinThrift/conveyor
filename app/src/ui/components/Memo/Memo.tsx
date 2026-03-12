@@ -17,12 +17,13 @@ export type MemoProps = {
         createdAt: Temporal.ZonedDateTime
         title?: string
         body: string
+        offset?: number
         onDoubleClick?: (e: React.MouseEvent) => void
     }) => React.ReactElement | React.ReactElement[]
 }
 
 export const Memo = React.memo(function Memo(props: MemoProps) {
-    let { ref, title, body, onDoubleClick } = useMemoState(props)
+    let { ref, title, body, offset, onDoubleClick } = useMemoState(props)
 
     return (
         <article
@@ -35,6 +36,7 @@ export const Memo = React.memo(function Memo(props: MemoProps) {
                 createdAt: props.memo.createdAt,
                 title,
                 body,
+                offset,
                 onDoubleClick,
             })}
         </article>
@@ -91,18 +93,25 @@ export const MemoBody = React.memo(function MemBody({
     id,
     title,
     children,
+    offset,
     onDoubleClick,
 }: {
     id: MemoID
     title?: string
     children: string
+    offset?: number
     onDoubleClick?: (e: React.MouseEvent) => void
 }) {
     return (
         <div className="memo-content">
             {title && <h1>{title}</h1>}
             <ErrorBoundary resetOn={[id]}>
-                <Markdown id={id} onDoubleClick={onDoubleClick} componentMap={{ Heading }}>
+                <Markdown
+                    id={id}
+                    offset={offset ?? title?.length}
+                    onDoubleClick={onDoubleClick}
+                    componentMap={{ Heading }}
+                >
                     {children}
                 </Markdown>
             </ErrorBoundary>
@@ -114,7 +123,8 @@ const Heading = React.memo(function Heading({
     level,
     id,
     children,
-}: React.PropsWithChildren<{ id: string; level: number }>) {
+    pos,
+}: React.PropsWithChildren<{ id: string; level: number; pos?: number }>) {
     let H = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
     let ref = useRef<HTMLHeadingElement | null>(null)
 
@@ -167,7 +177,7 @@ const Heading = React.memo(function Heading({
     }, [])
 
     return (
-        <H id={id} ref={ref}>
+        <H id={id} ref={ref} data-pos={pos}>
             <button
                 type="button"
                 className="memo-heading-collapse-button"
@@ -182,7 +192,7 @@ const Heading = React.memo(function Heading({
 })
 
 export function useMemoState(props: { memo: MemoT; doubleClickToEdit?: boolean }) {
-    let { title, body } = splitContent(props.memo.content)
+    let { title, body, offset } = splitContent(props.memo.content)
     let ref = useRef<HTMLElement | null>(null)
 
     let onDoubleClick = useMemo(() => {
@@ -211,6 +221,7 @@ export function useMemoState(props: { memo: MemoT; doubleClickToEdit?: boolean }
         ref,
         title,
         body,
+        offset,
         onDoubleClick,
     }
 }
@@ -243,7 +254,7 @@ function caretPositionFromPoint(
 }
 
 let titleRegexp = /^#\s+.*/
-function splitContent(content: string): { title?: string; body: string } {
+function splitContent(content: string): { title?: string; body: string; offset?: number } {
     let trimmed = content.trim()
     let match = titleRegexp.exec(trimmed)
     if (!match) {
@@ -253,7 +264,7 @@ function splitContent(content: string): { title?: string; body: string } {
     let title = match[0].substring(2)
     let body = trimmed.substring(match.index + 1 + match[0].length)
 
-    return { title, body }
+    return { title, body, offset: content.length - body.length }
 }
 
 declare global {

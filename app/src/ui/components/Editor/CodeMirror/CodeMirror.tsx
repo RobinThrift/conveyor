@@ -14,11 +14,12 @@ export interface CodeMirrorProps {
     text: string
 
     autoFocus?: boolean
-    placeCursorAt?: { x: number; y: number; snippet?: string }
 
     autocomplete?: {
         tags?: Tag[]
     }
+
+    placeCursorAt?: { x?: number; y?: number; snippet?: string; pageTop?: number; pos?: number }
 
     vimModeEnabled?: boolean
 

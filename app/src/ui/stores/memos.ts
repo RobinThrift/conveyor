@@ -14,6 +14,7 @@ type MemoRef = {
     isNew: boolean
     error?: Error
     saveRequest?: MemoSaveRequest
+    startEditAt?: { x?: number; y?: number; snippet?: string; pageTop?: number; pos?: number }
 }
 
 type MemoSaveRequest =
@@ -138,7 +139,10 @@ export const actions = createActions({
         return memo
     },
 
-    startEdit: (memoID: MemoID) => {
+    startEdit: (
+        memoID: MemoID,
+        startEditAt?: { x?: number; y?: number; snippet?: string; pageTop: number; pos?: number },
+    ) => {
         let nextRefs = {
             ...refs.state,
         }
@@ -148,7 +152,7 @@ export const actions = createActions({
             return
         }
 
-        nextRefs[memoID] = { ...ref, state: "editing" }
+        nextRefs[memoID] = { ...ref, startEditAt, state: "editing" }
 
         refs.setState(nextRefs)
     },
@@ -166,7 +170,7 @@ export const actions = createActions({
         if (ref.isNew) {
             delete nextRefs[memoID]
         } else {
-            nextRefs[memoID] = { ...ref, state: "done" }
+            nextRefs[memoID] = { ...ref, startEditAt: undefined, state: "done" }
         }
 
         refs.setState(nextRefs)
@@ -187,6 +191,7 @@ export const actions = createActions({
                     content: memo.content,
                     changes,
                 },
+                startEditAt: undefined,
                 state: "save-requested",
             },
         })
@@ -275,116 +280,14 @@ const _actions = createActions({
     setRef: (ref: MemoRef) => {
         refs.setState({ ...refs.state, [ref.memo.id]: { ...ref } })
     },
-    // appendMemos: (list: MemoList) => {
-    //     memos.setState((prev) => [...prev, ...list.items])
-    //     nextPage.setState(list.next)
-    //     status.setState("done")
-    //     error.setState(undefined)
-    // },
-    //
-    // prepend: (memo: Memo) => {
-    //     memos.setState((prev) => {
-    //         return [memo, ...prev]
-    //     })
-    // },
-    //
-    // setMemo: (memo: Memo) => {
-    //     let index = memos.state.findIndex((m) => m.id === memo.id)
-    //     if (index === -1) {
-    //         return
-    //     }
-    //
-    //     memos.setState((prev) => {
-    //         let next = [...prev]
-    //         next[index] = memo
-    //         return next
-    //     })
-    // },
-    //
-    // removeMemo: (id: MemoID) => {
-    //     memos.setState((prev) => {
-    //         return prev.filter((m) => m.id !== id)
-    //     })
-    // },
-    //
-    // updateMemo: (update: typeof single.lastUpdate.state) => {
-    //     if (!update) {
-    //         return
-    //     }
-    //
-    //     if (update.updated === "isArchived") {
-    //         let isArchivedFilter = filter.state.isArchived
-    //         if (isArchivedFilter && !update.memo.isArchived) {
-    //             _actions.removeMemo(update.memo.id)
-    //         } else if (!isArchivedFilter && update.memo.isArchived) {
-    //             _actions.removeMemo(update.memo.id)
-    //         }
-    //
-    //         return
-    //     }
-    //
-    //     if (update.updated === "isDeleted") {
-    //         let isDeletedFilter = filter.state.isDeleted
-    //         if (isDeletedFilter && !update.memo.isDeleted) {
-    //             _actions.removeMemo(update.memo.id)
-    //         }
-    //
-    //         if (!isDeletedFilter && update.memo.isDeleted) {
-    //             _actions.removeMemo(update.memo.id)
-    //         }
-    //
-    //         return
-    //     }
-    //
-    //     if (update.updated === "content" && update.memo.content?.content) {
-    //         let index = memos.state.findIndex((m) => m.id === update.memo.id)
-    //         if (index === -1) {
-    //             return
-    //         }
-    //
-    //         let memo = { ...memos.state[index] }
-    //         memo.content = update.memo.content?.content
-    //
-    //         memos.setState((prev) => {
-    //             let next = [...prev]
-    //             next[index] = memo
-    //             return next
-    //         })
-    //
-    //         return
-    //     }
-    // },
-    //
-    // setIsLoading: () => {
-    //     status.setState("loading")
-    //     error.setState(undefined)
-    // },
-    //
-    // setError: (err: Error) => {
-    //     status.setState("error")
-    //     error.setState(err)
-    // },
-    //
-    // markListAsOutdated: () => isOutdated.setState(true),
 })
 
 export const selectors = {
     get: (id: MemoID) => (s: typeof refs.state) => s[id].memo,
     isEditing: (id: MemoID) => (s: typeof refs.state) => s[id].state === "editing",
+    startEditAt: (id: MemoID) => (s: typeof refs.state) => s[id].startEditAt,
     ieNew: (id: MemoID) => (s: typeof refs.state) => s[id].isNew,
-    // isLoading: (s: typeof status.state) => s === "loading" || s === "page-requested",
-    // hasNextPage: (n: typeof nextPage.state) => typeof n !== "undefined",
-    // filter:
-    //     <K extends keyof ListMemosQuery>(key: K) =>
-    //     (f: typeof filter.state) =>
-    //         f[key],
 }
-
-// const pageSize = 10
-//
-// class NewerMemosLoadRequestError extends Error {
-//     public [CustomErrCode] = "NewerMemosLoadRequestError"
-// }
 
 export function registerEffects(backend: BackendClient) {
     let createOrUpdateMemo = createMemoCreatorUpdater(backend.memos)
@@ -416,91 +319,9 @@ export function registerEffects(backend: BackendClient) {
         autoMount: true,
     })
 
-    // let loadAbortCntrl: AbortController | undefined
-    //
-    // createEffect("memos/filterFromPageParams", {
-    //     fn: async (_, { batch }) => {
-    //         if (isEqual(filter.prevState, filter.state)) {
-    //             return
-    //         }
-    //         batch(() => {
-    //             memos.setState([])
-    //             nextPage.setState(undefined)
-    //             status.setState("page-requested")
-    //         })
-    //     },
-    //     deps: [filter],
-    //     autoMount: true,
-    // })
-    //
-    // createEffect("memos/load", {
-    //     fn: async (baseCtx: Context, { batch }) => {
-    //         batch(() => _actions.setIsLoading())
-    //
-    //         loadAbortCntrl?.abort(new NewerMemosLoadRequestError())
-    //         loadAbortCntrl = new AbortController()
-    //
-    //         let [ctx, cancel] = baseCtx.withSignal(loadAbortCntrl.signal).withTimeout(Second * 2)
-    //         let [list, err] = await backend.memos.listMemos(ctx, {
-    //             filter: filter.state,
-    //             pagination: {
-    //                 after: nextPage.state,
-    //                 pageSize,
-    //             },
-    //         })
-    //
-    //         err = err || ctx.err()
-    //         cancel()
-    //
-    //         if (err) {
-    //             if (isErr(err, NewerMemosLoadRequestError)) {
-    //                 return
-    //             }
-    //
-    //             batch(() => _actions.setError(err))
-    //             return
-    //         }
-    //
-    //         batch(() => _actions.appendMemos(list))
-    //     },
-    //     deps: [status],
-    //     precondition: () => status.state === "page-requested",
-    //     eager: false,
-    //     autoMount: true,
-    // })
-    // createEffect("memos/addCreatedToList", {
-    //     fn: async (_: Context, { batch }) => {
-    //         let lastCreated = create.lastCreatedMemo.state
-    //         if (!lastCreated) {
-    //             return
-    //         }
-    //
-    //         batch(() => _actions.prepend(lastCreated))
-    //     },
-    //     deps: [create.lastCreatedMemo],
-    //     precondition: () =>
-    //         typeof create.lastCreatedMemo.state !== "undefined" && noActiveFilters(filter.state),
-    //     eager: false,
-    //     autoMount: true,
-    // })
-    //
-    // createEffect("memos/updateMemoInList", {
-    //     fn: async (_: Context, { batch }) => {
-    //         batch(() => _actions.updateMemo(single.lastUpdate.state))
-    //     },
-    //     deps: [single.lastUpdate],
-    //     precondition: () => typeof single.lastUpdate.state !== "undefined",
-    //     eager: false,
-    //     autoMount: true,
-    // })
-
     backend.addEventListener("memos/updated", ({ memo }) => {
         _actions.updateMemo(memo)
     })
-
-    // backend.addEventListener("memos/created", () => {
-    //     _actions.markListAsOutdated()
-    // })
 }
 
 function createMemoCreatorUpdater(backend: BackendClient["memos"]) {
