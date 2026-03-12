@@ -64,8 +64,11 @@ async function main(file: string) {
             output[name] = palette
         }
 
+        // biome-ignore lint/suspicious/noConsole: is output
         console.log(`/* ${mode.toUpperCase()} */`)
+        // biome-ignore lint/suspicious/noConsole: is output
         console.log(outputToCSS(output))
+        // biome-ignore lint/suspicious/noConsole: is output
         console.log("\n")
     }
 }

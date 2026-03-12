@@ -155,6 +155,7 @@ export class Backend {
     private async _handleRequest(
         msg: WorkerRequestMessage<`${keyof typeof this._handlers}/${string}`>,
     ) {
+        // biome-ignore lint/suspicious/noConsole: deubg log
         console.debug("[BACKEND]: received request", msg)
 
         let result: Result<any> = Err(
@@ -190,6 +191,7 @@ export class Backend {
     }
 
     private _handleNofitication(msg: WorkerNotificationMessage<keyof ClientNotifications>) {
+        // biome-ignore lint/suspicious/noConsole: deubg log
         console.debug("[BACKEND]: received notification", msg)
         this._events[msg.action]?.forEach((handler) => {
             queueTask(() => handler(restoreTransferredValue(msg.data)))

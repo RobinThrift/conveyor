@@ -156,6 +156,7 @@ function astNodeToJSX(doc: Document, cursor: SyntaxNodeRef, stripParagraph?: boo
         case "Escape":
         case "HTMLTag":
         case "Subscript":
+            // biome-ignore lint/suspicious/noConsole: intentional logging
             console.debug(
                 `need tohandle node ${cursor.type.name}:`,
                 doc.id,

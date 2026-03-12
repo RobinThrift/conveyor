@@ -203,6 +203,7 @@ export class BackendClient {
     }
 
     private _handleResponse(msg: WorkerResponseMessage) {
+        // biome-ignore lint/suspicious/noConsole: deubg log
         console.debug("[UI]: received response", msg)
         let request = this._requests.get(`${msg.action}/${msg.id}`)
         if (!request) {
@@ -217,6 +218,7 @@ export class BackendClient {
     }
 
     private _handleNofitication(msg: WorkerNotificationMessage<keyof Notifications>) {
+        // biome-ignore lint/suspicious/noConsole: deubg log
         console.debug("[UI]: received notification", msg)
         this._events[msg.action]?.forEach((handler) => {
             queueTask(() => handler(restoreTransferredValue(msg.data as never)))

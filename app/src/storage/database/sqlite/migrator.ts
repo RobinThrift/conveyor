@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noConsole: logs here a important */
 import { privateKeyToDBKey } from "@/external/browser/sqlite/privateKeyToDBKey"
 import type { Context } from "@/lib/context"
 import type { Database, DBExec, Transactioner } from "@/lib/database"

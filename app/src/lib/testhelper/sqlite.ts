@@ -22,6 +22,7 @@ export class SQLite implements Database {
         this._lock = new Lock(`sqlite_${newID()}}`)
 
         this.sqlite3 = sqlite3InitModule({
+            // biome-ignore lint/suspicious/noConsole: intentional log forwarding
             print: (msg) => console.log(msg),
             printErr: (err) => console.error(err),
             locateFile: () => {

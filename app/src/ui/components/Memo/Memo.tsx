@@ -197,6 +197,7 @@ export function useMemoState(props: { memo: MemoT; doubleClickToEdit?: boolean }
 
                 let rect = ref.current?.getBoundingClientRect()
 
+                // biome-ignore lint/suspicious/noConsole: temporary
                 console.log(props.memo.id, {
                     x: e.clientX - (rect?.x ?? 0),
                     y: e.clientY - (rect?.y ?? 0),

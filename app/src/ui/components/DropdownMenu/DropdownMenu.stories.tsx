@@ -254,6 +254,7 @@ export const PreventFocusOnPress: Story = {
                 }
 
                 _logRaf = requestAnimationFrame(() => {
+                    // biome-ignore lint/suspicious/noConsole: in test for debugging
                     console.log("Active Element:", document.activeElement)
                     _logRaf = undefined
                 })

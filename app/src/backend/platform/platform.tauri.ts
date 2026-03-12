@@ -34,6 +34,7 @@ export async function init({ fs }: PlatformInitArgs): Promise<PlatformDependenci
     })
 
     if (__LOG_LEVEL__ === "debug") {
+        // biome-ignore lint/suspicious/noConsole: guarded debug log
         console.debug("Tauri AppConfigDir: ", await appConfigDir())
     }
 

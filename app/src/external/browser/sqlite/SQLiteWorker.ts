@@ -25,6 +25,7 @@ export const SQLiteWorker = createWorker({
         sqlite3Init = (async () => {
             performance.mark("sqlite-worker:init:start")
             let s = await sqlite3InitModule({
+                // biome-ignore lint/suspicious/noConsole: intentional log forwarding
                 print: (msg) => console.log(msg),
                 printErr: (err) => console.error(err),
                 locateFile: () => {
@@ -61,6 +62,7 @@ export const SQLiteWorker = createWorker({
 
         sqlite3 = sqlite3InitValue
 
+        // biome-ignore lint/suspicious/noConsole: debug logging
         console.debug(
             `Opening SQLite3 database (file: ${file}; version: ${sqlite3.version.libVersion})`,
         )
@@ -78,6 +80,7 @@ export const SQLiteWorker = createWorker({
                     : // biome-ignore lint/style/noNonNullAssertion: this must never be null
                       new sqlite3!.oo1.DB(file, flags)
 
+            // biome-ignore lint/suspicious/noConsole: debug logging
             console.debug(
                 // biome-ignore lint/style/noNonNullAssertion: this must never be null
                 "opfs" in sqlite3!
@@ -109,6 +112,7 @@ export const SQLiteWorker = createWorker({
     },
 
     close: async (): AsyncResult<void> => {
+        // biome-ignore lint/suspicious/noConsole: debug logging
         console.debug(`Closing SQLite3 database (version: ${sqlite3?.version.libVersion})`)
 
         return fromThrowing(() => {

@@ -41,7 +41,13 @@
                 "noTemplateCurlyInString": "error",
                 "noOctalEscape": "error",
                 "noUnknownAtRules": "off",
-                "useIterableCallbackReturn": "off"
+                "useIterableCallbackReturn": "off",
+                "noConsole": {
+                    "level": "warn",
+                    "options": {
+                        "allow": ["error"]
+                    }
+                }
             },
             "nursery": {}
         }
