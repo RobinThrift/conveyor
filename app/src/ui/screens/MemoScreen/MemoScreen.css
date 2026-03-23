@@ -469,7 +469,7 @@
     min-height: calc(100% - (var(--spacing)));
 
     .text-editor {
-        @apply flex-1 p-2 tablet:p-4;
+        @apply flex-1 py-2;
     }
 
     .cm-editor {

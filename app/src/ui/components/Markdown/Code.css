@@ -146,7 +146,7 @@
     text-decoration: italic;
 }
 
-.tok-heading {
+code .tok-heading {
     color: var(--code-heading);
     font-weight: bold;
 }

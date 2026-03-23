@@ -4,7 +4,7 @@ import * as process from "node:process"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react-swc"
 import type { GetModuleInfo } from "rollup"
-import { defineConfig, searchForWorkspaceRoot, type UserConfig } from "vite"
+import { defineConfig, searchForWorkspaceRoot, type UserConfig, type Plugin } from "vite"
 import { VitePWA } from "vite-plugin-pwa"
 
 export default defineConfig(async (config): Promise<UserConfig> => {
@@ -71,6 +71,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         },
 
         plugins: [
+            disableCodeMirrorVirtualDom(),
             tailwindcss(),
             react({ devTarget: "es2024" }),
             VitePWA({
@@ -122,7 +123,7 @@ export default defineConfig(async (config): Promise<UserConfig> => {
         ],
 
         optimizeDeps: {
-            exclude: ["@sqlite.org/sqlite-wasm", "bippy"],
+            exclude: ["@sqlite.org/sqlite-wasm", "bippy", "@codemirror/view"],
         },
 
         server: {
@@ -319,5 +320,19 @@ function mermaidPackageName(id: string): string | undefined {
 
     if (/mermaid/.test(id)) {
         return "mermaid"
+    }
+}
+
+// HACK: Disable CodeMirror virtual DOM by replacing VP.Margin with a huge value
+// This forces CodeMirror to render all content instead of virtualising
+// src: https://beyondtheprior.com/post/disable_codemirror_vdom/
+function disableCodeMirrorVirtualDom(): Plugin {
+    return {
+        name: "disable-codemirror-virtual-dom",
+        transform(code, id) {
+            if (id.includes("@codemirror/view")) {
+                return code.replaceAll("1000 /* VP.Margin */", "1e9 /* VP.Margin (CHANGED) */")
+            }
+        },
     }
 }

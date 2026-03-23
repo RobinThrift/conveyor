@@ -117,6 +117,8 @@
 }
 
 .memo-list-tab-panel {
+    @apply xs:pe-2;
+
     .memo-list {
         @media (min-width: 1024px) {
             --pt: max(env(safe-area-inset-top, 0px), calc(var(--spacing)));

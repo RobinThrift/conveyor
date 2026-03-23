@@ -12,7 +12,7 @@
     width: 100%;
 
     @container (width >= 768px) {
-        grid-auto-columns: 50%;
+        grid-template-columns: repeat(2, 1fr);
         --item-max-height: 40cqh;
 
         .memo-list-day,
@@ -22,7 +22,7 @@
     }
 
     @container (width >= 1024px) {
-        grid-auto-columns: 33.3%;
+        grid-template-columns: repeat(3, 1fr);
         --item-max-height: 50cqh;
 
         .memo-list-day,
@@ -32,7 +32,7 @@
     }
 
     @container (width >= 1680px) {
-        grid-auto-columns: 20%;
+        grid-template-columns: repeat(5, 1fr);
         --item-max-height: 45cqh;
         --gap-y: calc(var(--spacing) * 4);
 
@@ -43,7 +43,7 @@
     }
 
     @container (width >= 2100px) {
-        grid-auto-columns: 16.66%;
+        grid-template-columns: repeat(6, 1fr);
         --item-max-height: 40cqh;
 
         .memo-list-day,

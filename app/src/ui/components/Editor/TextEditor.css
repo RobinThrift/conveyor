@@ -43,11 +43,6 @@
 
 .cm-scroller {
     @apply grow font-sans!;
-    /* biome-ignore lint/complexity/noImportantStyles: required to work with codemirror */
-    overflow: visible !important;
-    height: 100%;
-
-    padding-bottom: calc(100dvh - var(--vvp-h));
 }
 
 .vim-enabled .cm-cursor {
@@ -104,6 +99,8 @@
 }
 
 .cm-line:has(.cm-heading-1) {
+    @apply font-semibold;
+    text-wrap: pretty;
     font-size: var(--h1-font-size);
     /* biome-ignore lint/complexity/noImportantStyles: required */
     padding-top: 0 !important;

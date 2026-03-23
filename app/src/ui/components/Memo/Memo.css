@@ -69,7 +69,6 @@
 
 .memo.is-editing {
     min-height: 100%;
-    overflow: hidden;
 }
 
 .memo .memo-date {

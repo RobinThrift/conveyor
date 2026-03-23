@@ -34,6 +34,7 @@ const themeExtension = EditorView.theme({
 
     "& .cm-scroller": {
         height: "100% !important",
+        "padding-bottom": "calc(100dvh/2)",
     },
 
     "& .cm-selectionMatch": {
