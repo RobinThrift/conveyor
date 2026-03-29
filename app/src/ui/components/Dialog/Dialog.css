@@ -44,13 +44,15 @@
 
     @media (min-width: 768px) {
         @apply max-w-3xl;
-        position-area: center;
+        position-area: unset;
+        left: 50%;
+        top: 50%;
+        translate: -50% -50%;
         width: 80svw;
         max-height: 85svh;
         height: revert;
         /* biome-ignore lint/complexity/noImportantStyles: required for reset */
         padding-bottom: revert !important;
-        top: 0;
 
         @starting-style {
             opacity: 0;
