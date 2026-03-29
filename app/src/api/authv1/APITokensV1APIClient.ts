@@ -4,6 +4,7 @@ import type { APIToken, APITokenList } from "@/domain/APIToken"
 import type { Pagination } from "@/domain/Pagination"
 import type { Context } from "@/lib/context"
 import { createErrType } from "@/lib/errors"
+import { temporalToDate } from "@/lib/i18n"
 import { jsonDeserialize, parseJSONDate } from "@/lib/json"
 import { type AsyncResult, fromPromise, Ok, wrapErr } from "@/lib/result"
 import { APIError, UnauthorizedError } from "../apiv1/APIError"
@@ -119,7 +120,10 @@ export class APITokensV1APIClient {
             ctx,
             "POST",
             "/api/auth/v1/apitokens",
-            JSON.stringify(apitoken),
+            JSON.stringify({
+                ...apitoken,
+                expiresAt: temporalToDate(apitoken.expiresAt),
+            }),
         )
         if (createReqErr) {
             return wrapErr`${new APITokensV1APIClient.ErrCreateAPIToken()}: ${createReqErr}`
