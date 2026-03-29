@@ -199,6 +199,7 @@ export function registerEffects(backend: BackendClient) {
                     state: "error",
                     error: err,
                 })
+                error.setState(err)
                 status.setState("done")
                 return
             }
@@ -231,6 +232,7 @@ export function registerEffects(backend: BackendClient) {
                     state: "error",
                     error: err,
                 })
+                error.setState(err)
                 status.setState("done")
                 return
             }
