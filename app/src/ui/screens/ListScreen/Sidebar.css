@@ -84,6 +84,11 @@
         z-index: unset;
         isolation: isolate;
         animation: unset;
+
+        .icon {
+            position: relative;
+            top: -2px;
+        }
     }
 }
 

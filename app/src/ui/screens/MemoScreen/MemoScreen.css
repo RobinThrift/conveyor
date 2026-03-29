@@ -1,6 +1,7 @@
 .memo-screen {
     @apply hidden flex-1 relative;
     --overflow-mask-z: 100;
+    --max-content-width: 1024px;
 
     min-height: 100dvh;
 
@@ -14,6 +15,23 @@
     translate: 0 var(--dragging-memo-tab-scroll-top, 0);
     @media (min-width: 768px) {
         --overflow-mask-height: calc(env(safe-area-inset-top, 0px) + 1lh);
+    }
+
+    @container (width >= 768px) {
+        position-anchor: --memo-tab-panel;
+        left: calc(
+            anchor(left) -
+            var(--spacing) *
+            6 +
+            var(--max-content-width) /
+            2 -
+            anchor(left)
+        );
+        right: calc(anchor(right) + var(--spacing) * 3);
+
+        .overflow-mask-item {
+            max-width: var(--max-content-width);
+        }
     }
 }
 
@@ -143,6 +161,10 @@
         env(safe-area-inset-bottom, 0px),
         calc(var(--spacing) * 3)
     );
+
+    @container (width >= 1224px) {
+        @apply pt-2;
+    }
 
     .memo-content {
         @apply px-2;
@@ -297,9 +319,10 @@
     inset: unset;
     overflow: clip;
     z-index: 10000;
+    transition-behavior: allow-discrete;
     transition-property: height, width, opacity, border-radius;
     transition-duration: 400ms, 300ms, 150ms, 200ms;
-    transition-delay: 0ms, 0ms, 0ms, 100ms;
+    transition-delay: 0ms, 50ms, 0ms, 100ms;
     transition-timing-function: linear(
         0,
         0.012 0.9%,
@@ -322,12 +345,13 @@
     right: anchor(right);
     translate: 0 -100%;
     interpolate-size: allow-keywords;
+    width: anchor-size(width);
 
     &:popover-open {
         @apply p-2 rounded-2xl surface-level-2 elevation-1;
         min-height: 20svh;
         height: min-content;
-        width: 95svw;
+        width: min(95svw, 600px);
         opacity: 1;
 
         .toc-item .toc-items {
@@ -355,6 +379,7 @@
         &:popover-open {
             @apply pt-0;
             border-radius: 100%;
+            min-height: unset;
             width: anchor-size(width);
             height: anchor-size(height);
             top: anchor(bottom);
@@ -444,12 +469,18 @@
 
     & > svg {
         @apply size-5;
+        transition: opacity 100ms;
+        opacity: 1;
         filter: drop-shadow(1px 1px 3px var(--color-body-bg-contrast));
     }
 
     @container (width >= 1400px) {
         @apply hidden;
     }
+}
+
+.memo-screen:has(.toc:popover-open) .toc-mobile-trigger > svg {
+    opacity: 0;
 }
 
 @keyframes memo-toc-desktop-hover-show {

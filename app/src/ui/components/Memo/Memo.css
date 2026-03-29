@@ -19,7 +19,7 @@
 }
 
 .memo .memo-header {
-    @apply flex flex-wrap py-2 px-1;
+    @apply flex flex-wrap pb-2 px-1;
 
     .btn {
         @apply rounded-full aspect-square;
@@ -41,7 +41,7 @@
     }
 
     .memo-date {
-        @apply flex-1 flex items-center;
+        @apply flex-1 flex items-center mb-2;
         order: 2;
     }
 
@@ -60,6 +60,7 @@
         }
 
         .memo-date {
+            @apply mb-0;
             flex: unset;
             display: block;
             order: 4;
@@ -82,7 +83,7 @@
 
 .memo.no-title .memo-date {
     time {
-        @apply text-inherit not-italic font-semibold;
+        @apply text-inherit not-italic font-semibold -mt-1 sm:mt-0;
         font-size: var(--h4-font-size);
     }
 }

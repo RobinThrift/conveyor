@@ -8,7 +8,7 @@ import type { MemoID, Memo as MemoT } from "@/domain/Memo"
 import { useAttachmentTransferer } from "@/ui/attachments"
 import { Button } from "@/ui/components/Button"
 import { Editor } from "@/ui/components/Editor"
-import { XIcon } from "@/ui/components/Icons"
+import { CaretLeftIcon, XIcon } from "@/ui/components/Icons"
 import { TOC } from "@/ui/components/Markdown/TOC"
 import {
     Memo,
@@ -241,7 +241,17 @@ function CloseMemoTabPanelButton({ memoID }: { memoID: MemoID }) {
 
     return (
         <div className="memo-tab-panel-close-btn">
-            <Button type="button" onClick={onClick} iconRight={<XIcon />} aria-label={t.Close} />
+            <Button
+                type="button"
+                onClick={onClick}
+                iconRight={
+                    <>
+                        <XIcon className="hidden sm:flex" />
+                        <CaretLeftIcon className="sm:hidden" />
+                    </>
+                }
+                aria-label={t.Close}
+            />
         </div>
     )
 }
