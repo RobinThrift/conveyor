@@ -276,7 +276,10 @@ export function registerEffects(backend: BackendClient) {
             (firstDay && Temporal.ZonedDateTime.compare(firstDay, memo.createdAt) < 0) ||
             memo.createdAt.toPlainDate().toJSON() in listItems.state
         ) {
-            batch(() => _actions.addMemoToList(memo))
+            batch(() => {
+                memos.actions.addMemoRefs([memo])
+                _actions.addMemoToList(memo)
+            })
             return
         }
 
