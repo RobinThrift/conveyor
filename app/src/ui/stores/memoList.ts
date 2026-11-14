@@ -1,4 +1,4 @@
-import type { Temporal } from "temporal-polyfill"
+import { Temporal } from "temporal-polyfill"
 
 import type { BackendClient } from "@/backend/BackendClient"
 import type { ListMemosQuery, Memo, MemoID, MemoList } from "@/domain/Memo"
@@ -273,7 +273,7 @@ export function registerEffects(backend: BackendClient) {
         let firstDay = Object.values(listItems.state).at(0)?.date
         if (
             !firstDay ||
-            (firstDay && firstDay < memo.createdAt) ||
+            (firstDay && Temporal.ZonedDateTime.compare(firstDay, memo.createdAt) < 0) ||
             memo.createdAt.toPlainDate().toJSON() in listItems.state
         ) {
             batch(() => _actions.addMemoToList(memo))
