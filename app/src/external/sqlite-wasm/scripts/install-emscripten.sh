@@ -16,9 +16,9 @@ fi
 
 cd /emsdk;
 
-./emsdk install latest;
+./emsdk install 5.0.7;
 
-./emsdk activate latest;
+./emsdk activate 5.0.7;
 
 source ./emsdk_env.sh
 

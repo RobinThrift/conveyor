@@ -6,7 +6,7 @@ set -o pipefail
 OUTDIR="/out"
 OPENSSL_DIR="/openssl-src"
 
-/emsdk/emsdk activate latest
+/emsdk/emsdk activate 5.0.7;
 
 source /emsdk/emsdk_env.sh
 

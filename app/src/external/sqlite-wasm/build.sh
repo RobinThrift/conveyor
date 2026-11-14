@@ -15,7 +15,7 @@ docker run --rm \
     -v `pwd`/build:/out \
     -e OPENSSL_VERSION="$OPENSSL_VERSION" \
     -e SQLCIPHER_VERSION="$SQLCIPHER_VERSION" \
-    debian:12-slim \
+    debian:13-slim \
     /scripts/build.sh;
 
 cp patches/index.mjs build/index.mjs;
